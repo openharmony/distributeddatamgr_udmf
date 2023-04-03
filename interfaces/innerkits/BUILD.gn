@@ -1,0 +1,83 @@
+# Copyright (C) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+import("//foundation/distributeddatamgr/udmf/udmf.gni")
+
+config("udmf_client_config") {
+  include_dirs = [
+    "${udmf_interfaces_path}/innerkits/client",
+    "${udmf_interfaces_path}/innerkits/common",
+    "${udmf_interfaces_path}/innerkits/data",
+
+    "${udmf_framework_path}/common",
+    "${udmf_framework_path}/manager",
+    "${udmf_framework_path}/manager/container",
+    "${udmf_framework_path}/manager/store",
+    "${udmf_framework_path}/manager/preprocess",
+    "${udmf_framework_path}/service",
+    "${kv_store_path}/frameworks/common",
+
+    "//third_party/libuv/include",
+    "//third_party/node/src",
+    "//commonlibrary/c_utils/base/include",
+  ]
+}
+
+ohos_shared_library("udmf_client") {
+  sources = [
+    "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
+    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/video.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "${udmf_framework_path}/common/udmf_types_util.cpp",
+    "${udmf_framework_path}/manager/container/base_data_container.cpp",
+    "${udmf_framework_path}/manager/container/runtime_data_container.cpp",
+    "${udmf_framework_path}/manager/preprocess/preprocess_utils.cpp",
+    "${udmf_framework_path}/manager/store/base_data_store.cpp",
+    "${udmf_framework_path}/manager/store/runtime_data_store.cpp",
+    "${udmf_framework_path}/manager/data_manager.cpp",
+    "${udmf_framework_path}/service/udmf_service_client.cpp",
+    "${udmf_framework_path}/service/udmf_service_proxy.cpp",
+  ]
+  public_configs = [ ":udmf_client_config" ]
+
+  deps = [
+    "//foundation/filemanagement/app_file_service/interfaces/innerkits/remote_file_share/native:remote_file_share_native",
+  ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
+    "os_account:os_account_innerkits",
+    "samgr:samgr_proxy",
+  ]
+
+  subsystem_name = "distributeddatamgr"
+  part_name = "udmf"
+}
