@@ -49,12 +49,6 @@ std::string File::GetRemoteUri() const
 void File::SetRemoteUri(const std::string &uri)
 {
     this->remoteUri_ = uri;
-    this->isConversedToRemote_ = true;
-}
-
-bool File::HasRemoteUri() const
-{
-    return this->isConversedToRemote_;
 }
 } // namespace UDMF
 } // namespace OHOS

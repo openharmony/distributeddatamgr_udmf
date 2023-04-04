@@ -31,10 +31,8 @@ public:
 
     std::string GetRemoteUri() const;
     void SetRemoteUri(const std::string &uri);
-    bool HasRemoteUri() const;
 
 protected:
-    bool isConversedToRemote_{ false };
     std::string oriUri_;
     std::string remoteUri_;
 };
