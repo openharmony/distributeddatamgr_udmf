@@ -41,6 +41,7 @@ public:
     virtual int32_t GetData(QueryOption &query, UnifiedData &unifiedData) = 0;
     virtual int32_t GetSummary(QueryOption &query, Summary &summary) = 0;
     virtual int32_t AddPrivilege(QueryOption &query, Privilege &privilege) = 0;
+    virtual int32_t Sync(const QueryOption &query, const std::vector<std::string> &devices) = 0;
 
 protected:
     enum FCode {
@@ -49,6 +50,7 @@ protected:
         GET_DATA,
         GET_SUMMARY,
         ADD_PRIVILEGE,
+        SYNC,
         CODE_BUTT
     };
 };

@@ -21,11 +21,11 @@ config("udmf_client_config") {
 
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/manager",
-    "${udmf_framework_path}/manager/container",
     "${udmf_framework_path}/manager/store",
     "${udmf_framework_path}/manager/preprocess",
     "${udmf_framework_path}/service",
     "${kv_store_path}/frameworks/common",
+    "${kv_store_path}/frameworks/libs/distributeddb/interfaces/include",
 
     "//third_party/libuv/include",
     "//third_party/node/src",
@@ -52,11 +52,9 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
-    "${udmf_framework_path}/manager/container/base_data_container.cpp",
-    "${udmf_framework_path}/manager/container/runtime_data_container.cpp",
     "${udmf_framework_path}/manager/preprocess/preprocess_utils.cpp",
-    "${udmf_framework_path}/manager/store/base_data_store.cpp",
-    "${udmf_framework_path}/manager/store/runtime_data_store.cpp",
+    "${udmf_framework_path}/manager/store/store_cache.cpp",
+    "${udmf_framework_path}/manager/store/runtime_store.cpp",
     "${udmf_framework_path}/manager/data_manager.cpp",
     "${udmf_framework_path}/service/udmf_service_client.cpp",
     "${udmf_framework_path}/service/udmf_service_proxy.cpp",
@@ -64,6 +62,7 @@ ohos_shared_library("udmf_client") {
   public_configs = [ ":udmf_client_config" ]
 
   deps = [
+    "//foundation/distributeddatamgr/kv_store/frameworks/libs/distributeddb:distributeddb",
     "//foundation/filemanagement/app_file_service/interfaces/innerkits/remote_file_share/native:remote_file_share_native",
   ]
 

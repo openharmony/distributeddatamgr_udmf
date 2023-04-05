@@ -15,7 +15,6 @@
 
 #include "data_manager.h"
 
-#include "data_mgr_meta.h"
 #include "logger.h"
 #include "preprocess_utils.h"
 
@@ -24,13 +23,10 @@ namespace UDMF {
 const std::string MSDP_PROCESS_NAME = "msdp_sa";
 DataManager::DataManager()
 {
-    storeMap_[UD_INTENTION_MAP.at(UD_INTENTION_DRAG)] = std::make_shared<RuntimeDataStore>();
     authorizationMap_[UD_INTENTION_MAP.at(UD_INTENTION_DRAG)] = MSDP_PROCESS_NAME;
 }
 
-DataManager::~DataManager()
-{
-}
+DataManager::~DataManager() {}
 
 DataManager &DataManager::GetInstance()
 {
@@ -41,34 +37,76 @@ DataManager &DataManager::GetInstance()
 int32_t DataManager::SaveData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
 {
     if (unifiedData.GetRecords().empty()) {
-        LOG_ERROR(UDMF_FRAMEWORK, "invalid parameters, have no record");
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid parameters, have no record");
         return E_INVALID_PARAMETERS;
     }
+
     if (!UnifiedDataUtils::IsValidIntention(option.intention)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "invalid parameters %{public}d", option.intention);
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid parameters intention: %{public}d.", option.intention);
         return E_INVALID_PARAMETERS;
     }
-    std::shared_ptr<BaseDataStore> store = storeMap_[UD_INTENTION_MAP.at(option.intention)];
-    return store->SaveData(option, unifiedData, key);
+
+    // imput runtime info before put it into store
+    PreProcessUtils utils = PreProcessUtils::GetInstance();
+    if (!utils.RuntimeDataImputation(unifiedData, option)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Imputation failed, %{public}s", utils.errorStr.c_str());
+        return E_UNKNOWN;
+    }
+    for (const auto &record : unifiedData.GetRecords()) {
+        record->SetUid(PreProcessUtils::GetInstance().IdGenerator());
+    }
+
+    std::string intention = unifiedData.GetRuntime()->key.intention;
+    auto store = storeCache_.GetStore(intention);
+    if (store == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Get store failed, intention: %{public}s.", intention.c_str());
+        return E_DB_ERROR;
+    }
+
+    if (!store->Clear()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Clear store failed, intention: %{public}s.", intention.c_str());
+        return E_DB_ERROR;
+    }
+
+    if (store->Put(unifiedData) != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Put unified data failed, intention: %{public}s.", intention.c_str());
+        return E_DB_ERROR;
+    }
+    key = unifiedData.GetRuntime()->key.GetUnifiedKey();
+    return E_OK;
 }
 
 int32_t DataManager::RetrieveData(QueryOption &query, UnifiedData &unifiedData)
 {
     UnifiedKey key(query.key);
-    std::shared_ptr<BaseDataStore> store = GetStore(key);
-    if (store == nullptr) {
-        LOG_ERROR(UDMF_FRAMEWORK, "invalid parameters %{public}s", key.key.c_str());
+    if (!key.IsValid()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Unified key: %{public}s is invalid.", query.key.c_str());
         return E_INVALID_PARAMETERS;
     }
-    int32_t res = store->RetrieveData(key, unifiedData);
+
+    auto store = storeCache_.GetStore(key.intention);
+    if (store == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Get store failed, intention: %{public}s.", key.intention.c_str());
+        return E_DB_ERROR;
+    }
+
+    UnifiedData tmpData;
+    int32_t res = store->Get(key, tmpData);
     if (res != E_OK) {
-        LOG_ERROR(UDMF_FRAMEWORK, "error cur when read from container");
+        LOG_ERROR(UDMF_FRAMEWORK, "Get data from store failed, intention: %{public}s.", key.intention.c_str());
         return res;
     }
-    std::shared_ptr<Runtime> runtime = unifiedData.GetRuntime();
+
+    std::shared_ptr<Runtime> runtime = tmpData.GetRuntime();
     if (runtime->privilege.pid != query.pid) {
-        LOG_ERROR(UDMF_FRAMEWORK, "invalid caller");
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid caller, intention: %{public}s.", key.intention.c_str());
         return E_INVALID_OPERATION;
+    }
+    unifiedData = tmpData;
+
+    if (store->Delete(key) != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Remove data failed, intention: %{public}s.", key.intention.c_str());
+        return E_DB_ERROR;
     }
     return E_OK;
 }
@@ -76,48 +114,90 @@ int32_t DataManager::RetrieveData(QueryOption &query, UnifiedData &unifiedData)
 int32_t DataManager::GetSummary(QueryOption &query, Summary &summary)
 {
     UnifiedKey key(query.key);
-    std::shared_ptr<BaseDataStore> store = GetStore(key);
-    if (store == nullptr) {
-        LOG_ERROR(UDMF_FRAMEWORK, "invalid parameters %{public}s", key.key.c_str());
+    if (!key.IsValid()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Unified key: %{public}s is invalid.", query.key.c_str());
         return E_INVALID_PARAMETERS;
     }
-    return store->RetrieveDataAbstract(key, summary);
+
+    auto store = storeCache_.GetStore(key.intention);
+    if (store == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Get store failed, intention: %{public}s.", key.intention.c_str());
+        return E_DB_ERROR;
+    }
+
+    if (store->GetSummary(key, summary) != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Store get summary failed, intention: %{public}s.", key.intention.c_str());
+        return E_DB_ERROR;
+    }
+    return E_OK;
 }
 
 int32_t DataManager::AddPrivilege(QueryOption &query, Privilege &privilege)
 {
+    UnifiedKey key(query.key);
+    if (!key.IsValid()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Unified key: %{public}s is invalid.", query.key.c_str());
+        return E_INVALID_PARAMETERS;
+    }
+
     std::string processName;
     PreProcessUtils utils = PreProcessUtils::GetInstance();
     if (!utils.GetNativeProcessNameByToken(query.tokenId, processName)) {
         LOG_ERROR(UDMF_FRAMEWORK, "%{public}s", utils.errorStr.c_str());
         return E_UNKNOWN;
     }
-    UnifiedKey key(query.key);
-    std::shared_ptr<BaseDataStore> store = GetStore(key);
+
     if (processName != authorizationMap_[key.intention]) {
-        LOG_ERROR(UDMF_FRAMEWORK, "process: %{public}s have no permission", processName.c_str());
+        LOG_ERROR(UDMF_FRAMEWORK, "Process: %{public}s have no permission", processName.c_str());
         return E_FORBIDDEN;
     }
+
+    auto store = storeCache_.GetStore(key.intention);
     if (store == nullptr) {
-        LOG_ERROR(UDMF_FRAMEWORK, "invalid parameters %{public}s", key.key.c_str());
+        LOG_ERROR(UDMF_FRAMEWORK, "Get store failed, intention: %{public}s.", key.intention.c_str());
+        return E_DB_ERROR;
+    }
+
+    UnifiedData data;
+    int32_t res = store->Get(key, data);
+    if (res != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Get data from store failed, intention: %{public}s.", key.intention.c_str());
+        return res;
+    }
+
+    if (data.GetRecords().empty()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid parameters, unified data has no record, intention: %{public}s.",
+            key.intention.c_str());
         return E_INVALID_PARAMETERS;
     }
-    return store->AddPrivilege(key, privilege);
+
+    data.GetRuntime()->privilege = privilege;
+    if (store->Update(data) != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Update unified data failed, intention: %{public}s.", key.intention.c_str());
+        return E_DB_ERROR;
+    }
+    return E_OK;
 }
 
-std::shared_ptr<BaseDataStore> DataManager::GetStore(UnifiedKey &key)
+int32_t DataManager::Sync(const QueryOption &query, const std::vector<std::string> &devices)
 {
+    UnifiedKey key(query.key);
     if (!key.IsValid()) {
-        LOG_ERROR(UDMF_FRAMEWORK, "invalid key");
-        return nullptr;
+        LOG_ERROR(UDMF_FRAMEWORK, "Unified key: %{public}s is invalid.", query.key.c_str());
+        return E_INVALID_PARAMETERS;
     }
 
-    auto storeIt = storeMap_.find(key.intention);
-    if (storeIt == storeMap_.end()) {
-        LOG_ERROR(UDMF_FRAMEWORK, "invalid intention");
-        return nullptr;
+    auto store = storeCache_.GetStore(key.intention);
+    if (store == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Get store failed, intention: %{public}s.", key.intention.c_str());
+        return E_DB_ERROR;
     }
-    return storeIt->second;
+
+    if (store->Sync(devices) != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Store sync failed, intention: %{public}s.", key.intention.c_str());
+        return E_DB_ERROR;
+    }
+    return E_OK;
 }
 } // namespace UDMF
 } // namespace OHOS

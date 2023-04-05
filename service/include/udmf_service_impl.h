@@ -34,6 +34,7 @@ public:
     int32_t GetData(QueryOption &query, UnifiedData &unifiedData) override;
     int32_t GetSummary(QueryOption &query, Summary &summary) override;
     int32_t AddPrivilege(QueryOption &query, Privilege &privilege) override;
+    int32_t Sync(const QueryOption &query, const std::vector<std::string> &devices) override;
 
 private:
     class Factory {

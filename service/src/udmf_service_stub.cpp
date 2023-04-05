@@ -33,6 +33,7 @@ UdmfServiceStub::UdmfServiceStub()
     memberFuncMap_[static_cast<uint32_t>(GET_DATA)] = &UdmfServiceStub::OnGetData;
     memberFuncMap_[static_cast<uint32_t>(GET_SUMMARY)] = &UdmfServiceStub::OnGetSummary;
     memberFuncMap_[static_cast<uint32_t>(ADD_PRIVILEGE)] = &UdmfServiceStub::OnAddPrivilege;
+    memberFuncMap_[static_cast<uint32_t>(SYNC)] = &UdmfServiceStub::OnSync;
 }
 
 UdmfServiceStub::~UdmfServiceStub()
@@ -70,7 +71,7 @@ int32_t UdmfServiceStub::OnSetData(MessageParcel &data, MessageParcel &reply)
     UnifiedData unifiedData;
     if (!ITypesUtil::Unmarshal(data, customOption, unifiedData)) {
         LOG_ERROR(UDMF_SERVICE, "Unmarshal option");
-        return E_INVALID_VALUE;
+        return IPC_STUB_INVALID_DATA_ERR;
     }
     int32_t token = static_cast<int>(IPCSkeleton::GetCallingTokenID());
     customOption.tokenId = token;
@@ -78,7 +79,7 @@ int32_t UdmfServiceStub::OnSetData(MessageParcel &data, MessageParcel &reply)
     int32_t status = SetData(customOption, unifiedData, key);
     if (!ITypesUtil::Marshal(reply, status, key)) {
         LOG_ERROR(UDMF_SERVICE, "Marshal key: %{public}s", key.c_str());
-        return E_WRITE_PARCEL_ERROR;
+        return IPC_STUB_WRITE_PARCEL_ERR;
     }
     return E_OK;
 }
@@ -89,7 +90,7 @@ int32_t UdmfServiceStub::OnGetData(MessageParcel &data, MessageParcel &reply)
     QueryOption query;
     if (!ITypesUtil::Unmarshal(data, query)) {
         LOG_ERROR(UDMF_SERVICE, "Unmarshal query");
-        return E_INVALID_VALUE;
+        return IPC_STUB_INVALID_DATA_ERR;
     }
     int32_t token = static_cast<int>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
@@ -99,7 +100,7 @@ int32_t UdmfServiceStub::OnGetData(MessageParcel &data, MessageParcel &reply)
     int32_t status = GetData(query, unifiedData);
     if (!ITypesUtil::Marshal(reply, status, unifiedData)) {
         LOG_ERROR(UDMF_SERVICE, "Marshal ud data, key: %{public}s", query.key.c_str());
-        return E_WRITE_PARCEL_ERROR;
+        return IPC_STUB_WRITE_PARCEL_ERR;
     }
     return E_OK;
 }
@@ -110,7 +111,7 @@ int32_t UdmfServiceStub::OnGetSummary(MessageParcel &data, MessageParcel &reply)
     QueryOption query;
     if (!ITypesUtil::Unmarshal(data, query)) {
         LOG_ERROR(UDMF_SERVICE, "Unmarshal query");
-        return E_INVALID_VALUE;
+        return IPC_STUB_INVALID_DATA_ERR;
     }
     int32_t token = static_cast<int>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
@@ -118,7 +119,7 @@ int32_t UdmfServiceStub::OnGetSummary(MessageParcel &data, MessageParcel &reply)
     int32_t status = GetSummary(query, summary);
     if (!ITypesUtil::Marshal(reply, status, summary)) {
         LOG_ERROR(UDMF_SERVICE, "Marshal summary, key: %{public}s", query.key.c_str());
-        return E_WRITE_PARCEL_ERROR;
+        return IPC_STUB_WRITE_PARCEL_ERR;
     }
     return E_OK;
 }
@@ -130,14 +131,33 @@ int32_t UdmfServiceStub::OnAddPrivilege(MessageParcel &data, MessageParcel &repl
     Privilege privilege;
     if (!ITypesUtil::Unmarshal(data, query, privilege)) {
         LOG_ERROR(UDMF_SERVICE, "Unmarshal query and privilege");
-        return E_INVALID_VALUE;
+        return IPC_STUB_INVALID_DATA_ERR;
     }
-    int32_t token = static_cast<int>(IPCSkeleton::GetCallingTokenID());
+    int32_t token = static_cast<int32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
     int32_t status = AddPrivilege(query, privilege);
     if (!ITypesUtil::Marshal(reply, status)) {
         LOG_ERROR(UDMF_SERVICE, "Marshal status, key: %{public}s", query.key.c_str());
-        return E_WRITE_PARCEL_ERROR;
+        return IPC_STUB_WRITE_PARCEL_ERR;
+    }
+    return E_OK;
+}
+
+int32_t UdmfServiceStub::OnSync(MessageParcel &data, MessageParcel &reply)
+{
+    LOG_INFO(UDMF_SERVICE, "start");
+    QueryOption query;
+    std::vector<std::string> devices;
+    if (!ITypesUtil::Unmarshal(data, query, devices)) {
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal query and devices");
+        return IPC_STUB_INVALID_DATA_ERR;
+    }
+    int32_t token = static_cast<int>(IPCSkeleton::GetCallingTokenID());
+    query.tokenId = token;
+    int32_t status = Sync(query, devices);
+    if (!ITypesUtil::Marshal(reply, status)) {
+        LOG_ERROR(UDMF_SERVICE, "Marshal status, key: %{public}s", query.key.c_str());
+        return IPC_STUB_WRITE_PARCEL_ERR;
     }
     return E_OK;
 }

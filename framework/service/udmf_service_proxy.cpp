@@ -129,6 +129,24 @@ int32_t UdmfServiceProxy::AddPrivilege(QueryOption &query, Privilege &privilege)
     return status;
 }
 
+int32_t UdmfServiceProxy::Sync(const QueryOption &query, const std::vector<std::string> &devices)
+{
+    LOG_INFO(UDMF_SERVICE, "start, key: %{public}s", query.key.c_str());
+    UnifiedKey key(query.key);
+    if (!key.IsValid()) {
+        LOG_ERROR(UDMF_SERVICE, "invalid key");
+        return E_INVALID_PARAMETERS;
+    }
+    MessageParcel reply;
+    int32_t status = IPC_SEND(SYNC, reply, query, devices);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s", status, query.key.c_str());
+    }
+    LOG_DEBUG(UDMF_SERVICE, "end.");
+    return status;
+}
+
+
 int32_t UdmfServiceProxy::SendRequest(
     IUdmfService::FCode code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -138,7 +156,7 @@ int32_t UdmfServiceProxy::SendRequest(
     }
     int err = remote->SendRequest(code, data, reply, option);
     LOG_DEBUG(UDMF_SERVICE, "err: %{public}d", err);
-    return E_OK;
+    return err;
 }
 } // namespace UDMF
 } // namespace OHOS

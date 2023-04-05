@@ -40,6 +40,7 @@ private:
     int32_t OnGetData(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSummary(MessageParcel &data, MessageParcel &reply);
     int32_t OnAddPrivilege(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSync(MessageParcel &data, MessageParcel &reply);
 
     bool VerifyPermission(const std::string &permission);
 

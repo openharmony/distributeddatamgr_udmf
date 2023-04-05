@@ -97,5 +97,11 @@ int32_t UdmfServiceClient::AddPrivilege(QueryOption &query, Privilege &privilege
     LOG_INFO(UDMF_SERVICE, "start");
     return udmfProxy_->AddPrivilege(query, privilege);
 }
+
+int32_t UdmfServiceClient::Sync(const QueryOption &query, const std::vector<std::string> &devices)
+{
+    LOG_INFO(UDMF_SERVICE, "start");
+    return udmfProxy_->Sync(query, devices);
+}
 } // namespace UDMF
 } // namespace OHOS

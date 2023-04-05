@@ -21,9 +21,8 @@
 #include <mutex>
 #include <vector>
 
-#include "base_data_store.h"
 #include "error_code.h"
-#include "runtime_data_store.h"
+#include "store_cache.h"
 #include "unified_data.h"
 #include "unified_types.h"
 
@@ -39,12 +38,11 @@ public:
     int32_t RetrieveData(QueryOption &query, UnifiedData &unifiedData);
     int32_t GetSummary(QueryOption &query, Summary &summary);
     int32_t AddPrivilege(QueryOption &query, Privilege &privilege);
+    int32_t Sync(const QueryOption &query, const std::vector<std::string> &devices);
 
 private:
     DataManager();
-    std::shared_ptr<BaseDataStore> GetStore(UnifiedKey &key);
-    std::mutex mapLock_;
-    std::map<std::string, std::shared_ptr<BaseDataStore>> storeMap_;
+    StoreCache storeCache_;
     std::map<std::string, std::string> authorizationMap_;
 };
 } // namespace UDMF

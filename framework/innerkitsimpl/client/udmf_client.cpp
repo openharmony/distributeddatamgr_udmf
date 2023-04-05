@@ -78,5 +78,18 @@ Status UdmfClient::AddPrivilege(QueryOption &query, Privilege &privilege)
     int32_t ret = service->AddPrivilege(query, privilege);
     return static_cast<Status>(ret);
 }
+
+Status UdmfClient::Sync(const QueryOption &query, const std::vector<std::string> &devices)
+{
+    LOG_INFO(UDMF_CLIENT, "start.");
+    auto service = UdmfServiceClient::GetInstance();
+    if (service == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        return E_ERROR;
+    }
+
+    int32_t ret = service->Sync(query, devices);
+    return static_cast<Status>(ret);
+}
 } // namespace UDMF
 } // namespace OHOS

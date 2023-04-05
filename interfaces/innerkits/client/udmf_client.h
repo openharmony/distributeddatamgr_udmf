@@ -17,6 +17,7 @@
 #define UDMF_CLIENT_H
 
 #include <string>
+#include <vector>
 
 #include "unified_data.h"
 #include "error_code.h"
@@ -33,6 +34,7 @@ public:
     Status GetData(QueryOption &query, UnifiedData &unifiedData);
     Status GetSummary(QueryOption &query, Summary& summary);
     Status AddPrivilege(QueryOption &query, Privilege &privilege);
+    Status Sync(const QueryOption &query, const std::vector<std::string> &devices);
 };
 } // namespace UDMF
 } // namespace OHOS

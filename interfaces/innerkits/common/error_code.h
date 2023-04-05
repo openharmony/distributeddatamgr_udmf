@@ -41,6 +41,7 @@ enum Status : int32_t {
     E_OUT_OF_RANGE,
     E_NO_PERMISSION,
     E_INVALID_PARAMETERS,
+    E_DB_ERROR,
     E_TIMEOUT,
     E_CANCELED,
     E_EXCEEDS_LIMIT,

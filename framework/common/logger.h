@@ -28,6 +28,7 @@ enum UdmfSubModule {
     UDMF_KITS_NAPI,     // for udmf napi kits module
     UDMF_CLIENT,        // for udmf client module
     UDMF_SERVICE,       // for udmf service module
+    UDMF_TEST,          // for udmf test module
 };
 
 // 0xD001600: subsystem:distributeddatamgr module:udmf, 8 bits reserved.
@@ -39,14 +40,16 @@ enum UDMFDomainId {
     UDMF_KITS_NAPI_DOMAIN,
     UDMF_CLIENT_DOMAIN,
     UDMF_SERVICE_DOMAIN,
+    UDMF_TEST_DOMAIN,
 };
 
-static constexpr OHOS::HiviewDFX::HiLogLabel UDMF_LABEL[UDMF_SERVICE + 1] = {
+static constexpr OHOS::HiviewDFX::HiLogLabel UDMF_LABEL[UDMF_TEST + 1] = {
     { LOG_CORE, UDMF_FRAMEWORK_DOMAIN, "UDMF_FWK" },
     { LOG_CORE, UDMF_KITS_INNER_DOMAIN, "UDMF_KITS_INNER" },
     { LOG_CORE, UDMF_KITS_NAPI_DOMAIN, "UDMF_KITS_NAPI" },
     { LOG_CORE, UDMF_CLIENT_DOMAIN, "UDMF_CLIENT" },
-    { LOG_CORE, UDMF_SERVICE_DOMAIN, "UDMF_SERVICE" }
+    { LOG_CORE, UDMF_SERVICE_DOMAIN, "UDMF_SERVICE" },
+    { LOG_CORE, UDMF_TEST_DOMAIN, "UDMF_TEST" }
 };
 
 // In order to improve performance, do not check the module range.

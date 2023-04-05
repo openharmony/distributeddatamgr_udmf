@@ -19,17 +19,16 @@ namespace OHOS {
 namespace UDMF {
 int64_t UnifiedData::GetSize()
 {
-    return this->totalSize_;
+    int64_t totalSize = 0;
+    for (const auto &record : this->records_) {
+        totalSize += record->GetSize();
+    }
+    return totalSize;
 }
 
 std::string UnifiedData::GetGroupId() const
 {
-    return this->groupId_;
-}
-
-void UnifiedData::SetGroupId(const std::string &id)
-{
-    this->groupId_ = id;
+    return this->runtime_->key.groupId;
 }
 
 std::shared_ptr<Runtime> UnifiedData::GetRuntime() const
@@ -40,7 +39,6 @@ std::shared_ptr<Runtime> UnifiedData::GetRuntime() const
 void UnifiedData::SetRuntime(Runtime &runtime)
 {
     this->runtime_ = std::make_shared<Runtime>(runtime);
-    this->groupId_ = this->runtime_->key.groupId;
 }
 
 void UnifiedData::AddRecord(const std::shared_ptr<UnifiedRecord> &record)
@@ -48,10 +46,8 @@ void UnifiedData::AddRecord(const std::shared_ptr<UnifiedRecord> &record)
     if (record == nullptr) {
         return;
     }
-    this->totalSize_ += record->GetSize();
     this->records_.emplace_back(record);
     if (records_.size() > MAX_RECORD_NUM) {
-        this->totalSize_ -= records_.back()->GetSize();
         std::vector<std::shared_ptr<UnifiedRecord>> new_records(records_.begin(), records_.end() - 1);
         this->records_ = new_records;
     }
@@ -67,9 +63,6 @@ std::shared_ptr<UnifiedRecord> UnifiedData::GetRecordAt(std::size_t index)
 
 void UnifiedData::SetRecords(std::vector<std::shared_ptr<UnifiedRecord>> records)
 {
-    for (const std::shared_ptr<UnifiedRecord> &record : records) {
-        this->totalSize_ += record->GetSize();
-    }
     this->records_ = std::move(records);
 }
 

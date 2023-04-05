@@ -27,7 +27,6 @@ public:
     int64_t GetSize();
 
     std::string GetGroupId() const;
-    void SetGroupId(const std::string &id);
 
     std::shared_ptr<Runtime> GetRuntime() const;
     void SetRuntime(Runtime &runtime);
@@ -40,8 +39,6 @@ public:
     std::vector<UDType> GetUDTypes();
 
 private:
-    int64_t totalSize_;
-    std::string groupId_;
     std::shared_ptr<Runtime> runtime_;
     std::vector<std::shared_ptr<UnifiedRecord>> records_;
 };

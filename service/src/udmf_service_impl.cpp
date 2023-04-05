@@ -65,5 +65,10 @@ int32_t UdmfServiceImpl::AddPrivilege(QueryOption &query, Privilege &privilege)
 {
     return DataManager::GetInstance().AddPrivilege(query, privilege);
 }
+
+int32_t UdmfServiceImpl::Sync(const QueryOption &query, const std::vector<std::string> &devices)
+{
+    return DataManager::GetInstance().Sync(query, devices);
+}
 } // namespace UDMF
 } // namespace OHOS
