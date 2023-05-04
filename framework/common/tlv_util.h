@@ -18,23 +18,25 @@
 
 #include <type_traits>
 
-#include "logger.h"
-#include "tlv_object.h"
-#include "unified_meta.h"
-#include "unified_types.h"
-#include "unified_key.h"
-#include "unified_record.h"
-#include "text.h"
-#include "plain_text.h"
-#include "html.h"
-#include "link.h"
+#include "application_defined_record.h"
 #include "file.h"
+#include "folder.h"
+#include "html.h"
 #include "image.h"
-#include "video.h"
-#include "system_defined_record.h"
-#include "system_defined_form.h"
+#include "link.h"
+#include "logger.h"
+#include "plain_text.h"
 #include "system_defined_appitem.h"
+#include "system_defined_form.h"
 #include "system_defined_pixelmap.h"
+#include "system_defined_record.h"
+#include "text.h"
+#include "tlv_object.h"
+#include "unified_key.h"
+#include "unified_meta.h"
+#include "unified_record.h"
+#include "unified_types.h"
+#include "video.h"
 
 namespace OHOS {
 namespace TLVUtil {
@@ -51,7 +53,7 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
     auto type = input->GetType();
     switch (type) {
         case UDType::TEXT: {
-            auto text = reinterpret_cast<Text *>(input.get());
+            auto text = static_cast<Text *>(input.get());
             if (text == nullptr) {
                 return false;
             }
@@ -59,13 +61,13 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
             break;
         }
         case UDType::PLAIN_TEXT: {
-            auto plainText = reinterpret_cast<PlainText *>(input.get());
+            auto plainText = static_cast<PlainText *>(input.get());
             if (plainText == nullptr) {
                 return false;
             }
             data.Count(plainText->GetContent());
             data.Count(plainText->GetAbstract());
-            auto text = reinterpret_cast<Text *>(input.get());
+            auto text = static_cast<Text *>(input.get());
             if (text == nullptr) {
                 return false;
             }
@@ -73,13 +75,13 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
             break;
         }
         case UDType::HTML: {
-            auto html = reinterpret_cast<Html *>(input.get());
+            auto html = static_cast<Html *>(input.get());
             if (html == nullptr) {
                 return false;
             }
             data.Count(html->GetHtmlContent());
             data.Count(html->GetPlainContent());
-            auto text = reinterpret_cast<Text *>(input.get());
+            auto text = static_cast<Text *>(input.get());
             if (text == nullptr) {
                 return false;
             }
@@ -87,13 +89,13 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
             break;
         }
         case UDType::HYPER_LINK: {
-            auto link = reinterpret_cast<Link *>(input.get());
+            auto link = static_cast<Link *>(input.get());
             if (link == nullptr) {
                 return false;
             }
             data.Count(link->GetUrl());
             data.Count(link->GetDescription());
-            auto text = reinterpret_cast<Text *>(input.get());
+            auto text = static_cast<Text *>(input.get());
             if (text == nullptr) {
                 return false;
             }
@@ -101,34 +103,59 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
             break;
         }
         case UDType::FILE: {
-            auto file = reinterpret_cast<File *>(input.get());
+            auto file = static_cast<File *>(input.get());
             if (file == nullptr) {
                 return false;
             }
             data.Count(file->GetUri());
             data.Count(file->GetRemoteUri());
+            data.Count(file->GetDetails());
             break;
         }
         case UDType::IMAGE: {
-            auto file = reinterpret_cast<File *>(input.get());
+            auto image = static_cast<Image *>(input.get());
+            if (image == nullptr) {
+                return false;
+            }
+            data.Count(image->GetUri());
+            data.Count(image->GetRemoteUri());
+            auto file = static_cast<File *>(input.get());
             if (file == nullptr) {
                 return false;
             }
-            data.Count(file->GetUri());
-            data.Count(file->GetRemoteUri());
+            data.Count(file->GetDetails());
             break;
         }
         case UDType::VIDEO: {
-            auto file = reinterpret_cast<File *>(input.get());
+            auto video = static_cast<Video *>(input.get());
+            if (video == nullptr) {
+                return false;
+            }
+            data.Count(video->GetUri());
+            data.Count(video->GetRemoteUri());
+            auto file = static_cast<File *>(input.get());
             if (file == nullptr) {
                 return false;
             }
-            data.Count(file->GetUri());
-            data.Count(file->GetRemoteUri());
+            data.Count(file->GetDetails());
+            break;
+        }
+        case UDType::FOLDER: {
+            auto folder = static_cast<Folder *>(input.get());
+            if (folder == nullptr) {
+                return false;
+            }
+            data.Count(folder->GetUri());
+            data.Count(folder->GetRemoteUri());
+            auto file = static_cast<File *>(input.get());
+            if (file == nullptr) {
+                return false;
+            }
+            data.Count(file->GetDetails());
             break;
         }
         case UDType::SYSTEM_DEFINED_RECORD: {
-            auto sdRecord = reinterpret_cast<SystemDefinedRecord *>(input.get());
+            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
             if (sdRecord == nullptr) {
                 return false;
             }
@@ -136,7 +163,7 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
             break;
         }
         case UDType::SYSTEM_DEFINED_FORM: {
-            auto form = reinterpret_cast<SystemDefinedForm *>(input.get());
+            auto form = static_cast<SystemDefinedForm *>(input.get());
             if (form == nullptr) {
                 return false;
             }
@@ -145,7 +172,7 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
             data.Count(form->GetBundleName());
             data.Count(form->GetAbilityName());
             data.Count(form->GetModule());
-            auto sdRecord = reinterpret_cast<SystemDefinedRecord *>(input.get());
+            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
             if (sdRecord == nullptr) {
                 return false;
             }
@@ -153,7 +180,7 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
             break;
         }
         case UDType::SYSTEM_DEFINED_APP_ITEM: {
-            auto appItem = reinterpret_cast<SystemDefinedAppItem *>(input.get());
+            auto appItem = static_cast<SystemDefinedAppItem *>(input.get());
             if (appItem == nullptr) {
                 return false;
             }
@@ -163,7 +190,7 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
             data.Count(appItem->GetAppLabelId());
             data.Count(appItem->GetBundleName());
             data.Count(appItem->GetAbilityName());
-            auto sdRecord = reinterpret_cast<SystemDefinedRecord *>(input.get());
+            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
             if (sdRecord == nullptr) {
                 return false;
             }
@@ -171,16 +198,25 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
             break;
         }
         case UDType::SYSTEM_DEFINED_PIXEL_MAP: {
-            auto pixelMap = reinterpret_cast<SystemDefinedPixelMap *>(input.get());
+            auto pixelMap = static_cast<SystemDefinedPixelMap *>(input.get());
             if (pixelMap == nullptr) {
                 return false;
             }
             data.Count(pixelMap->GetRawData());
-            auto sdRecord = reinterpret_cast<SystemDefinedRecord *>(input.get());
+            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
             if (sdRecord == nullptr) {
                 return false;
             }
             data.Count(sdRecord->GetDetails());
+            break;
+        }
+        case UDType::APPLICATION_DEFINED_RECORD: {
+            auto record = static_cast<ApplicationDefinedRecord *>(input.get());
+            if (record == nullptr) {
+                return false;
+            }
+            data.Count(record->GetApplicationDefinedType());
+            data.Count(record->GetRawData());
             break;
         }
         default: {
@@ -446,6 +482,9 @@ bool Writing(const File &input, TLVObject &data)
     if (!Writing(input.GetRemoteUri(), data)) {
         return false;
     }
+    if (!Writing(input.GetDetails(), data)) {
+        return false;
+    }
     return true;
 }
 
@@ -453,15 +492,20 @@ template<>
 bool Reading(File &output, TLVObject &data)
 {
     std::string uri;
+    std::string remoteUri;
+    UDDetails details;
     if (!Reading(uri, data)) {
         return false;
     }
-    output.SetUri(uri);
-    std::string remoteUri;
     if (!Reading(remoteUri, data)) {
         return false;
     }
+    if (!Reading(details, data)) {
+        return false;
+    }
+    output.SetUri(uri);
     output.SetRemoteUri(remoteUri);
+    output.SetDetails(details);
     return true;
 }
 
@@ -475,15 +519,20 @@ template<>
 bool Reading(Image &output, TLVObject &data)
 {
     std::string uri;
+    std::string remoteUri;
+    UDDetails details;
     if (!Reading(uri, data)) {
         return false;
     }
-    output.SetUri(uri);
-    std::string remoteUri;
     if (!Reading(remoteUri, data)) {
         return false;
     }
+    if (!Reading(details, data)) {
+        return false;
+    }
+    output.SetUri(uri);
     output.SetRemoteUri(remoteUri);
+    output.SetDetails(details);
     return true;
 }
 
@@ -497,15 +546,47 @@ template<>
 bool Reading(Video &output, TLVObject &data)
 {
     std::string uri;
+    std::string remoteUri;
+    UDDetails details;
     if (!Reading(uri, data)) {
         return false;
     }
-    output.SetUri(uri);
-    std::string remoteUri;
     if (!Reading(remoteUri, data)) {
         return false;
     }
+    if (!Reading(details, data)) {
+        return false;
+    }
+    output.SetUri(uri);
     output.SetRemoteUri(remoteUri);
+    output.SetDetails(details);
+    return true;
+}
+
+template<>
+bool Writing(const Folder &input, TLVObject &data)
+{
+    return true;
+}
+
+template<>
+bool Reading(Folder &output, TLVObject &data)
+{
+    std::string uri;
+    std::string remoteUri;
+    UDDetails details;
+    if (!Reading(uri, data)) {
+        return false;
+    }
+    if (!Reading(remoteUri, data)) {
+        return false;
+    }
+    if (!Reading(details, data)) {
+        return false;
+    }
+    output.SetUri(uri);
+    output.SetRemoteUri(remoteUri);
+    output.SetDetails(details);
     return true;
 }
 
@@ -677,6 +758,34 @@ bool Reading(SystemDefinedPixelMap &output, TLVObject &data)
 }
 
 template<>
+bool Writing(const ApplicationDefinedRecord &input, TLVObject &data)
+{
+    if (!Writing(input.GetApplicationDefinedType(), data)) {
+        return false;
+    }
+    if (!Writing(input.GetRawData(), data)) {
+        return false;
+    }
+    return true;
+}
+
+template<>
+bool Reading(ApplicationDefinedRecord &output, TLVObject &data)
+{
+    std::string type;
+    std::vector<uint8_t> rawData;
+    if (!Reading(type, data)) {
+        return false;
+    }
+    if (!Reading(rawData, data)) {
+        return false;
+    }
+    output.SetApplicationDefinedType(type);
+    output.SetRawData(rawData);
+    return true;
+}
+
+template<>
 bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
 {
     if (!CountBufferSize(input, data)) {
@@ -693,137 +802,158 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
     auto type = input->GetType();
     switch (type) {
         case UDType::TEXT: {
-            auto text = reinterpret_cast<Text *>(input.get());
+            auto text = static_cast<Text *>(input.get());
             if (text == nullptr) {
                 return false;
             }
             return Writing(*text, data);
         }
         case UDType::PLAIN_TEXT: {
-            auto plainText = reinterpret_cast<PlainText *>(input.get());
+            auto plainText = static_cast<PlainText *>(input.get());
             if (plainText == nullptr) {
                 return false;
             }
             if (!Writing(*plainText, data)) {
                 return false;
             }
-            auto text = reinterpret_cast<Text *>(input.get());
+            auto text = static_cast<Text *>(input.get());
             if (text == nullptr) {
                 return false;
             }
             return Writing(*text, data);
         }
         case UDType::HTML: {
-            auto html = reinterpret_cast<Html *>(input.get());
+            auto html = static_cast<Html *>(input.get());
             if (html == nullptr) {
                 return false;
             }
             if (!Writing(*html, data)) {
                 return false;
             }
-            auto text = reinterpret_cast<Text *>(input.get());
+            auto text = static_cast<Text *>(input.get());
             if (text == nullptr) {
                 return false;
             }
             return Writing(*text, data);
         }
         case UDType::HYPER_LINK: {
-            auto link = reinterpret_cast<Link *>(input.get());
+            auto link = static_cast<Link *>(input.get());
             if (link == nullptr) {
                 return false;
             }
             if (!Writing(*link, data)) {
                 return false;
             }
-            auto text = reinterpret_cast<Text *>(input.get());
+            auto text = static_cast<Text *>(input.get());
             if (text == nullptr) {
                 return false;
             }
             return Writing(*text, data);
         }
         case UDType::FILE: {
-            auto file = reinterpret_cast<File *>(input.get());
+            auto file = static_cast<File *>(input.get());
             if (file == nullptr) {
                 return false;
             }
             return Writing(*file, data);
         }
         case UDType::IMAGE: {
-            auto image = reinterpret_cast<Image *>(input.get());
+            auto image = static_cast<Image *>(input.get());
             if (image == nullptr) {
                 return false;
             }
             if (!Writing(*image, data)) {
                 return false;
             }
-            auto file = reinterpret_cast<File *>(input.get());
+            auto file = static_cast<File *>(input.get());
             if (file == nullptr) {
                 return false;
             }
             return Writing(*file, data);
         }
         case UDType::VIDEO: {
-            auto video = reinterpret_cast<Video *>(input.get());
+            auto video = static_cast<Video *>(input.get());
             if (video == nullptr) {
                 return false;
             }
             if (!Writing(*video, data)) {
                 return false;
             }
-            auto file = reinterpret_cast<File *>(input.get());
+            auto file = static_cast<File *>(input.get());
+            if (file == nullptr) {
+                return false;
+            }
+            return Writing(*file, data);
+        }
+        case UDType::FOLDER: {
+            auto folder = static_cast<Folder *>(input.get());
+            if (folder == nullptr) {
+                return false;
+            }
+            if (!Writing(*folder, data)) {
+                return false;
+            }
+            auto file = static_cast<File *>(input.get());
             if (file == nullptr) {
                 return false;
             }
             return Writing(*file, data);
         }
         case UDType::SYSTEM_DEFINED_RECORD: {
-            auto sdRecord = reinterpret_cast<SystemDefinedRecord *>(input.get());
+            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
             if (sdRecord == nullptr) {
                 return false;
             }
             return Writing(*sdRecord, data);
         }
         case UDType::SYSTEM_DEFINED_FORM: {
-            auto form = reinterpret_cast<SystemDefinedForm *>(input.get());
+            auto form = static_cast<SystemDefinedForm *>(input.get());
             if (form == nullptr) {
                 return false;
             }
             if (!Writing(*form, data)) {
                 return false;
             }
-            auto sdRecord = reinterpret_cast<SystemDefinedRecord *>(input.get());
+            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
             if (sdRecord == nullptr) {
                 return false;
             }
             return Writing(*sdRecord, data);
         }
         case UDType::SYSTEM_DEFINED_APP_ITEM: {
-            auto appItem = reinterpret_cast<SystemDefinedAppItem *>(input.get());
+            auto appItem = static_cast<SystemDefinedAppItem *>(input.get());
             if (appItem == nullptr) {
                 return false;
             }
             if (!Writing(*appItem, data)) {
                 return false;
             }
-            auto sdRecord = reinterpret_cast<SystemDefinedRecord *>(input.get());
+            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
             if (sdRecord == nullptr) {
                 return false;
             }
             return Writing(*sdRecord, data);
         }
         case UDType::SYSTEM_DEFINED_PIXEL_MAP: {
-            auto pixelMap = reinterpret_cast<SystemDefinedPixelMap *>(input.get());
+            auto pixelMap = static_cast<SystemDefinedPixelMap *>(input.get());
             if (pixelMap == nullptr) {
                 return false;
             }
             if (!Writing(*pixelMap, data)) {
                 return false;
             }
-            auto sdRecord = reinterpret_cast<SystemDefinedRecord *>(input.get());
+            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
             if (sdRecord == nullptr) {
                 return false;
             }
             return Writing(*sdRecord, data);
+        }
+        case UDType::APPLICATION_DEFINED_RECORD: {
+            auto record = static_cast<ApplicationDefinedRecord *>(input.get());
+            if (record == nullptr) {
+                return false;
+            }
+            return Writing(*record, data);
         }
         default: {
             return false;
@@ -899,6 +1029,14 @@ bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data)
             output = video;
             break;
         }
+        case UDType::FOLDER: {
+            std::shared_ptr<Folder> folder = std::make_shared<Folder>();
+            if (!Reading(*folder, data)) {
+                return false;
+            }
+            output = folder;
+            break;
+        }
         case UDType::SYSTEM_DEFINED_RECORD: {
             std::shared_ptr<SystemDefinedRecord> sdRecord = std::make_shared<SystemDefinedRecord>();
             if (!Reading(*sdRecord, data)) {
@@ -929,6 +1067,14 @@ bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data)
                 return false;
             }
             output = pixelMap;
+            break;
+        }
+        case UDType::APPLICATION_DEFINED_RECORD: {
+            std::shared_ptr<ApplicationDefinedRecord> record = std::make_shared<ApplicationDefinedRecord>();
+            if (!Reading(*record, data)) {
+                return false;
+            }
+            output = record;
             break;
         }
         default: {

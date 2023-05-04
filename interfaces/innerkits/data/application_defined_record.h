@@ -13,33 +13,31 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_FILE_H
-#define UDMF_FILE_H
+#ifndef UDMF_APPLICATION_DEFINED_RECORD_H
+#define UDMF_APPLICATION_DEFINED_RECORD_H
 
 #include "unified_record.h"
 
 namespace OHOS {
 namespace UDMF {
-class File : public UnifiedRecord {
+class ApplicationDefinedRecord : public UnifiedRecord {
 public:
-    File();
-    explicit File(const std::string &uri);
+    ApplicationDefinedRecord();
+    explicit ApplicationDefinedRecord(std::string type);
+    explicit ApplicationDefinedRecord(std::string type, std::vector<uint8_t> &data);
+
     int64_t GetSize() override;
 
-    std::string GetUri() const;
-    void SetUri(const std::string &uri);
+    std::string GetApplicationDefinedType() const;
+    void SetApplicationDefinedType(const std::string &type);
 
-    std::string GetRemoteUri() const;
-    void SetRemoteUri(const std::string &uri);
-
-    void SetDetails(UDDetails &variantMap);
-    UDDetails GetDetails() const;
-
+    std::vector<uint8_t> GetRawData() const;
+    void SetRawData(const std::vector<uint8_t> &rawData);
 protected:
-    std::string oriUri_;
-    std::string remoteUri_;
-    UDDetails details_;
+    std::string applicationDefinedType;
+    std::vector<uint8_t> rawData_;
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_FILE_H
+
+#endif // UDMF_APPLICATION_DEFINED_RECORD_H

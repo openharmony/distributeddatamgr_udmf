@@ -45,7 +45,7 @@ napi_value TextNapi::New(napi_env env, napi_callback_info info)
     auto *text = new (std::nothrow) TextNapi();
     ASSERT_ERR(ctxt->env, text != nullptr, Status::E_FORBIDDEN, "no memory for text!");
     text->value_ = std::make_shared<Text>();
-    ASSERT_CALL(env, napi_wrap(env, ctxt->self, text, Destructor, nullptr, nullptr), text);
+    ASSERT_CALL(ctxt->env, napi_wrap(env, ctxt->self, text, Destructor, nullptr, nullptr), text);
     return ctxt->self;
 }
 

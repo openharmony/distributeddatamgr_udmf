@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_VIDEO_NAPI_H
-#define UDMF_VIDEO_NAPI_H
+#ifndef UDMF_FILE_NAPI_H
+#define UDMF_FILE_NAPI_H
 
 #include <memory>
 
@@ -25,17 +25,23 @@ namespace OHOS {
 namespace UDMF {
 struct ContextBase;
 class UnifiedRecord;
-class Video;
-class VideoNapi {
+class File;
+class FileNapi {
 public:
     static napi_value Constructor(napi_env env);
     static void NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out);
-    std::shared_ptr<Video> value_;
+    static napi_value GetDetails(napi_env env, napi_callback_info info);
+    static napi_value SetDetails(napi_env env, napi_callback_info info);
+    static napi_value GetUri(napi_env env, napi_callback_info info);
+    static napi_value SetUri(napi_env env, napi_callback_info info);
+    std::shared_ptr<File> value_;
 
 private:
     static napi_value New(napi_env env, napi_callback_info info);
     static void Destructor(napi_env env, void *data, void *hint);
+    static FileNapi *GetFile(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt);
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_VIDEO_NAPI_H
+
+#endif // UDMF_FILE_NAPI_H

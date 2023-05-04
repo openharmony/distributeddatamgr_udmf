@@ -30,81 +30,95 @@ template<> bool Marshalling(const std::shared_ptr<UnifiedRecord> &input, Message
     auto type = input->GetType();
     switch (type) {
         case TEXT: {
-            auto text = reinterpret_cast<Text *>(input.get());
+            auto text = static_cast<Text *>(input.get());
             if (text == nullptr) {
                 return false;
             }
             return ITypesUtil::Marshal(parcel, *text);
         }
         case PLAIN_TEXT: {
-            auto plainText = reinterpret_cast<PlainText *>(input.get());
+            auto plainText = static_cast<PlainText *>(input.get());
             if (plainText == nullptr) {
                 return false;
             }
             return ITypesUtil::Marshal(parcel, *plainText);
         }
         case HTML: {
-            auto html = reinterpret_cast<Html *>(input.get());
+            auto html = static_cast<Html *>(input.get());
             if (html == nullptr) {
                 return false;
             }
             return ITypesUtil::Marshal(parcel, *html);
         }
         case HYPER_LINK: {
-            auto link = reinterpret_cast<Link *>(input.get());
+            auto link = static_cast<Link *>(input.get());
             if (link == nullptr) {
                 return false;
             }
             return ITypesUtil::Marshal(parcel, *link);
         }
         case FILE: {
-            auto file = reinterpret_cast<File *>(input.get());
+            auto file = static_cast<File *>(input.get());
             if (file == nullptr) {
                 return false;
             }
             return ITypesUtil::Marshal(parcel, *file);
         }
+        case FOLDER: {
+            auto folder = static_cast<Folder *>(input.get());
+            if (folder == nullptr) {
+                return false;
+            }
+            return ITypesUtil::Marshal(parcel, *folder);
+        }
         case IMAGE: {
-            auto image = reinterpret_cast<Image *>(input.get());
+            auto image = static_cast<Image *>(input.get());
             if (image == nullptr) {
                 return false;
             }
             return ITypesUtil::Marshal(parcel, *image);
         }
         case VIDEO: {
-            auto video = reinterpret_cast<Video *>(input.get());
+            auto video = static_cast<Video *>(input.get());
             if (video == nullptr) {
                 return false;
             }
             return ITypesUtil::Marshal(parcel, *video);
         }
         case SYSTEM_DEFINED_RECORD: {
-            auto sdRecord = reinterpret_cast<SystemDefinedRecord *>(input.get());
+            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
             if (sdRecord == nullptr) {
                 return false;
             }
             return ITypesUtil::Marshal(parcel, *sdRecord);
         }
         case SYSTEM_DEFINED_FORM: {
-            auto form = reinterpret_cast<SystemDefinedForm *>(input.get());
+            auto form = static_cast<SystemDefinedForm *>(input.get());
             if (form == nullptr) {
                 return false;
             }
             return ITypesUtil::Marshal(parcel, *form);
         }
         case SYSTEM_DEFINED_APP_ITEM: {
-            auto appItem = reinterpret_cast<SystemDefinedAppItem *>(input.get());
+            auto appItem = static_cast<SystemDefinedAppItem *>(input.get());
             if (appItem == nullptr) {
                 return false;
             }
             return ITypesUtil::Marshal(parcel, *appItem);
         }
         case SYSTEM_DEFINED_PIXEL_MAP: {
-            auto pixelMap = reinterpret_cast<SystemDefinedPixelMap *>(input.get());
+            auto pixelMap = static_cast<SystemDefinedPixelMap *>(input.get());
             if (pixelMap == nullptr) {
                 return false;
             }
             return ITypesUtil::Marshal(parcel, *pixelMap);
+        }
+        case APPLICATION_DEFINED_RECORD: {
+            auto record = static_cast<ApplicationDefinedRecord *>(input.get());
+            if (record == nullptr) {
+                return false;
+            }
+            return ITypesUtil::Marshal(parcel, *record);
         }
         default: {
             return false;
@@ -160,6 +174,14 @@ template<> bool Unmarshalling(std::shared_ptr<UnifiedRecord> &output, MessagePar
             output = file;
             break;
         }
+        case FOLDER: {
+            std::shared_ptr<Folder> folder = std::make_shared<Folder>();
+            if (!ITypesUtil::Unmarshal(parcel, *folder)) {
+                return false;
+            }
+            output = folder;
+            break;
+        }
         case IMAGE: {
             std::shared_ptr<Image> image = std::make_shared<Image>();
             if (!ITypesUtil::Unmarshal(parcel, *image)) {
@@ -206,6 +228,14 @@ template<> bool Unmarshalling(std::shared_ptr<UnifiedRecord> &output, MessagePar
                 return false;
             }
             output = pixelMap;
+            break;
+        }
+        case APPLICATION_DEFINED_RECORD: {
+            std::shared_ptr<ApplicationDefinedRecord> record = std::make_shared<ApplicationDefinedRecord>();
+            if (!ITypesUtil::Unmarshal(parcel, *record)) {
+                return false;
+            }
+            output = record;
             break;
         }
         default: {
@@ -279,12 +309,12 @@ template<> bool Marshalling(const Text &input, MessageParcel &parcel)
 
 template<> bool Unmarshalling(Text &output, MessageParcel &parcel)
 {
-    UDDetails detail;
-    if (!ITypesUtil::Unmarshal(parcel, detail)) {
+    UDDetails details;
+    if (!ITypesUtil::Unmarshal(parcel, details)) {
         LOG_ERROR(UDMF_KITS_NAPI, "Unmarshal Text failed!");
         return false;
     }
-    output.SetDetails(detail);
+    output.SetDetails(details);
     return true;
 }
 
@@ -297,14 +327,14 @@ template<> bool Unmarshalling(PlainText &output, MessageParcel &parcel)
 {
     std::string content;
     std::string abstract;
-    UDDetails detail;
-    if (!ITypesUtil::Unmarshal(parcel, content, abstract, detail)) {
+    UDDetails details;
+    if (!ITypesUtil::Unmarshal(parcel, content, abstract, details)) {
         LOG_ERROR(UDMF_KITS_NAPI, "Unmarshal PlainText failed!");
         return false;
     }
     output.SetContent(content);
     output.SetAbstract(abstract);
-    output.SetDetails(detail);
+    output.SetDetails(details);
     return true;
 }
 
@@ -317,14 +347,14 @@ template<> bool Unmarshalling(Html &output, MessageParcel &parcel)
 {
     std::string htmlContent;
     std::string plainContent;
-    UDDetails detail;
-    if (!ITypesUtil::Unmarshal(parcel, htmlContent, plainContent, detail)) {
+    UDDetails details;
+    if (!ITypesUtil::Unmarshal(parcel, htmlContent, plainContent, details)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal Html failed!");
         return false;
     }
     output.SetHtmlContent(htmlContent);
     output.SetPlainContent(plainContent);
-    output.SetDetails(detail);
+    output.SetDetails(details);
     return true;
 }
 
@@ -337,68 +367,94 @@ template<> bool Unmarshalling(Link &output, MessageParcel &parcel)
 {
     std::string url;
     std::string description;
-    UDDetails detail;
-    if (!ITypesUtil::Unmarshal(parcel, url, description, detail)) {
+    UDDetails details;
+    if (!ITypesUtil::Unmarshal(parcel, url, description, details)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal Link failed!");
         return false;
     }
     output.SetUrl(url);
     output.SetDescription(description);
-    output.SetDetails(detail);
+    output.SetDetails(details);
     return true;
 }
 
 template<> bool Marshalling(const File &input, MessageParcel &parcel)
 {
-    return ITypesUtil::Marshal(parcel, input.GetUri(), input.GetRemoteUri());
+    return ITypesUtil::Marshal(parcel, input.GetUri(), input.GetRemoteUri(), input.GetDetails());
 }
 
 template<> bool Unmarshalling(File &output, MessageParcel &parcel)
 {
     std::string uri;
     std::string remoteUri;
-    if (!ITypesUtil::Unmarshal(parcel, uri, remoteUri)) {
+    UDDetails details;
+    if (!ITypesUtil::Unmarshal(parcel, uri, remoteUri, details)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal File failed!");
         return false;
     }
     output.SetUri(uri);
     output.SetRemoteUri(remoteUri);
+    output.SetDetails(details);
     return true;
 }
 
 template<> bool Marshalling(const Image &input, MessageParcel &parcel)
 {
-    return ITypesUtil::Marshal(parcel, input.GetUri(), input.GetRemoteUri());
+    return ITypesUtil::Marshal(parcel, input.GetUri(), input.GetRemoteUri(), input.GetDetails());
 }
 
 template<> bool Unmarshalling(Image &output, MessageParcel &parcel)
 {
     std::string uri;
     std::string remoteUri;
-    if (!ITypesUtil::Unmarshal(parcel, uri, remoteUri)) {
+    UDDetails details;
+    if (!ITypesUtil::Unmarshal(parcel, uri, remoteUri, details)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal Image failed!");
         return false;
     }
     output.SetUri(uri);
     output.SetRemoteUri(remoteUri);
+    output.SetDetails(details);
     return true;
 }
 
 template<> bool Marshalling(const Video &input, MessageParcel &parcel)
 {
-    return ITypesUtil::Marshal(parcel, input.GetUri(), input.GetRemoteUri());
+    return ITypesUtil::Marshal(parcel, input.GetUri(), input.GetRemoteUri(), input.GetDetails());
 }
 
 template<> bool Unmarshalling(Video &output, MessageParcel &parcel)
 {
     std::string uri;
     std::string remoteUri;
-    if (!ITypesUtil::Unmarshal(parcel, uri, remoteUri)) {
+    UDDetails details;
+    if (!ITypesUtil::Unmarshal(parcel, uri, remoteUri, details)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal Video failed!");
         return false;
     }
     output.SetUri(uri);
     output.SetRemoteUri(remoteUri);
+    output.SetDetails(details);
+    return true;
+}
+
+template<> bool Marshalling(const Folder &input, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, input.GetUri(), input.GetRemoteUri(), input.GetDetails());
+}
+
+template<> bool Unmarshalling(Folder &output, MessageParcel &parcel)
+{
+    std::string uri;
+    std::string remoteUri;
+    UDDetails details;
+    if (!ITypesUtil::Unmarshal(parcel, uri, remoteUri, details)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal Folder failed!");
+        return false;
+    }
+    output.SetUri(uri);
+    output.SetRemoteUri(remoteUri);
+    output.SetDetails(details);
     return true;
 }
 
@@ -409,12 +465,12 @@ template<> bool Marshalling(const SystemDefinedRecord &input, MessageParcel &par
 
 template<> bool Unmarshalling(SystemDefinedRecord &output, MessageParcel &parcel)
 {
-    UDDetails detail;
-    if (!ITypesUtil::Unmarshal(parcel, detail)) {
+    UDDetails details;
+    if (!ITypesUtil::Unmarshal(parcel, details)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal SystemDefinedRecord failed!");
         return false;
     }
-    output.SetDetails(detail);
+    output.SetDetails(details);
     return true;
 }
 
@@ -431,8 +487,8 @@ template<> bool Unmarshalling(SystemDefinedForm &output, MessageParcel &parcel)
     std::string bundleName;
     std::string abilityName;
     std::string module;
-    UDDetails detail;
-    if (!ITypesUtil::Unmarshal(parcel, formId, formName, bundleName, abilityName, module, detail)) {
+    UDDetails details;
+    if (!ITypesUtil::Unmarshal(parcel, formId, formName, bundleName, abilityName, module, details)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal SystemDefinedForm failed!");
         return false;
     }
@@ -441,7 +497,7 @@ template<> bool Unmarshalling(SystemDefinedForm &output, MessageParcel &parcel)
     output.SetBundleName(bundleName);
     output.SetAbilityName(abilityName);
     output.SetModule(module);
-    output.SetDetails(detail);
+    output.SetDetails(details);
     return true;
 }
 
@@ -459,8 +515,8 @@ template<> bool Unmarshalling(SystemDefinedAppItem &output, MessageParcel &parce
     std::string appLabelId;
     std::string bundleName;
     std::string abilityName;
-    UDDetails detail;
-    if (!ITypesUtil::Unmarshal(parcel, appId, appName, appIconId, appLabelId, bundleName, abilityName, detail)) {
+    UDDetails details;
+    if (!ITypesUtil::Unmarshal(parcel, appId, appName, appIconId, appLabelId, bundleName, abilityName, details)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal UDAppItem failed!");
         return false;
     }
@@ -470,7 +526,7 @@ template<> bool Unmarshalling(SystemDefinedAppItem &output, MessageParcel &parce
     output.SetAppLabelId(appLabelId);
     output.SetBundleName(bundleName);
     output.SetAbilityName(abilityName);
-    output.SetDetails(detail);
+    output.SetDetails(details);
     return true;
 }
 
@@ -482,13 +538,31 @@ template<> bool Marshalling(const SystemDefinedPixelMap &input, MessageParcel &p
 template<> bool Unmarshalling(SystemDefinedPixelMap &output, MessageParcel &parcel)
 {
     std::vector<uint8_t> rawData;
-    UDDetails detail;
-    if (!ITypesUtil::Unmarshal(parcel, rawData, detail)) {
+    UDDetails details;
+    if (!ITypesUtil::Unmarshal(parcel, rawData, details)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal UDPixelMap failed!");
         return false;
     }
     output.SetRawData(rawData);
-    output.SetDetails(detail);
+    output.SetDetails(details);
+    return true;
+}
+
+template<> bool Marshalling(const ApplicationDefinedRecord &input, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, input.GetApplicationDefinedType(), input.GetRawData());
+}
+
+template<> bool Unmarshalling(ApplicationDefinedRecord &output, MessageParcel &parcel)
+{
+    std::string type;
+    std::vector<uint8_t> rawData;
+    if (!ITypesUtil::Unmarshal(parcel, type, rawData)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "Unmarshal ApplicationDefinedRecord failed!");
+        return false;
+    }
+    output.SetApplicationDefinedType(type);
+    output.SetRawData(rawData);
     return true;
 }
 

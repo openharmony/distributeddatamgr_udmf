@@ -18,7 +18,9 @@
 
 #include "itypes_util.h"
 
+#include "application_defined_record.h"
 #include "file.h"
+#include "folder.h"
 #include "html.h"
 #include "image.h"
 #include "link.h"
@@ -47,12 +49,14 @@ using PlainText = UDMF::PlainText;
 using Html = UDMF::Html;
 using Link = UDMF::Link;
 using File = UDMF::File;
+using Folder = UDMF::Folder;
 using Image = UDMF::Image;
 using Video = UDMF::Video;
 using SystemDefinedRecord = UDMF::SystemDefinedRecord;
 using SystemDefinedForm = UDMF::SystemDefinedForm;
 using SystemDefinedAppItem = UDMF::SystemDefinedAppItem;
 using SystemDefinedPixelMap = UDMF::SystemDefinedPixelMap;
+using ApplicationDefinedRecord = UDMF::ApplicationDefinedRecord;
 using UDType = UDMF::UDType;
 using Intention = UDMF::Intention;
 
@@ -95,6 +99,9 @@ template<> bool Unmarshalling(Image &output, MessageParcel &parcel);
 template<> bool Marshalling(const Video &input, MessageParcel &parcel);
 template<> bool Unmarshalling(Video &output, MessageParcel &parcel);
 
+template<> bool Marshalling(const Folder &input, MessageParcel &parcel);
+template<> bool Unmarshalling(Folder &output, MessageParcel &parcel);
+
 template<> bool Marshalling(const SystemDefinedRecord &input, MessageParcel &parcel);
 template<> bool Unmarshalling(SystemDefinedRecord &output, MessageParcel &parcel);
 
@@ -106,6 +113,9 @@ template<> bool Unmarshalling(SystemDefinedAppItem &output, MessageParcel &parce
 
 template<> bool Marshalling(const SystemDefinedPixelMap &input, MessageParcel &parcel);
 template<> bool Unmarshalling(SystemDefinedPixelMap &output, MessageParcel &parcel);
+
+template<> bool Marshalling(const ApplicationDefinedRecord &input, MessageParcel &parcel);
+template<> bool Unmarshalling(ApplicationDefinedRecord &output, MessageParcel &parcel);
 
 template<> bool Marshalling(const UDType &input, MessageParcel &parcel);
 template<> bool Unmarshalling(UDType &output, MessageParcel &parcel);

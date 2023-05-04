@@ -13,52 +13,18 @@
  * limitations under the License.
  */
 
+#ifndef UDMF_FOLDER_H
+#define UDMF_FOLDER_H
+
 #include "file.h"
 
 namespace OHOS {
 namespace UDMF {
-File::File() : UnifiedRecord(FILE)
-{
-}
-
-File::File(const std::string &uri) : UnifiedRecord(FILE)
-{
-    this->oriUri_ = uri;
-}
-
-int64_t File::GetSize()
-{
-    return this->oriUri_.size() + this->remoteUri_.size();
-}
-
-std::string File::GetUri() const
-{
-    return this->oriUri_;
-}
-
-void File::SetUri(const std::string &uri)
-{
-    this->oriUri_ = uri;
-}
-
-std::string File::GetRemoteUri() const
-{
-    return this->remoteUri_;
-}
-
-void File::SetRemoteUri(const std::string &uri)
-{
-    this->remoteUri_ = uri;
-}
-
-void File::SetDetails(UDDetails &variantMap)
-{
-    this->details_ = variantMap;
-}
-
-UDDetails File::GetDetails() const
-{
-    return this->details_;
-}
+class Folder : public File {
+public:
+    Folder();
+    explicit Folder(const std::string &uri);
+};
 } // namespace UDMF
 } // namespace OHOS
+#endif // UDMF_FOLDER_H

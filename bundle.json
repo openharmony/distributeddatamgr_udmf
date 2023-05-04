@@ -77,19 +77,21 @@
           "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
           "header": {
             "header_files": [
-              "system_defined_appitem.h",
-              "system_defined_form.h",
-              "system_defined_pixelmap.h",
-              "system_defined_record.h",
+              "application_defined_record.h",
               "file.h",
+              "folder.h",
               "html.h",
               "image.h",
               "link.h",
               "plain_text.h",
+              "system_defined_appitem.h",
+              "system_defined_form.h",
+              "system_defined_pixelmap.h",
+              "system_defined_record.h",
               "text.h",
-              "video.h",
               "unified_data.h",
-              "unified_record.h"
+              "unified_record.h",
+              "video.h"
             ],
             "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/data"
           }

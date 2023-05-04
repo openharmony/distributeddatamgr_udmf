@@ -12,11 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "image_napi.h"
+#include "folder_napi.h"
 
 #include "logger.h"
-#include "image.h"
+#include "folder.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "napi_queue.h"
@@ -25,48 +24,48 @@
 
 namespace OHOS {
 namespace UDMF {
-napi_value ImageNapi::Constructor(napi_env env)
+napi_value FolderNapi::Constructor(napi_env env)
 {
     napi_property_descriptor properties[] = {
-        /* Image extends UnifiedRecord */
+        /* Folder extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
-        /* Image extends File */
+        /* Folder extends File */
         DECLARE_NAPI_GETTER_SETTER("details", FileNapi::GetDetails, FileNapi::SetDetails),
         DECLARE_NAPI_GETTER_SETTER("imageUri", FileNapi::GetUri, FileNapi::SetUri),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
-    return NapiDataUtils::DefineClass(env, "Image", properties, count, ImageNapi::New);
+    return NapiDataUtils::DefineClass(env, "Folder", properties, count, FolderNapi::New);
 }
 
-napi_value ImageNapi::New(napi_env env, napi_callback_info info)
+napi_value FolderNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "ImageNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi::New");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
-    auto *image = new (std::nothrow) ImageNapi();
-    ASSERT_ERR(ctxt->env, image != nullptr, Status::E_FORBIDDEN, "no memory for image!");
-    image->value_ = std::make_shared<Image>();
-    ASSERT_CALL(env, napi_wrap(env, ctxt->self, image, Destructor, nullptr, nullptr), image);
+    auto *folder = new (std::nothrow) FolderNapi();
+    ASSERT_ERR(ctxt->env, folder != nullptr, Status::E_FORBIDDEN, "no memory for folder!");
+    folder->value_ = std::make_shared<Folder>();
+    ASSERT_CALL(env, napi_wrap(env, ctxt->self, folder, Destructor, nullptr, nullptr), folder);
     return ctxt->self;
 }
 
-void ImageNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
+void FolderNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
 {
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *image = new (std::nothrow) ImageNapi();
-    ASSERT_ERR_VOID(env, image != nullptr, Status::E_FORBIDDEN, "no memory for image!");
-    image->value_ = std::reinterpret_pointer_cast<Image>(in);
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, image, Destructor, nullptr, nullptr), image);
+    auto *folder = new (std::nothrow) FolderNapi();
+    ASSERT_ERR_VOID(env, folder != nullptr, Status::E_FORBIDDEN, "no memory for folder!");
+    folder->value_ = std::reinterpret_pointer_cast<Folder>(in);
+    ASSERT_CALL_DELETE(env, napi_wrap(env, out, folder, Destructor, nullptr, nullptr), folder);
 }
 
-void ImageNapi::Destructor(napi_env env, void *data, void *hint)
+void FolderNapi::Destructor(napi_env env, void *data, void *hint)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "Image finalize.");
-    auto *image = static_cast<ImageNapi *>(data);
-    ASSERT_VOID(image != nullptr, "finalize null!");
-    delete image;
+    LOG_DEBUG(UDMF_KITS_NAPI, "Folder finalize.");
+    auto *folder = reinterpret_cast<FolderNapi *>(data);
+    ASSERT_VOID(folder != nullptr, "finalize null!");
+    delete folder;
 }
 } // namespace UDMF
 } // namespace OHOS

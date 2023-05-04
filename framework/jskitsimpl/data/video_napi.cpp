@@ -21,6 +21,7 @@
 #include "napi_error_utils.h"
 #include "napi_queue.h"
 #include "unified_record_napi.h"
+#include "file_napi.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -29,8 +30,9 @@ napi_value VideoNapi::Constructor(napi_env env)
     napi_property_descriptor properties[] = {
         /* Video extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
-        /* Video property */
-        DECLARE_NAPI_GETTER_SETTER("videoUri", GetUri, SetUri),
+        /* Video extends File */
+        DECLARE_NAPI_GETTER_SETTER("details", FileNapi::GetDetails, FileNapi::SetDetails),
+        DECLARE_NAPI_GETTER_SETTER("imageUri", FileNapi::GetUri, FileNapi::SetUri),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "Video", properties, count, VideoNapi::New);
@@ -65,44 +67,6 @@ void VideoNapi::Destructor(napi_env env, void *data, void *hint)
     auto *video = reinterpret_cast<VideoNapi *>(data);
     ASSERT_VOID(video != nullptr, "finalize null!");
     delete video;
-}
-
-VideoNapi *VideoNapi::GetVideo(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
-{
-    ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    return reinterpret_cast<VideoNapi *>(ctxt->native);
-}
-
-napi_value VideoNapi::GetUri(napi_env env, napi_callback_info info)
-{
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
-    auto ctxt = std::make_shared<ContextBase>();
-    auto video = GetVideo(env, info, ctxt);
-    ASSERT_ERR(
-        ctxt->env, (video != nullptr && video->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
-    ctxt->status = NapiDataUtils::SetValue(env, video->value_->GetUri(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set uri failed!");
-    return ctxt->output;
-}
-
-napi_value VideoNapi::SetUri(napi_env env, napi_callback_info info)
-{
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
-    auto ctxt = std::make_shared<ContextBase>();
-    std::string uri;
-    auto input = [env, ctxt, &uri](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-        ctxt->status = NapiDataUtils::GetValue(env, argv[0], uri);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    };
-    ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto video = reinterpret_cast<VideoNapi *>(ctxt->native);
-    ASSERT_ERR(
-        ctxt->env, (video != nullptr && video->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
-    video->value_->SetUri(uri);
-    return nullptr;
 }
 } // namespace UDMF
 } // namespace OHOS

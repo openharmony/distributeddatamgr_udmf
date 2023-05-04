@@ -49,10 +49,11 @@ enum UDType : int32_t {
     SYSTEM_DEFINED_RECORD,
     SYSTEM_DEFINED_APP_ITEM,
     SYSTEM_DEFINED_PIXEL_MAP,
+    APPLICATION_DEFINED_RECORD,
     UD_BUTT
 };
 
-static const std::unordered_map<int32_t, std::string> UD_TYPE_MAP{
+static const std::unordered_map<int32_t, std::string> UD_TYPE_MAP {
     { TEXT, "Text" },
     { PLAIN_TEXT, "Text.PlainText" },
     { STYLED_TEXT, "Text.StyledText" },
@@ -72,20 +73,24 @@ static const std::unordered_map<int32_t, std::string> UD_TYPE_MAP{
     { SYSTEM_DEFINED_FORM, "SystemDefinedType.Form" },
     { SYSTEM_DEFINED_APP_ITEM, "SystemDefinedType.AppItem" },
     { SYSTEM_DEFINED_PIXEL_MAP, "SystemDefinedType.PixelMap" },
+    { APPLICATION_DEFINED_RECORD, "ApplicationDefinedType" },
     { UD_BUTT, "INVALID" }
 };
 
-static const std::unordered_map<int32_t, std::string> JS_UD_TYPE_NAME_MAP{
+static const std::unordered_map<int32_t, std::string> JS_UD_TYPE_NAME_MAP {
     { TEXT, "TEXT" },
     { PLAIN_TEXT, "PLAIN_TEXT" },
     { HYPER_LINK, "HYPER_LINK" },
     { HTML, "HTML" },
+    { FILE, "FILE" },
     { IMAGE, "IMAGE" },
     { VIDEO, "VIDEO" },
+    { FOLDER, "FOLDER" },
     { SYSTEM_DEFINED_RECORD, "SYSTEM_DEFINED_RECORD" },
     { SYSTEM_DEFINED_FORM, "SYSTEM_DEFINED_FORM" },
     { SYSTEM_DEFINED_APP_ITEM, "SYSTEM_DEFINED_APP_ITEM" },
     { SYSTEM_DEFINED_PIXEL_MAP, "SYSTEM_DEFINED_PIXEL_MAP" },
+    { APPLICATION_DEFINED_RECORD, "APPLICATION_DEFINED_RECORD" },
 };
 
 /*

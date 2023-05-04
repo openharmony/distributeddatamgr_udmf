@@ -14,26 +14,27 @@
  */
 
 #include <gtest/gtest.h>
-
 #include <unistd.h>
 
 #include "accesstoken_kit.h"
-#include "nativetoken_kit.h"
-#include "token_setproc.h"
-
-#include "logger.h"
-#include "udmf_client.h"
-#include "text.h"
-#include "plain_text.h"
-#include "html.h"
-#include "link.h"
+#include "application_defined_record.h"
 #include "file.h"
+#include "folder.h"
+#include "html.h"
 #include "image.h"
-#include "video.h"
-#include "system_defined_record.h"
-#include "system_defined_form.h"
+#include "link.h"
+#include "logger.h"
+#include "nativetoken_kit.h"
+#include "plain_text.h"
 #include "system_defined_appitem.h"
+#include "system_defined_form.h"
 #include "system_defined_pixelmap.h"
+#include "system_defined_record.h"
+#include "text.h"
+#include "token_setproc.h"
+#include "video.h"
+
+#include "udmf_client.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
@@ -88,37 +89,24 @@ void UdmfClientTest::SetNativeToken()
 void UdmfClientTest::SetHapToken()
 {
     HapInfoParams info = {
-        .userID = 100,
-        .bundleName = "ohos.test.demo",
-        .instIndex = 0,
-        .appIDDesc = "ohos.test.demo"
+        .userID = 100, .bundleName = "ohos.test.demo", .instIndex = 0, .appIDDesc = "ohos.test.demo"
     };
 
-    HapPolicyParams policy = {
-        .apl = APL_NORMAL,
+    HapPolicyParams policy = { .apl = APL_NORMAL,
         .domain = "test.domain",
-        .permList = {
-            {
-                .permissionName = "ohos.permission.test",
-                .bundleName = "ohos.test.demo",
-                .grantMode = 1,
-                .availableLevel = APL_NORMAL,
-                .label = "label",
-                .labelId = 1,
-                .description = "test",
-                .descriptionId = 1
-            }
-        },
-        .permStateList = {
-            {
-                .permissionName = "ohos.permission.test",
-                .isGeneral = true,
-                .resDeviceID = { "local" },
-                .grantStatus = { PermissionState::PERMISSION_GRANTED },
-                .grantFlags = { 1 }
-            }
-        }
-    };
+        .permList = { { .permissionName = "ohos.permission.test",
+            .bundleName = "ohos.test.demo",
+            .grantMode = 1,
+            .availableLevel = APL_NORMAL,
+            .label = "label",
+            .labelId = 1,
+            .description = "test",
+            .descriptionId = 1 } },
+        .permStateList = { { .permissionName = "ohos.permission.test",
+            .isGeneral = true,
+            .resDeviceID = { "local" },
+            .grantStatus = { PermissionState::PERMISSION_GRANTED },
+            .grantFlags = { 1 } } } };
     auto tokenID = AccessTokenKit::AllocHapToken(info, policy);
     SetSelfTokenID(tokenID.tokenIDEx);
 }
@@ -153,7 +141,7 @@ HWTEST_F(UdmfClientTest, SetData001, TestSize.Level1)
 
 /**
 * @tc.name: SetData002
-* @tc.desc: Set text data with valid params and get text data
+* @tc.desc: Set Text record with valid params and get data
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfClientTest, SetData002, TestSize.Level1)
@@ -214,7 +202,7 @@ HWTEST_F(UdmfClientTest, SetData002, TestSize.Level1)
 
 /**
 * @tc.name: SetData003
-* @tc.desc: Set data with valid params and get data
+* @tc.desc: Set PlainText record with valid params and get data
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -283,7 +271,7 @@ HWTEST_F(UdmfClientTest, SetData003, TestSize.Level1)
 
 /**
 * @tc.name: SetData004
-* @tc.desc: Set data with valid params and get data
+* @tc.desc: Set Html record with valid params and get data
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -352,7 +340,7 @@ HWTEST_F(UdmfClientTest, SetData004, TestSize.Level1)
 
 /**
 * @tc.name: SetData005
-* @tc.desc: Set data with valid params and get data
+* @tc.desc: Set Link record with valid params and get data
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -421,7 +409,7 @@ HWTEST_F(UdmfClientTest, SetData005, TestSize.Level1)
 
 /**
 * @tc.name: SetData006
-* @tc.desc: Set data with valid params and get data
+* @tc.desc: Set File record with valid params and get data
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -435,6 +423,9 @@ HWTEST_F(UdmfClientTest, SetData006, TestSize.Level1)
     File file1;
     file1.SetUri("uri");
     file1.SetRemoteUri("remoteUri");
+    UDDetails details1;
+    details1.insert({ "udmf_key", "udmf_value" });
+    file1.SetDetails(details1);
     std::shared_ptr<UnifiedRecord> record1 = std::make_shared<File>(file1);
     data1.AddRecord(record1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
@@ -465,6 +456,15 @@ HWTEST_F(UdmfClientTest, SetData006, TestSize.Level1)
     EXPECT_EQ(file1.GetUri(), file2->GetUri());
     EXPECT_EQ(file1.GetRemoteUri(), file2->GetRemoteUri());
 
+    auto details2 = file2->GetDetails();
+    for (auto &detail : details2) {
+        auto key = detail.first;
+        EXPECT_EQ(key, "udmf_key");
+        auto value = detail.second;
+        auto str = std::get<std::string>(value);
+        EXPECT_EQ(str, "udmf_value");
+    }
+
     UnifiedData data3;
     status = UdmfClient::GetInstance().GetData(option2, data3);
     EXPECT_EQ(status, E_OK);
@@ -475,7 +475,7 @@ HWTEST_F(UdmfClientTest, SetData006, TestSize.Level1)
 
 /**
 * @tc.name: SetData007
-* @tc.desc: Set data with valid params and get data
+* @tc.desc: Set Image record with valid params and get data
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -487,6 +487,9 @@ HWTEST_F(UdmfClientTest, SetData007, TestSize.Level1)
     UnifiedData data1;
     std::string key;
     Image image1;
+    UDDetails details1;
+    details1.insert({ "udmf_key", "udmf_value" });
+    image1.SetDetails(details1);
     image1.SetUri("uri");
     image1.SetRemoteUri("remoteUri");
     std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Image>(image1);
@@ -514,6 +517,18 @@ HWTEST_F(UdmfClientTest, SetData007, TestSize.Level1)
     auto type = record2->GetType();
     EXPECT_EQ(type, UDType::IMAGE);
 
+    auto file2 = static_cast<File *>(record2.get());
+    EXPECT_NE(file2, nullptr);
+
+    auto details2 = file2->GetDetails();
+    for (auto &detail : details2) {
+        auto key = detail.first;
+        EXPECT_EQ(key, "udmf_key");
+        auto value = detail.second;
+        auto str = std::get<std::string>(value);
+        EXPECT_EQ(str, "udmf_value");
+    }
+
     auto image2 = static_cast<Image *>(record2.get());
     EXPECT_NE(image2, nullptr);
     EXPECT_EQ(image1.GetUri(), image2->GetUri());
@@ -529,7 +544,7 @@ HWTEST_F(UdmfClientTest, SetData007, TestSize.Level1)
 
 /**
 * @tc.name: SetData008
-* @tc.desc: Set data with valid params and get data
+* @tc.desc: Set Video record with valid params and get data
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -541,6 +556,9 @@ HWTEST_F(UdmfClientTest, SetData008, TestSize.Level1)
     UnifiedData data1;
     std::string key;
     Video video1;
+    UDDetails details1;
+    details1.insert({ "udmf_key", "udmf_value" });
+    video1.SetDetails(details1);
     video1.SetUri("uri");
     video1.SetRemoteUri("remoteUri");
     std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Video>(video1);
@@ -568,6 +586,18 @@ HWTEST_F(UdmfClientTest, SetData008, TestSize.Level1)
     auto type = record2->GetType();
     EXPECT_EQ(type, UDType::VIDEO);
 
+    auto file2 = static_cast<File *>(record2.get());
+    EXPECT_NE(file2, nullptr);
+
+    auto details2 = file2->GetDetails();
+    for (auto &detail : details2) {
+        auto key = detail.first;
+        EXPECT_EQ(key, "udmf_key");
+        auto value = detail.second;
+        auto str = std::get<std::string>(value);
+        EXPECT_EQ(str, "udmf_value");
+    }
+
     auto video2 = static_cast<Video *>(record2.get());
     EXPECT_NE(video2, nullptr);
     EXPECT_EQ(video1.GetUri(), video2->GetUri());
@@ -583,13 +613,82 @@ HWTEST_F(UdmfClientTest, SetData008, TestSize.Level1)
 
 /**
 * @tc.name: SetData009
-* @tc.desc: Set data with valid params and get data
+* @tc.desc: Set Folder record with valid params and get data
 * @tc.type: FUNC
 * @tc.require:
 */
 HWTEST_F(UdmfClientTest, SetData009, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "SetData009 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data1;
+    std::string key;
+    Folder folder1;
+    UDDetails details1;
+    details1.insert({ "udmf_key", "udmf_value" });
+    folder1.SetDetails(details1);
+    folder1.SetUri("uri");
+    folder1.SetRemoteUri("remoteUri");
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Folder>(folder1);
+    data1.AddRecord(record1);
+    auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
+    EXPECT_EQ(status, E_OK);
+
+    SetNativeToken();
+
+    QueryOption option2 = { .key = key };
+    Privilege privilege;
+    privilege.pid = getpid();
+    privilege.readPermission = "readPermission";
+    privilege.writePermission = "writePermission";
+    status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
+    EXPECT_EQ(status, E_OK);
+
+    SetHapToken();
+
+    UnifiedData data2;
+    status = UdmfClient::GetInstance().GetData(option2, data2);
+    EXPECT_EQ(status, E_OK);
+
+    std::shared_ptr<UnifiedRecord> record2 = data2.GetRecordAt(0);
+    auto type = record2->GetType();
+    EXPECT_EQ(type, UDType::FOLDER);
+
+    auto file2 = static_cast<File *>(record2.get());
+    EXPECT_NE(file2, nullptr);
+
+    auto details2 = file2->GetDetails();
+    for (auto &detail : details2) {
+        auto key = detail.first;
+        EXPECT_EQ(key, "udmf_key");
+        auto value = detail.second;
+        auto str = std::get<std::string>(value);
+        EXPECT_EQ(str, "udmf_value");
+    }
+
+    auto folder2 = static_cast<Folder *>(record2.get());
+    EXPECT_NE(folder2, nullptr);
+    EXPECT_EQ(folder1.GetUri(), folder2->GetUri());
+    EXPECT_EQ(folder1.GetRemoteUri(), folder2->GetRemoteUri());
+
+    UnifiedData data3;
+    status = UdmfClient::GetInstance().GetData(option2, data3);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_TRUE(data3.IsEmpty());
+
+    LOG_INFO(UDMF_TEST, "SetData009 end.");
+}
+
+/**
+* @tc.name: SetData010
+* @tc.desc: Set SystemDefined record with valid params and get data
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(UdmfClientTest, SetData010, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData010 begin.");
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
@@ -640,18 +739,18 @@ HWTEST_F(UdmfClientTest, SetData009, TestSize.Level1)
     EXPECT_EQ(status, E_OK);
     EXPECT_TRUE(data3.IsEmpty());
 
-    LOG_INFO(UDMF_TEST, "SetData009 end.");
+    LOG_INFO(UDMF_TEST, "SetData010 end.");
 }
 
 /**
-* @tc.name: SetData010
-* @tc.desc: Set data with valid params and get data
+* @tc.name: SetData011
+* @tc.desc: Set Form record with valid params and get data
 * @tc.type: FUNC
 * @tc.require:
 */
-HWTEST_F(UdmfClientTest, SetData010, TestSize.Level1)
+HWTEST_F(UdmfClientTest, SetData011, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetData010 begin.");
+    LOG_INFO(UDMF_TEST, "SetData011 begin.");
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
@@ -715,18 +814,18 @@ HWTEST_F(UdmfClientTest, SetData010, TestSize.Level1)
     EXPECT_EQ(status, E_OK);
     EXPECT_TRUE(data3.IsEmpty());
 
-    LOG_INFO(UDMF_TEST, "SetData010 end.");
+    LOG_INFO(UDMF_TEST, "SetData011 end.");
 }
 
 /**
-* @tc.name: SetData011
-* @tc.desc: Set data with valid params and get data
+* @tc.name: SetData012
+* @tc.desc: Set AppItem record with valid params and get data
 * @tc.type: FUNC
 * @tc.require:
 */
-HWTEST_F(UdmfClientTest, SetData011, TestSize.Level1)
+HWTEST_F(UdmfClientTest, SetData012, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetData011 begin.");
+    LOG_INFO(UDMF_TEST, "SetData012 begin.");
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
@@ -792,18 +891,18 @@ HWTEST_F(UdmfClientTest, SetData011, TestSize.Level1)
     EXPECT_EQ(status, E_OK);
     EXPECT_TRUE(data3.IsEmpty());
 
-    LOG_INFO(UDMF_TEST, "SetData011 end.");
+    LOG_INFO(UDMF_TEST, "SetData012 end.");
 }
 
 /**
-* @tc.name: SetData012
-* @tc.desc: Set data with valid params and get data
+* @tc.name: SetData013
+* @tc.desc: Set PixelMap record with valid params and get data
 * @tc.type: FUNC
 * @tc.require:
 */
-HWTEST_F(UdmfClientTest, SetData012, TestSize.Level1)
+HWTEST_F(UdmfClientTest, SetData013, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetData012 begin.");
+    LOG_INFO(UDMF_TEST, "SetData013 begin.");
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
@@ -812,7 +911,7 @@ HWTEST_F(UdmfClientTest, SetData012, TestSize.Level1)
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
     systemDefinedPixelMap1.SetDetails(details1);
-    std::vector<uint8_t> rawData1 ={ 1, 2, 3, 4, 5 };
+    std::vector<uint8_t> rawData1 = { 1, 2, 3, 4, 5 };
     systemDefinedPixelMap1.SetRawData(rawData1);
     std::shared_ptr<UnifiedRecord> record1 = std::make_shared<SystemDefinedPixelMap>(systemDefinedPixelMap1);
     data1.AddRecord(record1);
@@ -864,12 +963,72 @@ HWTEST_F(UdmfClientTest, SetData012, TestSize.Level1)
     EXPECT_EQ(status, E_OK);
     EXPECT_TRUE(data3.IsEmpty());
 
-    LOG_INFO(UDMF_TEST, "SetData012 end.");
+    LOG_INFO(UDMF_TEST, "SetData013 end.");
+}
+
+/**
+* @tc.name: SetData014
+* @tc.desc: Set Application Defined record with valid params and get data
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(UdmfClientTest, SetData014, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData014 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data1;
+    std::string key;
+    ApplicationDefinedRecord applicationDefinedRecord1;
+    applicationDefinedRecord1.SetApplicationDefinedType("applicationDefinedType");
+    std::vector<uint8_t> rawData1 = { 1, 2, 3, 4, 5 };
+    applicationDefinedRecord1.SetRawData(rawData1);
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<ApplicationDefinedRecord>(applicationDefinedRecord1);
+    data1.AddRecord(record1);
+    auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
+    EXPECT_EQ(status, E_OK);
+
+    SetNativeToken();
+
+    QueryOption option2 = { .key = key };
+    Privilege privilege;
+    privilege.pid = getpid();
+    privilege.readPermission = "readPermission";
+    privilege.writePermission = "writePermission";
+    status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
+    EXPECT_EQ(status, E_OK);
+
+    SetHapToken();
+
+    UnifiedData data2;
+    status = UdmfClient::GetInstance().GetData(option2, data2);
+    EXPECT_EQ(status, E_OK);
+
+    std::shared_ptr<UnifiedRecord> record2 = data2.GetRecordAt(0);
+    auto type = record2->GetType();
+    EXPECT_EQ(type, UDType::APPLICATION_DEFINED_RECORD);
+
+    auto applicationDefinedRecord2 = static_cast<ApplicationDefinedRecord *>(record2.get());
+    EXPECT_NE(applicationDefinedRecord2, nullptr);
+    EXPECT_EQ(
+        applicationDefinedRecord1.GetApplicationDefinedType(), applicationDefinedRecord2->GetApplicationDefinedType());
+    auto rawData2 = applicationDefinedRecord2->GetRawData();
+    EXPECT_EQ(rawData1.size(), rawData2.size());
+    for (int i = 0; i < rawData1.size(); ++i) {
+        EXPECT_EQ(rawData1[i], rawData2[i]);
+    }
+
+    UnifiedData data3;
+    status = UdmfClient::GetInstance().GetData(option2, data3);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_TRUE(data3.IsEmpty());
+
+    LOG_INFO(UDMF_TEST, "SetData014 end.");
 }
 
 /**
 * @tc.name: GetData001
-* @tc.desc: Get data with invalid params
+* @tc.desc: Get data with invalid key
 * @tc.type: FUNC
 * @tc.require:
 */
@@ -933,6 +1092,8 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     UDDetails details;
     details.insert({ "udmf_key", "udmf_value" });
 
+    std::vector<uint8_t> rawData = { 1, 2, 3, 4, 5 };
+
     Text text;
     text.SetDetails(details);
     std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Text>(text);
@@ -946,12 +1107,14 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     data.AddRecord(record2);
 
     File file;
+    file.SetDetails(details);
     file.SetUri("uri");
     file.SetRemoteUri("remoteUri");
     std::shared_ptr<UnifiedRecord> record3 = std::make_shared<File>(file);
     data.AddRecord(record3);
 
     Image image;
+    file.SetDetails(details);
     image.SetUri("uri");
     image.SetRemoteUri("remoteUri");
     std::shared_ptr<UnifiedRecord> record4 = std::make_shared<Image>(image);
@@ -972,6 +1135,12 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     std::shared_ptr<UnifiedRecord> record6 = std::make_shared<SystemDefinedForm>(systemDefinedForm);
     data.AddRecord(record6);
 
+    ApplicationDefinedRecord applicationDefinedRecord;
+    applicationDefinedRecord.SetApplicationDefinedType("applicationDefinedType");
+    applicationDefinedRecord.SetRawData(rawData);
+    std::shared_ptr<UnifiedRecord> record7 = std::make_shared<ApplicationDefinedRecord>(applicationDefinedRecord);
+    data.AddRecord(record7);
+
     auto status = UdmfClient::GetInstance().SetData(option1, data, key);
     EXPECT_EQ(status, E_OK);
 
@@ -985,23 +1154,24 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     size += record4->GetSize();
     size += record5->GetSize();
     size += record6->GetSize();
+    size += record7->GetSize();
 
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(summary.totalSize, size);
-    EXPECT_EQ(summary.summary["Text"], record1->GetSize());
-    EXPECT_EQ(summary.summary["Text.PlainText"], record2->GetSize());
-    EXPECT_EQ(summary.summary["File"], record3->GetSize());
-    EXPECT_EQ(summary.summary["File.Media.Image"], record4->GetSize());
-    EXPECT_EQ(summary.summary["SystemDefinedType"], record5->GetSize());
-    EXPECT_EQ(summary.summary["SystemDefinedType.Form"], record6->GetSize());
+    EXPECT_EQ(summary.summary[UD_TYPE_MAP.at(UDMF::TEXT)], record1->GetSize());
+    EXPECT_EQ(summary.summary[UD_TYPE_MAP.at(UDMF::PLAIN_TEXT)], record2->GetSize());
+    EXPECT_EQ(summary.summary[UD_TYPE_MAP.at(UDMF::FILE)], record3->GetSize());
+    EXPECT_EQ(summary.summary[UD_TYPE_MAP.at(UDMF::IMAGE)], record4->GetSize());
+    EXPECT_EQ(summary.summary[UD_TYPE_MAP.at(UDMF::SYSTEM_DEFINED_RECORD)], record5->GetSize());
+    EXPECT_EQ(summary.summary[UD_TYPE_MAP.at(UDMF::SYSTEM_DEFINED_FORM)], record6->GetSize());
+    EXPECT_EQ(summary.summary[UD_TYPE_MAP.at(UDMF::APPLICATION_DEFINED_RECORD)], record7->GetSize());
 
     LOG_INFO(UDMF_TEST, "GetSummary001 end.");
 }
 
-
 /**
 * @tc.name: GetSummary002
-* @tc.desc: Get summary with invalid params
+* @tc.desc: Get summary with invalid key
 * @tc.type: FUNC
 * @tc.require:
 */

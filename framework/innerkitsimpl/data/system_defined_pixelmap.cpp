@@ -40,7 +40,7 @@ std::vector<uint8_t> SystemDefinedPixelMap::GetRawData() const
 
 void SystemDefinedPixelMap::SetRawData(const std::vector<uint8_t> &rawData)
 {
-    this->rawData_ = std::move(rawData);
+    this->rawData_ = rawData;
 }
 } // namespace UDMF
 } // namespace OHOS

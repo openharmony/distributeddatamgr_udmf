@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "file_napi.h"
+#include "folder_napi.h"
 #include "html_napi.h"
 #include "image_napi.h"
 #include "link_napi.h"
@@ -51,10 +53,14 @@ static napi_value Init(napi_env env, napi_value exports)
     LOG_INFO(UDMF_KITS_NAPI, "init HyperLink %{public}d", status);
     status = napi_set_named_property(env, exports, "HTML", OHOS::UDMF::HtmlNapi::Constructor(env));
     LOG_INFO(UDMF_KITS_NAPI, "init HTML %{public}d", status);
+    status = napi_set_named_property(env, exports, "File", OHOS::UDMF::FileNapi::Constructor(env));
+    LOG_INFO(UDMF_KITS_NAPI, "init File %{public}d", status);
     status = napi_set_named_property(env, exports, "Image", OHOS::UDMF::ImageNapi::Constructor(env));
     LOG_INFO(UDMF_KITS_NAPI, "init Image %{public}d", status);
     status = napi_set_named_property(env, exports, "Video", OHOS::UDMF::VideoNapi::Constructor(env));
     LOG_INFO(UDMF_KITS_NAPI, "init Video %{public}d", status);
+    status = napi_set_named_property(env, exports, "Folder", OHOS::UDMF::FolderNapi::Constructor(env));
+    LOG_INFO(UDMF_KITS_NAPI, "init Folder %{public}d", status);
     status = napi_set_named_property(
         env, exports, "SystemDefinedRecord", OHOS::UDMF::SystemDefinedRecordNapi::Constructor(env));
     LOG_INFO(UDMF_KITS_NAPI, "init SystemDefinedRecord %{public}d", status);

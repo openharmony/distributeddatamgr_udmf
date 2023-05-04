@@ -42,8 +42,10 @@ napi_value UDMFNapi::CreateUnifiedDataType(napi_env env, napi_callback_info info
     SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(PLAIN_TEXT), UD_TYPE_MAP.at(PLAIN_TEXT));
     SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(HTML), UD_TYPE_MAP.at(HTML));
     SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(HYPER_LINK), UD_TYPE_MAP.at(HYPER_LINK));
+    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(FILE), UD_TYPE_MAP.at(FILE));
     SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(IMAGE), UD_TYPE_MAP.at(IMAGE));
     SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(VIDEO), UD_TYPE_MAP.at(VIDEO));
+    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(FOLDER), UD_TYPE_MAP.at(FOLDER));
     SetNamedProperty(
         env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(SYSTEM_DEFINED_RECORD), UD_TYPE_MAP.at(SYSTEM_DEFINED_RECORD));
     SetNamedProperty(
@@ -52,6 +54,8 @@ napi_value UDMFNapi::CreateUnifiedDataType(napi_env env, napi_callback_info info
         UD_TYPE_MAP.at(SYSTEM_DEFINED_APP_ITEM));
     SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(SYSTEM_DEFINED_PIXEL_MAP),
         UD_TYPE_MAP.at(SYSTEM_DEFINED_PIXEL_MAP));
+    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(APPLICATION_DEFINED_RECORD),
+        UD_TYPE_MAP.at(APPLICATION_DEFINED_RECORD));
     napi_object_freeze(env, unifiedDataType);
     return unifiedDataType;
 }
