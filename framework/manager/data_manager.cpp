@@ -17,6 +17,7 @@
 
 #include "logger.h"
 #include "preprocess_utils.h"
+#include "checker_manager.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -24,9 +25,12 @@ const std::string MSDP_PROCESS_NAME = "msdp_sa";
 DataManager::DataManager()
 {
     authorizationMap_[UD_INTENTION_MAP.at(UD_INTENTION_DRAG)] = MSDP_PROCESS_NAME;
+    CheckerManager::GetInstance().LoadCheckers();
 }
 
-DataManager::~DataManager() {}
+DataManager::~DataManager()
+{
+}
 
 DataManager &DataManager::GetInstance()
 {
@@ -46,7 +50,7 @@ int32_t DataManager::SaveData(CustomOption &option, UnifiedData &unifiedData, st
         return E_INVALID_PARAMETERS;
     }
 
-    // imput runtime info before put it into store
+    // imput runtime info before put it into store and save one privilege
     PreProcessUtils utils = PreProcessUtils::GetInstance();
     if (!utils.RuntimeDataImputation(unifiedData, option)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Imputation failed, %{public}s", utils.errorStr.c_str());
@@ -102,10 +106,14 @@ int32_t DataManager::RetrieveData(QueryOption &query, UnifiedData &unifiedData)
     }
 
     std::shared_ptr<Runtime> runtime = tmpData.GetRuntime();
-    if (runtime->privilege.pid != query.pid) {
+    CheckerManager::CheckInfo info;
+    info.tokenId = query.tokenId;
+    info.pid = query.pid;
+    if (!CheckerManager::GetInstance().IsValid(runtime->privileges, info)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid caller, intention: %{public}s.", key.intention.c_str());
         return E_INVALID_OPERATION;
     }
+
     unifiedData = tmpData;
 
     if (store->Delete(key) != E_OK) {
@@ -175,7 +183,7 @@ int32_t DataManager::AddPrivilege(QueryOption &query, const Privilege &privilege
         return E_INVALID_PARAMETERS;
     }
 
-    data.GetRuntime()->privilege = privilege;
+    data.GetRuntime()->privileges.emplace_back(privilege);
     if (store->Update(data) != E_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "Update unified data failed, intention: %{public}s.", key.intention.c_str());
         return E_DB_ERROR;

@@ -46,7 +46,7 @@ struct Privilege {
 struct Runtime {
     UnifiedKey key;
     bool isPrivate{};
-    Privilege privilege;
+    std::vector<Privilege> privileges;
     // time when the data is created
     time_t createTime{};
     // name of the package for creating data

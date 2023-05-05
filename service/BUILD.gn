@@ -22,9 +22,9 @@ ohos_shared_library("udmf_server") {
   include_dirs = [
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/manager",
-    "${udmf_framework_path}/manager/container",
     "${udmf_framework_path}/manager/store",
     "${udmf_framework_path}/manager/preprocess",
+    "${udmf_framework_path}/manager/permission",
     "${udmf_framework_path}/service",
     "${udmf_interfaces_path}/innerkits/client",
     "${udmf_interfaces_path}/innerkits/common",
@@ -35,6 +35,7 @@ ohos_shared_library("udmf_server") {
     "//third_party/node/src",
     "//commonlibrary/c_utils/base/include",
   ]
+
   sources = [
     "src/udmf_service_impl.cpp",
     "src/udmf_service_stub.cpp",
@@ -57,5 +58,6 @@ ohos_shared_library("udmf_server") {
   ]
 
   subsystem_name = "distributeddatamgr"
+
   part_name = "udmf"
 }

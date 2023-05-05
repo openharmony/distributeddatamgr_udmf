@@ -41,8 +41,11 @@ bool PreProcessUtils::RuntimeDataImputation(UnifiedData &data, CustomOption &opt
     GetHapBundleNameByToken(option.tokenId, bundleName);
     std::string intention = it->second;
     UnifiedKey key(intention, bundleName, IdGenerator());
+    Privilege privilege;
+    privilege.tokenId = option.tokenId;
     Runtime runtime;
     runtime.key = key;
+    runtime.privileges.emplace_back(privilege);
     runtime.createTime = GetTimeStamp();
     runtime.sourcePackage = bundleName;
     runtime.createPackage = bundleName;

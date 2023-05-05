@@ -194,8 +194,12 @@ template<>
 bool CountBufferSize(const Runtime &input, TLVObject &data)
 {
     data.Count(input.key);
-    data.Count(input.privilege);
     data.Count(input.isPrivate);
+    int32_t size = input.privileges.size();
+    data.Count(size);
+    for (int i = 0; i < size; ++i) {
+        data.Count(input.privileges[i]);
+    }
     data.Count(static_cast<int64_t>(input.createTime));
     data.Count(static_cast<int64_t>(input.lastModifiedTime));
     data.Count(input.sourcePackage);
@@ -1056,8 +1060,14 @@ bool Writing(const Runtime &input, TLVObject &data)
     if (!Writing(input.isPrivate, data)) {
         return false;
     }
-    if (!Writing(input.privilege, data)) {
+    int32_t size = input.privileges.size();
+    if (!Writing(size, data)) {
         return false;
+    }
+    for (int i = 0; i < size; ++i) {
+        if (!Writing(input.privileges[i], data)) {
+            return false;
+        }
     }
     if (!Writing(static_cast<int64_t>(input.createTime), data)) {
         return false;
@@ -1088,7 +1098,8 @@ bool Reading(Runtime &output, TLVObject &data)
 {
     UnifiedKey key;
     bool isPrivate;
-    Privilege privilege;
+    int32_t size;
+    std::vector<Privilege> privileges;
     int64_t createTime;
     std::string sourcePackage;
     DataStatus dataStatus;
@@ -1102,8 +1113,15 @@ bool Reading(Runtime &output, TLVObject &data)
     if (!Reading(isPrivate, data)) {
         return false;
     }
-    if (!Reading(privilege, data)) {
+    if (!Reading(size, data)) {
         return false;
+    }
+    for (int i = 0; i < size; ++i) {
+        Privilege privilege;
+        if (!Reading(privilege, data)) {
+            return false;
+        }
+        privileges.emplace_back(privilege);
     }
     if (!Reading(createTime, data)) {
         return false;
@@ -1128,7 +1146,7 @@ bool Reading(Runtime &output, TLVObject &data)
     }
     output.key = key;
     output.isPrivate = isPrivate;
-    output.privilege = privilege;
+    output.privileges = privileges;
     output.createTime = createTime;
     output.sourcePackage = sourcePackage;
     output.dataStatus = dataStatus;

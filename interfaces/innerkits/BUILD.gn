@@ -23,6 +23,7 @@ config("udmf_client_config") {
     "${udmf_framework_path}/manager",
     "${udmf_framework_path}/manager/store",
     "${udmf_framework_path}/manager/preprocess",
+    "${udmf_framework_path}/manager/permission",
     "${udmf_framework_path}/service",
     "${kv_store_path}/frameworks/common",
     "${kv_store_path}/frameworks/libs/distributeddb/interfaces/include",
@@ -52,6 +53,9 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
+    "${udmf_framework_path}/common/anonymous.cpp",
+    "${udmf_framework_path}/manager/permission/checker_manager.cpp",
+    "${udmf_framework_path}/manager/permission/data_checker.cpp",
     "${udmf_framework_path}/manager/preprocess/preprocess_utils.cpp",
     "${udmf_framework_path}/manager/store/store_cache.cpp",
     "${udmf_framework_path}/manager/store/runtime_store.cpp",
@@ -59,6 +63,7 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/service/udmf_service_client.cpp",
     "${udmf_framework_path}/service/udmf_service_proxy.cpp",
   ]
+
   public_configs = [ ":udmf_client_config" ]
 
   deps = [
@@ -78,5 +83,6 @@ ohos_shared_library("udmf_client") {
   ]
 
   subsystem_name = "distributeddatamgr"
+
   part_name = "udmf"
 }
