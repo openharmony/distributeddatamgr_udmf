@@ -18,6 +18,8 @@
 #include "logger.h"
 #include "preprocess_utils.h"
 #include "checker_manager.h"
+#include "file.h"
+#include "uri_permission_manager.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -112,6 +114,21 @@ int32_t DataManager::RetrieveData(QueryOption &query, UnifiedData &unifiedData)
     if (!CheckerManager::GetInstance().IsValid(runtime->privileges, info)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid caller, intention: %{public}s.", key.intention.c_str());
         return E_INVALID_OPERATION;
+    }
+
+    auto records = tmpData.GetRecords();
+    for (auto record : records) {
+        auto type = record->GetType();
+        if (type == UDType::FILE || type == UDType::IMAGE || type == UDType::VIDEO) {
+            std::string bundleName;
+            if (!PreProcessUtils::GetInstance().GetHapBundleNameByToken(query.tokenId, bundleName)) {
+                return E_ERROR;
+            }
+            auto file = static_cast<File *>(record.get());
+            if (UriPermissionManager::GetInstance().GrantUriPermission(file->GetUri(), bundleName) != E_OK) {
+                return E_ERROR;
+            }
+        }
     }
 
     unifiedData = tmpData;

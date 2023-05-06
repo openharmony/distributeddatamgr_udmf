@@ -33,7 +33,9 @@
         "safwk",
         "samgr",
         "napi",
-        "utils_base"
+        "utils_base",
+        "ability_base",
+        "ability_runtime"
       ],
       "third_party": [
         "gtest_main",
