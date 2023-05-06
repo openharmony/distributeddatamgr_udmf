@@ -17,9 +17,9 @@
 
 #include <cstdlib>
 
-#include "iservice_registry.h"
-
 #include "data_manager.h"
+#include "iservice_registry.h"
+#include "lifecycle/lifecycle_manager.h"
 #include "logger.h"
 #include "preprocess_utils.h"
 
@@ -69,6 +69,20 @@ int32_t UdmfServiceImpl::AddPrivilege(QueryOption &query, Privilege &privilege)
 int32_t UdmfServiceImpl::Sync(const QueryOption &query, const std::vector<std::string> &devices)
 {
     return DataManager::GetInstance().Sync(query, devices);
+}
+
+int32_t UdmfServiceImpl::OnInitialize()
+{
+    LOG_INFO(UDMF_SERVICE, "start");
+    Status status = LifeCycleManager::GetInstance().DeleteOnStart();
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "DeleteOnStart execute failed, status: %{public}d", status);
+    }
+    status = LifeCycleManager::GetInstance().DeleteOnSchedule();
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "ScheduleTask start failed, status: %{public}d", status);
+    }
+    return DistributedData::FeatureSystem::STUB_SUCCESS;
 }
 } // namespace UDMF
 } // namespace OHOS

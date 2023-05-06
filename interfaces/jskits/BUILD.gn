@@ -26,6 +26,7 @@ config("udmf_napi_config") {
     "${udmf_framework_path}/manager/container",
     "${udmf_framework_path}/manager/store",
     "${udmf_framework_path}/manager/preprocess",
+    "${udmf_framework_path}/manager/lifecycle",
     "${udmf_framework_path}/service",
 
     "${udmf_service_path}/include",

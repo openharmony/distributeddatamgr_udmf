@@ -26,22 +26,26 @@ public:
     explicit RuntimeStore(std::string storeId);
     ~RuntimeStore();
     Status Put(const UnifiedData &unifiedData) override;
-    Status Get(const UnifiedKey &key, UnifiedData &unifiedData) override;
-    Status GetSummary(const UnifiedKey &key, Summary &summary) override;
+    Status Get(const std::string &key, UnifiedData &unifiedData) override;
+    Status GetSummary(const std::string &key, Summary &summary) override;
     Status Update(const UnifiedData &unifiedData) override;
-    Status Delete(const UnifiedKey &key) override;
+    Status Delete(const std::string &key) override;
+    Status DeleteBatch(std::vector<std::string> timeoutKeys) override;
     Status Sync(const std::vector<std::string> &devices) override;
-    bool Clear() override;
-    bool Init() override;
+    Status Clear() override;
     void Close() override;
+    bool Init() override;
+    std::vector<UnifiedData> GetDatas(const std::string &dataPrefix) override;
 
 private:
     static const std::string APP_ID;
     static const std::string DATA_PREFIX;
     static const std::string BASE_DIR;
+    static const std::int32_t SLASH_COUNT_IN_KEY;
     DistributedDB::KvStoreDelegateManager delegateManager_;
     std::shared_ptr<DistributedDB::KvStoreNbDelegate> kvStore_;
     std::string storeId_;
+    std::vector<DistributedDB::Entry> GetEntries(const std::string &dataPrefix);
 };
 } // namespace UDMF
 } // namespace OHOS

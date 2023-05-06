@@ -25,6 +25,7 @@ ohos_shared_library("udmf_server") {
     "${udmf_framework_path}/manager/store",
     "${udmf_framework_path}/manager/preprocess",
     "${udmf_framework_path}/manager/permission",
+    "${udmf_framework_path}/manager/lifecycle",
     "${udmf_framework_path}/service",
     "${udmf_interfaces_path}/innerkits/client",
     "${udmf_interfaces_path}/innerkits/common",

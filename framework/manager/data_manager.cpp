@@ -15,6 +15,7 @@
 
 #include "data_manager.h"
 
+#include "lifecycle/lifecycle_manager.h"
 #include "logger.h"
 #include "preprocess_utils.h"
 #include "checker_manager.h"
@@ -69,7 +70,7 @@ int32_t DataManager::SaveData(CustomOption &option, UnifiedData &unifiedData, st
         return E_DB_ERROR;
     }
 
-    if (!store->Clear()) {
+    if (store->Clear() != E_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "Clear store failed, intention: %{public}s.", intention.c_str());
         return E_DB_ERROR;
     }
@@ -97,7 +98,7 @@ int32_t DataManager::RetrieveData(QueryOption &query, UnifiedData &unifiedData)
     }
 
     UnifiedData tmpData;
-    int32_t res = store->Get(key, tmpData);
+    int32_t res = store->Get(query.key, tmpData);
     if (res != E_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "Get data from store failed, intention: %{public}s.", key.intention.c_str());
         return res;
@@ -133,7 +134,7 @@ int32_t DataManager::RetrieveData(QueryOption &query, UnifiedData &unifiedData)
 
     unifiedData = tmpData;
 
-    if (store->Delete(key) != E_OK) {
+    if (LifeCycleManager::GetInstance().DeleteOnGet(key) != E_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "Remove data failed, intention: %{public}s.", key.intention.c_str());
         return E_DB_ERROR;
     }
@@ -154,7 +155,7 @@ int32_t DataManager::GetSummary(QueryOption &query, Summary &summary)
         return E_DB_ERROR;
     }
 
-    if (store->GetSummary(key, summary) != E_OK) {
+    if (store->GetSummary(query.key, summary) != E_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "Store get summary failed, intention: %{public}s.", key.intention.c_str());
         return E_DB_ERROR;
     }
@@ -188,7 +189,7 @@ int32_t DataManager::AddPrivilege(QueryOption &query, const Privilege &privilege
     }
 
     UnifiedData data;
-    int32_t res = store->Get(key, data);
+    int32_t res = store->Get(query.key, data);
     if (res != E_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "Get data from store failed, intention: %{public}s.", key.intention.c_str());
         return res;

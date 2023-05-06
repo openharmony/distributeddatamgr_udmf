@@ -15,6 +15,7 @@
 
 #include "runtime_store.h"
 
+#include <algorithm>
 #include <vector>
 
 #include "logger.h"
@@ -26,6 +27,7 @@ using namespace DistributedDB;
 const std::string RuntimeStore::APP_ID = "distributeddata";
 const std::string RuntimeStore::DATA_PREFIX = "udmf://";
 const std::string RuntimeStore::BASE_DIR = "/data/service/el1/public/database/distributeddata/kvdb";
+const std::int32_t RuntimeStore::SLASH_COUNT_IN_KEY = 4;
 
 RuntimeStore::RuntimeStore(std::string storeId) : delegateManager_(APP_ID, "default"), storeId_(storeId)
 {
@@ -78,21 +80,16 @@ Status RuntimeStore::Put(const UnifiedData &unifiedData)
     return E_OK;
 }
 
-Status RuntimeStore::Get(const UnifiedKey &key, UnifiedData &unifiedData)
+Status RuntimeStore::Get(const std::string &key, UnifiedData &unifiedData)
 {
-    Query dbQuery = Query::Select();
-    std::vector<uint8_t> prefix = { key.key.begin(), key.key.end() };
-    dbQuery.PrefixKey(prefix);
-    std::vector<Entry> entries;
-    auto status = kvStore_->GetEntries(dbQuery, entries);
-    if (status != DBStatus::OK && status != DBStatus::NOT_FOUND) {
-        LOG_ERROR(UDMF_SERVICE, "KvStore getEntries failed, status: %{public}d.", static_cast<int>(status));
-        return E_DB_ERROR;
+    std::vector<Entry> entries = GetEntries(key);
+    if (entries.empty()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "KvStore getEntries failed, key: %{public}s.", key.c_str());
+        return E_OK;
     }
-
     for (const auto &entry : entries) {
         std::string keyStr(entry.key.begin(), entry.key.end());
-        if (keyStr == key.key) {
+        if (keyStr == key) {
             Runtime runtime;
             auto runtimeTlv = TLVObject(const_cast<std::vector<uint8_t> &>(entry.value));
             if (!TLVUtil::Reading(runtime, runtimeTlv)) {
@@ -113,7 +110,7 @@ Status RuntimeStore::Get(const UnifiedKey &key, UnifiedData &unifiedData)
     return E_OK;
 }
 
-Status RuntimeStore::GetSummary(const UnifiedKey &key, Summary &summary)
+Status RuntimeStore::GetSummary(const std::string &key, Summary &summary)
 {
     UnifiedData unifiedData;
     if (Get(key, unifiedData) != E_OK) {
@@ -136,8 +133,8 @@ Status RuntimeStore::GetSummary(const UnifiedKey &key, Summary &summary)
 
 Status RuntimeStore::Update(const UnifiedData &unifiedData)
 {
-    UnifiedKey unifiedKey = unifiedData.GetRuntime()->key;
-    if (Delete(unifiedKey) != E_OK) {
+    std::string key = unifiedData.GetRuntime()->key.key;
+    if (Delete(key) != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "Delete unified data failed.");
         return E_DB_ERROR;
     }
@@ -149,18 +146,16 @@ Status RuntimeStore::Update(const UnifiedData &unifiedData)
     return E_OK;
 }
 
-Status RuntimeStore::Delete(const UnifiedKey &key)
+Status RuntimeStore::Delete(const std::string &key)
 {
-    UnifiedData unifiedData;
-    if (Get(key, unifiedData) != E_OK) {
-        LOG_ERROR(UDMF_SERVICE, "Get unifiedData failed.");
+    std::vector<Entry> entries = GetEntries(key);
+    if (entries.empty()) {
+        LOG_INFO(UDMF_FRAMEWORK, "KvStore getEntries failed, key: %{public}s.", key.c_str());
+        return E_OK;
     }
-
     std::vector<Key> keys;
-    keys.push_back({ key.key.begin(), key.key.end() });
-    for (const auto &record : unifiedData.GetRecords()) {
-        std::string recordKey = key.key + "/" + record->GetUid();
-        keys.push_back({ recordKey.begin(), recordKey.end() });
+    for (const auto &entry : entries) {
+        keys.push_back(entry.key);
     }
     auto status = kvStore_->DeleteBatch(keys);
     if (status != DBStatus::OK) {
@@ -168,6 +163,19 @@ Status RuntimeStore::Delete(const UnifiedKey &key)
         return E_DB_ERROR;
     }
     return E_OK;
+}
+
+Status RuntimeStore::DeleteBatch(std::vector<std::string> timeoutKeys)
+{
+    Status status = E_OK;
+    if (timeoutKeys.empty()) {
+        LOG_INFO(UDMF_SERVICE, "No need to delete!");
+        return status;
+    }
+    for (const std::string &timeoutKey : timeoutKeys) {
+        status = status == E_OK ? Delete(timeoutKey) : status;
+    }
+    return status;
 }
 
 Status RuntimeStore::Sync(const std::vector<std::string> &devices)
@@ -183,32 +191,9 @@ Status RuntimeStore::Sync(const std::vector<std::string> &devices)
     return E_OK;
 }
 
-bool RuntimeStore::Clear()
+Status RuntimeStore::Clear()
 {
-    Query dbQuery = Query::Select();
-    std::vector<uint8_t> prefix = { DATA_PREFIX.begin(), DATA_PREFIX.end() };
-    dbQuery.PrefixKey(prefix);
-    std::vector<Entry> entries;
-    DBStatus status = kvStore_->GetEntries(dbQuery, entries);
-    if (status != DBStatus::OK && status != DBStatus::NOT_FOUND) {
-        LOG_ERROR(UDMF_SERVICE, "KvStore getEntries failed, status: %{public}d.", static_cast<int>(status));
-        return false;
-    }
-
-    if (entries.empty()) {
-        return true;
-    }
-
-    std::vector<Key> keys;
-    for (const auto &entry : entries) {
-        keys.push_back(entry.key);
-    }
-    status = kvStore_->DeleteBatch(keys);
-    if (status != DBStatus::OK) {
-        LOG_ERROR(UDMF_SERVICE, "DeleteBatch kvStore failed, status: %{public}d.", static_cast<int>(status));
-        return false;
-    }
-    return true;
+    return Delete(DATA_PREFIX) != E_DB_ERROR ? E_OK : E_DB_ERROR;
 }
 
 void RuntimeStore::Close()
@@ -255,6 +240,38 @@ bool RuntimeStore::Init()
     };
     kvStore_ = std::shared_ptr<KvStoreNbDelegate>(delegate, release);
     return true;
+}
+
+std::vector<UnifiedData> RuntimeStore::GetDatas(const std::string &dataPrefix)
+{
+    std::vector<UnifiedData> unifiedDatas;
+    auto entries = GetEntries(dataPrefix);
+    if (entries.empty()) {
+        LOG_INFO(UDMF_FRAMEWORK, "entries is empty.");
+        return unifiedDatas;
+    }
+    for (const auto &entry : entries) {
+        UnifiedData data;
+        std::string keyStr(entry.key.begin(), entry.key.end());
+        if (std::count(keyStr.begin(), keyStr.end(), '/') == SLASH_COUNT_IN_KEY) {
+            Get(keyStr, data);
+            unifiedDatas.push_back(data);
+        }
+    }
+    return unifiedDatas;
+}
+
+std::vector<Entry> RuntimeStore::GetEntries(const std::string &dataPrefix)
+{
+    Query dbQuery = Query::Select();
+    std::vector<uint8_t> prefix = { dataPrefix.begin(), dataPrefix.end() };
+    dbQuery.PrefixKey(prefix);
+    std::vector<Entry> entries;
+    auto status = kvStore_->GetEntries(dbQuery, entries);
+    if (status == DBStatus::NOT_FOUND || status != DBStatus::OK) {
+        LOG_ERROR(UDMF_SERVICE, "KvStore getEntries failed, status: %{public}d.", static_cast<int>(status));
+    }
+    return entries;
 }
 } // namespace UDMF
 } // namespace OHOS
