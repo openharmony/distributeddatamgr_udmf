@@ -37,7 +37,7 @@ public:
     int32_t SaveData(CustomOption &option, UnifiedData &unifiedData, std::string &key);
     int32_t RetrieveData(QueryOption &query, UnifiedData &unifiedData);
     int32_t GetSummary(QueryOption &query, Summary &summary);
-    int32_t AddPrivilege(QueryOption &query, Privilege &privilege);
+    int32_t AddPrivilege(QueryOption &query, const Privilege &privilege);
     int32_t Sync(const QueryOption &query, const std::vector<std::string> &devices);
 
 private:

@@ -79,5 +79,10 @@ std::vector<UDType> UnifiedData::GetUDTypes()
     }
     return typeSet;
 }
+
+bool UnifiedData::IsEmpty() const
+{
+    return records_.empty();
+}
 } // namespace UDMF
 } // namespace OHOS

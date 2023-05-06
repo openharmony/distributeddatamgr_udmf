@@ -37,7 +37,6 @@ napi_value UnifiedRecordNapi::Constructor(napi_env env)
 napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi::New");
-    std::string content;
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");

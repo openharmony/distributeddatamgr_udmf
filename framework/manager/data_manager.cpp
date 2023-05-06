@@ -97,6 +97,10 @@ int32_t DataManager::RetrieveData(QueryOption &query, UnifiedData &unifiedData)
         return res;
     }
 
+    if (tmpData.IsEmpty()) {
+        return E_OK;
+    }
+
     std::shared_ptr<Runtime> runtime = tmpData.GetRuntime();
     if (runtime->privilege.pid != query.pid) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid caller, intention: %{public}s.", key.intention.c_str());
@@ -132,7 +136,7 @@ int32_t DataManager::GetSummary(QueryOption &query, Summary &summary)
     return E_OK;
 }
 
-int32_t DataManager::AddPrivilege(QueryOption &query, Privilege &privilege)
+int32_t DataManager::AddPrivilege(QueryOption &query, const Privilege &privilege)
 {
     UnifiedKey key(query.key);
     if (!key.IsValid()) {
@@ -165,7 +169,7 @@ int32_t DataManager::AddPrivilege(QueryOption &query, Privilege &privilege)
         return res;
     }
 
-    if (data.GetRecords().empty()) {
+    if (data.IsEmpty()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid parameters, unified data has no record, intention: %{public}s.",
             key.intention.c_str());
         return E_INVALID_PARAMETERS;

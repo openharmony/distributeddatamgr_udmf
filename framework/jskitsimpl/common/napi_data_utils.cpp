@@ -96,7 +96,7 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::string &ou
 {
     size_t maxLen = STR_MAX_LENGTH;
     napi_status status = napi_get_value_string_utf8(env, in, NULL, 0, &maxLen);
-    if (maxLen <= 0) {
+    if (maxLen == 0) {
         GET_AND_THROW_LAST_ERROR(env);
         return status;
     }
@@ -176,7 +176,7 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::vector<uin
     LOG_ERROR_RETURN(status == napi_ok, "napi_get_typedarray_info failed!", napi_invalid_arg);
     LOG_ERROR_RETURN(type == napi_uint8_array, "is not Uint8Array!", napi_invalid_arg);
     LOG_ERROR_RETURN((length > 0) && (data != nullptr), "invalid data!", napi_invalid_arg);
-    out.assign((uint8_t *)data, ((uint8_t *)data) + length);
+    out.assign(reinterpret_cast<uint8_t *>(data), reinterpret_cast<uint8_t *>(data) + length);
     return status;
 }
 

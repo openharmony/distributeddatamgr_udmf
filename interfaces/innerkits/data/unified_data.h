@@ -38,6 +38,8 @@ public:
 
     std::vector<UDType> GetUDTypes();
 
+    bool IsEmpty() const;
+
 private:
     std::shared_ptr<Runtime> runtime_;
     std::vector<std::shared_ptr<UnifiedRecord>> records_;

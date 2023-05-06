@@ -98,7 +98,7 @@ napi_value SystemDefinedFormNapi::SetFormId(napi_env env, napi_callback_info inf
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "start");
     auto ctxt = std::make_shared<ContextBase>();
-    int32_t formId;
+    int32_t formId = 0;
     auto input = [env, ctxt, &formId](size_t argc, napi_value *argv) {
         ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], formId);

@@ -52,9 +52,13 @@ UdmfServiceProxy::UdmfServiceProxy(const sptr<IRemoteObject> &object) : IRemoteP
 {
 }
 
-int32_t UdmfServiceProxy::SetData(CustomOption &customOption, UnifiedData &unifiedData, std::string &key)
+int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
 {
-    LOG_INFO(UDMF_SERVICE, "start, tag: %{public}d", customOption.intention);
+    LOG_INFO(UDMF_SERVICE, "start, tag: %{public}d", option.intention);
+    if (!UnifiedDataUtils::IsValidIntention(option.intention)) {
+        LOG_ERROR(UDMF_SERVICE, "Invalid intention");
+        return E_INVALID_PARAMETERS;
+    }
     if (unifiedData.GetSize() > UDMF_MAX_DATA_SIZE) {
         LOG_ERROR(UDMF_SERVICE, "Exceeded the limit!");
         return E_INVALID_VALUE;
@@ -64,7 +68,7 @@ int32_t UdmfServiceProxy::SetData(CustomOption &customOption, UnifiedData &unifi
         return E_INVALID_VALUE;
     }
     MessageParcel reply;
-    int32_t status = IPC_SEND(SET_DATA, reply, customOption, unifiedData);
+    int32_t status = IPC_SEND(SET_DATA, reply, option, unifiedData);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s", status, key.c_str());
         return status;
