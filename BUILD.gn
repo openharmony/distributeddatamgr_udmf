@@ -23,3 +23,11 @@ group("udmf_packages") {
     ]
   }
 }
+
+group("fuzztest") {
+  testonly = true
+  deps = []
+  deps += [
+    "framework/innerkitsimpl/test/fuzztest/udmfclient_fuzzer:fuzztest",
+  ]
+}
