@@ -31,7 +31,7 @@ UriPermissionManager &UriPermissionManager::GetInstance()
 Status UriPermissionManager::GrantUriPermission(const std::string &path, const std::string &bundleName)
 {
     if (uriPermissionManager_ == nullptr) {
-        uriPermissionManager_ = std::make_shared<AAFwk::UriPermissionManagerClient>();
+        uriPermissionManager_ = AAFwk::UriPermissionManagerClient::GetInstance();
     }
     Uri uri(path);
     int autoRemove = 1;
