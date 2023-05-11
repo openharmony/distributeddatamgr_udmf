@@ -1,0 +1,125 @@
+{
+  "name": "@ohos/udmf",
+  "description": "Provide unified data management service for 3rd party app",
+  "version": "3.1",
+  "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "foundation/distributeddatamgr/udmf"
+  },
+  "dirs": {},
+  "scripts": {},
+  "component": {
+    "name": "udmf",
+    "subsystem": "distributeddatamgr",
+    "syscap": [
+      "SystemCapability.DistributedDataManager.UDMF.Core"
+    ],
+    "features": [
+    ],
+    "adapted_system_type": [
+      "mini",
+      "small",
+      "standard"
+    ],
+    "rom": "2048KB",
+    "ram": "10240KB",
+    "deps": {
+      "components": [
+        "ipc",
+        "hiviewdfx_hilog_native",
+        "appexecfwk_standard",
+        "aafwk_standard",
+        "safwk",
+        "samgr",
+        "napi",
+        "utils_base",
+        "ability_base",
+        "ability_runtime"
+      ],
+      "third_party": [
+        "gtest_main",
+        "libxml2",
+        "libsec_shared",
+        "shared_icuuc",
+        "shared_icui18n",
+        "sqlite"
+      ]
+    },
+    "build": {
+      "sub_component": [
+        "//foundation/distributeddatamgr/udmf:udmf_packages"
+      ],
+      "inner_kits": [
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
+          "header": {
+            "header_files": [
+              "udmf_client.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/client"
+          }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
+          "header": {
+            "header_files": [
+              "error_code.h",
+              "unified_key.h",
+              "unified_meta.h",
+              "unified_types.h",
+              "visibility.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/common"
+          }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
+          "header": {
+            "header_files": [
+              "application_defined_record.h",
+              "file.h",
+              "folder.h",
+              "html.h",
+              "image.h",
+              "link.h",
+              "plain_text.h",
+              "system_defined_appitem.h",
+              "system_defined_form.h",
+              "system_defined_pixelmap.h",
+              "system_defined_record.h",
+              "text.h",
+              "unified_data.h",
+              "unified_record.h",
+              "video.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/data"
+          }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/jskits:udmf_data_napi",
+          "header": {
+            "header_files": [
+              "unified_data_napi.h",
+              "summary_napi.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/jskits/data"
+          }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/jskits:udmf_data_napi",
+          "header": {
+            "header_files": [
+              "napi_queue.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/jskits/common"
+          }
+        }
+      ],
+      "test": [
+        "//foundation/distributeddatamgr/udmf/framework/innerkitsimpl/test/unittest:unittest",
+        "//foundation/distributeddatamgr/udmf:fuzztest"
+      ]
+    }
+  }
+}
