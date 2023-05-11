@@ -26,6 +26,7 @@ config("module_private_config") {
     "${udmf_framework_path}/manager/container",
     "${udmf_framework_path}/manager/store",
     "${udmf_framework_path}/manager/preprocess",
+    "${udmf_framework_path}/manager/permission",
     "${udmf_framework_path}/service",
   ]
 }
@@ -33,6 +34,8 @@ config("module_private_config") {
 common_deps = [
   "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
   "//foundation/distributeddatamgr/udmf/service:udmf_server",
+  "//foundation/ability/ability_runtime/interfaces/inner_api/uri_permission:uri_permission_mgr",
+  "//third_party/googletest:gtest_main",
 ]
 
 common_external_deps = [

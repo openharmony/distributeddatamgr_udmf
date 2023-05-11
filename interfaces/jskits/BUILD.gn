@@ -23,9 +23,9 @@ config("udmf_napi_config") {
 
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/manager",
-    "${udmf_framework_path}/manager/container",
     "${udmf_framework_path}/manager/store",
     "${udmf_framework_path}/manager/preprocess",
+    "${udmf_framework_path}/manager/permission",
     "${udmf_framework_path}/manager/lifecycle",
     "${udmf_framework_path}/service",
 

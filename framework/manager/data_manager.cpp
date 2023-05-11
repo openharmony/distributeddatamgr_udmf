@@ -90,50 +90,44 @@ int32_t DataManager::RetrieveData(QueryOption &query, UnifiedData &unifiedData)
         LOG_ERROR(UDMF_FRAMEWORK, "Unified key: %{public}s is invalid.", query.key.c_str());
         return E_INVALID_PARAMETERS;
     }
-
     auto store = storeCache_.GetStore(key.intention);
     if (store == nullptr) {
         LOG_ERROR(UDMF_FRAMEWORK, "Get store failed, intention: %{public}s.", key.intention.c_str());
         return E_DB_ERROR;
     }
-
-    UnifiedData tmpData;
-    int32_t res = store->Get(query.key, tmpData);
+    int32_t res = store->Get(query.key, unifiedData);
     if (res != E_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "Get data from store failed, intention: %{public}s.", key.intention.c_str());
         return res;
     }
-
-    if (tmpData.IsEmpty()) {
+    if (unifiedData.IsEmpty()) {
         return E_OK;
     }
-
-    std::shared_ptr<Runtime> runtime = tmpData.GetRuntime();
+    std::shared_ptr<Runtime> runtime = unifiedData.GetRuntime();
     CheckerManager::CheckInfo info;
     info.tokenId = query.tokenId;
     info.pid = query.pid;
     if (!CheckerManager::GetInstance().IsValid(runtime->privileges, info)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Invalid caller, intention: %{public}s.", key.intention.c_str());
         return E_INVALID_OPERATION;
     }
-
-    auto records = tmpData.GetRecords();
-    for (auto record : records) {
-        auto type = record->GetType();
-        if (type == UDType::FILE || type == UDType::IMAGE || type == UDType::VIDEO) {
-            std::string bundleName;
-            if (!PreProcessUtils::GetInstance().GetHapBundleNameByToken(query.tokenId, bundleName)) {
-                return E_ERROR;
+    std::string bundleName;
+    if (!PreProcessUtils::GetInstance().GetHapBundleNameByToken(query.tokenId, bundleName)) {
+        return E_ERROR;
+    }
+    if (runtime->createPackage != bundleName) {
+        auto records = unifiedData.GetRecords();
+        for (auto record : records) {
+            auto type = record->GetType();
+            std::string uri = "";
+            if (type == UDType::FILE || type == UDType::IMAGE || type == UDType::VIDEO || type == UDType::FOLDER) {
+                auto file = static_cast<File *>(record.get());
+                uri = file->GetUri();
             }
-            auto file = static_cast<File *>(record.get());
-            if (UriPermissionManager::GetInstance().GrantUriPermission(file->GetUri(), bundleName) != E_OK) {
+            if (!uri.empty() && (UriPermissionManager::GetInstance().GrantUriPermission(uri, bundleName) != E_OK)) {
                 return E_ERROR;
             }
         }
     }
-
-    unifiedData = tmpData;
-
     if (LifeCycleManager::GetInstance().DeleteOnGet(key) != E_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "Remove data failed, intention: %{public}s.", key.intention.c_str());
         return E_DB_ERROR;

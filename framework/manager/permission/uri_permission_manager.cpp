@@ -36,7 +36,7 @@ Status UriPermissionManager::GrantUriPermission(const std::string &path, const s
     Uri uri(path);
     int autoRemove = 1;
     auto status = uriPermissionManager_->GrantUriPermission(uri, AAFwk::Want::FLAG_AUTH_READ_URI_PERMISSION,
-                                                           bundleName, autoRemove);
+                                                            bundleName, autoRemove);
     if (status != ERR_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "GrantUriPermission failed, %{public}d", status);
         return E_ERROR;
