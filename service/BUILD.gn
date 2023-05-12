@@ -1,0 +1,64 @@
+# Copyright (C) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+import("//foundation/distributeddatamgr/udmf/udmf.gni")
+
+config("udmf_service_config") {
+  visibility = [ ":*" ]
+  include_dirs = ["include"]
+}
+
+ohos_shared_library("udmf_server") {
+  include_dirs = [
+    "${udmf_framework_path}/common",
+    "${udmf_framework_path}/manager",
+    "${udmf_framework_path}/manager/store",
+    "${udmf_framework_path}/manager/preprocess",
+    "${udmf_framework_path}/manager/permission",
+    "${udmf_framework_path}/manager/lifecycle",
+    "${udmf_framework_path}/service",
+    "${udmf_interfaces_path}/innerkits/client",
+    "${udmf_interfaces_path}/innerkits/common",
+    "${udmf_interfaces_path}/innerkits/data",
+    "//foundation/distributeddatamgr/kv_store/frameworks/common",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/framework/include",
+    "//third_party/libuv/include",
+    "//third_party/node/src",
+    "//commonlibrary/c_utils/base/include",
+  ]
+
+  sources = [
+    "src/udmf_service_impl.cpp",
+    "src/udmf_service_stub.cpp",
+  ]
+
+  configs = [ ":udmf_service_config" ]
+
+  deps = [
+    "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
+    "//base/security/access_token/interfaces/innerkits/accesstoken:libaccesstoken_sdk",
+    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/framework:distributeddatasvcfwk",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_core",
+    "multimedia_image_framework:image_native",
+    "data_object:distributeddataobject_impl",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+
+  subsystem_name = "distributeddatamgr"
+
+  part_name = "udmf"
+}
