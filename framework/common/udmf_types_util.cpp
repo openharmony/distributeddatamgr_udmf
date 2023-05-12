@@ -50,7 +50,7 @@ template<> bool Marshalling(const std::shared_ptr<UnifiedRecord> &input, Message
             }
             return ITypesUtil::Marshal(parcel, *html);
         }
-        case HYPER_LINK: {
+        case HYPERLINK: {
             auto link = static_cast<Link *>(input.get());
             if (link == nullptr) {
                 return false;
@@ -158,7 +158,7 @@ template<> bool Unmarshalling(std::shared_ptr<UnifiedRecord> &output, MessagePar
             output = html;
             break;
         }
-        case HYPER_LINK: {
+        case HYPERLINK: {
             std::shared_ptr<Link> link = std::make_shared<Link>();
             if (!ITypesUtil::Unmarshal(parcel, *link)) {
                 return false;

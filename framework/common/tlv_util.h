@@ -88,7 +88,7 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
             data.Count(text->GetDetails());
             break;
         }
-        case UDType::HYPER_LINK: {
+        case UDType::HYPERLINK: {
             auto link = static_cast<Link *>(input.get());
             if (link == nullptr) {
                 return false;
@@ -836,7 +836,7 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             }
             return Writing(*text, data);
         }
-        case UDType::HYPER_LINK: {
+        case UDType::HYPERLINK: {
             auto link = static_cast<Link *>(input.get());
             if (link == nullptr) {
                 return false;
@@ -997,7 +997,7 @@ bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data)
             output = html;
             break;
         }
-        case UDType::HYPER_LINK: {
+        case UDType::HYPERLINK: {
             std::shared_ptr<Link> link = std::make_shared<Link>();
             if (!Reading(*link, data)) {
                 return false;

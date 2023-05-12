@@ -37,7 +37,7 @@ napi_value LinkNapi::Constructor(napi_env env)
         DECLARE_NAPI_GETTER_SETTER("description", GetDescription, SetDescription),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
-    return NapiDataUtils::DefineClass(env, "HyperLink", properties, count, LinkNapi::New);
+    return NapiDataUtils::DefineClass(env, "Hyperlink", properties, count, LinkNapi::New);
 }
 
 napi_value LinkNapi::New(napi_env env, napi_callback_info info)

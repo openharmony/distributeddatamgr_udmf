@@ -160,7 +160,7 @@ void UnifiedDataNapi::GetRecord(napi_env env, std::shared_ptr<UnifiedRecord> in,
             HtmlNapi::NewInstance(env, in, out);
             break;
         }
-        case HYPER_LINK: {
+        case HYPERLINK: {
             LinkNapi::NewInstance(env, in, out);
             break;
         }

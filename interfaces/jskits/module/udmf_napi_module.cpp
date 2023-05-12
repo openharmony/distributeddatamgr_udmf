@@ -49,8 +49,8 @@ static napi_value Init(napi_env env, napi_value exports)
     LOG_INFO(UDMF_KITS_NAPI, "init Text %{public}d", status);
     status = napi_set_named_property(env, exports, "PlainText", OHOS::UDMF::PlainTextNapi::Constructor(env));
     LOG_INFO(UDMF_KITS_NAPI, "init PlainText %{public}d", status);
-    status = napi_set_named_property(env, exports, "HyperLink", OHOS::UDMF::LinkNapi::Constructor(env));
-    LOG_INFO(UDMF_KITS_NAPI, "init HyperLink %{public}d", status);
+    status = napi_set_named_property(env, exports, "Hyperlink", OHOS::UDMF::LinkNapi::Constructor(env));
+    LOG_INFO(UDMF_KITS_NAPI, "init Hyperlink %{public}d", status);
     status = napi_set_named_property(env, exports, "HTML", OHOS::UDMF::HtmlNapi::Constructor(env));
     LOG_INFO(UDMF_KITS_NAPI, "init HTML %{public}d", status);
     status = napi_set_named_property(env, exports, "File", OHOS::UDMF::FileNapi::Constructor(env));

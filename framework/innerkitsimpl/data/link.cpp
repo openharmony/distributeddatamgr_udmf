@@ -30,7 +30,7 @@ Link::Link(const std::string &url, const std::string &description)
     if (url.length() >= MAX_TEXT_LEN || description.length() >= MAX_TEXT_LEN) {
         return;
     }
-    this->dataType_ = HYPER_LINK;
+    this->dataType_ = HYPERLINK;
     this->url_ = url;
     this->description_ = description;
 }
