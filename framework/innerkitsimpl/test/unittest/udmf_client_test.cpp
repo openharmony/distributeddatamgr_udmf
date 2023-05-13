@@ -394,7 +394,7 @@ HWTEST_F(UdmfClientTest, SetData005, TestSize.Level1)
     std::shared_ptr<UnifiedRecord> record2 = data2.GetRecordAt(0);
     ASSERT_NE(record2, nullptr);
     auto type = record2->GetType();
-    ASSERT_EQ(type, UDType::HYPER_LINK);
+    ASSERT_EQ(type, UDType::HYPERLINK);
 
     auto text2 = static_cast<Text *>(record2.get());
     ASSERT_NE(text2, nullptr);
