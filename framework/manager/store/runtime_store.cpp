@@ -19,24 +19,25 @@
 #include <vector>
 
 #include "logger.h"
+#include "same_process_ipc_guard.h"
 #include "tlv_util.h"
 
 namespace OHOS {
 namespace UDMF {
-using namespace DistributedDB;
-const std::string RuntimeStore::APP_ID = "distributeddata";
+using namespace DistributedKv;
+const AppId RuntimeStore::APP_ID = { "distributeddata" };
 const std::string RuntimeStore::DATA_PREFIX = "udmf://";
-const std::string RuntimeStore::BASE_DIR = "/data/service/el1/public/database/distributeddata/kvdb";
+const std::string RuntimeStore::BASE_DIR = "/data/service/el1/public/database/distributeddata";
 const std::int32_t RuntimeStore::SLASH_COUNT_IN_KEY = 4;
 
-RuntimeStore::RuntimeStore(std::string storeId) : delegateManager_(APP_ID, "default"), storeId_(storeId)
+RuntimeStore::RuntimeStore(std::string storeId) : storeId_({ storeId })
 {
-    LOG_INFO(UDMF_SERVICE, "Construct runtimeStore: %{public}s.", storeId_.c_str());
+    LOG_INFO(UDMF_SERVICE, "Construct runtimeStore: %{public}s.", storeId_.storeId.c_str());
 }
 
 RuntimeStore::~RuntimeStore()
 {
-    LOG_INFO(UDMF_SERVICE, "Destruct runtimeStore: %{public}s.", storeId_.c_str());
+    LOG_INFO(UDMF_SERVICE, "Destruct runtimeStore: %{public}s.", storeId_.storeId.c_str());
     Close();
 }
 
@@ -57,9 +58,7 @@ Status RuntimeStore::Put(const UnifiedData &unifiedData)
             return E_INVALID_PARAMETERS;
         }
 
-        std::string recordKeyStr = unifiedKey + "/" + record->GetUid();
-        Key recordKey = { recordKeyStr.begin(), recordKeyStr.end() };
-        Entry entry = { recordKey, recordBytes };
+        Entry entry = { Key(unifiedKey + "/" + record->GetUid()), Value(recordBytes) };
         entries.push_back(entry);
     }
     // add runtime info
@@ -69,12 +68,11 @@ Status RuntimeStore::Put(const UnifiedData &unifiedData)
         LOG_ERROR(UDMF_SERVICE, "Marshall runtime info failed.");
         return E_UNKNOWN;
     }
-    Key runtimeKey = { unifiedKey.begin(), unifiedKey.end() };
-    Entry entry = { runtimeKey, runtimeBytes };
+    Entry entry = { Key(unifiedKey), Value(runtimeBytes) };
     entries.push_back(entry);
-    auto status = kvStore_->PutBatch(entries);
-    if (status != DBStatus::OK) {
-        LOG_ERROR(UDMF_SERVICE, "KvStore putBatch failed, status: %{public}d.", static_cast<int>(status));
+    DistributedKv::Status status = kvStore_->PutBatch(entries);
+    if (status != DistributedKv::Status::SUCCESS) {
+        LOG_ERROR(UDMF_SERVICE, "KvStore putBatch failed, status: %{public}d.", status);
         return E_DB_ERROR;
     }
     return E_OK;
@@ -88,10 +86,10 @@ Status RuntimeStore::Get(const std::string &key, UnifiedData &unifiedData)
         return E_OK;
     }
     for (const auto &entry : entries) {
-        std::string keyStr(entry.key.begin(), entry.key.end());
+        std::string keyStr = entry.key.ToString();
         if (keyStr == key) {
             Runtime runtime;
-            auto runtimeTlv = TLVObject(const_cast<std::vector<uint8_t> &>(entry.value));
+            auto runtimeTlv = TLVObject(const_cast<std::vector<uint8_t> &>(entry.value.Data()));
             if (!TLVUtil::Reading(runtime, runtimeTlv)) {
                 LOG_ERROR(UDMF_SERVICE, "Unmarshall runtime info failed.");
                 return E_UNKNOWN;
@@ -99,7 +97,7 @@ Status RuntimeStore::Get(const std::string &key, UnifiedData &unifiedData)
             unifiedData.SetRuntime(runtime);
         } else {
             std::shared_ptr<UnifiedRecord> record;
-            auto recordTlv = TLVObject(const_cast<std::vector<uint8_t> &>(entry.value));
+            auto recordTlv = TLVObject(const_cast<std::vector<uint8_t> &>(entry.value.Data()));
             if (!TLVUtil::Reading(record, recordTlv)) {
                 LOG_ERROR(UDMF_SERVICE, "Unmarshall unified record failed.");
                 return E_UNKNOWN;
@@ -157,9 +155,9 @@ Status RuntimeStore::Delete(const std::string &key)
     for (const auto &entry : entries) {
         keys.push_back(entry.key);
     }
-    auto status = kvStore_->DeleteBatch(keys);
-    if (status != DBStatus::OK) {
-        LOG_ERROR(UDMF_SERVICE, "DeleteBatch kvStore failed, status: %{public}d.", static_cast<int>(status));
+    DistributedKv::Status status = kvStore_->DeleteBatch(keys);
+    if (status != DistributedKv::Status::SUCCESS) {
+        LOG_ERROR(UDMF_SERVICE, "DeleteBatch kvStore failed, status: %{public}d.", status);
         return E_DB_ERROR;
     }
     return E_OK;
@@ -180,12 +178,10 @@ Status RuntimeStore::DeleteBatch(std::vector<std::string> timeoutKeys)
 
 Status RuntimeStore::Sync(const std::vector<std::string> &devices)
 {
-    auto onComplete = [this](const std::map<std::string, DBStatus> &) {
-        LOG_ERROR(UDMF_SERVICE, "Runtime kvStore sync complete.");
-    };
-    auto status = kvStore_->Sync(devices, SyncMode::SYNC_MODE_PUSH_ONLY, onComplete);
-    if (status != DBStatus::OK) {
-        LOG_ERROR(UDMF_SERVICE, "Sync kvStore failed, status: %{public}d.", static_cast<int>(status));
+    SameProcessIpcGuard ipcGuard;
+    DistributedKv::Status status = kvStore_->Sync(devices, SyncMode::PULL);
+    if (status != DistributedKv::Status::SUCCESS) {
+        LOG_ERROR(UDMF_SERVICE, "Sync kvStore failed, status: %{public}d.", status);
         return E_DB_ERROR;
     }
     return E_OK;
@@ -198,47 +194,26 @@ Status RuntimeStore::Clear()
 
 void RuntimeStore::Close()
 {
-    delegateManager_.CloseKvStore(kvStore_.get());
+    dataManager_.CloseKvStore(APP_ID, storeId_);
 }
 
 bool RuntimeStore::Init()
 {
-    KvStoreConfig kvStoreConfig{ BASE_DIR };
-    delegateManager_.SetKvStoreConfig(kvStoreConfig);
-
-    DBStatus dbStatusTmp = DBStatus::NOT_SUPPORT;
-    KvStoreNbDelegate::Option option;
-    option.createIfNecessary = true;
-    option.isMemoryDb = false;
-    option.createDirByStoreIdOnly = true;
-    option.isEncryptedDb = false;
-    option.isNeedRmCorruptedDb = true;
-    option.syncDualTupleMode = true;
-    int32_t securityLevel = 2;
-    option.secOption = { securityLevel, DistributedDB::ECE };
-    DistributedDB::KvStoreNbDelegate *delegate = nullptr;
-    delegateManager_.GetKvStore(storeId_, option,
-        [&delegate, &dbStatusTmp](DBStatus dbStatus, KvStoreNbDelegate *nbDelegate) {
-            delegate = nbDelegate;
-            dbStatusTmp = dbStatus;
-        });
-    if (dbStatusTmp != DBStatus::OK) {
-        LOG_ERROR(UDMF_SERVICE, "GetKvStore return error status: %{public}d.", static_cast<int>(dbStatusTmp));
+    Options options;
+    options.autoSync = false;
+    options.createIfMissing = true;
+    options.rebuild = true;
+    options.backup = false;
+    options.securityLevel = SecurityLevel::S1;
+    options.baseDir = BASE_DIR;
+    options.area = Area::EL1;
+    options.kvStoreType = KvStoreType::SINGLE_VERSION;
+    SameProcessIpcGuard ipcGuard;
+    DistributedKv::Status status = dataManager_.GetSingleKvStore(options, APP_ID, storeId_, kvStore_);
+    if (status != DistributedKv::Status::SUCCESS) {
+        LOG_ERROR(UDMF_SERVICE, "GetKvStore: %{public}s failed, status: %{public}d.", storeId_.storeId.c_str(), status);
         return false;
     }
-
-    auto release = [this](KvStoreNbDelegate *delegate) {
-        LOG_INFO(UDMF_SERVICE, "Release runtime kvStore.");
-        if (delegate == nullptr) {
-            return;
-        }
-
-        auto result = delegateManager_.CloseKvStore(delegate);
-        if (result != DBStatus::OK) {
-            LOG_ERROR(UDMF_SERVICE, "Close runtime kvStore return error status: %{public}d", static_cast<int>(result));
-        }
-    };
-    kvStore_ = std::shared_ptr<KvStoreNbDelegate>(delegate, release);
     return true;
 }
 
@@ -252,7 +227,7 @@ std::vector<UnifiedData> RuntimeStore::GetDatas(const std::string &dataPrefix)
     }
     for (const auto &entry : entries) {
         UnifiedData data;
-        std::string keyStr(entry.key.begin(), entry.key.end());
+        std::string keyStr = entry.key.ToString();
         if (std::count(keyStr.begin(), keyStr.end(), '/') == SLASH_COUNT_IN_KEY) {
             Get(keyStr, data);
             unifiedDatas.push_back(data);
@@ -263,12 +238,9 @@ std::vector<UnifiedData> RuntimeStore::GetDatas(const std::string &dataPrefix)
 
 std::vector<Entry> RuntimeStore::GetEntries(const std::string &dataPrefix)
 {
-    Query dbQuery = Query::Select();
-    std::vector<uint8_t> prefix = { dataPrefix.begin(), dataPrefix.end() };
-    dbQuery.PrefixKey(prefix);
     std::vector<Entry> entries;
-    auto status = kvStore_->GetEntries(dbQuery, entries);
-    if (status == DBStatus::NOT_FOUND || status != DBStatus::OK) {
+    auto status = kvStore_->GetEntries(Key(dataPrefix), entries);
+    if (status != DistributedKv::Status::SUCCESS) {
         LOG_ERROR(UDMF_SERVICE, "KvStore getEntries failed, status: %{public}d.", static_cast<int>(status));
     }
     return entries;

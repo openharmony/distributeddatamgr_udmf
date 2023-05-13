@@ -27,8 +27,6 @@ config("udmf_client_config") {
     "${udmf_framework_path}/manager/lifecycle",
     "${udmf_framework_path}/service",
     "${kv_store_path}/frameworks/common",
-    "${kv_store_path}/frameworks/libs/distributeddb/interfaces/include",
-
     "//third_party/libuv/include",
     "//third_party/node/src",
     "//commonlibrary/c_utils/base/include",
@@ -76,7 +74,6 @@ ohos_shared_library("udmf_client") {
   public_configs = [ ":udmf_client_config" ]
 
   deps = [
-    "//foundation/distributeddatamgr/kv_store/frameworks/libs/distributeddb:distributeddb",
     "//foundation/filemanagement/app_file_service/interfaces/innerkits/remote_file_share/native:remote_file_share_native",
     "//foundation/ability/ability_runtime/interfaces/inner_api/uri_permission:uri_permission_mgr",
   ]

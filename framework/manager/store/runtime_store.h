@@ -16,7 +16,8 @@
 #ifndef UDMF_RUNTIMESTORE_H
 #define UDMF_RUNTIMESTORE_H
 
-#include "kv_store_delegate_manager.h"
+#include "distributed_kv_data_manager.h"
+#include "single_kvstore.h"
 #include "store.h"
 
 namespace OHOS {
@@ -38,14 +39,14 @@ public:
     std::vector<UnifiedData> GetDatas(const std::string &dataPrefix) override;
 
 private:
-    static const std::string APP_ID;
+    static const DistributedKv::AppId APP_ID;
     static const std::string DATA_PREFIX;
     static const std::string BASE_DIR;
     static const std::int32_t SLASH_COUNT_IN_KEY;
-    DistributedDB::KvStoreDelegateManager delegateManager_;
-    std::shared_ptr<DistributedDB::KvStoreNbDelegate> kvStore_;
-    std::string storeId_;
-    std::vector<DistributedDB::Entry> GetEntries(const std::string &dataPrefix);
+    DistributedKv::DistributedKvDataManager dataManager_;
+    std::shared_ptr<DistributedKv::SingleKvStore> kvStore_;
+    DistributedKv::StoreId storeId_;
+    std::vector<DistributedKv::Entry> GetEntries(const std::string &dataPrefix);
 };
 } // namespace UDMF
 } // namespace OHOS
