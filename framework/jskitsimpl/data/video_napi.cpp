@@ -32,7 +32,7 @@ napi_value VideoNapi::Constructor(napi_env env)
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
         /* Video extends File */
         DECLARE_NAPI_GETTER_SETTER("details", FileNapi::GetDetails, FileNapi::SetDetails),
-        DECLARE_NAPI_GETTER_SETTER("imageUri", FileNapi::GetUri, FileNapi::SetUri),
+        DECLARE_NAPI_GETTER_SETTER("videoUri", FileNapi::GetUri, FileNapi::SetUri),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "Video", properties, count, VideoNapi::New);
