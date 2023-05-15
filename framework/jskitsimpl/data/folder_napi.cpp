@@ -31,7 +31,7 @@ napi_value FolderNapi::Constructor(napi_env env)
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
         /* Folder extends File */
         DECLARE_NAPI_GETTER_SETTER("details", FileNapi::GetDetails, FileNapi::SetDetails),
-        DECLARE_NAPI_GETTER_SETTER("imageUri", FileNapi::GetUri, FileNapi::SetUri),
+        DECLARE_NAPI_GETTER_SETTER("folderUri", FileNapi::GetUri, FileNapi::SetUri),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "Folder", properties, count, FolderNapi::New);
