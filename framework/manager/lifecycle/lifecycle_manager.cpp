@@ -16,6 +16,7 @@
 #include "lifecycle_manager.h"
 
 #include <algorithm>
+#include <cinttypes>
 
 namespace OHOS {
 namespace UDMF {
@@ -61,7 +62,7 @@ Status LifeCycleManager::DeleteOnSchedule()
         LOG_ERROR(UDMF_SERVICE, "ExecutorPool Schedule failed.");
         return E_ERROR;
     }
-    LOG_INFO(UDMF_SERVICE, "ScheduleTask start, TaskId: %{public}lu.", taskId);
+    LOG_INFO(UDMF_SERVICE, "ScheduleTask start, TaskId: %{public}" PRIu64 ".", taskId);
     return E_OK;
 }
 
