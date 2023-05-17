@@ -850,6 +850,45 @@ HWTEST_F(UdmfClientTest, SetData014, TestSize.Level1)
 }
 
 /**
+* @tc.name: SetData015
+* @tc.desc: Set multiple record with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData015, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData015 begin.");
+
+    CustomOption customOption = {.intention = Intention::UD_INTENTION_DRAG};
+    std::string key;
+    UnifiedData inputData;
+    std::vector<std::shared_ptr<UnifiedRecord>> inputRecords = {
+        std::make_shared<Text>(),
+        std::make_shared<PlainText>(),
+        std::make_shared<File>(),
+        std::make_shared<Image>(),
+        std::make_shared<SystemDefinedRecord>(),
+        std::make_shared<SystemDefinedForm>(),
+        std::make_shared<ApplicationDefinedRecord>()
+    };
+    inputData.SetRecords(inputRecords);
+
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption queryOption = { .key = key };
+    UnifiedData outputData;
+    status = UdmfClient::GetInstance().GetData(queryOption, outputData);
+    ASSERT_EQ(status, E_OK);
+    auto outputRecords = outputData.GetRecords();
+    ASSERT_EQ(inputRecords.size(), outputRecords.size());
+    for (size_t i = 0; i < outputRecords.size(); ++i) {
+        ASSERT_EQ(outputRecords[i]->GetType(), inputRecords[i]->GetType());
+    }
+
+    LOG_INFO(UDMF_TEST, "SetData015 end.");
+}
+
+/**
 * @tc.name: GetData001
 * @tc.desc: Get data with invalid key
 * @tc.type: FUNC
