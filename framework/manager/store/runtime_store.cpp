@@ -239,7 +239,10 @@ std::vector<UnifiedData> RuntimeStore::GetDatas(const std::string &dataPrefix)
 std::vector<Entry> RuntimeStore::GetEntries(const std::string &dataPrefix)
 {
     std::vector<Entry> entries;
-    auto status = kvStore_->GetEntries(Key(dataPrefix), entries);
+    DataQuery query;
+    query.KeyPrefix(dataPrefix);
+    query.OrderByWriteTime(true);
+    auto status = kvStore_->GetEntries(query, entries);
     if (status != DistributedKv::Status::SUCCESS) {
         LOG_ERROR(UDMF_SERVICE, "KvStore getEntries failed, status: %{public}d.", static_cast<int>(status));
     }
