@@ -218,6 +218,9 @@ HWTEST_F(UdmfClientTest, SetData001, TestSize.Level1)
     status = UdmfClient::GetInstance().SetData(option, data, key);
     EXPECT_EQ(status, E_INVALID_PARAMETERS);
 
+    option = {};
+    status = UdmfClient::GetInstance().SetData(option, data, key);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "SetData001 end.");
 }
 

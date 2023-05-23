@@ -23,7 +23,7 @@ namespace UDMF {
 std::shared_ptr<ExecutorPool> LifeCycleManager::executorPool_ = std::make_shared<ExecutorPool>(2, 1);
 
 std::unordered_map<std::string, std::shared_ptr<LifeCyclePolicy>> LifeCycleManager::intentionPolicyMap_ = {
-    { UD_INTENTION_MAP.at(UD_INTENTION_DRAG), std::make_shared<CleanAfterGetdata>() },
+    { UD_INTENTION_MAP.at(UD_INTENTION_DRAG), std::make_shared<CleanAfterGet>() },
 };
 
 LifeCycleManager &LifeCycleManager::GetInstance()

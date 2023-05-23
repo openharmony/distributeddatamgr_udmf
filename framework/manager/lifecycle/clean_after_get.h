@@ -18,7 +18,7 @@
 
 namespace OHOS {
 namespace UDMF {
-class CleanAfterGetdata : public LifeCyclePolicy {
+class CleanAfterGet : public LifeCyclePolicy {
 public:
 };
 } // namespace UDMF
