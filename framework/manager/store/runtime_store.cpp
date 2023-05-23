@@ -29,7 +29,7 @@ const AppId RuntimeStore::APP_ID = { "distributeddata" };
 const std::string RuntimeStore::DATA_PREFIX = "udmf://";
 const std::string RuntimeStore::BASE_DIR = "/data/service/el1/public/database/distributeddata";
 
-RuntimeStore::RuntimeStore(std::string storeId) : storeId_({ storeId })
+RuntimeStore::RuntimeStore(const std::string &storeId) : storeId_({ storeId })
 {
     LOG_INFO(UDMF_SERVICE, "Construct runtimeStore: %{public}s.", storeId_.storeId.c_str());
 }

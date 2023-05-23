@@ -33,7 +33,7 @@ void CheckerManager::RegisterChecker(const std::string &checker, std::function<C
 
 void CheckerManager::LoadCheckers()
 {
-    getters_.ForEach([this] (const auto &key, auto &val) {
+    getters_.ForEach([this] (const auto &key, const auto &val) {
         if (this->checkers_.find(key) != this->checkers_.end()) {
             return false;
         }

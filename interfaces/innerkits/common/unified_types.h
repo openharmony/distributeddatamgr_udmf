@@ -37,7 +37,7 @@ struct Summary {
 };
 
 struct Privilege {
-    int32_t tokenId;
+    uint32_t tokenId;
     int32_t pid;
     std::string readPermission;
     std::string writePermission;
@@ -67,8 +67,8 @@ struct Runtime {
  * Options for sharing data through UDMF.
  */
 struct CustomOption {
-    Intention intention {};
-    int32_t tokenId {};
+    Intention intention{};
+    uint32_t tokenId{};
 };
 
 /*
@@ -76,8 +76,8 @@ struct CustomOption {
  */
 struct QueryOption {
     std::string key;
-    int32_t tokenId {};
-    int32_t pid {};
+    uint32_t tokenId{};
+    int32_t pid{};
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -64,7 +64,7 @@ Status GenerateNapiError(Status error, int32_t &errCode, std::string &errMessage
     return error;
 }
 
-void ThrowNapiError(napi_env env, int32_t status, std::string errMessage, bool isParamsCheck)
+void ThrowNapiError(napi_env env, int32_t status, const std::string errMessage, bool isParamsCheck)
 {
     LOG_INFO(UDMF_KITS_NAPI, "ThrowNapiError message: %{public}s", errMessage.c_str());
     if (status == Status::E_OK) {
