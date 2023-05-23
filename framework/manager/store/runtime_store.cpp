@@ -28,7 +28,6 @@ using namespace DistributedKv;
 const AppId RuntimeStore::APP_ID = { "distributeddata" };
 const std::string RuntimeStore::DATA_PREFIX = "udmf://";
 const std::string RuntimeStore::BASE_DIR = "/data/service/el1/public/database/distributeddata";
-const std::int32_t RuntimeStore::SLASH_COUNT_IN_KEY = 4;
 
 RuntimeStore::RuntimeStore(std::string storeId) : storeId_({ storeId })
 {
@@ -70,12 +69,8 @@ Status RuntimeStore::Put(const UnifiedData &unifiedData)
     }
     Entry entry = { Key(unifiedKey), Value(runtimeBytes) };
     entries.push_back(entry);
-    DistributedKv::Status status = kvStore_->PutBatch(entries);
-    if (status != DistributedKv::Status::SUCCESS) {
-        LOG_ERROR(UDMF_SERVICE, "KvStore putBatch failed, status: %{public}d.", status);
-        return E_DB_ERROR;
-    }
-    return E_OK;
+    auto status = PutEntries(entries);
+    return status;
 }
 
 Status RuntimeStore::Get(const std::string &key, UnifiedData &unifiedData)
@@ -155,12 +150,8 @@ Status RuntimeStore::Delete(const std::string &key)
     for (const auto &entry : entries) {
         keys.push_back(entry.key);
     }
-    DistributedKv::Status status = kvStore_->DeleteBatch(keys);
-    if (status != DistributedKv::Status::SUCCESS) {
-        LOG_ERROR(UDMF_SERVICE, "DeleteBatch kvStore failed, status: %{public}d.", status);
-        return E_DB_ERROR;
-    }
-    return E_OK;
+    auto status = DeleteEntries(keys);
+    return status;
 }
 
 Status RuntimeStore::DeleteBatch(const std::vector<std::string> &timeoutKeys)
@@ -247,6 +238,38 @@ std::vector<Entry> RuntimeStore::GetEntries(const std::string &dataPrefix)
         LOG_DEBUG(UDMF_SERVICE, "KvStore getEntries failed, status: %{public}d.", static_cast<int>(status));
     }
     return entries;
+}
+
+Status RuntimeStore::PutEntries(const std::vector<Entry> &entries)
+{
+    auto size = entries.size();
+    DistributedKv::Status status;
+    for (int32_t index = 0; index < size; index += MAX_BATCH_SIZE) {
+        std::vector<Entry> batchEntries(entries.begin() + index,
+                                        entries.begin() + std::min(index + MAX_BATCH_SIZE, static_cast<int32_t>(size)));
+        status =  kvStore_->PutBatch(batchEntries);
+        if (status != DistributedKv::Status::SUCCESS) {
+            LOG_ERROR(UDMF_SERVICE, "KvStore putBatch failed, status: %{public}d.", status);
+            return E_DB_ERROR;
+        }
+    }
+    return E_OK;
+}
+
+Status RuntimeStore::DeleteEntries(const std::vector<Key> &keys)
+{
+    auto size = keys.size();
+    DistributedKv::Status status;
+    for (int32_t index = 0; index < size; index += MAX_BATCH_SIZE) {
+        std::vector<Key> batchKeys(keys.begin() + index,
+                                   keys.begin() + std::min(index + MAX_BATCH_SIZE, static_cast<int32_t>(size)));
+        status =  kvStore_->DeleteBatch(batchKeys);
+        if (status != DistributedKv::Status::SUCCESS) {
+            LOG_ERROR(UDMF_SERVICE, "KvStore deleteBatch failed, status: %{public}d.", status);
+            return E_DB_ERROR;
+        }
+    }
+    return E_OK;
 }
 } // namespace UDMF
 } // namespace OHOS

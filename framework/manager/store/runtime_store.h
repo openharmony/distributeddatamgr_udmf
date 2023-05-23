@@ -42,11 +42,14 @@ private:
     static const DistributedKv::AppId APP_ID;
     static const std::string DATA_PREFIX;
     static const std::string BASE_DIR;
-    static const std::int32_t SLASH_COUNT_IN_KEY;
+    static constexpr std::int32_t SLASH_COUNT_IN_KEY = 4;
+    static constexpr std::int32_t MAX_BATCH_SIZE = 128;
     DistributedKv::DistributedKvDataManager dataManager_;
     std::shared_ptr<DistributedKv::SingleKvStore> kvStore_;
     DistributedKv::StoreId storeId_;
     std::vector<DistributedKv::Entry> GetEntries(const std::string &dataPrefix);
+    Status PutEntries(const std::vector<DistributedKv::Entry> &entries);
+    Status DeleteEntries(const std::vector<DistributedKv::Key> &keys);
 };
 } // namespace UDMF
 } // namespace OHOS
