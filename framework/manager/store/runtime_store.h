@@ -31,7 +31,7 @@ public:
     Status GetSummary(const std::string &key, Summary &summary) override;
     Status Update(const UnifiedData &unifiedData) override;
     Status Delete(const std::string &key) override;
-    Status DeleteBatch(std::vector<std::string> timeoutKeys) override;
+    Status DeleteBatch(const std::vector<std::string> &timeoutKeys) override;
     Status Sync(const std::vector<std::string> &devices) override;
     Status Clear() override;
     void Close() override;

@@ -24,7 +24,7 @@ bool UnifiedDataUtils::IsValidType(int32_t value)
 
 bool UnifiedDataUtils::IsValidIntention(int32_t value)
 {
-    return value >= UD_INTENTION_DRAG && value < UD_INTENTION_BUTT;
+    return value > UD_INTENTION_BASE && value < UD_INTENTION_BUTT;
 }
 
 size_t UnifiedDataUtils::GetVariantSize(UDVariant &variant)
@@ -64,6 +64,26 @@ size_t UnifiedDataUtils::GetDetailsSize(UDDetails &details)
         total += GetVariantSize(prop.second);
     }
     return total;
+}
+
+bool UnifiedDataUtils::IsPersist(const Intention &intention)
+{
+    return intention > UD_INTENTION_SYS && intention < UD_INTENTION_BUTT;
+}
+
+bool UnifiedDataUtils::IsPersist(const std::string &intention)
+{
+    return IsPersist(GetIntentionByString(intention));
+}
+
+Intention UnifiedDataUtils::GetIntentionByString(const std::string &intention)
+{
+    for (const auto &it : UD_INTENTION_MAP) {
+        if (it.second == intention) {
+            return static_cast<Intention>(it.first);
+        }
+    }
+    return UD_INTENTION_BUTT;
 }
 } // namespace UDMF
 } // namespace OHOS

@@ -82,7 +82,7 @@ Status RuntimeStore::Get(const std::string &key, UnifiedData &unifiedData)
 {
     std::vector<Entry> entries = GetEntries(key);
     if (entries.empty()) {
-        LOG_ERROR(UDMF_FRAMEWORK, "KvStore getEntries failed, key: %{public}s.", key.c_str());
+        LOG_DEBUG(UDMF_FRAMEWORK, "KvStore getEntries failed, key: %{public}s.", key.c_str());
         return E_OK;
     }
     for (const auto &entry : entries) {
@@ -148,7 +148,7 @@ Status RuntimeStore::Delete(const std::string &key)
 {
     std::vector<Entry> entries = GetEntries(key);
     if (entries.empty()) {
-        LOG_INFO(UDMF_FRAMEWORK, "KvStore getEntries failed, key: %{public}s.", key.c_str());
+        LOG_DEBUG(UDMF_FRAMEWORK, "KvStore getEntries failed, key: %{public}s.", key.c_str());
         return E_OK;
     }
     std::vector<Key> keys;
@@ -163,11 +163,11 @@ Status RuntimeStore::Delete(const std::string &key)
     return E_OK;
 }
 
-Status RuntimeStore::DeleteBatch(std::vector<std::string> timeoutKeys)
+Status RuntimeStore::DeleteBatch(const std::vector<std::string> &timeoutKeys)
 {
     Status status = E_OK;
     if (timeoutKeys.empty()) {
-        LOG_INFO(UDMF_SERVICE, "No need to delete!");
+        LOG_DEBUG(UDMF_SERVICE, "No need to delete!");
         return status;
     }
     for (const std::string &timeoutKey : timeoutKeys) {
@@ -222,7 +222,7 @@ std::vector<UnifiedData> RuntimeStore::GetDatas(const std::string &dataPrefix)
     std::vector<UnifiedData> unifiedDatas;
     auto entries = GetEntries(dataPrefix);
     if (entries.empty()) {
-        LOG_INFO(UDMF_FRAMEWORK, "entries is empty.");
+        LOG_DEBUG(UDMF_FRAMEWORK, "entries is empty.");
         return unifiedDatas;
     }
     for (const auto &entry : entries) {
@@ -244,7 +244,7 @@ std::vector<Entry> RuntimeStore::GetEntries(const std::string &dataPrefix)
     query.OrderByWriteTime(true);
     auto status = kvStore_->GetEntries(query, entries);
     if (status != DistributedKv::Status::SUCCESS) {
-        LOG_ERROR(UDMF_SERVICE, "KvStore getEntries failed, status: %{public}d.", static_cast<int>(status));
+        LOG_DEBUG(UDMF_SERVICE, "KvStore getEntries failed, status: %{public}d.", static_cast<int>(status));
     }
     return entries;
 }
