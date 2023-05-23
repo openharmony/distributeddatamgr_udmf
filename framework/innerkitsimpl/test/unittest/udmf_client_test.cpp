@@ -41,7 +41,7 @@ using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
 using namespace OHOS::UDMF;
 using namespace OHOS;
-
+namespace OHOS::Test {
 class UdmfClientTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -176,7 +176,7 @@ void UdmfClientTest::AddPrivilege(QueryOption &option)
 
 void UdmfClientTest::CompareDetails(const UDDetails &details)
 {
-    for (auto &detail : details) {
+    for (const auto &detail : details) {
         auto key = detail.first;
         EXPECT_EQ(key, "udmf_key");
         auto value = detail.second;
@@ -1247,3 +1247,4 @@ HWTEST_F(UdmfClientTest, GetSelfData002, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "GetSelfData002 end.");
 }
+} // OHOS::Test

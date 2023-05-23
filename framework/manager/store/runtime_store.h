@@ -24,7 +24,7 @@ namespace OHOS {
 namespace UDMF {
 class RuntimeStore final : public Store {
 public:
-    explicit RuntimeStore(std::string storeId);
+    explicit RuntimeStore(const std::string &storeId);
     ~RuntimeStore();
     Status Put(const UnifiedData &unifiedData) override;
     Status Get(const std::string &key, UnifiedData &unifiedData) override;

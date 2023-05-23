@@ -37,7 +37,7 @@ struct Summary {
 };
 
 struct Privilege {
-    int32_t tokenId;
+    uint32_t tokenId;
     int32_t pid;
     std::string readPermission;
     std::string writePermission;
@@ -68,7 +68,7 @@ struct Runtime {
  */
 struct CustomOption {
     Intention intention{};
-    int32_t tokenId{};
+    uint32_t tokenId{};
 };
 
 /*
@@ -76,7 +76,7 @@ struct CustomOption {
  */
 struct QueryOption {
     std::string key;
-    int32_t tokenId{};
+    uint32_t tokenId{};
     int32_t pid{};
 };
 } // namespace UDMF

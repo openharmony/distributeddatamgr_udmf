@@ -231,7 +231,7 @@ bool CountBufferSize(const Runtime &input, TLVObject &data)
 {
     data.Count(input.key);
     data.Count(input.isPrivate);
-    int32_t size = input.privileges.size();
+    uint32_t size = input.privileges.size();
     data.Count(size);
     for (int i = 0; i < size; ++i) {
         data.Count(input.privileges[i]);
@@ -1206,7 +1206,7 @@ bool Writing(const Runtime &input, TLVObject &data)
     if (!Writing(input.isPrivate, data)) {
         return false;
     }
-    int32_t size = input.privileges.size();
+    uint32_t size = input.privileges.size();
     if (!Writing(size, data)) {
         return false;
     }

@@ -30,7 +30,7 @@ const std::string RuntimeStore::DATA_PREFIX = "udmf://";
 const std::string RuntimeStore::BASE_DIR = "/data/service/el1/public/database/distributeddata";
 const std::int32_t RuntimeStore::SLASH_COUNT_IN_KEY = 4;
 
-RuntimeStore::RuntimeStore(std::string storeId) : storeId_({ storeId })
+RuntimeStore::RuntimeStore(const std::string &storeId) : storeId_({ storeId })
 {
     LOG_INFO(UDMF_SERVICE, "Construct runtimeStore: %{public}s.", storeId_.storeId.c_str());
 }
