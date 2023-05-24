@@ -45,4 +45,4 @@ private:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_LINK_NAPI_H
+#endif // UDMF_LINK_NAPI_H

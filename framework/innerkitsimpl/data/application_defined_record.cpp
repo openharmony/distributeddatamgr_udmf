@@ -15,8 +15,6 @@
 
 #include "application_defined_record.h"
 
-#include <utility>
-
 namespace OHOS {
 namespace UDMF {
 ApplicationDefinedRecord::ApplicationDefinedRecord() : UnifiedRecord(APPLICATION_DEFINED_RECORD)

@@ -40,4 +40,4 @@ public:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_STORE_H
+#endif // UDMF_STORE_H

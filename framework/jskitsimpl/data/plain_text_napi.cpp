@@ -15,13 +15,12 @@
 
 #include "plain_text_napi.h"
 
-#include "logger.h"
-#include "plain_text.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "napi_queue.h"
-#include "unified_record_napi.h"
+#include "plain_text.h"
 #include "text_napi.h"
+#include "unified_record_napi.h"
 
 namespace OHOS {
 namespace UDMF {

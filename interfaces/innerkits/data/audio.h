@@ -13,19 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_IMAGE_H
-#define UDMF_IMAGE_H
+#ifndef UDMF_AUDIO_H
+#define UDMF_AUDIO_H
 
 #include "file.h"
 
 namespace OHOS {
 namespace UDMF {
-class Image : public File {
+class Audio : public File {
 public:
-    Image();
-    explicit Image(const std::string &uri);
+    Audio();
+    explicit Audio(const std::string &uri);
 };
 } // namespace UDMF
 } // namespace OHOS
 
-#endif // UDMF_IMAGE_H
+#endif // UDMF_AUDIO_H

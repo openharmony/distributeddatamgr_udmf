@@ -46,11 +46,7 @@ void UnifiedData::AddRecord(const std::shared_ptr<UnifiedRecord> &record)
     if (record == nullptr) {
         return;
     }
-    this->records_.emplace_back(record);
-    if (records_.size() > MAX_RECORD_NUM) {
-        std::vector<std::shared_ptr<UnifiedRecord>> new_records(records_.begin(), records_.end() - 1);
-        this->records_ = new_records;
-    }
+    this->records_.push_back(record);
 }
 
 std::shared_ptr<UnifiedRecord> UnifiedData::GetRecordAt(std::size_t index)

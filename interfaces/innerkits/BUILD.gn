@@ -41,6 +41,7 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
@@ -55,18 +56,18 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/video.cpp",
+    "${udmf_framework_path}/manager/data_manager.cpp",
+    "${udmf_framework_path}/manager/lifecycle/clean_after_get.cpp",
+    "${udmf_framework_path}/manager/lifecycle/clean_on_startup.cpp",
+    "${udmf_framework_path}/manager/lifecycle/clean_on_timeout.cpp",
+    "${udmf_framework_path}/manager/lifecycle/lifecycle_manager.cpp",
+    "${udmf_framework_path}/manager/lifecycle/lifecycle_policy.cpp",
     "${udmf_framework_path}/manager/permission/checker_manager.cpp",
     "${udmf_framework_path}/manager/permission/data_checker.cpp",
     "${udmf_framework_path}/manager/permission/uri_permission_manager.cpp",
     "${udmf_framework_path}/manager/preprocess/preprocess_utils.cpp",
-    "${udmf_framework_path}/manager/store/store_cache.cpp",
     "${udmf_framework_path}/manager/store/runtime_store.cpp",
-    "${udmf_framework_path}/manager/data_manager.cpp",
-    "${udmf_framework_path}/manager/lifecycle/lifecycle_manager.cpp",
-    "${udmf_framework_path}/manager/lifecycle/lifecycle_policy.cpp",
-    "${udmf_framework_path}/manager/lifecycle/clean_on_startup.cpp",
-    "${udmf_framework_path}/manager/lifecycle/clean_after_get.cpp",
-    "${udmf_framework_path}/manager/lifecycle/clean_on_timeout.cpp",
+    "${udmf_framework_path}/manager/store/store_cache.cpp",
     "${udmf_framework_path}/service/udmf_service_client.cpp",
     "${udmf_framework_path}/service/udmf_service_proxy.cpp",
   ]
@@ -74,8 +75,8 @@ ohos_shared_library("udmf_client") {
   public_configs = [ ":udmf_client_config" ]
 
   deps = [
-    "//foundation/filemanagement/app_file_service/interfaces/innerkits/remote_file_share/native:remote_file_share_native",
-    "//foundation/ability/ability_runtime/interfaces/inner_api/uri_permission:uri_permission_mgr",
+    "${aafwk_inner_api_path}/uri_permission:uri_permission_mgr",
+    "${file_service_path}/interfaces/innerkits/remote_file_share/native:remote_file_share_native",
   ]
 
   external_deps = [

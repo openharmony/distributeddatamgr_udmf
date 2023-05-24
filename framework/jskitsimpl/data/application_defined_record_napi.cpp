@@ -14,11 +14,10 @@
  */
 #include "application_defined_record_napi.h"
 
-#include "logger.h"
+#include "application_defined_record.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "napi_queue.h"
-#include "application_defined_record.h"
 #include "unified_record_napi.h"
 
 namespace OHOS {
@@ -81,8 +80,8 @@ napi_value ApplicationDefinedRecordNapi::GetApplicationDefinedType(napi_env env,
     LOG_INFO(UDMF_KITS_NAPI, "get content start");
     auto ctxt = std::make_shared<ContextBase>();
     auto record = GetApplicationDefinedRecord(env, info, ctxt);
-    ASSERT_ERR(ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+    ASSERT_ERR(
+        ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, record->value_->GetApplicationDefinedType(), ctxt->output);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set type failed!");
     return ctxt->output;
@@ -101,8 +100,8 @@ napi_value ApplicationDefinedRecordNapi::SetApplicationDefinedType(napi_env env,
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     auto record = reinterpret_cast<ApplicationDefinedRecordNapi *>(ctxt->native);
-    ASSERT_ERR(ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+    ASSERT_ERR(
+        ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     record->value_->SetApplicationDefinedType(type);
     return nullptr;
 }

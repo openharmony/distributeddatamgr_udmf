@@ -22,8 +22,6 @@ namespace OHOS {
 namespace UDMF {
 class UnifiedData {
 public:
-    static constexpr std::uint32_t MAX_RECORD_NUM = 512;
-
     int64_t GetSize();
 
     std::string GetGroupId() const;
@@ -46,4 +44,4 @@ private:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_UNIFIED_DATA_H
+#endif // UDMF_UNIFIED_DATA_H

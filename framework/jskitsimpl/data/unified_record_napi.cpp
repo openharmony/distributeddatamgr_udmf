@@ -15,11 +15,9 @@
 
 #include "unified_record_napi.h"
 
-#include "logger.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "napi_queue.h"
-#include "unified_meta.h"
 #include "unified_record.h"
 
 namespace OHOS {

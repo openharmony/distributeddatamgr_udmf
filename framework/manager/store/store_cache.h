@@ -33,4 +33,4 @@ private:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_STORE_CACHE_H
+#endif // UDMF_STORE_CACHE_H

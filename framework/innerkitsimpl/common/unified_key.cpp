@@ -15,8 +15,6 @@
 
 #include "unified_key.h"
 
-#include <utility>
-
 #include "logger.h"
 
 namespace OHOS {

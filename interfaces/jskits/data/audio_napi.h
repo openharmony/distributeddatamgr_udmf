@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_SUMMARY_NAPI_H
-#define UDMF_SUMMARY_NAPI_H
+#ifndef UDMF_AUDIO_NAPI_H
+#define UDMF_AUDIO_NAPI_H
 
 #include <memory>
 
@@ -24,21 +24,18 @@
 namespace OHOS {
 namespace UDMF {
 struct ContextBase;
-struct Summary;
-class SummaryNapi {
+class UnifiedRecord;
+class Audio;
+class AudioNapi {
 public:
     static napi_value Constructor(napi_env env);
-    static void NewInstance(napi_env env, std::shared_ptr<Summary> in, napi_value &out);
-    std::shared_ptr<Summary> value_;
+    static void NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out);
+    std::shared_ptr<Audio> value_;
 
 private:
     static napi_value New(napi_env env, napi_callback_info info);
     static void Destructor(napi_env env, void *data, void *hint);
-    static SummaryNapi *GetDataSummary(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt);
-
-    static napi_value GetSummary(napi_env env, napi_callback_info info);
-    static napi_value GetTotal(napi_env env, napi_callback_info info);
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_SUMMARY_NAPI_H
+#endif // UDMF_AUDIO_NAPI_H
