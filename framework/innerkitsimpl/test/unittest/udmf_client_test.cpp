@@ -13,12 +13,16 @@
  * limitations under the License.
  */
 
-#include "udmf_client.h"
-
 #include <gtest/gtest.h>
+
 #include <unistd.h>
 
+#include "token_setproc.h"
 #include "accesstoken_kit.h"
+#include "nativetoken_kit.h"
+
+#include "logger.h"
+#include "udmf_client.h"
 #include "application_defined_record.h"
 #include "audio.h"
 #include "file.h"
@@ -26,15 +30,12 @@
 #include "html.h"
 #include "image.h"
 #include "link.h"
-#include "logger.h"
-#include "nativetoken_kit.h"
 #include "plain_text.h"
 #include "system_defined_appitem.h"
 #include "system_defined_form.h"
 #include "system_defined_pixelmap.h"
 #include "system_defined_record.h"
 #include "text.h"
-#include "token_setproc.h"
 #include "video.h"
 
 using namespace testing::ext;
@@ -89,24 +90,37 @@ void UdmfClientTest::SetNativeToken()
 void UdmfClientTest::SetHapToken1()
 {
     HapInfoParams info = {
-        .userID = USER_ID, .bundleName = "ohos.test.demo1", .instIndex = INST_INDEX, .appIDDesc = "ohos.test.demo1"
+        .userID = USER_ID,
+        .bundleName = "ohos.test.demo1",
+        .instIndex = INST_INDEX,
+        .appIDDesc = "ohos.test.demo1"
     };
 
-    HapPolicyParams policy = { .apl = APL_NORMAL,
+    HapPolicyParams policy = {
+        .apl = APL_NORMAL,
         .domain = "test.domain",
-        .permList = { { .permissionName = "ohos.permission.test",
-            .bundleName = "ohos.test.demo1",
-            .grantMode = 1,
-            .availableLevel = APL_NORMAL,
-            .label = "label",
-            .labelId = 1,
-            .description = "test1",
-            .descriptionId = 1 } },
-        .permStateList = { { .permissionName = "ohos.permission.test",
-            .isGeneral = true,
-            .resDeviceID = { "local" },
-            .grantStatus = { PermissionState::PERMISSION_GRANTED },
-            .grantFlags = { 1 } } } };
+        .permList = {
+            {
+                .permissionName = "ohos.permission.test",
+                .bundleName = "ohos.test.demo1",
+                .grantMode = 1,
+                .availableLevel = APL_NORMAL,
+                .label = "label",
+                .labelId = 1,
+                .description = "test1",
+                .descriptionId = 1
+            }
+        },
+        .permStateList = {
+            {
+                .permissionName = "ohos.permission.test",
+                .isGeneral = true,
+                .resDeviceID = { "local" },
+                .grantStatus = { PermissionState::PERMISSION_GRANTED },
+                .grantFlags = { 1 }
+            }
+        }
+    };
     auto tokenID = AccessTokenKit::AllocHapToken(info, policy);
     SetSelfTokenID(tokenID.tokenIDEx);
 }
@@ -114,24 +128,37 @@ void UdmfClientTest::SetHapToken1()
 void UdmfClientTest::SetHapToken2()
 {
     HapInfoParams info = {
-        .userID = USER_ID, .bundleName = "ohos.test.demo2", .instIndex = INST_INDEX, .appIDDesc = "ohos.test.demo2"
+        .userID = USER_ID,
+        .bundleName = "ohos.test.demo2",
+        .instIndex = INST_INDEX,
+        .appIDDesc = "ohos.test.demo2"
     };
 
-    HapPolicyParams policy = { .apl = APL_NORMAL,
+    HapPolicyParams policy = {
+        .apl = APL_NORMAL,
         .domain = "test.domain",
-        .permList = { { .permissionName = "ohos.permission.test",
-            .bundleName = "ohos.test.demo2",
-            .grantMode = 1,
-            .availableLevel = APL_NORMAL,
-            .label = "label",
-            .labelId = 1,
-            .description = "test2",
-            .descriptionId = 1 } },
-        .permStateList = { { .permissionName = "ohos.permission.test",
-            .isGeneral = true,
-            .resDeviceID = { "local" },
-            .grantStatus = { PermissionState::PERMISSION_GRANTED },
-            .grantFlags = { 1 } } } };
+        .permList = {
+            {
+                .permissionName = "ohos.permission.test",
+                .bundleName = "ohos.test.demo2",
+                .grantMode = 1,
+                .availableLevel = APL_NORMAL,
+                .label = "label",
+                .labelId = 1,
+                .description = "test2",
+                .descriptionId = 1
+            }
+        },
+        .permStateList = {
+            {
+                .permissionName = "ohos.permission.test",
+                .isGeneral = true,
+                .resDeviceID = { "local" },
+                .grantStatus = { PermissionState::PERMISSION_GRANTED },
+                .grantFlags = { 1 }
+            }
+        }
+    };
     auto tokenID = AccessTokenKit::AllocHapToken(info, policy);
     SetSelfTokenID(tokenID.tokenIDEx);
 }
@@ -860,8 +887,8 @@ HWTEST_F(UdmfClientTest, SetData015, TestSize.Level1)
 
     auto applicationDefinedRecord2 = static_cast<ApplicationDefinedRecord *>(record2.get());
     ASSERT_NE(applicationDefinedRecord2, nullptr);
-    EXPECT_EQ(
-        applicationDefinedRecord1.GetApplicationDefinedType(), applicationDefinedRecord2->GetApplicationDefinedType());
+    EXPECT_EQ(applicationDefinedRecord1.GetApplicationDefinedType(),
+              applicationDefinedRecord2->GetApplicationDefinedType());
     auto rawData2 = applicationDefinedRecord2->GetRawData();
     EXPECT_EQ(rawData1.size(), rawData2.size());
     for (int i = 0; i < rawData1.size(); ++i) {
@@ -941,6 +968,72 @@ HWTEST_F(UdmfClientTest, SetData017, TestSize.Level1)
     ASSERT_EQ(inputRecords.size(), outputRecords.size());
 
     LOG_INFO(UDMF_TEST, "SetData017 end.");
+}
+
+/**
+* @tc.name: SetData018
+* @tc.desc: Set one 2MB record of data with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData018, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData018 begin.");
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData inputData;
+    std::string key;
+    UDDetails details;
+    std::string value;
+    int64_t maxSize = 512 * 1024;
+    for (int64_t i = 0; i < maxSize; ++i) {
+        value += "11";
+    }
+    details.insert({ value, value });
+    Text text;
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
+    inputData.AddRecord(record);
+
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption queryOption = { .key = key };
+    UnifiedData outputData;
+    status = UdmfClient::GetInstance().GetData(queryOption, outputData);
+    ASSERT_EQ(status, E_OK);
+
+    LOG_INFO(UDMF_TEST, "SetData018 end.");
+}
+
+/**
+* @tc.name: SetData019
+* @tc.desc: Set one over 4MB record of data with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData019, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData019 begin.");
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData inputData;
+    std::string key;
+    UDDetails details;
+    std::string value;
+    int64_t maxSize = 512 * 1024;
+    for (int64_t i = 0; i < maxSize; ++i) {
+        value += "1111";
+    }
+    details.insert({ value, value });
+    details.insert({ "udmf_key", "udmf_value" });
+    Text text;
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
+    inputData.AddRecord(record);
+
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_INVALID_VALUE);
+
+    LOG_INFO(UDMF_TEST, "SetData019 end.");
 }
 
 /**
@@ -1083,6 +1176,7 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "GetSummary001 end.");
 }
+
 
 /**
 * @tc.name: GetSummary002
