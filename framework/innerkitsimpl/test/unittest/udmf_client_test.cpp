@@ -218,6 +218,9 @@ HWTEST_F(UdmfClientTest, SetData001, TestSize.Level1)
     status = UdmfClient::GetInstance().SetData(option, data, key);
     EXPECT_EQ(status, E_INVALID_PARAMETERS);
 
+    option = {};
+    status = UdmfClient::GetInstance().SetData(option, data, key);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "SetData001 end.");
 }
 
@@ -886,6 +889,37 @@ HWTEST_F(UdmfClientTest, SetData015, TestSize.Level1)
     }
 
     LOG_INFO(UDMF_TEST, "SetData015 end.");
+}
+
+/**
+* @tc.name: SetData016
+* @tc.desc: Set 512 records with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData016, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData016 begin.");
+
+    CustomOption customOption = {.intention = Intention::UD_INTENTION_DRAG};
+    std::string key;
+    UnifiedData inputData;
+    std::vector<std::shared_ptr<UnifiedRecord>> inputRecords;
+    for (int32_t i = 0; i < 512; ++i) {
+        inputRecords.emplace_back(std::make_shared<Text>());
+    }
+    inputData.SetRecords(inputRecords);
+
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption queryOption = { .key = key };
+    UnifiedData outputData;
+    status = UdmfClient::GetInstance().GetData(queryOption, outputData);
+    ASSERT_EQ(status, E_OK);
+    auto outputRecords = outputData.GetRecords();
+    ASSERT_EQ(inputRecords.size(), outputRecords.size());
+
+    LOG_INFO(UDMF_TEST, "SetData016 end.");
 }
 
 /**

@@ -31,7 +31,7 @@ public:
     virtual Status GetSummary(const std::string &key, Summary &summary) = 0;
     virtual Status Update(const UnifiedData &unifiedData) = 0;
     virtual Status Delete(const std::string &key) = 0;
-    virtual Status DeleteBatch(std::vector<std::string> timeoutKeys) = 0;
+    virtual Status DeleteBatch(const std::vector<std::string> &timeoutKeys) = 0;
     virtual Status Sync(const std::vector<std::string> &devices) = 0;
     virtual Status Clear() = 0;
     virtual bool Init() = 0;

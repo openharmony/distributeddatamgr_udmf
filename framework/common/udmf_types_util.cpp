@@ -600,7 +600,7 @@ template<> bool Unmarshalling(Intention &output, MessageParcel &parcel)
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal PlainText failed!");
         return false;
     }
-    if (intention < UD_INTENTION_DRAG || intention >= UD_INTENTION_BUTT) {
+    if (!UnifiedDataUtils::IsValidIntention(intention)) {
         LOG_ERROR(UDMF_FRAMEWORK, "invalid UDIntention!");
         return false;
     }
