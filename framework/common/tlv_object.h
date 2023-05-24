@@ -28,6 +28,7 @@ namespace UDMF {
 enum TAG : uint16_t {
     TAG_INT32 = 0x0000,
     TAG_INT64,
+    TAG_SIZE_T,
     TAG_BOOL,
     TAG_DOUBLE,
     TAG_STRING,
@@ -63,6 +64,11 @@ public:
     std::vector<std::uint8_t> GetBuffer()
     {
         return *buffer_;
+    }
+
+    void Count(const size_t value)
+    {
+        total_ += sizeof(value) + sizeof(TLVHead);
     }
 
     void Count(const int32_t value)

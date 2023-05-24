@@ -62,6 +62,9 @@ template<>
 bool Reading(int32_t &output, TLVObject &data);
 
 template<>
+bool Writing(const size_t &input, TLVObject &data);
+
+template<>
 bool Writing(const int64_t &input, TLVObject &data);
 template<>
 bool Reading(int64_t &output, TLVObject &data);
@@ -70,6 +73,9 @@ template<>
 bool Writing(const bool &input, TLVObject &data);
 template<>
 bool Reading(bool &output, TLVObject &data);
+
+template<>
+bool Reading(size_t &output, TLVObject &data);
 
 template<>
 bool Writing(const std::string &input, TLVObject &data);
