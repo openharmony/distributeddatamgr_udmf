@@ -33,7 +33,7 @@ DataChecker::~DataChecker()
 
 bool DataChecker::IsValid(const std::vector<Privilege> &privileges, const CheckerManager::CheckInfo &info)
 {
-    for (const auto privilege : privileges) {
+    for (const auto &privilege : privileges) {
         if (privilege.tokenId == info.tokenId || privilege.pid == info.pid) {
             return true;
         }
