@@ -36,6 +36,7 @@ config("udmf_client_config") {
 ohos_shared_library("udmf_client") {
   sources = [
     "${udmf_framework_path}/common/anonymous.cpp",
+    "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",

@@ -24,6 +24,7 @@
 #include "udmf_types_util.h"
 #include "unified_data.h"
 #include "unified_meta.h"
+#include "tlv_util.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -67,11 +68,28 @@ int UdmfServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
 int32_t UdmfServiceStub::OnSetData(MessageParcel &data, MessageParcel &reply)
 {
     LOG_INFO(UDMF_SERVICE, "start");
-    CustomOption customOption {};
-    UnifiedData unifiedData;
-    if (!ITypesUtil::Unmarshal(data, customOption, unifiedData)) {
-        LOG_ERROR(UDMF_SERVICE, "Unmarshal option");
+    CustomOption customOption;
+    if (!ITypesUtil::Unmarshal(data, customOption)) {
         return IPC_STUB_INVALID_DATA_ERR;
+    }
+    UnifiedData unifiedData;
+    int32_t count = data.ReadInt32();
+    for (int32_t index = 0; index < count; ++index) {
+        std::shared_ptr<UnifiedRecord> record;
+        int32_t size = data.ReadInt32();
+        if (size == 0) {
+            continue;
+        }
+        const uint8_t *rawData = reinterpret_cast<const uint8_t *>(data.ReadRawData(size));
+        if (rawData == nullptr) {
+            return IPC_STUB_INVALID_DATA_ERR;
+        }
+        std::vector<uint8_t> recordBytes(rawData, rawData + size);
+        auto recordTlv = TLVObject(recordBytes);
+        if (!TLVUtil::Reading(record, recordTlv)) {
+            return IPC_STUB_INVALID_DATA_ERR;
+        }
+        unifiedData.AddRecord(record);
     }
     if (unifiedData.GetRecords().empty()) {
         LOG_ERROR(UDMF_SERVICE, "Empty data without any record!");
@@ -85,9 +103,8 @@ int32_t UdmfServiceStub::OnSetData(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR(UDMF_SERVICE, "Exceeded data limit!");
         return E_INVALID_VALUE;
     }
-    for (std::shared_ptr<UnifiedRecord> record : unifiedData.GetRecords()) {
-        if (unifiedData.GetSize() > UdmfService::MAX_RECORD_SIZE) {
-            LOG_ERROR(UDMF_SERVICE, "Exceeded record limit!");
+    for (const auto &record : unifiedData.GetRecords()) {
+        if (record->GetSize() > UdmfService::MAX_RECORD_SIZE) {
             return E_INVALID_VALUE;
         }
     }
@@ -116,9 +133,28 @@ int32_t UdmfServiceStub::OnGetData(MessageParcel &data, MessageParcel &reply)
     query.pid = pid;
     UnifiedData unifiedData;
     int32_t status = GetData(query, unifiedData);
-    if (!ITypesUtil::Marshal(reply, status, unifiedData)) {
+    if (!ITypesUtil::Marshal(reply, status)) {
         LOG_ERROR(UDMF_SERVICE, "Marshal ud data, key: %{public}s", query.key.c_str());
         return IPC_STUB_WRITE_PARCEL_ERR;
+    }
+    auto size = unifiedData.GetRecords().size();
+    if (!reply.WriteInt32(static_cast<int32_t>(size))) {
+        return E_WRITE_PARCEL_ERROR;
+    }
+    for (const auto &record : unifiedData.GetRecords()) {
+        if (record == nullptr) {
+            continue;
+        }
+        std::vector<uint8_t> recordBytes;
+        auto recordTlv = TLVObject(recordBytes);
+        if (!TLVUtil::Writing(record, recordTlv)) {
+            LOG_ERROR(UDMF_SERVICE, "TLVUtil writing unified record failed.");
+            return E_WRITE_PARCEL_ERROR;
+        }
+        if (!reply.WriteInt32(static_cast<int32_t>(recordBytes.size())) ||
+            !reply.WriteRawData(recordBytes.data(), recordBytes.size())) {
+            return E_WRITE_PARCEL_ERROR;
+        }
     }
     return E_OK;
 }
