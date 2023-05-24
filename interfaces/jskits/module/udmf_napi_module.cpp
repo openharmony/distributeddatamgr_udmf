@@ -14,6 +14,7 @@
  */
 
 #include "application_defined_record_napi.h"
+#include "audio_napi.h"
 #include "file_napi.h"
 #include "folder_napi.h"
 #include "html_napi.h"
@@ -60,6 +61,8 @@ static napi_value Init(napi_env env, napi_value exports)
     LOG_INFO(UDMF_KITS_NAPI, "init Image %{public}d", status);
     status = napi_set_named_property(env, exports, "Video", OHOS::UDMF::VideoNapi::Constructor(env));
     LOG_INFO(UDMF_KITS_NAPI, "init Video %{public}d", status);
+    status = napi_set_named_property(env, exports, "Audio", OHOS::UDMF::AudioNapi::Constructor(env));
+    LOG_INFO(UDMF_KITS_NAPI, "init Audio %{public}d", status);
     status = napi_set_named_property(env, exports, "Folder", OHOS::UDMF::FolderNapi::Constructor(env));
     LOG_INFO(UDMF_KITS_NAPI, "init Folder %{public}d", status);
     status = napi_set_named_property(
@@ -75,7 +78,7 @@ static napi_value Init(napi_env env, napi_value exports)
         env, exports, "SystemDefinedPixelMap", OHOS::UDMF::SystemDefinedPixelMapNapi::Constructor(env));
     LOG_INFO(UDMF_KITS_NAPI, "init SDPixelMap %{public}d", status);
     status = napi_set_named_property(
-            env, exports, "ApplicationDefinedRecord", OHOS::UDMF::ApplicationDefinedRecordNapi::Constructor(env));
+        env, exports, "ApplicationDefinedRecord", OHOS::UDMF::ApplicationDefinedRecordNapi::Constructor(env));
     LOG_INFO(UDMF_KITS_NAPI, "init ApplicationDefinedRecord %{public}d", status);
     return exports;
 }

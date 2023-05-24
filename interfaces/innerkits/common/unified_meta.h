@@ -85,6 +85,7 @@ static const std::unordered_map<int32_t, std::string> JS_UD_TYPE_NAME_MAP {
     { FILE, "FILE" },
     { IMAGE, "IMAGE" },
     { VIDEO, "VIDEO" },
+    { AUDIO, "AUDIO" },
     { FOLDER, "FOLDER" },
     { SYSTEM_DEFINED_RECORD, "SYSTEM_DEFINED_RECORD" },
     { SYSTEM_DEFINED_FORM, "SYSTEM_DEFINED_FORM" },
@@ -128,4 +129,4 @@ public:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UNIFIED_META_H
+#endif // UNIFIED_META_H

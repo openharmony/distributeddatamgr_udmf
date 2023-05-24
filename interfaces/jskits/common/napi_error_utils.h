@@ -73,7 +73,6 @@ napi_value GenerateErrorMsg(napi_env env, NapiErrorCode jsInfo);
             return;                                                 \
         }                                                           \
     } while (0)
-
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_ERROR_UTILS_H

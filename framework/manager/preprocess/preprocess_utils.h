@@ -41,4 +41,4 @@ public:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_PREPROCESS_UTILS_H
+#endif // UDMF_PREPROCESS_UTILS_H

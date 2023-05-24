@@ -25,4 +25,4 @@ public:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_CLEAN_ON_STARTUP_H
+#endif // UDMF_CLEAN_ON_STARTUP_H

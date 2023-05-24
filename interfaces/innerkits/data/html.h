@@ -39,4 +39,4 @@ private:
 } // namespace UDMF
 } // namespace OHOS
 
-#endif //UDMF_HTML_H
+#endif // UDMF_HTML_H

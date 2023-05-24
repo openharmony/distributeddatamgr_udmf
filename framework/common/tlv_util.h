@@ -283,6 +283,12 @@ bool Reading(int64_t &output, TLVObject &data)
 }
 
 template<>
+bool Reading(size_t &output, TLVObject &data)
+{
+    return data.ReadBasic(output);
+}
+
+template<>
 bool Writing(const bool &input, TLVObject &data)
 {
     return data.WriteBasic(TAG_BOOL, input);

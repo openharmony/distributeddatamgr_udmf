@@ -185,7 +185,7 @@ public:
     template<typename T>
     bool ReadBasic(T &value)
     {
-        TLVHead head{};
+        TLVHead head {};
         if (!ReadHead(head)) {
             return false;
         }
@@ -224,7 +224,7 @@ public:
 
     bool ReadString(std::string &value)
     {
-        TLVHead head{};
+        TLVHead head {};
         if (!ReadHead(head)) {
             return false;
         }
@@ -256,7 +256,7 @@ public:
 
     bool ReadVector(std::vector<uint8_t> &value)
     {
-        TLVHead head{};
+        TLVHead head {};
         if (!ReadHead(head)) {
             return false;
         }
@@ -326,7 +326,7 @@ public:
 
     bool ReadVariant(UDVariant &value)
     {
-        TLVHead head{};
+        TLVHead head {};
         if (!ReadHead(head)) {
             return false;
         }
@@ -414,7 +414,7 @@ public:
 
     bool ReadMap(UDDetails &value)
     {
-        TLVHead head{};
+        TLVHead head {};
         if (!ReadHead(head)) {
             return false;
         }

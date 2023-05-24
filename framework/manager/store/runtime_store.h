@@ -53,4 +53,4 @@ private:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_RUNTIMESTORE_H
+#endif // UDMF_RUNTIMESTORE_H

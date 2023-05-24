@@ -47,7 +47,7 @@ namespace UDMF {
         __status;                                                      \
     })
 
-static constexpr int32_t UDMF_MAX_DATA_SIZE = 5 * 1024 * 1024;
+
 UdmfServiceProxy::UdmfServiceProxy(const sptr<IRemoteObject> &object) : IRemoteProxy<IUdmfService>(object)
 {
 }
@@ -59,13 +59,23 @@ int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData
         LOG_ERROR(UDMF_SERVICE, "Invalid intention");
         return E_INVALID_PARAMETERS;
     }
-    if (unifiedData.GetSize() > UDMF_MAX_DATA_SIZE) {
-        LOG_ERROR(UDMF_SERVICE, "Exceeded the limit!");
+    if (unifiedData.GetRecords().empty()) {
+        LOG_ERROR(UDMF_SERVICE, "Empty data without any record!");
         return E_INVALID_VALUE;
     }
-    if (unifiedData.GetRecords().empty()) {
-        LOG_ERROR(UDMF_SERVICE, "Invalid data!");
+    if (unifiedData.GetRecords().size() > UdmfService::MAX_RECORD_NUM) {
+        LOG_ERROR(UDMF_SERVICE, "Excessive record: %{public}d!", unifiedData.GetRecords().size());
         return E_INVALID_VALUE;
+    }
+    if (unifiedData.GetSize() > UdmfService::MAX_DATA_SIZE) {
+        LOG_ERROR(UDMF_SERVICE, "Exceeded data limit!");
+        return E_INVALID_VALUE;
+    }
+    for (std::shared_ptr<UnifiedRecord> record : unifiedData.GetRecords()) {
+        if (unifiedData.GetSize() > UdmfService::MAX_RECORD_SIZE) {
+            LOG_ERROR(UDMF_SERVICE, "Exceeded record limit!");
+            return E_INVALID_VALUE;
+        }
     }
     MessageParcel reply;
     int32_t status = IPC_SEND(SET_DATA, reply, option, unifiedData);

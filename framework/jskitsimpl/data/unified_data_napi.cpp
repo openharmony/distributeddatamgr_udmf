@@ -15,25 +15,25 @@
 
 #include "unified_data_napi.h"
 
-#include "logger.h"
+#include "application_defined_record_napi.h"
+#include "audio_napi.h"
+#include "file_napi.h"
+#include "folder_napi.h"
+#include "html_napi.h"
+#include "image_napi.h"
+#include "link_napi.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "napi_queue.h"
-#include "unified_data.h"
-#include "unified_meta.h"
-#include "image.h"
-#include "image_napi.h"
-#include "text_napi.h"
 #include "plain_text_napi.h"
-#include "html_napi.h"
-#include "link_napi.h"
-#include "image_napi.h"
-#include "video_napi.h"
-#include "system_defined_record_napi.h"
 #include "system_defined_appitem_napi.h"
 #include "system_defined_form_napi.h"
 #include "system_defined_pixelmap_napi.h"
+#include "system_defined_record_napi.h"
+#include "text_napi.h"
+#include "unified_data.h"
 #include "unified_record_napi.h"
+#include "video_napi.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -164,12 +164,24 @@ void UnifiedDataNapi::GetRecord(napi_env env, std::shared_ptr<UnifiedRecord> in,
             LinkNapi::NewInstance(env, in, out);
             break;
         }
+        case FILE: {
+            FileNapi::NewInstance(env, in, out);
+            break;
+        }
         case IMAGE: {
             ImageNapi::NewInstance(env, in, out);
             break;
         }
         case VIDEO: {
             VideoNapi::NewInstance(env, in, out);
+            break;
+        }
+        case AUDIO: {
+            AudioNapi::NewInstance(env, in, out);
+            break;
+        }
+        case FOLDER: {
+            FolderNapi::NewInstance(env, in, out);
             break;
         }
         case SYSTEM_DEFINED_RECORD: {
@@ -186,6 +198,10 @@ void UnifiedDataNapi::GetRecord(napi_env env, std::shared_ptr<UnifiedRecord> in,
         }
         case SYSTEM_DEFINED_PIXEL_MAP: {
             SystemDefinedPixelMapNapi::NewInstance(env, in, out);
+            break;
+        }
+        case APPLICATION_DEFINED_RECORD: {
+            ApplicationDefinedRecordNapi::NewInstance(env, in, out);
             break;
         }
         default:

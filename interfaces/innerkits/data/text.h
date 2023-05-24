@@ -37,4 +37,4 @@ protected:
 } // namespace UDMF
 } // namespace OHOS
 
-#endif //UDMF_TEXT_H
+#endif // UDMF_TEXT_H

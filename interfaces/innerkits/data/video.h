@@ -27,4 +27,4 @@ public:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_VIDEO_H
+#endif // UDMF_VIDEO_H

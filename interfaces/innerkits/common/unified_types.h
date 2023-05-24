@@ -45,18 +45,18 @@ struct Privilege {
 
 struct Runtime {
     UnifiedKey key;
-    bool isPrivate{};
+    bool isPrivate {};
     std::vector<Privilege> privileges;
     // time when the data is created
-    time_t createTime{};
+    time_t createTime {};
     // name of the package for creating data
     std::string sourcePackage;
     // current data status
-    DataStatus dataStatus{WORKING};
+    DataStatus dataStatus { WORKING };
     // current data version
-    std::int32_t dataVersion{};
+    std::int32_t dataVersion {};
     // time when the data is last modified
-    time_t lastModifiedTime{};
+    time_t lastModifiedTime {};
     // time when data is written to the udmf
     std::string createPackage;
     // device ID of the data source
@@ -67,8 +67,8 @@ struct Runtime {
  * Options for sharing data through UDMF.
  */
 struct CustomOption {
-    Intention intention{};
-    uint32_t tokenId{};
+    Intention intention {};
+    uint32_t tokenId {};
 };
 
 /*
@@ -76,9 +76,9 @@ struct CustomOption {
  */
 struct QueryOption {
     std::string key;
-    uint32_t tokenId{};
-    int32_t pid{};
+    uint32_t tokenId {};
+    int32_t pid {};
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_UNIFIED_TYPES_H
+#endif // UDMF_UNIFIED_TYPES_H

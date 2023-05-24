@@ -15,7 +15,7 @@ import("//foundation/distributeddatamgr/udmf/udmf.gni")
 
 config("udmf_service_config") {
   visibility = [ ":*" ]
-  include_dirs = ["include"]
+  include_dirs = [ "include" ]
 }
 
 ohos_shared_library("udmf_server") {
@@ -45,17 +45,17 @@ ohos_shared_library("udmf_server") {
   configs = [ ":udmf_service_config" ]
 
   deps = [
-    "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
-    "//base/security/access_token/interfaces/innerkits/accesstoken:libaccesstoken_sdk",
-    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/framework:distributeddatasvcfwk",
+    "${access_kit_path}/interfaces/innerkits/accesstoken:libaccesstoken_sdk",
+    "${ddms_path}/services/distributeddataservice/framework:distributeddatasvcfwk",
+    "../interfaces/innerkits:udmf_client",
   ]
 
   external_deps = [
     "c_utils:utils",
-    "ipc:ipc_core",
-    "multimedia_image_framework:image_native",
     "data_object:distributeddataobject_impl",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "multimedia_image_framework:image_native",
   ]
 
   subsystem_name = "distributeddatamgr"
