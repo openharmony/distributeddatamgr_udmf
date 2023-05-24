@@ -44,4 +44,4 @@ private:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_LIFECYCLE_MANAGER_H
+#endif // UDMF_LIFECYCLE_MANAGER_H

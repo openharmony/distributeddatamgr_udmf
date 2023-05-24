@@ -36,4 +36,4 @@ protected:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_SYSTEM_DEFINED_RECORD_H
+#endif // UDMF_SYSTEM_DEFINED_RECORD_H

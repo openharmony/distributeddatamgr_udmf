@@ -23,4 +23,4 @@ public:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_CLEAN_AFTER_GET_H
+#endif // UDMF_CLEAN_AFTER_GET_H

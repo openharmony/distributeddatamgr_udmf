@@ -21,7 +21,6 @@
 #include <variant>
 #include <vector>
 
-#include "unified_meta.h"
 #include "unified_types.h"
 
 namespace OHOS {
@@ -47,4 +46,4 @@ private:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_UNIFIED_RECORD_H
+#endif // UDMF_UNIFIED_RECORD_H

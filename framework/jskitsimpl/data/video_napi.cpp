@@ -15,13 +15,12 @@
 
 #include "video_napi.h"
 
-#include "logger.h"
-#include "video.h"
+#include "file_napi.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "napi_queue.h"
 #include "unified_record_napi.h"
-#include "file_napi.h"
+#include "video.h"
 
 namespace OHOS {
 namespace UDMF {

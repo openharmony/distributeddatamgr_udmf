@@ -37,8 +37,7 @@ public:
 private:
     std::string identity;
 };
-
 } // namespace UDMF
 } // namespace OHOS
 
-#endif //UDMF_SAMEPROCESSIPCGUARD_H
+#endif // UDMF_SAMEPROCESSIPCGUARD_H

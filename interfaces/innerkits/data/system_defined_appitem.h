@@ -49,4 +49,4 @@ private:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_SYSTEM_DEFINED_APPITEM_H
+#endif // UDMF_SYSTEM_DEFINED_APPITEM_H

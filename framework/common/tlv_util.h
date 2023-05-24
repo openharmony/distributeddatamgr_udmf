@@ -19,6 +19,7 @@
 #include <type_traits>
 
 #include "application_defined_record.h"
+#include "audio.h"
 #include "file.h"
 #include "folder.h"
 #include "html.h"
@@ -133,6 +134,20 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
             }
             data.Count(video->GetUri());
             data.Count(video->GetRemoteUri());
+            auto file = static_cast<File *>(input.get());
+            if (file == nullptr) {
+                return false;
+            }
+            data.Count(file->GetDetails());
+            break;
+        }
+        case UDType::AUDIO: {
+            auto audio = static_cast<Audio *>(input.get());
+            if (audio == nullptr) {
+                return false;
+            }
+            data.Count(audio->GetUri());
+            data.Count(audio->GetRemoteUri());
             auto file = static_cast<File *>(input.get());
             if (file == nullptr) {
                 return false;
@@ -564,6 +579,33 @@ bool Reading(Video &output, TLVObject &data)
 }
 
 template<>
+bool Writing(const Audio &input, TLVObject &data)
+{
+    return true;
+}
+
+template<>
+bool Reading(Audio &output, TLVObject &data)
+{
+    std::string uri;
+    std::string remoteUri;
+    UDDetails details;
+    if (!Reading(uri, data)) {
+        return false;
+    }
+    if (!Reading(remoteUri, data)) {
+        return false;
+    }
+    if (!Reading(details, data)) {
+        return false;
+    }
+    output.SetUri(uri);
+    output.SetRemoteUri(remoteUri);
+    output.SetDetails(details);
+    return true;
+}
+
+template<>
 bool Writing(const Folder &input, TLVObject &data)
 {
     return true;
@@ -885,6 +927,20 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             }
             return Writing(*file, data);
         }
+        case UDType::AUDIO: {
+            auto audio = static_cast<Audio *>(input.get());
+            if (audio == nullptr) {
+                return false;
+            }
+            if (!Writing(*audio, data)) {
+                return false;
+            }
+            auto file = static_cast<File *>(input.get());
+            if (file == nullptr) {
+                return false;
+            }
+            return Writing(*file, data);
+        }
         case UDType::FOLDER: {
             auto folder = static_cast<Folder *>(input.get());
             if (folder == nullptr) {
@@ -1027,6 +1083,14 @@ bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data)
                 return false;
             }
             output = video;
+            break;
+        }
+        case UDType::AUDIO: {
+            std::shared_ptr<Audio> audio = std::make_shared<Audio>();
+            if (!Reading(*audio, data)) {
+                return false;
+            }
+            output = audio;
             break;
         }
         case UDType::FOLDER: {

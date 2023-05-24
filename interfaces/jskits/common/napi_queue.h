@@ -154,4 +154,4 @@ private:
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_NAPI_QUEUE_H
+#endif // UDMF_NAPI_QUEUE_H

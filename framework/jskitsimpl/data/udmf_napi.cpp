@@ -14,13 +14,9 @@
  */
 #include "udmf_napi.h"
 
-#include <unordered_map>
-
-#include "logger.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "napi_queue.h"
-#include "unified_meta.h"
 
 namespace OHOS {
 namespace UDMF {

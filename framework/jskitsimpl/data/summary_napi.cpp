@@ -15,7 +15,6 @@
 
 #include "summary_napi.h"
 
-#include "logger.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "napi_queue.h"

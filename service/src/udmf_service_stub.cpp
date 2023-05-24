@@ -67,11 +67,29 @@ int UdmfServiceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
 int32_t UdmfServiceStub::OnSetData(MessageParcel &data, MessageParcel &reply)
 {
     LOG_INFO(UDMF_SERVICE, "start");
-    CustomOption customOption{};
+    CustomOption customOption {};
     UnifiedData unifiedData;
     if (!ITypesUtil::Unmarshal(data, customOption, unifiedData)) {
         LOG_ERROR(UDMF_SERVICE, "Unmarshal option");
         return IPC_STUB_INVALID_DATA_ERR;
+    }
+    if (unifiedData.GetRecords().empty()) {
+        LOG_ERROR(UDMF_SERVICE, "Empty data without any record!");
+        return E_INVALID_VALUE;
+    }
+    if (unifiedData.GetRecords().size() > UdmfService::MAX_RECORD_NUM) {
+        LOG_ERROR(UDMF_SERVICE, "Excessive record: %{public}d!", unifiedData.GetRecords().size());
+        return E_INVALID_VALUE;
+    }
+    if (unifiedData.GetSize() > UdmfService::MAX_DATA_SIZE) {
+        LOG_ERROR(UDMF_SERVICE, "Exceeded data limit!");
+        return E_INVALID_VALUE;
+    }
+    for (std::shared_ptr<UnifiedRecord> record : unifiedData.GetRecords()) {
+        if (unifiedData.GetSize() > UdmfService::MAX_RECORD_SIZE) {
+            LOG_ERROR(UDMF_SERVICE, "Exceeded record limit!");
+            return E_INVALID_VALUE;
+        }
     }
     int32_t token = static_cast<int>(IPCSkeleton::GetCallingTokenID());
     customOption.tokenId = token;
@@ -175,6 +193,5 @@ bool UdmfServiceStub::VerifyPermission(const std::string &permission)
     return true;
 #endif // UDMF_PERMISSION_ENABLED
 }
-
 } // namespace UDMF
 } // namespace OHOS

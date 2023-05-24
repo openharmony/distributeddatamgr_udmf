@@ -15,7 +15,6 @@
 
 #include "system_defined_pixelmap_napi.h"
 
-#include "logger.h"
 #include "system_defined_pixelmap.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"

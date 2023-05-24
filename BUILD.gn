@@ -17,8 +17,8 @@ group("udmf_packages") {
   if (is_standard_system) {
     deps = [
       "interfaces/innerkits:udmf_client",
-      "interfaces/jskits:udmf_napi",
       "interfaces/jskits:udmf_data_napi",
+      "interfaces/jskits:udmf_napi",
       "service:udmf_server",
     ]
   }
@@ -27,7 +27,5 @@ group("udmf_packages") {
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [
-    "framework/innerkitsimpl/test/fuzztest/udmfclient_fuzzer:fuzztest",
-  ]
+  deps += [ "framework/innerkitsimpl/test/fuzztest/udmfclient_fuzzer:fuzztest" ]
 }

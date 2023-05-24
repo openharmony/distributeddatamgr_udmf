@@ -52,4 +52,4 @@ enum Status : int32_t {
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_ERROR_CODE_H
+#endif // UDMF_ERROR_CODE_H

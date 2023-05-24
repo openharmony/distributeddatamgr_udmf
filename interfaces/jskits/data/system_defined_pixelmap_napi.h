@@ -44,4 +44,4 @@ private:
 } // namespace UDMF
 } // namespace OHOS
 
-#endif //UDMF_SYSTEM_DEFINED_PIXELMAP_NAPI_H
+#endif // UDMF_SYSTEM_DEFINED_PIXELMAP_NAPI_H

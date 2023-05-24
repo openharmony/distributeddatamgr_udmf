@@ -59,4 +59,4 @@ private:
 } // namespace UDMF
 } // namespace OHOS
 
-#endif //UDMF_SYSTEM_DEFINED_APPITEM_NAPI_H
+#endif // UDMF_SYSTEM_DEFINED_APPITEM_NAPI_H
