@@ -19,8 +19,6 @@
 #include <memory>
 #include <string>
 
-#include "uri_permission_manager_client.h"
-
 #include "error_code.h"
 
 namespace OHOS {
@@ -29,9 +27,6 @@ class UriPermissionManager {
 public:
     static UriPermissionManager &GetInstance();
     Status GrantUriPermission(const std::string &path, const std::string &bundleName);
-
-private:
-    std::shared_ptr<AAFwk::UriPermissionManagerClient> uriPermissionManager_;
 };
 } // namespace UDMF
 } // namespace OHOS
