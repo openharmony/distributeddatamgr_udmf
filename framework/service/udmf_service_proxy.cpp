@@ -19,6 +19,7 @@
 
 #include "preprocess_utils.h"
 #include "udmf_types_util.h"
+#include "tlv_util.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -68,23 +69,41 @@ int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData
         return E_INVALID_VALUE;
     }
     if (unifiedData.GetSize() > UdmfService::MAX_DATA_SIZE) {
-        LOG_ERROR(UDMF_SERVICE, "Exceeded data limit!");
         return E_INVALID_VALUE;
     }
-    for (std::shared_ptr<UnifiedRecord> record : unifiedData.GetRecords()) {
-        if (unifiedData.GetSize() > UdmfService::MAX_RECORD_SIZE) {
-            LOG_ERROR(UDMF_SERVICE, "Exceeded record limit!");
+    MessageParcel request;
+    if (!request.WriteInterfaceToken(GetDescriptor())) {
+        return E_WRITE_PARCEL_ERROR;
+    }
+    if (!ITypesUtil::Marshal(request, option)) {
+        return E_WRITE_PARCEL_ERROR;
+    }
+    auto size = unifiedData.GetRecords().size();
+    if (!request.WriteInt32(static_cast<int32_t>(size))) {
+        return E_WRITE_PARCEL_ERROR;
+    }
+    for (const auto &record : unifiedData.GetRecords()) {
+        if (record->GetSize() > UdmfService::MAX_RECORD_SIZE) {
             return E_INVALID_VALUE;
+        }
+        std::vector<uint8_t> recordBytes;
+        auto recordTlv = TLVObject(recordBytes);
+        if (!TLVUtil::Writing(record, recordTlv)) {
+            return E_WRITE_PARCEL_ERROR;
+        }
+        if (!request.WriteInt32(static_cast<int32_t>(recordBytes.size())) ||
+            !request.WriteRawData(recordBytes.data(), recordBytes.size())) {
+            return E_WRITE_PARCEL_ERROR;
         }
     }
     MessageParcel reply;
-    int32_t status = IPC_SEND(SET_DATA, reply, option, unifiedData);
-    if (status != E_OK) {
-        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s", status, key.c_str());
-        return status;
+    MessageOption messageOption;
+    int error = Remote()->SendRequest(SET_DATA, request, reply, messageOption);
+    if (error != 0) {
+        return E_WRITE_PARCEL_ERROR;
     }
-    ITypesUtil::Unmarshal(reply, key);
-    LOG_DEBUG(UDMF_SERVICE, "end.");
+    int32_t status;
+    ITypesUtil::Unmarshal(reply, status, key);
     return status;
 }
 
@@ -102,7 +121,24 @@ int32_t UdmfServiceProxy::GetData(QueryOption &query, UnifiedData &unifiedData)
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s", status, query.key.c_str());
         return status;
     }
-    ITypesUtil::Unmarshal(reply, unifiedData);
+
+    int32_t count = reply.ReadInt32();
+    for (int32_t index = 0; index < count; ++index) {
+        std::shared_ptr<UnifiedRecord> record;
+        auto size = reply.ReadInt32();
+        if (size == 0) {
+            continue;
+        }
+        const uint8_t *rawData = reinterpret_cast<const uint8_t *>(reply.ReadRawData(size));
+        std::vector<uint8_t> recordBytes(rawData, rawData + size);
+        auto recordTlv = TLVObject(recordBytes);
+        if (!TLVUtil::Reading(record, recordTlv)) {
+            LOG_ERROR(UDMF_SERVICE, "Unmarshall unified record failed.");
+            return IPC_STUB_INVALID_DATA_ERR;
+        }
+        unifiedData.AddRecord(record);
+    }
+
     LOG_DEBUG(UDMF_SERVICE, "end.");
     return status;
 }
