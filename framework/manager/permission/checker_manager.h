@@ -32,7 +32,7 @@ public:
 
     class Checker {
     public:
-        virtual bool IsValid(std::vector<Privilege> &privileges, const CheckInfo &info) = 0;
+        virtual bool IsValid(const std::vector<Privilege> &privileges, const CheckInfo &info) = 0;
     protected:
         ~Checker() = default;
     };
@@ -41,7 +41,7 @@ public:
 
     void RegisterChecker(const std::string &checker, std::function<Checker *()> getter);
     void LoadCheckers();
-    bool IsValid(std::vector<Privilege> &privileges, const CheckInfo &info);
+    bool IsValid(const std::vector<Privilege> &privileges, const CheckInfo &info);
 
 private:
     std::map<std::string, Checker *> checkers_;

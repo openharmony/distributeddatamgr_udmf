@@ -231,9 +231,9 @@ bool CountBufferSize(const Runtime &input, TLVObject &data)
 {
     data.Count(input.key);
     data.Count(input.isPrivate);
-    uint32_t size = input.privileges.size();
+    size_t size = input.privileges.size();
     data.Count(size);
-    for (int i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         data.Count(input.privileges[i]);
     }
     data.Count(static_cast<int64_t>(input.createTime));
@@ -256,6 +256,12 @@ template<>
 bool Writing(const int32_t &input, TLVObject &data)
 {
     return data.WriteBasic(TAG_INT32, input);
+}
+
+template<>
+bool Writing(const size_t &input, TLVObject &data)
+{
+    return data.WriteBasic(TAG_SIZE_T, input);
 }
 
 template<>
@@ -1151,7 +1157,7 @@ bool Writing(const Privilege &input, TLVObject &data)
 template<>
 bool Reading(Privilege &output, TLVObject &data)
 {
-    int32_t tokenId;
+    uint32_t tokenId;
     int32_t pid;
     std::string readPermission;
     std::string writePermission;
@@ -1206,11 +1212,11 @@ bool Writing(const Runtime &input, TLVObject &data)
     if (!Writing(input.isPrivate, data)) {
         return false;
     }
-    uint32_t size = input.privileges.size();
+    size_t size = input.privileges.size();
     if (!Writing(size, data)) {
         return false;
     }
-    for (int i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         if (!Writing(input.privileges[i], data)) {
             return false;
         }

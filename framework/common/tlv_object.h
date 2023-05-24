@@ -34,6 +34,7 @@ enum TAG : uint16_t {
     TAG_VECTOR,
     TAG_MAP,
     TAG_BUTT,
+    TAG_SIZE_T,
 };
 
 #pragma pack(1)
@@ -63,6 +64,11 @@ public:
     std::vector<std::uint8_t> GetBuffer()
     {
         return *buffer_;
+    }
+
+    void Count(const size_t value)
+    {
+        total_ += sizeof(value) + sizeof(TLVHead);
     }
 
     void Count(const int32_t value)

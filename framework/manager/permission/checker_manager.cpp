@@ -46,7 +46,7 @@ void CheckerManager::LoadCheckers()
     });
 }
 
-bool CheckerManager::IsValid(std::vector<Privilege> &privileges, const CheckInfo &info)
+bool CheckerManager::IsValid(const std::vector<Privilege> &privileges, const CheckInfo &info)
 {
     auto it = checkers_.find(DATA_CHECKER);
     if (it == checkers_.end()) {
