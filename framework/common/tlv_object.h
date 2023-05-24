@@ -28,13 +28,13 @@ namespace UDMF {
 enum TAG : uint16_t {
     TAG_INT32 = 0x0000,
     TAG_INT64,
+    TAG_SIZE_T,
     TAG_BOOL,
     TAG_DOUBLE,
     TAG_STRING,
     TAG_VECTOR,
     TAG_MAP,
     TAG_BUTT,
-    TAG_SIZE_T,
 };
 
 #pragma pack(1)
