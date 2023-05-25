@@ -443,7 +443,8 @@ private:
             return false;
         }
         const auto *pHead = reinterpret_cast<const TLVHead *>(buffer_->data() + cursor_);
-        if (!HasExpectBuffer(NetToHost(pHead->len)) && !HasExpectBuffer(NetToHost(pHead->len) + sizeof(TLVHead))) {
+        if (!HasExpectBuffer(NetToHost(pHead->len)) &&
+            !HasExpectBuffer(NetToHost(pHead->len) + sizeof(TLVHead))) {
             return false;
         }
         head.tag = NetToHost(pHead->tag);
