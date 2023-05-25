@@ -16,7 +16,6 @@
 #ifndef UDMF_ENDIAN_CONVERTER_H
 #define UDMF_ENDIAN_CONVERTER_H
 
-#include <cstdint>
 #include <endian.h>
 
 namespace OHOS {
@@ -101,22 +100,22 @@ static inline uint64_t NetToHost(uint64_t value)
 
 static inline float HostToNet(float value)
 {
-    return htole32(*(uint32_t*)(&value));
+    return htole32(*reinterpret_cast<uint32_t*>(&value));
 }
 
 static inline float NetToHost(float value)
 {
-    return le32toh(*(uint32_t*)(&value));
+    return le32toh(*reinterpret_cast<uint32_t*>(&value));
 }
 
 static inline double HostToNet(double value)
 {
-    return htole64(*(uint64_t*)(&value));
+    return htole64(*reinterpret_cast<uint64_t*>(&value));
 }
 
 static inline double NetToHost(double value)
 {
-    return le64toh(*(uint64_t*)(&value));
+    return le64toh(*reinterpret_cast<uint64_t*>(&value));
 }
 } // namespace UDMF
 } // namespace OHOS
