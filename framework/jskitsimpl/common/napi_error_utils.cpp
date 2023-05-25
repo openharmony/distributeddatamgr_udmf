@@ -81,8 +81,8 @@ void ThrowNapiError(napi_env env, int32_t status, const std::string &errMessage,
 
     std::string message(napiError.message);
     if (isParamsCheck) {
-        auto errCode = 401;
-        napiError.jsCode = errCode;
+        auto paramsCheckError = 401;
+        napiError.jsCode = paramsCheckError;
         message += errMessage;
     }
 
