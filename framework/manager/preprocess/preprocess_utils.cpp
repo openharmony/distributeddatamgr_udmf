@@ -15,6 +15,8 @@
 
 #include "preprocess_utils.h"
 
+#include <sstream>
+
 #include "accesstoken_kit.h"
 #include "bundlemgr/bundle_mgr_client_impl.h"
 #include "ipc_skeleton.h"

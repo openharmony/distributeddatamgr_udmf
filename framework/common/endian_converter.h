@@ -16,6 +16,7 @@
 #ifndef UDMF_ENDIAN_CONVERTER_H
 #define UDMF_ENDIAN_CONVERTER_H
 
+#include <cstdint>
 #include <endian.h>
 
 namespace OHOS {
