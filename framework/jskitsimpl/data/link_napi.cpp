@@ -15,7 +15,6 @@
 
 #include "link_napi.h"
 
-#include "link.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "napi_queue.h"
