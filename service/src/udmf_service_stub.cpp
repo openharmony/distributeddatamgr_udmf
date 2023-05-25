@@ -96,7 +96,7 @@ int32_t UdmfServiceStub::OnSetData(MessageParcel &data, MessageParcel &reply)
         return E_INVALID_VALUE;
     }
     if (unifiedData.GetRecords().size() > UdmfService::MAX_RECORD_NUM) {
-        LOG_ERROR(UDMF_SERVICE, "Excessive record: %{public}d!", unifiedData.GetRecords().size());
+        LOG_ERROR(UDMF_SERVICE, "Excessive record: %{public}zu!", unifiedData.GetRecords().size());
         return E_INVALID_VALUE;
     }
     if (unifiedData.GetSize() > UdmfService::MAX_DATA_SIZE) {
