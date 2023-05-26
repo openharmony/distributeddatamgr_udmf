@@ -28,7 +28,8 @@ namespace UDMF {
 enum TAG : uint16_t {
     TAG_INT32 = 0x0000,
     TAG_INT64,
-    TAG_SIZE_T,
+    TAG_UINT32,
+    TAG_UINT64,
     TAG_BOOL,
     TAG_DOUBLE,
     TAG_STRING,
@@ -66,7 +67,12 @@ public:
         return *buffer_;
     }
 
-    void Count(const size_t value)
+    void Count(const uint32_t value)
+    {
+        total_ += sizeof(value) + sizeof(TLVHead);
+    }
+
+    void Count(const uint64_t value)
     {
         total_ += sizeof(value) + sizeof(TLVHead);
     }
