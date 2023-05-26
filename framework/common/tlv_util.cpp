@@ -217,9 +217,9 @@ bool CountBufferSize(const Runtime &input, TLVObject &data)
 {
     data.Count(input.key);
     data.Count(input.isPrivate);
-    size_t size = input.privileges.size();
+    uint32_t size = static_cast<uint32_t>(input.privileges.size());
     data.Count(size);
-    for (size_t i = 0; i < size; ++i) {
+    for (uint32_t i = 0; i < size; ++i) {
         data.Count(input.privileges[i]);
     }
     data.Count(static_cast<int64_t>(input.createTime));
@@ -1265,11 +1265,11 @@ bool Writing(const Runtime &input, TLVObject &data)
     if (!Writing(input.isPrivate, data)) {
         return false;
     }
-    size_t size = input.privileges.size();
+    uint32_t size = static_cast<uint32_t>(input.privileges.size());
     if (!Writing(size, data)) {
         return false;
     }
-    for (size_t i = 0; i < size; ++i) {
+    for (uint32_t i = 0; i < size; ++i) {
         if (!Writing(input.privileges[i], data)) {
             return false;
         }
@@ -1303,7 +1303,7 @@ bool Reading(Runtime &output, TLVObject &data)
 {
     UnifiedKey key;
     bool isPrivate;
-    int32_t size;
+    uint32_t size;
     std::vector<Privilege> privileges;
     int64_t createTime;
     std::string sourcePackage;
@@ -1321,7 +1321,7 @@ bool Reading(Runtime &output, TLVObject &data)
     if (!Reading(size, data)) {
         return false;
     }
-    for (int i = 0; i < size; ++i) {
+    for (uint32_t i = 0; i < size; ++i) {
         Privilege privilege;
         if (!Reading(privilege, data)) {
             return false;
