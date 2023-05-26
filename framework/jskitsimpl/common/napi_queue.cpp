@@ -92,8 +92,7 @@ napi_value NapiQueue::AsyncWork(napi_env env, std::shared_ptr<ContextBase> ctxt,
     LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork create string start");
     napi_create_string_utf8(ctxt->env, name.c_str(), NAPI_AUTO_LENGTH, &resource);
     LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork create string finish");
-    napi_create_async_work(
-        ctxt->env, nullptr, resource,
+    napi_create_async_work(ctxt->env, nullptr, resource,
         [](napi_env env, void *data) {
             LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork start execute");
             ASSERT_VOID(data != nullptr, "no data");
