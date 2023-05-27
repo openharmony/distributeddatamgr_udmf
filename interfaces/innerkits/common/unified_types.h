@@ -67,8 +67,8 @@ struct Runtime {
  * Options for sharing data through UDMF.
  */
 struct CustomOption {
-    Intention intention{};
-    uint32_t tokenId{};
+    Intention intention {};
+    uint32_t tokenId {};
 };
 
 /*
@@ -76,8 +76,8 @@ struct CustomOption {
  */
 struct QueryOption {
     std::string key;
-    uint32_t tokenId{};
-    int32_t pid{};
+    uint32_t tokenId {};
+    int32_t pid {};
 };
 } // namespace UDMF
 } // namespace OHOS

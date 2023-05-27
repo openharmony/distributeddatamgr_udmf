@@ -1303,7 +1303,7 @@ bool Reading(Runtime &output, TLVObject &data)
 {
     UnifiedKey key;
     bool isPrivate;
-    int32_t size;
+    uint32_t size;
     std::vector<Privilege> privileges;
     int64_t createTime;
     std::string sourcePackage;
@@ -1321,7 +1321,7 @@ bool Reading(Runtime &output, TLVObject &data)
     if (!Reading(size, data)) {
         return false;
     }
-    for (int i = 0; i < size; ++i) {
+    for (uint32_t i = 0; i < size; ++i) {
         Privilege privilege;
         if (!Reading(privilege, data)) {
             return false;
