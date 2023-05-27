@@ -405,7 +405,7 @@ public:
         cursor_ += sizeof(TLVHead);
         auto valueCursor = cursor_;
 
-        for (auto &item : value) {
+        for (const auto &item : value) {
             if (!WriteString(item.first)) {
                 return false;
             }
