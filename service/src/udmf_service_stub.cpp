@@ -74,6 +74,10 @@ int32_t UdmfServiceStub::OnSetData(MessageParcel &data, MessageParcel &reply)
     }
     UnifiedData unifiedData;
     int32_t count = data.ReadInt32();
+    if (count > MAX_RECORD_NUM) {
+        LOG_ERROR(UDMF_SERVICE, "Excessive record: %{public}d!", count);
+        return E_INVALID_VALUE;
+    }
     for (int32_t index = 0; index < count; ++index) {
         std::shared_ptr<UnifiedRecord> record;
         int32_t size = data.ReadInt32();
@@ -95,10 +99,6 @@ int32_t UdmfServiceStub::OnSetData(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR(UDMF_SERVICE, "Empty data without any record!");
         return E_INVALID_VALUE;
     }
-    if (unifiedData.GetRecords().size() > UdmfService::MAX_RECORD_NUM) {
-        LOG_ERROR(UDMF_SERVICE, "Excessive record: %{public}zu!", unifiedData.GetRecords().size());
-        return E_INVALID_VALUE;
-    }
     if (unifiedData.GetSize() > UdmfService::MAX_DATA_SIZE) {
         LOG_ERROR(UDMF_SERVICE, "Exceeded data limit!");
         return E_INVALID_VALUE;
@@ -108,7 +108,7 @@ int32_t UdmfServiceStub::OnSetData(MessageParcel &data, MessageParcel &reply)
             return E_INVALID_VALUE;
         }
     }
-    int32_t token = static_cast<int>(IPCSkeleton::GetCallingTokenID());
+    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     customOption.tokenId = token;
     std::string key;
     int32_t status = SetData(customOption, unifiedData, key);
@@ -127,7 +127,7 @@ int32_t UdmfServiceStub::OnGetData(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR(UDMF_SERVICE, "Unmarshal query");
         return IPC_STUB_INVALID_DATA_ERR;
     }
-    int32_t token = static_cast<int>(IPCSkeleton::GetCallingTokenID());
+    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
     int32_t pid = static_cast<int>(IPCSkeleton::GetCallingPid());
     query.pid = pid;
@@ -167,7 +167,7 @@ int32_t UdmfServiceStub::OnGetSummary(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR(UDMF_SERVICE, "Unmarshal query");
         return IPC_STUB_INVALID_DATA_ERR;
     }
-    int32_t token = static_cast<int>(IPCSkeleton::GetCallingTokenID());
+    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
     Summary summary;
     int32_t status = GetSummary(query, summary);
@@ -187,7 +187,7 @@ int32_t UdmfServiceStub::OnAddPrivilege(MessageParcel &data, MessageParcel &repl
         LOG_ERROR(UDMF_SERVICE, "Unmarshal query and privilege");
         return IPC_STUB_INVALID_DATA_ERR;
     }
-    int32_t token = static_cast<int32_t>(IPCSkeleton::GetCallingTokenID());
+    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
     int32_t status = AddPrivilege(query, privilege);
     if (!ITypesUtil::Marshal(reply, status)) {
@@ -206,7 +206,7 @@ int32_t UdmfServiceStub::OnSync(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR(UDMF_SERVICE, "Unmarshal query and devices");
         return IPC_STUB_INVALID_DATA_ERR;
     }
-    int32_t token = static_cast<int>(IPCSkeleton::GetCallingTokenID());
+    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
     int32_t status = Sync(query, devices);
     if (!ITypesUtil::Marshal(reply, status)) {
