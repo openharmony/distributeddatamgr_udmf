@@ -242,11 +242,11 @@ std::vector<Entry> RuntimeStore::GetEntries(const std::string &dataPrefix)
 
 Status RuntimeStore::PutEntries(const std::vector<Entry> &entries)
 {
-    auto size = entries.size();
+    size_t size = entries.size();
     DistributedKv::Status status;
-    for (int32_t index = 0; index < size; index += MAX_BATCH_SIZE) {
+    for (size_t index = 0; index < size; index += MAX_BATCH_SIZE) {
         std::vector<Entry> batchEntries(entries.begin() + index,
-                                        entries.begin() + std::min(index + MAX_BATCH_SIZE, static_cast<int32_t>(size)));
+                                        entries.begin() + std::min(index + MAX_BATCH_SIZE, size));
         status =  kvStore_->PutBatch(batchEntries);
         if (status != DistributedKv::Status::SUCCESS) {
             LOG_ERROR(UDMF_SERVICE, "KvStore putBatch failed, status: %{public}d.", status);
@@ -258,11 +258,11 @@ Status RuntimeStore::PutEntries(const std::vector<Entry> &entries)
 
 Status RuntimeStore::DeleteEntries(const std::vector<Key> &keys)
 {
-    auto size = keys.size();
+    size_t size = keys.size();
     DistributedKv::Status status;
-    for (int32_t index = 0; index < size; index += MAX_BATCH_SIZE) {
+    for (size_t index = 0; index < size; index += MAX_BATCH_SIZE) {
         std::vector<Key> batchKeys(keys.begin() + index,
-                                   keys.begin() + std::min(index + MAX_BATCH_SIZE, static_cast<int32_t>(size)));
+                                   keys.begin() + std::min(index + MAX_BATCH_SIZE, size));
         status =  kvStore_->DeleteBatch(batchKeys);
         if (status != DistributedKv::Status::SUCCESS) {
             LOG_ERROR(UDMF_SERVICE, "KvStore deleteBatch failed, status: %{public}d.", status);
