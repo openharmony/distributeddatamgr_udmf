@@ -19,6 +19,7 @@
 #include "itypes_util.h"
 
 #include "application_defined_record.h"
+#include "audio.h"
 #include "file.h"
 #include "folder.h"
 #include "html.h"
@@ -52,6 +53,7 @@ using File = UDMF::File;
 using Folder = UDMF::Folder;
 using Image = UDMF::Image;
 using Video = UDMF::Video;
+using Audio = UDMF::Audio;
 using SystemDefinedRecord = UDMF::SystemDefinedRecord;
 using SystemDefinedForm = UDMF::SystemDefinedForm;
 using SystemDefinedAppItem = UDMF::SystemDefinedAppItem;
@@ -98,6 +100,9 @@ template<> bool Unmarshalling(Image &output, MessageParcel &parcel);
 
 template<> bool Marshalling(const Video &input, MessageParcel &parcel);
 template<> bool Unmarshalling(Video &output, MessageParcel &parcel);
+
+template<> bool Marshalling(const Audio &input, MessageParcel &parcel);
+template<> bool Unmarshalling(Audio &output, MessageParcel &parcel);
 
 template<> bool Marshalling(const Folder &input, MessageParcel &parcel);
 template<> bool Unmarshalling(Folder &output, MessageParcel &parcel);

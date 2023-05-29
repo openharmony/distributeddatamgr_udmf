@@ -32,10 +32,10 @@ config("module_private_config") {
 }
 
 common_deps = [
-  "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
-  "//foundation/distributeddatamgr/udmf/service:udmf_server",
-  "//foundation/ability/ability_runtime/interfaces/inner_api/uri_permission:uri_permission_mgr",
-  "//third_party/googletest:gtest_main",
+  "${aafwk_path}/interfaces/inner_api/uri_permission:uri_permission_mgr",
+  "${third_party_path}/googletest:gtest_main",
+  "../../../../interfaces/innerkits:udmf_client",
+  "../../../../service:udmf_server",
 ]
 
 common_external_deps = [
@@ -67,8 +67,6 @@ ohos_unittest("UdmfClientTest") {
 group("unittest") {
   testonly = true
 
-  deps = [
-    ":UdmfClientTest",
-  ]
+  deps = [ ":UdmfClientTest" ]
 }
 ###############################################################################

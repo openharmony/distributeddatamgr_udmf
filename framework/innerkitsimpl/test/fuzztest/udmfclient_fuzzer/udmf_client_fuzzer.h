@@ -18,4 +18,4 @@
 
 #define FUZZ_PROJECT_NAME "udmfclient_fuzzer"
 
-#endif //UDMF_UDMF_CLIENT_FUZZER_H
+#endif // UDMF_UDMF_CLIENT_FUZZER_H

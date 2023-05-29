@@ -119,7 +119,8 @@ int32_t DataManager::RetrieveData(QueryOption &query, UnifiedData &unifiedData)
         for (auto record : records) {
             auto type = record->GetType();
             std::string uri = "";
-            if (type == UDType::FILE || type == UDType::IMAGE || type == UDType::VIDEO || type == UDType::FOLDER) {
+            if (type == UDType::FILE || type == UDType::IMAGE || type == UDType::VIDEO || type == UDType::AUDIO
+                || type == UDType::FOLDER) {
                 auto file = static_cast<File *>(record.get());
                 uri = file->GetUri();
             }

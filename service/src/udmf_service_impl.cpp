@@ -15,8 +15,6 @@
 
 #include "udmf_service_impl.h"
 
-#include <cstdlib>
-
 #include "data_manager.h"
 #include "iservice_registry.h"
 #include "lifecycle/lifecycle_manager.h"

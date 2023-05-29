@@ -14,7 +14,6 @@
 */
 #include "text_napi.h"
 
-#include "logger.h"
 #include "text.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"

@@ -85,6 +85,13 @@ template<> bool Marshalling(const std::shared_ptr<UnifiedRecord> &input, Message
             }
             return ITypesUtil::Marshal(parcel, *video);
         }
+        case AUDIO: {
+            auto audio = static_cast<Audio *>(input.get());
+            if (audio == nullptr) {
+                return false;
+            }
+            return ITypesUtil::Marshal(parcel, *audio);
+        }
         case SYSTEM_DEFINED_RECORD: {
             auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
             if (sdRecord == nullptr) {
@@ -196,6 +203,14 @@ template<> bool Unmarshalling(std::shared_ptr<UnifiedRecord> &output, MessagePar
                 return false;
             }
             output = video;
+            break;
+        }
+        case AUDIO: {
+            std::shared_ptr<Audio> audio = std::make_shared<Audio>();
+            if (!ITypesUtil::Unmarshal(parcel, *audio)) {
+                return false;
+            }
+            output = audio;
             break;
         }
         case SYSTEM_DEFINED_RECORD: {
@@ -438,6 +453,26 @@ template<> bool Unmarshalling(Video &output, MessageParcel &parcel)
     return true;
 }
 
+template<> bool Marshalling(const Audio &input, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, input.GetUri(), input.GetRemoteUri(), input.GetDetails());
+}
+
+template<> bool Unmarshalling(Audio &output, MessageParcel &parcel)
+{
+    std::string uri;
+    std::string remoteUri;
+    UDDetails details;
+    if (!ITypesUtil::Unmarshal(parcel, uri, remoteUri, details)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal Audio failed!");
+        return false;
+    }
+    output.SetUri(uri);
+    output.SetRemoteUri(remoteUri);
+    output.SetDetails(details);
+    return true;
+}
+
 template<> bool Marshalling(const Folder &input, MessageParcel &parcel)
 {
     return ITypesUtil::Marshal(parcel, input.GetUri(), input.GetRemoteUri(), input.GetDetails());
@@ -600,7 +635,7 @@ template<> bool Unmarshalling(Intention &output, MessageParcel &parcel)
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal PlainText failed!");
         return false;
     }
-    if (intention < UD_INTENTION_DRAG || intention >= UD_INTENTION_BUTT) {
+    if (!UnifiedDataUtils::IsValidIntention(intention)) {
         LOG_ERROR(UDMF_FRAMEWORK, "invalid UDIntention!");
         return false;
     }

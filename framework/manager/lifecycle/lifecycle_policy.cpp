@@ -19,7 +19,8 @@
 
 namespace OHOS {
 namespace UDMF {
-const LifeCyclePolicy::Duration LifeCyclePolicy::INTERVAL = std::chrono::milliseconds(60 * 60 * 1000);
+using namespace std::chrono;
+const LifeCyclePolicy::Duration LifeCyclePolicy::INTERVAL = milliseconds(60 * 60 * 1000);
 const std::string LifeCyclePolicy::DATA_PREFIX = "udmf://";
 
 Status LifeCyclePolicy::DeleteOnGet(const UnifiedKey &key)
@@ -70,13 +71,13 @@ std::vector<std::string> LifeCyclePolicy::GetTimeoutKeys(const std::shared_ptr<S
     std::vector<UnifiedData> datas = store->GetDatas(DATA_PREFIX);
     std::vector<std::string> timeoutKeys;
     if (datas.empty()) {
-        LOG_INFO(UDMF_FRAMEWORK, "entries is empty.");
+        LOG_DEBUG(UDMF_FRAMEWORK, "entries is empty.");
         return timeoutKeys;
     }
     auto curTime = PreProcessUtils::GetInstance().GetTimeStamp();
     for (const auto &data : datas) {
-        if (curTime > data.GetRuntime()->createTime
-                          + std::chrono::duration_cast<std::chrono::milliseconds>(interval).count()) {
+        if (curTime > data.GetRuntime()->createTime + duration_cast<milliseconds>(interval).count()
+            || curTime < data.GetRuntime()->createTime) {
             timeoutKeys.push_back(data.GetRuntime()->key.key);
         }
     }

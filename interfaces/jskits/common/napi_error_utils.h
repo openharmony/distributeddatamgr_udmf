@@ -37,7 +37,7 @@ struct NapiErrorCode {
 
 const std::optional<NapiErrorCode> GetErrorCode(int32_t errorCode);
 Status GenerateNapiError(Status error, int32_t &errCode, std::string &errMessage);
-void ThrowNapiError(napi_env env, int32_t errCode, std::string errMessage, bool isParamsCheck = true);
+void ThrowNapiError(napi_env env, int32_t errCode, const std::string &errMessage, bool isParamsCheck = true);
 napi_value GenerateErrorMsg(napi_env env, NapiErrorCode jsInfo);
 
 #define ASSERT_ERR(env, assertion, errorcode, message) \
@@ -73,7 +73,6 @@ napi_value GenerateErrorMsg(napi_env env, NapiErrorCode jsInfo);
             return;                                                 \
         }                                                           \
     } while (0)
-
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_ERROR_UTILS_H

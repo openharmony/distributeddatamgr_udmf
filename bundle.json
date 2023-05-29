@@ -78,6 +78,7 @@
           "header": {
             "header_files": [
               "application_defined_record.h",
+              "audio.h",
               "file.h",
               "folder.h",
               "html.h",

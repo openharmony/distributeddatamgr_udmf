@@ -14,13 +14,9 @@
  */
 #include "udmf_napi.h"
 
-#include <unordered_map>
-
-#include "logger.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "napi_queue.h"
-#include "unified_meta.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -45,6 +41,7 @@ napi_value UDMFNapi::CreateUnifiedDataType(napi_env env, napi_callback_info info
     SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(FILE), UD_TYPE_MAP.at(FILE));
     SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(IMAGE), UD_TYPE_MAP.at(IMAGE));
     SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(VIDEO), UD_TYPE_MAP.at(VIDEO));
+    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(AUDIO), UD_TYPE_MAP.at(AUDIO));
     SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(FOLDER), UD_TYPE_MAP.at(FOLDER));
     SetNamedProperty(
         env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(SYSTEM_DEFINED_RECORD), UD_TYPE_MAP.at(SYSTEM_DEFINED_RECORD));

@@ -85,6 +85,7 @@ static const std::unordered_map<int32_t, std::string> JS_UD_TYPE_NAME_MAP {
     { FILE, "FILE" },
     { IMAGE, "IMAGE" },
     { VIDEO, "VIDEO" },
+    { AUDIO, "AUDIO" },
     { FOLDER, "FOLDER" },
     { SYSTEM_DEFINED_RECORD, "SYSTEM_DEFINED_RECORD" },
     { SYSTEM_DEFINED_FORM, "SYSTEM_DEFINED_FORM" },
@@ -103,14 +104,17 @@ using UDDetails = std::map<std::string, UDVariant>;
  * UnifiedData Intention.
  */
 enum Intention : int32_t {
-    UD_INTENTION_DRAG = 0,
-    UD_INTENTION_SYS,
+    UD_INTENTION_BASE = 0,
+    UD_INTENTION_DRAG,
     UD_INTENTION_SHARE,
+    UD_INTENTION_SYS,
+    UD_INTENTION_SUPERHUB,
     UD_INTENTION_BUTT,
 };
 
 static const std::unordered_map<int32_t, std::string> UD_INTENTION_MAP {
-    {UD_INTENTION_DRAG, "drag"}
+    { UD_INTENTION_DRAG, "drag" },
+    { UD_INTENTION_SUPERHUB, "SuperHub" },
 };
 
 class UnifiedDataUtils {
@@ -119,7 +123,10 @@ public:
     static bool IsValidIntention(int32_t value);
     static size_t GetVariantSize(UDVariant &variant);
     static size_t GetDetailsSize(UDDetails &details);
+    static bool IsPersist(const Intention &intention);
+    static bool IsPersist(const std::string &intention);
+    static Intention GetIntentionByString(const std::string &intention);
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif //UNIFIED_META_H
+#endif // UNIFIED_META_H

@@ -15,13 +15,12 @@
 
 #include "image_napi.h"
 
-#include "logger.h"
+#include "file_napi.h"
 #include "image.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "napi_queue.h"
 #include "unified_record_napi.h"
-#include "file_napi.h"
 
 namespace OHOS {
 namespace UDMF {

@@ -25,7 +25,7 @@ public:
     DataChecker() noexcept;
     ~DataChecker();
 
-    bool IsValid(std::vector<Privilege> &privileges, const CheckerManager::CheckInfo &info) override;
+    bool IsValid(const std::vector<Privilege> &privileges, const CheckerManager::CheckInfo &info) override;
 
 private:
     static DataChecker instance_;

@@ -24,6 +24,7 @@
 #include "logger.h"
 #include "udmf_client.h"
 #include "application_defined_record.h"
+#include "audio.h"
 #include "file.h"
 #include "folder.h"
 #include "html.h"
@@ -41,7 +42,7 @@ using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
 using namespace OHOS::UDMF;
 using namespace OHOS;
-
+namespace OHOS::Test {
 class UdmfClientTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -176,7 +177,7 @@ void UdmfClientTest::AddPrivilege(QueryOption &option)
 
 void UdmfClientTest::CompareDetails(const UDDetails &details)
 {
-    for (auto &detail : details) {
+    for (const auto &detail : details) {
         auto key = detail.first;
         EXPECT_EQ(key, "udmf_key");
         auto value = detail.second;
@@ -218,6 +219,9 @@ HWTEST_F(UdmfClientTest, SetData001, TestSize.Level1)
     status = UdmfClient::GetInstance().SetData(option, data, key);
     EXPECT_EQ(status, E_INVALID_PARAMETERS);
 
+    option = {};
+    status = UdmfClient::GetInstance().SetData(option, data, key);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "SetData001 end.");
 }
 
@@ -550,12 +554,59 @@ HWTEST_F(UdmfClientTest, SetData008, TestSize.Level1)
 
 /**
 * @tc.name: SetData009
-* @tc.desc: Set Folder record with valid params and get data
+* @tc.desc: Set Audio record with valid params and get data
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfClientTest, SetData009, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "SetData009 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data1;
+    std::string key;
+    Audio audio1;
+    UDDetails details1;
+    details1.insert({ "udmf_key", "udmf_value" });
+    audio1.SetDetails(details1);
+    audio1.SetRemoteUri("remoteUri");
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Audio>(audio1);
+    data1.AddRecord(record1);
+    auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege(option2);
+    SetHapToken2();
+    UnifiedData data2;
+    status = UdmfClient::GetInstance().GetData(option2, data2);
+    ASSERT_EQ(status, E_OK);
+
+    std::shared_ptr<UnifiedRecord> record2 = data2.GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    auto type = record2->GetType();
+    EXPECT_EQ(type, UDType::AUDIO);
+
+    auto file2 = static_cast<File *>(record2.get());
+    ASSERT_NE(file2, nullptr);
+    CompareDetails(file2->GetDetails());
+
+    auto audio2 = static_cast<Audio *>(record2.get());
+    ASSERT_NE(audio2, nullptr);
+    EXPECT_EQ(audio1.GetRemoteUri(), audio2->GetRemoteUri());
+
+    GetEmptyData(option2);
+
+    LOG_INFO(UDMF_TEST, "SetData009 end.");
+}
+
+/**
+* @tc.name: SetData010
+* @tc.desc: Set Folder record with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData010, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData010 begin.");
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
@@ -592,17 +643,17 @@ HWTEST_F(UdmfClientTest, SetData009, TestSize.Level1)
 
     GetEmptyData(option2);
 
-    LOG_INFO(UDMF_TEST, "SetData009 end.");
+    LOG_INFO(UDMF_TEST, "SetData010 end.");
 }
 
 /**
-* @tc.name: SetData010
+* @tc.name: SetData011
 * @tc.desc: Set SystemDefined record with valid params and get data
 * @tc.type: FUNC
 */
-HWTEST_F(UdmfClientTest, SetData010, TestSize.Level1)
+HWTEST_F(UdmfClientTest, SetData011, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetData010 begin.");
+    LOG_INFO(UDMF_TEST, "SetData011 begin.");
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
@@ -634,17 +685,17 @@ HWTEST_F(UdmfClientTest, SetData010, TestSize.Level1)
 
     GetEmptyData(option2);
 
-    LOG_INFO(UDMF_TEST, "SetData010 end.");
+    LOG_INFO(UDMF_TEST, "SetData011 end.");
 }
 
 /**
-* @tc.name: SetData011
+* @tc.name: SetData012
 * @tc.desc: Set Form record with valid params and get data
 * @tc.type: FUNC
 */
-HWTEST_F(UdmfClientTest, SetData011, TestSize.Level1)
+HWTEST_F(UdmfClientTest, SetData012, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetData011 begin.");
+    LOG_INFO(UDMF_TEST, "SetData012 begin.");
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
@@ -689,17 +740,17 @@ HWTEST_F(UdmfClientTest, SetData011, TestSize.Level1)
 
     GetEmptyData(option2);
 
-    LOG_INFO(UDMF_TEST, "SetData011 end.");
+    LOG_INFO(UDMF_TEST, "SetData012 end.");
 }
 
 /**
-* @tc.name: SetData012
+* @tc.name: SetData013
 * @tc.desc: Set AppItem record with valid params and get data
 * @tc.type: FUNC
 */
-HWTEST_F(UdmfClientTest, SetData012, TestSize.Level1)
+HWTEST_F(UdmfClientTest, SetData013, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetData012 begin.");
+    LOG_INFO(UDMF_TEST, "SetData013 begin.");
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
@@ -746,17 +797,17 @@ HWTEST_F(UdmfClientTest, SetData012, TestSize.Level1)
 
     GetEmptyData(option2);
 
-    LOG_INFO(UDMF_TEST, "SetData012 end.");
+    LOG_INFO(UDMF_TEST, "SetData013 end.");
 }
 
 /**
-* @tc.name: SetData013
+* @tc.name: SetData014
 * @tc.desc: Set PixelMap record with valid params and get data
 * @tc.type: FUNC
 */
-HWTEST_F(UdmfClientTest, SetData013, TestSize.Level1)
+HWTEST_F(UdmfClientTest, SetData014, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetData013 begin.");
+    LOG_INFO(UDMF_TEST, "SetData014 begin.");
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
@@ -765,7 +816,7 @@ HWTEST_F(UdmfClientTest, SetData013, TestSize.Level1)
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
     systemDefinedPixelMap1.SetDetails(details1);
-    std::vector<uint8_t> rawData1 ={ 1, 2, 3, 4, 5 };
+    std::vector<uint8_t> rawData1 = { 1, 2, 3, 4, 5 };
     systemDefinedPixelMap1.SetRawData(rawData1);
     std::shared_ptr<UnifiedRecord> record1 = std::make_shared<SystemDefinedPixelMap>(systemDefinedPixelMap1);
     data1.AddRecord(record1);
@@ -798,17 +849,17 @@ HWTEST_F(UdmfClientTest, SetData013, TestSize.Level1)
 
     GetEmptyData(option2);
 
-    LOG_INFO(UDMF_TEST, "SetData013 end.");
+    LOG_INFO(UDMF_TEST, "SetData014 end.");
 }
 
 /**
-* @tc.name: SetData014
+* @tc.name: SetData015
 * @tc.desc: Set Application Defined record with valid params and get data
 * @tc.type: FUNC
 */
-HWTEST_F(UdmfClientTest, SetData014, TestSize.Level1)
+HWTEST_F(UdmfClientTest, SetData015, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetData014 begin.");
+    LOG_INFO(UDMF_TEST, "SetData015 begin.");
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
@@ -846,17 +897,17 @@ HWTEST_F(UdmfClientTest, SetData014, TestSize.Level1)
 
     GetEmptyData(option2);
 
-    LOG_INFO(UDMF_TEST, "SetData014 end.");
+    LOG_INFO(UDMF_TEST, "SetData015 end.");
 }
 
 /**
-* @tc.name: SetData015
+* @tc.name: SetData016
 * @tc.desc: Set multiple record with valid params and get data
 * @tc.type: FUNC
 */
-HWTEST_F(UdmfClientTest, SetData015, TestSize.Level1)
+HWTEST_F(UdmfClientTest, SetData016, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetData015 begin.");
+    LOG_INFO(UDMF_TEST, "SetData016 begin.");
 
     CustomOption customOption = {.intention = Intention::UD_INTENTION_DRAG};
     std::string key;
@@ -885,7 +936,104 @@ HWTEST_F(UdmfClientTest, SetData015, TestSize.Level1)
         ASSERT_EQ(outputRecords[i]->GetType(), inputRecords[i]->GetType());
     }
 
-    LOG_INFO(UDMF_TEST, "SetData015 end.");
+    LOG_INFO(UDMF_TEST, "SetData016 end.");
+}
+
+/**
+* @tc.name: SetData017
+* @tc.desc: Set 512 records with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData017, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData017 begin.");
+
+    CustomOption customOption = {.intention = Intention::UD_INTENTION_DRAG};
+    std::string key;
+    UnifiedData inputData;
+    std::vector<std::shared_ptr<UnifiedRecord>> inputRecords;
+    for (int32_t i = 0; i < 512; ++i) {
+        inputRecords.emplace_back(std::make_shared<Text>());
+    }
+    inputData.SetRecords(inputRecords);
+
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption queryOption = { .key = key };
+    UnifiedData outputData;
+    status = UdmfClient::GetInstance().GetData(queryOption, outputData);
+    ASSERT_EQ(status, E_OK);
+    auto outputRecords = outputData.GetRecords();
+    ASSERT_EQ(inputRecords.size(), outputRecords.size());
+
+    LOG_INFO(UDMF_TEST, "SetData017 end.");
+}
+
+/**
+* @tc.name: SetData018
+* @tc.desc: Set one 2MB record of data with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData018, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData018 begin.");
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData inputData;
+    std::string key;
+    UDDetails details;
+    std::string value;
+    int64_t maxSize = 512 * 1024;
+    for (int64_t i = 0; i < maxSize; ++i) {
+        value += "11";
+    }
+    details.insert({ value, value });
+    Text text;
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
+    inputData.AddRecord(record);
+
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption queryOption = { .key = key };
+    UnifiedData outputData;
+    status = UdmfClient::GetInstance().GetData(queryOption, outputData);
+    ASSERT_EQ(status, E_OK);
+
+    LOG_INFO(UDMF_TEST, "SetData018 end.");
+}
+
+/**
+* @tc.name: SetData019
+* @tc.desc: Set one over 4MB record of data with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData019, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData019 begin.");
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData inputData;
+    std::string key;
+    UDDetails details;
+    std::string value;
+    int64_t maxSize = 512 * 1024;
+    for (int64_t i = 0; i < maxSize; ++i) {
+        value += "1111";
+    }
+    details.insert({ value, value });
+    details.insert({ "udmf_key", "udmf_value" });
+    Text text;
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
+    inputData.AddRecord(record);
+
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_INVALID_VALUE);
+
+    LOG_INFO(UDMF_TEST, "SetData019 end.");
 }
 
 /**
@@ -1024,6 +1172,7 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     ASSERT_EQ(summary.summary["File.Media.Image"], record4->GetSize());
     ASSERT_EQ(summary.summary["SystemDefinedType"], record5->GetSize());
     ASSERT_EQ(summary.summary["SystemDefinedType.Form"], record6->GetSize());
+    ASSERT_EQ(summary.summary["ApplicationDefinedType"], record7->GetSize());
 
     LOG_INFO(UDMF_TEST, "GetSummary001 end.");
 }
@@ -1247,3 +1396,4 @@ HWTEST_F(UdmfClientTest, GetSelfData002, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "GetSelfData002 end.");
 }
+} // OHOS::Test

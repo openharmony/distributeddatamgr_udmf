@@ -28,6 +28,8 @@ namespace UDMF {
 enum TAG : uint16_t {
     TAG_INT32 = 0x0000,
     TAG_INT64,
+    TAG_UINT32,
+    TAG_UINT64,
     TAG_BOOL,
     TAG_DOUBLE,
     TAG_STRING,
@@ -63,6 +65,16 @@ public:
     std::vector<std::uint8_t> GetBuffer()
     {
         return *buffer_;
+    }
+
+    void Count(const uint32_t value)
+    {
+        total_ += sizeof(value) + sizeof(TLVHead);
+    }
+
+    void Count(const uint64_t value)
+    {
+        total_ += sizeof(value) + sizeof(TLVHead);
     }
 
     void Count(const int32_t value)
@@ -179,7 +191,7 @@ public:
     template<typename T>
     bool ReadBasic(T &value)
     {
-        TLVHead head{};
+        TLVHead head {};
         if (!ReadHead(head)) {
             return false;
         }
@@ -218,7 +230,7 @@ public:
 
     bool ReadString(std::string &value)
     {
-        TLVHead head{};
+        TLVHead head {};
         if (!ReadHead(head)) {
             return false;
         }
@@ -250,7 +262,7 @@ public:
 
     bool ReadVector(std::vector<uint8_t> &value)
     {
-        TLVHead head{};
+        TLVHead head {};
         if (!ReadHead(head)) {
             return false;
         }
@@ -320,7 +332,7 @@ public:
 
     bool ReadVariant(UDVariant &value)
     {
-        TLVHead head{};
+        TLVHead head {};
         if (!ReadHead(head)) {
             return false;
         }
@@ -393,7 +405,7 @@ public:
         cursor_ += sizeof(TLVHead);
         auto valueCursor = cursor_;
 
-        for (auto &item : value) {
+        for (const auto &item : value) {
             if (!WriteString(item.first)) {
                 return false;
             }
@@ -408,7 +420,7 @@ public:
 
     bool ReadMap(UDDetails &value)
     {
-        TLVHead head{};
+        TLVHead head {};
         if (!ReadHead(head)) {
             return false;
         }

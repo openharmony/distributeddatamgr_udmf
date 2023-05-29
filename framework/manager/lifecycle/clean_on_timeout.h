@@ -23,7 +23,6 @@ public:
     Status DeleteOnStart(const std::string &intention) override;
     Status DeleteOnGet(const UnifiedKey &key) override;
 };
-
 } // namespace UDMF
 } // namespace OHOS
-#endif //UDMF_CLEAN_ON_TIMEOUT_H
+#endif // UDMF_CLEAN_ON_TIMEOUT_H
