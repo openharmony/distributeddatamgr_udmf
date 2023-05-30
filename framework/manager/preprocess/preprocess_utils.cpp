@@ -24,6 +24,7 @@
 namespace OHOS {
 namespace UDMF {
 static constexpr int ID_LEN = 32;
+const char SPECIAL = '^';
 PreProcessUtils &PreProcessUtils::GetInstance()
 {
     static auto instance = new PreProcessUtils();
@@ -57,11 +58,13 @@ std::string PreProcessUtils::IdGenerator()
 {
     std::random_device randomDevice;
     int minimum = 48;
-    int maximum = 122;
+    int maximum = 121;
     std::uniform_int_distribution<int> distribution(minimum, maximum);
     std::stringstream idStr;
     for (int32_t i = 0; i < ID_LEN; i++) {
-        idStr << static_cast<uint8_t>(distribution(randomDevice));
+        auto asc = distribution(randomDevice);
+        asc = asc >= SPECIAL ? asc + 1 : asc;
+        idStr << static_cast<uint8_t>(asc);
     }
     return idStr.str();
 }

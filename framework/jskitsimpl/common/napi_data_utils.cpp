@@ -383,6 +383,16 @@ bool NapiDataUtils::IsTypeForNapiValue(napi_env env, napi_value param, napi_valu
     return valueType == expectType;
 }
 
+bool NapiDataUtils::IsNull(napi_env env, napi_value value)
+{
+    napi_valuetype type = napi_undefined;
+    napi_status status = napi_typeof(env, value, &type);
+    if (status == napi_ok && (type == napi_undefined || type == napi_null)) {
+        return true;
+    }
+    return false;
+}
+
 napi_value NapiDataUtils::DefineClass(napi_env env, const std::string &name,
     const napi_property_descriptor *properties, size_t count, napi_callback newcb)
 {

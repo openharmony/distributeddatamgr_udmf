@@ -18,6 +18,7 @@
 
 #include "distributed_kv_data_manager.h"
 #include "single_kvstore.h"
+
 #include "store.h"
 
 namespace OHOS {
@@ -31,12 +32,12 @@ public:
     Status GetSummary(const std::string &key, Summary &summary) override;
     Status Update(const UnifiedData &unifiedData) override;
     Status Delete(const std::string &key) override;
-    Status DeleteBatch(const std::vector<std::string> &timeoutKeys) override;
+    Status DeleteBatch(const std::vector<std::string> &unifiedKeys) override;
     Status Sync(const std::vector<std::string> &devices) override;
     Status Clear() override;
+    Status GetBatchData(const std::string &dataPrefix, std::vector<UnifiedData> &unifiedDataSet) override;
     void Close() override;
     bool Init() override;
-    std::vector<UnifiedData> GetDatas(const std::string &dataPrefix) override;
 
 private:
     static const DistributedKv::AppId APP_ID;
@@ -47,7 +48,7 @@ private:
     DistributedKv::DistributedKvDataManager dataManager_;
     std::shared_ptr<DistributedKv::SingleKvStore> kvStore_;
     DistributedKv::StoreId storeId_;
-    std::vector<DistributedKv::Entry> GetEntries(const std::string &dataPrefix);
+    Status GetEntries(const std::string &dataPrefix, std::vector<DistributedKv::Entry> &entries);
     Status PutEntries(const std::vector<DistributedKv::Entry> &entries);
     Status DeleteEntries(const std::vector<DistributedKv::Key> &keys);
 };

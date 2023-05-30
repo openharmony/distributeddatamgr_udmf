@@ -77,51 +77,50 @@ napi_value NapiQueue::AsyncWork(napi_env env, std::shared_ptr<ContextBase> ctxt,
     LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork name = %{public}s", name.c_str());
     ctxt->execute = std::move(execute);
     ctxt->complete = std::move(complete);
-    LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork move func finish");
+    LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork move func finish");
     napi_value promise = nullptr;
     if (ctxt->callbackRef == nullptr) {
-        LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork has promise");
+        LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork has promise");
         napi_create_promise(ctxt->env, &ctxt->deferred, &promise);
         LOG_DEBUG(UDMF_KITS_NAPI, "create deferred promise");
     } else {
-        LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork no promise");
+        LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork no promise");
         napi_get_undefined(ctxt->env, &promise);
     }
-
     napi_value resource = nullptr;
-    LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork create string start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork create string start");
     napi_create_string_utf8(ctxt->env, name.c_str(), NAPI_AUTO_LENGTH, &resource);
-    LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork create string finish");
+    LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork create string finish");
     napi_create_async_work(ctxt->env, nullptr, resource,
         [](napi_env env, void *data) {
-            LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork start execute");
+            LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork start execute");
             ASSERT_VOID(data != nullptr, "no data");
-            auto ctxt = reinterpret_cast<ContextBase*>(data);
+            auto ctxt = reinterpret_cast<ContextBase *>(data);
             LOG_DEBUG(UDMF_KITS_NAPI, "napi_async_execute_callback ctxt->status = %{public}d", ctxt->status);
             if (ctxt->execute && ctxt->status == napi_ok) {
-                LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork do user design execute");
+                LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork do user design execute");
                 ctxt->execute();
             }
-            LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork finish execute");
+            LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork finish execute");
         },
         [](napi_env env, napi_status status, void *data) {
-            LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork start output");
+            LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork start output");
             ASSERT_VOID(data != nullptr, "no data");
-            auto ctxt = reinterpret_cast<ContextBase*>(data);
+            auto ctxt = reinterpret_cast<ContextBase *>(data);
             LOG_DEBUG(UDMF_KITS_NAPI, "napi_async_complete_callback status = %{public}d, ctxt->status = %{public}d",
                 status, ctxt->status);
             if ((status != napi_ok) && (ctxt->status == napi_ok)) {
-                LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork check status");
+                LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork check status");
                 ctxt->status = status;
             }
             if ((ctxt->complete) && (status == napi_ok) && (ctxt->status == napi_ok)) {
-                LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork do user design output");
+                LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork do user design output");
                 ctxt->complete(ctxt->output);
             }
             GenerateOutput(ctxt);
-            LOG_INFO(UDMF_KITS_NAPI, "NapiQueue::AsyncWork finish output");
+            LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork finish output");
         },
-        reinterpret_cast<void*>(ctxt.get()), &ctxt->work);
+        reinterpret_cast<void *>(ctxt.get()), &ctxt->work);
     napi_queue_async_work(ctxt->env, ctxt->work);
     ctxt->hold = ctxt; // save crossing-thread ctxt.
     return promise;
@@ -129,9 +128,9 @@ napi_value NapiQueue::AsyncWork(napi_env env, std::shared_ptr<ContextBase> ctxt,
 
 void NapiQueue::GenerateOutput(ContextBase *ctxt)
 {
-    LOG_INFO(UDMF_KITS_NAPI, "GenerateOutput start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "GenerateOutput start");
     napi_value result[RESULT_ALL] = { nullptr };
-    LOG_INFO(UDMF_KITS_NAPI, "GenerateOutput ctxt->status = %{public}d", ctxt->status);
+    LOG_DEBUG(UDMF_KITS_NAPI, "GenerateOutput ctxt->status = %{public}d", ctxt->status);
     if (ctxt->status == napi_ok) {
         napi_get_undefined(ctxt->env, &result[RESULT_ERROR]);
         if (ctxt->output == nullptr) {
@@ -139,13 +138,21 @@ void NapiQueue::GenerateOutput(ContextBase *ctxt)
         }
         result[RESULT_DATA] = ctxt->output;
     } else {
+        napi_value code = nullptr;
         napi_value message = nullptr;
+        if (ctxt->jsCode != 0 && ctxt->jsCode != -1) {
+            napi_create_string_utf8(ctxt->env, std::to_string(ctxt->jsCode).c_str(), NAPI_AUTO_LENGTH, &code);
+        }
+        if (ctxt->jsCode == -1) {
+            std::string jsCode;
+            napi_create_string_utf8(ctxt->env, jsCode.c_str(), NAPI_AUTO_LENGTH, &code);
+        }
         napi_create_string_utf8(ctxt->env, ctxt->error.c_str(), NAPI_AUTO_LENGTH, &message);
-        napi_create_error(ctxt->env, nullptr, message, &result[RESULT_ERROR]);
+        napi_create_error(ctxt->env, code, message, &result[RESULT_ERROR]);
         napi_get_undefined(ctxt->env, &result[RESULT_DATA]);
     }
     if (ctxt->deferred != nullptr) {
-        LOG_INFO(UDMF_KITS_NAPI, "GenerateOutput deferred branch");
+        LOG_DEBUG(UDMF_KITS_NAPI, "GenerateOutput deferred branch");
         if (ctxt->status == napi_ok) {
             LOG_DEBUG(UDMF_KITS_NAPI, "deferred promise resolved");
             napi_resolve_deferred(ctxt->env, ctxt->deferred, result[RESULT_DATA]);
@@ -162,7 +169,7 @@ void NapiQueue::GenerateOutput(ContextBase *ctxt)
         napi_call_function(ctxt->env, nullptr, callback, RESULT_ALL, result, &callbackResult);
     }
     ctxt->hold.reset(); // release ctxt.
-    LOG_INFO(UDMF_KITS_NAPI, "GenerateOutput stop");
+    LOG_DEBUG(UDMF_KITS_NAPI, "GenerateOutput stop");
 }
 } // namespace UDMF
 } // namespace OHOS

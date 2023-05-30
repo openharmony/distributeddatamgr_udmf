@@ -843,7 +843,7 @@ HWTEST_F(UdmfClientTest, SetData014, TestSize.Level1)
     ASSERT_NE(systemDefinedPixelMap2, nullptr);
     auto rawData2 = systemDefinedPixelMap2->GetRawData();
     EXPECT_EQ(rawData1.size(), rawData2.size());
-    for (int i = 0; i < rawData1.size(); ++i) {
+    for (uint32_t i = 0; i < rawData1.size(); ++i) {
         EXPECT_EQ(rawData1[i], rawData2[i]);
     }
 
@@ -891,7 +891,7 @@ HWTEST_F(UdmfClientTest, SetData015, TestSize.Level1)
               applicationDefinedRecord2->GetApplicationDefinedType());
     auto rawData2 = applicationDefinedRecord2->GetRawData();
     EXPECT_EQ(rawData1.size(), rawData2.size());
-    for (int i = 0; i < rawData1.size(); ++i) {
+    for (uint32_t i = 0; i < rawData1.size(); ++i) {
         EXPECT_EQ(rawData1[i], rawData2[i]);
     }
 
@@ -1395,5 +1395,305 @@ HWTEST_F(UdmfClientTest, GetSelfData002, TestSize.Level1)
     GetEmptyData(option2);
 
     LOG_INFO(UDMF_TEST, "GetSelfData002 end.");
+}
+
+/**
+* @tc.name: SetData020
+* @tc.desc: Set datas with intention ${UD_INTENTION_SUPER_HUB} and manually check db is cleared before set or not
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData020, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData020 begin.");
+    QueryOption query = { .intention = Intention::UD_INTENTION_SUPER_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_TRUE(unifiedDataSet.empty());
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_SUPER_HUB };
+    UnifiedData data1;
+    PlainText plainText1;
+    plainText1.SetContent("content1");
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(plainText1);
+    data1.AddRecord(record1);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data1, key);
+    ASSERT_EQ(status, E_OK);
+
+    UnifiedData data2;
+    PlainText plainText2;
+    plainText1.SetContent("content2");
+    std::shared_ptr<UnifiedRecord> record2 = std::make_shared<PlainText>(plainText1);
+    data2.AddRecord(record2);
+    status = UdmfClient::GetInstance().SetData(customOption, data2, key);
+    ASSERT_EQ(status, E_OK);
+
+    SetHapToken2();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    auto size = static_cast<int32_t>(unifiedDataSet.size());
+    ASSERT_EQ(size, 2);
+    LOG_INFO(UDMF_TEST, "SetData020 end.");
+}
+
+/**
+* @tc.name: UpdateData001
+* @tc.desc: Update data with invalid params
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, UpdateData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "UpdateData001 begin.");
+
+    UnifiedData data;
+    QueryOption queryOption = { .key = "" };
+    auto status = UdmfClient::GetInstance().UpdateData(queryOption, data);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    queryOption = { .key = "udmf://drag/ohos.test.demo1/abcde" };
+    status = UdmfClient::GetInstance().UpdateData(queryOption, data);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_SUPER_HUB };
+    UnifiedData data1;
+    PlainText plainText1;
+    plainText1.SetContent("content1");
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(plainText1);
+    data1.AddRecord(record1);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data1, key);
+    ASSERT_EQ(status, E_OK);
+
+    queryOption = { .key = key };
+    SetHapToken2();
+    status = UdmfClient::GetInstance().UpdateData(queryOption, data);
+    ASSERT_EQ(status, E_INVALID_VALUE);
+    LOG_INFO(UDMF_TEST, "UpdateData001 end.");
+}
+
+/**
+* @tc.name: UpdateData002
+* @tc.desc: Update data with valid params
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, UpdateData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "UpdateData002 begin.");
+
+    UnifiedData data;
+    PlainText plainText;
+    plainText.SetContent("content");
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<PlainText>(plainText);
+    data.AddRecord(record);
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_SUPER_HUB };
+    UnifiedData data1;
+    PlainText plainText1;
+    plainText1.SetContent("content1");
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(plainText1);
+    data1.AddRecord(record1);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(customOption, data1, key);
+
+    ASSERT_EQ(status, E_OK);
+    QueryOption queryOption = { .key = key };
+    SetHapToken2();
+    status = UdmfClient::GetInstance().UpdateData(queryOption, data);
+    ASSERT_EQ(status, E_OK);
+
+    std::vector<UnifiedData> dataSet;
+    status = UdmfClient::GetInstance().GetBatchData(queryOption, dataSet);
+    std::shared_ptr<UnifiedRecord> record2 = dataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    auto type = record2->GetType();
+    ASSERT_EQ(type, UDType::PLAIN_TEXT);
+    auto plainText2 = static_cast<PlainText *>(record2.get());
+    ASSERT_EQ(plainText2->GetContent(), "content");
+
+    LOG_INFO(UDMF_TEST, "UpdateData002 end.");
+}
+
+/**
+* @tc.name: QueryData001
+* @tc.desc: Query data with invalid params
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, QueryData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "QueryData001 begin.");
+    std::vector<UnifiedData> unifiedDataSet;
+    QueryOption queryOption = {};
+    auto status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    queryOption = { .key = "udmf://drag/ohos.test.demo1/abcde" };
+    status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    queryOption = { .intention = UD_INTENTION_DRAG };
+    status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    queryOption = { .key = "udmf://SuperHub/ohos.test.demo1/abcde", .intention = UD_INTENTION_DRAG };
+    status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    queryOption = { .key = "udmf://drag/ohos.test.demo1/abcde", .intention = UD_INTENTION_SUPER_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+    LOG_INFO(UDMF_TEST, "QueryData001 end.");
+}
+
+/**
+* @tc.name: QueryData002
+* @tc.desc: Query data with valid params
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, QueryData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "QueryData002 begin.");
+
+    QueryOption query = { .intention = Intention::UD_INTENTION_SUPER_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_TRUE(unifiedDataSet.empty());
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_SUPER_HUB };
+    UnifiedData data;
+    PlainText plainText;
+    plainText.SetContent("content1");
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<PlainText>(plainText);
+    data.AddRecord(record);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    query = { .key = key };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    auto size = static_cast<int32_t>(unifiedDataSet.size());
+    ASSERT_EQ(size, 1);
+    std::shared_ptr<UnifiedRecord> record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    auto type = record2->GetType();
+    ASSERT_EQ(type, UDType::PLAIN_TEXT);
+    auto plainText2 = static_cast<PlainText *>(record2.get());
+    ASSERT_EQ(plainText2->GetContent(), "content1");
+
+    UnifiedData data2;
+    plainText.SetContent("content2");
+    record = std::make_shared<PlainText>(plainText);
+    data2.AddRecord(record);
+    status = UdmfClient::GetInstance().SetData(customOption, data2, key);
+    ASSERT_EQ(status, E_OK);
+
+    unifiedDataSet.clear();
+    query = { .key = key, .intention = UD_INTENTION_SUPER_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    size = static_cast<int32_t>(unifiedDataSet.size());
+    ASSERT_EQ(size, 1);
+    record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    type = record2->GetType();
+    ASSERT_EQ(type, UDType::PLAIN_TEXT);
+    plainText2 = static_cast<PlainText *>(record2.get());
+    ASSERT_EQ(plainText2->GetContent(), "content2");
+
+    unifiedDataSet.clear();
+    query = { .intention = UD_INTENTION_SUPER_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    size = static_cast<int32_t>(unifiedDataSet.size());
+    ASSERT_EQ(size, 2);
+
+    LOG_INFO(UDMF_TEST, "QueryData002 end.");
+}
+
+/**
+* @tc.name: DeleteData001
+* @tc.desc: Delete data with invalid params
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, DeleteData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "DeleteData001 begin.");
+    std::vector<UnifiedData> unifiedDataSet;
+    QueryOption queryOption = {};
+    auto status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    queryOption = { .key = "udmf://drag/ohos.test.demo1/abcde" };
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    queryOption = { .intention = UD_INTENTION_DRAG };
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    queryOption = { .key = "udmf://SuperHub/ohos.test.demo1/abcde", .intention = UD_INTENTION_DRAG };
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    queryOption = { .key = "udmf://drag/ohos.test.demo1/abcde", .intention = UD_INTENTION_SUPER_HUB };
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+    LOG_INFO(UDMF_TEST, "DeleteData001 end.");
+}
+
+/**
+* @tc.name: DeleteData002
+* @tc.desc: Delete data with valid params
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, DeleteData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "DeleteData002 begin.");
+
+    CustomOption customOption = { .intention = UD_INTENTION_SUPER_HUB };
+    UnifiedData data;
+    PlainText plainText;
+    plainText.SetContent("content1");
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<PlainText>(plainText);
+    data.AddRecord(record);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption queryOption = { .key = key };
+    SetHapToken2();
+
+    std::vector<UnifiedData> unifiedDataSet;
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
+    ASSERT_TRUE(unifiedDataSet.empty());
+
+    queryOption = { .intention = UD_INTENTION_SUPER_HUB };
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
+    ASSERT_TRUE(!unifiedDataSet.empty());
+
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
+    ASSERT_TRUE(unifiedDataSet.empty());
+    LOG_INFO(UDMF_TEST, "DeleteData002 end.");
 }
 } // OHOS::Test

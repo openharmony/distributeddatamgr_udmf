@@ -16,10 +16,10 @@
 #include "udmf_service_proxy.h"
 
 #include "ipc_types.h"
-
 #include "preprocess_utils.h"
-#include "udmf_types_util.h"
 #include "tlv_util.h"
+#include "udmf_service_utils.h"
+#include "udmf_types_util.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -48,7 +48,6 @@ namespace UDMF {
         __status;                                                      \
     })
 
-
 UdmfServiceProxy::UdmfServiceProxy(const sptr<IRemoteObject> &object) : IRemoteProxy<IUdmfService>(object)
 {
 }
@@ -64,10 +63,6 @@ int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData
         LOG_ERROR(UDMF_SERVICE, "Empty data without any record!");
         return E_INVALID_VALUE;
     }
-    if (unifiedData.GetRecords().size() > UdmfService::MAX_RECORD_NUM) {
-        LOG_ERROR(UDMF_SERVICE, "Excessive record: %{public}zu!", unifiedData.GetRecords().size());
-        return E_INVALID_VALUE;
-    }
     if (unifiedData.GetSize() > UdmfService::MAX_DATA_SIZE) {
         return E_INVALID_VALUE;
     }
@@ -78,23 +73,8 @@ int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData
     if (!ITypesUtil::Marshal(request, option)) {
         return E_WRITE_PARCEL_ERROR;
     }
-    auto size = unifiedData.GetRecords().size();
-    if (!request.WriteInt32(static_cast<int32_t>(size))) {
+    if (UdmfServiceUtils::MarshalUnifiedData(request, unifiedData) != E_OK) {
         return E_WRITE_PARCEL_ERROR;
-    }
-    for (const auto &record : unifiedData.GetRecords()) {
-        if (record->GetSize() > UdmfService::MAX_RECORD_SIZE) {
-            return E_INVALID_VALUE;
-        }
-        std::vector<uint8_t> recordBytes;
-        auto recordTlv = TLVObject(recordBytes);
-        if (!TLVUtil::Writing(record, recordTlv)) {
-            return E_WRITE_PARCEL_ERROR;
-        }
-        if (!request.WriteInt32(static_cast<int32_t>(recordBytes.size())) ||
-            !request.WriteRawData(recordBytes.data(), recordBytes.size())) {
-            return E_WRITE_PARCEL_ERROR;
-        }
     }
     MessageParcel reply;
     MessageOption messageOption;
@@ -107,7 +87,7 @@ int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData
     return status;
 }
 
-int32_t UdmfServiceProxy::GetData(QueryOption &query, UnifiedData &unifiedData)
+int32_t UdmfServiceProxy::GetData(const QueryOption &query, UnifiedData &unifiedData)
 {
     LOG_INFO(UDMF_SERVICE, "start, tag: %{public}s", query.key.c_str());
     UnifiedKey key(query.key);
@@ -121,29 +101,98 @@ int32_t UdmfServiceProxy::GetData(QueryOption &query, UnifiedData &unifiedData)
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s", status, query.key.c_str());
         return status;
     }
-
-    int32_t count = reply.ReadInt32();
-    for (int32_t index = 0; index < count; ++index) {
-        std::shared_ptr<UnifiedRecord> record;
-        auto size = reply.ReadInt32();
-        if (size == 0) {
-            continue;
-        }
-        const uint8_t *rawData = reinterpret_cast<const uint8_t *>(reply.ReadRawData(size));
-        std::vector<uint8_t> recordBytes(rawData, rawData + size);
-        auto recordTlv = TLVObject(recordBytes);
-        if (!TLVUtil::Reading(record, recordTlv)) {
-            LOG_ERROR(UDMF_SERVICE, "Unmarshall unified record failed.");
-            return IPC_STUB_INVALID_DATA_ERR;
-        }
-        unifiedData.AddRecord(record);
+    if (UdmfServiceUtils::UnMarshalUnifiedData(reply, unifiedData) != E_OK) {
+        return E_READ_PARCEL_ERROR;
     }
-
     LOG_DEBUG(UDMF_SERVICE, "end.");
     return status;
 }
 
-int32_t UdmfServiceProxy::GetSummary(QueryOption &query, Summary &summary)
+int32_t UdmfServiceProxy::GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
+{
+    LOG_INFO(UDMF_SERVICE, "start, tag: intention = %{public}d, key = %{public}s", query.intention, query.key.c_str());
+    auto find = UD_INTENTION_MAP.find(query.intention);
+    std::string intention = find == UD_INTENTION_MAP.end() ? intention : find->second;
+    if (!UnifiedDataUtils::IsValidOptions(query.key, intention)) {
+        LOG_ERROR(UDMF_SERVICE, "invalid option");
+        return E_INVALID_PARAMETERS;
+    }
+    MessageParcel reply;
+    int32_t status = IPC_SEND(GET_BATCH_DATA, reply, query);
+    LOG_DEBUG(UDMF_SERVICE, "GetBatchData : status =  %{public}d!", status);
+    if (status != E_OK) {
+        return status;
+    }
+    if (UdmfServiceUtils::UnMarshalBatchUnifiedData(reply, unifiedDataSet) != E_OK) {
+        return E_READ_PARCEL_ERROR;
+    }
+    LOG_DEBUG(UDMF_SERVICE, "end.");
+    return status;
+}
+
+int32_t UdmfServiceProxy::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
+{
+    LOG_INFO(UDMF_SERVICE, "start, tag: %{public}s", query.key.c_str());
+    UnifiedKey key(query.key);
+    if (!key.IsValid() || !UnifiedDataUtils::IsPersist(key.intention)) {
+        LOG_ERROR(UDMF_SERVICE, "invalid key");
+        return E_INVALID_PARAMETERS;
+    }
+    if (unifiedData.GetSize() > UdmfService::MAX_DATA_SIZE) {
+        LOG_ERROR(UDMF_SERVICE, "Exceeded the limit!");
+        return E_INVALID_VALUE;
+    }
+    if (unifiedData.GetRecords().empty()) {
+        LOG_ERROR(UDMF_SERVICE, "Invalid data!");
+        return E_INVALID_VALUE;
+    }
+
+    MessageParcel request;
+    if (!request.WriteInterfaceToken(GetDescriptor())) {
+        return E_WRITE_PARCEL_ERROR;
+    }
+    if (!ITypesUtil::Marshal(request, query)) {
+        return E_WRITE_PARCEL_ERROR;
+    }
+    if (UdmfServiceUtils::MarshalUnifiedData(request, unifiedData) != E_OK) {
+        return E_WRITE_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption messageOption;
+    int error = Remote()->SendRequest(UPDATE_DATA, request, reply, messageOption);
+    if (error != 0) {
+        return E_WRITE_PARCEL_ERROR;
+    }
+    int32_t status;
+    ITypesUtil::Unmarshal(reply, status);
+    LOG_DEBUG(UDMF_SERVICE, "end.");
+    return status;
+}
+
+int32_t UdmfServiceProxy::DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
+{
+    LOG_INFO(UDMF_SERVICE, "start, tag: intention = %{public}d, key = %{public}s", query.intention, query.key.c_str());
+    auto find = UD_INTENTION_MAP.find(query.intention);
+    std::string intention = find == UD_INTENTION_MAP.end() ? intention : find->second;
+    if (!UnifiedDataUtils::IsValidOptions(query.key, intention)) {
+        LOG_ERROR(UDMF_SERVICE, "invalid option");
+        return E_INVALID_PARAMETERS;
+    }
+    MessageParcel reply;
+    int32_t status = IPC_SEND(DELETE_DATA, reply, query);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x,key: %{public}s, intention:%{public}s", status, query.key.c_str(),
+            UD_INTENTION_MAP.at(query.intention).c_str());
+        return status;
+    }
+    if (UdmfServiceUtils::UnMarshalBatchUnifiedData(reply, unifiedDataSet) != E_OK) {
+        return E_READ_PARCEL_ERROR;
+    }
+    LOG_DEBUG(UDMF_SERVICE, "end.");
+    return status;
+}
+
+int32_t UdmfServiceProxy::GetSummary(const QueryOption &query, Summary &summary)
 {
     LOG_INFO(UDMF_SERVICE, "start, tag: %{public}s", query.key.c_str());
     UnifiedKey key(query.key);
@@ -162,7 +211,7 @@ int32_t UdmfServiceProxy::GetSummary(QueryOption &query, Summary &summary)
     return status;
 }
 
-int32_t UdmfServiceProxy::AddPrivilege(QueryOption &query, Privilege &privilege)
+int32_t UdmfServiceProxy::AddPrivilege(const QueryOption &query, Privilege &privilege)
 {
     LOG_INFO(UDMF_SERVICE, "start, key: %{public}s", query.key.c_str());
     UnifiedKey key(query.key);
@@ -195,7 +244,6 @@ int32_t UdmfServiceProxy::Sync(const QueryOption &query, const std::vector<std::
     LOG_DEBUG(UDMF_SERVICE, "end.");
     return status;
 }
-
 
 int32_t UdmfServiceProxy::SendRequest(
     IUdmfService::FCode code, MessageParcel &data, MessageParcel &reply, MessageOption &option)

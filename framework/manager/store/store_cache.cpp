@@ -30,7 +30,8 @@ std::shared_ptr<Store> StoreCache::GetStore(std::string intention)
             return true;
         }
 
-        if (intention == UD_INTENTION_MAP.at(UD_INTENTION_DRAG)) {
+        if (intention == UD_INTENTION_MAP.at(UD_INTENTION_DRAG)
+            || intention == UD_INTENTION_MAP.at(UD_INTENTION_SUPER_HUB)) {
             storePtr = std::make_shared<RuntimeStore>(intention);
             if (!storePtr->Init()) {
                 LOG_ERROR(UDMF_SERVICE, "Init runtime store failed.");

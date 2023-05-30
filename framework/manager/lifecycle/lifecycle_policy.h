@@ -33,7 +33,8 @@ public:
     virtual Status DeleteOnGet(const UnifiedKey &key);
     virtual Status DeleteOnStart(const std::string &intention);
     virtual Status DeleteOnTimeout(const std::string &intention);
-    virtual std::vector<std::string> GetTimeoutKeys(const std::shared_ptr<Store> &store, Duration interval);
+    virtual Status GetTimeoutKeys(
+        const std::shared_ptr<Store> &store, Duration interval, std::vector<std::string> &timeoutKeys);
 
 private:
     static const std::string DATA_PREFIX;

@@ -17,10 +17,11 @@
 #define UDMF_STORE_H
 
 #include <string>
+
 #include "error_code.h"
-#include "unified_types.h"
 #include "unified_data.h"
 #include "unified_key.h"
+#include "unified_types.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -31,12 +32,12 @@ public:
     virtual Status GetSummary(const std::string &key, Summary &summary) = 0;
     virtual Status Update(const UnifiedData &unifiedData) = 0;
     virtual Status Delete(const std::string &key) = 0;
-    virtual Status DeleteBatch(const std::vector<std::string> &timeoutKeys) = 0;
+    virtual Status DeleteBatch(const std::vector<std::string> &unifiedKeys) = 0;
     virtual Status Sync(const std::vector<std::string> &devices) = 0;
     virtual Status Clear() = 0;
     virtual bool Init() = 0;
     virtual void Close() = 0;
-    virtual std::vector<UnifiedData> GetDatas(const std::string &dataPrefix) = 0;
+    virtual Status GetBatchData(const std::string &dataPrefix, std::vector<UnifiedData> &unifiedDataSet) = 0;
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -19,9 +19,10 @@
 #include <map>
 #include <string>
 
-#include "error_code.h"
 #include "feature/feature_system.h"
 #include "message_parcel.h"
+
+#include "error_code.h"
 #include "udmf_service.h"
 
 namespace OHOS {
@@ -38,6 +39,9 @@ public:
 private:
     int32_t OnSetData(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetData(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetBatchData(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateData(MessageParcel &data, MessageParcel &reply);
+    int32_t OnDeleteData(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetSummary(MessageParcel &data, MessageParcel &reply);
     int32_t OnAddPrivilege(MessageParcel &data, MessageParcel &reply);
     int32_t OnSync(MessageParcel &data, MessageParcel &reply);

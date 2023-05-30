@@ -38,20 +38,25 @@ public:
     virtual ~UdmfService() = default;
 
     virtual int32_t SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key) = 0;
-    virtual int32_t GetData(QueryOption &query, UnifiedData &unifiedData) = 0;
-    virtual int32_t GetSummary(QueryOption &query, Summary &summary) = 0;
-    virtual int32_t AddPrivilege(QueryOption &query, Privilege &privilege) = 0;
+    virtual int32_t GetData(const QueryOption &query, UnifiedData &unifiedData) = 0;
+    virtual int32_t GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet) = 0;
+    virtual int32_t UpdateData(const QueryOption &query, UnifiedData &unifiedData) = 0;
+    virtual int32_t DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet) = 0;
+    virtual int32_t GetSummary(const QueryOption &query, Summary &summary) = 0;
+    virtual int32_t AddPrivilege(const QueryOption &query, Privilege &privilege) = 0;
     virtual int32_t Sync(const QueryOption &query, const std::vector<std::string> &devices) = 0;
 
     static constexpr int32_t MAX_DATA_SIZE = 4 * 1024 * 1024;
     static constexpr int32_t MAX_RECORD_SIZE = 2 * 1024 * 1024;
-    static constexpr int32_t MAX_RECORD_NUM = 512;
 
 protected:
     enum FCode {
         CODE_HEAD,
         SET_DATA = CODE_HEAD,
         GET_DATA,
+        GET_BATCH_DATA,
+        UPDATE_DATA,
+        DELETE_DATA,
         GET_SUMMARY,
         ADD_PRIVILEGE,
         SYNC,
