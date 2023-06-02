@@ -22,12 +22,8 @@ namespace UDMF {
 using NapiErrorCode = OHOS::UDMF::NapiErrorCode;
 
 static const NapiErrorCode JS_ERROR_CODE_MSGS[] = {
+    { Status::E_NO_PERMISSION, 201, "Permission denied!" },
     { Status::E_INVALID_PARAMETERS, 401, "Parameter error." },
-    { Status::E_ERROR, 20400001, "NAPI failed!" },
-    { Status::E_FORBIDDEN, 20400002, "Unsupported!" },
-    { Status::E_NO_PERMISSION, 20400003, "Have no permission!" },
-    { Status::E_INVALID_OPERATION, 20400004, "Invalid operation failed!" },
-    { Status::E_UNKNOWN, 20400005, "Unknown failed!" },
 };
 
 const std::optional<NapiErrorCode> GetErrorCode(int32_t errorCode)

@@ -15,6 +15,8 @@
 
 #include "unified_meta.h"
 
+#include "unified_key.h"
+
 namespace OHOS {
 namespace UDMF {
 bool UnifiedDataUtils::IsValidType(int32_t value)
@@ -84,6 +86,23 @@ Intention UnifiedDataUtils::GetIntentionByString(const std::string &intention)
         }
     }
     return UD_INTENTION_BUTT;
+}
+
+bool UnifiedDataUtils::IsValidOptions(const std::string &key, std::string &intention)
+{
+    UnifiedKey unifiedKey(key);
+    auto isValidKey = unifiedKey.IsValid();
+    if (key.empty() && IsPersist(intention)) {
+        return true;
+    }
+    if (intention.empty() && isValidKey && IsPersist(unifiedKey.intention)) {
+        return true;
+    }
+    if (isValidKey && unifiedKey.intention == intention && IsPersist(intention)) {
+        intention = "";
+        return true;
+    }
+    return false;
 }
 } // namespace UDMF
 } // namespace OHOS

@@ -71,6 +71,7 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/manager/store/store_cache.cpp",
     "${udmf_framework_path}/service/udmf_service_client.cpp",
     "${udmf_framework_path}/service/udmf_service_proxy.cpp",
+    "${udmf_framework_path}/service/udmf_service_utils.cpp",
   ]
 
   public_configs = [ ":udmf_client_config" ]

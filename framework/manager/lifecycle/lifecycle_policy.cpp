@@ -58,7 +58,12 @@ Status LifeCyclePolicy::DeleteOnTimeout(const std::string &intention)
         LOG_ERROR(UDMF_FRAMEWORK, "Get store failed, intention: %{public}s.", intention.c_str());
         return E_DB_ERROR;
     }
-    auto timeoutKeys = GetTimeoutKeys(store, INTERVAL);
+    std::vector<std::string> timeoutKeys;
+    auto status = GetTimeoutKeys(store, INTERVAL, timeoutKeys);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Get timeout keys failed.");
+        return E_DB_ERROR;
+    }
     if (store->DeleteBatch(timeoutKeys) != E_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "Remove data failed, intention: %{public}s.", intention.c_str());
         return E_DB_ERROR;
@@ -66,13 +71,18 @@ Status LifeCyclePolicy::DeleteOnTimeout(const std::string &intention)
     return E_OK;
 }
 
-std::vector<std::string> LifeCyclePolicy::GetTimeoutKeys(const std::shared_ptr<Store> &store, Duration interval)
+Status LifeCyclePolicy::GetTimeoutKeys(
+    const std::shared_ptr<Store> &store, Duration interval, std::vector<std::string> &timeoutKeys)
 {
-    std::vector<UnifiedData> datas = store->GetDatas(DATA_PREFIX);
-    std::vector<std::string> timeoutKeys;
+    std::vector<UnifiedData> datas;
+    auto status = store->GetBatchData(DATA_PREFIX, datas);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Get datas failed.");
+        return E_DB_ERROR;
+    }
     if (datas.empty()) {
         LOG_DEBUG(UDMF_FRAMEWORK, "entries is empty.");
-        return timeoutKeys;
+        return E_OK;
     }
     auto curTime = PreProcessUtils::GetInstance().GetTimeStamp();
     for (const auto &data : datas) {
@@ -81,7 +91,7 @@ std::vector<std::string> LifeCyclePolicy::GetTimeoutKeys(const std::shared_ptr<S
             timeoutKeys.push_back(data.GetRuntime()->key.key);
         }
     }
-    return timeoutKeys;
+    return E_OK;
 }
 } // namespace UDMF
 } // namespace OHOS

@@ -80,19 +80,37 @@ int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedDat
     return udmfProxy_->SetData(option, unifiedData, key);
 }
 
-int32_t UdmfServiceClient::GetData(QueryOption &query, UnifiedData &unifiedData)
+int32_t UdmfServiceClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
 {
     LOG_INFO(UDMF_SERVICE, "start");
     return udmfProxy_->GetData(query, unifiedData);
 }
 
-int32_t UdmfServiceClient::GetSummary(QueryOption &query, Summary &summary)
+int32_t UdmfServiceClient::GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
+{
+    LOG_INFO(UDMF_SERVICE, "start");
+    return udmfProxy_->GetBatchData(query, unifiedDataSet);
+}
+
+int32_t UdmfServiceClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
+{
+    LOG_INFO(UDMF_SERVICE, "start");
+    return udmfProxy_->UpdateData(query, unifiedData);
+}
+
+int32_t UdmfServiceClient::DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
+{
+    LOG_INFO(UDMF_SERVICE, "start");
+    return udmfProxy_->DeleteData(query, unifiedDataSet);
+}
+
+int32_t UdmfServiceClient::GetSummary(const QueryOption &query, Summary &summary)
 {
     LOG_INFO(UDMF_SERVICE, "start");
     return udmfProxy_->GetSummary(query, summary);
 }
 
-int32_t UdmfServiceClient::AddPrivilege(QueryOption &query, Privilege &privilege)
+int32_t UdmfServiceClient::AddPrivilege(const QueryOption &query, Privilege &privilege)
 {
     LOG_INFO(UDMF_SERVICE, "start");
     return udmfProxy_->AddPrivilege(query, privilege);

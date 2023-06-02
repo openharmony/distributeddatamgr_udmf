@@ -76,7 +76,8 @@ struct CustomOption {
  */
 struct QueryOption {
     std::string key;
-    uint32_t tokenId {};
+    Intention intention {};
+    int32_t tokenId {};
     int32_t pid {};
 };
 } // namespace UDMF
