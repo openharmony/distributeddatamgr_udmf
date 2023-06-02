@@ -118,7 +118,7 @@
         }
       ],
       "test": [
-        "//foundation/distributeddatamgr/udmf/framework/innerkitsimpl/test/unittest:unittest",
+        "//foundation/distributeddatamgr/udmf:unittest",
         "//foundation/distributeddatamgr/udmf:fuzztest"
       ]
     }
