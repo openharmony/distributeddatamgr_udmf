@@ -31,9 +31,12 @@ public:
     static UdmfClient &GetInstance();
 
     Status SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key);
-    Status GetData(QueryOption &query, UnifiedData &unifiedData);
-    Status GetSummary(QueryOption &query, Summary& summary);
-    Status AddPrivilege(QueryOption &query, Privilege &privilege);
+    Status GetData(const QueryOption &query, UnifiedData &unifiedData);
+    Status GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet);
+    Status UpdateData(const QueryOption &query, UnifiedData &unifiedData);
+    Status DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet);
+    Status GetSummary(const QueryOption &query, Summary& summary);
+    Status AddPrivilege(const QueryOption &query, Privilege &privilege);
     Status Sync(const QueryOption &query, const std::vector<std::string> &devices);
 };
 } // namespace UDMF

@@ -15,16 +15,17 @@
 
 #include "data_manager.h"
 
+#include "checker_manager.h"
+#include "file.h"
 #include "lifecycle/lifecycle_manager.h"
 #include "logger.h"
 #include "preprocess_utils.h"
-#include "checker_manager.h"
-#include "file.h"
 #include "uri_permission_manager.h"
 
 namespace OHOS {
 namespace UDMF {
 const std::string MSDP_PROCESS_NAME = "msdp_sa";
+const std::string DATA_PREFIX = "udmf://";
 DataManager::DataManager()
 {
     authorizationMap_[UD_INTENTION_MAP.at(UD_INTENTION_DRAG)] = MSDP_PROCESS_NAME;
@@ -70,7 +71,7 @@ int32_t DataManager::SaveData(CustomOption &option, UnifiedData &unifiedData, st
         return E_DB_ERROR;
     }
 
-    if (store->Clear() != E_OK) {
+    if (!UnifiedDataUtils::IsPersist(intention) && store->Clear() != E_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "Clear store failed, intention: %{public}s.", intention.c_str());
         return E_DB_ERROR;
     }
@@ -83,7 +84,7 @@ int32_t DataManager::SaveData(CustomOption &option, UnifiedData &unifiedData, st
     return E_OK;
 }
 
-int32_t DataManager::RetrieveData(QueryOption &query, UnifiedData &unifiedData)
+int32_t DataManager::RetrieveData(const QueryOption &query, UnifiedData &unifiedData)
 {
     UnifiedKey key(query.key);
     if (!key.IsValid()) {
@@ -136,7 +137,93 @@ int32_t DataManager::RetrieveData(QueryOption &query, UnifiedData &unifiedData)
     return E_OK;
 }
 
-int32_t DataManager::GetSummary(QueryOption &query, Summary &summary)
+int32_t DataManager::RetrieveBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
+{
+    std::vector<UnifiedData> dataSet;
+    std::shared_ptr<Store> store;
+    auto status = QueryDataCommon(query, dataSet, store);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "QueryDataCommon failed.");
+        return status;
+    }
+    if (dataSet.empty()) {
+        LOG_DEBUG(UDMF_FRAMEWORK, "has no data, key: %{public}s, intention: %{public}d.", query.key.c_str(),
+            query.intention);
+        return E_OK;
+    }
+    for (const auto &data : dataSet) {
+        unifiedDataSet.push_back(data);
+    }
+    return E_OK;
+}
+
+int32_t DataManager::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
+{
+    UnifiedKey key(query.key);
+    if (!key.IsValid()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Unified key: %{public}s is invalid.", query.key.c_str());
+        return E_INVALID_PARAMETERS;
+    }
+    auto store = storeCache_.GetStore(key.intention);
+    if (store == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Get store failed, intention: %{public}s.", key.intention.c_str());
+        return E_DB_ERROR;
+    }
+
+    UnifiedData data;
+    int32_t res = store->Get(query.key, data);
+    if (res != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Get data from store failed, intention: %{public}s.", key.intention.c_str());
+        return res;
+    }
+
+    if (data.IsEmpty()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid parameters, unified data has no record, intention: %{public}s.",
+            key.intention.c_str());
+        return E_INVALID_PARAMETERS;
+    }
+    std::shared_ptr<Runtime> runtime = data.GetRuntime();
+
+    runtime->lastModifiedTime = PreProcessUtils::GetInstance().GetTimeStamp();
+    unifiedData.SetRuntime(*runtime);
+    for (const auto &record : unifiedData.GetRecords()) {
+        record->SetUid(PreProcessUtils::GetInstance().IdGenerator());
+    }
+    if (store->Update(unifiedData) != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Update unified data failed, intention: %{public}s.", key.intention.c_str());
+        return E_DB_ERROR;
+    }
+    return E_OK;
+}
+int32_t DataManager::DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
+{
+    std::vector<UnifiedData> dataSet;
+    std::shared_ptr<Store> store;
+    auto status = QueryDataCommon(query, dataSet, store);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "QueryDataCommon failed.");
+        return status;
+    }
+    if (dataSet.empty()) {
+        LOG_DEBUG(UDMF_FRAMEWORK, "has no data, key: %{public}s, intention: %{public}d.", query.key.c_str(),
+            query.intention);
+        return E_OK;
+    }
+    std::shared_ptr<Runtime> runtime;
+    std::vector<std::string> deleteKeys;
+    for (const auto &data : dataSet) {
+        runtime = data.GetRuntime();
+        unifiedDataSet.push_back(data);
+        deleteKeys.push_back(runtime->key.key);
+    }
+    if (store->DeleteBatch(deleteKeys) != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Remove data failed.");
+        return E_DB_ERROR;
+    }
+    return E_OK;
+}
+
+int32_t DataManager::GetSummary(const QueryOption &query, Summary &summary)
 {
     UnifiedKey key(query.key);
     if (!key.IsValid()) {
@@ -157,7 +244,7 @@ int32_t DataManager::GetSummary(QueryOption &query, Summary &summary)
     return E_OK;
 }
 
-int32_t DataManager::AddPrivilege(QueryOption &query, const Privilege &privilege)
+int32_t DataManager::AddPrivilege(const QueryOption &query, const Privilege &privilege)
 {
     UnifiedKey key(query.key);
     if (!key.IsValid()) {
@@ -220,6 +307,36 @@ int32_t DataManager::Sync(const QueryOption &query, const std::vector<std::strin
 
     if (store->Sync(devices) != E_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "Store sync failed, intention: %{public}s.", key.intention.c_str());
+        return E_DB_ERROR;
+    }
+    return E_OK;
+}
+
+int32_t DataManager::QueryDataCommon(
+    const QueryOption &query, std::vector<UnifiedData> &dataSet, std::shared_ptr<Store> &store)
+{
+    auto find = UD_INTENTION_MAP.find(query.intention);
+    std::string intention = find == UD_INTENTION_MAP.end() ? intention : find->second;
+    if (!UnifiedDataUtils::IsValidOptions(query.key, intention)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Unified key: %{public}s and intention: %{public}s is invalid.", query.key.c_str(),
+            intention.c_str());
+        return E_INVALID_PARAMETERS;
+    }
+    std::string dataPrefix = DATA_PREFIX + intention;
+    UnifiedKey key(query.key);
+    key.IsValid();
+    if (intention.empty()) {
+        dataPrefix = key.key;
+        intention = key.intention;
+    }
+    LOG_DEBUG(UDMF_FRAMEWORK, "dataPrefix = %{public}s, intention: %{public}s.", dataPrefix.c_str(), intention.c_str());
+    store = storeCache_.GetStore(intention);
+    if (store == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Get store failed, intention: %{public}s.", intention.c_str());
+        return E_DB_ERROR;
+    }
+    if (store->GetBatchData(dataPrefix, dataSet) != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Get dataSet failed, dataPrefix: %{public}s.", dataPrefix.c_str());
         return E_DB_ERROR;
     }
     return E_OK;

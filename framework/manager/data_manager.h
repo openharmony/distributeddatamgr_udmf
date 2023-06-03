@@ -35,13 +35,17 @@ public:
     static DataManager &GetInstance();
 
     int32_t SaveData(CustomOption &option, UnifiedData &unifiedData, std::string &key);
-    int32_t RetrieveData(QueryOption &query, UnifiedData &unifiedData);
-    int32_t GetSummary(QueryOption &query, Summary &summary);
-    int32_t AddPrivilege(QueryOption &query, const Privilege &privilege);
+    int32_t RetrieveData(const QueryOption &query, UnifiedData &unifiedData);
+    int32_t RetrieveBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet);
+    int32_t UpdateData(const QueryOption &query, UnifiedData &unifiedData);
+    int32_t DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet);
+    int32_t GetSummary(const QueryOption &query, Summary &summary);
+    int32_t AddPrivilege(const QueryOption &query, const Privilege &privilege);
     int32_t Sync(const QueryOption &query, const std::vector<std::string> &devices);
 
 private:
     DataManager();
+    int32_t QueryDataCommon(const QueryOption &query, std::vector<UnifiedData> &datas, std::shared_ptr<Store> &store);
     StoreCache storeCache_;
     std::map<std::string, std::string> authorizationMap_;
 };

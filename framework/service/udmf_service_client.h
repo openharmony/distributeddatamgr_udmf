@@ -34,9 +34,12 @@ public:
     static std::shared_ptr<UdmfServiceClient> GetInstance();
 
     int32_t SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key) override;
-    int32_t GetData(QueryOption &query, UnifiedData &unifiedData) override;
-    int32_t GetSummary(QueryOption &query, Summary &summary) override;
-    int32_t AddPrivilege(QueryOption &query, Privilege &privilege) override;
+    int32_t GetData(const QueryOption &query, UnifiedData &unifiedData) override;
+    int32_t GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet) override;
+    int32_t UpdateData(const QueryOption &query, UnifiedData &unifiedData) override;
+    int32_t DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet) override;
+    int32_t GetSummary(const QueryOption &query, Summary &summary) override;
+    int32_t AddPrivilege(const QueryOption &query, Privilege &privilege) override;
     int32_t Sync(const QueryOption &query, const std::vector<std::string> &devices) override;
 
 private:

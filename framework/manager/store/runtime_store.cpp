@@ -75,9 +75,12 @@ Status RuntimeStore::Put(const UnifiedData &unifiedData)
 
 Status RuntimeStore::Get(const std::string &key, UnifiedData &unifiedData)
 {
-    std::vector<Entry> entries = GetEntries(key);
+    std::vector<Entry> entries;
+    if (GetEntries(key, entries) != E_OK) {
+        return E_DB_ERROR;
+    }
     if (entries.empty()) {
-        LOG_DEBUG(UDMF_FRAMEWORK, "KvStore getEntries failed, key: %{public}s.", key.c_str());
+        LOG_DEBUG(UDMF_FRAMEWORK, "entries is empty.");
         return E_OK;
     }
     for (const auto &entry : entries) {
@@ -131,7 +134,6 @@ Status RuntimeStore::Update(const UnifiedData &unifiedData)
         LOG_ERROR(UDMF_SERVICE, "Delete unified data failed.");
         return E_DB_ERROR;
     }
-
     if (Put(unifiedData) != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "Put unified data failed.");
         return E_DB_ERROR;
@@ -141,9 +143,12 @@ Status RuntimeStore::Update(const UnifiedData &unifiedData)
 
 Status RuntimeStore::Delete(const std::string &key)
 {
-    std::vector<Entry> entries = GetEntries(key);
+    std::vector<Entry> entries;
+    if (GetEntries(key, entries) != E_OK) {
+        return E_DB_ERROR;
+    }
     if (entries.empty()) {
-        LOG_DEBUG(UDMF_FRAMEWORK, "KvStore getEntries failed, key: %{public}s.", key.c_str());
+        LOG_DEBUG(UDMF_FRAMEWORK, "entries is empty.");
         return E_OK;
     }
     std::vector<Key> keys;
@@ -154,17 +159,19 @@ Status RuntimeStore::Delete(const std::string &key)
     return status;
 }
 
-Status RuntimeStore::DeleteBatch(const std::vector<std::string> &timeoutKeys)
+Status RuntimeStore::DeleteBatch(const std::vector<std::string> &unifiedKeys)
 {
-    Status status = E_OK;
-    if (timeoutKeys.empty()) {
+    LOG_DEBUG(UDMF_SERVICE, "called!");
+    if (unifiedKeys.empty()) {
         LOG_DEBUG(UDMF_SERVICE, "No need to delete!");
-        return status;
+        return E_OK;
     }
-    for (const std::string &timeoutKey : timeoutKeys) {
-        status = status == E_OK ? Delete(timeoutKey) : status;
+    for (const std::string &unifiedKey : unifiedKeys) {
+        if (Delete(unifiedKey) != E_OK) {
+            return E_DB_ERROR;
+        }
     }
-    return status;
+    return E_OK;
 }
 
 Status RuntimeStore::Sync(const std::vector<std::string> &devices)
@@ -181,6 +188,29 @@ Status RuntimeStore::Sync(const std::vector<std::string> &devices)
 Status RuntimeStore::Clear()
 {
     return Delete(DATA_PREFIX) != E_DB_ERROR ? E_OK : E_DB_ERROR;
+}
+
+Status RuntimeStore::GetBatchData(const std::string &dataPrefix, std::vector<UnifiedData> &unifiedDataSet)
+{
+    std::vector<Entry> entries;
+    auto status = GetEntries(dataPrefix, entries);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "GetEntries failed.");
+        return E_DB_ERROR;
+    }
+    if (entries.empty()) {
+        LOG_DEBUG(UDMF_FRAMEWORK, "entries is empty.");
+        return E_OK;
+    }
+    for (const auto &entry : entries) {
+        UnifiedData data;
+        std::string keyStr = entry.key.ToString();
+        if (std::count(keyStr.begin(), keyStr.end(), '/') == SLASH_COUNT_IN_KEY) {
+            status = Get(keyStr, data);
+            unifiedDataSet.push_back(data);
+        }
+    }
+    return status;
 }
 
 void RuntimeStore::Close()
@@ -208,36 +238,17 @@ bool RuntimeStore::Init()
     return true;
 }
 
-std::vector<UnifiedData> RuntimeStore::GetDatas(const std::string &dataPrefix)
+Status RuntimeStore::GetEntries(const std::string &dataPrefix, std::vector<Entry> &entries)
 {
-    std::vector<UnifiedData> unifiedDatas;
-    auto entries = GetEntries(dataPrefix);
-    if (entries.empty()) {
-        LOG_DEBUG(UDMF_FRAMEWORK, "entries is empty.");
-        return unifiedDatas;
-    }
-    for (const auto &entry : entries) {
-        UnifiedData data;
-        std::string keyStr = entry.key.ToString();
-        if (std::count(keyStr.begin(), keyStr.end(), '/') == SLASH_COUNT_IN_KEY) {
-            Get(keyStr, data);
-            unifiedDatas.push_back(data);
-        }
-    }
-    return unifiedDatas;
-}
-
-std::vector<Entry> RuntimeStore::GetEntries(const std::string &dataPrefix)
-{
-    std::vector<Entry> entries;
     DataQuery query;
     query.KeyPrefix(dataPrefix);
     query.OrderByWriteTime(true);
     auto status = kvStore_->GetEntries(query, entries);
     if (status != DistributedKv::Status::SUCCESS) {
-        LOG_DEBUG(UDMF_SERVICE, "KvStore getEntries failed, status: %{public}d.", static_cast<int>(status));
+        LOG_ERROR(UDMF_SERVICE, "KvStore getEntries failed, status: %{public}d.", static_cast<int>(status));
+        return E_DB_ERROR;
     }
-    return entries;
+    return E_OK;
 }
 
 Status RuntimeStore::PutEntries(const std::vector<Entry> &entries)
@@ -245,9 +256,9 @@ Status RuntimeStore::PutEntries(const std::vector<Entry> &entries)
     size_t size = entries.size();
     DistributedKv::Status status;
     for (size_t index = 0; index < size; index += MAX_BATCH_SIZE) {
-        std::vector<Entry> batchEntries(entries.begin() + index,
-                                        entries.begin() + std::min(index + MAX_BATCH_SIZE, size));
-        status =  kvStore_->PutBatch(batchEntries);
+        std::vector<Entry> batchEntries(
+            entries.begin() + index, entries.begin() + std::min(index + MAX_BATCH_SIZE, size));
+        status = kvStore_->PutBatch(batchEntries);
         if (status != DistributedKv::Status::SUCCESS) {
             LOG_ERROR(UDMF_SERVICE, "KvStore putBatch failed, status: %{public}d.", status);
             return E_DB_ERROR;
@@ -261,9 +272,8 @@ Status RuntimeStore::DeleteEntries(const std::vector<Key> &keys)
     size_t size = keys.size();
     DistributedKv::Status status;
     for (size_t index = 0; index < size; index += MAX_BATCH_SIZE) {
-        std::vector<Key> batchKeys(keys.begin() + index,
-                                   keys.begin() + std::min(index + MAX_BATCH_SIZE, size));
-        status =  kvStore_->DeleteBatch(batchKeys);
+        std::vector<Key> batchKeys(keys.begin() + index, keys.begin() + std::min(index + MAX_BATCH_SIZE, size));
+        status = kvStore_->DeleteBatch(batchKeys);
         if (status != DistributedKv::Status::SUCCESS) {
             LOG_ERROR(UDMF_SERVICE, "KvStore deleteBatch failed, status: %{public}d.", status);
             return E_DB_ERROR;

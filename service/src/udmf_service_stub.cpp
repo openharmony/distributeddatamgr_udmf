@@ -19,19 +19,21 @@
 
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
-
 #include "logger.h"
+#include "tlv_util.h"
+#include "udmf_service_utils.h"
 #include "udmf_types_util.h"
 #include "unified_data.h"
 #include "unified_meta.h"
-#include "tlv_util.h"
-
 namespace OHOS {
 namespace UDMF {
 UdmfServiceStub::UdmfServiceStub()
 {
     memberFuncMap_[static_cast<uint32_t>(SET_DATA)] = &UdmfServiceStub::OnSetData;
     memberFuncMap_[static_cast<uint32_t>(GET_DATA)] = &UdmfServiceStub::OnGetData;
+    memberFuncMap_[static_cast<uint32_t>(GET_BATCH_DATA)] = &UdmfServiceStub::OnGetBatchData;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_DATA)] = &UdmfServiceStub::OnUpdateData;
+    memberFuncMap_[static_cast<uint32_t>(DELETE_DATA)] = &UdmfServiceStub::OnDeleteData;
     memberFuncMap_[static_cast<uint32_t>(GET_SUMMARY)] = &UdmfServiceStub::OnGetSummary;
     memberFuncMap_[static_cast<uint32_t>(ADD_PRIVILEGE)] = &UdmfServiceStub::OnAddPrivilege;
     memberFuncMap_[static_cast<uint32_t>(SYNC)] = &UdmfServiceStub::OnSync;
@@ -73,27 +75,8 @@ int32_t UdmfServiceStub::OnSetData(MessageParcel &data, MessageParcel &reply)
         return IPC_STUB_INVALID_DATA_ERR;
     }
     UnifiedData unifiedData;
-    int32_t count = data.ReadInt32();
-    if (count > MAX_RECORD_NUM) {
-        LOG_ERROR(UDMF_SERVICE, "Excessive record: %{public}d!", count);
-        return E_INVALID_VALUE;
-    }
-    for (int32_t index = 0; index < count; ++index) {
-        std::shared_ptr<UnifiedRecord> record;
-        int32_t size = data.ReadInt32();
-        if (size == 0) {
-            continue;
-        }
-        const uint8_t *rawData = reinterpret_cast<const uint8_t *>(data.ReadRawData(size));
-        if (rawData == nullptr) {
-            return IPC_STUB_INVALID_DATA_ERR;
-        }
-        std::vector<uint8_t> recordBytes(rawData, rawData + size);
-        auto recordTlv = TLVObject(recordBytes);
-        if (!TLVUtil::Reading(record, recordTlv)) {
-            return IPC_STUB_INVALID_DATA_ERR;
-        }
-        unifiedData.AddRecord(record);
+    if (UdmfServiceUtils::UnMarshalUnifiedData(data, unifiedData) != E_OK) {
+        return IPC_STUB_INVALID_DATA_ERR;
     }
     if (unifiedData.GetRecords().empty()) {
         LOG_ERROR(UDMF_SERVICE, "Empty data without any record!");
@@ -137,24 +120,94 @@ int32_t UdmfServiceStub::OnGetData(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR(UDMF_SERVICE, "Marshal ud data, key: %{public}s", query.key.c_str());
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
-    auto size = unifiedData.GetRecords().size();
-    if (!reply.WriteInt32(static_cast<int32_t>(size))) {
+    if (UdmfServiceUtils::MarshalUnifiedData(reply, unifiedData) != E_OK) {
         return E_WRITE_PARCEL_ERROR;
     }
+    return E_OK;
+}
+
+int32_t UdmfServiceStub::OnGetBatchData(MessageParcel &data, MessageParcel &reply)
+{
+    LOG_INFO(UDMF_SERVICE, "start");
+    QueryOption query;
+    if (!ITypesUtil::Unmarshal(data, query)) {
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal query");
+        return IPC_STUB_INVALID_DATA_ERR;
+    }
+    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
+    query.tokenId = token;
+    int32_t pid = static_cast<int>(IPCSkeleton::GetCallingPid());
+    query.pid = pid;
+    std::vector<UnifiedData> unifiedDataSet;
+    int32_t status = GetBatchData(query, unifiedDataSet);
+    LOG_DEBUG(UDMF_SERVICE, "Getdata : status =  %{public}d!", status);
+    if (!ITypesUtil::Marshal(reply, status)) {
+        LOG_ERROR(UDMF_SERVICE, "Marshal ud data, key: %{public}s", query.key.c_str());
+        return IPC_STUB_WRITE_PARCEL_ERR;
+    }
+    if (UdmfServiceUtils::MarshalBatchUnifiedData(reply, unifiedDataSet) != E_OK) {
+        return E_WRITE_PARCEL_ERROR;
+    }
+    return E_OK;
+}
+
+int32_t UdmfServiceStub::OnUpdateData(MessageParcel &data, MessageParcel &reply)
+{
+    LOG_INFO(UDMF_SERVICE, "start");
+    QueryOption query;
+    if (!ITypesUtil::Unmarshal(data, query)) {
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal query");
+        return IPC_STUB_INVALID_DATA_ERR;
+    }
+    UnifiedData unifiedData;
+    if (UdmfServiceUtils::UnMarshalUnifiedData(data, unifiedData) != E_OK) {
+        return IPC_STUB_INVALID_DATA_ERR;
+    }
+    if (unifiedData.GetRecords().empty()) {
+        LOG_ERROR(UDMF_SERVICE, "Empty data without any record!");
+        return E_INVALID_VALUE;
+    }
+    if (unifiedData.GetSize() > UdmfService::MAX_DATA_SIZE) {
+        LOG_ERROR(UDMF_SERVICE, "Exceeded data limit!");
+        return E_INVALID_VALUE;
+    }
     for (const auto &record : unifiedData.GetRecords()) {
-        if (record == nullptr) {
-            continue;
+        if (record->GetSize() > UdmfService::MAX_RECORD_SIZE) {
+            return E_INVALID_VALUE;
         }
-        std::vector<uint8_t> recordBytes;
-        auto recordTlv = TLVObject(recordBytes);
-        if (!TLVUtil::Writing(record, recordTlv)) {
-            LOG_ERROR(UDMF_SERVICE, "TLVUtil writing unified record failed.");
-            return E_WRITE_PARCEL_ERROR;
-        }
-        if (!reply.WriteInt32(static_cast<int32_t>(recordBytes.size())) ||
-            !reply.WriteRawData(recordBytes.data(), recordBytes.size())) {
-            return E_WRITE_PARCEL_ERROR;
-        }
+    }
+    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
+    query.tokenId = token;
+    int32_t pid = static_cast<int>(IPCSkeleton::GetCallingPid());
+    query.pid = pid;
+    int32_t status = UpdateData(query, unifiedData);
+    if (!ITypesUtil::Marshal(reply, status)) {
+        LOG_ERROR(UDMF_SERVICE, "Marshal update status failed, key: %{public}s", query.key.c_str());
+        return IPC_STUB_WRITE_PARCEL_ERR;
+    }
+    return E_OK;
+}
+
+int32_t UdmfServiceStub::OnDeleteData(MessageParcel &data, MessageParcel &reply)
+{
+    LOG_INFO(UDMF_SERVICE, "start");
+    QueryOption query;
+    if (!ITypesUtil::Unmarshal(data, query)) {
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal query");
+        return IPC_STUB_INVALID_DATA_ERR;
+    }
+    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
+    query.tokenId = token;
+    int32_t pid = static_cast<int>(IPCSkeleton::GetCallingPid());
+    query.pid = pid;
+    std::vector<UnifiedData> unifiedDataSet;
+    int32_t status = DeleteData(query, unifiedDataSet);
+    if (!ITypesUtil::Marshal(reply, status)) {
+        LOG_ERROR(UDMF_SERVICE, "Marshal ud data, key: %{public}s", query.key.c_str());
+        return IPC_STUB_WRITE_PARCEL_ERR;
+    }
+    if (UdmfServiceUtils::MarshalBatchUnifiedData(reply, unifiedDataSet) != E_OK) {
+        return E_WRITE_PARCEL_ERROR;
     }
     return E_OK;
 }

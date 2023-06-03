@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -13,31 +13,9 @@
 
 import("//build/ohos.gni")
 
-group("udmf_packages") {
-  if (is_standard_system) {
-    deps = [
-      "interfaces/innerkits:udmf_client",
-      "interfaces/jskits:udmf_data_napi",
-      "interfaces/jskits:udmf_napi",
-      "service:udmf_server",
-    ]
-  }
-}
-
-group("unittest") {
-  testonly = true
-
-  deps = [
-    "framework/innerkitsimpl/test/unittest:unittest",
-    "framework/jskitsimpl/unittest:unittest",
-  ]
-}
-
+#########################################################################################
 group("fuzztest") {
   testonly = true
 
-  deps = [
-    "framework/innerkitsimpl/test/fuzztest:fuzztest",
-    "service/test/fuzztest:fuzztest",
-  ]
+  deps = [ "udmfclient_fuzzer:fuzztest" ]
 }

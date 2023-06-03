@@ -23,6 +23,7 @@
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
+#include "napi_error_utils.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -135,6 +136,16 @@ private:
             GET_AND_THROW_LAST_ERROR((env)); \
             return;                          \
         }                                    \
+    } while (0)
+
+#define ASSERT_WITH_ERRCODE(ctxt, condition, errcode, message)                                     \
+    do {                                                                                           \
+        if (!(condition)) {                                                                        \
+            (ctxt)->status = napi_generic_failure;                                                 \
+            GenerateNapiError(errcode, (ctxt)->jsCode, (ctxt)->error);                             \
+            LOG_ERROR(UDMF_KITS_NAPI, "test (" #condition ") failed: " message);                   \
+            return;                                                                                \
+        }                                                                                          \
     } while (0)
 
 class NapiQueue {

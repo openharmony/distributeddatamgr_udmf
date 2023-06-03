@@ -29,7 +29,7 @@ UdmfClient &UdmfClient::GetInstance()
 
 Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
 {
-    LOG_INFO(UDMF_CLIENT, "start.");
+    LOG_DEBUG(UDMF_CLIENT, "start.");
     auto service = UdmfServiceClient::GetInstance();
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
@@ -40,9 +40,9 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
     return static_cast<Status>(ret);
 }
 
-Status UdmfClient::GetData(QueryOption &query, UnifiedData &unifiedData)
+Status UdmfClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
 {
-    LOG_INFO(UDMF_CLIENT, "start.");
+    LOG_DEBUG(UDMF_CLIENT, "start.");
     auto service = UdmfServiceClient::GetInstance();
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
@@ -50,12 +50,52 @@ Status UdmfClient::GetData(QueryOption &query, UnifiedData &unifiedData)
     }
 
     int32_t ret = service->GetData(query, unifiedData);
+    LOG_DEBUG(UDMF_SERVICE, "Getdata : ret =  %{public}d!", ret);
     return static_cast<Status>(ret);
 }
 
-Status UdmfClient::GetSummary(QueryOption &query, Summary &summary)
+Status UdmfClient::GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
 {
-    LOG_INFO(UDMF_CLIENT, "start.");
+    LOG_DEBUG(UDMF_CLIENT, "start.");
+    auto service = UdmfServiceClient::GetInstance();
+    if (service == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        return E_ERROR;
+    }
+
+    int32_t ret = service->GetBatchData(query, unifiedDataSet);
+    return static_cast<Status>(ret);
+}
+
+Status UdmfClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
+{
+    LOG_DEBUG(UDMF_CLIENT, "start.");
+    auto service = UdmfServiceClient::GetInstance();
+    if (service == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        return E_ERROR;
+    }
+
+    int32_t ret = service->UpdateData(query, unifiedData);
+    return static_cast<Status>(ret);
+}
+
+Status UdmfClient::DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
+{
+    LOG_DEBUG(UDMF_CLIENT, "start.");
+    auto service = UdmfServiceClient::GetInstance();
+    if (service == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        return E_ERROR;
+    }
+
+    int32_t ret = service->DeleteData(query, unifiedDataSet);
+    return static_cast<Status>(ret);
+}
+
+Status UdmfClient::GetSummary(const QueryOption &query, Summary &summary)
+{
+    LOG_DEBUG(UDMF_CLIENT, "start.");
     auto service = UdmfServiceClient::GetInstance();
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
@@ -66,9 +106,9 @@ Status UdmfClient::GetSummary(QueryOption &query, Summary &summary)
     return static_cast<Status>(ret);
 }
 
-Status UdmfClient::AddPrivilege(QueryOption &query, Privilege &privilege)
+Status UdmfClient::AddPrivilege(const QueryOption &query, Privilege &privilege)
 {
-    LOG_INFO(UDMF_CLIENT, "start.");
+    LOG_DEBUG(UDMF_CLIENT, "start.");
     auto service = UdmfServiceClient::GetInstance();
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
@@ -81,7 +121,7 @@ Status UdmfClient::AddPrivilege(QueryOption &query, Privilege &privilege)
 
 Status UdmfClient::Sync(const QueryOption &query, const std::vector<std::string> &devices)
 {
-    LOG_INFO(UDMF_CLIENT, "start.");
+    LOG_DEBUG(UDMF_CLIENT, "start.");
     auto service = UdmfServiceClient::GetInstance();
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");

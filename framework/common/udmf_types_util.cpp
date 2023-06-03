@@ -309,12 +309,12 @@ template<> bool Unmarshalling(CustomOption &output, MessageParcel &parcel)
 
 template<> bool Marshalling(const QueryOption &input, MessageParcel &parcel)
 {
-    return ITypesUtil::Marshal(parcel, input.key);
+    return ITypesUtil::Marshal(parcel, input.key, input.intention);
 }
 
 template<> bool Unmarshalling(QueryOption &output, MessageParcel &parcel)
 {
-    return ITypesUtil::Unmarshal(parcel, output.key);
+    return ITypesUtil::Unmarshal(parcel, output.key, output.intention);
 }
 
 template<> bool Marshalling(const Text &input, MessageParcel &parcel)
@@ -552,7 +552,7 @@ template<> bool Unmarshalling(SystemDefinedAppItem &output, MessageParcel &parce
     std::string abilityName;
     UDDetails details;
     if (!ITypesUtil::Unmarshal(parcel, appId, appName, appIconId, appLabelId, bundleName, abilityName, details)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal UDAppItem failed!");
+        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal SystemDefinedAppItem failed!");
         return false;
     }
     output.SetAppId(appId);
@@ -575,7 +575,7 @@ template<> bool Unmarshalling(SystemDefinedPixelMap &output, MessageParcel &parc
     std::vector<uint8_t> rawData;
     UDDetails details;
     if (!ITypesUtil::Unmarshal(parcel, rawData, details)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal UDPixelMap failed!");
+        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal SystemDefinedPixelMap failed!");
         return false;
     }
     output.SetRawData(rawData);
@@ -611,7 +611,7 @@ template<> bool Unmarshalling(UDType &output, MessageParcel &parcel)
 {
     int32_t type;
     if (!ITypesUtil::Unmarshal(parcel, type)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal PlainText failed!");
+        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal UDType failed!");
         return false;
     }
     if (type < TEXT || type >= UD_BUTT) {
@@ -632,11 +632,11 @@ template<> bool Unmarshalling(Intention &output, MessageParcel &parcel)
 {
     int32_t intention;
     if (!ITypesUtil::Unmarshal(parcel, intention)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal PlainText failed!");
+        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal Intention failed!");
         return false;
     }
-    if (!UnifiedDataUtils::IsValidIntention(intention)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "invalid UDIntention!");
+    if (intention < UD_INTENTION_BASE || intention > UD_INTENTION_BUTT) {
+        LOG_ERROR(UDMF_FRAMEWORK, "invalid Intention!");
         return false;
     }
     output = static_cast<Intention>(intention);

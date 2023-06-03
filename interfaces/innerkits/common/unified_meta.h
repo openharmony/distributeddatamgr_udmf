@@ -108,13 +108,17 @@ enum Intention : int32_t {
     UD_INTENTION_DRAG,
     UD_INTENTION_SHARE,
     UD_INTENTION_SYS,
-    UD_INTENTION_SUPERHUB,
+    UD_INTENTION_SUPER_HUB,
     UD_INTENTION_BUTT,
 };
 
 static const std::unordered_map<int32_t, std::string> UD_INTENTION_MAP {
     { UD_INTENTION_DRAG, "drag" },
-    { UD_INTENTION_SUPERHUB, "SuperHub" },
+    { UD_INTENTION_SUPER_HUB, "SuperHub" },
+};
+
+static const std::unordered_map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
+    { UD_INTENTION_SUPER_HUB, "SUPER_HUB" },
 };
 
 class UnifiedDataUtils {
@@ -126,6 +130,7 @@ public:
     static bool IsPersist(const Intention &intention);
     static bool IsPersist(const std::string &intention);
     static Intention GetIntentionByString(const std::string &intention);
+    static bool IsValidOptions(const std::string &key, std::string &intention);
 };
 } // namespace UDMF
 } // namespace OHOS
