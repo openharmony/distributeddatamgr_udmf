@@ -88,7 +88,6 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
         }                                                                                              \
         HiLog::Debug(lable, "%{public}d: %{public}s " fmt " ", __LINE__, __FUNCTION__, ##__VA_ARGS__); \
     } while (0)
-
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_LOGGER_H
