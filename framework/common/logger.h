@@ -39,21 +39,56 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
 
 // In order to improve performance, do not check the module range.
 // Besides, make sure module is less than UDMF_SERVICE.
-#define LOG_FATAL(module, fmt, ...)      \
-    (void)OHOS::HiviewDFX::HiLog::Fatal( \
-        LogLabel(), "%{public}d: %{public}s " fmt " ", __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define LOG_ERROR(module, fmt, ...)      \
-    (void)OHOS::HiviewDFX::HiLog::Error( \
-        LogLabel(), "%{public}d: %{public}s " fmt " ", __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define LOG_WARN(module, fmt, ...)      \
-    (void)OHOS::HiviewDFX::HiLog::Warn( \
-        LogLabel(), "%{public}d: %{public}s " fmt " ", __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define LOG_INFO(module, fmt, ...)      \
-    (void)OHOS::HiviewDFX::HiLog::Info( \
-        LogLabel(), "%{public}d: %{public}s " fmt " ", __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define LOG_DEBUG(module, fmt, ...)      \
-    (void)OHOS::HiviewDFX::HiLog::Debug( \
-        LogLabel(), "%{public}d: %{public}s " fmt " ", __LINE__, __FUNCTION__, ##__VA_ARGS__)
+#define LOG_FATAL(module, fmt, ...)                                                                    \
+    do {                                                                                               \
+        using HiLog = OHOS::HiviewDFX::HiLog;                                                          \
+        auto lable = LogLabel();                                                                       \
+        if (!HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_FATAL)) {                          \
+            break;                                                                                     \
+        }                                                                                              \
+        HiLog::Fatal(lable, "%{public}d: %{public}s " fmt " ", __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+    } while (0)
+
+#define LOG_ERROR(module, fmt, ...)                                                                    \
+    do {                                                                                               \
+        using HiLog = OHOS::HiviewDFX::HiLog;                                                          \
+        auto lable = LogLabel();                                                                       \
+        if (!HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_ERROR)) {                          \
+            break;                                                                                     \
+        }                                                                                              \
+        HiLog::Error(lable, "%{public}d: %{public}s " fmt " ", __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+    } while (0)
+
+#define LOG_WARN(module, fmt, ...)                                                                     \
+    do {                                                                                               \
+        using HiLog = OHOS::HiviewDFX::HiLog;                                                          \
+        auto lable = LogLabel();                                                                       \
+        if (!HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_WARN)) {                           \
+            break;                                                                                     \
+        }                                                                                              \
+        HiLog::Warn(lable, "%{public}d: %{public}s " fmt " ", __LINE__, __FUNCTION__, ##__VA_ARGS__);  \
+    } while (0)
+
+#define LOG_INFO(module, fmt, ...)                                                                     \
+    do {                                                                                               \
+        using HiLog = OHOS::HiviewDFX::HiLog;                                                          \
+        auto lable = LogLabel();                                                                       \
+        if (!HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_INFO)) {                           \
+            break;                                                                                     \
+        }                                                                                              \
+        HiLog::Info(lable, "%{public}d: %{public}s " fmt " ", __LINE__, __FUNCTION__, ##__VA_ARGS__);  \
+    } while (0)
+
+#define LOG_DEBUG(module, fmt, ...)                                                                    \
+    do {                                                                                               \
+        using HiLog = OHOS::HiviewDFX::HiLog;                                                          \
+        auto lable = LogLabel();                                                                       \
+        if (!HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_DEBUG)) {                          \
+            break;                                                                                     \
+        }                                                                                              \
+        HiLog::Debug(lable, "%{public}d: %{public}s " fmt " ", __LINE__, __FUNCTION__, ##__VA_ARGS__); \
+    } while (0)
+
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_LOGGER_H
