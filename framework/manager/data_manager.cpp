@@ -107,7 +107,6 @@ int32_t DataManager::RetrieveData(const QueryOption &query, UnifiedData &unified
     std::shared_ptr<Runtime> runtime = unifiedData.GetRuntime();
     CheckerManager::CheckInfo info;
     info.tokenId = query.tokenId;
-    info.pid = query.pid;
     if (!CheckerManager::GetInstance().IsValid(runtime->privileges, info)) {
         return E_INVALID_OPERATION;
     }

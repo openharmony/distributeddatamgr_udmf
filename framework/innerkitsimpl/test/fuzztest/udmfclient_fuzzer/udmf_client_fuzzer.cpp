@@ -39,7 +39,7 @@ using namespace OHOS::Security::AccessToken;
 using namespace OHOS::UDMF;
 
 namespace OHOS {
-void SetHapToken()
+void AllocHapToken()
 {
     HapInfoParams info = {
         .userID = 100,
@@ -79,7 +79,7 @@ void SetHapToken()
 
 void SetUpTestCase()
 {
-    SetHapToken();
+    AllocHapToken();
 }
 
 void TearDown()
@@ -103,6 +103,12 @@ void SetNativeToken()
     AccessTokenKit::ReloadNativeTokenInfo();
 }
 
+void SetHapToken()
+{
+    auto tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo", 0);
+    SetSelfTokenID(tokenId);
+}
+
 void SetDataTextFuzz(const uint8_t *data, size_t size)
 {
     std::string skey(data, data + size);
@@ -122,7 +128,6 @@ void SetDataTextFuzz(const uint8_t *data, size_t size)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.pid = getpid();
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
@@ -156,7 +161,6 @@ void SetDataPlainTextFuzz(const uint8_t *data, size_t size)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.pid = getpid();
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
@@ -190,7 +194,6 @@ void SetDataHtmlFuzz(const uint8_t *data, size_t size)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.pid = getpid();
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
@@ -224,7 +227,6 @@ void SetDataLinkFuzz(const uint8_t *data, size_t size)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.pid = getpid();
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
@@ -255,7 +257,6 @@ void SetDataFileFuzz(const uint8_t *data, size_t size)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.pid = getpid();
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
@@ -283,7 +284,6 @@ void SetDataImageFuzz(const uint8_t *data, size_t size)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.pid = getpid();
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
@@ -311,7 +311,6 @@ void SetDataVideoFuzz(const uint8_t *data, size_t size)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.pid = getpid();
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
@@ -341,7 +340,6 @@ void SetDataSystemDefinedRecordFuzz(const uint8_t *data, size_t size)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.pid = getpid();
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
@@ -382,7 +380,6 @@ void SetDataSystemDefinedFormFuzz(const uint8_t *data, size_t size)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.pid = getpid();
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
@@ -424,7 +421,6 @@ void SetDataSystemDefinedAppItemFuzz(const uint8_t *data, size_t size)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.pid = getpid();
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
@@ -456,7 +452,6 @@ void SetDataSystemDefinedPixelMapFuzz(const uint8_t *data, size_t size)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.pid = getpid();
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);

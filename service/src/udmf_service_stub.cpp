@@ -112,8 +112,6 @@ int32_t UdmfServiceStub::OnGetData(MessageParcel &data, MessageParcel &reply)
     }
     uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
-    int32_t pid = static_cast<int>(IPCSkeleton::GetCallingPid());
-    query.pid = pid;
     UnifiedData unifiedData;
     int32_t status = GetData(query, unifiedData);
     if (!ITypesUtil::Marshal(reply, status)) {
@@ -136,8 +134,6 @@ int32_t UdmfServiceStub::OnGetBatchData(MessageParcel &data, MessageParcel &repl
     }
     uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
-    int32_t pid = static_cast<int>(IPCSkeleton::GetCallingPid());
-    query.pid = pid;
     std::vector<UnifiedData> unifiedDataSet;
     int32_t status = GetBatchData(query, unifiedDataSet);
     LOG_DEBUG(UDMF_SERVICE, "Getdata : status =  %{public}d!", status);
@@ -178,8 +174,6 @@ int32_t UdmfServiceStub::OnUpdateData(MessageParcel &data, MessageParcel &reply)
     }
     uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
-    int32_t pid = static_cast<int>(IPCSkeleton::GetCallingPid());
-    query.pid = pid;
     int32_t status = UpdateData(query, unifiedData);
     if (!ITypesUtil::Marshal(reply, status)) {
         LOG_ERROR(UDMF_SERVICE, "Marshal update status failed, key: %{public}s", query.key.c_str());
@@ -198,8 +192,6 @@ int32_t UdmfServiceStub::OnDeleteData(MessageParcel &data, MessageParcel &reply)
     }
     uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
-    int32_t pid = static_cast<int>(IPCSkeleton::GetCallingPid());
-    query.pid = pid;
     std::vector<UnifiedData> unifiedDataSet;
     int32_t status = DeleteData(query, unifiedDataSet);
     if (!ITypesUtil::Marshal(reply, status)) {

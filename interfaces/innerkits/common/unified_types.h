@@ -38,7 +38,6 @@ struct Summary {
 
 struct Privilege {
     uint32_t tokenId;
-    int32_t pid;
     std::string readPermission;
     std::string writePermission;
 };
@@ -78,7 +77,6 @@ struct QueryOption {
     std::string key;
     Intention intention {};
     int32_t tokenId {};
-    int32_t pid {};
 };
 } // namespace UDMF
 } // namespace OHOS

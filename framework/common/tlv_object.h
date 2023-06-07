@@ -165,7 +165,6 @@ public:
     void Count(const Privilege &value)
     {
         Count(value.tokenId);
-        Count(value.pid);
         Count(value.readPermission);
         Count(value.writePermission);
     }
