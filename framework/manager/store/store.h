@@ -17,16 +17,19 @@
 #define UDMF_STORE_H
 
 #include <string>
+#include <shared_mutex>
 
 #include "error_code.h"
 #include "unified_data.h"
 #include "unified_key.h"
 #include "unified_types.h"
 
+
 namespace OHOS {
 namespace UDMF {
 class Store {
 public:
+    using Time = std::chrono::steady_clock::time_point;
     virtual Status Put(const UnifiedData &unifiedData) = 0;
     virtual Status Get(const std::string &key, UnifiedData &unifiedData) = 0;
     virtual Status GetSummary(const std::string &key, Summary &summary) = 0;
@@ -38,6 +41,22 @@ public:
     virtual bool Init() = 0;
     virtual void Close() = 0;
     virtual Status GetBatchData(const std::string &dataPrefix, std::vector<UnifiedData> &unifiedDataSet) = 0;
+
+    bool operator<(const Time &time) const
+    {
+        std::shared_lock<decltype(timeMutex_)> lock(timeMutex_);
+        return time_ < time;
+    }
+
+    void updateTime()
+    {
+        std::unique_lock<std::shared_mutex> lock(timeMutex_);
+        time_ = std::chrono::steady_clock::now() + std::chrono::minutes(INTERVAL);
+    }
+private:
+    static constexpr int64_t INTERVAL = 1; // 1 min
+    mutable Time time_;
+    mutable std::shared_mutex timeMutex_;
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -31,6 +31,7 @@ const std::string RuntimeStore::BASE_DIR = "/data/service/el1/public/database/di
 
 RuntimeStore::RuntimeStore(const std::string &storeId) : storeId_({ storeId })
 {
+    updateTime();
     LOG_INFO(UDMF_SERVICE, "Construct runtimeStore: %{public}s.", storeId_.storeId.c_str());
 }
 
@@ -42,6 +43,7 @@ RuntimeStore::~RuntimeStore()
 
 Status RuntimeStore::Put(const UnifiedData &unifiedData)
 {
+    updateTime();
     std::vector<Entry> entries;
     std::string unifiedKey = unifiedData.GetRuntime()->key.GetUnifiedKey();
     // add unified record
@@ -76,6 +78,7 @@ Status RuntimeStore::Put(const UnifiedData &unifiedData)
 
 Status RuntimeStore::Get(const std::string &key, UnifiedData &unifiedData)
 {
+    updateTime();
     std::vector<Entry> entries;
     if (GetEntries(key, entries) != E_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "GetEntries failed, dataPrefix: %{public}s.", key.c_str());
@@ -90,6 +93,7 @@ Status RuntimeStore::Get(const std::string &key, UnifiedData &unifiedData)
 
 Status RuntimeStore::GetSummary(const std::string &key, Summary &summary)
 {
+    updateTime();
     UnifiedData unifiedData;
     if (Get(key, unifiedData) != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "Get unified data failed.");
@@ -111,6 +115,7 @@ Status RuntimeStore::GetSummary(const std::string &key, Summary &summary)
 
 Status RuntimeStore::Update(const UnifiedData &unifiedData)
 {
+    updateTime();
     std::string key = unifiedData.GetRuntime()->key.key;
     if (Delete(key) != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "Delete unified data failed.");
@@ -125,6 +130,7 @@ Status RuntimeStore::Update(const UnifiedData &unifiedData)
 
 Status RuntimeStore::Delete(const std::string &key)
 {
+    updateTime();
     std::vector<Entry> entries;
     if (GetEntries(key, entries) != E_OK) {
         LOG_ERROR(UDMF_FRAMEWORK, "GetEntries failed, dataPrefix: %{public}s.", key.c_str());
@@ -143,6 +149,7 @@ Status RuntimeStore::Delete(const std::string &key)
 
 Status RuntimeStore::DeleteBatch(const std::vector<std::string> &unifiedKeys)
 {
+    updateTime();
     LOG_DEBUG(UDMF_SERVICE, "called!");
     if (unifiedKeys.empty()) {
         LOG_DEBUG(UDMF_SERVICE, "No need to delete!");
@@ -159,6 +166,7 @@ Status RuntimeStore::DeleteBatch(const std::vector<std::string> &unifiedKeys)
 
 Status RuntimeStore::Sync(const std::vector<std::string> &devices)
 {
+    updateTime();
     SameProcessIpcGuard ipcGuard;
     DistributedKv::Status status = kvStore_->Sync(devices, SyncMode::PULL);
     if (status != DistributedKv::Status::SUCCESS) {
@@ -170,11 +178,13 @@ Status RuntimeStore::Sync(const std::vector<std::string> &devices)
 
 Status RuntimeStore::Clear()
 {
+    updateTime();
     return Delete(DATA_PREFIX);
 }
 
 Status RuntimeStore::GetBatchData(const std::string &dataPrefix, std::vector<UnifiedData> &unifiedDataSet)
 {
+    updateTime();
     std::vector<Entry> entries;
     auto status = GetEntries(dataPrefix, entries);
     if (status != E_OK) {
