@@ -72,7 +72,7 @@ describe('UdmfJSTest', function () {
     expect(records[0].abstract).assertEqual('abstract');
     console.info("UdmfPlainTextTest end")
   })
-  
+
   /**
    * @tc.name UdmfHyperlinkTest
    * @tc.desc Test Js Api Hyperlink testcase

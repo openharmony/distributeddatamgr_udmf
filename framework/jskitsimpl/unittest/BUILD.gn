@@ -21,8 +21,7 @@ ohos_js_unittest("UDMFJsTest") {
 
   hap_profile = "./config.json"
 
-  certificate_profile =
-      "${developer_test_path}/signature/openharmony_sx.p7b"
+  certificate_profile = "${developer_test_path}/signature/openharmony_sx.p7b"
 }
 
 group("unittest") {
