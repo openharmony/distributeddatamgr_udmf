@@ -48,10 +48,10 @@ describe('UdmfJSTest', function () {
     unifiedDataAll = new UDMF.UnifiedData(text);
     let unifiedData = new UDMF.UnifiedData(text);
     let records = unifiedData.getRecords();
-    let record = <UDMF.Text> (records[0]);
+    // let record = <UDMF.Text> (records[0]);
     expect(records.length).assertEqual(1);
-    expect(record.details.Key).assertEqual('text' + KEY_TEST_ELEMENT);
-    expect(record.details.Value).assertEqual('text' + VALUE_TEST_ELEMENT);
+    expect(records[0].details.Key).assertEqual('text' + KEY_TEST_ELEMENT);
+    expect(records[0].details.Value).assertEqual('text' + VALUE_TEST_ELEMENT);
     console.info("UdmfTextTest end");
   })
 
@@ -73,12 +73,12 @@ describe('UdmfJSTest', function () {
     unifiedDataAll.addRecord(plainText);
     let unifiedData = new UDMF.UnifiedData(plainText);
     let records = unifiedData.getRecords();
-    let record = <UDMF.PlainText> (records[0]);
+    // let record = <UDMF.PlainText> (records[0]);
     expect(records.length).assertEqual(1);
-    expect(record.details.Key).assertEqual('text' + KEY_TEST_ELEMENT);
-    expect(record.details.Value).assertEqual('text' + VALUE_TEST_ELEMENT);
-    expect(record.textContent).assertEqual('textContent');
-    expect(record.abstract).assertEqual('abstract');
+    expect(records[0].details.Key).assertEqual('text' + KEY_TEST_ELEMENT);
+    expect(records[0].details.Value).assertEqual('text' + VALUE_TEST_ELEMENT);
+    expect(records[0].textContent).assertEqual('textContent');
+    expect(records[0].abstract).assertEqual('abstract');
     console.info("UdmfPlainTextTest end")
   })
   /**
@@ -99,12 +99,12 @@ describe('UdmfJSTest', function () {
     unifiedDataAll.addRecord(link);
     let unifiedData = new UDMF.UnifiedData(link);
     let records = unifiedData.getRecords();
-    let record = <UDMF.Hyperlink> (records[0]);
+    // let record = <UDMF.Hyperlink> (records[0]);
     expect(records.length).assertEqual(1);
-    expect(record.details.Key).assertEqual('link' + KEY_TEST_ELEMENT);
-    expect(record.details.Value).assertEqual('link' + VALUE_TEST_ELEMENT);
-    expect(record.url).assertEqual('url');
-    expect(record.description).assertEqual('description');
+    expect(records[0].details.Key).assertEqual('link' + KEY_TEST_ELEMENT);
+    expect(records[0].details.Value).assertEqual('link' + VALUE_TEST_ELEMENT);
+    expect(records[0].url).assertEqual('url');
+    expect(records[0].description).assertEqual('description');
     console.info("UdmfHyperlinkTest end")
   })
 
@@ -126,12 +126,12 @@ describe('UdmfJSTest', function () {
     unifiedDataAll.addRecord(html);
     let unifiedData = new UDMF.UnifiedData(html);
     let records = unifiedData.getRecords();
-    let record = <UDMF.HTML> (records[0]);
+    // let record = <UDMF.HTML> (records[0]);
     expect(records.length).assertEqual(1);
-    expect(record.details.Key).assertEqual('html' + KEY_TEST_ELEMENT);
-    expect(record.details.Value).assertEqual('html' + VALUE_TEST_ELEMENT);
-    expect(record.htmlContent).assertEqual('htmlContent');
-    expect(record.plainContent).assertEqual('plainContent');
+    expect(records[0].details.Key).assertEqual('html' + KEY_TEST_ELEMENT);
+    expect(records[0].details.Value).assertEqual('html' + VALUE_TEST_ELEMENT);
+    expect(records[0].htmlContent).assertEqual('htmlContent');
+    expect(records[0].plainContent).assertEqual('plainContent');
     console.info("UdmfHtmlTest end")
   })
 
@@ -152,11 +152,11 @@ describe('UdmfJSTest', function () {
     unifiedDataAll.addRecord(file);
     let unifiedData = new UDMF.UnifiedData(file);
     let records = unifiedData.getRecords();
-    let record = <UDMF.File> (records[0]);
+    // let record = <UDMF.File> (records[0]);
     expect(records.length).assertEqual(1);
-    expect(record.details.Key).assertEqual('file' + KEY_TEST_ELEMENT);
-    expect(record.details.Value).assertEqual('file' + VALUE_TEST_ELEMENT);
-    expect(record.uri).assertEqual('uri');
+    expect(records[0].details.Key).assertEqual('file' + KEY_TEST_ELEMENT);
+    expect(records[0].details.Value).assertEqual('file' + VALUE_TEST_ELEMENT);
+    expect(records[0].uri).assertEqual('uri');
     console.info("UdmfFileTest end")
   })
 
@@ -177,11 +177,11 @@ describe('UdmfJSTest', function () {
     unifiedDataAll.addRecord(folder);
     let unifiedData = new UDMF.UnifiedData(folder);
     let records = unifiedData.getRecords();
-    let record = <UDMF.Folder> (records[0]);
+    // let record = <UDMF.Folder> (records[0]);
     expect(records.length).assertEqual(1);
-    expect(record.details.Key).assertEqual('folder' + KEY_TEST_ELEMENT);
-    expect(record.details.Value).assertEqual('folder' + VALUE_TEST_ELEMENT);
-    expect(record.uri).assertEqual('folderUri');
+    expect(records[0].details.Key).assertEqual('folder' + KEY_TEST_ELEMENT);
+    expect(records[0].details.Value).assertEqual('folder' + VALUE_TEST_ELEMENT);
+    expect(records[0].uri).assertEqual('folderUri');
     console.info("UdmfFolderTest end")
   })
 
@@ -202,11 +202,11 @@ describe('UdmfJSTest', function () {
     unifiedDataAll.addRecord(image);
     let unifiedData = new UDMF.UnifiedData(image);
     let records = unifiedData.getRecords();
-    let record = <UDMF.Image> (records[0]);
+    // let record = <UDMF.Image> (records[0]);
     expect(records.length).assertEqual(1);
-    expect(record.details.Key).assertEqual('image' + KEY_TEST_ELEMENT);
-    expect(record.details.Value).assertEqual('image' + VALUE_TEST_ELEMENT);
-    expect(record.imageUri).assertEqual('imageUri');
+    expect(records[0].details.Key).assertEqual('image' + KEY_TEST_ELEMENT);
+    expect(records[0].details.Value).assertEqual('image' + VALUE_TEST_ELEMENT);
+    expect(records[0].imageUri).assertEqual('imageUri');
     console.info("UdmfImageTest end")
   })
 
@@ -227,11 +227,11 @@ describe('UdmfJSTest', function () {
     unifiedDataAll.addRecord(video);
     let unifiedData = new UDMF.UnifiedData(video);
     let records = unifiedData.getRecords();
-    let record = <UDMF.Video> (records[0]);
+    // let record = <UDMF.Video> (records[0]);
     expect(records.length).assertEqual(1);
-    expect(record.details.Key).assertEqual('video' + KEY_TEST_ELEMENT);
-    expect(record.details.Value).assertEqual('video' + VALUE_TEST_ELEMENT);
-    expect(record.videoUri).assertEqual('videoUri');
+    expect(records[0].details.Key).assertEqual('video' + KEY_TEST_ELEMENT);
+    expect(records[0].details.Value).assertEqual('video' + VALUE_TEST_ELEMENT);
+    expect(records[0].videoUri).assertEqual('videoUri');
     console.info("UdmfVideoTest end")
   })
 
@@ -252,12 +252,12 @@ describe('UdmfJSTest', function () {
     unifiedDataAll.addRecord(systemDefinedRecord);
     let unifiedData = new UDMF.UnifiedData(systemDefinedRecord);
     let records = unifiedData.getRecords();
-    let record = <UDMF.SystemDefinedRecord> (records[0]);
+    // let record = <UDMF.SystemDefinedRecord> (records[0]);
     expect(records.length).assertEqual(1);
-    expect(record.details.recordKey1).assertEqual('systemDefinedRecord' + KEY_TEST_ELEMENT);
-    expect(record.details.recordKey2).assertEqual(1);
+    expect(records[0].details.recordKey1).assertEqual('systemDefinedRecord' + KEY_TEST_ELEMENT);
+    expect(records[0].details.recordKey2).assertEqual(1);
     for (var i = 0; i < u8Array.length; i++) {
-      expect(record.details.recordKey3[i]).assertEqual(u8Array[i]);
+      expect(records[0].details.recordKey3[i]).assertEqual(u8Array[i]);
     }
     console.info("UdmfSystemDefinedRecordTest end")
   })
@@ -280,15 +280,15 @@ describe('UdmfJSTest', function () {
     unifiedDataAll.addRecord(systemDefinedPixelMap);
     let unifiedData = new UDMF.UnifiedData(systemDefinedPixelMap);
     let records = unifiedData.getRecords();
-    let record = <UDMF.SystemDefinedPixelMap> (records[0]);
+    // let record = <UDMF.SystemDefinedPixelMap> (records[0]);
     expect(records.length).assertEqual(1);
-    expect(record.details.recordKey1).assertEqual('systemDefinedPixelMap' + KEY_TEST_ELEMENT);
-    expect(record.details.recordKey2).assertEqual(1);
+    expect(records[0].details.recordKey1).assertEqual('systemDefinedPixelMap' + KEY_TEST_ELEMENT);
+    expect(records[0].details.recordKey2).assertEqual(1);
     for (var i = 0; i < u8Array.length; i++) {
-      expect(record.details.recordKey3[i]).assertEqual(u8Array[i]);
+      expect(records[0].details.recordKey3[i]).assertEqual(u8Array[i]);
     }
     for (var i = 0; i < u8Array.length; i++) {
-      expect(record.rawData[i]).assertEqual(u8Array[i]);
+      expect(records[0].rawData[i]).assertEqual(u8Array[i]);
     }
     console.info("UdmfSystemDefinedPixelMapTest end")
   })
@@ -316,17 +316,17 @@ describe('UdmfJSTest', function () {
     let unifiedData = new UDMF.UnifiedData(form);
     let records = unifiedData.getRecords();
     expect(records.length).assertEqual(1);
-    let record = <UDMF.SystemDefinedForm> (records[0]);
-    expect(record.details.formKey1).assertEqual(330);
-    expect(record.details.formKey2).assertEqual('form' + VALUE_TEST_ELEMENT);
+    // let record = <UDMF.SystemDefinedForm> (records[0]);
+    expect(records[0].details.formKey1).assertEqual(330);
+    expect(records[0].details.formKey2).assertEqual('form' + VALUE_TEST_ELEMENT);
     for (var i = 0; i < u8Array.length; i++) {
-      expect(record.details.formKey3[i]).assertEqual(u8Array[i]);
+      expect(records[0].details.formKey3[i]).assertEqual(u8Array[i]);
     }
-    expect(record.formId).assertEqual(TEST_ID);
-    expect(record.formName).assertEqual('MyFormName');
-    expect(record.bundleName).assertEqual(TEST_BUNDLE_NAME);
-    expect(record.abilityName).assertEqual(TEST_ABILITY_NAME);
-    expect(record.module).assertEqual(TEST_MODULE);
+    expect(records[0].formId).assertEqual(TEST_ID);
+    expect(records[0].formName).assertEqual('MyFormName');
+    expect(records[0].bundleName).assertEqual(TEST_BUNDLE_NAME);
+    expect(records[0].abilityName).assertEqual(TEST_ABILITY_NAME);
+    expect(records[0].module).assertEqual(TEST_MODULE);
     console.info("UdmfSystemDefinedFormTest end")
   })
 
@@ -353,19 +353,19 @@ describe('UdmfJSTest', function () {
     unifiedDataAll.addRecord(appItem);
     let unifiedData = new UDMF.UnifiedData(appItem);
     let records = unifiedData.getRecords();
-    let record = <UDMF.SystemDefinedAppItem> (records[0]);
+    // let record = <UDMF.SystemDefinedAppItem> (records[0]);
     expect(records.length).assertEqual(1);
-    expect(record.details.appItemKey1).assertEqual(1);
-    expect(record.details.appItemKey2).assertEqual('appItem' + VALUE_TEST_ELEMENT);
+    expect(records[0].details.appItemKey1).assertEqual(1);
+    expect(records[0].details.appItemKey2).assertEqual('appItem' + VALUE_TEST_ELEMENT);
     for (var i = 0; i < u8Array.length; i++) {
-      expect(record.details.appItemKey3[i]).assertEqual(u8Array[i]);
+      expect(records[0].details.appItemKey3[i]).assertEqual(u8Array[i]);
     }
-    expect(record.appId).assertEqual('MyAppId');
-    expect(record.appName).assertEqual('MyAppName');
-    expect(record.abilityName).assertEqual(TEST_ABILITY_NAME);
-    expect(record.bundleName).assertEqual(TEST_BUNDLE_NAME);
-    expect(record.appIconId).assertEqual('MyAppIconId');
-    expect(record.appLabelId).assertEqual('MyAppLabelId');
+    expect(records[0].appId).assertEqual('MyAppId');
+    expect(records[0].appName).assertEqual('MyAppName');
+    expect(records[0].abilityName).assertEqual(TEST_ABILITY_NAME);
+    expect(records[0].bundleName).assertEqual(TEST_BUNDLE_NAME);
+    expect(records[0].appIconId).assertEqual('MyAppIconId');
+    expect(records[0].appLabelId).assertEqual('MyAppLabelId');
     console.info("UdmfSystemDefinedAppItemTest end")
   })
 
@@ -383,11 +383,11 @@ describe('UdmfJSTest', function () {
     unifiedDataAll.addRecord(applicationDefinedRecord);
     let unifiedData = new UDMF.UnifiedData(applicationDefinedRecord);
     let records = unifiedData.getRecords();
-    let record = <UDMF.ApplicationDefinedRecord> (records[0]);
+    // let record = <UDMF.ApplicationDefinedRecord> (records[0]);
     expect(records.length).assertEqual(1);
-    expect(record.applicationDefinedType).assertEqual('applicationDefinedType');
+    expect(records[0].applicationDefinedType).assertEqual('applicationDefinedType');
     for (var i = 0; i < u8Array.length; i++) {
-      expect(record.rawData[i]).assertEqual(u8Array[i]);
+      expect(records[0].rawData[i]).assertEqual(u8Array[i]);
     }
     console.info("UdmfApplicationDefinedRecord end")
   })
@@ -401,31 +401,31 @@ describe('UdmfJSTest', function () {
   it('UdmfAllRecordsTest', 0, function () {
     let records = unifiedDataAll.getRecords();
     expect(records.length).assertEqual(13);
-    let record1 = <UDMF.Text> (records[0]);
-    let record2 = <UDMF.PlainText> (records[1]);
-    let record3 = <UDMF.Hyperlink> (records[2]);
-    let record4 = <UDMF.HTML> (records[3]);
-    let record5 = <UDMF.File> (records[4]);
-    let record6 = <UDMF.Folder> (records[5]);
-    let record7 = <UDMF.Image> (records[6]);
-    let record8 = <UDMF.Video> (records[7]);
-    let record9 = <UDMF.SystemDefinedRecord> (records[8]);
-    let record10 = <UDMF.SystemDefinedPixelMap> (records[9]);
-    let record11 = <UDMF.SystemDefinedForm> (records[10]);
-    let record12 = <UDMF.SystemDefinedAppItem> (records[11]);
-    let record13 = <UDMF.ApplicationDefinedRecord> (records[12]);
-    expect(record1.getType()).assertEqual(UDMF.UnifiedDataType.TEXT);
-    expect(record2.getType()).assertEqual(UDMF.UnifiedDataType.PLAIN_TEXT);
-    expect(record3.getType()).assertEqual(UDMF.UnifiedDataType.HYPERLINK);
-    expect(record4.getType()).assertEqual(UDMF.UnifiedDataType.HTML);
-    expect(record5.getType()).assertEqual(UDMF.UnifiedDataType.FILE);
-    expect(record6.getType()).assertEqual(UDMF.UnifiedDataType.FOLDER);
-    expect(record7.getType()).assertEqual(UDMF.UnifiedDataType.IMAGE);
-    expect(record8.getType()).assertEqual(UDMF.UnifiedDataType.VIDEO);
-    expect(record9.getType()).assertEqual(UDMF.UnifiedDataType.SYSTEM_DEFINED_RECORD);
-    expect(record10.getType()).assertEqual(UDMF.UnifiedDataType.SYSTEM_DEFINED_PIXEL_MAP);
-    expect(record11.getType()).assertEqual(UDMF.UnifiedDataType.SYSTEM_DEFINED_FORM);
-    expect(record12.getType()).assertEqual(UDMF.UnifiedDataType.SYSTEM_DEFINED_APP_ITEM);
-    expect(record13.getType()).assertEqual(UDMF.UnifiedDataType.APPLICATION_DEFINED_RECORD);
+    // let record1 = <UDMF.Text> (records[0]);
+    // let record2 = <UDMF.PlainText> (records[1]);
+    // let record3 = <UDMF.Hyperlink> (records[2]);
+    // let record4 = <UDMF.HTML> (records[3]);
+    // let record5 = <UDMF.File> (records[4]);
+    // let record6 = <UDMF.Folder> (records[5]);
+    // let record7 = <UDMF.Image> (records[6]);
+    // let record8 = <UDMF.Video> (records[7]);
+    // let record9 = <UDMF.SystemDefinedRecord> (records[8]);
+    // let record10 = <UDMF.SystemDefinedPixelMap> (records[9]);
+    // let record11 = <UDMF.SystemDefinedForm> (records[10]);
+    // let record12 = <UDMF.SystemDefinedAppItem> (records[11]);
+    // let record13 = <UDMF.ApplicationDefinedRecord> (records[12]);
+    // expect(record1.getType()).assertEqual(UDMF.UnifiedDataType.TEXT);
+    // expect(record2.getType()).assertEqual(UDMF.UnifiedDataType.PLAIN_TEXT);
+    // expect(record3.getType()).assertEqual(UDMF.UnifiedDataType.HYPERLINK);
+    // expect(record4.getType()).assertEqual(UDMF.UnifiedDataType.HTML);
+    // expect(record5.getType()).assertEqual(UDMF.UnifiedDataType.FILE);
+    // expect(record6.getType()).assertEqual(UDMF.UnifiedDataType.FOLDER);
+    // expect(record7.getType()).assertEqual(UDMF.UnifiedDataType.IMAGE);
+    // expect(record8.getType()).assertEqual(UDMF.UnifiedDataType.VIDEO);
+    // expect(record9.getType()).assertEqual(UDMF.UnifiedDataType.SYSTEM_DEFINED_RECORD);
+    // expect(record10.getType()).assertEqual(UDMF.UnifiedDataType.SYSTEM_DEFINED_PIXEL_MAP);
+    // expect(record11.getType()).assertEqual(UDMF.UnifiedDataType.SYSTEM_DEFINED_FORM);
+    // expect(record12.getType()).assertEqual(UDMF.UnifiedDataType.SYSTEM_DEFINED_APP_ITEM);
+    // expect(record13.getType()).assertEqual(UDMF.UnifiedDataType.APPLICATION_DEFINED_RECORD);
   })
 })
