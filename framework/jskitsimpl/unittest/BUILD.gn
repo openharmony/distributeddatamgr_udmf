@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("//foundation/distributeddatamgr/udmf/udmf.gni")
 
 module_output_path = "udmf/jskitsimpl"
 
@@ -21,7 +22,7 @@ ohos_js_unittest("UDMFJsTest") {
   hap_profile = "./config.json"
 
   certificate_profile =
-      "//test/testfwk/developer_test/signature/openharmony_sx.p7b"
+      "${developer_test_path}/signature/openharmony_sx.p7b"
 }
 
 group("unittest") {

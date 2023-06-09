@@ -40,3 +40,5 @@ udmf_interfaces_path = "${udmf_root_path}/interfaces"
 udmf_service_path = "${udmf_root_path}/service"
 
 kv_store_path = "//foundation/distributeddatamgr/kv_store"
+
+developer_test_path = "//test/testfwk/developer_test"
