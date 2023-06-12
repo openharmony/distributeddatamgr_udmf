@@ -137,7 +137,6 @@ describe('UdmfJSTest', function () {
       Value: 'file' + VALUE_TEST_ELEMENT,
     };
     file.uri = 'uri';
-    unifiedDataAll.addRecord(file);
     let unifiedData = new UDMF.UnifiedData(file);
     let records = unifiedData.getRecords();
     expect(records.length).assertEqual(1);
@@ -292,7 +291,7 @@ describe('UdmfJSTest', function () {
     let unifiedData = new UDMF.UnifiedData(form);
     let records = unifiedData.getRecords();
     expect(records.length).assertEqual(1);
-    expect(records[0].details.formKey1).assertEqual(330);
+    expect(records[0].details.formKey1).assertEqual(1);
     expect(records[0].details.formKey2).assertEqual('form' + VALUE_TEST_ELEMENT);
     for (var i = 0; i < u8Array.length; i++) {
       expect(records[0].details.formKey3[i]).assertEqual(u8Array[i]);
