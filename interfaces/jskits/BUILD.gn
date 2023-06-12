@@ -32,7 +32,6 @@ config("udmf_napi_config") {
     "${udmf_service_path}/include",
     "//third_party/libuv/include",
     "//third_party/node/src",
-    "//commonlibrary/c_utils/base/include",
 
     "${aafwk_inner_api_path}/ability_manager/include",
     "${aafwk_kits_path}/appkit/native/app/include/",
