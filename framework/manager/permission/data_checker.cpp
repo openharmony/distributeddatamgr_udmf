@@ -34,14 +34,12 @@ DataChecker::~DataChecker()
 bool DataChecker::IsValid(const std::vector<Privilege> &privileges, const CheckerManager::CheckInfo &info)
 {
     for (const auto &privilege : privileges) {
-        if (privilege.tokenId == info.tokenId || privilege.pid == info.pid) {
+        if (privilege.tokenId == info.tokenId) {
             return true;
         }
     }
-
-    LOG_ERROR(UDMF_FRAMEWORK, "Invalid parameters, %{public}s, %{public}s",
-              Anonymous::Change(std::to_string(info.tokenId)).c_str(),
-              Anonymous::Change(std::to_string(info.pid)).c_str());
+    LOG_ERROR(UDMF_FRAMEWORK, "Invalid parameters, %{public}s",
+              Anonymous::Change(std::to_string(info.tokenId)).c_str());
     return false;
 }
 } // namespace UDMF

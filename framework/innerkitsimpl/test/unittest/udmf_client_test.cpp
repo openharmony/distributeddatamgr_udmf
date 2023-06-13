@@ -51,6 +51,8 @@ public:
     void TearDown() override;
 
     void SetNativeToken();
+    static void AllocHapToken1();
+    static void AllocHapToken2();
     void SetHapToken1();
     void SetHapToken2();
 
@@ -64,11 +66,15 @@ public:
 
 void UdmfClientTest::SetUpTestCase()
 {
+    AllocHapToken1();
+    AllocHapToken2();
 }
 
 void UdmfClientTest::TearDownTestCase()
 {
     auto tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo1", INST_INDEX);
+    AccessTokenKit::DeleteToken(tokenId);
+    tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo2", INST_INDEX);
     AccessTokenKit::DeleteToken(tokenId);
 }
 
@@ -87,7 +93,7 @@ void UdmfClientTest::SetNativeToken()
     SetSelfTokenID(tokenId);
 }
 
-void UdmfClientTest::SetHapToken1()
+void UdmfClientTest::AllocHapToken1()
 {
     HapInfoParams info = {
         .userID = USER_ID,
@@ -125,7 +131,7 @@ void UdmfClientTest::SetHapToken1()
     SetSelfTokenID(tokenID.tokenIDEx);
 }
 
-void UdmfClientTest::SetHapToken2()
+void UdmfClientTest::AllocHapToken2()
 {
     HapInfoParams info = {
         .userID = USER_ID,
@@ -163,10 +169,21 @@ void UdmfClientTest::SetHapToken2()
     SetSelfTokenID(tokenID.tokenIDEx);
 }
 
+void UdmfClientTest::SetHapToken1()
+{
+    auto tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo1", INST_INDEX);
+    SetSelfTokenID(tokenId);
+}
+
+void UdmfClientTest::SetHapToken2()
+{
+    auto tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo2", INST_INDEX);
+    SetSelfTokenID(tokenId);
+}
+
 void UdmfClientTest::AddPrivilege(QueryOption &option)
 {
     Privilege privilege;
-    privilege.pid = getpid();
     privilege.tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo2", INST_INDEX);
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
@@ -1250,7 +1267,6 @@ HWTEST_F(UdmfClientTest, AddPrivilege001, TestSize.Level1)
 
     QueryOption option2 = { .key = key };
     Privilege privilege;
-    privilege.pid = getpid();
     SetHapToken2();
     privilege.tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo2", 0);
     privilege.readPermission = "readPermission";

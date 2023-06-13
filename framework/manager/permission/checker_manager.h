@@ -27,7 +27,6 @@ class CheckerManager {
 public:
     struct CheckInfo {
         uint32_t tokenId;
-        int32_t pid;
     };
 
     class Checker {

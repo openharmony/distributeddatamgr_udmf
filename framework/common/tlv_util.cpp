@@ -1195,9 +1195,6 @@ bool Writing(const Privilege &input, TLVObject &data)
     if (!Writing(input.tokenId, data)) {
         return false;
     }
-    if (!Writing(input.pid, data)) {
-        return false;
-    }
     if (!Writing(input.readPermission, data)) {
         return false;
     }
@@ -1211,13 +1208,9 @@ template<>
 bool Reading(Privilege &output, TLVObject &data)
 {
     uint32_t tokenId;
-    int32_t pid;
     std::string readPermission;
     std::string writePermission;
     if (!Reading(tokenId, data)) {
-        return false;
-    }
-    if (!Reading(pid, data)) {
         return false;
     }
     if (!Reading(readPermission, data)) {
@@ -1227,7 +1220,6 @@ bool Reading(Privilege &output, TLVObject &data)
         return false;
     }
     output.tokenId = tokenId;
-    output.pid = pid;
     output.readPermission = readPermission;
     output.writePermission = writePermission;
     return true;

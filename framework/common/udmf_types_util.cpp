@@ -289,12 +289,12 @@ template<> bool Unmarshalling(Summary &output, MessageParcel &parcel)
 
 template<> bool Marshalling(const Privilege &input, MessageParcel &parcel)
 {
-    return ITypesUtil::Marshal(parcel, input.tokenId, input.pid, input.readPermission, input.writePermission);
+    return ITypesUtil::Marshal(parcel, input.tokenId, input.readPermission, input.writePermission);
 }
 
 template<> bool Unmarshalling(Privilege &output, MessageParcel &parcel)
 {
-    return ITypesUtil::Unmarshal(parcel, output.tokenId, output.pid, output.readPermission, output.writePermission);
+    return ITypesUtil::Unmarshal(parcel, output.tokenId, output.readPermission, output.writePermission);
 }
 
 template<> bool Marshalling(const CustomOption &input, MessageParcel &parcel)
