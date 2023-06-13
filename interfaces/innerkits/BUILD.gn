@@ -29,7 +29,6 @@ config("udmf_client_config") {
     "${kv_store_path}/frameworks/common",
     "//third_party/libuv/include",
     "//third_party/node/src",
-    "//commonlibrary/c_utils/base/include",
   ]
 }
 

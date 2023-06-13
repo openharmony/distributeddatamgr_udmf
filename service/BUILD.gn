@@ -30,11 +30,10 @@ ohos_shared_library("udmf_server") {
     "${udmf_interfaces_path}/innerkits/client",
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_interfaces_path}/innerkits/data",
-    "//foundation/distributeddatamgr/kv_store/frameworks/common",
-    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/framework/include",
+    "${kv_store_path}/frameworks/common",
+    "${ddms_path}/services/distributeddataservice/framework/include",
     "//third_party/libuv/include",
     "//third_party/node/src",
-    "//commonlibrary/c_utils/base/include",
   ]
 
   sources = [

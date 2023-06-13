@@ -1,7 +1,7 @@
 {
   "name": "@ohos/udmf",
   "description": "Provide unified data management service for 3rd party app",
-  "version": "3.1",
+  "version": "4.0",
   "license": "Apache License 2.0",
   "publishAs": "code-segment",
   "segment": {
@@ -18,32 +18,31 @@
     "features": [
     ],
     "adapted_system_type": [
-      "mini",
-      "small",
       "standard"
     ],
-    "rom": "2048KB",
-    "ram": "10240KB",
+    "rom": "1000KB",
+    "ram": "636KB",
     "deps": {
       "components": [
+        "access_token",
+        "app_file_service",
+        "bounds_checking_function",
+        "bundle_framework",
+        "c_utils",
+        "data_object",
+        "datamgr_service",
+        "kv_store",
+        "multimedia_image_framework",
+        "os_account",
         "ipc",
         "hiviewdfx_hilog_native",
-        "appexecfwk_standard",
-        "aafwk_standard",
-        "safwk",
         "samgr",
         "napi",
-        "utils_base",
         "ability_base",
         "ability_runtime"
       ],
       "third_party": [
-        "gtest_main",
-        "libxml2",
-        "libsec_shared",
-        "shared_icuuc",
-        "shared_icui18n",
-        "sqlite"
+        "gtest_main"
       ]
     },
     "build": {
