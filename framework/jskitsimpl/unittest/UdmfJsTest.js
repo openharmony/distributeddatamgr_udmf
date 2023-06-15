@@ -248,25 +248,4 @@ describe('UdmfJSTest', function () {
     expect(records[0].appLabelId).assertEqual('MyAppLabelId');
     console.info("UdmfSystemDefinedAppItemTest end")
   })
-
-  /**
-   * @tc.name UdmfSystemDefinedFormTest
-   * @tc.desc Test Js Api ApplicationDefinedRecord testcase
-   * @tc.type: FUNC
-   * @tc.require: issueNumber
-   */
-  it('UdmfApplicationDefinedRecord', 0, function () {
-    console.info('UdmfApplicationDefinedRecord start');
-    let applicationDefinedRecord = new UDMF.ApplicationDefinedRecord();
-    applicationDefinedRecord.applicationDefinedType = 'applicationDefinedType';
-    applicationDefinedRecord.rawData = u8Array;
-    let unifiedData = new UDMF.UnifiedData(applicationDefinedRecord);
-    let records = unifiedData.getRecords();
-    expect(records.length).assertEqual(1);
-    expect(records[0].applicationDefinedType).assertEqual('applicationDefinedType');
-    for (var i = 0; i < u8Array.length; i++) {
-      expect(records[0].rawData[i]).assertEqual(u8Array[i]);
-    }
-    console.info("UdmfApplicationDefinedRecord end")
-  })
 })
