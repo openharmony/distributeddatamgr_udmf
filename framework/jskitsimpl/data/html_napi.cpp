@@ -26,12 +26,13 @@ namespace OHOS {
 namespace UDMF {
 napi_value HtmlNapi::Constructor(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
     napi_property_descriptor properties[] = {
         /* Html extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
         /* Html extends Text */
         DECLARE_NAPI_GETTER_SETTER("details", TextNapi::GetDetails, TextNapi::SetDetails),
-        /* Html property */
+        /* Html properties */
         DECLARE_NAPI_GETTER_SETTER("htmlContent", GetHtmlContent, SetHtmlContent),
         DECLARE_NAPI_GETTER_SETTER("plainContent", GetPlainContent, SetPlainContent),
     };
@@ -41,7 +42,7 @@ napi_value HtmlNapi::Constructor(napi_env env)
 
 napi_value HtmlNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
@@ -55,31 +56,33 @@ napi_value HtmlNapi::New(napi_env env, napi_callback_info info)
 
 void HtmlNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *html = new (std::nothrow) HtmlNapi();
     ASSERT_ERR_VOID(env, html != nullptr, Status::E_FORBIDDEN, "no memory for html!");
-    html->value_ = std::reinterpret_pointer_cast<Html>(in);
+    html->value_ = std::static_pointer_cast<Html>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, html, Destructor, nullptr, nullptr), html);
 }
 
 void HtmlNapi::Destructor(napi_env env, void *data, void *hint)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "Html finalize.");
-    auto *html = reinterpret_cast<HtmlNapi *>(data);
+    LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi finalize.");
+    auto *html = static_cast<HtmlNapi *>(data);
     ASSERT_VOID(html != nullptr, "finalize null!");
     delete html;
 }
 
 HtmlNapi *HtmlNapi::GetHtml(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    return reinterpret_cast<HtmlNapi *>(ctxt->native);
+    return static_cast<HtmlNapi *>(ctxt->native);
 }
 
 napi_value HtmlNapi::GetPlainContent(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto html = GetHtml(env, info, ctxt);
     ASSERT_ERR(
@@ -91,7 +94,7 @@ napi_value HtmlNapi::GetPlainContent(napi_env env, napi_callback_info info)
 
 napi_value HtmlNapi::SetPlainContent(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::string plainContent;
     auto input = [env, ctxt, &plainContent](size_t argc, napi_value *argv) {
@@ -101,7 +104,7 @@ napi_value HtmlNapi::SetPlainContent(napi_env env, napi_callback_info info)
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto html = reinterpret_cast<HtmlNapi *>(ctxt->native);
+    auto html = static_cast<HtmlNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     html->value_->SetPlainContent(plainContent);
@@ -110,7 +113,7 @@ napi_value HtmlNapi::SetPlainContent(napi_env env, napi_callback_info info)
 
 napi_value HtmlNapi::GetHtmlContent(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto html = GetHtml(env, info, ctxt);
     ASSERT_ERR(
@@ -122,7 +125,7 @@ napi_value HtmlNapi::GetHtmlContent(napi_env env, napi_callback_info info)
 
 napi_value HtmlNapi::SetHtmlContent(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::string htmlContent;
     auto input = [env, ctxt, &htmlContent](size_t argc, napi_value *argv) {
@@ -132,7 +135,7 @@ napi_value HtmlNapi::SetHtmlContent(napi_env env, napi_callback_info info)
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto html = reinterpret_cast<HtmlNapi *>(ctxt->native);
+    auto html = static_cast<HtmlNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     html->value_->SetHtmlContent(htmlContent);

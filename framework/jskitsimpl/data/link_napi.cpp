@@ -26,12 +26,13 @@ namespace OHOS {
 namespace UDMF {
 napi_value LinkNapi::Constructor(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "LinkNapi");
     napi_property_descriptor properties[] = {
         /* Link extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
         /* Link extends Text */
         DECLARE_NAPI_GETTER_SETTER("details", TextNapi::GetDetails, TextNapi::SetDetails),
-        /* Link property */
+        /* Link properties */
         DECLARE_NAPI_GETTER_SETTER("url", GetUrl, SetUrl),
         DECLARE_NAPI_GETTER_SETTER("description", GetDescription, SetDescription),
     };
@@ -41,7 +42,7 @@ napi_value LinkNapi::Constructor(napi_env env)
 
 napi_value LinkNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "LinkNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "LinkNapi");
     auto ctxt = std::make_shared<ContextBase>();
 
     ctxt->GetCbInfoSync(env, info);
@@ -56,31 +57,33 @@ napi_value LinkNapi::New(napi_env env, napi_callback_info info)
 
 void LinkNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "LinkNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *link = new (std::nothrow) LinkNapi();
     ASSERT_ERR_VOID(env, link != nullptr, Status::E_FORBIDDEN, "no memory for link!");
-    link->value_ = std::reinterpret_pointer_cast<Link>(in);
+    link->value_ = std::static_pointer_cast<Link>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, link, Destructor, nullptr, nullptr), link);
 }
 
 void LinkNapi::Destructor(napi_env env, void *data, void *hint)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "Link finalize.");
-    auto *link = reinterpret_cast<LinkNapi *>(data);
+    LOG_DEBUG(UDMF_KITS_NAPI, "LinkNapi finalize.");
+    auto *link = static_cast<LinkNapi *>(data);
     ASSERT_VOID(link != nullptr, "finalize null!");
     delete link;
 }
 
 LinkNapi *LinkNapi::GetLink(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "LinkNapi");
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    return reinterpret_cast<LinkNapi *>(ctxt->native);
+    return static_cast<LinkNapi *>(ctxt->native);
 }
 
 napi_value LinkNapi::GetUrl(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "LinkNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto link = GetLink(env, info, ctxt);
     ASSERT_ERR(
@@ -92,7 +95,7 @@ napi_value LinkNapi::GetUrl(napi_env env, napi_callback_info info)
 
 napi_value LinkNapi::SetUrl(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "LinkNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::string url;
     auto input = [env, ctxt, &url](size_t argc, napi_value *argv) {
@@ -102,7 +105,7 @@ napi_value LinkNapi::SetUrl(napi_env env, napi_callback_info info)
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto link = reinterpret_cast<LinkNapi *>(ctxt->native);
+    auto link = static_cast<LinkNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (link != nullptr && link->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     link->value_->SetUrl(url);
@@ -111,7 +114,7 @@ napi_value LinkNapi::SetUrl(napi_env env, napi_callback_info info)
 
 napi_value LinkNapi::GetDescription(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "LinkNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto link = GetLink(env, info, ctxt);
     ASSERT_ERR(
@@ -123,7 +126,7 @@ napi_value LinkNapi::GetDescription(napi_env env, napi_callback_info info)
 
 napi_value LinkNapi::SetDescription(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "LinkNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::string description;
     auto input = [env, ctxt, &description](size_t argc, napi_value *argv) {
@@ -133,7 +136,7 @@ napi_value LinkNapi::SetDescription(napi_env env, napi_callback_info info)
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto link = reinterpret_cast<LinkNapi *>(ctxt->native);
+    auto link = static_cast<LinkNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (link != nullptr && link->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     link->value_->SetDescription(description);

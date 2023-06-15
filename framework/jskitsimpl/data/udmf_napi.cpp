@@ -25,9 +25,12 @@ namespace OHOS {
 namespace UDMF {
 napi_value UDMFNapi::UDMFInit(napi_env env, napi_value exports)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UDMFNapi");
+    napi_value unifiedDataType = CreateUnifiedDataType(env);
+    napi_value intention = CreateIntention(env);
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_GETTER("UnifiedDataType", CreateUnifiedDataType),
-        DECLARE_NAPI_GETTER("Intention", CreateIntention),
+        DECLARE_NAPI_PROPERTY("UnifiedDataType", unifiedDataType),
+        DECLARE_NAPI_PROPERTY("Intention", intention),
         DECLARE_NAPI_FUNCTION("insertData", InsertData),
         DECLARE_NAPI_FUNCTION("updateData", UpdateData),
         DECLARE_NAPI_FUNCTION("queryData", QueryData),
@@ -38,8 +41,9 @@ napi_value UDMFNapi::UDMFInit(napi_env env, napi_value exports)
     return exports;
 }
 
-napi_value UDMFNapi::CreateUnifiedDataType(napi_env env, napi_callback_info info)
+napi_value UDMFNapi::CreateUnifiedDataType(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UDMFNapi");
     napi_value unifiedDataType = nullptr;
     napi_create_object(env, &unifiedDataType);
     SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(TEXT), UD_TYPE_MAP.at(TEXT));
@@ -65,7 +69,7 @@ napi_value UDMFNapi::CreateUnifiedDataType(napi_env env, napi_callback_info info
     return unifiedDataType;
 }
 
-napi_value UDMFNapi::CreateIntention(napi_env env, napi_callback_info info)
+napi_value UDMFNapi::CreateIntention(napi_env env)
 {
     napi_value intention = nullptr;
     napi_create_object(env, &intention);

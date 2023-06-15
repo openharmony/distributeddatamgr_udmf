@@ -25,10 +25,11 @@ namespace OHOS {
 namespace UDMF {
 napi_value SystemDefinedRecordNapi::Constructor(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedRecordNapi");
     napi_property_descriptor properties[] = {
         /* SystemDefinedRecord extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
-        /* SystemDefinedRecord property */
+        /* SystemDefinedRecord properties */
         DECLARE_NAPI_GETTER_SETTER("details", GetDetails, SetDetails),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
@@ -37,7 +38,7 @@ napi_value SystemDefinedRecordNapi::Constructor(napi_env env)
 
 napi_value SystemDefinedRecordNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedRecordNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
@@ -51,17 +52,18 @@ napi_value SystemDefinedRecordNapi::New(napi_env env, napi_callback_info info)
 
 void SystemDefinedRecordNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedRecordNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *sdRecord = new (std::nothrow) SystemDefinedRecordNapi();
     ASSERT_ERR_VOID(env, sdRecord != nullptr, Status::E_FORBIDDEN, "no memory for system defined record!");
-    sdRecord->value_ = std::reinterpret_pointer_cast<SystemDefinedRecord>(in);
+    sdRecord->value_ = std::static_pointer_cast<SystemDefinedRecord>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, sdRecord, Destructor, nullptr, nullptr), sdRecord);
 }
 
 void SystemDefinedRecordNapi::Destructor(napi_env env, void *data, void *hint)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedRecord finalize.");
-    auto *sdRecord = reinterpret_cast<SystemDefinedRecordNapi *>(data);
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedRecordNapi finalize.");
+    auto *sdRecord = static_cast<SystemDefinedRecordNapi *>(data);
     ASSERT_VOID(sdRecord != nullptr, "finalize null!");
     delete sdRecord;
 }
@@ -69,14 +71,15 @@ void SystemDefinedRecordNapi::Destructor(napi_env env, void *data, void *hint)
 SystemDefinedRecordNapi *SystemDefinedRecordNapi::GetSystemDefinedRecord(
     napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedRecordNapi");
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    return reinterpret_cast<SystemDefinedRecordNapi *>(ctxt->native);
+    return static_cast<SystemDefinedRecordNapi *>(ctxt->native);
 }
 
 napi_value SystemDefinedRecordNapi::GetDetails(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto sdRecord = GetSystemDefinedRecord(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (sdRecord != nullptr && sdRecord->value_ != nullptr), Status::E_INVALID_PARAMETERS,
@@ -88,7 +91,7 @@ napi_value SystemDefinedRecordNapi::GetDetails(napi_env env, napi_callback_info 
 
 napi_value SystemDefinedRecordNapi::SetDetails(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
 
     UDDetails details;
@@ -99,7 +102,7 @@ napi_value SystemDefinedRecordNapi::SetDetails(napi_env env, napi_callback_info 
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto sdRecord = reinterpret_cast<SystemDefinedRecordNapi *>(ctxt->native);
+    auto sdRecord = static_cast<SystemDefinedRecordNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (sdRecord != nullptr && sdRecord->value_ != nullptr), Status::E_INVALID_PARAMETERS,
         "invalid object!");

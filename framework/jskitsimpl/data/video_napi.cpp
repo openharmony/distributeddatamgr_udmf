@@ -26,12 +26,15 @@ namespace OHOS {
 namespace UDMF {
 napi_value VideoNapi::Constructor(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "VideoNapi");
     napi_property_descriptor properties[] = {
         /* Video extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
         /* Video extends File */
         DECLARE_NAPI_GETTER_SETTER("details", FileNapi::GetDetails, FileNapi::SetDetails),
-        DECLARE_NAPI_GETTER_SETTER("videoUri", FileNapi::GetUri, FileNapi::SetUri),
+        DECLARE_NAPI_GETTER_SETTER("uri", FileNapi::GetUri, FileNapi::SetUri),
+        /* Video properties */
+        DECLARE_NAPI_GETTER_SETTER("videoUri", GetVideoUri, SetVideoUri),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "Video", properties, count, VideoNapi::New);
@@ -39,7 +42,7 @@ napi_value VideoNapi::Constructor(napi_env env)
 
 napi_value VideoNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "VideoNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "VideoNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
@@ -53,19 +56,59 @@ napi_value VideoNapi::New(napi_env env, napi_callback_info info)
 
 void VideoNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "VideoNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *video = new (std::nothrow) VideoNapi();
     ASSERT_ERR_VOID(env, video != nullptr, Status::E_FORBIDDEN, "no memory for video!");
-    video->value_ = std::reinterpret_pointer_cast<Video>(in);
+    video->value_ = std::static_pointer_cast<Video>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, video, Destructor, nullptr, nullptr), video);
 }
 
 void VideoNapi::Destructor(napi_env env, void *data, void *hint)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "Video finalize.");
-    auto *video = reinterpret_cast<VideoNapi *>(data);
+    LOG_DEBUG(UDMF_KITS_NAPI, "VideoNapi finalize.");
+    auto *video = static_cast<VideoNapi *>(data);
     ASSERT_VOID(video != nullptr, "finalize null!");
     delete video;
+}
+
+VideoNapi *VideoNapi::GetVideo(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "VideoNapi");
+    ctxt->GetCbInfoSync(env, info);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    return static_cast<VideoNapi *>(ctxt->native);
+}
+
+napi_value VideoNapi::GetVideoUri(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "VideoNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    auto video = GetVideo(env, info, ctxt);
+    ASSERT_ERR(
+        ctxt->env, (video != nullptr && video->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    ctxt->status = NapiDataUtils::SetValue(env, video->value_->GetUri(), ctxt->output);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set video uri failed!");
+    return ctxt->output;
+}
+
+napi_value VideoNapi::SetVideoUri(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "VideoNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    std::string uri;
+    auto input = [env, ctxt, &uri](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], uri);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    auto video = static_cast<VideoNapi *>(ctxt->native);
+    ASSERT_ERR(
+        ctxt->env, (video != nullptr && video->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    video->value_->SetUri(uri);
+    return nullptr;
 }
 } // namespace UDMF
 } // namespace OHOS

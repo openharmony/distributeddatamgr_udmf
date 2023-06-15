@@ -28,8 +28,8 @@ public:
     static napi_value UDMFInit(napi_env env, napi_value exports);
 
 private:
-    static napi_value CreateUnifiedDataType(napi_env env, napi_callback_info info);
-    static napi_value CreateIntention(napi_env env, napi_callback_info info);
+    static napi_value CreateUnifiedDataType(napi_env env);
+    static napi_value CreateIntention(napi_env env);
     static napi_status SetNamedProperty(
         napi_env env, napi_value &obj, const std::string &name, const std::string &value);
     static napi_value InsertData(napi_env env, napi_callback_info info);

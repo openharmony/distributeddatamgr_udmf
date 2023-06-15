@@ -35,6 +35,9 @@ public:
 private:
     static napi_value New(napi_env env, napi_callback_info info);
     static void Destructor(napi_env env, void *data, void *hint);
+    static ImageNapi *GetImage(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt);
+    static napi_value GetImageUri(napi_env env, napi_callback_info info);
+    static napi_value SetImageUri(napi_env env, napi_callback_info info);
 };
 } // namespace UDMF
 } // namespace OHOS
