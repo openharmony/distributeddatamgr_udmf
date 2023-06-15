@@ -27,7 +27,10 @@ group("udmf_packages") {
 group("unittest") {
   testonly = true
 
-  deps = [ "framework/innerkitsimpl/test/unittest:unittest" ]
+  deps = [
+    "framework/innerkitsimpl/test/unittest:unittest",
+    "framework/jskitsimpl/unittest:unittest",
+  ]
 }
 
 group("fuzztest") {
