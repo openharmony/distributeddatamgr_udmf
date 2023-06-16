@@ -58,7 +58,7 @@ UDMF定义了标准化的数据接入与读取通路，为各种业务场景（�
 
 ## 目录
 
-UDMF项目仓的代码目录结构以及对应目录的功能描述如下所示：
+UDMF代码仓的目录结构和对应目录的功能描述如下所示：
 
 ```undefined
 foundation/distributeddatamgr/udmf  # udmf统一数据管理部件
