@@ -44,7 +44,7 @@ UDMF提供了标准化的数据定义，统一定义了以下几种不同的数�
 
 ### 标准化数据通路
 
-UDMF定义了标准化的数据接入与读取通路，为各种业务场景（如跨应用跨设备数据拖拽）提供了跨应用跨设备的数据接入与读取通路，通路中的数据URI定义为：udmf://intension/bundleName/groupName/guid，其中各组成部分的含义分别为：  
+UDMF定义了标准化的数据接入与读取通路，为各种业务场景（如跨应用跨设备数据拖拽）提供了跨应用跨设备的数据接入与读取通路，通路中的数据URI定义为udmf://intension/bundleName/groupName/guid，其中各组成部分的含义分别为：  
 **udmf:** 协议名，表示使用UDMF提供的数据通路。  
 **intension:** 通道分类，例如Drag(拖拽数据)，SuperHub(中转站)等。  
 **bundleName:** 数据来源应用的包名称。  
@@ -58,7 +58,7 @@ UDMF定义了标准化的数据接入与读取通路，为各种业务场景（�
 
 ## 目录
 
-UDMF代码仓的目录结构和对应目录的功能描述如下所示：
+UDMF代码仓的目录结构和对应目录的功能描述如下：
 
 ```undefined
 foundation/distributeddatamgr/udmf  # udmf统一数据管理部件
