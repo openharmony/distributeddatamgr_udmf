@@ -69,8 +69,8 @@ foundation/distributeddatamgr/udmf  # udmf统一数据管理部件
 │   │   ├── common                  # native接口公共工具类
 │   │   ├── data                    # 数据结构定义
 │   │   └── test                    # 测试目录
-│   ├── jskitsimpl                  # public接口具体实现
-│   │   ├── common                  # public接口公共工具类
+│   ├── jskitsimpl                  # js接口具体实现
+│   │   ├── common                  # js接口公共工具类
 │   │   |── data                    # 统一数据公共接口实现
 |   |   └── unittest                # js单元测试目录
 │   ├── manager                     # 数据管理核心类
