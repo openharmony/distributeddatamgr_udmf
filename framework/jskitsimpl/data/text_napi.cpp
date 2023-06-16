@@ -24,10 +24,11 @@ namespace OHOS {
 namespace UDMF {
 napi_value TextNapi::Constructor(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "TextNapi");
     napi_property_descriptor properties[] = {
         /* Text extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
-        /* Text property */
+        /* Text properties */
         DECLARE_NAPI_GETTER_SETTER("details", GetDetails, SetDetails),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
@@ -36,7 +37,7 @@ napi_value TextNapi::Constructor(napi_env env)
 
 napi_value TextNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "TextNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "TextNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
@@ -50,31 +51,33 @@ napi_value TextNapi::New(napi_env env, napi_callback_info info)
 
 void TextNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "TextNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *text = new (std::nothrow) TextNapi();
     ASSERT_ERR_VOID(env, text != nullptr, Status::E_FORBIDDEN, "no memory for text!");
-    text->value_ = std::reinterpret_pointer_cast<Text>(in);
+    text->value_ = std::static_pointer_cast<Text>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, text, Destructor, nullptr, nullptr), text);
 }
 
 void TextNapi::Destructor(napi_env env, void *data, void *hint)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "Text finalize.");
-    auto *text = reinterpret_cast<TextNapi *>(data);
+    LOG_DEBUG(UDMF_KITS_NAPI, "TextNapi finalize.");
+    auto *text = static_cast<TextNapi *>(data);
     ASSERT_VOID(text != nullptr, "finalize null!");
     delete text;
 }
 
 TextNapi *TextNapi::GetText(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "TextNapi");
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    return reinterpret_cast<TextNapi *>(ctxt->native);
+    return static_cast<TextNapi *>(ctxt->native);
 }
 
 napi_value TextNapi::GetDetails(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "TextNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto text = GetText(env, info, ctxt);
     ASSERT_ERR(
@@ -86,7 +89,7 @@ napi_value TextNapi::GetDetails(napi_env env, napi_callback_info info)
 
 napi_value TextNapi::SetDetails(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "TextNapi");
     auto ctxt = std::make_shared<ContextBase>();
     UDDetails details;
     auto input = [env, ctxt, &details](size_t argc, napi_value *argv) {
@@ -96,7 +99,7 @@ napi_value TextNapi::SetDetails(napi_env env, napi_callback_info info)
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto text = reinterpret_cast<TextNapi *>(ctxt->native);
+    auto text = static_cast<TextNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (text != nullptr && text->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     text->value_->SetDetails(details);

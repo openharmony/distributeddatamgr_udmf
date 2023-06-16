@@ -39,8 +39,9 @@ namespace OHOS {
 namespace UDMF {
 napi_value UnifiedDataNapi::Constructor(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     napi_property_descriptor properties[] = {
-        /* UnifiedData property */
+        /* UnifiedData properties */
         DECLARE_NAPI_FUNCTION("addRecord", AddRecord),
         DECLARE_NAPI_FUNCTION("getRecords", GetRecords),
     };
@@ -50,7 +51,7 @@ napi_value UnifiedDataNapi::Constructor(napi_env env)
 
 napi_value UnifiedDataNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     UnifiedRecordNapi *uRecord = nullptr;
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, info, ctxt, &uRecord](size_t argc, napi_value *argv) {
@@ -81,13 +82,14 @@ napi_value UnifiedDataNapi::New(napi_env env, napi_callback_info info)
 void UnifiedDataNapi::Destructor(napi_env env, void *data, void *hint)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi finalize.");
-    auto *uData = reinterpret_cast<UnifiedDataNapi *>(data);
+    auto *uData = static_cast<UnifiedDataNapi *>(data);
     ASSERT_VOID(uData != nullptr, "finalize null!");
     delete uData;
 }
 
 void UnifiedDataNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedData> in, napi_value &out)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *unifiedData = new (std::nothrow) UnifiedDataNapi();
     ASSERT_ERR_VOID(env, unifiedData != nullptr, Status::E_FORBIDDEN, "no memory for unified data!");
@@ -97,15 +99,16 @@ void UnifiedDataNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedData> in,
 
 UnifiedDataNapi *UnifiedDataNapi::GetUnifiedData(napi_env env, napi_callback_info info)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    return reinterpret_cast<UnifiedDataNapi *>(ctxt->native);
+    return static_cast<UnifiedDataNapi *>(ctxt->native);
 }
 
 napi_value UnifiedDataNapi::AddRecord(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     UnifiedRecordNapi *uRecord = nullptr;
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, info, ctxt, &uRecord](size_t argc, napi_value *argv) {
@@ -118,7 +121,7 @@ napi_value UnifiedDataNapi::AddRecord(napi_env env, napi_callback_info info)
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto *uData = reinterpret_cast<UnifiedDataNapi *>(ctxt->native);
+    auto *uData = static_cast<UnifiedDataNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (uData != nullptr && uData->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     uData->value_->AddRecord(uRecord->value_);
@@ -127,7 +130,7 @@ napi_value UnifiedDataNapi::AddRecord(napi_env env, napi_callback_info info)
 
 napi_value UnifiedDataNapi::GetRecords(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto uData = GetUnifiedData(env, info);
     ASSERT_ERR(

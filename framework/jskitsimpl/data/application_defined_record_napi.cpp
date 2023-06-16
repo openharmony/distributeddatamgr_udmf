@@ -24,10 +24,11 @@ namespace OHOS {
 namespace UDMF {
 napi_value ApplicationDefinedRecordNapi::Constructor(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi");
     napi_property_descriptor properties[] = {
         /* ApplicationDefinedRecord extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
-        /* ApplicationDefinedRecord property */
+        /* ApplicationDefinedRecord properties */
         DECLARE_NAPI_GETTER_SETTER("applicationDefinedType", GetApplicationDefinedType, SetApplicationDefinedType),
         DECLARE_NAPI_GETTER_SETTER("rawData", GetRawData, SetRawData),
     };
@@ -38,7 +39,7 @@ napi_value ApplicationDefinedRecordNapi::Constructor(napi_env env)
 
 napi_value ApplicationDefinedRecordNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
@@ -52,6 +53,7 @@ napi_value ApplicationDefinedRecordNapi::New(napi_env env, napi_callback_info in
 
 void ApplicationDefinedRecordNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *record = new (std::nothrow) ApplicationDefinedRecordNapi();
     ASSERT_ERR_VOID(env, record != nullptr, Status::E_FORBIDDEN, "no memory for application defined record!");
@@ -61,8 +63,8 @@ void ApplicationDefinedRecordNapi::NewInstance(napi_env env, std::shared_ptr<Uni
 
 void ApplicationDefinedRecordNapi::Destructor(napi_env env, void *data, void *hint)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecord finalize.");
-    auto *record = reinterpret_cast<ApplicationDefinedRecord *>(data);
+    LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi finalize.");
+    auto *record = static_cast<ApplicationDefinedRecord *>(data);
     ASSERT_VOID(record != nullptr, "finalize null!");
     delete record;
 }
@@ -70,14 +72,15 @@ void ApplicationDefinedRecordNapi::Destructor(napi_env env, void *data, void *hi
 ApplicationDefinedRecordNapi *ApplicationDefinedRecordNapi::GetApplicationDefinedRecord(
     napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi");
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    return reinterpret_cast<ApplicationDefinedRecordNapi *>(ctxt->native);
+    return static_cast<ApplicationDefinedRecordNapi *>(ctxt->native);
 }
 
 napi_value ApplicationDefinedRecordNapi::GetApplicationDefinedType(napi_env env, napi_callback_info info)
 {
-    LOG_INFO(UDMF_KITS_NAPI, "get content start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto record = GetApplicationDefinedRecord(env, info, ctxt);
     ASSERT_ERR(
@@ -89,7 +92,7 @@ napi_value ApplicationDefinedRecordNapi::GetApplicationDefinedType(napi_env env,
 
 napi_value ApplicationDefinedRecordNapi::SetApplicationDefinedType(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::string type;
     auto input = [env, ctxt, &type](size_t argc, napi_value *argv) {
@@ -99,7 +102,7 @@ napi_value ApplicationDefinedRecordNapi::SetApplicationDefinedType(napi_env env,
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto record = reinterpret_cast<ApplicationDefinedRecordNapi *>(ctxt->native);
+    auto record = static_cast<ApplicationDefinedRecordNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     record->value_->SetApplicationDefinedType(type);
@@ -108,7 +111,7 @@ napi_value ApplicationDefinedRecordNapi::SetApplicationDefinedType(napi_env env,
 
 napi_value ApplicationDefinedRecordNapi::GetRawData(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto record = GetApplicationDefinedRecord(env, info, ctxt);
     ASSERT_ERR(
@@ -120,7 +123,7 @@ napi_value ApplicationDefinedRecordNapi::GetRawData(napi_env env, napi_callback_
 
 napi_value ApplicationDefinedRecordNapi::SetRawData(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::vector<uint8_t> rawData;
     auto input = [env, ctxt, &rawData](size_t argc, napi_value *argv) {
@@ -130,7 +133,7 @@ napi_value ApplicationDefinedRecordNapi::SetRawData(napi_env env, napi_callback_
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto record = reinterpret_cast<ApplicationDefinedRecordNapi *>(ctxt->native);
+    auto record = static_cast<ApplicationDefinedRecordNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     record->value_->SetRawData(rawData);

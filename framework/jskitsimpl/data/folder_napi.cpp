@@ -25,12 +25,15 @@ namespace OHOS {
 namespace UDMF {
 napi_value FolderNapi::Constructor(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi");
     napi_property_descriptor properties[] = {
         /* Folder extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
         /* Folder extends File */
         DECLARE_NAPI_GETTER_SETTER("details", FileNapi::GetDetails, FileNapi::SetDetails),
-        DECLARE_NAPI_GETTER_SETTER("folderUri", FileNapi::GetUri, FileNapi::SetUri),
+        DECLARE_NAPI_GETTER_SETTER("uri", FileNapi::GetUri, FileNapi::SetUri),
+        /* Folder properties */
+        DECLARE_NAPI_GETTER_SETTER("folderUri", GetFolderUri, SetFolderUri),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "Folder", properties, count, FolderNapi::New);
@@ -38,7 +41,7 @@ napi_value FolderNapi::Constructor(napi_env env)
 
 napi_value FolderNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
@@ -52,19 +55,59 @@ napi_value FolderNapi::New(napi_env env, napi_callback_info info)
 
 void FolderNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *folder = new (std::nothrow) FolderNapi();
     ASSERT_ERR_VOID(env, folder != nullptr, Status::E_FORBIDDEN, "no memory for folder!");
-    folder->value_ = std::reinterpret_pointer_cast<Folder>(in);
+    folder->value_ = std::static_pointer_cast<Folder>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, folder, Destructor, nullptr, nullptr), folder);
 }
 
 void FolderNapi::Destructor(napi_env env, void *data, void *hint)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "Folder finalize.");
-    auto *folder = reinterpret_cast<FolderNapi *>(data);
+    LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi finalize.");
+    auto *folder = static_cast<FolderNapi *>(data);
     ASSERT_VOID(folder != nullptr, "finalize null!");
     delete folder;
+}
+
+FolderNapi *FolderNapi::GetFolder(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi");
+    ctxt->GetCbInfoSync(env, info);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    return static_cast<FolderNapi *>(ctxt->native);
+}
+
+napi_value FolderNapi::GetFolderUri(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    auto folder = GetFolder(env, info, ctxt);
+    ASSERT_ERR(
+        ctxt->env, (folder != nullptr && folder->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    ctxt->status = NapiDataUtils::SetValue(env, folder->value_->GetUri(), ctxt->output);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set folder uri failed!");
+    return ctxt->output;
+}
+
+napi_value FolderNapi::SetFolderUri(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    std::string uri;
+    auto input = [env, ctxt, &uri](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], uri);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    auto folder = static_cast<FolderNapi *>(ctxt->native);
+    ASSERT_ERR(
+        ctxt->env, (folder != nullptr && folder->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    folder->value_->SetUri(uri);
+    return nullptr;
 }
 } // namespace UDMF
 } // namespace OHOS

@@ -24,6 +24,7 @@ namespace OHOS {
 namespace UDMF {
 napi_value SummaryNapi::Constructor(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi");
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_GETTER_SETTER("summary", GetSummary, nullptr),
         DECLARE_NAPI_GETTER_SETTER("totalSize", GetTotal, nullptr),
@@ -34,7 +35,7 @@ napi_value SummaryNapi::Constructor(napi_env env)
 
 napi_value SummaryNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
@@ -49,13 +50,14 @@ napi_value SummaryNapi::New(napi_env env, napi_callback_info info)
 void SummaryNapi::Destructor(napi_env env, void *data, void *hint)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi finalize.");
-    auto *summary = reinterpret_cast<SummaryNapi *>(data);
+    auto *summary = static_cast<SummaryNapi *>(data);
     ASSERT_VOID(summary != nullptr, "finalize null!");
     delete summary;
 }
 
 void SummaryNapi::NewInstance(napi_env env, std::shared_ptr<Summary> in, napi_value &out)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *summary = new (std::nothrow) SummaryNapi();
     ASSERT_ERR_VOID(env, summary != nullptr, Status::E_FORBIDDEN, "no memory for summary!");
@@ -65,14 +67,15 @@ void SummaryNapi::NewInstance(napi_env env, std::shared_ptr<Summary> in, napi_va
 
 SummaryNapi *SummaryNapi::GetDataSummary(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi");
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    return reinterpret_cast<SummaryNapi *>(ctxt->native);
+    return static_cast<SummaryNapi *>(ctxt->native);
 }
 
 napi_value SummaryNapi::GetSummary(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto summary = GetDataSummary(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (summary != nullptr && summary->value_ != nullptr), Status::E_INVALID_PARAMETERS,
@@ -84,7 +87,7 @@ napi_value SummaryNapi::GetSummary(napi_env env, napi_callback_info info)
 
 napi_value SummaryNapi::GetTotal(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto summary = GetDataSummary(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (summary != nullptr && summary->value_ != nullptr), Status::E_INVALID_PARAMETERS,

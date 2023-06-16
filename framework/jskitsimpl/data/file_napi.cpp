@@ -25,10 +25,11 @@ namespace OHOS {
 namespace UDMF {
 napi_value FileNapi::Constructor(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     napi_property_descriptor properties[] = {
         /* File extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
-        /* File property */
+        /* File properties */
         DECLARE_NAPI_GETTER_SETTER("details", GetDetails, SetDetails),
         DECLARE_NAPI_GETTER_SETTER("uri", GetUri, SetUri),
     };
@@ -38,7 +39,7 @@ napi_value FileNapi::Constructor(napi_env env)
 
 napi_value FileNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
@@ -52,31 +53,33 @@ napi_value FileNapi::New(napi_env env, napi_callback_info info)
 
 void FileNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *file = new (std::nothrow) FileNapi();
     ASSERT_ERR_VOID(env, file != nullptr, Status::E_FORBIDDEN, "no memory for file!");
-    file->value_ = std::reinterpret_pointer_cast<File>(in);
+    file->value_ = std::static_pointer_cast<File>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, file, Destructor, nullptr, nullptr), file);
 }
 
 void FileNapi::Destructor(napi_env env, void *data, void *hint)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "File finalize.");
-    auto *file = reinterpret_cast<FileNapi *>(data);
+    LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi finalize.");
+    auto *file = static_cast<FileNapi *>(data);
     ASSERT_VOID(file != nullptr, "finalize null!");
     delete file;
 }
 
 FileNapi *FileNapi::GetFile(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    return reinterpret_cast<FileNapi *>(ctxt->native);
+    return static_cast<FileNapi *>(ctxt->native);
 }
 
 napi_value FileNapi::GetDetails(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto file = GetFile(env, info, ctxt);
     ASSERT_ERR(
@@ -88,7 +91,7 @@ napi_value FileNapi::GetDetails(napi_env env, napi_callback_info info)
 
 napi_value FileNapi::SetDetails(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     auto ctxt = std::make_shared<ContextBase>();
     UDDetails details;
     auto input = [env, ctxt, &details](size_t argc, napi_value *argv) {
@@ -98,7 +101,7 @@ napi_value FileNapi::SetDetails(napi_env env, napi_callback_info info)
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto file = reinterpret_cast<FileNapi *>(ctxt->native);
+    auto file = static_cast<FileNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     file->value_->SetDetails(details);
@@ -107,7 +110,7 @@ napi_value FileNapi::SetDetails(napi_env env, napi_callback_info info)
 
 napi_value FileNapi::GetUri(napi_env env, napi_callback_info info)
 {
-    LOG_INFO(UDMF_KITS_NAPI, "get uri start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto file = GetFile(env, info, ctxt);
     ASSERT_ERR(
@@ -119,7 +122,7 @@ napi_value FileNapi::GetUri(napi_env env, napi_callback_info info)
 
 napi_value FileNapi::SetUri(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::string uri;
     auto input = [env, ctxt, &uri](size_t argc, napi_value *argv) {
@@ -129,7 +132,7 @@ napi_value FileNapi::SetUri(napi_env env, napi_callback_info info)
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto file = reinterpret_cast<FileNapi *>(ctxt->native);
+    auto file = static_cast<FileNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     file->value_->SetUri(uri);

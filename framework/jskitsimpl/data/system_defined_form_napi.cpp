@@ -26,12 +26,13 @@ namespace OHOS {
 namespace UDMF {
 napi_value SystemDefinedFormNapi::Constructor(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     napi_property_descriptor properties[] = {
         /* SystemDefinedForm extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
         /* SystemDefinedForm extends SystemDefinedRecord */
         DECLARE_NAPI_GETTER_SETTER("details", SystemDefinedRecordNapi::GetDetails, SystemDefinedRecordNapi::SetDetails),
-        /* SystemDefinedForm property */
+        /* SystemDefinedForm properties */
         DECLARE_NAPI_GETTER_SETTER("formId", GetFormId, SetFormId),
         DECLARE_NAPI_GETTER_SETTER("formName", GetFormName, SetFormName),
         DECLARE_NAPI_GETTER_SETTER("bundleName", GetBundleName, SetBundleName),
@@ -44,7 +45,7 @@ napi_value SystemDefinedFormNapi::Constructor(napi_env env)
 
 napi_value SystemDefinedFormNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
@@ -58,17 +59,18 @@ napi_value SystemDefinedFormNapi::New(napi_env env, napi_callback_info info)
 
 void SystemDefinedFormNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *sdForm = new (std::nothrow) SystemDefinedFormNapi();
     ASSERT_ERR_VOID(env, sdForm != nullptr, Status::E_FORBIDDEN, "no memory for system defined form!");
-    sdForm->value_ = std::reinterpret_pointer_cast<SystemDefinedForm>(in);
+    sdForm->value_ = std::static_pointer_cast<SystemDefinedForm>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, sdForm, Destructor, nullptr, nullptr), sdForm);
 }
 
 void SystemDefinedFormNapi::Destructor(napi_env env, void *data, void *hint)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedForm finalize.");
-    auto *sdForm = reinterpret_cast<SystemDefinedFormNapi *>(data);
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi finalize.");
+    auto *sdForm = static_cast<SystemDefinedFormNapi *>(data);
     ASSERT_VOID(sdForm != nullptr, "finalize null!");
     delete sdForm;
 }
@@ -76,14 +78,15 @@ void SystemDefinedFormNapi::Destructor(napi_env env, void *data, void *hint)
 SystemDefinedFormNapi *SystemDefinedFormNapi::GetSystemDefinedForm(
     napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    return reinterpret_cast<SystemDefinedFormNapi *>(ctxt->native);
+    return static_cast<SystemDefinedFormNapi *>(ctxt->native);
 }
 
 napi_value SystemDefinedFormNapi::GetFormId(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto sdForm = GetSystemDefinedForm(env, info, ctxt);
     ASSERT_ERR(
@@ -95,7 +98,7 @@ napi_value SystemDefinedFormNapi::GetFormId(napi_env env, napi_callback_info inf
 
 napi_value SystemDefinedFormNapi::SetFormId(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     auto ctxt = std::make_shared<ContextBase>();
     int32_t formId = 0;
     auto input = [env, ctxt, &formId](size_t argc, napi_value *argv) {
@@ -105,7 +108,7 @@ napi_value SystemDefinedFormNapi::SetFormId(napi_env env, napi_callback_info inf
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto sdForm = reinterpret_cast<SystemDefinedFormNapi *>(ctxt->native);
+    auto sdForm = static_cast<SystemDefinedFormNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     sdForm->value_->SetFormId(formId);
@@ -114,7 +117,7 @@ napi_value SystemDefinedFormNapi::SetFormId(napi_env env, napi_callback_info inf
 
 napi_value SystemDefinedFormNapi::GetFormName(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto sdForm = GetSystemDefinedForm(env, info, ctxt);
     ASSERT_ERR(
@@ -126,7 +129,7 @@ napi_value SystemDefinedFormNapi::GetFormName(napi_env env, napi_callback_info i
 
 napi_value SystemDefinedFormNapi::SetFormName(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::string formName;
     auto input = [env, ctxt, &formName](size_t argc, napi_value *argv) {
@@ -136,7 +139,7 @@ napi_value SystemDefinedFormNapi::SetFormName(napi_env env, napi_callback_info i
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto sdForm = reinterpret_cast<SystemDefinedFormNapi *>(ctxt->native);
+    auto sdForm = static_cast<SystemDefinedFormNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     sdForm->value_->SetFormName(formName);
@@ -145,7 +148,7 @@ napi_value SystemDefinedFormNapi::SetFormName(napi_env env, napi_callback_info i
 
 napi_value SystemDefinedFormNapi::GetBundleName(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto sdForm = GetSystemDefinedForm(env, info, ctxt);
     ASSERT_ERR(
@@ -157,7 +160,7 @@ napi_value SystemDefinedFormNapi::GetBundleName(napi_env env, napi_callback_info
 
 napi_value SystemDefinedFormNapi::SetBundleName(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::string bundleName;
     auto input = [env, ctxt, &bundleName](size_t argc, napi_value *argv) {
@@ -167,7 +170,7 @@ napi_value SystemDefinedFormNapi::SetBundleName(napi_env env, napi_callback_info
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto sdForm = reinterpret_cast<SystemDefinedFormNapi *>(ctxt->native);
+    auto sdForm = static_cast<SystemDefinedFormNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     sdForm->value_->SetBundleName(bundleName);
@@ -176,7 +179,7 @@ napi_value SystemDefinedFormNapi::SetBundleName(napi_env env, napi_callback_info
 
 napi_value SystemDefinedFormNapi::GetAbilityName(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto sdForm = GetSystemDefinedForm(env, info, ctxt);
     ASSERT_ERR(
@@ -188,7 +191,7 @@ napi_value SystemDefinedFormNapi::GetAbilityName(napi_env env, napi_callback_inf
 
 napi_value SystemDefinedFormNapi::SetAbilityName(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::string abilityName;
     auto input = [env, ctxt, &abilityName](size_t argc, napi_value *argv) {
@@ -198,7 +201,7 @@ napi_value SystemDefinedFormNapi::SetAbilityName(napi_env env, napi_callback_inf
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto sdForm = reinterpret_cast<SystemDefinedFormNapi *>(ctxt->native);
+    auto sdForm = static_cast<SystemDefinedFormNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     sdForm->value_->SetAbilityName(abilityName);
@@ -207,7 +210,7 @@ napi_value SystemDefinedFormNapi::SetAbilityName(napi_env env, napi_callback_inf
 
 napi_value SystemDefinedFormNapi::GetModule(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto sdForm = GetSystemDefinedForm(env, info, ctxt);
     ASSERT_ERR(
@@ -219,7 +222,7 @@ napi_value SystemDefinedFormNapi::GetModule(napi_env env, napi_callback_info inf
 
 napi_value SystemDefinedFormNapi::SetModule(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::string module;
     auto input = [env, ctxt, &module](size_t argc, napi_value *argv) {
@@ -229,7 +232,7 @@ napi_value SystemDefinedFormNapi::SetModule(napi_env env, napi_callback_info inf
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto sdForm = reinterpret_cast<SystemDefinedFormNapi *>(ctxt->native);
+    auto sdForm = static_cast<SystemDefinedFormNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     sdForm->value_->SetModule(module);

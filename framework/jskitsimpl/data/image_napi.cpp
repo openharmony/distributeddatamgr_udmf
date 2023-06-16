@@ -26,12 +26,15 @@ namespace OHOS {
 namespace UDMF {
 napi_value ImageNapi::Constructor(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "ImageNapi");
     napi_property_descriptor properties[] = {
         /* Image extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
         /* Image extends File */
         DECLARE_NAPI_GETTER_SETTER("details", FileNapi::GetDetails, FileNapi::SetDetails),
-        DECLARE_NAPI_GETTER_SETTER("imageUri", FileNapi::GetUri, FileNapi::SetUri),
+        DECLARE_NAPI_GETTER_SETTER("uri", FileNapi::GetUri, FileNapi::SetUri),
+        /* Image properties */
+        DECLARE_NAPI_GETTER_SETTER("imageUri", GetImageUri, SetImageUri),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "Image", properties, count, ImageNapi::New);
@@ -39,7 +42,7 @@ napi_value ImageNapi::Constructor(napi_env env)
 
 napi_value ImageNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "ImageNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "ImageNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
@@ -53,19 +56,59 @@ napi_value ImageNapi::New(napi_env env, napi_callback_info info)
 
 void ImageNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "ImageNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *image = new (std::nothrow) ImageNapi();
     ASSERT_ERR_VOID(env, image != nullptr, Status::E_FORBIDDEN, "no memory for image!");
-    image->value_ = std::reinterpret_pointer_cast<Image>(in);
+    image->value_ = std::static_pointer_cast<Image>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, image, Destructor, nullptr, nullptr), image);
 }
 
 void ImageNapi::Destructor(napi_env env, void *data, void *hint)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "Image finalize.");
+    LOG_DEBUG(UDMF_KITS_NAPI, "ImageNapi finalize.");
     auto *image = static_cast<ImageNapi *>(data);
     ASSERT_VOID(image != nullptr, "finalize null!");
     delete image;
+}
+
+ImageNapi *ImageNapi::GetImage(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "ImageNapi");
+    ctxt->GetCbInfoSync(env, info);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    return static_cast<ImageNapi *>(ctxt->native);
+}
+
+napi_value ImageNapi::GetImageUri(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "ImageNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    auto image = GetImage(env, info, ctxt);
+    ASSERT_ERR(
+        ctxt->env, (image != nullptr && image->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    ctxt->status = NapiDataUtils::SetValue(env, image->value_->GetUri(), ctxt->output);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set image uri failed!");
+    return ctxt->output;
+}
+
+napi_value ImageNapi::SetImageUri(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "ImageNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    std::string uri;
+    auto input = [env, ctxt, &uri](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], uri);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    auto image = static_cast<ImageNapi *>(ctxt->native);
+    ASSERT_ERR(
+        ctxt->env, (image != nullptr && image->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    image->value_->SetUri(uri);
+    return nullptr;
 }
 } // namespace UDMF
 } // namespace OHOS

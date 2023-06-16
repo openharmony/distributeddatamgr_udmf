@@ -24,8 +24,9 @@ namespace OHOS {
 namespace UDMF {
 napi_value UnifiedRecordNapi::Constructor(napi_env env)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     napi_property_descriptor properties[] = {
-        /* UnifiedRecord property */
+        /* UnifiedRecord properties */
         DECLARE_NAPI_FUNCTION("getType", GetType),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
@@ -34,7 +35,7 @@ napi_value UnifiedRecordNapi::Constructor(napi_env env)
 
 napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi::New");
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
@@ -49,7 +50,7 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
 void UnifiedRecordNapi::Destructor(napi_env env, void *data, void *hint)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi finalize.");
-    auto *uRecord = reinterpret_cast<UnifiedRecordNapi *>(data);
+    auto *uRecord = static_cast<UnifiedRecordNapi *>(data);
     ASSERT_VOID(uRecord != nullptr, "finalize null!");
     delete uRecord;
 }
@@ -57,14 +58,15 @@ void UnifiedRecordNapi::Destructor(napi_env env, void *data, void *hint)
 UnifiedRecordNapi *UnifiedRecordNapi::GetUnifiedRecord(
     napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    return reinterpret_cast<UnifiedRecordNapi *>(ctxt->native);
+    return static_cast<UnifiedRecordNapi *>(ctxt->native);
 }
 
 napi_value UnifiedRecordNapi::GetType(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "start");
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto uRecord = GetUnifiedRecord(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_INVALID_PARAMETERS,
