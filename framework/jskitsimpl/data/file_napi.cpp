@@ -45,7 +45,7 @@ napi_value FileNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *file = new (std::nothrow) FileNapi();
-    ASSERT_ERR(ctxt->env, file != nullptr, Status::E_FORBIDDEN, "no memory for file!");
+    ASSERT_ERR(ctxt->env, file != nullptr, Status::E_UNKNOWN, "no memory for file!");
     file->value_ = std::make_shared<File>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, file, Destructor, nullptr, nullptr), file);
     return ctxt->self;
@@ -56,7 +56,7 @@ void FileNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi
     LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *file = new (std::nothrow) FileNapi();
-    ASSERT_ERR_VOID(env, file != nullptr, Status::E_FORBIDDEN, "no memory for file!");
+    ASSERT_ERR_VOID(env, file != nullptr, Status::E_UNKNOWN, "no memory for file!");
     file->value_ = std::static_pointer_cast<File>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, file, Destructor, nullptr, nullptr), file);
 }
@@ -95,7 +95,7 @@ napi_value FileNapi::SetDetails(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     UDDetails details;
     auto input = [env, ctxt, &details](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], details);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
@@ -126,7 +126,7 @@ napi_value FileNapi::SetUri(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string uri;
     auto input = [env, ctxt, &uri](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], uri);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };

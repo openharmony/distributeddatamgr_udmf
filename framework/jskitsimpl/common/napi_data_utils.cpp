@@ -390,6 +390,11 @@ bool NapiDataUtils::IsNull(napi_env env, napi_value value)
     if (status == napi_ok && (type == napi_undefined || type == napi_null)) {
         return true;
     }
+    if (type == napi_string) {
+        size_t len;
+        status = napi_get_value_string_utf8(env, value, NULL, 0, &len);
+        return len == 0;
+    }
     return false;
 }
 

@@ -72,23 +72,26 @@ int32_t UdmfServiceStub::OnSetData(MessageParcel &data, MessageParcel &reply)
     LOG_INFO(UDMF_SERVICE, "start");
     CustomOption customOption;
     if (!ITypesUtil::Unmarshal(data, customOption)) {
-        return IPC_STUB_INVALID_DATA_ERR;
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal customOption failed!");
+        return E_READ_PARCEL_ERROR;
     }
     UnifiedData unifiedData;
     if (UdmfServiceUtils::UnMarshalUnifiedData(data, unifiedData) != E_OK) {
-        return IPC_STUB_INVALID_DATA_ERR;
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal unifiedData failed!");
+        return E_READ_PARCEL_ERROR;
     }
-    if (unifiedData.GetRecords().empty()) {
+    if (unifiedData.IsEmpty()) {
         LOG_ERROR(UDMF_SERVICE, "Empty data without any record!");
-        return E_INVALID_VALUE;
+        return E_INVALID_PARAMETERS;
     }
     if (unifiedData.GetSize() > UdmfService::MAX_DATA_SIZE) {
         LOG_ERROR(UDMF_SERVICE, "Exceeded data limit!");
-        return E_INVALID_VALUE;
+        return E_INVALID_PARAMETERS;
     }
     for (const auto &record : unifiedData.GetRecords()) {
         if (record->GetSize() > UdmfService::MAX_RECORD_SIZE) {
-            return E_INVALID_VALUE;
+            LOG_ERROR(UDMF_SERVICE, "Exceeded record limit!");
+            return E_INVALID_PARAMETERS;
         }
     }
     uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
@@ -96,8 +99,8 @@ int32_t UdmfServiceStub::OnSetData(MessageParcel &data, MessageParcel &reply)
     std::string key;
     int32_t status = SetData(customOption, unifiedData, key);
     if (!ITypesUtil::Marshal(reply, status, key)) {
-        LOG_ERROR(UDMF_SERVICE, "Marshal key: %{public}s", key.c_str());
-        return IPC_STUB_WRITE_PARCEL_ERR;
+        LOG_ERROR(UDMF_SERVICE, "Marshal status&key failed, status: %{public}d, key: %{public}s", status, key.c_str());
+        return E_WRITE_PARCEL_ERROR;
     }
     return E_OK;
 }
@@ -107,18 +110,19 @@ int32_t UdmfServiceStub::OnGetData(MessageParcel &data, MessageParcel &reply)
     LOG_INFO(UDMF_SERVICE, "start");
     QueryOption query;
     if (!ITypesUtil::Unmarshal(data, query)) {
-        LOG_ERROR(UDMF_SERVICE, "Unmarshal query");
-        return IPC_STUB_INVALID_DATA_ERR;
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal queryOption failed!");
+        return E_READ_PARCEL_ERROR;
     }
     uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
     UnifiedData unifiedData;
     int32_t status = GetData(query, unifiedData);
     if (!ITypesUtil::Marshal(reply, status)) {
-        LOG_ERROR(UDMF_SERVICE, "Marshal ud data, key: %{public}s", query.key.c_str());
-        return IPC_STUB_WRITE_PARCEL_ERR;
+        LOG_ERROR(UDMF_SERVICE, "Marshal status failed, status: %{public}d", status);
+        return E_WRITE_PARCEL_ERROR;
     }
     if (UdmfServiceUtils::MarshalUnifiedData(reply, unifiedData) != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "Marshal ud data failed");
         return E_WRITE_PARCEL_ERROR;
     }
     return E_OK;
@@ -129,8 +133,8 @@ int32_t UdmfServiceStub::OnGetBatchData(MessageParcel &data, MessageParcel &repl
     LOG_INFO(UDMF_SERVICE, "start");
     QueryOption query;
     if (!ITypesUtil::Unmarshal(data, query)) {
-        LOG_ERROR(UDMF_SERVICE, "Unmarshal query");
-        return IPC_STUB_INVALID_DATA_ERR;
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal queryOption failed!");
+        return E_READ_PARCEL_ERROR;
     }
     uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
@@ -138,10 +142,11 @@ int32_t UdmfServiceStub::OnGetBatchData(MessageParcel &data, MessageParcel &repl
     int32_t status = GetBatchData(query, unifiedDataSet);
     LOG_DEBUG(UDMF_SERVICE, "Getdata : status =  %{public}d!", status);
     if (!ITypesUtil::Marshal(reply, status)) {
-        LOG_ERROR(UDMF_SERVICE, "Marshal ud data, key: %{public}s", query.key.c_str());
-        return IPC_STUB_WRITE_PARCEL_ERR;
+        LOG_ERROR(UDMF_SERVICE, "Marshal status failed, status: %{public}d", status);
+        return E_WRITE_PARCEL_ERROR;
     }
     if (UdmfServiceUtils::MarshalBatchUnifiedData(reply, unifiedDataSet) != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "Marshal ud data failed");
         return E_WRITE_PARCEL_ERROR;
     }
     return E_OK;
@@ -152,32 +157,34 @@ int32_t UdmfServiceStub::OnUpdateData(MessageParcel &data, MessageParcel &reply)
     LOG_INFO(UDMF_SERVICE, "start");
     QueryOption query;
     if (!ITypesUtil::Unmarshal(data, query)) {
-        LOG_ERROR(UDMF_SERVICE, "Unmarshal query");
-        return IPC_STUB_INVALID_DATA_ERR;
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal queryOption failed!");
+        return E_READ_PARCEL_ERROR;
     }
     UnifiedData unifiedData;
     if (UdmfServiceUtils::UnMarshalUnifiedData(data, unifiedData) != E_OK) {
-        return IPC_STUB_INVALID_DATA_ERR;
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal unifiedData failed!");
+        return E_READ_PARCEL_ERROR;
     }
-    if (unifiedData.GetRecords().empty()) {
+    if (unifiedData.IsEmpty()) {
         LOG_ERROR(UDMF_SERVICE, "Empty data without any record!");
-        return E_INVALID_VALUE;
+        return E_INVALID_PARAMETERS;
     }
     if (unifiedData.GetSize() > UdmfService::MAX_DATA_SIZE) {
         LOG_ERROR(UDMF_SERVICE, "Exceeded data limit!");
-        return E_INVALID_VALUE;
+        return E_INVALID_PARAMETERS;
     }
     for (const auto &record : unifiedData.GetRecords()) {
         if (record->GetSize() > UdmfService::MAX_RECORD_SIZE) {
-            return E_INVALID_VALUE;
+            LOG_ERROR(UDMF_SERVICE, "Exceeded record limit!");
+            return E_INVALID_PARAMETERS;
         }
     }
     uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
     int32_t status = UpdateData(query, unifiedData);
     if (!ITypesUtil::Marshal(reply, status)) {
-        LOG_ERROR(UDMF_SERVICE, "Marshal update status failed, key: %{public}s", query.key.c_str());
-        return IPC_STUB_WRITE_PARCEL_ERR;
+        LOG_ERROR(UDMF_SERVICE, "Marshal status failed, status: %{public}d", status);
+        return E_WRITE_PARCEL_ERROR;
     }
     return E_OK;
 }
@@ -187,18 +194,19 @@ int32_t UdmfServiceStub::OnDeleteData(MessageParcel &data, MessageParcel &reply)
     LOG_INFO(UDMF_SERVICE, "start");
     QueryOption query;
     if (!ITypesUtil::Unmarshal(data, query)) {
-        LOG_ERROR(UDMF_SERVICE, "Unmarshal query");
-        return IPC_STUB_INVALID_DATA_ERR;
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal queryOption failed!");
+        return E_READ_PARCEL_ERROR;
     }
     uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
     std::vector<UnifiedData> unifiedDataSet;
     int32_t status = DeleteData(query, unifiedDataSet);
     if (!ITypesUtil::Marshal(reply, status)) {
-        LOG_ERROR(UDMF_SERVICE, "Marshal ud data, key: %{public}s", query.key.c_str());
-        return IPC_STUB_WRITE_PARCEL_ERR;
+        LOG_ERROR(UDMF_SERVICE, "Marshal status failed, status: %{public}d", status);
+        return E_WRITE_PARCEL_ERROR;
     }
     if (UdmfServiceUtils::MarshalBatchUnifiedData(reply, unifiedDataSet) != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "Marshal unifiedData failed");
         return E_WRITE_PARCEL_ERROR;
     }
     return E_OK;
@@ -210,7 +218,7 @@ int32_t UdmfServiceStub::OnGetSummary(MessageParcel &data, MessageParcel &reply)
     QueryOption query;
     if (!ITypesUtil::Unmarshal(data, query)) {
         LOG_ERROR(UDMF_SERVICE, "Unmarshal query");
-        return IPC_STUB_INVALID_DATA_ERR;
+        return E_READ_PARCEL_ERROR;
     }
     uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
@@ -218,7 +226,7 @@ int32_t UdmfServiceStub::OnGetSummary(MessageParcel &data, MessageParcel &reply)
     int32_t status = GetSummary(query, summary);
     if (!ITypesUtil::Marshal(reply, status, summary)) {
         LOG_ERROR(UDMF_SERVICE, "Marshal summary, key: %{public}s", query.key.c_str());
-        return IPC_STUB_WRITE_PARCEL_ERR;
+        return E_WRITE_PARCEL_ERROR;
     }
     return E_OK;
 }
@@ -230,14 +238,14 @@ int32_t UdmfServiceStub::OnAddPrivilege(MessageParcel &data, MessageParcel &repl
     Privilege privilege;
     if (!ITypesUtil::Unmarshal(data, query, privilege)) {
         LOG_ERROR(UDMF_SERVICE, "Unmarshal query and privilege");
-        return IPC_STUB_INVALID_DATA_ERR;
+        return E_READ_PARCEL_ERROR;
     }
     uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
     int32_t status = AddPrivilege(query, privilege);
     if (!ITypesUtil::Marshal(reply, status)) {
         LOG_ERROR(UDMF_SERVICE, "Marshal status, key: %{public}s", query.key.c_str());
-        return IPC_STUB_WRITE_PARCEL_ERR;
+        return E_WRITE_PARCEL_ERROR;
     }
     return E_OK;
 }
@@ -249,14 +257,14 @@ int32_t UdmfServiceStub::OnSync(MessageParcel &data, MessageParcel &reply)
     std::vector<std::string> devices;
     if (!ITypesUtil::Unmarshal(data, query, devices)) {
         LOG_ERROR(UDMF_SERVICE, "Unmarshal query and devices");
-        return IPC_STUB_INVALID_DATA_ERR;
+        return E_READ_PARCEL_ERROR;
     }
     uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
     query.tokenId = token;
     int32_t status = Sync(query, devices);
     if (!ITypesUtil::Marshal(reply, status)) {
         LOG_ERROR(UDMF_SERVICE, "Marshal status, key: %{public}s", query.key.c_str());
-        return IPC_STUB_WRITE_PARCEL_ERR;
+        return E_WRITE_PARCEL_ERROR;
     }
     return E_OK;
 }

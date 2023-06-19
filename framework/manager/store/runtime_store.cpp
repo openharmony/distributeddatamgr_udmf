@@ -47,14 +47,15 @@ Status RuntimeStore::Put(const UnifiedData &unifiedData)
     // add unified record
     for (const auto &record : unifiedData.GetRecords()) {
         if (record == nullptr) {
-            continue;
+            LOG_ERROR(UDMF_SERVICE, "record is nullptr.");
+            return E_INVALID_PARAMETERS;
         }
 
         std::vector<uint8_t> recordBytes;
         auto recordTlv = TLVObject(recordBytes);
         if (!TLVUtil::Writing(record, recordTlv)) {
             LOG_ERROR(UDMF_SERVICE, "Marshall unified record failed.");
-            return E_INVALID_PARAMETERS;
+            return E_WRITE_PARCEL_ERROR;
         }
 
         Entry entry = { Key(unifiedKey + "/" + record->GetUid()), Value(recordBytes) };
@@ -65,7 +66,7 @@ Status RuntimeStore::Put(const UnifiedData &unifiedData)
     auto runtimeTlv = TLVObject(runtimeBytes);
     if (!TLVUtil::Writing(*unifiedData.GetRuntime(), runtimeTlv)) {
         LOG_ERROR(UDMF_SERVICE, "Marshall runtime info failed.");
-        return E_UNKNOWN;
+        return E_WRITE_PARCEL_ERROR;
     }
     Entry entry = { Key(unifiedKey), Value(runtimeBytes) };
     entries.push_back(entry);
@@ -77,33 +78,14 @@ Status RuntimeStore::Get(const std::string &key, UnifiedData &unifiedData)
 {
     std::vector<Entry> entries;
     if (GetEntries(key, entries) != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "GetEntries failed, dataPrefix: %{public}s.", key.c_str());
         return E_DB_ERROR;
     }
     if (entries.empty()) {
         LOG_DEBUG(UDMF_FRAMEWORK, "entries is empty.");
         return E_OK;
     }
-    for (const auto &entry : entries) {
-        std::string keyStr = entry.key.ToString();
-        if (keyStr == key) {
-            Runtime runtime;
-            auto runtimeTlv = TLVObject(const_cast<std::vector<uint8_t> &>(entry.value.Data()));
-            if (!TLVUtil::Reading(runtime, runtimeTlv)) {
-                LOG_ERROR(UDMF_SERVICE, "Unmarshall runtime info failed.");
-                return E_UNKNOWN;
-            }
-            unifiedData.SetRuntime(runtime);
-        } else {
-            std::shared_ptr<UnifiedRecord> record;
-            auto recordTlv = TLVObject(const_cast<std::vector<uint8_t> &>(entry.value.Data()));
-            if (!TLVUtil::Reading(record, recordTlv)) {
-                LOG_ERROR(UDMF_SERVICE, "Unmarshall unified record failed.");
-                return E_UNKNOWN;
-            }
-            unifiedData.AddRecord(record);
-        }
-    }
-    return E_OK;
+    return UnMarshalEntries(key, entries, unifiedData);
 }
 
 Status RuntimeStore::GetSummary(const std::string &key, Summary &summary)
@@ -145,6 +127,7 @@ Status RuntimeStore::Delete(const std::string &key)
 {
     std::vector<Entry> entries;
     if (GetEntries(key, entries) != E_OK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "GetEntries failed, dataPrefix: %{public}s.", key.c_str());
         return E_DB_ERROR;
     }
     if (entries.empty()) {
@@ -155,8 +138,7 @@ Status RuntimeStore::Delete(const std::string &key)
     for (const auto &entry : entries) {
         keys.push_back(entry.key);
     }
-    auto status = DeleteEntries(keys);
-    return status;
+    return DeleteEntries(keys);
 }
 
 Status RuntimeStore::DeleteBatch(const std::vector<std::string> &unifiedKeys)
@@ -168,6 +150,7 @@ Status RuntimeStore::DeleteBatch(const std::vector<std::string> &unifiedKeys)
     }
     for (const std::string &unifiedKey : unifiedKeys) {
         if (Delete(unifiedKey) != E_OK) {
+            LOG_ERROR(UDMF_FRAMEWORK, "Delete failed, key: %{public}s.", unifiedKey.c_str());
             return E_DB_ERROR;
         }
     }
@@ -187,7 +170,7 @@ Status RuntimeStore::Sync(const std::vector<std::string> &devices)
 
 Status RuntimeStore::Clear()
 {
-    return Delete(DATA_PREFIX) != E_DB_ERROR ? E_OK : E_DB_ERROR;
+    return Delete(DATA_PREFIX);
 }
 
 Status RuntimeStore::GetBatchData(const std::string &dataPrefix, std::vector<UnifiedData> &unifiedDataSet)
@@ -195,22 +178,29 @@ Status RuntimeStore::GetBatchData(const std::string &dataPrefix, std::vector<Uni
     std::vector<Entry> entries;
     auto status = GetEntries(dataPrefix, entries);
     if (status != E_OK) {
-        LOG_ERROR(UDMF_FRAMEWORK, "GetEntries failed.");
+        LOG_ERROR(UDMF_FRAMEWORK, "GetEntries failed, dataPrefix: %{public}s.", dataPrefix.c_str());
         return E_DB_ERROR;
     }
     if (entries.empty()) {
         LOG_DEBUG(UDMF_FRAMEWORK, "entries is empty.");
         return E_OK;
     }
+    std::vector<std::string> keySet;
     for (const auto &entry : entries) {
-        UnifiedData data;
         std::string keyStr = entry.key.ToString();
         if (std::count(keyStr.begin(), keyStr.end(), '/') == SLASH_COUNT_IN_KEY) {
-            status = Get(keyStr, data);
-            unifiedDataSet.push_back(data);
+            keySet.emplace_back(keyStr);
         }
     }
-    return status;
+
+    for (const std::string &key : keySet) {
+        UnifiedData data;
+        if (UnMarshalEntries(key, entries, data) != E_OK) {
+            return E_READ_PARCEL_ERROR;
+        }
+        unifiedDataSet.emplace_back(data);
+    }
+    return E_OK;
 }
 
 void RuntimeStore::Close()
@@ -277,6 +267,33 @@ Status RuntimeStore::DeleteEntries(const std::vector<Key> &keys)
         if (status != DistributedKv::Status::SUCCESS) {
             LOG_ERROR(UDMF_SERVICE, "KvStore deleteBatch failed, status: %{public}d.", status);
             return E_DB_ERROR;
+        }
+    }
+    return E_OK;
+}
+
+Status RuntimeStore::UnMarshalEntries(const std::string &key, std::vector<Entry> &entries, UnifiedData &unifiedData)
+{
+    for (const auto &entry : entries) {
+        std::string keyStr = entry.key.ToString();
+        if (keyStr == key) {
+            Runtime runtime;
+            auto runtimeTlv = TLVObject(const_cast<std::vector<uint8_t> &>(entry.value.Data()));
+            if (!TLVUtil::Reading(runtime, runtimeTlv)) {
+                LOG_ERROR(UDMF_SERVICE, "Unmarshall runtime info failed.");
+                return E_READ_PARCEL_ERROR;
+            }
+            unifiedData.SetRuntime(runtime);
+            break;
+        }
+        if (keyStr.find(key) == 0) {
+            std::shared_ptr<UnifiedRecord> record;
+            auto recordTlv = TLVObject(const_cast<std::vector<uint8_t> &>(entry.value.Data()));
+            if (!TLVUtil::Reading(record, recordTlv)) {
+                LOG_ERROR(UDMF_SERVICE, "Unmarshall unified record failed.");
+                return E_READ_PARCEL_ERROR;
+            }
+            unifiedData.AddRecord(record);
         }
     }
     return E_OK;

@@ -51,7 +51,7 @@ napi_value SystemDefinedFormNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *sdForm = new (std::nothrow) SystemDefinedFormNapi();
-    ASSERT_ERR(ctxt->env, sdForm != nullptr, Status::E_FORBIDDEN, "no memory for system defined form!");
+    ASSERT_ERR(ctxt->env, sdForm != nullptr, Status::E_UNKNOWN, "no memory for system defined form!");
     sdForm->value_ = std::make_shared<SystemDefinedForm>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, sdForm, Destructor, nullptr, nullptr), sdForm);
     return ctxt->self;
@@ -62,7 +62,7 @@ void SystemDefinedFormNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRec
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *sdForm = new (std::nothrow) SystemDefinedFormNapi();
-    ASSERT_ERR_VOID(env, sdForm != nullptr, Status::E_FORBIDDEN, "no memory for system defined form!");
+    ASSERT_ERR_VOID(env, sdForm != nullptr, Status::E_UNKNOWN, "no memory for system defined form!");
     sdForm->value_ = std::static_pointer_cast<SystemDefinedForm>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, sdForm, Destructor, nullptr, nullptr), sdForm);
 }
@@ -102,7 +102,7 @@ napi_value SystemDefinedFormNapi::SetFormId(napi_env env, napi_callback_info inf
     auto ctxt = std::make_shared<ContextBase>();
     int32_t formId = 0;
     auto input = [env, ctxt, &formId](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], formId);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
@@ -133,7 +133,7 @@ napi_value SystemDefinedFormNapi::SetFormName(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<ContextBase>();
     std::string formName;
     auto input = [env, ctxt, &formName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], formName);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
@@ -164,7 +164,7 @@ napi_value SystemDefinedFormNapi::SetBundleName(napi_env env, napi_callback_info
     auto ctxt = std::make_shared<ContextBase>();
     std::string bundleName;
     auto input = [env, ctxt, &bundleName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], bundleName);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
@@ -195,7 +195,7 @@ napi_value SystemDefinedFormNapi::SetAbilityName(napi_env env, napi_callback_inf
     auto ctxt = std::make_shared<ContextBase>();
     std::string abilityName;
     auto input = [env, ctxt, &abilityName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], abilityName);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
@@ -226,7 +226,7 @@ napi_value SystemDefinedFormNapi::SetModule(napi_env env, napi_callback_info inf
     auto ctxt = std::make_shared<ContextBase>();
     std::string module;
     auto input = [env, ctxt, &module](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], module);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };

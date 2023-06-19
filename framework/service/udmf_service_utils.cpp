@@ -22,22 +22,27 @@ int32_t UdmfServiceUtils::MarshalUnifiedData(MessageParcel &data, const UnifiedD
 {
     auto size = unifiedData.GetRecords().size();
     if (!data.WriteInt32(static_cast<int32_t>(size))) {
+        LOG_ERROR(UDMF_SERVICE, "WriteInt32 failed! size: %{public}d", size);
         return E_WRITE_PARCEL_ERROR;
     }
     for (const auto &record : unifiedData.GetRecords()) {
         if (record == nullptr) {
-            continue;
+            LOG_ERROR(UDMF_SERVICE, "record is nullptr!");
+            return E_INVALID_PARAMETERS;
         }
         if (record->GetSize() > UdmfService::MAX_RECORD_SIZE) {
-            return E_INVALID_VALUE;
+            LOG_ERROR(UDMF_SERVICE, "Exceeded record limit!");
+            return E_INVALID_PARAMETERS;
         }
         std::vector<uint8_t> recordBytes;
         auto recordTlv = TLVObject(recordBytes);
         if (!TLVUtil::Writing(record, recordTlv)) {
+            LOG_ERROR(UDMF_SERVICE, "recordTlv writing failed!");
             return E_WRITE_PARCEL_ERROR;
         }
         if (!data.WriteInt32(static_cast<int32_t>(recordBytes.size()))
             || !data.WriteRawData(recordBytes.data(), recordBytes.size())) {
+            LOG_ERROR(UDMF_SERVICE, "WriteRawData failed! size: %{public}d", recordBytes.size());
             return E_WRITE_PARCEL_ERROR;
         }
     }
@@ -51,17 +56,19 @@ int32_t UdmfServiceUtils::UnMarshalUnifiedData(MessageParcel &data, UnifiedData 
         std::shared_ptr<UnifiedRecord> record;
         auto size = data.ReadInt32();
         if (size == 0) {
-            continue;
+            LOG_ERROR(UDMF_SERVICE, "record is empty!");
+            return E_INVALID_PARAMETERS;
         }
         const uint8_t *rawData = reinterpret_cast<const uint8_t *>(data.ReadRawData(size));
         if (rawData == nullptr) {
-            return IPC_STUB_INVALID_DATA_ERR;
+            LOG_ERROR(UDMF_SERVICE, "rawData is nullptr!");
+            return E_READ_PARCEL_ERROR;
         }
         std::vector<uint8_t> recordBytes(rawData, rawData + size);
         auto recordTlv = TLVObject(recordBytes);
         if (!TLVUtil::Reading(record, recordTlv)) {
             LOG_ERROR(UDMF_SERVICE, "Unmarshall unified record failed.");
-            return IPC_STUB_INVALID_DATA_ERR;
+            return E_READ_PARCEL_ERROR;
         }
         unifiedData.AddRecord(record);
     }
@@ -72,10 +79,12 @@ int32_t UdmfServiceUtils::MarshalBatchUnifiedData(MessageParcel &data, const std
 {
     auto unifiedDataSetSize = unifiedDataSet.size();
     if (!data.WriteInt32(static_cast<int32_t>(unifiedDataSetSize))) {
+        LOG_ERROR(UDMF_SERVICE, "WriteInt32 failed. unifiedDataSetSize: %{public}d", unifiedDataSetSize);
         return E_WRITE_PARCEL_ERROR;
     }
     for (const auto &unifiedData : unifiedDataSet) {
         if (MarshalUnifiedData(data, unifiedData) != E_OK) {
+            LOG_ERROR(UDMF_SERVICE, "MarshalUnifiedData failed.");
             return E_WRITE_PARCEL_ERROR;
         }
     }
@@ -88,6 +97,7 @@ int32_t UdmfServiceUtils::UnMarshalBatchUnifiedData(MessageParcel &data, std::ve
     for (int32_t dataIndex = 0; dataIndex < unifiedDataSetCount; dataIndex++) {
         UnifiedData unifiedData;
         if (UnMarshalUnifiedData(data, unifiedData) != E_OK) {
+            LOG_ERROR(UDMF_SERVICE, "UnMarshalUnifiedData failed.");
             return E_READ_PARCEL_ERROR;
         }
         unifiedDataSet.push_back(unifiedData);

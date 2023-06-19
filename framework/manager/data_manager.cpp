@@ -44,7 +44,7 @@ DataManager &DataManager::GetInstance()
 
 int32_t DataManager::SaveData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
 {
-    if (unifiedData.GetRecords().empty()) {
+    if (unifiedData.IsEmpty()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid parameters, have no record");
         return E_INVALID_PARAMETERS;
     }
@@ -81,6 +81,7 @@ int32_t DataManager::SaveData(CustomOption &option, UnifiedData &unifiedData, st
         return E_DB_ERROR;
     }
     key = unifiedData.GetRuntime()->key.GetUnifiedKey();
+    LOG_DEBUG(UDMF_FRAMEWORK, "Put unified data successful, key: %{public}s.", key.c_str());
     return E_OK;
 }
 
@@ -108,7 +109,7 @@ int32_t DataManager::RetrieveData(const QueryOption &query, UnifiedData &unified
     CheckerManager::CheckInfo info;
     info.tokenId = query.tokenId;
     if (!CheckerManager::GetInstance().IsValid(runtime->privileges, info)) {
-        return E_INVALID_OPERATION;
+        return E_NO_PERMISSION;
     }
     std::string bundleName;
     if (!PreProcessUtils::GetInstance().GetHapBundleNameByToken(query.tokenId, bundleName)) {
@@ -125,7 +126,7 @@ int32_t DataManager::RetrieveData(const QueryOption &query, UnifiedData &unified
                 uri = file->GetUri();
             }
             if (!uri.empty() && (UriPermissionManager::GetInstance().GrantUriPermission(uri, bundleName) != E_OK)) {
-                return E_ERROR;
+                return E_NO_PERMISSION;
             }
         }
     }
@@ -146,7 +147,7 @@ int32_t DataManager::RetrieveBatchData(const QueryOption &query, std::vector<Uni
         return status;
     }
     if (dataSet.empty()) {
-        LOG_DEBUG(UDMF_FRAMEWORK, "has no data, key: %{public}s, intention: %{public}d.", query.key.c_str(),
+        LOG_WARN(UDMF_FRAMEWORK, "has no data, key: %{public}s, intention: %{public}d.", query.key.c_str(),
             query.intention);
         return E_OK;
     }
@@ -163,6 +164,10 @@ int32_t DataManager::UpdateData(const QueryOption &query, UnifiedData &unifiedDa
         LOG_ERROR(UDMF_FRAMEWORK, "Unified key: %{public}s is invalid.", query.key.c_str());
         return E_INVALID_PARAMETERS;
     }
+    if (unifiedData.IsEmpty()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid parameters, unified data has no record.");
+        return E_INVALID_PARAMETERS;
+    }
     auto store = storeCache_.GetStore(key.intention);
     if (store == nullptr) {
         LOG_ERROR(UDMF_FRAMEWORK, "Get store failed, intention: %{public}s.", key.intention.c_str());
@@ -175,14 +180,12 @@ int32_t DataManager::UpdateData(const QueryOption &query, UnifiedData &unifiedDa
         LOG_ERROR(UDMF_FRAMEWORK, "Get data from store failed, intention: %{public}s.", key.intention.c_str());
         return res;
     }
-
     if (data.IsEmpty()) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Invalid parameters, unified data has no record, intention: %{public}s.",
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid parameter, unified data has no record; intention: %{public}s.",
             key.intention.c_str());
         return E_INVALID_PARAMETERS;
     }
     std::shared_ptr<Runtime> runtime = data.GetRuntime();
-
     runtime->lastModifiedTime = PreProcessUtils::GetInstance().GetTimeStamp();
     unifiedData.SetRuntime(*runtime);
     for (const auto &record : unifiedData.GetRecords()) {
@@ -204,7 +207,7 @@ int32_t DataManager::DeleteData(const QueryOption &query, std::vector<UnifiedDat
         return status;
     }
     if (dataSet.empty()) {
-        LOG_DEBUG(UDMF_FRAMEWORK, "has no data, key: %{public}s, intention: %{public}d.", query.key.c_str(),
+        LOG_WARN(UDMF_FRAMEWORK, "has no data, key: %{public}s, intention: %{public}d.", query.key.c_str(),
             query.intention);
         return E_OK;
     }
@@ -260,7 +263,7 @@ int32_t DataManager::AddPrivilege(const QueryOption &query, const Privilege &pri
 
     if (processName != authorizationMap_[key.intention]) {
         LOG_ERROR(UDMF_FRAMEWORK, "Process: %{public}s have no permission", processName.c_str());
-        return E_FORBIDDEN;
+        return E_NO_PERMISSION;
     }
 
     auto store = storeCache_.GetStore(key.intention);

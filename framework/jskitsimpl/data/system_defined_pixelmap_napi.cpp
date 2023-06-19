@@ -47,7 +47,7 @@ napi_value SystemDefinedPixelMapNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *sdPixelMap = new (std::nothrow) SystemDefinedPixelMapNapi();
-    ASSERT_ERR(ctxt->env, sdPixelMap != nullptr, Status::E_FORBIDDEN, "no memory for system defined pixel map!");
+    ASSERT_ERR(ctxt->env, sdPixelMap != nullptr, Status::E_UNKNOWN, "no memory for system defined pixel map!");
     sdPixelMap->value_ = std::make_shared<SystemDefinedPixelMap>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, sdPixelMap, Destructor, nullptr, nullptr), sdPixelMap);
     return ctxt->self;
@@ -58,7 +58,7 @@ void SystemDefinedPixelMapNapi::NewInstance(napi_env env, std::shared_ptr<Unifie
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedPixelMapNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *sdPixelMap = new (std::nothrow) SystemDefinedPixelMapNapi();
-    ASSERT_ERR_VOID(env, sdPixelMap != nullptr, Status::E_FORBIDDEN, "no memory for system defined pixel map!");
+    ASSERT_ERR_VOID(env, sdPixelMap != nullptr, Status::E_UNKNOWN, "no memory for system defined pixel map!");
     sdPixelMap->value_ = std::static_pointer_cast<SystemDefinedPixelMap>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, sdPixelMap, Destructor, nullptr, nullptr), sdPixelMap);
 }
@@ -98,7 +98,7 @@ napi_value SystemDefinedPixelMapNapi::SetRawData(napi_env env, napi_callback_inf
     auto ctxt = std::make_shared<ContextBase>();
     std::vector<uint8_t> pixelMap;
     auto input = [env, ctxt, &pixelMap](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], pixelMap);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };

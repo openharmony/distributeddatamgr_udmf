@@ -70,7 +70,7 @@ napi_value UnifiedDataNapi::New(napi_env env, napi_callback_info info)
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     auto *uData = new (std::nothrow) UnifiedDataNapi();
-    ASSERT_ERR(ctxt->env, uData != nullptr, Status::E_FORBIDDEN, "no memory for unified data!");
+    ASSERT_ERR(ctxt->env, uData != nullptr, Status::E_UNKNOWN, "no memory for unified data!");
     uData->value_ = std::make_shared<UnifiedData>();
     if (uRecord) {
         uData->value_->AddRecord(uRecord->value_);
@@ -92,7 +92,7 @@ void UnifiedDataNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedData> in,
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *unifiedData = new (std::nothrow) UnifiedDataNapi();
-    ASSERT_ERR_VOID(env, unifiedData != nullptr, Status::E_FORBIDDEN, "no memory for unified data!");
+    ASSERT_ERR_VOID(env, unifiedData != nullptr, Status::E_UNKNOWN, "no memory for unified data!");
     unifiedData->value_ = in;
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, unifiedData, Destructor, nullptr, nullptr), unifiedData);
 }
@@ -112,7 +112,7 @@ napi_value UnifiedDataNapi::AddRecord(napi_env env, napi_callback_info info)
     UnifiedRecordNapi *uRecord = nullptr;
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, info, ctxt, &uRecord](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = napi_unwrap(env, *argv, reinterpret_cast<void **>(&uRecord));
         ASSERT_BUSINESS_ERR(ctxt, (ctxt->status == napi_ok && uRecord != nullptr && uRecord->value_ != nullptr),
             Status::E_INVALID_PARAMETERS, "invalid object!");

@@ -521,6 +521,114 @@ void GetSummaryFuzz(const uint8_t *data, size_t size)
     UnifiedData data2;
     UdmfClient::GetInstance().GetData(option2, data2);
 }
+
+void GetBatchDataByKeyFuzz(const uint8_t *data, size_t size)
+{
+    std::string skey(data, data + size);
+    CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
+    UnifiedData data1;
+    std::string key;
+    PlainText plainText(skey, skey);
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(plainText);
+    data1.AddRecord(record1);
+    UdmfClient::GetInstance().SetData(option1, data1, key);
+
+    SetHapToken();
+    QueryOption option2 = { .key = key };
+    std::vector<UnifiedData> dataSet2;
+    UdmfClient::GetInstance().GetBatchData(option2, dataSet2);
+
+    SetHapToken();
+    QueryOption option3 = { .key = skey };
+    std::vector<UnifiedData> dataSet3;
+    UdmfClient::GetInstance().GetBatchData(option3, dataSet3);
+}
+
+void GetBatchDataByIntentionFuzz(const uint8_t *data, size_t size)
+{
+    std::string skey(data, data + size);
+    CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
+    UnifiedData data1;
+    std::string key;
+    PlainText plainText(skey, skey);
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(plainText);
+    data1.AddRecord(record1);
+    UdmfClient::GetInstance().SetData(option1, data1, key);
+
+    SetHapToken();
+    Intention intention = UnifiedDataUtils::GetIntentionByString(skey);
+    QueryOption option2 = { .intention = intention };
+    std::vector<UnifiedData> dataSet;
+    UdmfClient::GetInstance().GetBatchData(option2, dataSet);
+}
+
+void DeleteDataByKeyFuzz(const uint8_t *data, size_t size)
+{
+    std::string skey(data, data + size);
+    CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
+    UnifiedData data1;
+    std::string key;
+    PlainText plainText(skey, skey);
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(plainText);
+    data1.AddRecord(record1);
+    UdmfClient::GetInstance().SetData(option1, data1, key);
+
+    SetHapToken();
+    QueryOption option2 = { .key = key };
+    std::vector<UnifiedData> dataSet2;
+    UdmfClient::GetInstance().DeleteData(option2, dataSet2);
+
+    SetHapToken();
+    QueryOption option3 = { .key = skey };
+    std::vector<UnifiedData> dataSet3;
+    UdmfClient::GetInstance().DeleteData(option3, dataSet3);
+}
+
+void DeleteDataByIntentionFuzz(const uint8_t *data, size_t size)
+{
+    std::string skey(data, data + size);
+    CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
+    UnifiedData data1;
+    std::string key;
+    PlainText plainText(skey, skey);
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(plainText);
+    data1.AddRecord(record1);
+    UdmfClient::GetInstance().SetData(option1, data1, key);
+
+    SetHapToken();
+    Intention intention = UnifiedDataUtils::GetIntentionByString(skey);
+    QueryOption option2 = { .intention = intention };
+    std::vector<UnifiedData> dataSet;
+    UdmfClient::GetInstance().DeleteData(option2, dataSet);
+}
+
+void UpdateDataFuzz(const uint8_t *data, size_t size)
+{
+    std::string skey(data, data + size);
+    CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
+    UnifiedData data1;
+    std::string key;
+    PlainText plainText(skey, skey);
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(plainText);
+    data1.AddRecord(record1);
+    UdmfClient::GetInstance().SetData(option1, data1, key);
+
+    SetHapToken();
+    UnifiedData data2;
+    PlainText plainText2(skey + "2", skey + "2");
+    record1 = std::make_shared<PlainText>(plainText2);
+    data2.AddRecord(record1);
+    QueryOption option2 = { .key = key };
+    UdmfClient::GetInstance().UpdateData(option2, data2);
+
+    SetHapToken();
+    UnifiedData data3;
+    PlainText plainText3(skey + "3", skey + "3");
+    record1 = std::make_shared<PlainText>(plainText3);
+    data3.AddRecord(record1);
+    QueryOption option3 = { .key = skey };
+    UdmfClient::GetInstance().UpdateData(option3, data3);
+}
 }
 
 /* Fuzzer entry point */
@@ -540,6 +648,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::SetDataTextFuzz(data, size);
     OHOS::SetDataVideoFuzz(data, size);
     OHOS::GetSummaryFuzz(data, size);
+    OHOS::GetBatchDataByKeyFuzz(data, size);
+    OHOS::GetBatchDataByIntentionFuzz(data, size);
+    OHOS::DeleteDataByKeyFuzz(data, size);
+    OHOS::DeleteDataByIntentionFuzz(data, size);
+    OHOS::UpdateDataFuzz(data, size);
     OHOS::TearDown();
     return 0;
 }

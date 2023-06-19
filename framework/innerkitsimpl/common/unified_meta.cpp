@@ -70,7 +70,7 @@ size_t UnifiedDataUtils::GetDetailsSize(UDDetails &details)
 
 bool UnifiedDataUtils::IsPersist(const Intention &intention)
 {
-    return intention > UD_INTENTION_SYS && intention < UD_INTENTION_BUTT;
+    return intention >= UD_INTENTION_DATA_HUB && intention < UD_INTENTION_BUTT;
 }
 
 bool UnifiedDataUtils::IsPersist(const std::string &intention)
