@@ -92,6 +92,7 @@ ohos_shared_library("udmf_client") {
     "samgr:samgr_proxy",
   ]
 
+  innerapi_tags = [ "platformsdk" ]
   subsystem_name = "distributeddatamgr"
 
   part_name = "udmf"
