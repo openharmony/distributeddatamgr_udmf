@@ -69,21 +69,19 @@ ohos_shared_library("udmf_napi") {
   ]
   public_configs = [ ":udmf_napi_config" ]
 
-  deps = [
-    "${arkui_path}/napi:ace_napi",
-    "${third_party_path}/bounds_checking_function:libsec_static",
-    "../innerkits:udmf_client",
-  ]
+  deps = [ "../innerkits:udmf_client" ]
 
   external_deps = [
     "ability_base:base",
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
     "ability_runtime:napi_base_context",
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
+    "napi:ace_napi",
   ]
 
   relative_install_dir = "module/data"
@@ -118,21 +116,19 @@ ohos_shared_library("udmf_data_napi") {
   ]
   public_configs = [ ":udmf_napi_config" ]
 
-  deps = [
-    "${arkui_path}/napi:ace_napi",
-    "${third_party_path}/bounds_checking_function:libsec_static",
-    "../innerkits:udmf_client",
-  ]
+  deps = [ "../innerkits:udmf_client" ]
 
   external_deps = [
     "ability_base:base",
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
     "ability_runtime:napi_base_context",
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
+    "napi:ace_napi",
   ]
 
   subsystem_name = "distributeddatamgr"

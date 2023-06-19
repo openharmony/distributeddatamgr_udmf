@@ -24,6 +24,9 @@
     "ram": "636KB",
     "deps": {
       "components": [
+        "aafwk_standard",
+        "ability_base",
+        "ability_runtime",
         "access_token",
         "app_file_service",
         "bounds_checking_function",
@@ -31,15 +34,13 @@
         "c_utils",
         "data_object",
         "datamgr_service",
+        "hiviewdfx_hilog_native",
+        "ipc",
         "kv_store",
         "multimedia_image_framework",
-        "os_account",
-        "ipc",
-        "hiviewdfx_hilog_native",
-        "samgr",
         "napi",
-        "ability_base",
-        "ability_runtime"
+        "os_account",
+        "samgr"
       ],
       "third_party": [
         "gtest_main"

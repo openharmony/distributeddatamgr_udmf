@@ -44,17 +44,15 @@ ohos_shared_library("udmf_server") {
   configs = [ ":udmf_service_config" ]
 
   deps = [
-    "${access_kit_path}/interfaces/innerkits/accesstoken:libaccesstoken_sdk",
     "${ddms_path}/services/distributeddataservice/framework:distributeddatasvcfwk",
     "../interfaces/innerkits:udmf_client",
   ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "c_utils:utils",
-    "data_object:distributeddataobject_impl",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "multimedia_image_framework:image_native",
   ]
 
   subsystem_name = "distributeddatamgr"
