@@ -64,7 +64,7 @@ void ApplicationDefinedRecordNapi::NewInstance(napi_env env, std::shared_ptr<Uni
 void ApplicationDefinedRecordNapi::Destructor(napi_env env, void *data, void *hint)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi finalize.");
-    auto *record = static_cast<ApplicationDefinedRecord *>(data);
+    auto *record = static_cast<ApplicationDefinedRecordNapi *>(data);
     ASSERT_VOID(record != nullptr, "finalize null!");
     delete record;
 }
