@@ -48,7 +48,7 @@ napi_value PlainTextNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *plainText = new (std::nothrow) PlainTextNapi();
-    ASSERT_ERR(ctxt->env, plainText != nullptr, Status::E_FORBIDDEN, "no memory for plain text!");
+    ASSERT_ERR(ctxt->env, plainText != nullptr, Status::E_UNKNOWN, "no memory for plain text!");
     plainText->value_ = std::make_shared<PlainText>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, plainText, Destructor, nullptr, nullptr), plainText);
     return ctxt->self;
@@ -59,7 +59,7 @@ void PlainTextNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in,
     LOG_DEBUG(UDMF_KITS_NAPI, "PlainTextNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *plainText = new (std::nothrow) PlainTextNapi();
-    ASSERT_ERR_VOID(env, plainText != nullptr, Status::E_FORBIDDEN, "no memory for plain text!");
+    ASSERT_ERR_VOID(env, plainText != nullptr, Status::E_UNKNOWN, "no memory for plain text!");
     plainText->value_ = std::static_pointer_cast<PlainText>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, plainText, Destructor, nullptr, nullptr), plainText);
 }
@@ -98,7 +98,7 @@ napi_value PlainTextNapi::SetContent(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string content;
     auto input = [env, ctxt, &content](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], content);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
@@ -129,7 +129,7 @@ napi_value PlainTextNapi::SetAbstract(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string abstract;
     auto input = [env, ctxt, &abstract](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], abstract);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };

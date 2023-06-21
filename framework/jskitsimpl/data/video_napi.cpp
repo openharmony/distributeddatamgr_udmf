@@ -48,7 +48,7 @@ napi_value VideoNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *video = new (std::nothrow) VideoNapi();
-    ASSERT_ERR(ctxt->env, video != nullptr, Status::E_FORBIDDEN, "no memory for video!");
+    ASSERT_ERR(ctxt->env, video != nullptr, Status::E_UNKNOWN, "no memory for video!");
     video->value_ = std::make_shared<Video>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, video, Destructor, nullptr, nullptr), video);
     return ctxt->self;
@@ -59,7 +59,7 @@ void VideoNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, nap
     LOG_DEBUG(UDMF_KITS_NAPI, "VideoNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *video = new (std::nothrow) VideoNapi();
-    ASSERT_ERR_VOID(env, video != nullptr, Status::E_FORBIDDEN, "no memory for video!");
+    ASSERT_ERR_VOID(env, video != nullptr, Status::E_UNKNOWN, "no memory for video!");
     video->value_ = std::static_pointer_cast<Video>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, video, Destructor, nullptr, nullptr), video);
 }
@@ -98,7 +98,7 @@ napi_value VideoNapi::SetVideoUri(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string uri;
     auto input = [env, ctxt, &uri](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], uri);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };

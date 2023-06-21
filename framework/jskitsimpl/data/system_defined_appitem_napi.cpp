@@ -52,7 +52,7 @@ napi_value SystemDefinedAppItemNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *sdAppItem = new (std::nothrow) SystemDefinedAppItemNapi();
-    ASSERT_ERR(ctxt->env, sdAppItem != nullptr, Status::E_FORBIDDEN, "no memory for system defined appitem!");
+    ASSERT_ERR(ctxt->env, sdAppItem != nullptr, Status::E_UNKNOWN, "no memory for system defined appitem!");
     sdAppItem->value_ = std::make_shared<SystemDefinedAppItem>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, sdAppItem, Destructor, nullptr, nullptr), sdAppItem);
     return ctxt->self;
@@ -63,7 +63,7 @@ void SystemDefinedAppItemNapi::NewInstance(napi_env env, std::shared_ptr<Unified
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedAppItemNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *sdAppItem = new (std::nothrow) SystemDefinedAppItemNapi();
-    ASSERT_ERR_VOID(env, sdAppItem != nullptr, Status::E_FORBIDDEN, "no memory for system defined appitem!");
+    ASSERT_ERR_VOID(env, sdAppItem != nullptr, Status::E_UNKNOWN, "no memory for system defined appitem!");
     sdAppItem->value_ = std::static_pointer_cast<SystemDefinedAppItem>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, sdAppItem, Destructor, nullptr, nullptr), sdAppItem);
 }
@@ -103,7 +103,7 @@ napi_value SystemDefinedAppItemNapi::SetAppId(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<ContextBase>();
     std::string appId;
     auto input = [env, ctxt, &appId](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], appId);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
@@ -134,7 +134,7 @@ napi_value SystemDefinedAppItemNapi::SetAppName(napi_env env, napi_callback_info
     auto ctxt = std::make_shared<ContextBase>();
     std::string appName;
     auto input = [env, ctxt, &appName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], appName);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
@@ -165,7 +165,7 @@ napi_value SystemDefinedAppItemNapi::SetAppIconId(napi_env env, napi_callback_in
     auto ctxt = std::make_shared<ContextBase>();
     std::string appIconId;
     auto input = [env, ctxt, &appIconId](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], appIconId);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
@@ -196,7 +196,7 @@ napi_value SystemDefinedAppItemNapi::SetAppLabelId(napi_env env, napi_callback_i
     auto ctxt = std::make_shared<ContextBase>();
     std::string appLabelId;
     auto input = [env, ctxt, &appLabelId](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], appLabelId);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
@@ -227,7 +227,7 @@ napi_value SystemDefinedAppItemNapi::SetBundleName(napi_env env, napi_callback_i
     auto ctxt = std::make_shared<ContextBase>();
     std::string bundleName;
     auto input = [env, ctxt, &bundleName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], bundleName);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
@@ -258,7 +258,7 @@ napi_value SystemDefinedAppItemNapi::SetAbilityName(napi_env env, napi_callback_
     auto ctxt = std::make_shared<ContextBase>();
     std::string abilityName;
     auto input = [env, ctxt, &abilityName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], abilityName);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };

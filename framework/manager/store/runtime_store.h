@@ -51,6 +51,8 @@ private:
     Status GetEntries(const std::string &dataPrefix, std::vector<DistributedKv::Entry> &entries);
     Status PutEntries(const std::vector<DistributedKv::Entry> &entries);
     Status DeleteEntries(const std::vector<DistributedKv::Key> &keys);
+    Status UnMarshalEntries(
+        const std::string &key, std::vector<DistributedKv::Entry> &entries, UnifiedData &unifiedData);
 };
 } // namespace UDMF
 } // namespace OHOS

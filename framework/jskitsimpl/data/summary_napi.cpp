@@ -41,7 +41,7 @@ napi_value SummaryNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *summary = new (std::nothrow) SummaryNapi();
-    ASSERT_ERR(ctxt->env, summary != nullptr, Status::E_FORBIDDEN, "no memory for summary!");
+    ASSERT_ERR(ctxt->env, summary != nullptr, Status::E_UNKNOWN, "no memory for summary!");
     summary->value_ = std::make_shared<Summary>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, summary, Destructor, nullptr, nullptr), summary);
     return ctxt->self;
@@ -60,7 +60,7 @@ void SummaryNapi::NewInstance(napi_env env, std::shared_ptr<Summary> in, napi_va
     LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *summary = new (std::nothrow) SummaryNapi();
-    ASSERT_ERR_VOID(env, summary != nullptr, Status::E_FORBIDDEN, "no memory for summary!");
+    ASSERT_ERR_VOID(env, summary != nullptr, Status::E_UNKNOWN, "no memory for summary!");
     summary->value_ = in;
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, summary, Destructor, nullptr, nullptr), summary);
 }

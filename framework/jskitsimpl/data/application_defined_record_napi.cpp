@@ -45,7 +45,7 @@ napi_value ApplicationDefinedRecordNapi::New(napi_env env, napi_callback_info in
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *record = new (std::nothrow) ApplicationDefinedRecordNapi();
-    ASSERT_ERR(ctxt->env, record != nullptr, Status::E_FORBIDDEN, "no memory for application defined record!");
+    ASSERT_ERR(ctxt->env, record != nullptr, Status::E_UNKNOWN, "no memory for application defined record!");
     record->value_ = std::make_shared<ApplicationDefinedRecord>();
     ASSERT_CALL(ctxt->env, napi_wrap(env, ctxt->self, record, Destructor, nullptr, nullptr), record);
     return ctxt->self;
@@ -56,7 +56,7 @@ void ApplicationDefinedRecordNapi::NewInstance(napi_env env, std::shared_ptr<Uni
     LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *record = new (std::nothrow) ApplicationDefinedRecordNapi();
-    ASSERT_ERR_VOID(env, record != nullptr, Status::E_FORBIDDEN, "no memory for application defined record!");
+    ASSERT_ERR_VOID(env, record != nullptr, Status::E_UNKNOWN, "no memory for application defined record!");
     record->value_ = std::static_pointer_cast<ApplicationDefinedRecord>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, record, Destructor, nullptr, nullptr), record);
 }
@@ -96,7 +96,7 @@ napi_value ApplicationDefinedRecordNapi::SetApplicationDefinedType(napi_env env,
     auto ctxt = std::make_shared<ContextBase>();
     std::string type;
     auto input = [env, ctxt, &type](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
@@ -127,7 +127,7 @@ napi_value ApplicationDefinedRecordNapi::SetRawData(napi_env env, napi_callback_
     auto ctxt = std::make_shared<ContextBase>();
     std::vector<uint8_t> rawData;
     auto input = [env, ctxt, &rawData](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], rawData);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };

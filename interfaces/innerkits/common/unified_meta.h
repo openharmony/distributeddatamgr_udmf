@@ -106,19 +106,17 @@ using UDDetails = std::map<std::string, UDVariant>;
 enum Intention : int32_t {
     UD_INTENTION_BASE = 0,
     UD_INTENTION_DRAG,
-    UD_INTENTION_SHARE,
-    UD_INTENTION_SYS,
-    UD_INTENTION_SUPER_HUB,
+    UD_INTENTION_DATA_HUB,
     UD_INTENTION_BUTT,
 };
 
 static const std::unordered_map<int32_t, std::string> UD_INTENTION_MAP {
     { UD_INTENTION_DRAG, "drag" },
-    { UD_INTENTION_SUPER_HUB, "SuperHub" },
+    { UD_INTENTION_DATA_HUB, "DataHub" },
 };
 
 static const std::unordered_map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
-    { UD_INTENTION_SUPER_HUB, "SUPER_HUB" },
+    { UD_INTENTION_DATA_HUB, "DATA_HUB" },
 };
 
 class UnifiedDataUtils {
