@@ -232,6 +232,32 @@ bool CountBufferSize(const Runtime &input, TLVObject &data)
     return true;
 }
 
+template<>
+bool CountBufferSize(const UnifiedData &input, TLVObject &data)
+{
+    int32_t size = input.GetRecords().size();
+    data.Count(size);
+    for (auto record : input.GetRecords()) {
+        if (!CountBufferSize(record, data)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template<>
+bool CountBufferSize(const std::vector<UnifiedData> &input, TLVObject &data)
+{
+    int32_t size = input.size();
+    data.Count(size);
+    for (auto unifiedData : input) {
+        if (!CountBufferSize(unifiedData, data)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 template<typename T>
 bool Writing(const T &input, TLVObject &data);
 
@@ -825,10 +851,12 @@ bool Reading(ApplicationDefinedRecord &output, TLVObject &data)
 template<>
 bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
 {
-    if (!CountBufferSize(input, data)) {
-        return false;
+    if (data.GetBuffer().size() == 0) {
+        if (!CountBufferSize(input, data)) {
+            return false;
+        }
+        data.UpdateSize();
     }
-    data.UpdateSize();
 
     if (!Writing(input->GetType(), data)) {
         return false;
@@ -1142,6 +1170,84 @@ bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data)
     }
     output->SetUid(uid);
     output->SetType(type);
+    return true;
+}
+
+template<>
+bool Writing(const UnifiedData &input, TLVObject &data)
+{
+    if (data.GetBuffer().size() == 0) {
+        if (!CountBufferSize(input, data)) {
+            return false;
+        }
+        data.UpdateSize();
+    }
+
+    int32_t size = input.GetRecords().size();
+    if (!Writing(size, data)) {
+        return false;
+    }
+
+    for (auto record : input.GetRecords()) {
+        if (!Writing(record, data)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template<>
+bool Reading(UnifiedData &output, TLVObject &data)
+{
+    int32_t size;
+    if (!Reading(size, data)) {
+        return false;
+    }
+    while (size-- > 0) {
+        std::shared_ptr<UnifiedRecord> record;
+        if (!Reading(record, data)) {
+            return false;
+        }
+        output.AddRecord(record);
+    }
+    return true;
+}
+
+template<>
+bool Writing(const std::vector<UnifiedData> &input, TLVObject &data)
+{
+    if (!CountBufferSize(input, data)) {
+        return false;
+    }
+    data.UpdateSize();
+
+    int32_t size = input.size();
+    if (!Writing(size, data)) {
+        return false;
+    }
+
+    for (auto unifiedData : input) {
+        if (!Writing(unifiedData, data)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template<>
+bool Reading(std::vector<UnifiedData> &output, TLVObject &data)
+{
+    int32_t size;
+    if (!Reading(size, data)) {
+        return false;
+    }
+    while (size-- > 0) {
+        UnifiedData unifiedData;
+        if (!Reading(unifiedData, data)) {
+            return false;
+        }
+        output.push_back(unifiedData);
+    }
     return true;
 }
 

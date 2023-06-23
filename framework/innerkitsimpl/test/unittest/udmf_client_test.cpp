@@ -1058,6 +1058,42 @@ HWTEST_F(UdmfClientTest, SetData019, TestSize.Level1)
 }
 
 /**
+* @tc.name: SetData020
+* @tc.desc: Set two 2MB record of data with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData020, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData020 begin.");
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData inputData;
+    std::string key;
+    UDDetails details;
+    std::string value;
+    int64_t maxSize = 512 * 1024;
+    for (int64_t i = 0; i < maxSize; ++i) {
+        value += "11";
+    }
+    details.insert({ value, value });
+    Text text;
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
+    for (int i = 0; i < 2; ++i) {
+        inputData.AddRecord(record);
+    }
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption queryOption = { .key = key };
+    UnifiedData outputData;
+    status = UdmfClient::GetInstance().GetData(queryOption, outputData);
+    ASSERT_EQ(status, E_OK);
+
+    LOG_INFO(UDMF_TEST, "SetData020 end.");
+}
+
+/**
 * @tc.name: GetData001
 * @tc.desc: Get data with invalid key
 * @tc.type: FUNC
@@ -1418,13 +1454,13 @@ HWTEST_F(UdmfClientTest, GetSelfData002, TestSize.Level1)
 }
 
 /**
-* @tc.name: SetData020
+* @tc.name: SetData021
 * @tc.desc: Set datas with intention ${UD_INTENTION_DATA_HUB} and manually check db is cleared before set or not
 * @tc.type: FUNC
 */
-HWTEST_F(UdmfClientTest, SetData020, TestSize.Level1)
+HWTEST_F(UdmfClientTest, SetData021, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetData020 begin.");
+    LOG_INFO(UDMF_TEST, "SetData021 begin.");
     QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
     std::vector<UnifiedData> unifiedDataSet;
     auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
@@ -1457,7 +1493,7 @@ HWTEST_F(UdmfClientTest, SetData020, TestSize.Level1)
     ASSERT_EQ(status, E_OK);
     auto size = static_cast<int32_t>(unifiedDataSet.size());
     ASSERT_EQ(size, 2);
-    LOG_INFO(UDMF_TEST, "SetData020 end.");
+    LOG_INFO(UDMF_TEST, "SetData021 end.");
 }
 
 /**

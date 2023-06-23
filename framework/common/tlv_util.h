@@ -33,6 +33,7 @@
 #include "system_defined_record.h"
 #include "text.h"
 #include "tlv_object.h"
+#include "unified_data.h"
 #include "unified_key.h"
 #include "unified_meta.h"
 #include "unified_record.h"
@@ -50,6 +51,12 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
 
 template<>
 bool CountBufferSize(const Runtime &input, TLVObject &data);
+
+template<>
+bool CountBufferSize(const UnifiedData &input, TLVObject &data);
+
+template<>
+bool CountBufferSize(const std::vector<UnifiedData> &input, TLVObject &data);
 
 template<typename T>
 bool Writing(const T &input, TLVObject &data);
@@ -182,6 +189,16 @@ template<>
 bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data);
 template<>
 bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data);
+
+template<>
+bool Writing(const UnifiedData &input, TLVObject &data);
+template<>
+bool Reading(UnifiedData &output, TLVObject &data);
+
+template<>
+bool Writing(const std::vector<UnifiedData> &input, TLVObject &data);
+template<>
+bool Reading(std::vector<UnifiedData> &output, TLVObject &data);
 
 template<>
 bool Writing(const UnifiedKey &input, TLVObject &data);
