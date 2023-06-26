@@ -76,7 +76,7 @@ struct CustomOption {
 struct QueryOption {
     std::string key;
     Intention intention {};
-    int32_t tokenId {};
+    uint32_t  tokenId {};
 };
 } // namespace UDMF
 } // namespace OHOS
