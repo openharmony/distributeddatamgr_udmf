@@ -14,6 +14,7 @@
  */
 
 #include "store_cache.h"
+#include <chrono>
 
 #include "logger.h"
 #include "runtime_store.h"
@@ -21,6 +22,8 @@
 
 namespace OHOS {
 namespace UDMF {
+std::shared_ptr<ExecutorPool> StoreCache::executorPool_ = std::make_shared<ExecutorPool>(2, 1);
+
 std::shared_ptr<Store> StoreCache::GetStore(std::string intention)
 {
     std::shared_ptr<Store> store;
@@ -42,7 +45,31 @@ std::shared_ptr<Store> StoreCache::GetStore(std::string intention)
         }
         return false;
     });
+
+    std::unique_lock<std::mutex> lock(taskMutex_);
+    if (taskId_ == ExecutorPool::INVALID_TASK_ID) {
+        taskId_ = executorPool_->Schedule(std::chrono::minutes(INTERVAL), std::bind(&StoreCache::GarbageCollect, this));
+    }
     return store;
+}
+
+void StoreCache::GarbageCollect()
+{
+    auto current = std::chrono::steady_clock::now();
+    stores_.EraseIf([&current](auto &key, std::shared_ptr<Store> &storePtr) {
+        if (*storePtr < current) {
+            LOG_DEBUG(UDMF_SERVICE, "GarbageCollect, stores:%{public}s time limit, will be close.", key.c_str());
+            return true;
+        }
+        return false;
+    });
+    std::unique_lock<std::mutex> lock(taskMutex_);
+    if (!stores_.Empty()) {
+        LOG_DEBUG(UDMF_SERVICE, "GarbageCollect, stores size:%{public}zu", stores_.Size());
+        taskId_ = executorPool_->Schedule(std::chrono::minutes(INTERVAL), std::bind(&StoreCache::GarbageCollect, this));
+    } else {
+        taskId_ = ExecutorPool::INVALID_TASK_ID;
+    }
 }
 } // namespace UDMF
 } // namespace OHOS

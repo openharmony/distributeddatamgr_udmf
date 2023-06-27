@@ -17,8 +17,10 @@
 #define UDMF_STORE_CACHE_H
 
 #include <memory>
+#include <mutex>
 
 #include "concurrent_map.h"
+#include "executor_pool.h"
 #include "store.h"
 #include "unified_meta.h"
 
@@ -29,7 +31,14 @@ public:
     std::shared_ptr<Store> GetStore(std::string intention);
 
 private:
+    void GarbageCollect();
+
     ConcurrentMap<std::string, std::shared_ptr<Store>> stores_;
+    std::mutex taskMutex_;
+    ExecutorPool::TaskId taskId_ = ExecutorPool::INVALID_TASK_ID;
+
+    static constexpr int64_t INTERVAL = 1;  // 1 min
+    static std::shared_ptr<ExecutorPool> executorPool_;
 };
 } // namespace UDMF
 } // namespace OHOS
