@@ -35,8 +35,8 @@ public:
     bool RuntimeDataImputation(UnifiedData &data, CustomOption &option);
     std::string IdGenerator();
     time_t GetTimeStamp();
-    bool GetHapBundleNameByToken(int tokenId, std::string &bundleName);
-    bool GetNativeProcessNameByToken(int tokenId, std::string &processName);
+    bool GetHapBundleNameByToken(uint32_t  tokenId, std::string &bundleName);
+    bool GetNativeProcessNameByToken(uint32_t  tokenId, std::string &processName);
     std::string errorStr;
 };
 } // namespace UDMF

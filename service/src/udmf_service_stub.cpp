@@ -92,7 +92,7 @@ int32_t UdmfServiceStub::OnSetData(MessageParcel &data, MessageParcel &reply)
             return E_INVALID_PARAMETERS;
         }
     }
-    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
+    uint32_t token = IPCSkeleton::GetCallingTokenID();
     customOption.tokenId = token;
     std::string key;
     int32_t status = SetData(customOption, unifiedData, key);
@@ -112,7 +112,7 @@ int32_t UdmfServiceStub::OnGetData(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR(UDMF_SERVICE, "Unmarshal queryOption failed!");
         return E_READ_PARCEL_ERROR;
     }
-    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
+    uint32_t token = IPCSkeleton::GetCallingTokenID();
     query.tokenId = token;
     UnifiedData unifiedData;
     int32_t status = GetData(query, unifiedData);
@@ -131,7 +131,7 @@ int32_t UdmfServiceStub::OnGetBatchData(MessageParcel &data, MessageParcel &repl
         LOG_ERROR(UDMF_SERVICE, "Unmarshal queryOption failed!");
         return E_READ_PARCEL_ERROR;
     }
-    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
+    uint32_t token = IPCSkeleton::GetCallingTokenID();
     query.tokenId = token;
     std::vector<UnifiedData> unifiedDataSet;
     int32_t status = GetBatchData(query, unifiedDataSet);
@@ -165,7 +165,7 @@ int32_t UdmfServiceStub::OnUpdateData(MessageParcel &data, MessageParcel &reply)
             return E_INVALID_PARAMETERS;
         }
     }
-    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
+    uint32_t token = IPCSkeleton::GetCallingTokenID();
     query.tokenId = token;
     int32_t status = UpdateData(query, unifiedData);
     if (!ITypesUtil::Marshal(reply, status)) {
@@ -183,7 +183,7 @@ int32_t UdmfServiceStub::OnDeleteData(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR(UDMF_SERVICE, "Unmarshal queryOption failed!");
         return E_READ_PARCEL_ERROR;
     }
-    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
+    uint32_t token = IPCSkeleton::GetCallingTokenID();
     query.tokenId = token;
     std::vector<UnifiedData> unifiedDataSet;
     int32_t status = DeleteData(query, unifiedDataSet);
@@ -202,7 +202,7 @@ int32_t UdmfServiceStub::OnGetSummary(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR(UDMF_SERVICE, "Unmarshal query");
         return E_READ_PARCEL_ERROR;
     }
-    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
+    uint32_t token = IPCSkeleton::GetCallingTokenID();
     query.tokenId = token;
     Summary summary;
     int32_t status = GetSummary(query, summary);
@@ -222,7 +222,7 @@ int32_t UdmfServiceStub::OnAddPrivilege(MessageParcel &data, MessageParcel &repl
         LOG_ERROR(UDMF_SERVICE, "Unmarshal query and privilege");
         return E_READ_PARCEL_ERROR;
     }
-    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
+    uint32_t token = IPCSkeleton::GetCallingTokenID();
     query.tokenId = token;
     int32_t status = AddPrivilege(query, privilege);
     if (!ITypesUtil::Marshal(reply, status)) {
@@ -241,7 +241,7 @@ int32_t UdmfServiceStub::OnSync(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR(UDMF_SERVICE, "Unmarshal query and devices");
         return E_READ_PARCEL_ERROR;
     }
-    uint32_t token = static_cast<uint32_t>(IPCSkeleton::GetCallingTokenID());
+    uint32_t token = IPCSkeleton::GetCallingTokenID();
     query.tokenId = token;
     int32_t status = Sync(query, devices);
     if (!ITypesUtil::Marshal(reply, status)) {

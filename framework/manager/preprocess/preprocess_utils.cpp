@@ -77,7 +77,7 @@ time_t PreProcessUtils::GetTimeStamp()
     return timestamp;
 }
 
-bool PreProcessUtils::GetHapBundleNameByToken(int tokenId, std::string &bundleName)
+bool PreProcessUtils::GetHapBundleNameByToken(uint32_t  tokenId, std::string &bundleName)
 {
     Security::AccessToken::HapTokenInfo hapInfo;
     if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo)
@@ -89,7 +89,7 @@ bool PreProcessUtils::GetHapBundleNameByToken(int tokenId, std::string &bundleNa
     return true;
 }
 
-bool PreProcessUtils::GetNativeProcessNameByToken(int tokenId, std::string &processName)
+bool PreProcessUtils::GetNativeProcessNameByToken(uint32_t  tokenId, std::string &processName)
 {
     Security::AccessToken::NativeTokenInfo nativeInfo;
     if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, nativeInfo)
