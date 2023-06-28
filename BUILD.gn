@@ -19,7 +19,6 @@ group("udmf_packages") {
       "interfaces/innerkits:udmf_client",
       "interfaces/jskits:udmf_data_napi",
       "interfaces/jskits:udmf_napi",
-      "service:udmf_server",
     ]
   }
 }
@@ -36,8 +35,5 @@ group("unittest") {
 group("fuzztest") {
   testonly = true
 
-  deps = [
-    "framework/innerkitsimpl/test/fuzztest:fuzztest",
-    "service/test/fuzztest:fuzztest",
-  ]
+  deps = [ "framework/innerkitsimpl/test/fuzztest:fuzztest" ]
 }

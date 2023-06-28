@@ -25,7 +25,6 @@
 #include "html.h"
 #include "image.h"
 #include "link.h"
-#include "logger.h"
 #include "plain_text.h"
 #include "system_defined_appitem.h"
 #include "system_defined_form.h"

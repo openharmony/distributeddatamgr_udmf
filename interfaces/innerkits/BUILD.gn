@@ -20,21 +20,18 @@ config("udmf_client_config") {
     "${udmf_interfaces_path}/innerkits/data",
 
     "${udmf_framework_path}/common",
-    "${udmf_framework_path}/manager",
-    "${udmf_framework_path}/manager/store",
-    "${udmf_framework_path}/manager/preprocess",
-    "${udmf_framework_path}/manager/permission",
-    "${udmf_framework_path}/manager/lifecycle",
     "${udmf_framework_path}/service",
     "${kv_store_path}/frameworks/common",
     "//third_party/libuv/include",
     "//third_party/node/src",
+    "${kv_store_path}/frameworks/innerkitsimpl/distributeddatafwk/include",
+    "${kv_store_path}/frameworks/innerkitsimpl/distributeddatafwk/src",
+    "${kv_store_path}/interfaces/innerkits/distributeddata/include",
   ]
 }
 
 ohos_shared_library("udmf_client") {
   sources = [
-    "${udmf_framework_path}/common/anonymous.cpp",
     "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
@@ -56,18 +53,6 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/video.cpp",
-    "${udmf_framework_path}/manager/data_manager.cpp",
-    "${udmf_framework_path}/manager/lifecycle/clean_after_get.cpp",
-    "${udmf_framework_path}/manager/lifecycle/clean_on_startup.cpp",
-    "${udmf_framework_path}/manager/lifecycle/clean_on_timeout.cpp",
-    "${udmf_framework_path}/manager/lifecycle/lifecycle_manager.cpp",
-    "${udmf_framework_path}/manager/lifecycle/lifecycle_policy.cpp",
-    "${udmf_framework_path}/manager/permission/checker_manager.cpp",
-    "${udmf_framework_path}/manager/permission/data_checker.cpp",
-    "${udmf_framework_path}/manager/permission/uri_permission_manager.cpp",
-    "${udmf_framework_path}/manager/preprocess/preprocess_utils.cpp",
-    "${udmf_framework_path}/manager/store/runtime_store.cpp",
-    "${udmf_framework_path}/manager/store/store_cache.cpp",
     "${udmf_framework_path}/service/udmf_service_client.cpp",
     "${udmf_framework_path}/service/udmf_service_proxy.cpp",
   ]
