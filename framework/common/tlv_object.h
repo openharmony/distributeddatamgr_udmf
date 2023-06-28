@@ -16,7 +16,6 @@
 #ifndef UDMF_TLV_OBJECT_H
 #define UDMF_TLV_OBJECT_H
 
-#include "logger.h"
 #include "securec.h"
 #include "error_code.h"
 #include "unified_meta.h"

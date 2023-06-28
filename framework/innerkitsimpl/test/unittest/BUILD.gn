@@ -22,11 +22,6 @@ config("module_private_config") {
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_interfaces_path}/innerkits/data",
     "${udmf_framework_path}/common",
-    "${udmf_framework_path}/manager",
-    "${udmf_framework_path}/manager/container",
-    "${udmf_framework_path}/manager/store",
-    "${udmf_framework_path}/manager/preprocess",
-    "${udmf_framework_path}/manager/permission",
     "${udmf_framework_path}/service",
   ]
 }
@@ -35,7 +30,6 @@ common_deps = [
   "${aafwk_path}/interfaces/inner_api/uri_permission:uri_permission_mgr",
   "${third_party_path}/googletest:gtest_main",
   "../../../../interfaces/innerkits:udmf_client",
-  "../../../../service:udmf_server",
 ]
 
 common_external_deps = [

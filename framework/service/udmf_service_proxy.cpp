@@ -17,7 +17,7 @@
 
 #include "ipc_types.h"
 
-#include "preprocess_utils.h"
+#include "logger.h"
 #include "tlv_util.h"
 #include "udmf_types_util.h"
 
