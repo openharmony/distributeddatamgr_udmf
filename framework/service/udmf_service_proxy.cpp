@@ -37,7 +37,7 @@ namespace UDMF {
                 break;                                                                       \
             }                                                                                \
             MessageOption option;                                                            \
-            auto result = SendRequest((code), request, reply, option);                       \
+            auto result = SendRequest(code, request, reply, option);                         \
             if (result != 0) {                                                               \
                 LOG_ERROR(UDMF_SERVICE, "SendRequest failed, result = %{public}d!", result); \
                 __status = E_IPC;                                                            \
@@ -79,7 +79,7 @@ int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData
         }
     }
     MessageParcel reply;
-    int32_t status = IPC_SEND(SET_DATA, reply, option, unifiedData);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_DATA, reply, option, unifiedData);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x!", status);
         return status;
@@ -100,7 +100,7 @@ int32_t UdmfServiceProxy::GetData(const QueryOption &query, UnifiedData &unified
         return E_INVALID_PARAMETERS;
     }
     MessageParcel reply;
-    int32_t status = IPC_SEND(GET_DATA, reply, query);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::GET_DATA, reply, query);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s!", status, query.key.c_str());
         return status;
@@ -122,7 +122,7 @@ int32_t UdmfServiceProxy::GetBatchData(const QueryOption &query, std::vector<Uni
         return E_INVALID_PARAMETERS;
     }
     MessageParcel reply;
-    int32_t status = IPC_SEND(GET_BATCH_DATA, reply, query);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::GET_BATCH_DATA, reply, query);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s, intention:%{public}d!", status,
                   query.key.c_str(), query.intention);
@@ -162,7 +162,7 @@ int32_t UdmfServiceProxy::UpdateData(const QueryOption &query, UnifiedData &unif
         }
     }
     MessageParcel reply;
-    int32_t status = IPC_SEND(UPDATE_DATA, reply, query, unifiedData);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::UPDATE_DATA, reply, query, unifiedData);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x!", status);
         return status;
@@ -180,7 +180,7 @@ int32_t UdmfServiceProxy::DeleteData(const QueryOption &query, std::vector<Unifi
         return E_INVALID_PARAMETERS;
     }
     MessageParcel reply;
-    int32_t status = IPC_SEND(DELETE_DATA, reply, query);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::DELETE_DATA, reply, query);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x,key: %{public}s, intention:%{public}s", status, query.key.c_str(),
                   UD_INTENTION_MAP.at(query.intention).c_str());
@@ -203,7 +203,7 @@ int32_t UdmfServiceProxy::GetSummary(const QueryOption &query, Summary &summary)
         return E_INVALID_PARAMETERS;
     }
     MessageParcel reply;
-    int32_t status = IPC_SEND(GET_SUMMARY, reply, query);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::GET_SUMMARY, reply, query);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s!", status, query.key.c_str());
         return status;
@@ -225,7 +225,7 @@ int32_t UdmfServiceProxy::AddPrivilege(const QueryOption &query, Privilege &priv
         return E_INVALID_PARAMETERS;
     }
     MessageParcel reply;
-    int32_t status = IPC_SEND(ADD_PRIVILEGE, reply, query, privilege);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::ADD_PRIVILEGE, reply, query, privilege);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s", status, query.key.c_str());
     }
@@ -242,7 +242,7 @@ int32_t UdmfServiceProxy::Sync(const QueryOption &query, const std::vector<std::
         return E_INVALID_PARAMETERS;
     }
     MessageParcel reply;
-    int32_t status = IPC_SEND(SYNC, reply, query, devices);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SYNC, reply, query, devices);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s", status, query.key.c_str());
     }
@@ -250,14 +250,14 @@ int32_t UdmfServiceProxy::Sync(const QueryOption &query, const std::vector<std::
     return status;
 }
 
-int32_t UdmfServiceProxy::SendRequest(
-    IUdmfService::FCode code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t UdmfServiceProxy::SendRequest(UdmfServiceInterfaceCode code, MessageParcel &data,
+                                      MessageParcel &reply, MessageOption &option)
 {
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         return E_IPC;
     }
-    int err = remote->SendRequest(code, data, reply, option);
+    int err = remote->SendRequest(static_cast<uint32_t>(code), data, reply, option);
     LOG_DEBUG(UDMF_SERVICE, "err: %{public}d", err);
     return err;
 }

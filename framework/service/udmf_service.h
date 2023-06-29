@@ -48,20 +48,6 @@ public:
 
     static constexpr int32_t MAX_DATA_SIZE = 4 * 1024 * 1024;
     static constexpr int32_t MAX_RECORD_SIZE = 2 * 1024 * 1024;
-
-protected:
-    enum FCode {
-        CODE_HEAD,
-        SET_DATA = CODE_HEAD,
-        GET_DATA,
-        GET_BATCH_DATA,
-        UPDATE_DATA,
-        DELETE_DATA,
-        GET_SUMMARY,
-        ADD_PRIVILEGE,
-        SYNC,
-        CODE_BUTT
-    };
 };
 } // namespace UDMF
 } // namespace OHOS
