@@ -26,11 +26,7 @@ config("module_private_config") {
   ]
 }
 
-common_deps = [
-  "${aafwk_path}/interfaces/inner_api/uri_permission:uri_permission_mgr",
-  "${third_party_path}/googletest:gtest_main",
-  "../../../../interfaces/innerkits:udmf_client",
-]
+common_deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
 
 common_external_deps = [
   "access_token:libaccesstoken_sdk",
@@ -38,10 +34,9 @@ common_external_deps = [
   "access_token:libtoken_setproc",
   "bundle_framework:appexecfwk_core",
   "c_utils:utils",
-  "hiviewdfx_hilog_native:libhilog",
+  "hilog:libhilog",
   "ipc:ipc_core",
   "kv_store:distributeddata_inner",
-  "os_account:os_account_innerkits",
   "samgr:samgr_proxy",
 ]
 

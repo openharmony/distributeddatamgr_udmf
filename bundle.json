@@ -24,26 +24,21 @@
     "ram": "636KB",
     "deps": {
       "components": [
-        "aafwk_standard",
         "ability_base",
         "ability_runtime",
         "access_token",
-        "app_file_service",
-        "bounds_checking_function",
         "bundle_framework",
         "c_utils",
-        "data_object",
-        "datamgr_service",
-        "hiviewdfx_hilog_native",
+        "hilog",
+        "hitrace",
         "ipc",
         "kv_store",
-        "multimedia_image_framework",
         "napi",
-        "os_account",
         "samgr"
       ],
       "third_party": [
-        "gtest_main"
+        "bounds_checking_function",
+        "googletest"
       ]
     },
     "build": {
