@@ -34,7 +34,7 @@
         "c_utils",
         "data_object",
         "datamgr_service",
-        "hiviewdfx_hilog_native",
+        "hilog",
         "ipc",
         "kv_store",
         "multimedia_image_framework",
