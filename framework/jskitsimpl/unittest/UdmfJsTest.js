@@ -413,4 +413,4 @@ describe('UdmfJSTest', function () {
     expect(records[12].getType()).assertEqual(UDMF.UnifiedDataType.APPLICATION_DEFINED_RECORD);
     console.info('UdmfAllRecordsTest end');
   });
-})
+});
