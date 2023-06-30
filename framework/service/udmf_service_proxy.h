@@ -21,6 +21,7 @@
 #include "iremote_broker.h"
 #include "iremote_proxy.h"
 
+#include "distributeddata_udmf_ipc_interface_code.h"
 #include "udmf_service.h"
 
 namespace OHOS {
@@ -45,7 +46,8 @@ public:
 
 private:
     static inline BrokerDelegator<UdmfServiceProxy> delegator_;
-    int32_t SendRequest(FCode code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t SendRequest(UdmfServiceInterfaceCode code, MessageParcel &data,
+                        MessageParcel &reply, MessageOption &option);
 };
 } // namespace UDMF
 } // namespace OHOS
