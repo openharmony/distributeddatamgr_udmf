@@ -294,7 +294,7 @@ describe('UdmfPromiseJSTest', function () {
             UDMF.insertData(optionsValid, unifiedData01).then((data) => {
               console.info(TAG, `insert success. The key: ${data}`);
               UDMF.queryData(optionsValid).then((data) => {
-                console.info(TAG, `query success.`);
+                console.info(TAG, 'query success.');
                 expect(data.length).assertEqual(2);
                 done();
               }).catch(() => {
@@ -369,10 +369,10 @@ describe('UdmfPromiseJSTest', function () {
         let options = { key: data };
         console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
         UDMF.queryData(options).then((data) => {
-          console.info(TAG, `query success.`);
+          console.info(TAG, 'query success.');
           expect(data.length).assertEqual(1);
           UDMF.deleteData(options).then((data) => {
-            console.info(TAG, `delete success.`);
+            console.info(TAG, 'delete success.');
             expect(data.length).assertEqual(1);
             let records = data[0].getRecords();
             expect(records.length).assertEqual(1);
@@ -383,7 +383,7 @@ describe('UdmfPromiseJSTest', function () {
               expect(null).assertFail();
               done();
             }).catch(() => {
-              console.info(TAG, `query has no data.`);
+              console.info(TAG, 'query has no data.');
               done();
             });
           }).catch(() => {

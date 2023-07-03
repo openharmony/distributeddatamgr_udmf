@@ -192,7 +192,7 @@ describe('UdmfCallbackJSTest', function () {
           console.info(TAG, 'update success.');
           UDMF.queryData(options, (err, data) => {
             expect(err).assertUndefined();
-            console.info(TAG, `query success.`);
+            console.info(TAG, 'query success.');
             expect(data.length).assertEqual(1);
             let records = data[0].getRecords();
             expect(records.length).assertEqual(1);
@@ -316,11 +316,11 @@ describe('UdmfCallbackJSTest', function () {
         console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
         UDMF.queryData(options, (err, data) => {
           expect(err).assertUndefined();
-          console.info(TAG, `query success.`);
+          console.info(TAG, 'query success.');
           expect(data.length).assertEqual(1);
           UDMF.deleteData(options, (err, data) => {
             expect(err).assertUndefined();
-            console.info(TAG, `delete success.`);
+            console.info(TAG, 'delete success.');
             expect(data.length).assertEqual(1);
             let records = data[0].getRecords();
             expect(records.length).assertEqual(1);
@@ -328,7 +328,7 @@ describe('UdmfCallbackJSTest', function () {
             expect(records[0].textContent).assertEqual(TEXT_CONTEXT_01);
             UDMF.queryData(options, (err, data) => {
               expect(data).assertUndefined();
-              console.info(TAG, `query has no data.`);
+              console.info(TAG, 'query has no data.');
               done();
             });
           });
