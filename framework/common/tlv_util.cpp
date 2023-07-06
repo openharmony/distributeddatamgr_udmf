@@ -235,7 +235,7 @@ bool CountBufferSize(const Runtime &input, TLVObject &data)
 template<>
 bool CountBufferSize(const UnifiedData &input, TLVObject &data)
 {
-    int32_t size = input.GetRecords().size();
+    int32_t size = static_cast<int32_t>(input.GetRecords().size());
     data.Count(size);
     for (auto record : input.GetRecords()) {
         if (!CountBufferSize(record, data)) {
@@ -248,7 +248,7 @@ bool CountBufferSize(const UnifiedData &input, TLVObject &data)
 template<>
 bool CountBufferSize(const std::vector<UnifiedData> &input, TLVObject &data)
 {
-    int32_t size = input.size();
+    int32_t size = static_cast<int32_t>(input.size());
     data.Count(size);
     for (auto unifiedData : input) {
         if (!CountBufferSize(unifiedData, data)) {
@@ -1183,7 +1183,7 @@ bool Writing(const UnifiedData &input, TLVObject &data)
         data.UpdateSize();
     }
 
-    int32_t size = input.GetRecords().size();
+    int32_t size = static_cast<int32_t>(input.GetRecords().size());
     if (!Writing(size, data)) {
         return false;
     }
@@ -1221,7 +1221,7 @@ bool Writing(const std::vector<UnifiedData> &input, TLVObject &data)
     }
     data.UpdateSize();
 
-    int32_t size = input.size();
+    int32_t size = static_cast<int32_t>(input.size());
     if (!Writing(size, data)) {
         return false;
     }
