@@ -39,6 +39,7 @@ enum Status : int32_t {
     E_INVALID_PARAMETERS,
     E_DB_ERROR,
     E_UNKNOWN,
+    E_FS_ERROR,
     E_BUTT,
 };
 } // namespace UDMF
