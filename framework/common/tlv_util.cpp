@@ -20,6 +20,9 @@ namespace TLVUtil {
 template<>
 bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
 {
+    if (input==nullptr) {
+         return false;
+    }
     data.Count(input->GetType());
     data.Count(input->GetUid());
     auto type = input->GetType();
