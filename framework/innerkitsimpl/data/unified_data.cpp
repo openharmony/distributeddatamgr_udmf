@@ -76,6 +76,15 @@ std::vector<UDType> UnifiedData::GetUDTypes()
     return typeSet;
 }
 
+std::string UnifiedData::GetTypes()
+{
+    std::string types;
+    for (const std::shared_ptr<UnifiedRecord> &record : records_) {
+        types.append("-").append(UD_TYPE_MAP.at(record->GetType()));
+    }
+    return types;
+}
+
 bool UnifiedData::IsEmpty() const
 {
     return records_.empty();

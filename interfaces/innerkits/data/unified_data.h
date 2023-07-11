@@ -35,6 +35,7 @@ public:
     std::vector<std::shared_ptr<UnifiedRecord>> GetRecords() const;
 
     std::vector<UDType> GetUDTypes();
+    std::string GetTypes();
 
     bool IsEmpty() const;
 
