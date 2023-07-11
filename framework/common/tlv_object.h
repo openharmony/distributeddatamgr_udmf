@@ -244,7 +244,7 @@ public:
         if (!HasExpectBuffer(head.len)) {
             return false;
         }
-       if (buffer_== nullptr) {
+        if (buffer_== nullptr) {
             return false;
         }
         value.append(reinterpret_cast<const char *>(buffer_->data() + cursor_), head.len);

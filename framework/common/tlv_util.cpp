@@ -21,7 +21,7 @@ template<>
 bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
 {
     if (input==nullptr) {
-         return false;
+        return false;
     }
     data.Count(input->GetType());
     data.Count(input->GetUid());
