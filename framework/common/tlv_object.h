@@ -459,9 +459,6 @@ private:
 
     inline void WriteHead(uint16_t type, size_t tagCursor, uint32_t len)
     {
-        if (buffer_== nullptr) {
-            return false;
-        }
         auto *tlvHead = reinterpret_cast<TLVHead *>(buffer_->data() + tagCursor);
         tlvHead->tag = HostToNet(type);
         tlvHead->len = HostToNet(len);
