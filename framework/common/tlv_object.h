@@ -174,9 +174,6 @@ public:
         if (!HasExpectBuffer(sizeof(TLVHead) + sizeof(value))) {
             return false;
         }
-        if (buffer_== nullptr) {
-            return false;
-        }
         auto *tlvHead = reinterpret_cast<TLVHead*>(buffer_->data() + cursor_);
         tlvHead->tag = HostToNet(type);
         tlvHead->len = HostToNet((uint32_t)sizeof(value));
@@ -202,9 +199,6 @@ public:
         if (!HasExpectBuffer(head.len)) {
             return false;
         }
-        if (buffer_== nullptr) {
-            return false;
-        }
         auto ret = memcpy_s(&value, sizeof(T), buffer_->data() + cursor_, sizeof(T));
         if (ret != EOK) {
             return false;
@@ -217,9 +211,6 @@ public:
     bool WriteString(const std::string &value)
     {
         if (!HasExpectBuffer(sizeof(TLVHead) + value.size())) {
-            return false;
-        }
-        if (buffer_== nullptr) {
             return false;
         }
         auto *tlvHead = reinterpret_cast<TLVHead *>(buffer_->data() + cursor_);
@@ -244,9 +235,6 @@ public:
         if (!HasExpectBuffer(head.len)) {
             return false;
         }
-        if (buffer_== nullptr) {
-            return false;
-        }
         value.append(reinterpret_cast<const char *>(buffer_->data() + cursor_), head.len);
         cursor_ += head.len;
         return true;
@@ -261,9 +249,6 @@ public:
         cursor_ += sizeof(TLVHead);
 
         if (!value.empty()) {
-            if (buffer_== nullptr) {
-            return false;
-        }
             auto err = memcpy_s(buffer_->data() + cursor_, buffer_->size() - cursor_, value.data(), value.size());
             if (err != EOK) {
                 return false;
@@ -280,9 +265,6 @@ public:
             return false;
         }
         if (!HasExpectBuffer(head.len)) {
-            return false;
-        }
-        if (buffer_== nullptr) {
             return false;
         }
         std::vector<uint8_t> buff(buffer_->data() + cursor_, buffer_->data() + cursor_ + head.len);
@@ -464,9 +446,6 @@ private:
         if (!HasExpectBuffer(sizeof(TLVHead))) {
             return false;
         }
-        if (buffer_== nullptr) {
-            return false;
-        }
         const auto *pHead = reinterpret_cast<const TLVHead *>(buffer_->data() + cursor_);
         if (!HasExpectBuffer(NetToHost(pHead->len)) &&
             !HasExpectBuffer(NetToHost(pHead->len) + sizeof(TLVHead))) {
@@ -480,6 +459,9 @@ private:
 
     inline void WriteHead(uint16_t type, size_t tagCursor, uint32_t len)
     {
+        if (buffer_== nullptr) {
+            return false;
+        }
         auto *tlvHead = reinterpret_cast<TLVHead *>(buffer_->data() + tagCursor);
         tlvHead->tag = HostToNet(type);
         tlvHead->len = HostToNet(len);
@@ -487,6 +469,9 @@ private:
 
     inline bool HasExpectBuffer(const uint32_t expectLen) const
     {
+        if (buffer_== nullptr) {
+            return false;
+        }
         return buffer_->size() >= cursor_ && buffer_->size() - cursor_ >= expectLen;
     }
 
