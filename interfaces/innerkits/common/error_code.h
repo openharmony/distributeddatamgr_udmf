@@ -42,6 +42,19 @@ enum Status : int32_t {
     E_FS_ERROR,
     E_BUTT,
 };
+
+static const std::unordered_map<int32_t, std::string> ERROR_MAP {
+    { Status::E_OK, "E_OK" },
+    { Status::E_WRITE_PARCEL_ERROR, "E_WRITE_PARCEL_ERROR" },
+    { Status::E_READ_PARCEL_ERROR, "E_READ_PARCEL_ERROR" },
+    { Status::E_IPC, "E_IPC" },
+    { Status::E_ERROR, "E_ERROR" },
+    { Status::E_NO_PERMISSION, "E_NO_PERMISSION" },
+    { Status::E_INVALID_PARAMETERS, "E_INVALID_PARAMETERS" },
+    { Status::E_DB_ERROR, "E_DB_ERROR" },
+    { Status::E_UNKNOWN, "E_UNKNOWN" },
+    { Status::E_FS_ERROR, "E_FS_ERROR" }
+};
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_ERROR_CODE_H
