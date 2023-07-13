@@ -193,7 +193,7 @@ public:
         if (!ReadHead(head)) {
             return false;
         }
-        if (head.len == 0) {
+        if (head.len == 0 || head.len != sizeof(T)) {
             return false;
         }
         if (!HasExpectBuffer(head.len)) {
