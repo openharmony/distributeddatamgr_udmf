@@ -466,6 +466,9 @@ private:
 
     inline bool HasExpectBuffer(const uint32_t expectLen) const
     {
+        if (buffer_== nullptr) {
+            return false;
+        }
         return buffer_->size() >= cursor_ && buffer_->size() - cursor_ >= expectLen;
     }
 
