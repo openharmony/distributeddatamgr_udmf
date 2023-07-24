@@ -20,8 +20,7 @@
 #include <string>
 
 #include "ikvstore_data_service.h"
-#include "iremote_broker.h"
-
+#include "iremote_object.h"
 #include "udmf_service.h"
 #include "udmf_service_proxy.h"
 
@@ -43,6 +42,14 @@ public:
     int32_t Sync(const QueryOption &query, const std::vector<std::string> &devices) override;
 
 private:
+    class ServiceDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        ServiceDeathRecipient();
+        virtual ~ServiceDeathRecipient();
+
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+    };
+
     static std::shared_ptr<UdmfServiceClient> instance_;
     static std::mutex mutex_;
     static sptr<DistributedKv::IKvStoreDataService> kvDataServiceProxy_;
