@@ -71,7 +71,32 @@ sptr<DistributedKv::IKvStoreDataService> UdmfServiceClient::GetDistributedKvData
         LOG_ERROR(UDMF_SERVICE, "initialize proxy failed.");
         return nullptr;
     }
+    auto deathRecipientPtr = new (std::nothrow)ServiceDeathRecipient();
+    if (deathRecipientPtr == nullptr) {
+        return nullptr;
+    }
+    if ((remote->IsProxyObject()) && (!remote->AddDeathRecipient(deathRecipientPtr))) {
+        LOG_ERROR(UDMF_SERVICE, "Add death recipient fail!");
+    }
     return kvDataServiceProxy_;
+}
+
+UdmfServiceClient::ServiceDeathRecipient::ServiceDeathRecipient()
+{
+    LOG_INFO(UDMF_SERVICE, "Construct!");
+}
+
+UdmfServiceClient::ServiceDeathRecipient::~ServiceDeathRecipient()
+{
+    LOG_INFO(UDMF_SERVICE, "Destruct!");
+}
+
+void UdmfServiceClient::ServiceDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    LOG_WARN(UDMF_SERVICE, "DistributedDataService die!");
+    std::lock_guard<decltype(mutex_)> lockGuard(mutex_);
+    kvDataServiceProxy_ = nullptr;
+    instance_ = nullptr;
 }
 
 int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
