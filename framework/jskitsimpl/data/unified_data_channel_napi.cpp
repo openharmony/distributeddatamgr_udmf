@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "udmf_napi.h"
+#include "unified_data_channel_napi.h"
 
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
@@ -23,13 +23,11 @@
 
 namespace OHOS {
 namespace UDMF {
-napi_value UDMFNapi::UDMFInit(napi_env env, napi_value exports)
+napi_value UnifiedDataChannelNapi::UnifiedDataChannelInit(napi_env env, napi_value exports)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "UDMFNapi");
-    napi_value unifiedDataType = CreateUnifiedDataType(env);
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataChannelNapi");
     napi_value intention = CreateIntention(env);
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_PROPERTY("UnifiedDataType", unifiedDataType),
         DECLARE_NAPI_PROPERTY("Intention", intention),
         DECLARE_NAPI_FUNCTION("insertData", InsertData),
         DECLARE_NAPI_FUNCTION("updateData", UpdateData),
@@ -41,35 +39,7 @@ napi_value UDMFNapi::UDMFInit(napi_env env, napi_value exports)
     return exports;
 }
 
-napi_value UDMFNapi::CreateUnifiedDataType(napi_env env)
-{
-    LOG_DEBUG(UDMF_KITS_NAPI, "UDMFNapi");
-    napi_value unifiedDataType = nullptr;
-    napi_create_object(env, &unifiedDataType);
-    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(TEXT), UD_TYPE_MAP.at(TEXT));
-    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(PLAIN_TEXT), UD_TYPE_MAP.at(PLAIN_TEXT));
-    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(HTML), UD_TYPE_MAP.at(HTML));
-    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(HYPERLINK), UD_TYPE_MAP.at(HYPERLINK));
-    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(FILE), UD_TYPE_MAP.at(FILE));
-    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(IMAGE), UD_TYPE_MAP.at(IMAGE));
-    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(VIDEO), UD_TYPE_MAP.at(VIDEO));
-    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(AUDIO), UD_TYPE_MAP.at(AUDIO));
-    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(FOLDER), UD_TYPE_MAP.at(FOLDER));
-    SetNamedProperty(
-        env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(SYSTEM_DEFINED_RECORD), UD_TYPE_MAP.at(SYSTEM_DEFINED_RECORD));
-    SetNamedProperty(
-        env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(SYSTEM_DEFINED_FORM), UD_TYPE_MAP.at(SYSTEM_DEFINED_FORM));
-    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(SYSTEM_DEFINED_APP_ITEM),
-        UD_TYPE_MAP.at(SYSTEM_DEFINED_APP_ITEM));
-    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(SYSTEM_DEFINED_PIXEL_MAP),
-        UD_TYPE_MAP.at(SYSTEM_DEFINED_PIXEL_MAP));
-    SetNamedProperty(env, unifiedDataType, JS_UD_TYPE_NAME_MAP.at(APPLICATION_DEFINED_RECORD),
-        UD_TYPE_MAP.at(APPLICATION_DEFINED_RECORD));
-    napi_object_freeze(env, unifiedDataType);
-    return unifiedDataType;
-}
-
-napi_value UDMFNapi::CreateIntention(napi_env env)
+napi_value UnifiedDataChannelNapi::CreateIntention(napi_env env)
 {
     napi_value intention = nullptr;
     napi_create_object(env, &intention);
@@ -79,7 +49,8 @@ napi_value UDMFNapi::CreateIntention(napi_env env)
     return intention;
 }
 
-napi_status UDMFNapi::SetNamedProperty(napi_env env, napi_value &obj, const std::string &name, const std::string &value)
+napi_status UnifiedDataChannelNapi::SetNamedProperty(napi_env env, napi_value &obj, const std::string &name,
+    const std::string &value)
 {
     napi_value property = nullptr;
     napi_status status = NapiDataUtils::SetValue(env, value, property);
@@ -89,7 +60,7 @@ napi_status UDMFNapi::SetNamedProperty(napi_env env, napi_value &obj, const std:
     return status;
 }
 
-napi_value UDMFNapi::InsertData(napi_env env, napi_callback_info info)
+napi_value UnifiedDataChannelNapi::InsertData(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "InsertData is called!");
     struct InsertContext : public ContextBase {
@@ -107,8 +78,8 @@ napi_value UDMFNapi::InsertData(napi_env env, napi_callback_info info)
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && UnifiedDataUtils::IsPersist(intention),
             E_INVALID_PARAMETERS, "invalid arg[0], i.e. invalid intention!");
         ctxt->status = napi_unwrap(env, argv[1], reinterpret_cast<void **>(&unifiedDataNapi));
-        ASSERT_BUSINESS_ERR(
-            ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS, "invalid arg[1], i.e. invalid unifiedData!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "invalid arg[1], i.e. invalid unifiedData!");
     };
     ctxt->GetCbInfo(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "Insert Exit");
@@ -127,7 +98,7 @@ napi_value UDMFNapi::InsertData(napi_env env, napi_callback_info info)
     return NapiQueue::AsyncWork(env, ctxt, std::string(__FUNCTION__), execute, output);
 }
 
-napi_value UDMFNapi::UpdateData(napi_env env, napi_callback_info info)
+napi_value UnifiedDataChannelNapi::UpdateData(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UpdateData is called!");
     struct UpdateContext : public ContextBase {
@@ -146,8 +117,8 @@ napi_value UDMFNapi::UpdateData(napi_env env, napi_callback_info info)
             ctxt->status == napi_ok && key.IsValid() && UnifiedDataUtils::IsPersist(key.intention),
             E_INVALID_PARAMETERS, "invalid arg[0], i.e. invalid key!");
         ctxt->status = napi_unwrap(env, argv[1], reinterpret_cast<void **>(&unifiedDataNapi));
-        ASSERT_BUSINESS_ERR(
-            ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS, "invalid arg[1], i.e. invalid unifiedData!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "invalid arg[1], i.e. invalid unifiedData!");
     };
     ctxt->GetCbInfo(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "Update Exit");
@@ -160,7 +131,7 @@ napi_value UDMFNapi::UpdateData(napi_env env, napi_callback_info info)
     return NapiQueue::AsyncWork(env, ctxt, std::string(__FUNCTION__), execute);
 }
 
-napi_value UDMFNapi::QueryData(napi_env env, napi_callback_info info)
+napi_value UnifiedDataChannelNapi::QueryData(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "QueryData is called!");
     struct QueryContext : public ContextBase {
@@ -179,8 +150,8 @@ napi_value UDMFNapi::QueryData(napi_env env, napi_callback_info info)
         keyStatus = GetNamedProperty(env, options, "key", ctxt->key);
         intentionStatus = GetNamedProperty(env, options, "intention", intention);
         ASSERT_BUSINESS_ERR(ctxt,
-            (keyStatus == napi_ok || intentionStatus == napi_ok)
-                && UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
+            (keyStatus == napi_ok || intentionStatus == napi_ok) &&
+                UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
             E_INVALID_PARAMETERS, "invalid arg[0], i.e. invalid options!");
     };
     ctxt->GetCbInfo(env, info, input);
@@ -213,7 +184,7 @@ napi_value UDMFNapi::QueryData(napi_env env, napi_callback_info info)
     return NapiQueue::AsyncWork(env, ctxt, std::string(__FUNCTION__), execute, output);
 }
 
-napi_value UDMFNapi::DeleteData(napi_env env, napi_callback_info info)
+napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "DeleteData is called!");
     struct DeleteContext : public ContextBase {
@@ -232,8 +203,8 @@ napi_value UDMFNapi::DeleteData(napi_env env, napi_callback_info info)
         keyStatus = GetNamedProperty(env, options, "key", ctxt->key);
         intentionStatus = GetNamedProperty(env, options, "intention", intention);
         ASSERT_BUSINESS_ERR(ctxt,
-            (keyStatus == napi_ok || intentionStatus == napi_ok)
-                && UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
+            (keyStatus == napi_ok || intentionStatus == napi_ok) &&
+                UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
             E_INVALID_PARAMETERS, "invalid arg[0], i.e. invalid options!");
     };
     ctxt->GetCbInfo(env, info, input);
@@ -266,7 +237,8 @@ napi_value UDMFNapi::DeleteData(napi_env env, napi_callback_info info)
     return NapiQueue::AsyncWork(env, ctxt, std::string(__FUNCTION__), execute, output);
 }
 
-napi_status UDMFNapi::GetNamedProperty(napi_env env, napi_value &obj, const std::string &key, std::string &value)
+napi_status UnifiedDataChannelNapi::GetNamedProperty(napi_env env, napi_value &obj, const std::string &key,
+    std::string &value)
 {
     bool hasKey = false;
     napi_status status = napi_has_named_property(env, obj, key.c_str(), &hasKey);

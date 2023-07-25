@@ -14,7 +14,8 @@
  */
 
 import { describe, beforeAll, beforeEach, afterEach, afterAll, it, expect } from 'deccjsunit/index';
-import UDMF from '@ohos.data.UDMF';
+import UDC from '@ohos.data.unifiedDataChannel';
+import UTD from '@ohos.data.uniformTypeDescriptor';
 
 const TEXT_CONTEXT_01 = 'TextContent01';
 const TEXT_CONTEXT_02 = 'TextContent02';
@@ -22,18 +23,18 @@ const ERROR_PARAMETER = '401';
 
 describe('UdmfPromiseJSTest', function () {
 
-  let gPlainText1 = new UDMF.PlainText();
+  let gPlainText1 = new UDC.PlainText();
   gPlainText1.textContent = TEXT_CONTEXT_01;
-  let gPlainText2 = new UDMF.PlainText();
+  let gPlainText2 = new UDC.PlainText();
   gPlainText2.textContent = TEXT_CONTEXT_02;
 
   const optionsValid = { intention: 'DataHub', };
   const optionsInValidIntention = { intention: 'Drag', };
   const optionsInValidKey = { key: 'udmf://drag/com.test.demo/123456789', };
   const optionsInValidAll = { intention: 'DataHub', key: 'udmf://drag/com.test.demo/123456789' };
-  const unifiedData01 = new UDMF.UnifiedData(gPlainText1);
-  const unifiedData02 = new UDMF.UnifiedData(gPlainText2);
-  const unifiedDataInvalid = new UDMF.UnifiedData();
+  const unifiedData01 = new UDC.UnifiedData(gPlainText1);
+  const unifiedData02 = new UDC.UnifiedData(gPlainText2);
+  const unifiedDataInvalid = new UDC.UnifiedData();
 
   /**
    * @tc.name UdmfInsertPromiseInvalidOptionsTest
@@ -45,7 +46,7 @@ describe('UdmfPromiseJSTest', function () {
     const TAG = 'UdmfInsertPromiseInvalidOptionsTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.insertData(optionsInValidIntention, unifiedData01).then(() => {
+      UDC.insertData(optionsInValidIntention, unifiedData01).then(() => {
         console.info(TAG, 'Unreachable code!');
         expect(null).assertFail();
         done();
@@ -72,7 +73,7 @@ describe('UdmfPromiseJSTest', function () {
     const TAG = 'UdmfInsertPromiseInvalidDataTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.insertData(optionsValid, unifiedDataInvalid).then(() => {
+      UDC.insertData(optionsValid, unifiedDataInvalid).then(() => {
         console.info(TAG, 'Unreachable code!');
         expect(null).assertFail();
         done();
@@ -99,11 +100,11 @@ describe('UdmfPromiseJSTest', function () {
     const TAG = 'UdmfInsertPromiseSucTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.insertData(optionsValid, unifiedData01).then((data) => {
+      UDC.insertData(optionsValid, unifiedData01).then((data) => {
         console.info(TAG, `insert success. The key: ${data}`);
         let options = { key: data };
         console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
-        UDMF.queryData(options).then((data) => {
+        UDC.queryData(options).then((data) => {
           console.info(TAG, 'query success.');
           console.info(TAG, `data.length = ${data.length}.`);
           expect(data.length).assertEqual(1);
@@ -112,7 +113,7 @@ describe('UdmfPromiseJSTest', function () {
           console.info(TAG, `records[0].getType() = ${records[0].getType()}.`);
           console.info(TAG, `records[0].textContent = ${records[0].textContent}.`);
           expect(records.length).assertEqual(1);
-          expect(records[0].getType()).assertEqual(UDMF.UnifiedDataType.PLAIN_TEXT);
+          expect(records[0].getType()).assertEqual(UTD.UniformDataType.PLAIN_TEXT);
           expect(records[0].textContent).assertEqual(TEXT_CONTEXT_01);
           done();
         }).catch(() => {
@@ -143,7 +144,7 @@ describe('UdmfPromiseJSTest', function () {
     const TAG = 'UdmfUpdatePromiseInvalidOptionsTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.updateData(optionsInValidKey, unifiedData01).then(() => {
+      UDC.updateData(optionsInValidKey, unifiedData01).then(() => {
         console.info(TAG, 'Unreachable code!');
         expect(null).assertFail();
         done();
@@ -170,11 +171,11 @@ describe('UdmfPromiseJSTest', function () {
     const TAG = 'UdmfUpdatePromiseInvalidDataTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.insertData(optionsValid, unifiedData01).then((data) => {
+      UDC.insertData(optionsValid, unifiedData01).then((data) => {
         console.info(TAG, `insert success. The key: ${data}`);
         let options = { key: data };
         console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
-        UDMF.updateData(options, unifiedDataInvalid).then(() => {
+        UDC.updateData(options, unifiedDataInvalid).then(() => {
           console.info(TAG, 'Unreachable code!');
           expect(null).assertFail();
           done();
@@ -206,18 +207,18 @@ describe('UdmfPromiseJSTest', function () {
     const TAG = 'UdmfUpdatePromiseSucTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.insertData(optionsValid, unifiedData01).then((data) => {
+      UDC.insertData(optionsValid, unifiedData01).then((data) => {
         console.info(TAG, `insert success. The key: ${data}`);
         let options = { key: data };
         console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
-        UDMF.updateData(options, unifiedData02).then((data) => {
+        UDC.updateData(options, unifiedData02).then((data) => {
           console.info(TAG, 'update success.');
-          UDMF.queryData(options).then((data) => {
+          UDC.queryData(options).then((data) => {
             console.info(TAG, 'query success.');
             expect(data.length).assertEqual(1);
             let records = data[0].getRecords();
             expect(records.length).assertEqual(1);
-            expect(records[0].getType()).assertEqual(UDMF.UnifiedDataType.PLAIN_TEXT);
+            expect(records[0].getType()).assertEqual(UTD.UniformDataType.PLAIN_TEXT);
             expect(records[0].textContent).assertEqual(TEXT_CONTEXT_02);
             done();
           }).catch(() => {
@@ -254,7 +255,7 @@ describe('UdmfPromiseJSTest', function () {
     const TAG = 'UdmfQueryPromiseInvalidOptionsTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.queryData(optionsInValidAll).then(() => {
+      UDC.queryData(optionsInValidAll).then(() => {
         console.error(TAG, 'Unreachable code!');
         expect(null).assertFail();
         done();
@@ -281,19 +282,19 @@ describe('UdmfPromiseJSTest', function () {
     const TAG = 'UdmfQueryPromiseSucTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.deleteData(optionsValid).then(() => {
+      UDC.deleteData(optionsValid).then(() => {
         console.info(TAG, 'delete success.');
-        UDMF.queryData(optionsValid).then(() => {
+        UDC.queryData(optionsValid).then(() => {
           console.error(TAG, 'Unreachable code!');
           expect(null).assertFail();
           done();
         }).catch((err) => {
           console.info(TAG, 'query has no data.');
-          UDMF.insertData(optionsValid, unifiedData01).then((data) => {
+          UDC.insertData(optionsValid, unifiedData01).then((data) => {
             console.info(TAG, `insert success. The key: ${data}`);
-            UDMF.insertData(optionsValid, unifiedData01).then((data) => {
+            UDC.insertData(optionsValid, unifiedData01).then((data) => {
               console.info(TAG, `insert success. The key: ${data}`);
-              UDMF.queryData(optionsValid).then((data) => {
+              UDC.queryData(optionsValid).then((data) => {
                 console.info(TAG, 'query success.');
                 expect(data.length).assertEqual(2);
                 done();
@@ -337,7 +338,7 @@ describe('UdmfPromiseJSTest', function () {
     const TAG = 'UdmfDeletePromiseInvalidOptionsTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.deleteData(optionsInValidAll).then(() => {
+      UDC.deleteData(optionsInValidAll).then(() => {
         console.error(TAG, 'Unreachable code!');
         expect(null).assertFail();
         done();
@@ -364,21 +365,21 @@ describe('UdmfPromiseJSTest', function () {
     const TAG = 'UdmfDeletePromiseSucTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.insertData(optionsValid, unifiedData01).then((data) => {
+      UDC.insertData(optionsValid, unifiedData01).then((data) => {
         console.info(TAG, `insert success. The key: ${data}`);
         let options = { key: data };
         console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
-        UDMF.queryData(options).then((data) => {
+        UDC.queryData(options).then((data) => {
           console.info(TAG, 'query success.');
           expect(data.length).assertEqual(1);
-          UDMF.deleteData(options).then((data) => {
+          UDC.deleteData(options).then((data) => {
             console.info(TAG, 'delete success.');
             expect(data.length).assertEqual(1);
             let records = data[0].getRecords();
             expect(records.length).assertEqual(1);
-            expect(records[0].getType()).assertEqual(UDMF.UnifiedDataType.PLAIN_TEXT);
+            expect(records[0].getType()).assertEqual(UTD.UniformDataType.PLAIN_TEXT);
             expect(records[0].textContent).assertEqual(TEXT_CONTEXT_01);
-            UDMF.queryData(options).then(() => {
+            UDC.queryData(options).then(() => {
               console.error(TAG, 'Unreachable code!');
               expect(null).assertFail();
               done();

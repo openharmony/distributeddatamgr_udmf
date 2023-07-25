@@ -14,7 +14,8 @@
  */
 
 import { describe, beforeAll, beforeEach, afterEach, afterAll, it, expect } from 'deccjsunit/index';
-import UDMF from '@ohos.data.UDMF';
+import UDC from '@ohos.data.unifiedDataChannel';
+import UTD from '@ohos.data.uniformTypeDescriptor';
 
 const TEXT_CONTEXT_01 = 'TextContent01';
 const TEXT_CONTEXT_02 = 'TextContent02';
@@ -22,18 +23,18 @@ const ERROR_PARAMETER = '401';
 
 describe('UdmfCallbackJSTest', function () {
 
-  let gPlainText1 = new UDMF.PlainText();
+  let gPlainText1 = new UDC.PlainText();
   gPlainText1.textContent = TEXT_CONTEXT_01;
-  let gPlainText2 = new UDMF.PlainText();
+  let gPlainText2 = new UDC.PlainText();
   gPlainText2.textContent = TEXT_CONTEXT_02;
 
   const optionsValid = { intention: 'DataHub', };
   const optionsInValidIntention = { intention: 'Drag', };
   const optionsInValidKey = { key: 'udmf://drag/com.test.demo/123456789', };
   const optionsInValidAll = { intention: 'DataHub', key: 'udmf://drag/com.test.demo/123456789' };
-  const unifiedData01 = new UDMF.UnifiedData(gPlainText1);
-  const unifiedData02 = new UDMF.UnifiedData(gPlainText2);
-  const unifiedDataInvalid = new UDMF.UnifiedData();
+  const unifiedData01 = new UDC.UnifiedData(gPlainText1);
+  const unifiedData02 = new UDC.UnifiedData(gPlainText2);
+  const unifiedDataInvalid = new UDC.UnifiedData();
 
   /**
    * @tc.name UdmfInsertCallbackInvalidOptionsTest
@@ -45,7 +46,7 @@ describe('UdmfCallbackJSTest', function () {
     const TAG = 'UdmfInsertCallbackInvalidOptionsTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.insertData(optionsInValidIntention, unifiedData01, (err, data) => {
+      UDC.insertData(optionsInValidIntention, unifiedData01, (err, data) => {
         console.info(TAG, 'Unreachable code!');
         expect(null).assertFail();
         done();
@@ -68,7 +69,7 @@ describe('UdmfCallbackJSTest', function () {
     const TAG = 'UdmfInsertCallbackInvalidDataTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.insertData(optionsValid, unifiedDataInvalid, (err, data) => {
+      UDC.insertData(optionsValid, unifiedDataInvalid, (err, data) => {
         expect(data).assertUndefined();
         console.error(TAG, `get fail. code is ${err.code},message is ${err.message} `);
         expect(err.code === ERROR_PARAMETER).assertTrue();
@@ -92,12 +93,12 @@ describe('UdmfCallbackJSTest', function () {
     const TAG = 'UdmfInsertCallbackSucTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.insertData(optionsValid, unifiedData01, (err, data) => {
+      UDC.insertData(optionsValid, unifiedData01, (err, data) => {
         expect(err).assertUndefined();
         console.info(TAG, `insert success. The key: ${data}`);
         let options = { key: data };
         console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
-        UDMF.queryData(options, (err, data) => {
+        UDC.queryData(options, (err, data) => {
           expect(err).assertUndefined();
           console.info(TAG, 'query success.');
           console.info(TAG, `data.length = ${data.length}.`);
@@ -107,7 +108,7 @@ describe('UdmfCallbackJSTest', function () {
           console.info(TAG, `records[0].getType() = ${records[0].getType()}.`);
           console.info(TAG, `records[0].textContent = ${records[0].textContent}.`);
           expect(records.length).assertEqual(1);
-          expect(records[0].getType()).assertEqual(UDMF.UnifiedDataType.PLAIN_TEXT);
+          expect(records[0].getType()).assertEqual(UTD.UniformDataType.PLAIN_TEXT);
           expect(records[0].textContent).assertEqual(TEXT_CONTEXT_01);
           done();
         });
@@ -130,7 +131,7 @@ describe('UdmfCallbackJSTest', function () {
     const TAG = 'UdmfUpdateCallbackInvalidOptionsTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.updateData(optionsInValidKey, unifiedData01, (err) => {
+      UDC.updateData(optionsInValidKey, unifiedData01, (err) => {
         console.error(TAG, 'Unreachable code!');
         expect(null).assertFail();
       });
@@ -153,12 +154,12 @@ describe('UdmfCallbackJSTest', function () {
     const TAG = 'UdmfUpdateCallbackInvalidDataTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.insertData(optionsValid, unifiedData01, (err, data) => {
+      UDC.insertData(optionsValid, unifiedData01, (err, data) => {
         expect(err).assertUndefined();
         console.info(TAG, `insert success. The key: ${data}`);
         let options = { key: data };
         console.info(TAG, `update start. The options: ${JSON.stringify(options)}`);
-        UDMF.updateData(options, unifiedDataInvalid, (err) => {
+        UDC.updateData(options, unifiedDataInvalid, (err) => {
           console.error(TAG, `get fail. code is ${err.code},message is ${err.message} `);
           expect(err.code === ERROR_PARAMETER).assertTrue();
           done();
@@ -182,21 +183,21 @@ describe('UdmfCallbackJSTest', function () {
     const TAG = 'UdmfUpdateCallbackSucTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.insertData(optionsValid, unifiedData01, (err, data) => {
+      UDC.insertData(optionsValid, unifiedData01, (err, data) => {
         expect(err).assertUndefined();
         console.info(TAG, `insert success. The key: ${data}`);
         let options = { key: data };
         console.info(TAG, `update start. The options: ${JSON.stringify(options)}`);
-        UDMF.updateData(options, unifiedData02, (err) => {
+        UDC.updateData(options, unifiedData02, (err) => {
           expect(err).assertUndefined();
           console.info(TAG, 'update success.');
-          UDMF.queryData(options, (err, data) => {
+          UDC.queryData(options, (err, data) => {
             expect(err).assertUndefined();
             console.info(TAG, 'query success.');
             expect(data.length).assertEqual(1);
             let records = data[0].getRecords();
             expect(records.length).assertEqual(1);
-            expect(records[0].getType()).assertEqual(UDMF.UnifiedDataType.PLAIN_TEXT);
+            expect(records[0].getType()).assertEqual(UTD.UniformDataType.PLAIN_TEXT);
             expect(records[0].textContent).assertEqual(TEXT_CONTEXT_02);
             done();
           });
@@ -222,7 +223,7 @@ describe('UdmfCallbackJSTest', function () {
     const TAG = 'UdmfQueryCallbackInvalidOptionsTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.queryData(optionsInValidAll, (err, data) => {
+      UDC.queryData(optionsInValidAll, (err, data) => {
         console.error(TAG, 'Unreachable code!');
         expect(null).assertFail();
         done();
@@ -245,19 +246,19 @@ describe('UdmfCallbackJSTest', function () {
     const TAG = 'UdmfQueryCallbackSucTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.deleteData(optionsValid, (err, data) => {
+      UDC.deleteData(optionsValid, (err, data) => {
         expect(err).assertUndefined();
         console.info(TAG, 'delete success.');
-        UDMF.queryData(optionsValid, (err, data) => {
+        UDC.queryData(optionsValid, (err, data) => {
           console.info(TAG, 'query has no data.');
           expect(data).assertUndefined();
-          UDMF.insertData(optionsValid, unifiedData01, (err, data) => {
+          UDC.insertData(optionsValid, unifiedData01, (err, data) => {
             expect(err).assertUndefined();
             console.info(TAG, `insert success. The key: ${data}`);
-            UDMF.insertData(optionsValid, unifiedData02, (err, data) => {
+            UDC.insertData(optionsValid, unifiedData02, (err, data) => {
               expect(err).assertUndefined();
               console.info(TAG, `insert success. The key: ${data}`);
-              UDMF.queryData(optionsValid, function (err, data) {
+              UDC.queryData(optionsValid, function (err, data) {
                 expect(err).assertUndefined();
                 console.info(TAG, 'query success.');
                 expect(data.length).assertEqual(2);
@@ -286,7 +287,7 @@ describe('UdmfCallbackJSTest', function () {
     const TAG = 'UdmfDeleteCallbackInvalidOptionsTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.deleteData(optionsInValidAll, (err, data) => {
+      UDC.deleteData(optionsInValidAll, (err, data) => {
         console.error(TAG, 'Unreachable code!');
         expect(null).assertFail();
         done();
@@ -309,24 +310,24 @@ describe('UdmfCallbackJSTest', function () {
     const TAG = 'UdmfDeleteCallbackSucTest:';
     console.info(TAG, 'start');
     try {
-      UDMF.insertData(optionsValid, unifiedData01, (err, data) => {
+      UDC.insertData(optionsValid, unifiedData01, (err, data) => {
         expect(err).assertUndefined();
         console.info(TAG, `insert success. The key: ${data}`);
         let options = { key: data };
         console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
-        UDMF.queryData(options, (err, data) => {
+        UDC.queryData(options, (err, data) => {
           expect(err).assertUndefined();
           console.info(TAG, 'query success.');
           expect(data.length).assertEqual(1);
-          UDMF.deleteData(options, (err, data) => {
+          UDC.deleteData(options, (err, data) => {
             expect(err).assertUndefined();
             console.info(TAG, 'delete success.');
             expect(data.length).assertEqual(1);
             let records = data[0].getRecords();
             expect(records.length).assertEqual(1);
-            expect(records[0].getType()).assertEqual(UDMF.UnifiedDataType.PLAIN_TEXT);
+            expect(records[0].getType()).assertEqual(UTD.UniformDataType.PLAIN_TEXT);
             expect(records[0].textContent).assertEqual(TEXT_CONTEXT_01);
-            UDMF.queryData(options, (err, data) => {
+            UDC.queryData(options, (err, data) => {
               expect(data).assertUndefined();
               console.info(TAG, 'query has no data.');
               done();

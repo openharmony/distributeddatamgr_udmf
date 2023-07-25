@@ -36,11 +36,8 @@ config("udmf_napi_config") {
   ]
 }
 
-ohos_shared_library("udmf_napi") {
+ohos_shared_library("unifieddatachannel_napi") {
   sources = [
-    "${udmf_framework_path}/jskitsimpl/common/napi_data_utils.cpp",
-    "${udmf_framework_path}/jskitsimpl/common/napi_error_utils.cpp",
-    "${udmf_framework_path}/jskitsimpl/common/napi_queue.cpp",
     "${udmf_framework_path}/jskitsimpl/data/application_defined_record_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/audio_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/file_napi.cpp",
@@ -55,24 +52,25 @@ ohos_shared_library("udmf_napi") {
     "${udmf_framework_path}/jskitsimpl/data/system_defined_pixelmap_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/system_defined_record_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/text_napi.cpp",
-    "${udmf_framework_path}/jskitsimpl/data/udmf_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/unified_data_channel_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/unified_data_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/unified_record_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/video_napi.cpp",
-    "${udmf_interfaces_path}/jskits/module/udmf_napi_module.cpp",
+    "${udmf_interfaces_path}/jskits/module/unified_data_channel_napi_module.cpp",
   ]
+
+  ldflags = [ "-Wl,--exclude-libs=ALL" ]
+
   public_configs = [ ":udmf_napi_config" ]
 
   deps = [
     "${third_party_path}/bounds_checking_function:libsec_shared",
     "../innerkits:udmf_client",
+    "../jskits:udmf_js_common",
   ]
 
   external_deps = [
-    "ability_base:base",
-    "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
-    "ability_runtime:napi_base_context",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
@@ -85,11 +83,36 @@ ohos_shared_library("udmf_napi") {
   part_name = "udmf"
 }
 
+ohos_shared_library("uniformtypedescriptor_napi") {
+  sources = [
+    "${udmf_framework_path}/jskitsimpl/data/uniform_type_descriptor_napi.cpp",
+    "${udmf_interfaces_path}/jskits/module/uniform_type_descriptor_napi_module.cpp",
+  ]
+
+  ldflags = [ "-Wl,--exclude-libs=ALL" ]
+
+  public_configs = [ ":udmf_napi_config" ]
+
+  deps = [
+    "${third_party_path}/bounds_checking_function:libsec_shared",
+    "../innerkits:udmf_client",
+    "../jskits:udmf_js_common",
+  ]
+
+  external_deps = [
+    "ability_runtime:abilitykit_native",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "napi:ace_napi",
+  ]
+
+  relative_install_dir = "module/data"
+  subsystem_name = "distributeddatamgr"
+  part_name = "udmf"
+}
+
 ohos_shared_library("udmf_data_napi") {
   sources = [
-    "${udmf_framework_path}/jskitsimpl/common/napi_data_utils.cpp",
-    "${udmf_framework_path}/jskitsimpl/common/napi_error_utils.cpp",
-    "${udmf_framework_path}/jskitsimpl/common/napi_queue.cpp",
     "${udmf_framework_path}/jskitsimpl/data/application_defined_record_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/audio_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/file_napi.cpp",
@@ -104,24 +127,25 @@ ohos_shared_library("udmf_data_napi") {
     "${udmf_framework_path}/jskitsimpl/data/system_defined_pixelmap_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/system_defined_record_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/text_napi.cpp",
-    "${udmf_framework_path}/jskitsimpl/data/udmf_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/unified_data_channel_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/unified_data_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/unified_record_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/video_napi.cpp",
-    "${udmf_interfaces_path}/jskits/module/udmf_napi_module.cpp",
+    "${udmf_interfaces_path}/jskits/module/unified_data_channel_napi_module.cpp",
   ]
+
+  ldflags = [ "-Wl,--exclude-libs=ALL" ]
+
   public_configs = [ ":udmf_napi_config" ]
 
   deps = [
     "${third_party_path}/bounds_checking_function:libsec_shared",
     "../innerkits:udmf_client",
+    "../jskits:udmf_js_common",
   ]
 
   external_deps = [
-    "ability_base:base",
-    "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
-    "ability_runtime:napi_base_context",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
@@ -129,6 +153,28 @@ ohos_shared_library("udmf_data_napi") {
     "napi:ace_napi",
   ]
 
+  subsystem_name = "distributeddatamgr"
+  part_name = "udmf"
+}
+
+ohos_static_library("udmf_js_common") {
+  sources = [
+    "${udmf_framework_path}/jskitsimpl/common/napi_data_utils.cpp",
+    "${udmf_framework_path}/jskitsimpl/common/napi_error_utils.cpp",
+    "${udmf_framework_path}/jskitsimpl/common/napi_queue.cpp",
+  ]
+
+  ldflags = [ "-Wl,--exclude-libs=ALL" ]
+  cflags = [ "-fvisibility=hidden" ]
+
+  include_dirs = [ "${udmf_interfaces_path}/jskits/common" ]
+
+  public_configs = [ ":udmf_napi_config" ]
+  external_deps = [
+    "ability_runtime:abilitykit_native",
+    "hilog:libhilog",
+    "napi:ace_napi",
+  ]
   subsystem_name = "distributeddatamgr"
   part_name = "udmf"
 }
