@@ -60,6 +60,7 @@ struct Runtime {
     std::string createPackage;
     // device ID of the data source
     std::string deviceId;
+    std::uint32_t recordTotalNum {};
 };
 
 /*
