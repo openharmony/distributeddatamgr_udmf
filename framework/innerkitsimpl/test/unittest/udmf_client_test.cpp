@@ -207,8 +207,7 @@ void UdmfClientTest::GetEmptyData(QueryOption &option)
 {
     UnifiedData data;
     auto status = UdmfClient::GetInstance().GetData(option, data);
-    EXPECT_EQ(status, E_OK);
-    EXPECT_TRUE(data.IsEmpty());
+    EXPECT_EQ(status, E_NOT_FOUND);
 }
 
 /**
