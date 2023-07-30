@@ -232,6 +232,7 @@ bool CountBufferSize(const Runtime &input, TLVObject &data)
     data.Count(input.dataVersion);
     data.Count(input.createPackage);
     data.Count(input.deviceId);
+    data.Count(input.recordTotalNum);
     return true;
 }
 
@@ -1396,6 +1397,9 @@ bool Writing(const Runtime &input, TLVObject &data)
     if (!Writing(input.deviceId, data)) {
         return false;
     }
+    if (!Writing(input.recordTotalNum, data)) {
+        return false;
+    }
     return true;
 }
 
@@ -1413,6 +1417,7 @@ bool Reading(Runtime &output, TLVObject &data)
     int64_t lastModifiedTime;
     std::string createPackage;
     std::string deviceId;
+    uint32_t recordTotalNum;
     if (!Reading(key, data)) {
         return false;
     }
@@ -1450,6 +1455,9 @@ bool Reading(Runtime &output, TLVObject &data)
     if (!Reading(deviceId, data)) {
         return false;
     }
+    if (!Reading(recordTotalNum, data)) {
+        return false;
+    }
     output.key = key;
     output.isPrivate = isPrivate;
     output.privileges = privileges;
@@ -1460,6 +1468,7 @@ bool Reading(Runtime &output, TLVObject &data)
     output.lastModifiedTime = lastModifiedTime;
     output.createPackage = createPackage;
     output.deviceId = deviceId;
+    output.recordTotalNum = recordTotalNum;
     return true;
 }
 } // namespace TLVUtil
