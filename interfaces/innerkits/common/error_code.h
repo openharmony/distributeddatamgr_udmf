@@ -40,6 +40,7 @@ enum Status : int32_t {
     E_DB_ERROR,
     E_UNKNOWN,
     E_FS_ERROR,
+    E_NOT_FOUND,
     E_BUTT,
 };
 
@@ -53,7 +54,8 @@ static const std::unordered_map<int32_t, std::string> ERROR_MAP {
     { Status::E_INVALID_PARAMETERS, "E_INVALID_PARAMETERS" },
     { Status::E_DB_ERROR, "E_DB_ERROR" },
     { Status::E_UNKNOWN, "E_UNKNOWN" },
-    { Status::E_FS_ERROR, "E_FS_ERROR" }
+    { Status::E_FS_ERROR, "E_FS_ERROR" },
+    { Status::E_NOT_FOUND, "E_NOT_FOUND" }
 };
 } // namespace UDMF
 } // namespace OHOS
