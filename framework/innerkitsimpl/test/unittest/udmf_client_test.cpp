@@ -1222,12 +1222,12 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
 
     ASSERT_EQ(status, E_OK);
     ASSERT_EQ(summary.totalSize, size);
-    ASSERT_EQ(summary.summary["Text"], record1->GetSize());
-    ASSERT_EQ(summary.summary["Text.PlainText"], record2->GetSize());
-    ASSERT_EQ(summary.summary["File"], record3->GetSize());
-    ASSERT_EQ(summary.summary["File.Media.Image"], record4->GetSize());
+    ASSERT_EQ(summary.summary["general.text"], record1->GetSize());
+    ASSERT_EQ(summary.summary["general.plain-text"], record2->GetSize());
+    ASSERT_EQ(summary.summary["general.file"], record3->GetSize());
+    ASSERT_EQ(summary.summary["general.image"], record4->GetSize());
     ASSERT_EQ(summary.summary["SystemDefinedType"], record5->GetSize());
-    ASSERT_EQ(summary.summary["SystemDefinedType.Form"], record6->GetSize());
+    ASSERT_EQ(summary.summary["openharmony.form"], record6->GetSize());
     ASSERT_EQ(summary.summary["ApplicationDefinedType"], record7->GetSize());
 
     LOG_INFO(UDMF_TEST, "GetSummary001 end.");
