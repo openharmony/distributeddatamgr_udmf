@@ -73,11 +73,6 @@ foundation/distributeddatamgr/udmf  # udmf统一数据管理部件
 │   │   ├── common                  # js接口公共工具类
 │   │   |── data                    # 统一数据公共接口实现
 |   |   └── unittest                # js单元测试目录
-│   ├── manager                     # 数据管理核心类
-|   |   ├── lifecycle               # 生命周期管理
-|   |   ├── permission              # 权限管理
-│   │   ├── preprocess              # 预处理
-│   │   └── store                   # 存储策略
 │   └── service                     # 服务模块
 ├── interfaces                      # udmf对外接口声明
 │   ├── innerkits                   # nativie接口声明
@@ -88,10 +83,6 @@ foundation/distributeddatamgr/udmf  # udmf统一数据管理部件
 │       ├── common                  # napi工具类声明
 │       ├── data                    # napi数据封装声明
 │       └── module                  # 统一数据模块注册
-├── service                         # udmf服务框架代码
-│   ├── include                     # 服务端声明
-│   ├── src                         # 服务端具体实现
-|   └── test                        # 测试目录
 ├── BUILD.gn                        # 编译配置文件
 ├── bundle.json                     # 模块配置文件
 ├── LICENSE                         # License文件
