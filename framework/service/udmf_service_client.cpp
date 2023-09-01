@@ -16,6 +16,7 @@
 #include "udmf_service_client.h"
 
 #include "iservice_registry.h"
+#include "datamgr_service_proxy.h"
 #include "system_ability_definition.h"
 
 #include "logger.h"
@@ -66,7 +67,7 @@ sptr<DistributedKv::IKvStoreDataService> UdmfServiceClient::GetDistributedKvData
     }
 
     auto remote = samgr->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
-    kvDataServiceProxy_ = iface_cast<DistributedKv::IKvStoreDataService>(remote);
+    kvDataServiceProxy_ = iface_cast<DistributedKv::DataMgrServiceProxy>(remote);
     if (kvDataServiceProxy_ == nullptr) {
         LOG_ERROR(UDMF_SERVICE, "initialize proxy failed.");
         return nullptr;
