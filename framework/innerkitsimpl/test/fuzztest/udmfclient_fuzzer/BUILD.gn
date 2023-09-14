@@ -18,7 +18,7 @@ import("//foundation/distributeddatamgr/udmf/udmf.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("UdmfClientFuzzTest") {
-  module_out_path = "udmf/innerkitsImpl"
+  module_out_path = "udmf/udmf"
 
   include_dirs = [
     "${udmf_interfaces_path}/innerkits/client",
