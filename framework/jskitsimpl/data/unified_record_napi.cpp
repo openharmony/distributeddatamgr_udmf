@@ -41,7 +41,7 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *udRecord = new (std::nothrow) UnifiedRecordNapi();
-    ASSERT_ERR(ctxt->env, udRecord != nullptr, Status::E_UNKNOWN, "no memory for unified record!");
+    ASSERT_ERR(ctxt->env, udRecord != nullptr, Status::E_ERROR, "no memory for unified record!");
     udRecord->value_ = std::make_shared<UnifiedRecord>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, udRecord, Destructor, nullptr, nullptr), udRecord);
     return ctxt->self;

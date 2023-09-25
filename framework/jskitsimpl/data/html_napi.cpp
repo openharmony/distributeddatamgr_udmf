@@ -48,7 +48,7 @@ napi_value HtmlNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *html = new (std::nothrow) HtmlNapi();
-    ASSERT_ERR(ctxt->env, html != nullptr, Status::E_UNKNOWN, "no memory for html!");
+    ASSERT_ERR(ctxt->env, html != nullptr, Status::E_ERROR, "no memory for html!");
     html->value_ = std::make_shared<Html>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, html, Destructor, nullptr, nullptr), html);
     return ctxt->self;
@@ -59,7 +59,7 @@ void HtmlNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi
     LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *html = new (std::nothrow) HtmlNapi();
-    ASSERT_ERR_VOID(env, html != nullptr, Status::E_UNKNOWN, "no memory for html!");
+    ASSERT_ERR_VOID(env, html != nullptr, Status::E_ERROR, "no memory for html!");
     html->value_ = std::static_pointer_cast<Html>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, html, Destructor, nullptr, nullptr), html);
 }

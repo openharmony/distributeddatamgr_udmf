@@ -102,49 +102,102 @@ void UdmfServiceClient::ServiceDeathRecipient::OnRemoteDied(const wptr<IRemoteOb
 
 int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
 {
-    LOG_INFO(UDMF_SERVICE, "start");
+    LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}d", option.intention);
+    if (!UnifiedDataUtils::IsValidIntention(option.intention)) {
+        LOG_ERROR(UDMF_SERVICE, "Invalid intention");
+        return E_INVALID_PARAMETERS;
+    }
+
+    if (!unifiedData.IsValid()) {
+        LOG_ERROR(UDMF_SERVICE, "UnifiedData is invalid.");
+        return E_INVALID_PARAMETERS;
+    }
     return udmfProxy_->SetData(option, unifiedData, key);
 }
 
 int32_t UdmfServiceClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
 {
-    LOG_INFO(UDMF_SERVICE, "start");
+    LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}s", query.key.c_str());
+    UnifiedKey key(query.key);
+    if (!key.IsValid()) {
+        LOG_ERROR(UDMF_SERVICE, "invalid key");
+        return E_INVALID_PARAMETERS;
+    }
     return udmfProxy_->GetData(query, unifiedData);
 }
 
 int32_t UdmfServiceClient::GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
 {
-    LOG_INFO(UDMF_SERVICE, "start");
+    LOG_DEBUG(UDMF_SERVICE, "start, tag: intention = %{public}d, key = %{public}s", query.intention, query.key.c_str());
+    auto find = UD_INTENTION_MAP.find(query.intention);
+    std::string intention = find == UD_INTENTION_MAP.end() ? intention : find->second;
+    if (!UnifiedDataUtils::IsValidOptions(query.key, intention)) {
+        LOG_ERROR(UDMF_SERVICE, "invalid option, query.key: %{public}s, intention: %{public}s", query.key.c_str(),
+            intention.c_str());
+        return E_INVALID_PARAMETERS;
+    }
     return udmfProxy_->GetBatchData(query, unifiedDataSet);
 }
 
 int32_t UdmfServiceClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
 {
-    LOG_INFO(UDMF_SERVICE, "start");
+    LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}s", query.key.c_str());
+    UnifiedKey key(query.key);
+    if (!key.IsValid() || !UnifiedDataUtils::IsPersist(key.intention)) {
+        LOG_ERROR(UDMF_SERVICE, "invalid key, key.intention: %{public}s", key.intention.c_str());
+        return E_INVALID_PARAMETERS;
+    }
+
+    if (!unifiedData.IsValid()) {
+        LOG_ERROR(UDMF_SERVICE, "UnifiedData is invalid.");
+        return E_INVALID_PARAMETERS;
+    }
     return udmfProxy_->UpdateData(query, unifiedData);
 }
 
 int32_t UdmfServiceClient::DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
 {
-    LOG_INFO(UDMF_SERVICE, "start");
+    LOG_DEBUG(UDMF_SERVICE, "start, tag: intention = %{public}d, key = %{public}s", query.intention, query.key.c_str());
+    auto find = UD_INTENTION_MAP.find(query.intention);
+    std::string intention = find == UD_INTENTION_MAP.end() ? intention : find->second;
+    if (!UnifiedDataUtils::IsValidOptions(query.key, intention)) {
+        LOG_ERROR(UDMF_SERVICE, "invalid option, query.key: %{public}s, intention: %{public}s", query.key.c_str(),
+            intention.c_str());
+        return E_INVALID_PARAMETERS;
+    }
     return udmfProxy_->DeleteData(query, unifiedDataSet);
 }
 
 int32_t UdmfServiceClient::GetSummary(const QueryOption &query, Summary &summary)
 {
-    LOG_INFO(UDMF_SERVICE, "start");
+    LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}s", query.key.c_str());
+    UnifiedKey key(query.key);
+    if (!key.IsValid()) {
+        LOG_ERROR(UDMF_SERVICE, "invalid key");
+        return E_INVALID_PARAMETERS;
+    }
     return udmfProxy_->GetSummary(query, summary);
 }
 
 int32_t UdmfServiceClient::AddPrivilege(const QueryOption &query, Privilege &privilege)
 {
-    LOG_INFO(UDMF_SERVICE, "start");
+    LOG_DEBUG(UDMF_SERVICE, "start, key: %{public}s", query.key.c_str());
+    UnifiedKey key(query.key);
+    if (!key.IsValid()) {
+        LOG_ERROR(UDMF_SERVICE, "invalid key");
+        return E_INVALID_PARAMETERS;
+    }
     return udmfProxy_->AddPrivilege(query, privilege);
 }
 
 int32_t UdmfServiceClient::Sync(const QueryOption &query, const std::vector<std::string> &devices)
 {
-    LOG_INFO(UDMF_SERVICE, "start");
+    LOG_DEBUG(UDMF_SERVICE, "start, key: %{public}s", query.key.c_str());
+    UnifiedKey key(query.key);
+    if (!key.IsValid()) {
+        LOG_ERROR(UDMF_SERVICE, "invalid key");
+        return E_INVALID_PARAMETERS;
+    }
     return udmfProxy_->Sync(query, devices);
 }
 } // namespace UDMF

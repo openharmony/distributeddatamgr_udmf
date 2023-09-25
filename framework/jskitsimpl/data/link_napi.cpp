@@ -49,7 +49,7 @@ napi_value LinkNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *link = new (std::nothrow) LinkNapi();
-    ASSERT_ERR(ctxt->env, link != nullptr, Status::E_UNKNOWN, "no memory for link!");
+    ASSERT_ERR(ctxt->env, link != nullptr, Status::E_ERROR, "no memory for link!");
     link->value_ = std::make_shared<Link>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, link, Destructor, nullptr, nullptr), link);
     return ctxt->self;
@@ -60,7 +60,7 @@ void LinkNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi
     LOG_DEBUG(UDMF_KITS_NAPI, "LinkNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *link = new (std::nothrow) LinkNapi();
-    ASSERT_ERR_VOID(env, link != nullptr, Status::E_UNKNOWN, "no memory for link!");
+    ASSERT_ERR_VOID(env, link != nullptr, Status::E_ERROR, "no memory for link!");
     link->value_ = std::static_pointer_cast<Link>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, link, Destructor, nullptr, nullptr), link);
 }

@@ -48,7 +48,7 @@ napi_value ImageNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *image = new (std::nothrow) ImageNapi();
-    ASSERT_ERR(ctxt->env, image != nullptr, Status::E_UNKNOWN, "no memory for image!");
+    ASSERT_ERR(ctxt->env, image != nullptr, Status::E_ERROR, "no memory for image!");
     image->value_ = std::make_shared<Image>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, image, Destructor, nullptr, nullptr), image);
     return ctxt->self;
@@ -59,7 +59,7 @@ void ImageNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, nap
     LOG_DEBUG(UDMF_KITS_NAPI, "ImageNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *image = new (std::nothrow) ImageNapi();
-    ASSERT_ERR_VOID(env, image != nullptr, Status::E_UNKNOWN, "no memory for image!");
+    ASSERT_ERR_VOID(env, image != nullptr, Status::E_ERROR, "no memory for image!");
     image->value_ = std::static_pointer_cast<Image>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, image, Destructor, nullptr, nullptr), image);
 }

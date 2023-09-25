@@ -45,9 +45,6 @@ public:
     virtual int32_t GetSummary(const QueryOption &query, Summary &summary) = 0;
     virtual int32_t AddPrivilege(const QueryOption &query, Privilege &privilege) = 0;
     virtual int32_t Sync(const QueryOption &query, const std::vector<std::string> &devices) = 0;
-
-    static constexpr int32_t MAX_DATA_SIZE = 4 * 1024 * 1024;
-    static constexpr int32_t MAX_RECORD_SIZE = 2 * 1024 * 1024;
 };
 } // namespace UDMF
 } // namespace OHOS

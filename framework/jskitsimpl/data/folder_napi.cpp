@@ -47,7 +47,7 @@ napi_value FolderNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *folder = new (std::nothrow) FolderNapi();
-    ASSERT_ERR(ctxt->env, folder != nullptr, Status::E_UNKNOWN, "no memory for folder!");
+    ASSERT_ERR(ctxt->env, folder != nullptr, Status::E_ERROR, "no memory for folder!");
     folder->value_ = std::make_shared<Folder>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, folder, Destructor, nullptr, nullptr), folder);
     return ctxt->self;
@@ -58,7 +58,7 @@ void FolderNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, na
     LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *folder = new (std::nothrow) FolderNapi();
-    ASSERT_ERR_VOID(env, folder != nullptr, Status::E_UNKNOWN, "no memory for folder!");
+    ASSERT_ERR_VOID(env, folder != nullptr, Status::E_ERROR, "no memory for folder!");
     folder->value_ = std::static_pointer_cast<Folder>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, folder, Destructor, nullptr, nullptr), folder);
 }

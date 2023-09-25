@@ -52,7 +52,7 @@ napi_value SystemDefinedAppItemNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *sdAppItem = new (std::nothrow) SystemDefinedAppItemNapi();
-    ASSERT_ERR(ctxt->env, sdAppItem != nullptr, Status::E_UNKNOWN, "no memory for system defined appitem!");
+    ASSERT_ERR(ctxt->env, sdAppItem != nullptr, Status::E_ERROR, "no memory for system defined appitem!");
     sdAppItem->value_ = std::make_shared<SystemDefinedAppItem>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, sdAppItem, Destructor, nullptr, nullptr), sdAppItem);
     return ctxt->self;
@@ -63,7 +63,7 @@ void SystemDefinedAppItemNapi::NewInstance(napi_env env, std::shared_ptr<Unified
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedAppItemNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *sdAppItem = new (std::nothrow) SystemDefinedAppItemNapi();
-    ASSERT_ERR_VOID(env, sdAppItem != nullptr, Status::E_UNKNOWN, "no memory for system defined appitem!");
+    ASSERT_ERR_VOID(env, sdAppItem != nullptr, Status::E_ERROR, "no memory for system defined appitem!");
     sdAppItem->value_ = std::static_pointer_cast<SystemDefinedAppItem>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, sdAppItem, Destructor, nullptr, nullptr), sdAppItem);
 }

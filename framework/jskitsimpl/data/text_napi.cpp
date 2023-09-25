@@ -43,7 +43,7 @@ napi_value TextNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *text = new (std::nothrow) TextNapi();
-    ASSERT_ERR(ctxt->env, text != nullptr, Status::E_UNKNOWN, "no memory for text!");
+    ASSERT_ERR(ctxt->env, text != nullptr, Status::E_ERROR, "no memory for text!");
     text->value_ = std::make_shared<Text>();
     ASSERT_CALL(ctxt->env, napi_wrap(env, ctxt->self, text, Destructor, nullptr, nullptr), text);
     return ctxt->self;
@@ -54,7 +54,7 @@ void TextNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi
     LOG_DEBUG(UDMF_KITS_NAPI, "TextNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *text = new (std::nothrow) TextNapi();
-    ASSERT_ERR_VOID(env, text != nullptr, Status::E_UNKNOWN, "no memory for text!");
+    ASSERT_ERR_VOID(env, text != nullptr, Status::E_ERROR, "no memory for text!");
     text->value_ = std::static_pointer_cast<Text>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, text, Destructor, nullptr, nullptr), text);
 }
