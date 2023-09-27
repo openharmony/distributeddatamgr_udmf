@@ -55,29 +55,6 @@ UdmfServiceProxy::UdmfServiceProxy(const sptr<IRemoteObject> &object) : IRemoteP
 
 int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
 {
-    LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}d", option.intention);
-    if (!UnifiedDataUtils::IsValidIntention(option.intention)) {
-        LOG_ERROR(UDMF_SERVICE, "Invalid intention");
-        return E_INVALID_PARAMETERS;
-    }
-    if (unifiedData.IsEmpty()) {
-        LOG_ERROR(UDMF_SERVICE, "Empty data without any record!");
-        return E_INVALID_PARAMETERS;
-    }
-    if (unifiedData.GetSize() > UdmfService::MAX_DATA_SIZE) {
-        LOG_ERROR(UDMF_SERVICE, "Exceeded the limit!");
-        return E_INVALID_PARAMETERS;
-    }
-    for (const auto &record : unifiedData.GetRecords()) {
-        if (record == nullptr) {
-            LOG_ERROR(UDMF_SERVICE, "record is nullptr!");
-            return E_INVALID_PARAMETERS;
-        }
-        if (record->GetSize() > UdmfService::MAX_RECORD_SIZE) {
-            LOG_ERROR(UDMF_SERVICE, "Exceeded record limit!");
-            return E_INVALID_PARAMETERS;
-        }
-    }
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_DATA, reply, option, unifiedData);
     if (status != E_OK) {
@@ -93,12 +70,6 @@ int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData
 
 int32_t UdmfServiceProxy::GetData(const QueryOption &query, UnifiedData &unifiedData)
 {
-    LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}s", query.key.c_str());
-    UnifiedKey key(query.key);
-    if (!key.IsValid()) {
-        LOG_ERROR(UDMF_SERVICE, "invalid key");
-        return E_INVALID_PARAMETERS;
-    }
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::GET_DATA, reply, query);
     if (status != E_OK) {
@@ -114,13 +85,6 @@ int32_t UdmfServiceProxy::GetData(const QueryOption &query, UnifiedData &unified
 
 int32_t UdmfServiceProxy::GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
 {
-    LOG_DEBUG(UDMF_SERVICE, "start, tag: intention = %{public}d, key = %{public}s", query.intention, query.key.c_str());
-    auto find = UD_INTENTION_MAP.find(query.intention);
-    std::string intention = find == UD_INTENTION_MAP.end() ? intention : find->second;
-    if (!UnifiedDataUtils::IsValidOptions(query.key, intention)) {
-        LOG_ERROR(UDMF_SERVICE, "invalid option");
-        return E_INVALID_PARAMETERS;
-    }
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::GET_BATCH_DATA, reply, query);
     if (status != E_OK) {
@@ -137,30 +101,6 @@ int32_t UdmfServiceProxy::GetBatchData(const QueryOption &query, std::vector<Uni
 
 int32_t UdmfServiceProxy::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
 {
-    LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}s", query.key.c_str());
-    UnifiedKey key(query.key);
-    if (!key.IsValid() || !UnifiedDataUtils::IsPersist(key.intention)) {
-        LOG_ERROR(UDMF_SERVICE, "invalid key");
-        return E_INVALID_PARAMETERS;
-    }
-    if (unifiedData.GetSize() > UdmfService::MAX_DATA_SIZE) {
-        LOG_ERROR(UDMF_SERVICE, "Exceeded the limit!");
-        return E_INVALID_PARAMETERS;
-    }
-    if (unifiedData.IsEmpty()) {
-        LOG_ERROR(UDMF_SERVICE, "Empty data without any record!");
-        return E_INVALID_PARAMETERS;
-    }
-    for (const auto &record : unifiedData.GetRecords()) {
-        if (record == nullptr) {
-            LOG_ERROR(UDMF_SERVICE, "record is nullptr!");
-            return E_INVALID_PARAMETERS;
-        }
-        if (record->GetSize() > UdmfService::MAX_RECORD_SIZE) {
-            LOG_ERROR(UDMF_SERVICE, "Exceeded record limit!");
-            return E_INVALID_PARAMETERS;
-        }
-    }
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::UPDATE_DATA, reply, query, unifiedData);
     if (status != E_OK) {
@@ -172,13 +112,6 @@ int32_t UdmfServiceProxy::UpdateData(const QueryOption &query, UnifiedData &unif
 
 int32_t UdmfServiceProxy::DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
 {
-    LOG_DEBUG(UDMF_SERVICE, "start, tag: intention = %{public}d, key = %{public}s", query.intention, query.key.c_str());
-    auto find = UD_INTENTION_MAP.find(query.intention);
-    std::string intention = find == UD_INTENTION_MAP.end() ? intention : find->second;
-    if (!UnifiedDataUtils::IsValidOptions(query.key, intention)) {
-        LOG_ERROR(UDMF_SERVICE, "invalid option");
-        return E_INVALID_PARAMETERS;
-    }
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::DELETE_DATA, reply, query);
     if (status != E_OK) {
@@ -196,12 +129,6 @@ int32_t UdmfServiceProxy::DeleteData(const QueryOption &query, std::vector<Unifi
 
 int32_t UdmfServiceProxy::GetSummary(const QueryOption &query, Summary &summary)
 {
-    LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}s", query.key.c_str());
-    UnifiedKey key(query.key);
-    if (!key.IsValid()) {
-        LOG_ERROR(UDMF_SERVICE, "invalid key");
-        return E_INVALID_PARAMETERS;
-    }
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::GET_SUMMARY, reply, query);
     if (status != E_OK) {
@@ -218,12 +145,6 @@ int32_t UdmfServiceProxy::GetSummary(const QueryOption &query, Summary &summary)
 
 int32_t UdmfServiceProxy::AddPrivilege(const QueryOption &query, Privilege &privilege)
 {
-    LOG_DEBUG(UDMF_SERVICE, "start, key: %{public}s", query.key.c_str());
-    UnifiedKey key(query.key);
-    if (!key.IsValid()) {
-        LOG_ERROR(UDMF_SERVICE, "invalid key");
-        return E_INVALID_PARAMETERS;
-    }
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::ADD_PRIVILEGE, reply, query, privilege);
     if (status != E_OK) {
@@ -235,12 +156,6 @@ int32_t UdmfServiceProxy::AddPrivilege(const QueryOption &query, Privilege &priv
 
 int32_t UdmfServiceProxy::Sync(const QueryOption &query, const std::vector<std::string> &devices)
 {
-    LOG_DEBUG(UDMF_SERVICE, "start, key: %{public}s", query.key.c_str());
-    UnifiedKey key(query.key);
-    if (!key.IsValid()) {
-        LOG_ERROR(UDMF_SERVICE, "invalid key");
-        return E_INVALID_PARAMETERS;
-    }
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SYNC, reply, query, devices);
     if (status != E_OK) {

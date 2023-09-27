@@ -48,7 +48,7 @@ napi_value AudioNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *audio = new (std::nothrow) AudioNapi();
-    ASSERT_ERR(ctxt->env, audio != nullptr, Status::E_UNKNOWN, "no memory for audio!");
+    ASSERT_ERR(ctxt->env, audio != nullptr, Status::E_ERROR, "no memory for audio!");
     audio->value_ = std::make_shared<Audio>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, audio, Destructor, nullptr, nullptr), audio);
     return ctxt->self;
@@ -59,7 +59,7 @@ void AudioNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, nap
     LOG_DEBUG(UDMF_KITS_NAPI, "AudioNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *audio = new (std::nothrow) AudioNapi();
-    ASSERT_ERR_VOID(env, audio != nullptr, Status::E_UNKNOWN, "no memory for audio!");
+    ASSERT_ERR_VOID(env, audio != nullptr, Status::E_ERROR, "no memory for audio!");
     audio->value_ = std::static_pointer_cast<Audio>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, audio, Destructor, nullptr, nullptr), audio);
 }

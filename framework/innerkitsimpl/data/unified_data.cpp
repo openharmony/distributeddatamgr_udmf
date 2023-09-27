@@ -15,6 +15,8 @@
 
 #include "unified_data.h"
 
+#include "logger.h"
+
 namespace OHOS {
 namespace UDMF {
 int64_t UnifiedData::GetSize()
@@ -88,6 +90,40 @@ std::string UnifiedData::GetTypes()
 bool UnifiedData::IsEmpty() const
 {
     return records_.empty();
+}
+
+bool UnifiedData::IsValid()
+{
+    if (this->IsEmpty()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Empty data without any record!");
+        return false;
+    }
+    if (this->GetSize() > MAX_DATA_SIZE) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Exceeded data limit!");
+        return false;
+    }
+    for (const auto &record : this->GetRecords()) {
+        if (record->GetSize() > UnifiedRecord::MAX_RECORD_SIZE) {
+            LOG_ERROR(UDMF_FRAMEWORK, "Exceeded record limit!");
+            return false;
+        }
+    }
+    return true;
+}
+
+bool UnifiedData::IsComplete()
+{
+    std::shared_ptr<Runtime> runtime = this->GetRuntime();
+    if (runtime == nullptr) {
+        return false;
+    }
+    if (static_cast<uint32_t>(this->GetRecords().size()) != runtime->recordTotalNum) {
+        LOG_ERROR(UDMF_FRAMEWORK,
+            "The records of unifiedData is incomplete, expected recordsNum is %{public}u, not %{public}zu.",
+            runtime->recordTotalNum, this->GetRecords().size());
+        return false;
+    }
+    return true;
 }
 } // namespace UDMF
 } // namespace OHOS

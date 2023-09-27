@@ -45,7 +45,7 @@ napi_value FileNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *file = new (std::nothrow) FileNapi();
-    ASSERT_ERR(ctxt->env, file != nullptr, Status::E_UNKNOWN, "no memory for file!");
+    ASSERT_ERR(ctxt->env, file != nullptr, Status::E_ERROR, "no memory for file!");
     file->value_ = std::make_shared<File>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, file, Destructor, nullptr, nullptr), file);
     return ctxt->self;
@@ -56,7 +56,7 @@ void FileNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi
     LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *file = new (std::nothrow) FileNapi();
-    ASSERT_ERR_VOID(env, file != nullptr, Status::E_UNKNOWN, "no memory for file!");
+    ASSERT_ERR_VOID(env, file != nullptr, Status::E_ERROR, "no memory for file!");
     file->value_ = std::static_pointer_cast<File>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, file, Destructor, nullptr, nullptr), file);
 }

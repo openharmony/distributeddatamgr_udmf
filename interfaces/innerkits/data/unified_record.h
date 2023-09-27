@@ -38,6 +38,8 @@ public:
     std::string GetUid() const;
     void SetUid(const std::string &id);
 
+    static constexpr int32_t MAX_RECORD_SIZE = 2 * 1024 * 1024;
+
 protected:
     UDType dataType_;
 

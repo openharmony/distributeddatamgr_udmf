@@ -31,14 +31,13 @@ constexpr ErrCode UDMF_ERR_OFFSET = ErrCodeOffset(SUBSYS_DISTRIBUTEDDATAMNG, UDM
 
 enum Status : int32_t {
     E_OK = ERR_OK,
+    E_ERROR,
     E_WRITE_PARCEL_ERROR = UDMF_ERR_OFFSET,
     E_READ_PARCEL_ERROR,
     E_IPC,
-    E_ERROR,
     E_NO_PERMISSION,
     E_INVALID_PARAMETERS,
     E_DB_ERROR,
-    E_UNKNOWN,
     E_FS_ERROR,
     E_NOT_FOUND,
     E_BUTT,
@@ -46,14 +45,13 @@ enum Status : int32_t {
 
 static const std::unordered_map<int32_t, std::string> ERROR_MAP {
     { Status::E_OK, "E_OK" },
+    { Status::E_ERROR, "E_ERROR" },
     { Status::E_WRITE_PARCEL_ERROR, "E_WRITE_PARCEL_ERROR" },
     { Status::E_READ_PARCEL_ERROR, "E_READ_PARCEL_ERROR" },
     { Status::E_IPC, "E_IPC" },
-    { Status::E_ERROR, "E_ERROR" },
     { Status::E_NO_PERMISSION, "E_NO_PERMISSION" },
     { Status::E_INVALID_PARAMETERS, "E_INVALID_PARAMETERS" },
     { Status::E_DB_ERROR, "E_DB_ERROR" },
-    { Status::E_UNKNOWN, "E_UNKNOWN" },
     { Status::E_FS_ERROR, "E_FS_ERROR" },
     { Status::E_NOT_FOUND, "E_NOT_FOUND" }
 };

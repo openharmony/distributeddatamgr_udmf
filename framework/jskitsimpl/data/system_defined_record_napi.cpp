@@ -44,7 +44,7 @@ napi_value SystemDefinedRecordNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *sdRecord = new (std::nothrow) SystemDefinedRecordNapi();
-    ASSERT_ERR(ctxt->env, sdRecord != nullptr, Status::E_UNKNOWN, "no memory for system defined record!");
+    ASSERT_ERR(ctxt->env, sdRecord != nullptr, Status::E_ERROR, "no memory for system defined record!");
     sdRecord->value_ = std::make_shared<SystemDefinedRecord>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, sdRecord, Destructor, nullptr, nullptr), sdRecord);
     return ctxt->self;
@@ -55,7 +55,7 @@ void SystemDefinedRecordNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedR
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedRecordNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *sdRecord = new (std::nothrow) SystemDefinedRecordNapi();
-    ASSERT_ERR_VOID(env, sdRecord != nullptr, Status::E_UNKNOWN, "no memory for system defined record!");
+    ASSERT_ERR_VOID(env, sdRecord != nullptr, Status::E_ERROR, "no memory for system defined record!");
     sdRecord->value_ = std::static_pointer_cast<SystemDefinedRecord>(in);
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, sdRecord, Destructor, nullptr, nullptr), sdRecord);
 }
