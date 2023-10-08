@@ -35,7 +35,9 @@ ohos_shared_library("udmf_client") {
   sources = [
     "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
+    "${udmf_framework_path}/common/utd_config.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/utd_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
@@ -51,6 +53,7 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/type_descriptor.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/video.cpp",
@@ -72,6 +75,9 @@ ohos_shared_library("udmf_client") {
     "kv_store:distributeddata_mgr",
     "samgr:samgr_proxy",
   ]
+
+  public_configs += [ "//third_party/cJSON:cJSON_config" ]
+  deps = [ "//third_party/cJSON:cjson" ]
 
   innerapi_tags = [ "platformsdk" ]
   subsystem_name = "distributeddatamgr"

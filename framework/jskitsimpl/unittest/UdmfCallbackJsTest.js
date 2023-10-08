@@ -260,7 +260,7 @@ describe('UdmfCallbackJSTest', function () {
               console.info(TAG, `insert success. The key: ${data}`);
               UDC.queryData(optionsValid, function (err, data) {
                 expect(err).assertUndefined();
-                console.info(TAG, 'query success.');
+                console.info(TAG, 'query success.data.length=' + data.length);
                 expect(data.length).assertEqual(2);
                 done();
               });

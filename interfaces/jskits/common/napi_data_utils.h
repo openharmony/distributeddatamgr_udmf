@@ -31,6 +31,8 @@
 
 #include "logger.h"
 #include "unified_meta.h"
+#include "type_descriptor.h"
+#include "type_descriptor_napi.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -83,6 +85,8 @@ public:
     /* napi_value <-> UDDetails */
     static napi_status GetValue(napi_env env, napi_value in, UDDetails &out);
     static napi_status SetValue(napi_env env, const UDDetails &in, napi_value &out);
+
+    static napi_status GetValue(napi_env env, napi_value in, std::shared_ptr<TypeDescriptor> &descriptor);
 
     static bool IsTypeForNapiValue(napi_env env, napi_value param, napi_valuetype expectType);
 

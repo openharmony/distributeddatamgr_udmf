@@ -19,6 +19,9 @@
 #include "napi_error_utils.h"
 #include "napi_queue.h"
 #include "unified_meta.h"
+#include "type_descriptor_napi.h"
+#include "type_descriptor.h"
+#include "utd_client.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -28,6 +31,7 @@ napi_value UniformTypeDescriptorNapi::UniformTypeDescriptorInit(napi_env env, na
     napi_value uniformDataType = CreateUniformDataType(env);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_PROPERTY("UniformDataType", uniformDataType),
+        DECLARE_NAPI_FUNCTION("getTypeDescriptor", GetTypeDescriptor),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
@@ -38,25 +42,9 @@ napi_value UniformTypeDescriptorNapi::CreateUniformDataType(napi_env env)
 {
     napi_value uniformDataType = nullptr;
     napi_create_object(env, &uniformDataType);
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(TEXT), UD_TYPE_MAP.at(TEXT));
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(PLAIN_TEXT), UD_TYPE_MAP.at(PLAIN_TEXT));
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(HTML), UD_TYPE_MAP.at(HTML));
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(HYPERLINK), UD_TYPE_MAP.at(HYPERLINK));
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(FILE), UD_TYPE_MAP.at(FILE));
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(IMAGE), UD_TYPE_MAP.at(IMAGE));
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(VIDEO), UD_TYPE_MAP.at(VIDEO));
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(AUDIO), UD_TYPE_MAP.at(AUDIO));
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(FOLDER), UD_TYPE_MAP.at(FOLDER));
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(SYSTEM_DEFINED_RECORD),
-        UD_TYPE_MAP.at(SYSTEM_DEFINED_RECORD));
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(SYSTEM_DEFINED_FORM),
-        UD_TYPE_MAP.at(SYSTEM_DEFINED_FORM));
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(SYSTEM_DEFINED_APP_ITEM),
-        UD_TYPE_MAP.at(SYSTEM_DEFINED_APP_ITEM));
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(SYSTEM_DEFINED_PIXEL_MAP),
-        UD_TYPE_MAP.at(SYSTEM_DEFINED_PIXEL_MAP));
-    SetNamedProperty(env, uniformDataType, JS_UD_TYPE_NAME_MAP.at(APPLICATION_DEFINED_RECORD),
-        UD_TYPE_MAP.at(APPLICATION_DEFINED_RECORD));
+    for (auto &[utdTypeKey, utdTypeValue] : JS_UD_TYPE_NAME_MAP) {
+        SetNamedProperty(env, uniformDataType, utdTypeValue, UD_TYPE_MAP.at(utdTypeKey));
+    }
     napi_object_freeze(env, uniformDataType);
     return uniformDataType;
 }
@@ -70,6 +58,31 @@ napi_status UniformTypeDescriptorNapi::SetNamedProperty(napi_env env, napi_value
     status = napi_set_named_property(env, obj, name.c_str(), property);
     ASSERT(status == napi_ok, "napi_set_named_property failed!", status);
     return status;
+}
+
+napi_value UniformTypeDescriptorNapi::GetTypeDescriptor(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "GetTypeDescriptor is called!");
+    std::string typeId;
+    auto ctxt = std::make_shared<ContextBase>();
+    auto input = [env, ctxt, &typeId](size_t argc, napi_value* argv) {
+        LOG_DEBUG(UDMF_KITS_NAPI, "GetTypeDescriptor, argc = %{public}zu !", argc);
+        // required 1 arguments : typeId
+        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");
+    std::shared_ptr<TypeDescriptor> descriptor;
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    ASSERT_ERR(ctxt->env, status == E_OK, Status::E_ERROR, "Get TypeDescriptor invalid arguments!");
+    // descriptor not found, not exception.
+    if (descriptor == nullptr) {
+        return NULL;
+    }
+    napi_value dataNapi = nullptr;
+    TypeDescriptorNapi::NewInstance(env, descriptor, dataNapi);
+    return dataNapi;
 }
 } // namespace UDMF
 } // namespace OHOS
