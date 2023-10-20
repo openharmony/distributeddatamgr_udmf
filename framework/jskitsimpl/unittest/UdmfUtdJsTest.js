@@ -19,7 +19,8 @@ import UTD from '@ohos.data.uniformTypeDescriptor';
 const ERROR_PARAMETER = '401';
 
 describe('UdmfUtdJSTest', function () {
-  /**
+
+  /*
    * @tc.name UdmfTestTypeDescriptor001
    * @tc.desc Test Js Api 
    * @tc.type: FUNC
@@ -37,7 +38,7 @@ describe('UdmfUtdJSTest', function () {
     console.info(TAG, 'end');
   });
 
-  /**
+  /*
    * @tc.name UdmfTestTypeDescriptor002
    * @tc.desc Test Js Api 
    * @tc.type: FUNC
@@ -47,7 +48,6 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor002:';
     console.info(TAG, 'start');
     let typeObj = UTD.getTypeDescriptor("com.adobe.photoshop-image");
-    console.info(TAG, 'typeDescriptor, ret ' + typeObj.toString());
     console.info(TAG, 'typeDescriptor, typeId ' + typeObj.typeId);
     console.info(TAG, 'typeDescriptor, belongingToTypes ' + typeObj.belongingToTypes);
     console.info(TAG, 'typeDescriptor, description ' + typeObj.description);
@@ -60,7 +60,7 @@ describe('UdmfUtdJSTest', function () {
     console.info(TAG, 'end');
   });
 
-  /**
+  /*
    * @tc.name UdmfTestTypeDescriptor003
    * @tc.desc Test Js Api 
    * @tc.type: FUNC
@@ -69,22 +69,21 @@ describe('UdmfUtdJSTest', function () {
    it('UdmfTestTypeDescriptor003', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor003:';
     console.info(TAG, 'start');
-    try {
-      let typeObj = UTD.getTypeDescriptor("general.type-script");
-      let typeObj2 = UTD.getTypeDescriptor("general.python-script");
-      console.info(TAG, 'typeDescriptor, ret ' + typeObj);
-      console.info(TAG, 'typeDescriptor, ret ' + typeObj2);
-      let ret = typeObj.equals(typeObj2);
-      console.info(TAG, 'typeObj equals with equals is ' + ret);
-      expect(ret).assertEqual(false);
-    } catch (e) {
-      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
-      expect(e.code === ERROR_PARAMETER).assertTrue();
-    }
+    let typeObj = UTD.getTypeDescriptor("general.type-script");
+    let typeObj2 = UTD.getTypeDescriptor("general.python-script");
+    let typeObj3 = UTD.getTypeDescriptor("general.python-script");
+    console.info(TAG, 'typeDescriptor, ret ' + typeObj);
+    console.info(TAG, 'typeDescriptor, ret ' + typeObj2);
+    let ret = typeObj.equals(typeObj2);
+    console.info(TAG, 'typeObj equals with typeObj2 is ' + ret);
+    expect(ret).assertEqual(false);
+    ret = typeObj2.equals(typeObj3);
+    console.info(TAG, 'typeObj2 equals with typeObj3 is ' + ret);
+    expect(ret).assertEqual(true);
     console.info(TAG, 'end');
   });
 
-  /**
+  /*
    * @tc.name UdmfTestTypeDescriptor004
    * @tc.desc Test Js Api 
    * @tc.type: FUNC
@@ -94,15 +93,21 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor004:';
     console.info(TAG, 'start');
     for (var utdType in UTD.UniformDataType) {
-      console.info(TAG, 'typeDescriptor, utdType=' + UTD.UniformDataType[utdType]);
+      console.info(TAG, 'typeDescriptor, utdType=' + UTD.UniformDataType[utdType] + ", " +
+        Object.prototype.toString.call(UTD.UniformDataType[utdType]));
       let typeObj = UTD.getTypeDescriptor(UTD.UniformDataType[utdType]);
       if (typeObj != null) {
-        console.info(TAG, 'typeDescriptor, typeId ' +  typeObj.typeId + ', belonging ' + typeObj.belongingToTypes);
-        console.info(TAG, 'typeDescriptor, description ' + typeObj.description);
-        console.info(TAG, 'typeDescriptor, referenceURL ' + typeObj.referenceURL + ', iconFile ' + typeObj.iconFile);
+        let typeId = typeObj.typeId;
+        let belonging = typeObj.belongingToTypes; 
+        let description = typeObj.description;
+        let referenceURL = typeObj.referenceURL;
+        let iconFile = typeObj.iconFile;
+        console.info(TAG, ', typeId: ' + typeId + ", " + Object.prototype.toString.call(typeId) +
+          ', belongingToTypes: ' + belonging + ", " + Object.prototype.toString.call(belonging));
+        console.info(TAG, 'description: ' + ", " + Object.prototype.toString.call(description));
+        console.info(TAG, 'referenceURL: ' + referenceURL + ", " + Object.prototype.toString.call(referenceURL)
+          + ', iconFile: ' + iconFile + ", " + Object.prototype.toString.call(iconFile));
         expect(typeObj.typeId).assertEqual(UTD.UniformDataType[utdType]);
-      } else {
-        console.info(TAG, 'typeDescriptor, not found utdType object. utdType=' + UTD.UniformDataType[utdType]);
       }
     }
     console.info(TAG, 'end');

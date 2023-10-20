@@ -12,32 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef UTD_CLIENT_H
-#define UTD_CLIENT_H
-
-#include <string>
-#include <vector>
-#include <map>
-
+#ifndef UDMF_PRESET_TYPE_DESCRIPTORS
+#define UDMF_PRESET_TYPE_DESCRIPTORS
 #include "type_descriptor.h"
 #include "error_code.h"
 
 namespace OHOS {
 namespace UDMF {
-class TypeDescriptor;
-class UtdClient {
+class PresetTypeDescriptors {
 public:
-    static UtdClient &GetInstance();
-    Status GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
+    static PresetTypeDescriptors &GetInstance();
+    std::vector<TypeDescriptor> &GetTypeDescriptors();
 private:
-    UtdClient();
-    ~UtdClient();
-    UtdClient(const UtdClient &obj) = delete;
-    UtdClient &operator=(const UtdClient &obj) = delete;
+    PresetTypeDescriptors();
+    ~PresetTypeDescriptors();
+    PresetTypeDescriptors(const PresetTypeDescriptors &obj) = delete;
+    PresetTypeDescriptors &operator=(const PresetTypeDescriptors &obj) = delete;
 
-    std::vector<TypeDescriptor> descriptors_;
+    void InitDescriptors();
+    std::vector<TypeDescriptor> typeDescriptors_;
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UTD_CLIENT_H
+#endif // UDMF_PRESET_TYPE_DESCRIPTORS

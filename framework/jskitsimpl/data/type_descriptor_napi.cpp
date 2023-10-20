@@ -89,7 +89,7 @@ napi_value TypeDescriptorNapi::Equals(napi_env env, napi_callback_info info)
 
     ctxt->GetCbInfo(env, info, input);
     NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");
-    bool equalsRet = reinterpret_cast<TypeDescriptor*>(ctxt->native)->Equals(typeDescriptor);
+    bool equalsRet = reinterpret_cast<TypeDescriptorNapi*>(ctxt->native)->value_->Equals(typeDescriptor);
     napi_get_boolean(env, equalsRet, &ctxt->output);
     return ctxt->output;
 }

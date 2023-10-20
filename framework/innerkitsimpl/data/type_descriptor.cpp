@@ -19,7 +19,11 @@
 
 namespace OHOS {
 namespace UDMF {
-TypeDescriptor::TypeDescriptor(const std::string &typeId) : typeId_(typeId)
+TypeDescriptor::TypeDescriptor(const std::string &typeId, const std::set<std::string> &belongingToTypes,
+    const std::vector<std::string> &filenameExtensions, const std::vector<std::string> &mimeTypes,
+    const std::string &description, const std::string &referenceURL, const std::string &iconFile) : typeId_(typeId),
+    belongingToTypes_(belongingToTypes), filenameExtensions_(filenameExtensions), mimeTypes_(mimeTypes),
+    description_(description), referenceURL_(referenceURL), iconFile_(iconFile)
 {
 }
 
@@ -29,17 +33,12 @@ TypeDescriptor::~TypeDescriptor()
 
 bool TypeDescriptor::Equals(std::shared_ptr<TypeDescriptor> descriptor)
 {
-    return  descriptor->GetTypeId() == typeId_;
+    return  descriptor->GetTypeId() == this->GetTypeId();
 }
 
-std::string TypeDescriptor::GetTypeId()
+const std::string& TypeDescriptor::GetTypeId() const
 {
     return typeId_;
-}
-
-void TypeDescriptor::SetBelongingToTypes(const std::set<std::string> &belongingToTypes)
-{
-    belongingToTypes_ = belongingToTypes;
 }
 
 std::set<std::string> TypeDescriptor::GetBelongingToTypes()
@@ -47,19 +46,9 @@ std::set<std::string> TypeDescriptor::GetBelongingToTypes()
     return belongingToTypes_;
 }
 
-void TypeDescriptor::SetIconFile(const std::string &iconFile)
-{
-    iconFile_ = iconFile;
-}
-
 std::string TypeDescriptor::GetIconFile()
 {
     return iconFile_;
-}
-
-void TypeDescriptor::SetDescription(std::string description)
-{
-    description_ = description;
 }
 
 std::string TypeDescriptor::GetDescription()
@@ -67,29 +56,14 @@ std::string TypeDescriptor::GetDescription()
     return description_;
 }
 
-void TypeDescriptor::SetReferenceURL(std::string referenceURL)
-{
-    referenceURL_ = referenceURL;
-}
-
 std::string TypeDescriptor::GetReferenceURL()
 {
     return referenceURL_;
 }
 
-void TypeDescriptor::SetFilenameExtensions(const std::vector<std::string> &filenameExtensions)
-{
-    filenameExtensions_ = filenameExtensions;
-}
-
 std::vector<std::string> TypeDescriptor::GetFilenameExtensions()
 {
     return filenameExtensions_;
-}
-
-void TypeDescriptor::SetMimeTypes(const std::vector<std::string> &mimeTypes)
-{
-    mimeTypes_ = mimeTypes;
 }
 
 std::vector<std::string> TypeDescriptor::GetMimeTypes()

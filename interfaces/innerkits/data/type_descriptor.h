@@ -24,32 +24,27 @@ namespace OHOS {
 namespace UDMF {
 class TypeDescriptor {
 public:
-    explicit TypeDescriptor(const std::string &typeId);
+    TypeDescriptor(const std::string &typeId, const std::set<std::string> &belongingToTypes,
+                   const std::vector<std::string> &filenameExtensions, const std::vector<std::string> &mimeTypes,
+                   const std::string &description, const std::string &referenceURL, const std::string &iconFile);
     ~TypeDescriptor();
     bool Equals(std::shared_ptr<TypeDescriptor> descriptor);
-    std::string GetTypeId();
-    void SetBelongingToTypes(const std::set<std::string> &belongingToTypes);
+    const std::string& GetTypeId() const;
     std::set<std::string> GetBelongingToTypes();
-    void SetIconFile(const std::string &iconFile);
     std::string GetIconFile();
-    void SetDescription(std::string description);
     std::string GetDescription();
-    void SetReferenceURL(std::string referenceURL);
     std::string GetReferenceURL();
-    void SetFilenameExtensions(const std::vector<std::string> &filenameExtensions);
     std::vector<std::string> GetFilenameExtensions();
-    void SetMimeTypes(const std::vector<std::string> &mimeTypes);
     std::vector<std::string> GetMimeTypes();
 
 private:
     std::string typeId_;
     std::set<std::string> belongingToTypes_;
-    std::string iconFile_;
     std::vector<std::string> filenameExtensions_;
     std::vector<std::string> mimeTypes_;
-
     std::string description_;
     std::string referenceURL_;
+    std::string iconFile_;
 };
 } // namespace UDMF
 } // namespace OHOS

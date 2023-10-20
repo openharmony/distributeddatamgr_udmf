@@ -14,17 +14,14 @@
  */
 
 #include "utd_client.h"
-
-#include "error_code.h"
 #include "logger.h"
-#include "udmf_service_client.h"
-#include "utd_config.h"
+#include "preset_type_descriptors.h"
 
 namespace OHOS {
 namespace UDMF {
 UtdClient::UtdClient()
 {
-    InitDescriptor();
+    LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
 }
 
 UtdClient::~UtdClient()
@@ -37,19 +34,16 @@ UtdClient &UtdClient::GetInstance()
     return *instance_;
 }
 
-void UtdClient::InitDescriptor()
-{
-    descriptors_ = UtdConfig::GetInstance().GetDescriptorsFromConfig();
-}
-
 Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor)
 {
-    auto iter = descriptors_.find(typeId);
-    if (iter != descriptors_.end()) {
-        descriptor = std::make_shared<TypeDescriptor>(iter->second);
-        LOG_DEBUG(UDMF_CLIENT, "got descriptor success. %{public}s ", typeId.c_str());
-        return Status::E_OK;
+    descriptors_ = PresetTypeDescriptors::GetInstance().GetTypeDescriptors();
+    for (const auto &utdType : descriptors_) {
+        if (utdType.GetTypeId() == typeId) {
+            descriptor = std::make_shared<TypeDescriptor>(utdType);
+            LOG_DEBUG(UDMF_CLIENT, "get descriptor success. %{public}s ", typeId.c_str());
+        }
     }
+
     return Status::E_OK;
 }
 } // namespace UDMF

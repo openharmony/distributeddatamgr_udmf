@@ -33,9 +33,9 @@ config("udmf_client_config") {
 
 ohos_shared_library("udmf_client") {
   sources = [
+    "${udmf_framework_path}/common/preset_type_descriptors.cpp",
     "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
-    "${udmf_framework_path}/common/utd_config.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/utd_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
@@ -75,9 +75,6 @@ ohos_shared_library("udmf_client") {
     "kv_store:distributeddata_mgr",
     "samgr:samgr_proxy",
   ]
-
-  public_configs += [ "//third_party/cJSON:cJSON_config" ]
-  deps = [ "//third_party/cJSON:cjson" ]
 
   innerapi_tags = [ "platformsdk" ]
   subsystem_name = "distributeddatamgr"

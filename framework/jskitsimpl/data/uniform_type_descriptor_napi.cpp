@@ -75,14 +75,12 @@ napi_value UniformTypeDescriptorNapi::GetTypeDescriptor(napi_env env, napi_callb
     NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");
     std::shared_ptr<TypeDescriptor> descriptor;
     auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
-    ASSERT_ERR(ctxt->env, status == E_OK, Status::E_ERROR, "Get TypeDescriptor invalid arguments!");
-    // descriptor not found, not exception.
-    if (descriptor == nullptr) {
-        return NULL;
+    ASSERT_ERR(ctxt->env, status == E_OK, Status::E_ERROR, "invalid arguments!");
+    TypeDescriptorNapi::NewInstance(env, descriptor, ctxt->output);
+    if (descriptor == nullptr) { // descriptor not found, not exception, need return null object.
+        napi_get_null(env, &ctxt->output);
     }
-    napi_value dataNapi = nullptr;
-    TypeDescriptorNapi::NewInstance(env, descriptor, dataNapi);
-    return dataNapi;
+    return ctxt->output;
 }
 } // namespace UDMF
 } // namespace OHOS

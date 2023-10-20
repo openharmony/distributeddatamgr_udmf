@@ -38,7 +38,6 @@
       ],
       "third_party": [
         "bounds_checking_function",
-        "cJSON",
         "googletest"
       ]
     },
