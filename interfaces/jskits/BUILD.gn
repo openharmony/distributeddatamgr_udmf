@@ -85,6 +85,7 @@ ohos_shared_library("unifieddatachannel_napi") {
 
 ohos_shared_library("uniformtypedescriptor_napi") {
   sources = [
+    "${udmf_framework_path}/jskitsimpl/data/type_descriptor_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/uniform_type_descriptor_napi.cpp",
     "${udmf_interfaces_path}/jskits/module/uniform_type_descriptor_napi_module.cpp",
   ]

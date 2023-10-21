@@ -15,6 +15,7 @@
 
 #include "logger.h"
 #include "uniform_type_descriptor_napi.h"
+#include "type_descriptor_napi.h"
 
 using namespace OHOS::UDMF;
 
@@ -22,6 +23,9 @@ EXTERN_C_START
 static napi_value Init(napi_env env, napi_value exports)
 {
     OHOS::UDMF::UniformTypeDescriptorNapi::UniformTypeDescriptorInit(env, exports);
+    napi_status status =
+        napi_set_named_property(env, exports, "TypeDescriptor", OHOS::UDMF::TypeDescriptorNapi::Constructor(env));
+    LOG_INFO(UDMF_KITS_NAPI, "init TypeDescriptor %{public}d", status);
     return exports;
 }
 EXTERN_C_END
