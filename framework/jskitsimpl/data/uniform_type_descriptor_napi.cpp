@@ -14,7 +14,6 @@
 */
 
 #include "uniform_type_descriptor_napi.h"
-
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "napi_queue.h"
@@ -68,14 +67,16 @@ napi_value UniformTypeDescriptorNapi::GetTypeDescriptor(napi_env env, napi_callb
     auto input = [env, ctxt, &typeId](size_t argc, napi_value* argv) {
         LOG_DEBUG(UDMF_KITS_NAPI, "GetTypeDescriptor, argc = %{public}zu !", argc);
         // required 1 arguments : typeId
-        ASSERT_BUSINESS_ERR(ctxt, argc == 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "invalid arg[0], i.e. invalid arguments!");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");
+    ASSERT_NULL(!ctxt->isThrowError, "GetTypeDescriptor Exit");
     std::shared_ptr<TypeDescriptor> descriptor;
     auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
-    ASSERT_ERR(ctxt->env, status == E_OK, Status::E_ERROR, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, status == E_OK, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     TypeDescriptorNapi::NewInstance(env, descriptor, ctxt->output);
     if (descriptor == nullptr) { // descriptor not found, not exception, need return null object.
         napi_get_null(env, &ctxt->output);

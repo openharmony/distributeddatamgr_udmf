@@ -16,6 +16,7 @@
 #include "type_descriptor_napi.h"
 #include "utd_client.h"
 #include "napi_data_utils.h"
+#include "napi_error_utils.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -85,10 +86,12 @@ napi_value TypeDescriptorNapi::Equals(napi_env env, napi_callback_info info)
         // required 1 arguments : descriptor
         ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeDescriptor);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "invalid arg[0], i.e. invalid arguments!");
     };
 
-    ctxt->GetCbInfo(env, info, input);
-    NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_NULL(!ctxt->isThrowError, "Equals Exit");
     bool equalsRet = reinterpret_cast<TypeDescriptorNapi*>(ctxt->native)->value_->Equals(typeDescriptor);
     napi_get_boolean(env, equalsRet, &ctxt->output);
     return ctxt->output;
