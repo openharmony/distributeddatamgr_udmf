@@ -94,21 +94,24 @@ napi_status NapiDataUtils::SetValue(napi_env env, const double &in, napi_value &
 /* napi_value <-> std::string */
 napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::string &out)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value <- string");
+    napi_valuetype type = napi_undefined;
+    napi_status status = napi_typeof(env, in, &type);
+    LOG_ERROR_RETURN((status == napi_ok) && (type == napi_string), "invalid type", napi_invalid_arg);
+
     size_t maxLen = STR_MAX_LENGTH;
-    napi_status status = napi_get_value_string_utf8(env, in, NULL, 0, &maxLen);
-    if (maxLen == 0) {
-        GET_AND_THROW_LAST_ERROR(env);
+    status = napi_get_value_string_utf8(env, in, NULL, 0, &maxLen);
+    if (maxLen <= 0) {
         return status;
     }
     char *buf = new (std::nothrow) char[maxLen + STR_TAIL_LENGTH];
     if (buf != nullptr) {
         size_t len = 0;
         status = napi_get_value_string_utf8(env, in, buf, maxLen + STR_TAIL_LENGTH, &len);
-        if (status != napi_ok) {
-            GET_AND_THROW_LAST_ERROR(env);
+        if (status == napi_ok) {
+            buf[len] = 0;
+            out = std::string(buf);
         }
-        buf[len] = 0;
-        out = std::string(buf);
         delete[] buf;
     } else {
         status = napi_generic_failure;

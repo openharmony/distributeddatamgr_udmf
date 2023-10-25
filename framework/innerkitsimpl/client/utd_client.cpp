@@ -30,8 +30,8 @@ UtdClient::~UtdClient()
 
 UtdClient &UtdClient::GetInstance()
 {
-    static auto instance_ = new UtdClient();
-    return *instance_;
+    static auto instance = new UtdClient();
+    return *instance;
 }
 
 Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor)

@@ -26,8 +26,8 @@ PresetTypeDescriptors::~PresetTypeDescriptors()
 
 PresetTypeDescriptors &PresetTypeDescriptors::GetInstance()
 {
-    static auto instance_ = new PresetTypeDescriptors();
-    return *instance_;
+    static auto instance = new PresetTypeDescriptors();
+    return *instance;
 }
 
 std::vector<TypeDescriptor> &PresetTypeDescriptors::GetTypeDescriptors()
