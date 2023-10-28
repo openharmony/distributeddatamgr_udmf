@@ -24,7 +24,10 @@ napi_value TypeDescriptorNapi::Constructor(napi_env env)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "typeDescriptorNapi");
     napi_property_descriptor properties[] = {
-        /* UnifiedData properties */
+        /* TypeDescriptor properties */
+        DECLARE_NAPI_FUNCTION("belongsTo", BelongsTo),
+        DECLARE_NAPI_FUNCTION("isLowerLevelType", IsLowerLevelType),
+        DECLARE_NAPI_FUNCTION("isHigherLevelType", IsHigherLevelType),
         DECLARE_NAPI_FUNCTION("equals", Equals),
         DECLARE_NAPI_GETTER_SETTER("typeId", GetTypeId, nullptr),
         DECLARE_NAPI_GETTER_SETTER("belongingToTypes", GetBelongingToTypes, nullptr),
@@ -75,6 +78,66 @@ TypeDescriptorNapi *TypeDescriptorNapi::GetDescriptorNapi(napi_env env, napi_cal
     ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     return static_cast<TypeDescriptorNapi *>(ctxt->native);
+}
+
+napi_value TypeDescriptorNapi::BelongsTo(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "TypeDescriptorNapi::BelongsTo()");
+    auto ctxt = std::make_shared<ContextBase>();
+    std::string typeId;
+    auto input = [env, ctxt, &typeId](size_t argc, napi_value* argv) {
+        // required 1 arguments : descriptor
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "invalid arg[0], i.e. invalid arguments!");
+    };
+
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_NULL(!ctxt->isThrowError, "BelongsTo Exit");
+    bool equalsRet = reinterpret_cast<TypeDescriptorNapi*>(ctxt->native)->value_->BelongsTo(typeId);
+    napi_get_boolean(env, equalsRet, &ctxt->output);
+    return ctxt->output;
+}
+
+napi_value TypeDescriptorNapi::IsLowerLevelType(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "TypeDescriptorNapi::IsLowerLevelType()");
+    auto ctxt = std::make_shared<ContextBase>();
+    std::string typeId;
+    auto input = [env, ctxt, &typeId](size_t argc, napi_value* argv) {
+        // required 1 arguments : descriptor
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "invalid arg[0], i.e. invalid arguments!");
+    };
+
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_NULL(!ctxt->isThrowError, "IsLowerLevelType Exit");
+    bool equalsRet = reinterpret_cast<TypeDescriptorNapi*>(ctxt->native)->value_->IsLowerLevelType(typeId);
+    napi_get_boolean(env, equalsRet, &ctxt->output);
+    return ctxt->output;
+}
+
+napi_value TypeDescriptorNapi::IsHigherLevelType(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "TypeDescriptorNapi::IsHigherLevelType()");
+    auto ctxt = std::make_shared<ContextBase>();
+    std::string typeId;
+    auto input = [env, ctxt, &typeId](size_t argc, napi_value* argv) {
+        // required 1 arguments : descriptor
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "invalid arg[0], i.e. invalid arguments!");
+    };
+
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_NULL(!ctxt->isThrowError, "IsHigherLevelType Exit");
+    bool equalsRet = reinterpret_cast<TypeDescriptorNapi*>(ctxt->native)->value_->IsHigherLevelType(typeId);
+    napi_get_boolean(env, equalsRet, &ctxt->output);
+    return ctxt->output;
 }
 
 napi_value TypeDescriptorNapi::Equals(napi_env env, napi_callback_info info)

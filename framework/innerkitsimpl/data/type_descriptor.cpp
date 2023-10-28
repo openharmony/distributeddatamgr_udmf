@@ -14,8 +14,8 @@
  */
 
 #include "type_descriptor.h"
-
 #include "logger.h"
+#include "utd_graph.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -29,6 +29,24 @@ TypeDescriptor::TypeDescriptor(const std::string &typeId, const std::set<std::st
 
 TypeDescriptor::~TypeDescriptor()
 {
+}
+
+bool TypeDescriptor::BelongsTo(const std::string &typeId)
+{
+    if (typeId_ == typeId) {
+        return true;
+    };
+    return UtdGraph::GetInstance().IsRelatedOrNot(typeId, typeId_);
+}
+
+bool TypeDescriptor::IsLowerLevelType(const std::string &typeId)
+{
+    return UtdGraph::GetInstance().IsRelatedOrNot(typeId, typeId_);
+}
+
+bool TypeDescriptor::IsHigherLevelType(const std::string &typeId)
+{
+    return UtdGraph::GetInstance().IsRelatedOrNot(typeId_, typeId);
 }
 
 bool TypeDescriptor::Equals(std::shared_ptr<TypeDescriptor> descriptor)

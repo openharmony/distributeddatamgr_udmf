@@ -164,7 +164,7 @@ bool Unmarshalling(UDType &output, MessageParcel &parcel)
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal UDType failed!");
         return false;
     }
-    if (type < TEXT || type >= UD_BUTT) {
+    if (type < ENTITY || type >= UD_BUTT) {
         LOG_ERROR(UDMF_FRAMEWORK, "invalid UDType!");
         return false;
     }

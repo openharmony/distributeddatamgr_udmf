@@ -50,7 +50,8 @@
           "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
           "header": {
             "header_files": [
-              "udmf_client.h"
+              "udmf_client.h",
+              "utd_client.h"
             ],
             "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/client"
           }
@@ -85,6 +86,7 @@
               "system_defined_pixelmap.h",
               "system_defined_record.h",
               "text.h",
+              "type_descriptor.h",
               "unified_data.h",
               "unified_record.h",
               "video.h"
