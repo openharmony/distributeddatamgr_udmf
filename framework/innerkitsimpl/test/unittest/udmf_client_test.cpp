@@ -1367,6 +1367,73 @@ HWTEST_F(UdmfClientTest, AddPrivilege002, TestSize.Level1)
 }
 
 /**
+* @tc.name: AddPrivilege003
+* @tc.desc: Add privilege with invalid intention
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, AddPrivilege003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "AddPrivilege003 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    Text text;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
+    data.AddRecord(record);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    Privilege privilege;
+    SetHapToken2();
+    privilege.tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo2", 0);
+    privilege.readPermission = "readPermission";
+    privilege.writePermission = "writePermission";
+    SetNativeToken();
+    status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
+    ASSERT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "AddPrivilege003 end.");
+}
+
+/**
+* @tc.name: AddPrivilege004
+* @tc.desc: Add privilege for unauthorized process with valid params
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, AddPrivilege004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "AddPrivilege004 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    Text text;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
+    data.AddRecord(record);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    Privilege privilege;
+    SetHapToken2();
+    privilege.tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo2", 0);
+    privilege.readPermission = "readPermission";
+    privilege.writePermission = "writePermission";
+    auto tokenId = AccessTokenKit::GetNativeTokenId("foundation");
+    SetSelfTokenID(tokenId);
+    status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
+    ASSERT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "AddPrivilege004 end.");
+}
+
+/**
 * @tc.name: GetSelfData001
 * @tc.desc: Set File record with valid params and no add privilege and get data by self
 * @tc.type: FUNC
