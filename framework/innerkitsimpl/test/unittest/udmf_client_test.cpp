@@ -50,7 +50,7 @@ public:
     void SetUp() override;
     void TearDown() override;
 
-    void SetNativeToken();
+    void SetNativeToken(const std::string processName);
     static void AllocHapToken1();
     static void AllocHapToken2();
     void SetHapToken1();
@@ -87,9 +87,9 @@ void UdmfClientTest::TearDown()
 {
 }
 
-void UdmfClientTest::SetNativeToken()
+void UdmfClientTest::SetNativeToken(const std::string processName)
 {
-    auto tokenId = AccessTokenKit::GetNativeTokenId("msdp_sa");
+    auto tokenId = AccessTokenKit::GetNativeTokenId(processName);
     SetSelfTokenID(tokenId);
 }
 
@@ -187,7 +187,7 @@ void UdmfClientTest::AddPrivilege(QueryOption &option)
     privilege.tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo2", INST_INDEX);
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
-    SetNativeToken();
+    SetNativeToken("msdp_sa");
     auto status = UdmfClient::GetInstance().AddPrivilege(option, privilege);
     ASSERT_EQ(status, E_OK);
 }
@@ -1310,7 +1310,7 @@ HWTEST_F(UdmfClientTest, AddPrivilege001, TestSize.Level1)
     privilege.tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo2", 0);
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
-    SetNativeToken();
+    SetNativeToken("msdp_sa");
     status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
     ASSERT_EQ(status, E_OK);
 
@@ -1393,9 +1393,9 @@ HWTEST_F(UdmfClientTest, AddPrivilege003, TestSize.Level1)
     privilege.tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo2", 0);
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
-    SetNativeToken();
+    SetNativeToken("msdp_sa");
     status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
-    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(status, E_NO_PERMISSION);
     LOG_INFO(UDMF_TEST, "AddPrivilege003 end.");
 }
 
@@ -1426,10 +1426,9 @@ HWTEST_F(UdmfClientTest, AddPrivilege004, TestSize.Level1)
     privilege.tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo2", 0);
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
-    auto tokenId = AccessTokenKit::GetNativeTokenId("foundation");
-    SetSelfTokenID(tokenId);
+    SetNativeToken("foundation");
     status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
-    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(status, E_NO_PERMISSION);
     LOG_INFO(UDMF_TEST, "AddPrivilege004 end.");
 }
 
