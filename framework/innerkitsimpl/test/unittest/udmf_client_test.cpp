@@ -50,7 +50,7 @@ public:
     void SetUp() override;
     void TearDown() override;
 
-    void SetNativeToken();
+    void SetNativeToken(const std::string processName);
     static void AllocHapToken1();
     static void AllocHapToken2();
     void SetHapToken1();
@@ -87,9 +87,9 @@ void UdmfClientTest::TearDown()
 {
 }
 
-void UdmfClientTest::SetNativeToken()
+void UdmfClientTest::SetNativeToken(const std::string processName)
 {
-    auto tokenId = AccessTokenKit::GetNativeTokenId("msdp_sa");
+    auto tokenId = AccessTokenKit::GetNativeTokenId(processName);
     SetSelfTokenID(tokenId);
 }
 
@@ -187,7 +187,7 @@ void UdmfClientTest::AddPrivilege(QueryOption &option)
     privilege.tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo2", INST_INDEX);
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
-    SetNativeToken();
+    SetNativeToken("msdp_sa");
     auto status = UdmfClient::GetInstance().AddPrivilege(option, privilege);
     ASSERT_EQ(status, E_OK);
 }
@@ -1310,7 +1310,7 @@ HWTEST_F(UdmfClientTest, AddPrivilege001, TestSize.Level1)
     privilege.tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo2", 0);
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
-    SetNativeToken();
+    SetNativeToken("msdp_sa");
     status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
     ASSERT_EQ(status, E_OK);
 
@@ -1364,6 +1364,72 @@ HWTEST_F(UdmfClientTest, AddPrivilege002, TestSize.Level1)
     EXPECT_EQ(status, E_INVALID_PARAMETERS);
 
     LOG_INFO(UDMF_FRAMEWORK, "AddPrivilege002 end.");
+}
+
+/**
+* @tc.name: AddPrivilege003
+* @tc.desc: Add privilege with invalid intention
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, AddPrivilege003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "AddPrivilege003 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    Text text;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
+    data.AddRecord(record);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    Privilege privilege;
+    SetHapToken2();
+    privilege.tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo2", 0);
+    privilege.readPermission = "readPermission";
+    privilege.writePermission = "writePermission";
+    SetNativeToken("msdp_sa");
+    status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
+    ASSERT_EQ(status, E_NO_PERMISSION);
+    LOG_INFO(UDMF_TEST, "AddPrivilege003 end.");
+}
+
+/**
+* @tc.name: AddPrivilege004
+* @tc.desc: Add privilege for unauthorized process with valid params
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, AddPrivilege004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "AddPrivilege004 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    Text text;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
+    data.AddRecord(record);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    Privilege privilege;
+    SetHapToken2();
+    privilege.tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo2", 0);
+    privilege.readPermission = "readPermission";
+    privilege.writePermission = "writePermission";
+    SetNativeToken("foundation");
+    status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
+    ASSERT_EQ(status, E_NO_PERMISSION);
+    LOG_INFO(UDMF_TEST, "AddPrivilege004 end.");
 }
 
 /**
