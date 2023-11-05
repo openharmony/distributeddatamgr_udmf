@@ -28,7 +28,8 @@ namespace UDMF {
 class UtdGraph {
 public:
     static UtdGraph &GetInstance();
-    uint32_t GetLocateIndex(const std::string &node); // 顶点数据和下标转换
+    uint32_t GetLocateIndex(const std::string &node);
+    bool IsInvalidType(const std::string &node);
     void AddLocateDatas(uint32_t index, std::string node);
     void SetDataToGraph(uint32_t vesNum, std::vector<std::vector<uint32_t>> edges);
     bool IsRelatedOrNot(const std::string &startNode, const std::string &endNode);
@@ -39,8 +40,8 @@ private:
     UtdGraph &operator=(const UtdGraph &obj) = delete;
     mutable std::shared_mutex graphMutex_;
     Graph graph_;
-    mutable std::shared_mutex vesNodesMutex_;
-    std::map<std::string, uint32_t> vesNodes_;
+    mutable std::shared_mutex vertexConversionTableMutex_;
+    std::map<std::string, uint32_t> vertexConversionTable_;
 };
 } // namespace UDMF
 } // namespace OHOS

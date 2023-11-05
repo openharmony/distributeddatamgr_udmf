@@ -13,16 +13,13 @@
  * limitations under the License.
  */
 #include "graph.h"
-#include "securec.h"
-using namespace std;
 namespace OHOS {
 namespace UDMF {
-void Graph::CreateAdjList(uint32_t vesNum, vector<vector<uint32_t>> edges)
+void Graph::CreateAdjList(uint32_t vertexNum, std::vector<std::vector<uint32_t>> edges)
 {
-    vesNum_ = vesNum;
-    for (uint32_t node = 0; node < vesNum_; node++) {
-        adjList_[node].value = node;
-        adjList_[node].firstEdge = nullptr;
+    vertexNum_ = vertexNum;
+    for (uint32_t node = 0; node < vertexNum_; node++) {
+        adjList_.push_back({node, nullptr});
     }
     uint32_t start;
     uint32_t end;
@@ -40,9 +37,10 @@ void Graph::CreateAdjList(uint32_t vesNum, vector<vector<uint32_t>> edges)
 void Graph::Dfs(uint32_t startNode, bool isInit, Action action)
 {
     if (isInit) {
-        (void)memset_s(visited_, sizeof(visited_), 0, sizeof(visited_));
+        visited_.resize(vertexNum_);
+        fill(visited_.begin(), visited_.end(), 0);
     }
-    stack <uint32_t>nodes;
+    std::stack<uint32_t> nodes;
     EdgeNode *edge = nullptr;
     visited_[startNode] = 1;
     nodes.push(startNode);
@@ -69,11 +67,12 @@ void Graph::Dfs(uint32_t startNode, bool isInit, Action action)
     }
 }
 
-vector<uint32_t> Graph::DfsUnconnectedGraph()
+std::vector<uint32_t> Graph::DfsUnconnectedGraph()
 {
-    (void)memset_s(visited_, sizeof(visited_), 0, sizeof(visited_));
-    vector<uint32_t> result;
-    for (uint32_t node = 0; node < vesNum_; node++) {
+    visited_.resize(vertexNum_);
+    fill(visited_.begin(), visited_.end(), 0);
+    std::vector<uint32_t> result;
+    for (uint32_t node = 0; node < vertexNum_; node++) {
         if (!visited_[node]) {
             Dfs(node, false, [&](uint32_t currNode) -> bool {
                 result.push_back(currNode);

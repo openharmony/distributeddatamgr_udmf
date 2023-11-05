@@ -30,15 +30,18 @@ class UtdClient {
 public:
     static UtdClient &GetInstance();
     Status GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
-    Status GetUniformDataTypeByFilenameExtension(const std::string &fileExtension, const std::string &belongs,
-                                                 std::string &typeId);
-    Status GetUniformDataTypeByMIMEType(const std::string &mimeType, const std::string &belongs, std::string &typeId);
+    Status GetUniformDataTypeByFilenameExtension(const std::string &fileExtension, std::string &typeId,
+                                                 std::string belongs = DEFAULT_TYPE_ID);
+    Status GetUniformDataTypeByMIMEType(const std::string &mimeType, std::string &typeId,
+                                        std::string belongs = DEFAULT_TYPE_ID);
+
 private:
     UtdClient();
     ~UtdClient();
     UtdClient(const UtdClient &obj) = delete;
     UtdClient &operator=(const UtdClient &obj) = delete;
-    void SetDataToGraph();
+    void SummarizeData();
+    static constexpr const char* DEFAULT_TYPE_ID = "#default";
     std::vector<TypeDescriptor> descriptors_;
 };
 } // namespace UDMF

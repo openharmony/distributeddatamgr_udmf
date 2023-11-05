@@ -95,8 +95,10 @@ napi_value TypeDescriptorNapi::BelongsTo(napi_env env, napi_callback_info info)
 
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "BelongsTo Exit");
-    bool equalsRet = reinterpret_cast<TypeDescriptorNapi*>(ctxt->native)->value_->BelongsTo(typeId);
-    napi_get_boolean(env, equalsRet, &ctxt->output);
+    bool checkRet = false;
+    Status status = reinterpret_cast<TypeDescriptorNapi*>(ctxt->native)->value_->BelongsTo(typeId, checkRet);
+    ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
+    napi_get_boolean(env, checkRet, &ctxt->output);
     return ctxt->output;
 }
 
@@ -115,8 +117,10 @@ napi_value TypeDescriptorNapi::IsLowerLevelType(napi_env env, napi_callback_info
 
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "IsLowerLevelType Exit");
-    bool equalsRet = reinterpret_cast<TypeDescriptorNapi*>(ctxt->native)->value_->IsLowerLevelType(typeId);
-    napi_get_boolean(env, equalsRet, &ctxt->output);
+    bool checkRet = false;
+    Status status = reinterpret_cast<TypeDescriptorNapi*>(ctxt->native)->value_->IsLowerLevelType(typeId, checkRet);
+    ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
+    napi_get_boolean(env, checkRet, &ctxt->output);
     return ctxt->output;
 }
 
@@ -135,8 +139,10 @@ napi_value TypeDescriptorNapi::IsHigherLevelType(napi_env env, napi_callback_inf
 
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "IsHigherLevelType Exit");
-    bool equalsRet = reinterpret_cast<TypeDescriptorNapi*>(ctxt->native)->value_->IsHigherLevelType(typeId);
-    napi_get_boolean(env, equalsRet, &ctxt->output);
+    bool checkRet = false;
+    Status status = reinterpret_cast<TypeDescriptorNapi*>(ctxt->native)->value_->IsHigherLevelType(typeId, checkRet);
+    ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
+    napi_get_boolean(env, checkRet, &ctxt->output);
     return ctxt->output;
 }
 

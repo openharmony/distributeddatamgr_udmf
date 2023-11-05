@@ -31,22 +31,50 @@ TypeDescriptor::~TypeDescriptor()
 {
 }
 
-bool TypeDescriptor::BelongsTo(const std::string &typeId)
+Status TypeDescriptor::BelongsTo(const std::string &typeId, bool &checkResult)
 {
+    checkResult = false;
+    if (UtdGraph::GetInstance().IsInvalidType(typeId)) {
+        checkResult = false;
+        LOG_ERROR(UDMF_CLIENT, "invalid para. %{public}s,", typeId.c_str());
+        return Status::E_INVALID_PARAMETERS;
+    }
     if (typeId_ == typeId) {
-        return true;
+        checkResult = true;
+        return Status::E_OK;
     };
-    return UtdGraph::GetInstance().IsRelatedOrNot(typeId, typeId_);
+    checkResult = UtdGraph::GetInstance().IsRelatedOrNot(typeId, typeId_);
+    return Status::E_OK;
 }
 
-bool TypeDescriptor::IsLowerLevelType(const std::string &typeId)
+Status TypeDescriptor::IsLowerLevelType(const std::string &typeId, bool &checkResult)
 {
-    return UtdGraph::GetInstance().IsRelatedOrNot(typeId, typeId_);
+    if (UtdGraph::GetInstance().IsInvalidType(typeId)) {
+        checkResult = false;
+        LOG_ERROR(UDMF_CLIENT, "invalid para. %{public}s,", typeId.c_str());
+        return Status::E_INVALID_PARAMETERS;
+    }
+    if (typeId_ == typeId) {
+        checkResult = false;
+        return Status::E_OK;
+    };
+    checkResult = UtdGraph::GetInstance().IsRelatedOrNot(typeId, typeId_);
+    return Status::E_OK;
 }
 
-bool TypeDescriptor::IsHigherLevelType(const std::string &typeId)
+Status TypeDescriptor::IsHigherLevelType(const std::string &typeId, bool &checkResult)
 {
-    return UtdGraph::GetInstance().IsRelatedOrNot(typeId_, typeId);
+    if (UtdGraph::GetInstance().IsInvalidType(typeId)) {
+        checkResult = false;
+        LOG_ERROR(UDMF_CLIENT, "invalid para. %{public}s,", typeId.c_str());
+        return Status::E_INVALID_PARAMETERS;
+    }
+    if (typeId_ == typeId) {
+        checkResult = false;
+        return Status::E_OK;
+    };
+    checkResult = UtdGraph::GetInstance().IsRelatedOrNot(typeId_, typeId);
+    return Status::E_OK;
 }
 
 bool TypeDescriptor::Equals(std::shared_ptr<TypeDescriptor> descriptor)

@@ -20,7 +20,7 @@
 #include <set>
 #include <vector>
 #include <map>
-
+#include "error_code.h"
 namespace OHOS {
 namespace UDMF {
 class TypeDescriptor {
@@ -29,9 +29,9 @@ public:
                    const std::vector<std::string> &filenameExtensions, const std::vector<std::string> &mimeTypes,
                    const std::string &description, const std::string &referenceURL, const std::string &iconFile);
     ~TypeDescriptor();
-    bool BelongsTo(const std::string &typeId);
-    bool IsLowerLevelType(const std::string &typeId);
-    bool IsHigherLevelType(const std::string &typeId);
+    Status BelongsTo(const std::string &typeId, bool &checkResult);
+    Status IsLowerLevelType(const std::string &typeId, bool &checkResult);
+    Status IsHigherLevelType(const std::string &typeId, bool &checkResult);
     bool Equals(std::shared_ptr<TypeDescriptor> descriptor);
     const std::string& GetTypeId() const;
     std::set<std::string> GetBelongingToTypes();

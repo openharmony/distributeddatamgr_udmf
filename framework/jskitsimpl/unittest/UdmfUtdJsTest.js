@@ -22,14 +22,14 @@ describe('UdmfUtdJSTest', function () {
 
   /*
    * @tc.name UdmfTestTypeDescriptor001
-   * @tc.desc Test Js Api input invall string
+   * @tc.desc Test Js Api input invalid string
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
   it ('UdmfTestTypeDescriptor001', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor001:';
     console.info(TAG, 'start');
-    let typeObj = UTD.getTypeDescriptor('general.invallType');
+    let typeObj = UTD.getTypeDescriptor('general.invalidType');
     console.info(TAG, 'typeDescriptor, ret= ' + typeObj);
     if (typeObj == null) {
       console.info(TAG, 'typeDescriptor, typeObj == null is true');
@@ -93,7 +93,7 @@ describe('UdmfUtdJSTest', function () {
 
   /*
    * @tc.name UdmfTestTypeDescriptor004
-   * @tc.desc Test Js Api invall para type
+   * @tc.desc Test Js Api invalid para type
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
@@ -101,7 +101,7 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor004:';
     console.info(TAG, 'start');
     try{
-      let typeObj = UTD.getTypeDescriptor(123);
+      let typeObj = UTD.getTypeDescriptor(null);
       console.info(TAG, 'typeDescriptor, ret ' + typeObj);
     } catch (e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
@@ -134,7 +134,7 @@ describe('UdmfUtdJSTest', function () {
     expect(typeObj.belongingToTypes[0]).assertEqual('general.image');
     expect(typeObj.description).assertEqual('Adobe Photoshop document.');
     let equalStr = 'https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/' +
-    'apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype';
+      'apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype';
     expect(typeObj.referenceURL).assertEqual(equalStr);
     expect(typeObj.iconFile).assertEqual('');
     console.info(TAG, 'end');
@@ -179,7 +179,7 @@ describe('UdmfUtdJSTest', function () {
 
   /*
    * @tc.name UdmfTestTypeDescriptor008
-   * @tc.desc Test Js Api equals invall para type
+   * @tc.desc Test Js Api equals invalid para type
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
@@ -396,6 +396,356 @@ describe('UdmfUtdJSTest', function () {
     let typeId = UTD.getUniformDataTypeByMIMEType('application/vnd.ms-excel', 'general.object');
     expect(typeId === 'com.microsoft.excel.xls').assertTrue();
     console.info(TAG, 'typeDescriptor, ret ' + typeId);
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor017
+  * @tc.desc Test Js Api getUniformDataTypeByMIMEType invalid para
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor017', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor017:';
+    console.info(TAG, 'start');
+    try{
+      let typeId = UTD.getUniformDataTypeByMIMEType('')
+      console.info(TAG, 'getUniformDataTypeByMIMEType, ret ' + typeId);
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor018
+  * @tc.desc Test Js Api getUniformDataTypeByFilenameExtension invalid para
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor018', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor018:';
+    console.info(TAG, 'start');
+    try {
+      let typeId = UTD.getUniformDataTypeByFilenameExtension('')
+      console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + typeId);
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor019
+  * @tc.desc Test Js Api belongsTo invalid para
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor019', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor019:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('general.type-script');
+    console.info(TAG, 'typeDescriptor, ret ' + typeObj);
+    try {
+      typeObj.belongsTo('1111');
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+   * @tc.name UdmfTestTypeDescriptor020
+   * @tc.desc Test Js Api equals invalid para type
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTestTypeDescriptor020', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor020:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('general.type-script');
+    console.info(TAG, 'typeDescriptor, ret ' + typeObj);
+    try {
+      typeObj.isLowerLevelType('1111');
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+   * @tc.name UdmfTestTypeDescriptor021
+   * @tc.desc Test Js Api isHigherLevelType invalid para type
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTestTypeDescriptor021', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor021:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('general.type-script');
+    console.info(TAG, 'typeDescriptor, ret ' + typeObj);
+    try {
+      typeObj.isHigherLevelType('1111');
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor022
+  * @tc.desc Test Js Api belongsTo invalid para
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor022', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor022:';
+    console.info(TAG, 'start');
+    try {
+      let typeId = UTD.getTypeDescriptor('general.type-script');
+      console.info(TAG, 'typeDescriptor, ret ' + typeId);
+      typeId.belongsTo();
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor023
+  * @tc.desc Test Js Api isLowerLevelType invalid para
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor023', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor023:';
+    console.info(TAG, 'start');
+    try {
+      let typeId = UTD.getTypeDescriptor('general.type-script');
+      console.info(TAG, 'typeDescriptor, ret ' + typeId);
+      typeId.isLowerLevelType();
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor024
+  * @tc.desc Test Js Api getUniformDataTypeByFilenameExtension invalid para
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor024', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor024:';
+    console.info(TAG, 'start');
+    try {
+      let typeId = UTD.getTypeDescriptor('general.type-script');
+      console.info(TAG, 'typeDescriptor, ret ' + typeId);
+      typeId.isHigherLevelType();
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor025
+  * @tc.desc Test Js Api getUniformDataTypeByMIMEType invalid para
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor025', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor025:';
+    console.info(TAG, 'start');
+    try {
+      let typeId = UTD.getUniformDataTypeByMIMEType();
+      console.info(TAG, 'getUniformDataTypeByMIMEType, ret ' + typeId);
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor026
+  * @tc.desc Test Js Api getUniformDataTypeByFilenameExtension invalid para
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor026', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor026:';
+    console.info(TAG, 'start');
+    try {
+      let typeId = UTD.getUniformDataTypeByFilenameExtension();
+      console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + typeId);
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor027
+  * @tc.desc Test Js Api getUniformDataTypeByFilenameExtension
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor027', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor027:';
+    console.info(TAG, 'start');
+    let typeId = UTD.getUniformDataTypeByFilenameExtension('.ts');
+    expect(typeId === 'general.type-script').assertTrue();
+    console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + typeId);
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor028
+  * @tc.desc Test Js Api getUniformDataTypeByMIMEType
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor028', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor028:';
+    console.info(TAG, 'start');
+    let typeId = UTD.getUniformDataTypeByMIMEType('application/vnd.ms-excel');
+    expect(typeId === 'com.microsoft.excel.xls').assertTrue();
+    console.info(TAG, 'getUniformDataTypeByMIMEType, ret ' + typeId);
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor029
+  * @tc.desc Test Js Api getUniformDataTypeByFilenameExtension
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor029', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor029:';
+    console.info(TAG, 'start');
+    try {
+      let typeId = UTD.getUniformDataTypeByFilenameExtension('invalidFilenameExtension');
+      console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + typeId);
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor030
+  * @tc.desc Test Js Api getUniformDataTypeByMIMEType
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor030', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor030:';
+    console.info(TAG, 'start');
+    try {
+      let typeId = UTD.getUniformDataTypeByMIMEType('invalidMIMEType');
+      console.info(TAG, 'getUniformDataTypeByMIMEType, ret ' + typeId);
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor031
+  * @tc.desc Test Js Api belongsTo invalid para
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor031', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor031:';
+    console.info(TAG, 'start');
+    let typeId = UTD.getTypeDescriptor('general.type-script');
+    console.info(TAG, 'typeDescriptor, ret ' + typeId);
+    let ret = typeId.belongsTo('general.type-script');
+    expect(ret === true).assertTrue();
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor032
+  * @tc.desc Test Js Api isLowerLevelType invalid para
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor032', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor032:';
+    console.info(TAG, 'start');
+    let typeId = UTD.getTypeDescriptor('general.type-script');
+    console.info(TAG, 'typeDescriptor, ret ' + typeId);
+    let ret = typeId.isLowerLevelType('general.type-script');
+    expect(ret === false).assertTrue();
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor033
+  * @tc.desc Test Js Api getUniformDataTypeByFilenameExtension invalid para
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor033', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor033:';
+    console.info(TAG, 'start');
+    let typeId = UTD.getTypeDescriptor('general.type-script');
+    console.info(TAG, 'typeDescriptor, ret ' + typeId);
+    let ret = typeId.isHigherLevelType('general.type-script');
+    expect(ret === false).assertTrue();
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor032
+  * @tc.desc Test Js Api getUniformDataTypeByFilenameExtension
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor034', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor034:';
+    console.info(TAG, 'start');
+    try {
+      let typeId = UTD.getUniformDataTypeByFilenameExtension('');
+      console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + typeId);
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor035
+  * @tc.desc Test Js Api getUniformDataTypeByMIMEType
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor035', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor035:';
+    console.info(TAG, 'start');
+    try {
+      let typeId = UTD.getUniformDataTypeByMIMEType('');
+      console.info(TAG, 'getUniformDataTypeByMIMEType, ret ' + typeId);
+    } catch(e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
     console.info(TAG, 'end');
   });
 });
