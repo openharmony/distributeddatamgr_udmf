@@ -28,6 +28,9 @@ namespace UDMF {
 class TypeDescriptorNapi {
 public:
     static void NewInstance(napi_env env, std::shared_ptr<TypeDescriptor> in, napi_value &out);
+    static napi_value BelongsTo(napi_env env, napi_callback_info info);
+    static napi_value IsLowerLevelType(napi_env env, napi_callback_info info);
+    static napi_value IsHigherLevelType(napi_env env, napi_callback_info info);
     static napi_value Equals(napi_env env, napi_callback_info info);
     static napi_value Constructor(napi_env env);
 

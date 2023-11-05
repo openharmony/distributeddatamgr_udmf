@@ -30,7 +30,10 @@
 namespace OHOS {
 namespace UDMF {
 enum UDType : int32_t {
-    TEXT = 0,
+    ENTITY = 0,
+    OBJECT,
+    COMPOSITE_OBJECT,
+    TEXT,
     PLAIN_TEXT,
     HTML,
     HYPERLINK,
@@ -120,10 +123,15 @@ enum UDType : int32_t {
     SYSTEM_DEFINED_PIXEL_MAP,
     OPENHARMONY_ATOMIC_SERVICE,
     APPLICATION_DEFINED_RECORD,
+    OPENHARMONY_PACKAGE,
+    OPENHARMONY_HAP,
     UD_BUTT
 };
 
 static const std::unordered_map<int32_t, std::string> UD_TYPE_MAP {
+    { ENTITY, "general.entity" },
+    { OBJECT, "general.object" },
+    { COMPOSITE_OBJECT, "general.composite-object" },
     { TEXT, "general.text" },
     { PLAIN_TEXT, "general.plain-text" },
     { HTML, "general.html" },
@@ -214,10 +222,15 @@ static const std::unordered_map<int32_t, std::string> UD_TYPE_MAP {
     { SYSTEM_DEFINED_PIXEL_MAP, "openharmony.pixel-map" },
     { OPENHARMONY_ATOMIC_SERVICE, "openharmony.atomic-service" },
     { APPLICATION_DEFINED_RECORD, "ApplicationDefinedType" },
+    { OPENHARMONY_PACKAGE, "openharmony.package" },
+    { OPENHARMONY_HAP, "openharmony.hap" },
     { UD_BUTT, "INVALID"}
 };
 
 static const std::unordered_map<int32_t, std::string> JS_UD_TYPE_NAME_MAP {
+    { ENTITY, "ENTITY" },
+    { OBJECT, "OBJECT" },
+    { COMPOSITE_OBJECT, "COMPOSITE_OBJECT" },
     { TEXT, "TEXT" },
     { PLAIN_TEXT, "PLAIN_TEXT" },
     { HTML, "HTML" },
@@ -308,6 +321,8 @@ static const std::unordered_map<int32_t, std::string> JS_UD_TYPE_NAME_MAP {
     { SYSTEM_DEFINED_PIXEL_MAP, "OPENHARMONY_PIXEL_MAP" },
     { OPENHARMONY_ATOMIC_SERVICE, "OPENHARMONY_ATOMIC_SERVICE" },
     { APPLICATION_DEFINED_RECORD, "APPLICATION_DEFINED_RECORD" },
+    { OPENHARMONY_PACKAGE, "OPENHARMONY_PACKAGE" },
+    { OPENHARMONY_HAP, "OPENHARMONY_HAP" }
 };
 
 /*

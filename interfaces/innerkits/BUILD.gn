@@ -18,8 +18,8 @@ config("udmf_client_config") {
     "${udmf_interfaces_path}/innerkits/client",
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_interfaces_path}/innerkits/data",
-
     "${udmf_framework_path}/common",
+    "${udmf_framework_path}/innerkitsimpl/data",
     "${udmf_framework_path}/service",
     "${kv_store_path}/frameworks/common",
     "//third_party/libuv/include",
@@ -33,9 +33,10 @@ config("udmf_client_config") {
 
 ohos_shared_library("udmf_client") {
   sources = [
-    "${udmf_framework_path}/common/preset_type_descriptors.cpp",
+    "${udmf_framework_path}/common/graph.cpp",
     "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
+    "${udmf_framework_path}/common/utd_graph.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/utd_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
@@ -48,6 +49,7 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",

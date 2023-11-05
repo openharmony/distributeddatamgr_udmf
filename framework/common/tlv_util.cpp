@@ -390,7 +390,7 @@ bool Reading(UDType &output, TLVObject &data)
     if (!Reading(type, data)) {
         return false;
     }
-    if (type < UDType::TEXT || type >= UDType::UD_BUTT) {
+    if (type < UDType::ENTITY || type >= UDType::UD_BUTT) {
         return false;
     }
     output = static_cast<UDType>(type);

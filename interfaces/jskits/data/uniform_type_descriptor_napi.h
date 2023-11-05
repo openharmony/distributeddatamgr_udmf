@@ -27,6 +27,8 @@ class UniformTypeDescriptorNapi {
 public:
     static napi_value UniformTypeDescriptorInit(napi_env env, napi_value exports);
     static napi_value GetTypeDescriptor(napi_env env, napi_callback_info info);
+    static napi_value GetUniformDataTypeByFilenameExtension(napi_env env, napi_callback_info info);
+    static napi_value GetUniformDataTypeByMIMEType(napi_env env, napi_callback_info info);
 
 private:
     static napi_value CreateUniformDataType(napi_env env);

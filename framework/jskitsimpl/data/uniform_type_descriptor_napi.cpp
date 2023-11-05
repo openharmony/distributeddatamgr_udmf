@@ -31,6 +31,8 @@ napi_value UniformTypeDescriptorNapi::UniformTypeDescriptorInit(napi_env env, na
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_PROPERTY("UniformDataType", uniformDataType),
         DECLARE_NAPI_FUNCTION("getTypeDescriptor", GetTypeDescriptor),
+        DECLARE_NAPI_FUNCTION("getUniformDataTypeByFilenameExtension", GetUniformDataTypeByFilenameExtension),
+        DECLARE_NAPI_FUNCTION("getUniformDataTypeByMIMEType", GetUniformDataTypeByMIMEType),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
@@ -81,6 +83,62 @@ napi_value UniformTypeDescriptorNapi::GetTypeDescriptor(napi_env env, napi_callb
     if (descriptor == nullptr) { // descriptor not found, not exception, need return null object.
         napi_get_null(env, &ctxt->output);
     }
+    return ctxt->output;
+}
+
+napi_value UniformTypeDescriptorNapi::GetUniformDataTypeByFilenameExtension(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "GetUniformDataTypeByFilenameExtension is called!");
+    std::string filenameExtension;
+    std::string belongsTo;
+    auto ctxt = std::make_shared<ContextBase>();
+    auto input = [env, ctxt, &filenameExtension, &belongsTo](size_t argc, napi_value* argv) {
+        LOG_DEBUG(UDMF_KITS_NAPI, "GetTypeDescriptor, argc = %{public}zu !", argc);
+        // required 1 arguments : typeId
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], filenameExtension);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "invalid arg[0], i.e. invalid arguments!");
+        if (argc > 1) {
+            ctxt->status = NapiDataUtils::GetValue(env, argv[1], belongsTo);
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+                                "invalid arg[1], i.e. invalid arguments!");
+        }
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_NULL(!ctxt->isThrowError, "GetUniformDataTypeByFilenameExtension Exit");
+    std::string typeId;
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, belongsTo, typeId);
+    ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
+    NapiDataUtils::SetValue(env, typeId, ctxt->output);
+    return ctxt->output;
+}
+
+napi_value UniformTypeDescriptorNapi::GetUniformDataTypeByMIMEType(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "GetUniformDataTypeByMIMEType is called!");
+    std::string mimeType;
+    std::string belongsTo;
+    auto ctxt = std::make_shared<ContextBase>();
+    auto input = [env, ctxt, &mimeType, &belongsTo](size_t argc, napi_value* argv) {
+        LOG_DEBUG(UDMF_KITS_NAPI, "GetTypeDescriptor, argc = %{public}zu !", argc);
+        // required 1 arguments : typeId
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], mimeType);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "invalid arg[0], i.e. invalid arguments!");
+        if (argc > 1) {
+            ctxt->status = NapiDataUtils::GetValue(env, argv[1], belongsTo);
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+                                "invalid arg[1], i.e. invalid arguments!");
+        }
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_NULL(!ctxt->isThrowError, "GetUniformDataTypeByMIMEType Exit");
+    std::string typeId;
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, belongsTo, typeId);
+    ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
+    NapiDataUtils::SetValue(env, typeId, ctxt->output);
     return ctxt->output;
 }
 } // namespace UDMF

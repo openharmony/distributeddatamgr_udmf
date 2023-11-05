@@ -40,7 +40,7 @@ describe('UdmfUtdJSTest', function () {
 
   /*
    * @tc.name UdmfTestTypeDescriptor002
-   * @tc.desc Test Js Api 
+   * @tc.desc Test Js Api
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
@@ -61,14 +61,16 @@ describe('UdmfUtdJSTest', function () {
     expect(typeObj.typeId).assertEqual(UTD.UniformDataType.PHOTOSHOP_IMAGE);
     expect(typeObj.belongingToTypes[0]).assertEqual('general.image');
     expect(typeObj.description).assertEqual('Adobe Photoshop document.');
-    expect(typeObj.referenceURL).assertEqual('');
+    let equalStr = 'https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/' +
+      'apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype';
+    expect(typeObj.referenceURL).assertEqual(equalStr);
     expect(typeObj.iconFile).assertEqual('');
     console.info(TAG, 'end');
   });
 
   /*
    * @tc.name UdmfTestTypeDescriptor003
-   * @tc.desc Test Js Api 
+   * @tc.desc Test Js Api
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
@@ -108,33 +110,35 @@ describe('UdmfUtdJSTest', function () {
     console.info(TAG, 'end');
   });
 
-    /*
-   * @tc.name UdmfTestTypeDescriptor005
-   * @tc.desc Test Js Api 
-   * @tc.type: FUNC
-   * @tc.require: issueNumber
-   */
-    it('UdmfTestTypeDescriptor005', 0, function () {
-      const TAG = 'UdmfTestTypeDescriptor005:';
-      console.info(TAG, 'start');
-      let typeObj = UTD.getTypeDescriptor('com.adobe.photoshop-image', 'safafdsaf',123456,'hahaha');
-      let typeId = typeObj.typeId;
-      let belonging = typeObj.belongingToTypes;
-      let description = typeObj.description;
-      let referenceURL = typeObj.referenceURL;
-      let iconFile = typeObj.iconFile;
-      console.info(TAG, ', typeId: ' + typeId + ', ' + Object.prototype.toString.call(typeId) +
-        ', belongingToTypes: ' + belonging + ', ' + Object.prototype.toString.call(belonging));
-      console.info(TAG, 'description: ' + typeObj.description + ', ' + Object.prototype.toString.call(description));
-      console.info(TAG, 'referenceURL: ' + referenceURL + ', ' + Object.prototype.toString.call(referenceURL)
-        + ', iconFile: ' + iconFile + ', ' + Object.prototype.toString.call(iconFile));
-      expect(typeObj.typeId).assertEqual(UTD.UniformDataType.PHOTOSHOP_IMAGE);
-      expect(typeObj.belongingToTypes[0]).assertEqual('general.image');
-      expect(typeObj.description).assertEqual('Adobe Photoshop document.');
-      expect(typeObj.referenceURL).assertEqual('');
-      expect(typeObj.iconFile).assertEqual('');
-      console.info(TAG, 'end');
-    });
+  /*
+ * @tc.name UdmfTestTypeDescriptor005
+ * @tc.desc Test Js Api
+ * @tc.type: FUNC
+ * @tc.require: issueNumber
+ */
+  it('UdmfTestTypeDescriptor005', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor005:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('com.adobe.photoshop-image', 'safafdsaf',123456,'hahaha');
+    let typeId = typeObj.typeId;
+    let belonging = typeObj.belongingToTypes;
+    let description = typeObj.description;
+    let referenceURL = typeObj.referenceURL;
+    let iconFile = typeObj.iconFile;
+    console.info(TAG, ', typeId: ' + typeId + ', ' + Object.prototype.toString.call(typeId) +
+      ', belongingToTypes: ' + belonging + ', ' + Object.prototype.toString.call(belonging));
+    console.info(TAG, 'description: ' + typeObj.description + ', ' + Object.prototype.toString.call(description));
+    console.info(TAG, 'referenceURL: ' + referenceURL + ', ' + Object.prototype.toString.call(referenceURL)
+      + ', iconFile: ' + iconFile + ', ' + Object.prototype.toString.call(iconFile));
+    expect(typeObj.typeId).assertEqual(UTD.UniformDataType.PHOTOSHOP_IMAGE);
+    expect(typeObj.belongingToTypes[0]).assertEqual('general.image');
+    expect(typeObj.description).assertEqual('Adobe Photoshop document.');
+    let equalStr = 'https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/' +
+    'apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype';
+    expect(typeObj.referenceURL).assertEqual(equalStr);
+    expect(typeObj.iconFile).assertEqual('');
+    console.info(TAG, 'end');
+  });
 
   /*
    * @tc.name UdmfTestTypeDescriptor007
@@ -185,7 +189,7 @@ describe('UdmfUtdJSTest', function () {
     let typeObj = UTD.getTypeDescriptor('general.type-script');
     console.info(TAG, 'typeDescriptor, ret ' + typeObj);
     try{
-      typeObj.equals("1111");
+      typeObj.equals('1111');
     } catch(e){
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
@@ -275,7 +279,7 @@ describe('UdmfUtdJSTest', function () {
     expect(UTD.UniformDataType.PCM).assertEqual('general.pcm');
     console.info(TAG, 'end');
   });
-  
+
   /*
    * @tc.name UdmfTestTypeDescriptor011
    * @tc.desc Test Js Api enum value judge part3
@@ -314,6 +318,84 @@ describe('UdmfUtdJSTest', function () {
     expect(UTD.UniformDataType.OPENHARMONY_APP_ITEM).assertEqual('openharmony.app-item');
     expect(UTD.UniformDataType.OPENHARMONY_PIXEL_MAP).assertEqual('openharmony.pixel-map');
     expect(UTD.UniformDataType.OPENHARMONY_ATOMIC_SERVICE).assertEqual('openharmony.atomic-service');
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor012
+  * @tc.desc Test Js Api belongsTo
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor012', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor012:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('general.type-script');
+    let ret = typeObj.belongsTo("general.plain-text");
+    expect(ret == true).assertTrue();
+    console.info(TAG, 'typeDescriptor, ret ' + typeObj);
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor013
+  * @tc.desc Test Js Api isLowerLevelType
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor013', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor013:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('general.type-script');
+    let ret = typeObj.isLowerLevelType("general.plain-text");
+    expect(ret == true).assertTrue();
+    console.info(TAG, 'typeDescriptor, ret ' + ret);
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor014
+  * @tc.desc Test Js Api isLowerLevelType
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor014', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor014:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('general.plain-text');
+    let ret = typeObj.isHigherLevelType('general.type-script');
+    expect(ret == true).assertTrue();
+    console.info(TAG, 'typeDescriptor, ret ' + typeObj);
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor015
+  * @tc.desc Test Js Api getUniformDataTypeByFilenameExtension
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor015', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor015:';
+    console.info(TAG, 'start');
+    let typeId = UTD.getUniformDataTypeByFilenameExtension('.ts', 'general.plain-text')
+    expect(typeId == 'general.type-script').assertTrue();
+    console.info(TAG, 'typeDescriptor, ret ' + typeId);
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor016
+  * @tc.desc Test Js Api getUniformDataTypeByMIMEType
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor016', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor016:';
+    console.info(TAG, 'start');
+    let typeId = UTD.getUniformDataTypeByMIMEType('application/vnd.ms-excel', 'general.object')
+    expect(typeId == 'com.microsoft.excel.xls').assertTrue();
+    console.info(TAG, 'typeDescriptor, ret ' + typeId);
     console.info(TAG, 'end');
   });
 });

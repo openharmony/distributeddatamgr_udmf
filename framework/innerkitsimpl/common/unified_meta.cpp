@@ -21,7 +21,7 @@ namespace OHOS {
 namespace UDMF {
 bool UnifiedDataUtils::IsValidType(int32_t value)
 {
-    return value >= TEXT && value < UD_BUTT;
+    return value >= ENTITY && value < UD_BUTT;
 }
 
 bool UnifiedDataUtils::IsValidIntention(int32_t value)

@@ -24,7 +24,7 @@ UnifiedRecord::UnifiedRecord()
 
 UnifiedRecord::UnifiedRecord(UDType type)
 {
-    if (type < TEXT || type > UD_BUTT) {
+    if (type < ENTITY || type > UD_BUTT) {
         dataType_ = UD_BUTT;
     }
     dataType_ = type;
