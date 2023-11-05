@@ -56,8 +56,8 @@ bool UtdGraph::IsRelatedOrNot(const std::string &startNode, const std::string &e
     uint32_t end = GetLocateIndex(endNode);
     std::shared_lock<decltype(graphMutex_)> graphLock(graphMutex_);
     graph_.Dfs(start, true, [&](uint32_t currNode)-> bool {
-        if (end==currNode) {
-            isFind= true;
+        if (end == currNode) {
+            isFind = true;
             return true;
         }
         return false;

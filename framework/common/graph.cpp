@@ -19,17 +19,17 @@ namespace OHOS {
 namespace UDMF {
 void Graph::CreateAdjList(uint32_t vesNum, vector<vector<uint32_t>> edges)
 {
-    vesNum_=vesNum;
+    vesNum_ = vesNum;
     for (uint32_t node = 0; node < vesNum_; node++) {
-        adjList_[node].value=node;
+        adjList_[node].value = node;
         adjList_[node].firstEdge = nullptr;
     }
     uint32_t start;
     uint32_t end;
     EdgeNode *edge;
     for (auto edgeNode : edges) {
-        start=edgeNode[0];
-        end=edgeNode[1];
+        start = edgeNode[0];
+        end = edgeNode[1];
         edge = new EdgeNode;   // add new edge
         edge->adjIndex = end;
         edge->next = adjList_[start].firstEdge;
@@ -44,7 +44,7 @@ void Graph::Dfs(uint32_t startNode, bool isInit, Action action)
     }
     stack <uint32_t>nodes;
     EdgeNode *edge = nullptr;
-    visited_[startNode]=1;
+    visited_[startNode] = 1;
     nodes.push(startNode);
     if (action(adjList_[startNode].value)) {
         return;
@@ -53,14 +53,14 @@ void Graph::Dfs(uint32_t startNode, bool isInit, Action action)
         edge = adjList_[nodes.top()].firstEdge;
         while (edge) {
             if (visited_[edge->adjIndex] == 0) {
-                visited_[edge->adjIndex]=1;
+                visited_[edge->adjIndex] = 1;
                 if (action(adjList_[edge->adjIndex].value)) {
                     return;
                 }
                 nodes.push(edge->adjIndex);
                 edge = adjList_[edge->adjIndex].firstEdge;
             } else {
-                edge=edge->next;
+                edge = edge->next;
             }
         }
         if (edge == nullptr) {

@@ -96,7 +96,7 @@ void UtdClient::SetDataToGraph()
     for (auto &descriptor : descriptors_) {
         std::set<std::string> belongs = descriptor.GetBelongingToTypes();
         for (auto belongType : belongs) {
-            edges.push_back({UtdGraph::GetInstance().GetLocateIndex(belongType), 
+            edges.push_back({UtdGraph::GetInstance().GetLocateIndex(belongType),
                              UtdGraph::GetInstance().GetLocateIndex(descriptor.GetTypeId())});
         }
     }
