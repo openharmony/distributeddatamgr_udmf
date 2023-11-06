@@ -13,23 +13,20 @@
  * limitations under the License.
  */
 #include "graph.h"
-#include "securec.h"
-using namespace std;
 namespace OHOS {
 namespace UDMF {
-void Graph::CreateAdjList(uint32_t vesNum, vector<vector<uint32_t>> edges)
+void Graph::CreateAdjList(uint32_t vertexNum, std::vector<std::vector<uint32_t>> edges)
 {
-    vesNum_=vesNum;
-    for (uint32_t node = 0; node < vesNum_; node++) {
-        adjList_[node].value=node;
-        adjList_[node].firstEdge = nullptr;
+    vertexNum_ = vertexNum;
+    for (uint32_t node = 0; node < vertexNum_; node++) {
+        adjList_.push_back({node, nullptr});
     }
     uint32_t start;
     uint32_t end;
     EdgeNode *edge;
     for (auto edgeNode : edges) {
-        start=edgeNode[0];
-        end=edgeNode[1];
+        start = edgeNode[0];
+        end = edgeNode[1];
         edge = new EdgeNode;   // add new edge
         edge->adjIndex = end;
         edge->next = adjList_[start].firstEdge;
@@ -40,11 +37,12 @@ void Graph::CreateAdjList(uint32_t vesNum, vector<vector<uint32_t>> edges)
 void Graph::Dfs(uint32_t startNode, bool isInit, Action action)
 {
     if (isInit) {
-        (void)memset_s(visited_, sizeof(visited_), 0, sizeof(visited_));
+        visited_.resize(vertexNum_);
+        fill(visited_.begin(), visited_.end(), 0);
     }
-    stack <uint32_t>nodes;
+    std::stack<uint32_t> nodes;
     EdgeNode *edge = nullptr;
-    visited_[startNode]=1;
+    visited_[startNode] = 1;
     nodes.push(startNode);
     if (action(adjList_[startNode].value)) {
         return;
@@ -53,14 +51,14 @@ void Graph::Dfs(uint32_t startNode, bool isInit, Action action)
         edge = adjList_[nodes.top()].firstEdge;
         while (edge) {
             if (visited_[edge->adjIndex] == 0) {
-                visited_[edge->adjIndex]=1;
+                visited_[edge->adjIndex] = 1;
                 if (action(adjList_[edge->adjIndex].value)) {
                     return;
                 }
                 nodes.push(edge->adjIndex);
                 edge = adjList_[edge->adjIndex].firstEdge;
             } else {
-                edge=edge->next;
+                edge = edge->next;
             }
         }
         if (edge == nullptr) {
@@ -69,11 +67,12 @@ void Graph::Dfs(uint32_t startNode, bool isInit, Action action)
     }
 }
 
-vector<uint32_t> Graph::DfsUnconnectedGraph()
+std::vector<uint32_t> Graph::DfsUnconnectedGraph()
 {
-    (void)memset_s(visited_, sizeof(visited_), 0, sizeof(visited_));
-    vector<uint32_t> result;
-    for (uint32_t node = 0; node < vesNum_; node++) {
+    visited_.resize(vertexNum_);
+    fill(visited_.begin(), visited_.end(), 0);
+    std::vector<uint32_t> result;
+    for (uint32_t node = 0; node < vertexNum_; node++) {
         if (!visited_[node]) {
             Dfs(node, false, [&](uint32_t currNode) -> bool {
                 result.push_back(currNode);

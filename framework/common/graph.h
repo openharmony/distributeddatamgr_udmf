@@ -23,26 +23,26 @@
 
 namespace OHOS {
 namespace UDMF {
-struct EdgeNode {  // 边表结点
-    uint32_t adjIndex;     //  存储顶点的下标
-    EdgeNode* next;   //  连接下一个邻点
+struct EdgeNode {
+    uint32_t adjIndex;
+    EdgeNode* next;
 };
 
-struct VertexNode { // 顶点表结点
-    int value;
+struct VertexNode {
+    uint32_t value;
     EdgeNode* firstEdge;
 };
-using Action = std::function<bool(uint32_t node)>;
 class Graph {
 public:
-    void CreateAdjList(uint32_t vesNum, std::vector<std::vector<uint32_t>> edges);
-    void Dfs(uint32_t startNode, bool isInit, Action action);  // 指定点遍历,指定条件结束
-    std::vector<uint32_t> DfsUnconnectedGraph();   // dfs非联通图完全遍历
+    using Action = std::function<bool(uint32_t node)>;
+    void CreateAdjList(uint32_t vertexNum, std::vector<std::vector<uint32_t>> edges);
+    void Dfs(uint32_t startNode, bool isInit, Action action);
+    // Specify traversal start node, whether initializing the visited map and end condition.
+    std::vector<uint32_t> DfsUnconnectedGraph();
 private:
-    static constexpr uint32_t MAX_LENGTH = 500;
-    uint32_t vesNum_;      // 顶点数
-    VertexNode adjList_[MAX_LENGTH];  // 邻接表
-    uint32_t visited_[MAX_LENGTH]; // 判断是否有被访问过, 下标=顶点值
+    uint32_t vertexNum_;
+    std::vector<VertexNode> adjList_;  // Adjacency List
+    std::vector<uint32_t> visited_;    // Determine if it has been accessed, index=vertex value
 };
 } // namespace UDMF
 } // namespace OHOS

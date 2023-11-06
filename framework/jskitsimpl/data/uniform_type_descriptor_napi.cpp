@@ -78,7 +78,7 @@ napi_value UniformTypeDescriptorNapi::GetTypeDescriptor(napi_env env, napi_callb
     ASSERT_NULL(!ctxt->isThrowError, "GetTypeDescriptor Exit");
     std::shared_ptr<TypeDescriptor> descriptor;
     auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
-    ASSERT_ERR(ctxt->env, status == E_OK, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
     TypeDescriptorNapi::NewInstance(env, descriptor, ctxt->output);
     if (descriptor == nullptr) { // descriptor not found, not exception, need return null object.
         napi_get_null(env, &ctxt->output);
@@ -108,9 +108,18 @@ napi_value UniformTypeDescriptorNapi::GetUniformDataTypeByFilenameExtension(napi
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "GetUniformDataTypeByFilenameExtension Exit");
     std::string typeId;
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, belongsTo, typeId);
+    auto status = E_OK;
+    if (belongsTo.empty()) {
+        status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, typeId);
+    } else {
+        status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, typeId, belongsTo);
+    }
     ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
-    NapiDataUtils::SetValue(env, typeId, ctxt->output);
+    if (!typeId.empty()) {
+        NapiDataUtils::SetValue(env, typeId, ctxt->output);
+    } else {
+        napi_get_null(env, &ctxt->output);
+    }
     return ctxt->output;
 }
 
@@ -136,9 +145,19 @@ napi_value UniformTypeDescriptorNapi::GetUniformDataTypeByMIMEType(napi_env env,
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "GetUniformDataTypeByMIMEType Exit");
     std::string typeId;
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, belongsTo, typeId);
+    auto status = E_OK;
+    if (belongsTo.empty()) {
+        status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, typeId);
+    } else {
+        status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, typeId, belongsTo);
+    }
     ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
-    NapiDataUtils::SetValue(env, typeId, ctxt->output);
+    if (!typeId.empty()) {
+        NapiDataUtils::SetValue(env, typeId, ctxt->output);
+    } else {
+        napi_get_null(env, &ctxt->output);
+    }
+
     return ctxt->output;
 }
 } // namespace UDMF

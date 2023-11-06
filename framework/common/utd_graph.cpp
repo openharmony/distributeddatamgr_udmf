@@ -32,20 +32,29 @@ UtdGraph &UtdGraph::GetInstance()
     return *instance;
 }
 
+bool UtdGraph::IsInvalidType(const std::string &node)
+{
+    if (vertexConversionTable_.find(node) == vertexConversionTable_.end()) {
+        LOG_ERROR(UDMF_CLIENT, "invalid typeDescriptor. typeDescriptor:%{public}s ", node.c_str());
+        return true;
+    }
+    return false;
+}
+
 uint32_t UtdGraph::GetLocateIndex(const std::string &node) // 顶点数据和下标转换
 {
-    std::shared_lock<decltype(vesNodesMutex_)> vesNodesLock(vesNodesMutex_);
-    return vesNodes_.at(node);
+    std::shared_lock<decltype(vertexConversionTableMutex_)> Lock(vertexConversionTableMutex_);
+    return vertexConversionTable_.at(node);
 }
 void UtdGraph::AddLocateDatas(uint32_t index, std::string node)
 {
-    std::unique_lock<std::shared_mutex> vesNodesLock(vesNodesMutex_);
-    vesNodes_.insert({ node, index });
+    std::unique_lock<std::shared_mutex> Lock(vertexConversionTableMutex_);
+    vertexConversionTable_.insert(std::make_pair(node, index));
 }
 
 void UtdGraph::SetDataToGraph(uint32_t vesNum, std::vector<std::vector<uint32_t>> edges)
 {
-    std::unique_lock<std::shared_mutex> graphLock(graphMutex_);
+    std::unique_lock<std::shared_mutex> Lock(graphMutex_);
     graph_.CreateAdjList(vesNum, edges);
 }
 
@@ -54,10 +63,10 @@ bool UtdGraph::IsRelatedOrNot(const std::string &startNode, const std::string &e
     bool isFind = false;
     uint32_t start = GetLocateIndex(startNode);
     uint32_t end = GetLocateIndex(endNode);
-    std::shared_lock<decltype(graphMutex_)> graphLock(graphMutex_);
+    std::shared_lock<decltype(graphMutex_)> Lock(graphMutex_);
     graph_.Dfs(start, true, [&](uint32_t currNode)-> bool {
-        if (end==currNode) {
-            isFind= true;
+        if (end == currNode) {
+            isFind = true;
             return true;
         }
         return false;
