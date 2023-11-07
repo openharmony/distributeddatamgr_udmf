@@ -20,7 +20,7 @@ config("udmf_client_config") {
     "${udmf_interfaces_path}/innerkits/data",
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/innerkitsimpl/data",
-    "${udmf_framework_path}/service",
+    "${udmf_framework_path}/innerkitsimpl/service",
     "${kv_store_path}/frameworks/common",
     "//third_party/libuv/include",
     "//third_party/node/src",
@@ -65,8 +65,8 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/video.cpp",
-    "${udmf_framework_path}/service/udmf_service_client.cpp",
-    "${udmf_framework_path}/service/udmf_service_proxy.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
   ]
 
   public_configs = [ ":udmf_client_config" ]

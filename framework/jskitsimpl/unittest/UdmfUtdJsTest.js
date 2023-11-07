@@ -190,6 +190,7 @@ describe('UdmfUtdJSTest', function () {
     console.info(TAG, 'typeDescriptor, ret ' + typeObj);
     try{
       typeObj.equals('1111');
+      expect().assertFail();
     } catch(e){
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
@@ -409,11 +410,12 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor017:';
     console.info(TAG, 'start');
     try{
-      let typeId = UTD.getUniformDataTypeByMIMEType('')
+      let typeId = UTD.getUniformDataTypeByMIMEType('');
       console.info(TAG, 'getUniformDataTypeByMIMEType, ret ' + typeId);
+      expect(typeId === null).assertTrue();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
-      expect(e.code === ERROR_PARAMETER).assertTrue();
+      expect().assertFail();
     }
     console.info(TAG, 'end');
   });
@@ -428,11 +430,12 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor018:';
     console.info(TAG, 'start');
     try {
-      let typeId = UTD.getUniformDataTypeByFilenameExtension('')
+      let typeId = UTD.getUniformDataTypeByFilenameExtension('');
       console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + typeId);
+      expect(typeId === null).assertTrue();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
-      expect(e.code === ERROR_PARAMETER).assertTrue();
+      expect().assertFail();
     }
     console.info(TAG, 'end');
   });
@@ -450,6 +453,7 @@ describe('UdmfUtdJSTest', function () {
     console.info(TAG, 'typeDescriptor, ret ' + typeObj);
     try {
       typeObj.belongsTo('1111');
+      expect().assertFail();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
@@ -470,6 +474,7 @@ describe('UdmfUtdJSTest', function () {
     console.info(TAG, 'typeDescriptor, ret ' + typeObj);
     try {
       typeObj.isLowerLevelType('1111');
+      expect().assertFail();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
@@ -490,6 +495,7 @@ describe('UdmfUtdJSTest', function () {
     console.info(TAG, 'typeDescriptor, ret ' + typeObj);
     try {
       typeObj.isHigherLevelType('1111');
+      expect().assertFail();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
@@ -510,6 +516,7 @@ describe('UdmfUtdJSTest', function () {
       let typeId = UTD.getTypeDescriptor('general.type-script');
       console.info(TAG, 'typeDescriptor, ret ' + typeId);
       typeId.belongsTo();
+      expect().assertFail();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
@@ -530,6 +537,7 @@ describe('UdmfUtdJSTest', function () {
       let typeId = UTD.getTypeDescriptor('general.type-script');
       console.info(TAG, 'typeDescriptor, ret ' + typeId);
       typeId.isLowerLevelType();
+      expect().assertFail();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
@@ -550,6 +558,7 @@ describe('UdmfUtdJSTest', function () {
       let typeId = UTD.getTypeDescriptor('general.type-script');
       console.info(TAG, 'typeDescriptor, ret ' + typeId);
       typeId.isHigherLevelType();
+      expect().assertFail();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
@@ -569,6 +578,7 @@ describe('UdmfUtdJSTest', function () {
     try {
       let typeId = UTD.getUniformDataTypeByMIMEType();
       console.info(TAG, 'getUniformDataTypeByMIMEType, ret ' + typeId);
+      expect().assertFail();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
@@ -588,6 +598,7 @@ describe('UdmfUtdJSTest', function () {
     try {
       let typeId = UTD.getUniformDataTypeByFilenameExtension();
       console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + typeId);
+      expect().assertFail();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
@@ -637,9 +648,10 @@ describe('UdmfUtdJSTest', function () {
     try {
       let typeId = UTD.getUniformDataTypeByFilenameExtension('invalidFilenameExtension');
       console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + typeId);
+      expect(typeId === null).assertTrue();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
-      expect(e.code === ERROR_PARAMETER).assertTrue();
+      expect().assertFail();
     }
     console.info(TAG, 'end');
   });
@@ -656,9 +668,10 @@ describe('UdmfUtdJSTest', function () {
     try {
       let typeId = UTD.getUniformDataTypeByMIMEType('invalidMIMEType');
       console.info(TAG, 'getUniformDataTypeByMIMEType, ret ' + typeId);
+      expect(typeId === null).assertTrue();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
-      expect(e.code === ERROR_PARAMETER).assertTrue();
+      expect().assertFail();
     }
     console.info(TAG, 'end');
   });
@@ -721,8 +734,9 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor034:';
     console.info(TAG, 'start');
     try {
-      let typeId = UTD.getUniformDataTypeByFilenameExtension('');
+      let typeId = UTD.getUniformDataTypeByFilenameExtension('.ts','');
       console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + typeId);
+      expect().assertFail();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
@@ -740,8 +754,9 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor035:';
     console.info(TAG, 'start');
     try {
-      let typeId = UTD.getUniformDataTypeByMIMEType('');
+      let typeId = UTD.getUniformDataTypeByMIMEType('video/3gpp2','');
       console.info(TAG, 'getUniformDataTypeByMIMEType, ret ' + typeId);
+      expect().assertFail();
     } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();

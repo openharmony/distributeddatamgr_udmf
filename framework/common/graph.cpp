@@ -15,23 +15,21 @@
 #include "graph.h"
 namespace OHOS {
 namespace UDMF {
-void Graph::CreateAdjList(uint32_t vertexNum, std::vector<std::vector<uint32_t>> edges)
+Graph::Graph(uint32_t vertexNum):vertexNum_(vertexNum)
 {
-    vertexNum_ = vertexNum;
     for (uint32_t node = 0; node < vertexNum_; node++) {
         adjList_.push_back({node, nullptr});
     }
-    uint32_t start;
-    uint32_t end;
-    EdgeNode *edge;
-    for (auto edgeNode : edges) {
-        start = edgeNode[0];
-        end = edgeNode[1];
-        edge = new EdgeNode;   // add new edge
-        edge->adjIndex = end;
-        edge->next = adjList_[start].firstEdge;
-        adjList_[start].firstEdge = edge;
-    }
+    visited_.resize(vertexNum_);
+    fill(visited_.begin(), visited_.end(), 0);
+}
+
+void Graph::AddEdge(uint32_t start, uint32_t end)
+{
+    EdgeNode *edge = new EdgeNode;  // add new edge
+    edge->adjIndex = end;
+    edge->next = adjList_[start].firstEdge;
+    adjList_[start].firstEdge = edge;
 }
 
 void Graph::Dfs(uint32_t startNode, bool isInit, Action action)
@@ -65,22 +63,6 @@ void Graph::Dfs(uint32_t startNode, bool isInit, Action action)
             nodes.pop();
         }
     }
-}
-
-std::vector<uint32_t> Graph::DfsUnconnectedGraph()
-{
-    visited_.resize(vertexNum_);
-    fill(visited_.begin(), visited_.end(), 0);
-    std::vector<uint32_t> result;
-    for (uint32_t node = 0; node < vertexNum_; node++) {
-        if (!visited_[node]) {
-            Dfs(node, false, [&](uint32_t currNode) -> bool {
-                result.push_back(currNode);
-                return false;
-            });
-        }
-    }
-    return result;
 }
 } // namespace UDMF
 } // namespace OHOS

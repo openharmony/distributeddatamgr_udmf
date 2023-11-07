@@ -101,7 +101,7 @@ napi_value UniformTypeDescriptorNapi::GetUniformDataTypeByFilenameExtension(napi
             "invalid arg[0], i.e. invalid arguments!");
         if (argc > 1) {
             ctxt->status = NapiDataUtils::GetValue(env, argv[1], belongsTo);
-            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok  && !belongsTo.empty(), E_INVALID_PARAMETERS,
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !belongsTo.empty(), E_INVALID_PARAMETERS,
                                 "invalid arg[1], i.e. invalid arguments!");
         }
     };

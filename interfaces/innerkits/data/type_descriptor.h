@@ -21,6 +21,7 @@
 #include <vector>
 #include <map>
 #include "error_code.h"
+#include "utd_common.h"
 namespace OHOS {
 namespace UDMF {
 class TypeDescriptor {
@@ -28,6 +29,7 @@ public:
     TypeDescriptor(const std::string &typeId, const std::set<std::string> &belongingToTypes,
                    const std::vector<std::string> &filenameExtensions, const std::vector<std::string> &mimeTypes,
                    const std::string &description, const std::string &referenceURL, const std::string &iconFile);
+    TypeDescriptor(const TypeDescriptorCfg& typeDescriptorCfg);
     ~TypeDescriptor();
     Status BelongsTo(const std::string &typeId, bool &checkResult);
     Status IsLowerLevelType(const std::string &typeId, bool &checkResult);

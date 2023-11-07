@@ -22,7 +22,7 @@ config("udmf_napi_config") {
     "${udmf_interfaces_path}/jskits/data",
 
     "${udmf_framework_path}/common",
-    "${udmf_framework_path}/service",
+    "${udmf_framework_path}/innerkits/service",
 
     "//third_party/libuv/include",
     "//third_party/node/src",
