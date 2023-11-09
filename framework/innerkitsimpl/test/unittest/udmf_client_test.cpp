@@ -50,7 +50,7 @@ public:
     void SetUp() override;
     void TearDown() override;
 
-    void SetNativeToken(const std::string processName);
+    void SetNativeToken(const std::string& processName);
     static void AllocHapToken1();
     static void AllocHapToken2();
     void SetHapToken1();
@@ -87,7 +87,7 @@ void UdmfClientTest::TearDown()
 {
 }
 
-void UdmfClientTest::SetNativeToken(const std::string processName)
+void UdmfClientTest::SetNativeToken(const std::string& processName)
 {
     auto tokenId = AccessTokenKit::GetNativeTokenId(processName);
     SetSelfTokenID(tokenId);
