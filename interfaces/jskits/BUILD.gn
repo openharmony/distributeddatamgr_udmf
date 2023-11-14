@@ -37,12 +37,6 @@ config("udmf_napi_config") {
 }
 
 ohos_shared_library("unifieddatachannel_napi") {
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
   sources = [
     "${udmf_framework_path}/jskitsimpl/data/application_defined_record_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/audio_napi.cpp",
@@ -90,12 +84,6 @@ ohos_shared_library("unifieddatachannel_napi") {
 }
 
 ohos_shared_library("uniformtypedescriptor_napi") {
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
   sources = [
     "${udmf_framework_path}/jskitsimpl/data/type_descriptor_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/uniform_type_descriptor_napi.cpp",
@@ -125,12 +113,6 @@ ohos_shared_library("uniformtypedescriptor_napi") {
 }
 
 ohos_shared_library("udmf_data_napi") {
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
   sources = [
     "${udmf_framework_path}/jskitsimpl/data/application_defined_record_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/audio_napi.cpp",
@@ -177,12 +159,6 @@ ohos_shared_library("udmf_data_napi") {
 }
 
 ohos_static_library("udmf_js_common") {
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
   sources = [
     "${udmf_framework_path}/jskitsimpl/common/napi_data_utils.cpp",
     "${udmf_framework_path}/jskitsimpl/common/napi_error_utils.cpp",
