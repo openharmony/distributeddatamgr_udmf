@@ -14,15 +14,16 @@
  */
 #ifndef UDMF_PRESET_TYPE_DESCRIPTORS
 #define UDMF_PRESET_TYPE_DESCRIPTORS
-#include "type_descriptor.h"
+#include <string>
 #include "error_code.h"
+#include "utd_common.h"
 
 namespace OHOS {
 namespace UDMF {
 class PresetTypeDescriptors {
 public:
     static PresetTypeDescriptors &GetInstance();
-    std::vector<TypeDescriptor> &GetTypeDescriptors();
+    std::vector<TypeDescriptorCfg> &GetTypeCfgs();
 private:
     PresetTypeDescriptors();
     ~PresetTypeDescriptors();
@@ -30,7 +31,7 @@ private:
     PresetTypeDescriptors &operator=(const PresetTypeDescriptors &obj) = delete;
 
     void InitDescriptors();
-    std::vector<TypeDescriptor> typeDescriptors_;
+    std::vector<TypeDescriptorCfg> typeDescriptors_;
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -19,7 +19,8 @@
 #include <string>
 #include <vector>
 #include <map>
-
+#include "utd_common.h"
+#include "preset_type_descriptors.h"
 #include "type_descriptor.h"
 #include "error_code.h"
 
@@ -31,18 +32,18 @@ public:
     static UtdClient &GetInstance();
     Status GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
     Status GetUniformDataTypeByFilenameExtension(const std::string &fileExtension, std::string &typeId,
-                                                 std::string belongs = DEFAULT_TYPE_ID);
+                                                 std::string belongsTo = DEFAULT_TYPE_ID);
     Status GetUniformDataTypeByMIMEType(const std::string &mimeType, std::string &typeId,
-                                        std::string belongs = DEFAULT_TYPE_ID);
+                                        std::string belongsTo = DEFAULT_TYPE_ID);
 
 private:
     UtdClient();
     ~UtdClient();
     UtdClient(const UtdClient &obj) = delete;
     UtdClient &operator=(const UtdClient &obj) = delete;
-    void SummarizeData();
+    void InitUtdGraph();
     static constexpr const char* DEFAULT_TYPE_ID = "#default";
-    std::vector<TypeDescriptor> descriptors_;
+    std::vector<TypeDescriptorCfg> descriptorCfgs_;
 };
 } // namespace UDMF
 } // namespace OHOS

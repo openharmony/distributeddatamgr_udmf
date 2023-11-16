@@ -68,12 +68,12 @@ foundation/distributeddatamgr/udmf  # udmf统一数据管理部件
 │   │   ├── client                  # native客户端
 │   │   ├── common                  # native接口公共工具类
 │   │   ├── data                    # 数据结构定义
+│   │   ├── service                 # 服务模块
 │   │   └── test                    # 测试目录
 │   ├── jskitsimpl                  # js接口具体实现
 │   │   ├── common                  # js接口公共工具类
 │   │   |── data                    # 统一数据公共接口实现
 |   |   └── unittest                # js单元测试目录
-│   └── service                     # 服务模块
 ├── interfaces                      # udmf对外接口声明
 │   ├── innerkits                   # nativie接口声明
 │   │   ├── client                  # client接口声明

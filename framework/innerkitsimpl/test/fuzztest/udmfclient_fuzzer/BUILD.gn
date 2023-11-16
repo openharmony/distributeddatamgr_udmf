@@ -25,7 +25,7 @@ ohos_fuzztest("UdmfClientFuzzTest") {
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_interfaces_path}/innerkits/data",
     "${udmf_framework_path}/common",
-    "${udmf_framework_path}/service",
+    "${udmf_framework_path}/innerkits/service",
   ]
 
   fuzz_config_file =

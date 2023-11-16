@@ -31,7 +31,7 @@ PresetTypeDescriptors &PresetTypeDescriptors::GetInstance()
     return *instance;
 }
 
-std::vector<TypeDescriptor> &PresetTypeDescriptors::GetTypeDescriptors()
+std::vector<TypeDescriptorCfg> &PresetTypeDescriptors::GetTypeCfgs()
 {
     return typeDescriptors_;
 }

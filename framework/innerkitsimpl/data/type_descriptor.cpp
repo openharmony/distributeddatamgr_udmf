@@ -27,6 +27,17 @@ TypeDescriptor::TypeDescriptor(const std::string &typeId, const std::set<std::st
 {
 }
 
+TypeDescriptor::TypeDescriptor(const TypeDescriptorCfg& typeDescriptorCfg)
+{
+    typeId_ = typeDescriptorCfg.typeId;
+    belongingToTypes_ = typeDescriptorCfg.belongingToTypes;
+    filenameExtensions_ = typeDescriptorCfg.filenameExtensions;
+    mimeTypes_ = typeDescriptorCfg.mimeTypes;
+    description_ = typeDescriptorCfg.description;
+    referenceURL_ = typeDescriptorCfg.referenceURL;
+    iconFile_ = typeDescriptorCfg.iconFile;
+}
+
 TypeDescriptor::~TypeDescriptor()
 {
 }
@@ -34,8 +45,7 @@ TypeDescriptor::~TypeDescriptor()
 Status TypeDescriptor::BelongsTo(const std::string &typeId, bool &checkResult)
 {
     checkResult = false;
-    if (UtdGraph::GetInstance().IsInvalidType(typeId)) {
-        checkResult = false;
+    if (!UtdGraph::GetInstance().IsValidType(typeId)) {
         LOG_ERROR(UDMF_CLIENT, "invalid para. %{public}s,", typeId.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
@@ -43,43 +53,39 @@ Status TypeDescriptor::BelongsTo(const std::string &typeId, bool &checkResult)
         checkResult = true;
         return Status::E_OK;
     };
-    checkResult = UtdGraph::GetInstance().IsRelatedOrNot(typeId, typeId_);
+    checkResult = UtdGraph::GetInstance().IsLowerLevelType(typeId, typeId_);
     return Status::E_OK;
 }
 
 Status TypeDescriptor::IsLowerLevelType(const std::string &typeId, bool &checkResult)
 {
-    if (UtdGraph::GetInstance().IsInvalidType(typeId)) {
-        checkResult = false;
+    if (!UtdGraph::GetInstance().IsValidType(typeId)) {
         LOG_ERROR(UDMF_CLIENT, "invalid para. %{public}s,", typeId.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
     if (typeId_ == typeId) {
-        checkResult = false;
         return Status::E_OK;
     };
-    checkResult = UtdGraph::GetInstance().IsRelatedOrNot(typeId, typeId_);
+    checkResult = UtdGraph::GetInstance().IsLowerLevelType(typeId, typeId_);
     return Status::E_OK;
 }
 
 Status TypeDescriptor::IsHigherLevelType(const std::string &typeId, bool &checkResult)
 {
-    if (UtdGraph::GetInstance().IsInvalidType(typeId)) {
-        checkResult = false;
+    if (!UtdGraph::GetInstance().IsValidType(typeId)) {
         LOG_ERROR(UDMF_CLIENT, "invalid para. %{public}s,", typeId.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
     if (typeId_ == typeId) {
-        checkResult = false;
         return Status::E_OK;
     };
-    checkResult = UtdGraph::GetInstance().IsRelatedOrNot(typeId_, typeId);
+    checkResult = UtdGraph::GetInstance().IsLowerLevelType(typeId_, typeId);
     return Status::E_OK;
 }
 
 bool TypeDescriptor::Equals(std::shared_ptr<TypeDescriptor> descriptor)
 {
-    return  descriptor->GetTypeId() == this->GetTypeId();
+    return descriptor->GetTypeId() == this->GetTypeId();
 }
 
 const std::string& TypeDescriptor::GetTypeId() const

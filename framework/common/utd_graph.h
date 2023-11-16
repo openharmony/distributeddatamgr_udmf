@@ -21,27 +21,28 @@
 #include <stack>
 #include <string>
 #include <shared_mutex>
-#include <graph.h>
+#include "graph.h"
+#include "utd_common.h"
+#include "preset_type_descriptors.h"
 
 namespace OHOS {
 namespace UDMF {
 class UtdGraph {
 public:
     static UtdGraph &GetInstance();
-    uint32_t GetLocateIndex(const std::string &node);
-    bool IsInvalidType(const std::string &node);
-    void AddLocateDatas(uint32_t index, std::string node);
-    void SetDataToGraph(uint32_t vesNum, std::vector<std::vector<uint32_t>> edges);
-    bool IsRelatedOrNot(const std::string &startNode, const std::string &endNode);
+    bool IsValidType(const std::string &node);
+    void InitUtdGraph(std::vector<TypeDescriptorCfg> descriptors);
+    bool IsLowerLevelType(const std::string &lowerLevelType, const std::string &heigitLevelType);
 private:
     UtdGraph();
     ~UtdGraph();
     UtdGraph(const UtdGraph &obj) = delete;
     UtdGraph &operator=(const UtdGraph &obj) = delete;
+    uint32_t GetIndex(const std::string &node);
+    void AddEdge(const std::string &startNode, const std::string &endNode);
     mutable std::shared_mutex graphMutex_;
-    Graph graph_;
-    mutable std::shared_mutex vertexConversionTableMutex_;
-    std::map<std::string, uint32_t> vertexConversionTable_;
+    Graph *graph_;
+    std::map<std::string, uint32_t> typeIdIndex_;
 };
 } // namespace UDMF
 } // namespace OHOS

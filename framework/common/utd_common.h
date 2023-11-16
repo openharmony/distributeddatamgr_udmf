@@ -12,37 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef UDMF_GRAPH_H
-#define UDMF_GRAPH_H
-
-#include <vector>
-#include <iostream>
-#include <stack>
+#ifndef UDMF_UTD_TYPE
+#define UDMF_UTD_TYPE
 #include <string>
+#include <set>
+#include <vector>
+#include "error_code.h"
+
 
 namespace OHOS {
 namespace UDMF {
-struct EdgeNode {
-    uint32_t adjIndex;
-    EdgeNode* next;
-};
-
-struct VertexNode {
-    uint32_t value;
-    EdgeNode* firstEdge;
-};
-class Graph {
-public:
-    explicit Graph(uint32_t vertexNum);
-    using Action = std::function<bool(uint32_t node)>;
-    void AddEdge(uint32_t start, uint32_t end);
-    void Dfs(uint32_t startNode, bool isInit, Action action);
-private:
-    uint32_t vertexNum_;
-    std::vector<VertexNode> adjList_;  // Adjacency List
-    std::vector<uint32_t> visited_;    // Determine whether the vertex has been accessed, index=vertex value
+struct TypeDescriptorCfg {
+    std::string typeId;
+    std::set<std::string> belongingToTypes;
+    std::vector<std::string> filenameExtensions;
+    std::vector<std::string> mimeTypes;
+    std::string description;
+    std::string referenceURL;
+    std::string iconFile;
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_GRAPH_H
+#endif // UDMF_UTD_TYPE

@@ -32,39 +32,50 @@ UtdGraph &UtdGraph::GetInstance()
     return *instance;
 }
 
-bool UtdGraph::IsInvalidType(const std::string &node)
+bool UtdGraph::IsValidType(const std::string &node)
 {
-    if (vertexConversionTable_.find(node) == vertexConversionTable_.end()) {
-        LOG_ERROR(UDMF_CLIENT, "invalid typeDescriptor. typeDescriptor:%{public}s ", node.c_str());
-        return true;
+    if (typeIdIndex_.find(node) == typeIdIndex_.end()) {
+        LOG_ERROR(UDMF_CLIENT, "invalid typeId. typeId:%{public}s ", node.c_str());
+        return false;
     }
-    return false;
+    return true;
 }
 
-uint32_t UtdGraph::GetLocateIndex(const std::string &node) // 顶点数据和下标转换
+uint32_t UtdGraph::GetIndex(const std::string &node)
 {
-    std::shared_lock<decltype(vertexConversionTableMutex_)> Lock(vertexConversionTableMutex_);
-    return vertexConversionTable_.at(node);
-}
-void UtdGraph::AddLocateDatas(uint32_t index, std::string node)
-{
-    std::unique_lock<std::shared_mutex> Lock(vertexConversionTableMutex_);
-    vertexConversionTable_.insert(std::make_pair(node, index));
+    return typeIdIndex_.at(node);
 }
 
-void UtdGraph::SetDataToGraph(uint32_t vesNum, std::vector<std::vector<uint32_t>> edges)
+void UtdGraph::InitUtdGraph(std::vector<TypeDescriptorCfg> descriptorCfgs)
 {
+    uint32_t descriptorsNum = static_cast<uint32_t>(descriptorCfgs.size());
     std::unique_lock<std::shared_mutex> Lock(graphMutex_);
-    graph_.CreateAdjList(vesNum, edges);
+    graph_ = new Graph(descriptorsNum);
+    for (uint32_t i = 0; i < descriptorsNum; i++) {
+        typeIdIndex_.insert(std::make_pair(descriptorCfgs[i].typeId, i));
+    }
+    for (auto &descriptorCfg : descriptorCfgs) {
+        std::set<std::string> belongsTo = descriptorCfg.belongingToTypes;
+        for (auto belongsToType : belongsTo) {
+            AddEdge(belongsToType, descriptorCfg.typeId);
+        }
+    }
 }
 
-bool UtdGraph::IsRelatedOrNot(const std::string &startNode, const std::string &endNode)
+void UtdGraph::AddEdge(const std::string &startNode, const std::string &endNode)
+{
+    uint32_t start = GetIndex(startNode);
+    uint32_t end = GetIndex(endNode);
+    graph_->AddEdge(start, end);
+}
+
+bool UtdGraph::IsLowerLevelType(const std::string &lowerLevelType, const std::string &heigitLevelType)
 {
     bool isFind = false;
-    uint32_t start = GetLocateIndex(startNode);
-    uint32_t end = GetLocateIndex(endNode);
+    uint32_t start = GetIndex(lowerLevelType);
+    uint32_t end = GetIndex(heigitLevelType);
     std::shared_lock<decltype(graphMutex_)> Lock(graphMutex_);
-    graph_.Dfs(start, true, [&](uint32_t currNode)-> bool {
+    graph_->Dfs(start, true, [&isFind, &end](uint32_t currNode)-> bool {
         if (end == currNode) {
             isFind = true;
             return true;

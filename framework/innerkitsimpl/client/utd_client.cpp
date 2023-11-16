@@ -15,14 +15,13 @@
 
 #include "utd_client.h"
 #include "logger.h"
-#include "preset_type_descriptors.h"
 #include "utd_graph.h"
 namespace OHOS {
 namespace UDMF {
 UtdClient::UtdClient()
 {
-    descriptors_ = PresetTypeDescriptors::GetInstance().GetTypeDescriptors();
-    SummarizeData();
+    descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetTypeCfgs();
+    UtdGraph::GetInstance().InitUtdGraph(descriptorCfgs_);
     LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
 }
 
@@ -38,9 +37,9 @@ UtdClient &UtdClient::GetInstance()
 
 Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor)
 {
-    for (const auto &utdType : descriptors_) {
-        if (utdType.GetTypeId() == typeId) {
-            descriptor = std::make_shared<TypeDescriptor>(utdType);
+    for (const auto &utdTypeCfg : descriptorCfgs_) {
+        if (utdTypeCfg.typeId == typeId) {
+            descriptor = std::make_shared<TypeDescriptor>(utdTypeCfg);
             LOG_DEBUG(UDMF_CLIENT, "get descriptor success. %{public}s ", typeId.c_str());
             return Status::E_OK;
         }
@@ -49,70 +48,52 @@ Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<T
 }
 
 Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileExtension, std::string &typeId,
-                                                        std::string belongs)
+                                                        std::string belongsTo)
 {
-    if (belongs != DEFAULT_TYPE_ID && UtdGraph::GetInstance().IsInvalidType(belongs)) {
-        LOG_ERROR(UDMF_CLIENT, "invalid belongs. fileExtension:%{public}s, belongs:%{public}s ",
-                  fileExtension.c_str(), belongs.c_str());
+    if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
+        LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. fileExtension:%{public}s, belongsTo:%{public}s ",
+                  fileExtension.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
 
-    for (auto &utdType : descriptors_) {
-        std::vector<std::string> fileExtensions = utdType.GetFilenameExtensions();
+    for (auto &utdTypeCfg : descriptorCfgs_) {
+        std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
         if (find(fileExtensions.begin(), fileExtensions.end(), fileExtension) != fileExtensions.end()) {
-            typeId = utdType.GetTypeId();
+            typeId = utdTypeCfg.typeId;
             break;
         }
     }
 
-    // the  find typeId is not belongs to the belongs.
-    if (!typeId.empty() && !belongs.empty() && belongs != DEFAULT_TYPE_ID && belongs != typeId &&
-        !UtdGraph::GetInstance().IsRelatedOrNot(belongs, typeId)) {
+    // the find typeId is not belongsTo to the belongsTo.
+    if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
+        !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
         typeId = "";
     }
     return Status::E_OK;
 }
 
 Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std::string &typeId,
-                                               std::string belongs)
+                                               std::string belongsTo)
 {
-    if (belongs != DEFAULT_TYPE_ID && UtdGraph::GetInstance().IsInvalidType(belongs)) {
-        LOG_ERROR(UDMF_CLIENT, "invalid belongs. mimeType:%{public}s, belongs:%{public}s ",
-                  mimeType.c_str(), belongs.c_str());
+    if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
+        LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. mimeType:%{public}s, belongsTo:%{public}s ",
+                  mimeType.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
 
-    for (auto &utdType : descriptors_) {
-        std::vector<std::string> mimeTypes = utdType.GetMimeTypes();
+    for (auto &utdTypeCfg : descriptorCfgs_) {
+        std::vector<std::string> mimeTypes = utdTypeCfg.mimeTypes;
         if (find(mimeTypes.begin(), mimeTypes.end(), mimeType) != mimeTypes.end()) {
-            typeId = utdType.GetTypeId();
+            typeId = utdTypeCfg.typeId;
             break;
         }
     }
-    // the  find typeId is not belongs to the belongs.
-    if (!typeId.empty() && !belongs.empty() && belongs != DEFAULT_TYPE_ID && belongs != typeId &&
-        !UtdGraph::GetInstance().IsRelatedOrNot(belongs, typeId)) {
+    // the find typeId is not belongsTo to the belongsTo.
+    if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
+        !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
         typeId = "";
     }
     return Status::E_OK;
-}
-
-void UtdClient::SummarizeData()
-{
-    uint32_t descriptorsNum = static_cast<uint32_t>(descriptors_.size());
-    for (uint32_t i = 0; i < descriptorsNum; i++) {
-        UtdGraph::GetInstance().AddLocateDatas(i, descriptors_[i].GetTypeId());
-    }
-
-    std::vector<std::vector<uint32_t>> edges;
-    for (auto &descriptor : descriptors_) {
-        std::set<std::string> belongs = descriptor.GetBelongingToTypes();
-        for (auto belongType : belongs) {
-            edges.push_back({UtdGraph::GetInstance().GetLocateIndex(belongType),
-                             UtdGraph::GetInstance().GetLocateIndex(descriptor.GetTypeId())});
-        }
-    }
-    UtdGraph::GetInstance().SetDataToGraph(descriptorsNum, edges);
 }
 } // namespace UDMF
 } // namespace OHOS
