@@ -734,7 +734,7 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor034:';
     console.info(TAG, 'start');
     try {
-      let typeId = UTD.getUniformDataTypeByFilenameExtension('.ts','');
+      let typeId = UTD.getUniformDataTypeByFilenameExtension('.ts', '');
       console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + typeId);
       expect().assertFail();
     } catch(e) {
@@ -754,7 +754,7 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor035:';
     console.info(TAG, 'start');
     try {
-      let typeId = UTD.getUniformDataTypeByMIMEType('video/3gpp2','');
+      let typeId = UTD.getUniformDataTypeByMIMEType('video/3gpp2', '');
       console.info(TAG, 'getUniformDataTypeByMIMEType, ret ' + typeId);
       expect().assertFail();
     } catch(e) {
