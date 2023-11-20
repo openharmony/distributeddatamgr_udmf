@@ -17,6 +17,9 @@ import { describe, beforeAll, beforeEach, afterEach, afterAll, it, expect } from
 import UTD from '@ohos.data.uniformTypeDescriptor';
 
 const ERROR_PARAMETER = '401';
+const INVALID_TYPE1 = 'invalidUtdType';
+const INVALID_TYPE2 = 123456;
+
 
 describe('UdmfUtdJSTest', function () {
 
@@ -56,8 +59,8 @@ describe('UdmfUtdJSTest', function () {
     console.info(TAG, ', typeId: ' + typeId + ', ' + Object.prototype.toString.call(typeId) +
       ', belongingToTypes: ' + belonging + ', ' + Object.prototype.toString.call(belonging));
     console.info(TAG, 'description: ' + typeObj.description + ', ' + Object.prototype.toString.call(description));
-    console.info(TAG, 'referenceURL: ' + referenceURL + ', ' + Object.prototype.toString.call(referenceURL)
-      + ', iconFile: ' + iconFile + ', ' + Object.prototype.toString.call(iconFile));
+    console.info(TAG, 'referenceURL: ' + referenceURL + ', ' + Object.prototype.toString.call(referenceURL) +
+      ', iconFile: ' + iconFile + ', ' + Object.prototype.toString.call(iconFile));
     expect(typeObj.typeId).assertEqual(UTD.UniformDataType.PHOTOSHOP_IMAGE);
     expect(typeObj.belongingToTypes[0]).assertEqual('general.image');
     expect(typeObj.description).assertEqual('Adobe Photoshop document.');
@@ -100,7 +103,7 @@ describe('UdmfUtdJSTest', function () {
   it ('UdmfTestTypeDescriptor004', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor004:';
     console.info(TAG, 'start');
-    try{
+    try {
       let typeObj = UTD.getTypeDescriptor(null);
       console.info(TAG, 'typeDescriptor, ret ' + typeObj);
     } catch (e) {
@@ -119,7 +122,7 @@ describe('UdmfUtdJSTest', function () {
   it ('UdmfTestTypeDescriptor005', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor005:';
     console.info(TAG, 'start');
-    let typeObj = UTD.getTypeDescriptor('com.adobe.photoshop-image', 'safafdsaf',123456,'hahaha');
+    let typeObj = UTD.getTypeDescriptor('com.adobe.photoshop-image', INVALID_TYPE1, INVALID_TYPE2);
     let typeId = typeObj.typeId;
     let belonging = typeObj.belongingToTypes;
     let description = typeObj.description;
@@ -191,7 +194,7 @@ describe('UdmfUtdJSTest', function () {
     try{
       typeObj.equals('1111');
       expect().assertFail();
-    } catch(e){
+    } catch(e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
     }
