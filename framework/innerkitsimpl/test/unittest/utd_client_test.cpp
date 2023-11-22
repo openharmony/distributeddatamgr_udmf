@@ -292,5 +292,4 @@ HWTEST_F(UtdClientTest, TypeDescriptorGetAttr001, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "TypeDescriptorGetAttr001 end.");
 }
-
 } // OHOS::Test
