@@ -15,7 +15,9 @@
 #include "preset_type_descriptors.h"
 namespace OHOS {
 namespace UDMF {
-constexpr const char* REFERENCE_URL = "https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype";
+constexpr const char *REFERENCE_URL = "https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/"\
+                                      "apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype";
+
 PresetTypeDescriptors::PresetTypeDescriptors()
 {
     InitDescriptors();
@@ -216,7 +218,7 @@ void PresetTypeDescriptors::InitDescriptors()
          ""},
         {"general.mp3",
          {"general.audio"},
-         {".mp3,"},
+         {".mp3"},
          {"audio/mp3"},
          "MPEG-3 audio.",
          REFERENCE_URL,
@@ -456,7 +458,7 @@ void PresetTypeDescriptors::InitDescriptors()
          {"general.object"},
          {},
          {},
-         "Base type for messages (email, IM, and so on).",
+         "Base type for messages.",
          REFERENCE_URL,
          ""},
         {"general.contact",

@@ -104,7 +104,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension001, TestSize.Level
     std::string filenameExtension = ".azw3";
     std::string blongsToType = "general.ebook";
     std::string currType;
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType,
+                                                                                 blongsToType);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(currType, "com.amazon.azw3");
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtension001 end.");
@@ -149,7 +150,7 @@ HWTEST_F(UtdClientTest, BelongsTo001, TestSize.Level1)
 
 /**
 * @tc.name: BelongsTo002
-* @tc.desc: BelongsTo 
+* @tc.desc: BelongsTo
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, BelongsTo002, TestSize.Level1)
