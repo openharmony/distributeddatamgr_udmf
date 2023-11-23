@@ -45,7 +45,7 @@ ohos_unittest("UdmfClientTest") {
 
   sources = [
     "udmf_client_test.cpp",
-    "utd_client_test .cpp",
+    "utd_client_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]
