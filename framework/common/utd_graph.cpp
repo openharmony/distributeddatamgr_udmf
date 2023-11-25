@@ -41,12 +41,16 @@ bool UtdGraph::IsValidType(const std::string &node)
     return true;
 }
 
-uint32_t UtdGraph::GetIndex(const std::string &node)
+int32_t UtdGraph::GetIndex(const std::string &node)
 {
-    return typeIdIndex_.at(node);
+    auto idx = typeIdIndex_.find(node);
+    if (idx == typeIdIndex_.end()) {
+        return -1;
+    }
+    return idx->second;
 }
 
-void UtdGraph::InitUtdGraph(std::vector<TypeDescriptorCfg> descriptorCfgs)
+void UtdGraph::InitUtdGraph(std::vector<TypeDescriptorCfg> &descriptorCfgs)
 {
     uint32_t descriptorsNum = static_cast<uint32_t>(descriptorCfgs.size());
     std::unique_lock<std::shared_mutex> Lock(graphMutex_);
@@ -60,13 +64,16 @@ void UtdGraph::InitUtdGraph(std::vector<TypeDescriptorCfg> descriptorCfgs)
             AddEdge(belongsToType, descriptorCfg.typeId);
         }
     }
+    LOG_INFO(UDMF_CLIENT, "InitUtdGraph success, descriptorsNum:%{public}u. ", descriptorsNum);
 }
 
 void UtdGraph::AddEdge(const std::string &startNode, const std::string &endNode)
 {
-    uint32_t start = GetIndex(startNode);
-    uint32_t end = GetIndex(endNode);
-    graph_->AddEdge(start, end);
+    int32_t start = GetIndex(startNode);
+    int32_t end = GetIndex(endNode);
+    if (start != -1 && end != -1) {
+        graph_->AddEdge(start, end);
+    }
 }
 
 bool UtdGraph::IsLowerLevelType(const std::string &lowerLevelType, const std::string &heigitLevelType)
@@ -75,14 +82,22 @@ bool UtdGraph::IsLowerLevelType(const std::string &lowerLevelType, const std::st
     uint32_t start = GetIndex(lowerLevelType);
     uint32_t end = GetIndex(heigitLevelType);
     std::shared_lock<decltype(graphMutex_)> Lock(graphMutex_);
-    graph_->Dfs(start, true, [&isFind, &end](uint32_t currNode)-> bool {
+    graph_->Dfs(start, [&isFind, &end](uint32_t currNode)-> bool {
         if (end == currNode) {
             isFind = true;
             return true;
         }
         return false;
-    });
+    }, true);
     return isFind;
+}
+
+bool UtdGraph::IsCircle()
+{
+    std::shared_lock<decltype(graphMutex_)> Lock(graphMutex_);
+    bool circleFlag = graph_->DfsUnconnectedGraph([&](uint32_t currNode) -> bool
+                                                  { return false; });
+    return circleFlag;
 }
 } // namespace UDMF
 } // namespace OHOS

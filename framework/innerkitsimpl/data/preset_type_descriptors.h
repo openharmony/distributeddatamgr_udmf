@@ -23,7 +23,7 @@ namespace UDMF {
 class PresetTypeDescriptors {
 public:
     static PresetTypeDescriptors &GetInstance();
-    std::vector<TypeDescriptorCfg> &GetTypeCfgs();
+    std::vector<TypeDescriptorCfg> &GetPresetTypes();
 private:
     PresetTypeDescriptors();
     ~PresetTypeDescriptors();

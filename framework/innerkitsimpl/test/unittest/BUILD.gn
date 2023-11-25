@@ -44,8 +44,11 @@ ohos_unittest("UdmfClientTest") {
   module_out_path = module_output_path
 
   sources = [
+    "graph_test.cpp",
     "udmf_client_test.cpp",
     "utd_client_test.cpp",
+    "utd_custom_persistence_test.cpp",
+    "utd_json_parse_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]

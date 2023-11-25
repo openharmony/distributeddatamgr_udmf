@@ -16,12 +16,13 @@
 #include "utd_client.h"
 #include "logger.h"
 #include "utd_graph.h"
+#include "utd_custom_persistence.h"
 namespace OHOS {
 namespace UDMF {
+constexpr const char* CUSTOM_TYPE_CFG_PATH = "/data/utd/utd-adt.json";
 UtdClient::UtdClient()
 {
-    descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetTypeCfgs();
-    UtdGraph::GetInstance().InitUtdGraph(descriptorCfgs_);
+    Init();
     LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
 }
 
@@ -33,6 +34,17 @@ UtdClient &UtdClient::GetInstance()
 {
     static auto instance = new UtdClient();
     return *instance;
+}
+
+void UtdClient::Init()
+{
+    descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
+    std::vector<TypeDescriptorCfg> customTypes =
+        UtdCustomPersistence::GetInstance().GetCustomTypesFromCfg(CUSTOM_TYPE_CFG_PATH);
+    if (!customTypes.empty()) {
+        descriptorCfgs_.insert(descriptorCfgs_.end(), customTypes.begin(), customTypes.end());
+    }
+    UtdGraph::GetInstance().InitUtdGraph(descriptorCfgs_);
 }
 
 Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor)
