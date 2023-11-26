@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_UTD_JSON_PARSE_H
-#define UDMF_UTD_JSON_PARSE_H
+#ifndef UDMF_CUSTOM_UTD_JSON_PARSER_H
+#define UDMF_CUSTOM_UTD_JSON_PARSER_H
 #include <string>
 #include <vector>
 #include <set>
@@ -25,24 +25,23 @@
 #include "utd_common.h"
 namespace OHOS {
 namespace UDMF {
-class UtdJsonParse {
+class CustomUtdJsonParser {
 public:
     using json = cJSON;
-    UtdJsonParse();
-    ~UtdJsonParse();
-    int32_t ParseJsonData(const std::string &jsonData, std::vector<TypeDescriptorCfg> &typesCfg);
-    int32_t ParseJsonData(const std::string &jsonData, std::vector<TypeDescriptorCfg> &typesDeclarations,
+    CustomUtdJsonParser();
+    ~CustomUtdJsonParser();
+    bool ParseStoredCustomUtdJson(const std::string &jsonData, std::vector<TypeDescriptorCfg> &typesCfg);
+    bool ParseUserCustomUtdJson(const std::string &jsonData, std::vector<TypeDescriptorCfg> &typesDeclarations,
                           std::vector<TypeDescriptorCfg> &typesReference);
-    int32_t ConvertUtdCustomToStr(std::vector<TypeDescriptorCfg> &typesCfg, std::string &jsonData);
+    bool ConvertUtdCfgsToJson(std::vector<TypeDescriptorCfg> &typesCfg, std::string &jsonData);
 
 private:
-    int32_t ParseJsonDataFromCfg();
-    int32_t AddJsonStringArray(std::vector<std::string> &datas, const std::string &attrName, json &node);
-    bool GetSubNodeValue(const json &jsonRoot, const std::string &nodeName, std::vector<TypeDescriptorCfg> &typesCfg);
+    bool AddJsonStringArray(std::vector<std::string> &datas, const std::string &nodeName, json &node);
+    bool GetTypeDescriptors(const json &jsonRoot, const std::string &nodeName,
+                            std::vector<TypeDescriptorCfg> &typesCfg);
     std::string GetStringValue(const json &subNode, const std::string &nodeName);
     std::vector<std::string> GetStringArrayValue(const json &node, const std::string &nodeName);
-    bool GetStringArrayValue(const json &subNode, std::vector<std::string> &value);
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_UTD_JSON_PARSE_H
+#endif // UDMF_CUSTOM_UTD_JSON_PARSER_H

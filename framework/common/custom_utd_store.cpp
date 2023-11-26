@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "utd_custom_persistence.h"
+#include "custom_utd_store.h"
 #include <fstream>
 #include <sys/stat.h>
 #include "unistd.h"
@@ -22,21 +22,21 @@ namespace OHOS {
 namespace UDMF {
 constexpr const char* UTD_CFG_FILE = "utd-adt.json";
 
-UtdCustomPersistence::UtdCustomPersistence()
+CustomUtdStore::CustomUtdStore()
 {
 }
 
-UtdCustomPersistence::~UtdCustomPersistence()
+CustomUtdStore::~CustomUtdStore()
 {
 }
 
-UtdCustomPersistence &UtdCustomPersistence::GetInstance()
+CustomUtdStore &CustomUtdStore::GetInstance()
 {
-    static UtdCustomPersistence utdCustomPersistence;
+    static CustomUtdStore utdCustomPersistence;
     return utdCustomPersistence;
 }
 
-std::vector<TypeDescriptorCfg> UtdCustomPersistence::GetCustomTypesFromCfg(const std::string &cfgFilePath)
+std::vector<TypeDescriptorCfg> CustomUtdStore::GetTypeCfgs(const std::string &cfgFilePath)
 {
     LOG_DEBUG(UDMF_CLIENT, "get utdcustom from cfg, Path:%{public}s.", cfgFilePath.c_str());
     std::string jsonStr;
@@ -47,31 +47,27 @@ std::vector<TypeDescriptorCfg> UtdCustomPersistence::GetCustomTypesFromCfg(const
         jsonStr += line;
     }
     std::vector<TypeDescriptorCfg> customUtdTypes;
-    utdJsonParse_.ParseJsonData(jsonStr, customUtdTypes);
-    jsonStr ="";  // to del
-    utdJsonParse_.ConvertUtdCustomToStr(customUtdTypes, jsonStr);   // to del
-    LOG_DEBUG(UDMF_CLIENT, "ConvertUtdCustomToStr, jsonStr:%{public}s.", jsonStr.c_str());   // to del
+    utdJsonParser_.ParseStoredCustomUtdJson(jsonStr, customUtdTypes);
+    LOG_DEBUG(UDMF_CLIENT, "GetTypeCfgs, customUtdTypes total:%{public}zu.", customUtdTypes.size());
     return customUtdTypes;
 }
 
-int32_t UtdCustomPersistence::PersistingCustomUtdData(std::vector<TypeDescriptorCfg> &customUtdTypes,
-                                                      const std::string &cfgFilePath)
+int32_t CustomUtdStore::SaveTypeCfgs(std::vector<TypeDescriptorCfg> &customUtdTypes, const std::string &cfgFilePath)
 {
     std::string jsonData;
     std::string cfgFileName = UTD_CFG_FILE;
     std::string cfgFileDir = cfgFilePath.substr(0, cfgFilePath.length() - cfgFileName.length());
-    int32_t ret = utdJsonParse_.ConvertUtdCustomToStr(customUtdTypes, jsonData);
-    if (ret == 0 && CreateDirectory(cfgFileDir)) {
-        UpdateTypesCfgFile(jsonData, cfgFilePath);
+    if (utdJsonParser_.ConvertUtdCfgsToJson(customUtdTypes, jsonData) && CreateDirectory(cfgFileDir)) {
+        SavaCfgFile(jsonData, cfgFilePath);
     }
     return 0;
 }
 
-int32_t UtdCustomPersistence::UpdateTypesCfgFile(const std::string &jsonData, const std::string cfgFilePath)
+int32_t CustomUtdStore::SavaCfgFile(const std::string &jsonData, const std::string cfgFilePath)
 {
     std::ofstream ofs;
     LOG_DEBUG(UDMF_CLIENT, "set cfg start, path:%{public}s ", cfgFilePath.c_str());
-    ofs.open(cfgFilePath, 0x02); // ios::out
+    ofs.open(cfgFilePath, 0x02);
     LOG_DEBUG(UDMF_CLIENT, "set cfg, is_open= %{public}d", ofs.is_open());
     ofs << jsonData << std::endl;
     ofs.close();
@@ -79,8 +75,9 @@ int32_t UtdCustomPersistence::UpdateTypesCfgFile(const std::string &jsonData, co
     return 0;
 }
 
-bool UtdCustomPersistence::CreateDirectory(const std::string &path) const
+bool CustomUtdStore::CreateDirectory(const std::string &path) const
 {
+    LOG_DEBUG(UDMF_CLIENT, "CreateDirectory start, path:%{public}s ", path.c_str());
     if (access(path.c_str(), F_OK) == 0) {
         return true;
     }

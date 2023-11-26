@@ -12,14 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "utd_json_parse.h"
+#include "custom_utd_json_parser.h"
 #include <fstream>
 #include <cJSON.h>
 #include "error_code.h"
 #include "logger.h"
 namespace OHOS {
 namespace UDMF {
-// TypeDescriptorCfg attr. Used when converting JSON and strings to and from each other. 
 constexpr const char* TYPEID = "typeId";
 constexpr const char* BELONGINGTOTYPES = "belongingToTypes";
 constexpr const char* FILE_NAME_EXTENSTENSIONS = "filenameExtensions";
@@ -27,52 +26,53 @@ constexpr const char* MIME_TYPES = "mimeTypes";
 constexpr const char* DESCRIPTION = "description";
 constexpr const char* REFERENCE_URL = "referenceURL";
 constexpr const char* ICON_FILE = "iconFile";
-constexpr const char* OWNER = "owner";
-constexpr const char* INSTALLERS = "installers";
+constexpr const char* OWNER = "ownerBundle";
+constexpr const char* INSTALLERS = "installerBundles";
 
-UtdJsonParse::UtdJsonParse()
+CustomUtdJsonParser::CustomUtdJsonParser()
 {
 }
 
-UtdJsonParse::~UtdJsonParse()
+CustomUtdJsonParser::~CustomUtdJsonParser()
 {
 }
 
-int32_t UtdJsonParse::ParseJsonData(const std::string &jsonData, std::vector<TypeDescriptorCfg> &typesCfg)
+bool CustomUtdJsonParser::ParseStoredCustomUtdJson(const std::string &jsonData,
+                                                   std::vector<TypeDescriptorCfg> &typesCfg)
 {
     if (jsonData.empty()) {
-        return -1;
+        return false;
     }
 
+    cJSON* jsonRoot = cJSON_Parse(jsonData.c_str());
+    if (jsonRoot != NULL && cJSON_IsObject(jsonRoot)) {
+        GetTypeDescriptors(*jsonRoot, UTD_CUSTOM, typesCfg);
+    }
+    cJSON_Delete(jsonRoot);
+    return true;
+}
+
+bool CustomUtdJsonParser::ParseUserCustomUtdJson(const std::string &jsonData,
+                                                 std::vector<TypeDescriptorCfg> &typesDeclarations,
+                                                 std::vector<TypeDescriptorCfg> &typesReference)
+{
+    if (jsonData.empty()) {
+        return false;
+    }
     // parse utd-adt.json to TypeDescriptorCfg obj
     cJSON* jsonRoot = cJSON_Parse(jsonData.c_str());
     if (jsonRoot != NULL && cJSON_IsObject(jsonRoot)) {
-        GetSubNodeValue(*jsonRoot, UTD_CUSTOM, typesCfg);
+        GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_DECLAEEARION, typesDeclarations);
+        GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_REFERENCE, typesReference);
     }
     cJSON_Delete(jsonRoot);
-    return 0;
+    return true;
 }
 
-int32_t UtdJsonParse::ParseJsonData(const std::string &jsonData, std::vector<TypeDescriptorCfg> &typesDeclarations,
-                                    std::vector<TypeDescriptorCfg> &typesReference)
-{
-    if (jsonData.empty()) {
-        return -1;
-    }
-        // parse utd-adt.json to TypeDescriptorCfg obj
-    cJSON* jsonRoot = cJSON_Parse(jsonData.c_str());
-    if (jsonRoot != NULL && cJSON_IsObject(jsonRoot)) {
-        GetSubNodeValue(*jsonRoot, UTD_CUSTOM_DECLAEEARION, typesDeclarations);
-        GetSubNodeValue(*jsonRoot, UTD_CUSTOM_REFERENCE, typesReference);
-    }
-    cJSON_Delete(jsonRoot);
-    return 0;
-}
-
-int32_t UtdJsonParse::ConvertUtdCustomToStr(std::vector<TypeDescriptorCfg> &typesCfg, std::string &jsonData)
+bool CustomUtdJsonParser::ConvertUtdCfgsToJson(std::vector<TypeDescriptorCfg> &typesCfg, std::string &jsonData)
 {
     json* root = cJSON_CreateObject();
-    json* utdCustom = cJSON_CreateArray();
+    json* CustomUTDs = cJSON_CreateArray();
     for (auto utdTypeCfg : typesCfg) {
         json* jsonItem = cJSON_CreateObject();
         cJSON_AddStringToObject(jsonItem, TYPEID, utdTypeCfg.typeId.c_str());
@@ -84,31 +84,32 @@ int32_t UtdJsonParse::ConvertUtdCustomToStr(std::vector<TypeDescriptorCfg> &type
         cJSON_AddStringToObject(jsonItem, DESCRIPTION, utdTypeCfg.description.c_str());
         cJSON_AddStringToObject(jsonItem, REFERENCE_URL, utdTypeCfg.referenceURL.c_str());
         cJSON_AddStringToObject(jsonItem, ICON_FILE, utdTypeCfg.iconFile.c_str());
-        cJSON_AddStringToObject(jsonItem, OWNER, utdTypeCfg.owner.c_str());
-        std::vector<std::string> installers(utdTypeCfg.installers.begin(), utdTypeCfg.installers.end());
-        AddJsonStringArray(installers, INSTALLERS, *jsonItem);
+        cJSON_AddStringToObject(jsonItem, OWNER, utdTypeCfg.ownerBundle.c_str());
+        std::vector<std::string> installerBundles(utdTypeCfg.installerBundles.begin(),
+                                                  utdTypeCfg.installerBundles.end());
+        AddJsonStringArray(installerBundles, INSTALLERS, *jsonItem);
 
-        cJSON_AddItemToArray(utdCustom, jsonItem);
+        cJSON_AddItemToArray(CustomUTDs, jsonItem);
     }
-    cJSON_AddItemToObject(root, UTD_CUSTOM, utdCustom);
+    cJSON_AddItemToObject(root, UTD_CUSTOM, CustomUTDs);
 
     jsonData = cJSON_Print(root);
-    LOG_DEBUG(UDMF_CLIENT, "ConvertUtdCustomToStr, jsonData: %{public}s.", jsonData.c_str());
-    return 0;
+    LOG_DEBUG(UDMF_CLIENT, "ConvertUtdCfgsToJson, jsonData size: %{public}zu.", jsonData.length());
+    return true;
 }
 
-int32_t UtdJsonParse::AddJsonStringArray(std::vector<std::string> &datas, const std::string &attrName, json &node)
+bool CustomUtdJsonParser::AddJsonStringArray(std::vector<std::string> &datas, const std::string &nodeName, json &node)
 {
-    json *arrayNode = cJSON_AddArrayToObject(&node, attrName.c_str());
+    json *arrayNode = cJSON_AddArrayToObject(&node, nodeName.c_str());
     for (const auto &data : datas) {
         json* item = cJSON_CreateString(data.c_str());
         cJSON_AddItemToArray(arrayNode, item);
     }
-    return 0;
+    return true;
 }
 
-bool UtdJsonParse::GetSubNodeValue(const json &jsonRoot, const std::string &nodeName,
-                                   std::vector<TypeDescriptorCfg> &typesCfgs)
+bool CustomUtdJsonParser::GetTypeDescriptors(const json &jsonRoot, const std::string &nodeName,
+                                             std::vector<TypeDescriptorCfg> &typesCfgs)
 {
     if (cJSON_HasObjectItem(&jsonRoot, nodeName.c_str())) {
         cJSON *subNode = cJSON_GetObjectItem(&jsonRoot, nodeName.c_str());
@@ -124,16 +125,16 @@ bool UtdJsonParse::GetSubNodeValue(const json &jsonRoot, const std::string &node
             typeCfg.description = GetStringValue(*node, DESCRIPTION);
             typeCfg.referenceURL = GetStringValue(*node, REFERENCE_URL);
             typeCfg.iconFile = GetStringValue(*node, ICON_FILE);
-            typeCfg.owner = GetStringValue(*node, OWNER);
-            std::vector<std::string> installers = GetStringArrayValue(*node, INSTALLERS);
-            typeCfg.installers.insert(installers.begin(), installers.end());
+            typeCfg.ownerBundle = GetStringValue(*node, OWNER);
+            std::vector<std::string> installerBundles = GetStringArrayValue(*node, INSTALLERS);
+            typeCfg.installerBundles.insert(installerBundles.begin(), installerBundles.end());
             typesCfgs.push_back(typeCfg);
         }
     }
     return true;
 }
 
-std::string UtdJsonParse::GetStringValue(const json &node, const std::string &nodeName)
+std::string CustomUtdJsonParser::GetStringValue(const json &node, const std::string &nodeName)
 {
     std::string value;
     if (!cJSON_IsNull(&node) && cJSON_IsObject(&node) && cJSON_HasObjectItem(&node, nodeName.c_str())) {
@@ -145,7 +146,7 @@ std::string UtdJsonParse::GetStringValue(const json &node, const std::string &no
     return value;
 }
 
-std::vector<std::string> UtdJsonParse::GetStringArrayValue(const json &node, const std::string &nodeName)
+std::vector<std::string> CustomUtdJsonParser::GetStringArrayValue(const json &node, const std::string &nodeName)
 {
     std::vector<std::string> values;
     if (!cJSON_IsNull(&node) && cJSON_IsObject(&node) && cJSON_HasObjectItem(&node, nodeName.c_str())) {

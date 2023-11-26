@@ -16,7 +16,7 @@
 #include "utd_client.h"
 #include "logger.h"
 #include "utd_graph.h"
-#include "utd_custom_persistence.h"
+#include "custom_utd_store.h"
 namespace OHOS {
 namespace UDMF {
 constexpr const char* CUSTOM_TYPE_CFG_PATH = "/data/utd/utd-adt.json";
@@ -40,7 +40,7 @@ void UtdClient::Init()
 {
     descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
     std::vector<TypeDescriptorCfg> customTypes =
-        UtdCustomPersistence::GetInstance().GetCustomTypesFromCfg(CUSTOM_TYPE_CFG_PATH);
+        CustomUtdStore::GetInstance().GetTypeCfgs(CUSTOM_TYPE_CFG_PATH);
     if (!customTypes.empty()) {
         descriptorCfgs_.insert(descriptorCfgs_.end(), customTypes.begin(), customTypes.end());
     }

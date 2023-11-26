@@ -37,7 +37,7 @@ public:
     explicit Graph(uint32_t vertexNum);
     using Action = std::function<bool(uint32_t node)>;
     void AddEdge(uint32_t start, uint32_t end);
-    bool Dfs(uint32_t startNode, Action action, bool isInit = false);
+    bool Dfs(uint32_t startNode, Action action, bool isInit = true);
     bool DfsUnconnectedGraph(Action action);
 private:
     uint32_t vertexNum_;

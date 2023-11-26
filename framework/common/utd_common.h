@@ -29,23 +29,20 @@ struct TypeDescriptorCfg {
     std::string description;
     std::string referenceURL;
     std::string iconFile;
-    std::string owner;
-    std::set<std::string> installers;
+    std::string ownerBundle;
+    std::set<std::string> installerBundles;
 
     bool operator==(const TypeDescriptorCfg &typeDescriptor) const
     {
-        if(typeDescriptor.typeId == typeId){
-            return true;
-        } else {
-            return false;
-        }
+        return typeDescriptor.typeId == typeId;
     }
 };
 
 // UTD data category
 constexpr const char* UTD_CUSTOM_DECLAEEARION = "UniformDataTypeDeclarations";
 constexpr const char* UTD_CUSTOM_REFERENCE = "ReferenceUniformDataTypeDeclarations";
-constexpr const char* UTD_CUSTOM = "utdCustom";
+
+constexpr const char* UTD_CUSTOM = "CustomUTDs";
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_UTD_TYPE

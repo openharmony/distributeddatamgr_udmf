@@ -71,9 +71,12 @@ void UtdGraph::AddEdge(const std::string &startNode, const std::string &endNode)
 {
     int32_t start = GetIndex(startNode);
     int32_t end = GetIndex(endNode);
-    if (start != -1 && end != -1) {
-        graph_->AddEdge(start, end);
+    if (start < 0 || end < 0) {
+        LOG_WARN(UDMF_CLIENT, "abnormal edge, startNode:%{public}s, endNode:%{public}s. ",
+                 startNode.c_str(), endNode.c_str());
+        return;
     }
+    graph_->AddEdge(start, end);
 }
 
 bool UtdGraph::IsLowerLevelType(const std::string &lowerLevelType, const std::string &heigitLevelType)
@@ -88,16 +91,14 @@ bool UtdGraph::IsLowerLevelType(const std::string &lowerLevelType, const std::st
             return true;
         }
         return false;
-    }, true);
+    });
     return isFind;
 }
 
-bool UtdGraph::IsCircle()
+bool UtdGraph::IsDAG()
 {
     std::shared_lock<decltype(graphMutex_)> Lock(graphMutex_);
-    bool circleFlag = graph_->DfsUnconnectedGraph([&](uint32_t currNode) -> bool
-                                                  { return false; });
-    return circleFlag;
+    return graph_->DfsUnconnectedGraph([&](uint32_t currNode) -> bool {return false; });
 }
 } // namespace UDMF
 } // namespace OHOS

@@ -44,7 +44,7 @@ bool Graph::Dfs(uint32_t startNode, Action action, bool isInit)
     nodes.push(startNode);
     result_.push_back(startNode);
     if (action(adjList_[startNode].value)) {
-        return false;
+        return true;
     }
     while (!nodes.empty()) {
         edge = adjList_[nodes.top()].firstEdge;
@@ -54,11 +54,11 @@ bool Graph::Dfs(uint32_t startNode, Action action, bool isInit)
                 if (adjList_[edge->adjIndex].firstEdge != nullptr) {
                     auto iter = find(result_.begin(), result_.end(), adjList_[edge->adjIndex].firstEdge->adjIndex);
                     if (iter != result_.end() && visited_[adjList_[edge->adjIndex].firstEdge->adjIndex] == 1) {
-                        return true;     // current node , iscycle
+                        return false;     // current node, iscycle
                     }
                 }
                 if (action(adjList_[edge->adjIndex].value)) {
-                    return false;
+                    return true;
                 }
                 result_.push_back(startNode);
                 nodes.push(edge->adjIndex);
@@ -72,23 +72,22 @@ bool Graph::Dfs(uint32_t startNode, Action action, bool isInit)
             nodes.pop();
         }
     }
-    return false;
+    return true;
 }
 
 bool Graph::DfsUnconnectedGraph(Action action)
 {
-    
     visited_.resize(vertexNum_);
     fill(visited_.begin(), visited_.end(), 0);
     result_.clear();
     for (uint32_t node = 0; node < vertexNum_; node++) {
         if (!visited_[node]) {
-            if(Dfs(node, action)){
-                return true;
+            if (!Dfs(node, action, false)) {
+                return false;
             }
         }
     }
-    return false;
+    return true;
 }
 } // namespace UDMF
 } // namespace OHOS

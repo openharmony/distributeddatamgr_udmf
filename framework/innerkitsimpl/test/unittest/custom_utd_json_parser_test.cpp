@@ -16,45 +16,36 @@
 #include <gtest/gtest.h>
 
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #include "logger.h"
-#include "utd_custom_persistence.h"
 #include "utd_common.h"
+#include "custom_utd_json_parser.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
 using namespace OHOS;
 namespace OHOS::Test {
-constexpr const char* TEST_CFG_FILE = "/data/100_test/utd-adt.json";
-constexpr const char* TEST_CFG_DIR = "/data/100_test";
-
-constexpr const char* TEST_DATA2 = "{\
-  \"utdCustom\": [{\
+constexpr const char* TEST_DATA1 = "{\
+    \"UniformDataTypeDeclarations\": [{\
     \"typeId\": \"com.example.utdtest.document\",\
     \"belongingToTypes\": [\"com.example.utdtest2.document\"],\
     \"FilenameExtensions\": [\".mydocument\", \".mydoc\"],\
     \"mimeTypes\": [\"application/my-document\", \"application/my-doc\"],\
     \"description\": \"My document.\",\
     \"referenceURL\": \"http://www.mycompany.com/my-document.html\",\
-    \"iconFile\": \"resources/my-document.png\",\
-    \"installers\":[\"com.example.utdtest\"],\
-    \"owner\":\"com.example.utdtest\"\
-  }, {\
+    \"iconFile\": \"resources/my-document.png\"\
+    }],\
+    \"ReferenceUniformDataTypeDeclarations\": [{\
     \"typeId\": \"com.example.utdtest2.document\",\
     \"belongingToTypes\": [\"general.object\"],\
     \"FilenameExtensions\": [\".mydocument2\", \".mydoc2\"],\
     \"mimeTypes\": [\"application/my-document2\", \"application/my-doc2\"],\
     \"description\": \"My document 2.\",\
-    \"referenceURL\": \"hhttp://www.mycompany.com/my-document2.html\",\
-    \"iconFile\": \"resources/my-document2.png\",\
-    \"installers\":[\"com.example.utdtest2\", \"com.example.utdtest\"],\
-    \"owner\":\"com.example.utdtest2\"\
-  }]\
-}";
+    \"referenceURL\": \"http://www.mycompany.com/my-document2.html\",\
+    \"iconFile\": \"resources/my-document2.png\"\
+    }]}";
 
-class UtdCustomPersistenceTest : public testing::Test {
+class CustomUtdJsonParserTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -62,45 +53,36 @@ public:
     void TearDown() override;
 };
 
-void UtdCustomPersistenceTest::SetUpTestCase()
+void CustomUtdJsonParserTest::SetUpTestCase()
 {
 }
 
-void UtdCustomPersistenceTest::TearDownTestCase()
+void CustomUtdJsonParserTest::TearDownTestCase()
 {
 }
 
-void UtdCustomPersistenceTest::SetUp()
+void CustomUtdJsonParserTest::SetUp()
 {
 }
 
-void UtdCustomPersistenceTest::TearDown()
+void CustomUtdJsonParserTest::TearDown()
 {
-    if (remove(TEST_CFG_FILE) == 0) {
-        rmdir(TEST_CFG_DIR);
-        LOG_INFO(UDMF_TEST, "Removed file success, %{public}s.", TEST_CFG_FILE);
-    } else {
-        LOG_INFO(UDMF_TEST, "Failed to remove the file., %{public}s.", TEST_CFG_FILE);
-    }
 }
 
 /**
-* @tc.name: PersistingCustomUtdData001
-* @tc.desc: PersistingCustomUtdData
+* @tc.name: ParseJsonData001
+* @tc.desc: ParseJson
 * @tc.type: FUNC
 */
-HWTEST_F(UtdCustomPersistenceTest, PersistingCustomUtdData001, TestSize.Level1)
+HWTEST_F(CustomUtdJsonParserTest, ParseJsonData001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "PersistingCustomUtdData001 begin.");
-    std::vector<TypeDescriptorCfg> typesCfg;
-    UtdJsonParse parse;
-    parse.ParseJsonData(TEST_DATA2, typesCfg);
-    auto status = UtdCustomPersistence::GetInstance().PersistingCustomUtdData(typesCfg, TEST_CFG_FILE);
-    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "ParseJsonData001 begin.");
+    std::vector<TypeDescriptorCfg> typesCfg1;
+    std::vector<TypeDescriptorCfg> typesCfg2;
+    CustomUtdJsonParser parser;
+    parser.ParseUserCustomUtdJson(TEST_DATA1, typesCfg1, typesCfg2);
+    TypeDescriptorCfg type1 = *(typesCfg1.begin());
 
-    typesCfg.clear();
-    typesCfg = UtdCustomPersistence::GetInstance().GetCustomTypesFromCfg(TEST_CFG_FILE);
-    TypeDescriptorCfg type1 = *(typesCfg.begin());
     EXPECT_EQ(type1.typeId, "com.example.utdtest.document");
     EXPECT_EQ(*(type1.belongingToTypes.begin()), "com.example.utdtest2.document");
     EXPECT_EQ(*(type1.filenameExtensions.begin()), ".mydocument");
@@ -108,9 +90,16 @@ HWTEST_F(UtdCustomPersistenceTest, PersistingCustomUtdData001, TestSize.Level1)
     EXPECT_EQ(type1.description, "My document.");
     EXPECT_EQ(type1.referenceURL, "http://www.mycompany.com/my-document.html");
     EXPECT_EQ(type1.iconFile, "resources/my-document.png");
-    EXPECT_EQ(*(type1.installers.begin()), "com.example.utdtest");
-    EXPECT_EQ(type1.owner, "com.example.utdtest");
 
-    LOG_INFO(UDMF_TEST, "PersistingCustomUtdData001 end.");
+    TypeDescriptorCfg type2 = *(typesCfg2.begin());
+    EXPECT_EQ(type2.typeId, "com.example.utdtest2.document");
+    EXPECT_EQ(*(type2.belongingToTypes.begin()), "general.object");
+    EXPECT_EQ(*(type2.filenameExtensions.begin()), ".mydocument2");
+    EXPECT_EQ(*(type2.mimeTypes.begin()), "application/my-document2");
+    EXPECT_EQ(type2.description, "My document 2.");
+    EXPECT_EQ(type2.referenceURL, "http://www.mycompany.com/my-document2.html");
+    EXPECT_EQ(type2.iconFile, "resources/my-document2.png");
+
+    LOG_INFO(UDMF_TEST, "ParseJsonData001 end.");
 }
 } // OHOS::Test

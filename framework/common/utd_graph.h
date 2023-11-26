@@ -33,7 +33,7 @@ public:
     bool IsValidType(const std::string &node);
     void InitUtdGraph(std::vector<TypeDescriptorCfg> &descriptors);
     bool IsLowerLevelType(const std::string &lowerLevelType, const std::string &heigitLevelType);
-    bool IsCircle();
+    bool IsDAG();
 private:
     UtdGraph();
     ~UtdGraph();

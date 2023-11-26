@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_UTD_CUSTOM_PERSISTENCE_H
-#define UDMF_UTD_CUSTOM_PERSISTENCE_H
+#ifndef UDMF_CUSTOM_UTD_STORE_H
+#define UDMF_CUSTOM_UTD_STORE_H
 #include <string>
 #include <vector>
 #include <set>
@@ -22,24 +22,23 @@
 #include <cstdint>
 #include "visibility.h"
 #include "utd_common.h"
-#include "utd_json_parse.h"
+#include "custom_utd_json_parser.h"
 namespace OHOS {
 namespace UDMF {
-class UtdCustomPersistence {
+class CustomUtdStore {
 public:
-    static UtdCustomPersistence &GetInstance();
-    std::vector<TypeDescriptorCfg> GetCustomTypesFromCfg(const std::string &cfgFilePath);
-    int32_t PersistingCustomUtdData(std::vector<TypeDescriptorCfg> &customUtdTypes,
-                                    const std::string &cfgFilePath);
+    static CustomUtdStore &GetInstance();
+    std::vector<TypeDescriptorCfg> GetTypeCfgs(const std::string &cfgFilePath);
+    int32_t SaveTypeCfgs(std::vector<TypeDescriptorCfg> &customUtdTypes, const std::string &cfgFilePath);
 
 private:
-    UtdCustomPersistence();
-    ~UtdCustomPersistence();
-    int32_t UpdateTypesCfgFile(const std::string &jsonData, const std::string cfgFilePath);
+    CustomUtdStore();
+    ~CustomUtdStore();
+    int32_t SavaCfgFile(const std::string &jsonData, const std::string cfgFilePath);
     bool CreateDirectory(const std::string &path) const;
 
-    UtdJsonParse utdJsonParse_;
+    CustomUtdJsonParser utdJsonParser_;
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_UTD_CUSTOM_PERSISTENCE_H
+#endif // UDMF_CUSTOM_UTD_STORE_H
