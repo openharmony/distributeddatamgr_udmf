@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace UDMF {
 constexpr const char *TYPE_ID_REGEX = "[A_za-z0-9_.]+$";
-constexpr const char FILE_EXTENSION_REGEX = '.';
+constexpr const char FILE_EXTENSION_PREFIX = '.';
 
 UtdCfgsChecker::UtdCfgsChecker()
 {
@@ -56,14 +56,14 @@ bool UtdCfgsChecker::CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::ve
 bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string &bundleName)
 {
     for (auto declarationType: typeCfgs.first) {
-        if (!std::regex_match(declarationType.typeId, std::regex(bundleName + TYPE_ID_CHECKER))) {
+        if (!std::regex_match(declarationType.typeId, std::regex(bundleName + TYPE_ID_REGEX))) {
             LOG_ERROR(UDMF_CLIENT, "Declaration typeId check failed, id: %{public}s, bundleName: %{public}s.",
                 declarationType.typeId.c_str(), bundleName.c_str());
             return false;
         }
     }
     for (auto referenceTypes: typeCfgs.second) {
-        if (!std::regex_match(referenceTypes.typeId, std::regex(TYPE_ID_CHECKER))) {
+        if (!std::regex_match(referenceTypes.typeId, std::regex(TYPE_ID_REGEX))) {
             LOG_ERROR(UDMF_CLIENT, "Reference typeId check failed, id: %{public}s, bundleName: %{public}s.",
                 referenceTypes.typeId.c_str(), bundleName.c_str());
             return false;
@@ -78,7 +78,7 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
     }
     for (TypeDescriptorCfg &typeCfg : inputTypeCfgs) {
         for (std::string filenames : typeCfg.filenameExtensions) {
-            if (!(filenames[0] == EXTENSIONS_CHECKER)) {
+            if (!(filenames[0] == FILE_EXTENSION_PREFIX)) {
                 LOG_ERROR(UDMF_CLIENT, "Extension not valid, extension: %{public}s, bundleName: %{public}s.",
                     filenames.c_str(), bundleName.c_str());
                 return false;

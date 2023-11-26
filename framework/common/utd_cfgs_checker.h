@@ -21,6 +21,7 @@ namespace UDMF {
 class UtdCfgsChecker {
 public:
     using CustomUtdCfgs = std::pair<std::vector<TypeDescriptorCfg>, std::vector<TypeDescriptorCfg>>;
+
     static UtdCfgsChecker &GetInstance();
     bool CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
         const std::vector<TypeDescriptorCfg> &customCfgs, const std::string &bundleName);
@@ -40,4 +41,4 @@ private:
 };
 }
 }
-#endif //UDMF_UTD_CFGS_CHERCKER_H
+#endif // UDMF_UTD_CFGS_CHERCKER_H
