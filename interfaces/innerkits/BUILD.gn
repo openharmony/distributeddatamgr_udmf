@@ -37,6 +37,7 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
     "${udmf_framework_path}/common/utd_graph.cpp",
+    "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/utd_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
