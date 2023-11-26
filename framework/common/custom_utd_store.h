@@ -12,27 +12,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef UDMF_PRESET_TYPE_DESCRIPTORS
-#define UDMF_PRESET_TYPE_DESCRIPTORS
-#include <string>
-#include "error_code.h"
-#include "utd_common.h"
 
+#ifndef UDMF_CUSTOM_UTD_STORE_H
+#define UDMF_CUSTOM_UTD_STORE_H
+#include <string>
+#include <vector>
+#include <set>
+#include <map>
+#include <cstdint>
+#include "visibility.h"
+#include "utd_common.h"
+#include "custom_utd_json_parser.h"
 namespace OHOS {
 namespace UDMF {
-class PresetTypeDescriptors {
+class CustomUtdStore {
 public:
-    static PresetTypeDescriptors &GetInstance();
-    std::vector<TypeDescriptorCfg> &GetPresetTypes();
-private:
-    PresetTypeDescriptors();
-    ~PresetTypeDescriptors();
-    PresetTypeDescriptors(const PresetTypeDescriptors &obj) = delete;
-    PresetTypeDescriptors &operator=(const PresetTypeDescriptors &obj) = delete;
+    static CustomUtdStore &GetInstance();
+    std::vector<TypeDescriptorCfg> GetTypeCfgs(const std::string &cfgFilePath);
+    int32_t SaveTypeCfgs(std::vector<TypeDescriptorCfg> &customUtdTypes, const std::string &cfgFilePath);
 
-    void InitDescriptors();
-    std::vector<TypeDescriptorCfg> typeDescriptors_;
+private:
+    CustomUtdStore();
+    ~CustomUtdStore();
+    int32_t SavaCfgFile(const std::string &jsonData, const std::string cfgFilePath);
+    bool CreateDirectory(const std::string &path) const;
+
+    CustomUtdJsonParser utdJsonParser_;
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_PRESET_TYPE_DESCRIPTORS
+#endif // UDMF_CUSTOM_UTD_STORE_H

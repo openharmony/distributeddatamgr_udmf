@@ -19,7 +19,6 @@
 #include <vector>
 #include "error_code.h"
 
-
 namespace OHOS {
 namespace UDMF {
 struct TypeDescriptorCfg {
@@ -30,7 +29,20 @@ struct TypeDescriptorCfg {
     std::string description;
     std::string referenceURL;
     std::string iconFile;
+    std::string ownerBundle;
+    std::set<std::string> installerBundles;
+
+    bool operator==(const TypeDescriptorCfg &typeDescriptor) const
+    {
+        return typeDescriptor.typeId == typeId;
+    }
 };
+
+// UTD data category
+constexpr const char* UTD_CUSTOM_DECLAEEARION = "UniformDataTypeDeclarations";
+constexpr const char* UTD_CUSTOM_REFERENCE = "ReferenceUniformDataTypeDeclarations";
+
+constexpr const char* UTD_CUSTOM = "CustomUTDs";
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_UTD_TYPE

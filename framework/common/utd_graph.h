@@ -31,14 +31,15 @@ class UtdGraph {
 public:
     static UtdGraph &GetInstance();
     bool IsValidType(const std::string &node);
-    void InitUtdGraph(std::vector<TypeDescriptorCfg> descriptors);
+    void InitUtdGraph(std::vector<TypeDescriptorCfg> &descriptors);
     bool IsLowerLevelType(const std::string &lowerLevelType, const std::string &heigitLevelType);
+    bool IsDAG();
 private:
     UtdGraph();
     ~UtdGraph();
     UtdGraph(const UtdGraph &obj) = delete;
     UtdGraph &operator=(const UtdGraph &obj) = delete;
-    uint32_t GetIndex(const std::string &node);
+    int32_t GetIndex(const std::string &node);
     void AddEdge(const std::string &startNode, const std::string &endNode);
     mutable std::shared_mutex graphMutex_;
     Graph *graph_;

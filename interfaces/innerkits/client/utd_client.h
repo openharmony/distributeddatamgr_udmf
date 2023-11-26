@@ -41,7 +41,7 @@ private:
     ~UtdClient();
     UtdClient(const UtdClient &obj) = delete;
     UtdClient &operator=(const UtdClient &obj) = delete;
-    void InitUtdGraph();
+    void Init();
     static constexpr const char* DEFAULT_TYPE_ID = "#default";
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
 };

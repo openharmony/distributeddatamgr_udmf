@@ -37,11 +37,13 @@ public:
     explicit Graph(uint32_t vertexNum);
     using Action = std::function<bool(uint32_t node)>;
     void AddEdge(uint32_t start, uint32_t end);
-    void Dfs(uint32_t startNode, bool isInit, Action action);
+    bool Dfs(uint32_t startNode, Action action, bool isInit = true);
+    bool DfsUnconnectedGraph(Action action);
 private:
     uint32_t vertexNum_;
     std::vector<VertexNode> adjList_;  // Adjacency List
     std::vector<uint32_t> visited_;    // Determine whether the vertex has been accessed, index=vertex value
+    std::vector<uint32_t> result_;
 };
 } // namespace UDMF
 } // namespace OHOS

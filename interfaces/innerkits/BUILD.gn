@@ -33,6 +33,8 @@ config("udmf_client_config") {
 
 ohos_shared_library("udmf_client") {
   sources = [
+    "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
+    "${udmf_framework_path}/common/custom_utd_store.cpp",
     "${udmf_framework_path}/common/graph.cpp",
     "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
@@ -77,6 +79,9 @@ ohos_shared_library("udmf_client") {
     "kv_store:distributeddata_mgr",
     "samgr:samgr_proxy",
   ]
+
+  public_configs += [ "//third_party/cJSON:cJSON_config" ]
+  deps = [ "//third_party/cJSON:cjson" ]
 
   innerapi_tags = [ "platformsdk" ]
   subsystem_name = "distributeddatamgr"
