@@ -24,6 +24,8 @@ public:
     static UtdCfgsChecker &GetInstance();
     bool CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
         const std::vector<TypeDescriptorCfg> &customCfgs, const std::string &bundleName);
+    bool CheckBelongingToTypes(const std::vector<TypeDescriptorCfg> &typeCfgs,
+        const std::vector<TypeDescriptorCfg> &presetCfgs);
 
 private:
     UtdCfgsChecker();
@@ -33,7 +35,7 @@ private:
     bool CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string &bundleName);
     bool CheckTypesRelation(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
         const std::vector<TypeDescriptorCfg> &customCfgs);
-    bool IsCircle(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
+    bool CanConstructDAG(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
         const std::vector<TypeDescriptorCfg> &customCfgs);
 };
 }

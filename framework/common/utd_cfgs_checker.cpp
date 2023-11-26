@@ -22,9 +22,11 @@
 
 namespace OHOS {
 namespace UDMF {
+constexpr const char *TYPE_ID_CHECKER = "[A_za-z0-9_.]+$";
+constexpr const char EXTENSIONS_CHECKER = '.';
+
 UtdCfgsChecker::UtdCfgsChecker()
 {
-    LOG_INFO(UDMF_CLIENT, "construct UtdCfgsChecker sucess.");
 }
 
 UtdCfgsChecker::~UtdCfgsChecker()
@@ -41,29 +43,29 @@ bool UtdCfgsChecker::CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::ve
     const std::vector<TypeDescriptorCfg> &customCfgs, const std::string &bundleName)
 {
     if (!CheckTypesFormat(typeCfgs, bundleName)) {
-        LOG_ERROR(UDMF_CLIENT, "CheckTypesFormat not pass");
+        LOG_ERROR(UDMF_CLIENT, "CheckTypesFormat not pass, bundleName: %{public}s.", bundleName.c_str());
         return false;
     }
-    LOG_ERROR(UDMF_CLIENT, "CheckTypesFormat pass");
     if (!CheckTypesRelation(typeCfgs, presetCfgs, customCfgs)) {
-        LOG_ERROR(UDMF_CLIENT, "CheckTypesRelation not pass");
+        LOG_ERROR(UDMF_CLIENT, "CheckTypesRelation not pass, bundleName: %{public}s.", bundleName.c_str());
         return false;
     }
-    LOG_ERROR(UDMF_CLIENT, "CheckTypesRelation pass");
     return true;
 }
 
 bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string &bundleName)
 {
     for (auto declarationType: typeCfgs.first) {
-        if (!std::regex_match(declarationType.typeId, std::regex(bundleName + "[A_za-z0-9_.]+$"))) {
-            LOG_ERROR(UDMF_CLIENT, "typeId is %{public}s.,",declarationType.typeId.c_str() );
+        if (!std::regex_match(declarationType.typeId, std::regex(bundleName + TYPE_ID_CHECKER))) {
+            LOG_ERROR(UDMF_CLIENT, "Declaration typeId check failed, id: %{public}s, bundleName: %{public}s.",
+                declarationType.typeId.c_str(), bundleName.c_str());
             return false;
         }
     }
     for (auto referenceTypes: typeCfgs.second) {
-        if (!std::regex_match(referenceTypes.typeId, std::regex("[A_za-z0-9_.]+$"))) {
-            LOG_ERROR(UDMF_CLIENT, "typeId is %{public}s.,",referenceTypes.typeId.c_str() );
+        if (!std::regex_match(referenceTypes.typeId, std::regex(TYPE_ID_CHECKER))) {
+            LOG_ERROR(UDMF_CLIENT, "Reference typeId check failed, id: %{public}s, bundleName: %{public}s.",
+                referenceTypes.typeId.c_str(), bundleName.c_str());
             return false;
         }
     }
@@ -76,9 +78,9 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
     }
     for (TypeDescriptorCfg &typeCfg : inputTypeCfgs) {
         for (std::string filenames : typeCfg.filenameExtensions) {
-            if (!filenames[0] == '.') {
-                LOG_ERROR(UDMF_CLIENT, "File name extensions not valid, file names extensions: %{public}s.",
-                    filenames.c_str());
+            if (!(filenames[0] == EXTENSIONS_CHECKER)) {
+                LOG_ERROR(UDMF_CLIENT, "Extension not valid, extension: %{public}s, bundleName: %{public}s.",
+                    filenames.c_str(), bundleName.c_str());
                 return false;
             }
         }
@@ -100,43 +102,54 @@ bool UtdCfgsChecker::CheckTypesRelation(CustomUtdCfgs &typeCfgs, const std::vect
     if (!typeCfgs.second.empty()) {
         inputTypeCfgs.insert(inputTypeCfgs.end(), typeCfgs.second.begin(), typeCfgs.second.end());
     }
-    std::vector<TypeDescriptorCfg> inputAndPresetTypeCfgs;
-    if (!presetCfgs.empty()) {
-        inputAndPresetTypeCfgs.insert(inputAndPresetTypeCfgs.end(), inputTypeCfgs.begin(), inputTypeCfgs.end());
-        inputAndPresetTypeCfgs.insert(inputAndPresetTypeCfgs.end(), presetCfgs.begin(), presetCfgs.end());
-    }
     std::vector<std::string> typeIds;
-    for (auto &typeCfg: inputAndPresetTypeCfgs) {
-        LOG_ERROR(UDMF_CLIENT, "typeid is :%{public}s", typeCfg.typeId.c_str());
-        typeIds.push_back(typeCfg.typeId);
+    for (auto &inputTypeCfg: inputTypeCfgs) {
+        typeIds.push_back(inputTypeCfg.typeId);
+    }
+    for (auto &presetCfg: presetCfgs) {
+        typeIds.push_back(presetCfg.typeId);
     }
     if (std::set<std::string>(typeIds.begin(), typeIds.end()).size() != typeIds.size()) {
-        LOG_ERROR(UDMF_CLIENT, "Can not set same typeIds.");
+        LOG_ERROR(UDMF_CLIENT, "Find duplicated typeIds.");
         return false;
     }
-    for (auto customType : customCfgs) {
-        typeIds.push_back(customType.typeId);
+    if (!CheckBelongingToTypes(inputTypeCfgs, presetCfgs)) {
+        LOG_ERROR(UDMF_CLIENT, "BelongingToType check failed.");
+        return false;
     }
-    for (auto inputCfg : inputTypeCfgs) {
-        for (std::string belong : inputCfg.belongingToTypes) {
-            if (inputCfg.typeId == belong) {
-                LOG_ERROR(UDMF_CLIENT, "TypeId cannot equals belongingToType, typeId: %{public}s.",
-                    inputCfg.typeId.c_str());
-                return false;
-            }
-            if (find(typeIds.begin(), typeIds.end(), belong) == typeIds.end()) {
-                return false;
-            }
-        }
-    }
-    if (IsCircle(typeCfgs, presetCfgs, customCfgs)) {
-        LOG_ERROR(UDMF_CLIENT, "is circle");
+    if (!CanConstructDAG(typeCfgs, presetCfgs, customCfgs)) {
+        LOG_ERROR(UDMF_CLIENT, "Can not construct DAG.");
         return false;
     }
     return true;
 }
 
-bool UtdCfgsChecker::IsCircle(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
+bool UtdCfgsChecker::CheckBelongingToTypes(const std::vector<TypeDescriptorCfg> &typeCfgs,
+    const std::vector<TypeDescriptorCfg> &presetCfgs)
+{
+    std::vector<std::string> typeIds;
+    for (auto &typeCfg: typeCfgs) {
+        typeIds.push_back(typeCfg.typeId);
+    }
+    for (auto &presetCfg: presetCfgs) {
+        typeIds.push_back(presetCfg.typeId);
+    }
+    for (auto &inputCfg : typeCfgs) {
+        for (std::string belongingToType : inputCfg.belongingToTypes) {
+            if (inputCfg.typeId == belongingToType) {
+                LOG_ERROR(UDMF_CLIENT, "TypeId cannot equals belongingToType, typeId: %{public}s.",
+                          inputCfg.typeId.c_str());
+                return false;
+            }
+            if (find(typeIds.begin(), typeIds.end(), belongingToType) == typeIds.end()) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool UtdCfgsChecker::CanConstructDAG(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
     const std::vector<TypeDescriptorCfg> &customCfgs)
 {
     std::vector<TypeDescriptorCfg> allTypeCfgs;
@@ -146,7 +159,6 @@ bool UtdCfgsChecker::IsCircle(CustomUtdCfgs &typeCfgs, const std::vector<TypeDes
     for (TypeDescriptorCfg &declarationType : typeCfgs.first) {
         for (auto iter = allTypeCfgs.begin(); iter != allTypeCfgs.end();) {
             if (iter->typeId == declarationType.typeId) {
-                iter->belongingToTypes = declarationType.belongingToTypes;
                 iter = allTypeCfgs.erase(iter);
             } else {
                 iter ++;
@@ -155,14 +167,16 @@ bool UtdCfgsChecker::IsCircle(CustomUtdCfgs &typeCfgs, const std::vector<TypeDes
         allTypeCfgs.push_back(declarationType);
     }
     for (TypeDescriptorCfg &referenceTypes : typeCfgs.second) {
-        for (auto iter = allTypeCfgs.begin(); iter != allTypeCfgs.end();) {
-            if (iter->typeId == referenceTypes.typeId) {
-                iter = allTypeCfgs.erase(iter);
-            } else {
-                iter ++;
+        bool found = false;
+        for (auto &typeCfg : allTypeCfgs) {
+            if (typeCfg.typeId == referenceTypes.typeId) {
+                found = true;
+                break;
             }
         }
-        allTypeCfgs.push_back(referenceTypes);
+        if (!found) {
+            allTypeCfgs.push_back(referenceTypes);
+        }
     }
     if (!presetCfgs.empty()) {
         allTypeCfgs.insert(allTypeCfgs.end(), presetCfgs.begin(), presetCfgs.end());
@@ -170,7 +184,6 @@ bool UtdCfgsChecker::IsCircle(CustomUtdCfgs &typeCfgs, const std::vector<TypeDes
     if (!allTypeCfgs.empty()) {
         UtdGraph::GetInstance().InitUtdGraph(allTypeCfgs);
         if (UtdGraph::GetInstance().IsDAG()) {
-            LOG_ERROR(UDMF_CLIENT, "Parse failed because of has cycle");
             return true;
         }
     }
