@@ -22,8 +22,8 @@
 
 namespace OHOS {
 namespace UDMF {
-constexpr const char *TYPE_ID_CHECKER = "[A_za-z0-9_.]+$";
-constexpr const char EXTENSIONS_CHECKER = '.';
+constexpr const char *TYPE_ID_REGEX = "[A_za-z0-9_.]+$";
+constexpr const char FILE_EXTENSION_REGEX = '.';
 
 UtdCfgsChecker::UtdCfgsChecker()
 {
@@ -138,10 +138,12 @@ bool UtdCfgsChecker::CheckBelongingToTypes(const std::vector<TypeDescriptorCfg> 
         for (std::string belongingToType : inputCfg.belongingToTypes) {
             if (inputCfg.typeId == belongingToType) {
                 LOG_ERROR(UDMF_CLIENT, "TypeId cannot equals belongingToType, typeId: %{public}s.",
-                          inputCfg.typeId.c_str());
+                    inputCfg.typeId.c_str());
                 return false;
             }
             if (find(typeIds.begin(), typeIds.end(), belongingToType) == typeIds.end()) {
+                LOG_ERROR(UDMF_CLIENT, "BelongingToType can not find in typeids, belongingToType: %{public}s.",
+                    belongingToType.c_str());
                 return false;
             }
         }
@@ -189,6 +191,5 @@ bool UtdCfgsChecker::CanConstructDAG(CustomUtdCfgs &typeCfgs, const std::vector<
     }
     return false;
 }
-
 } // namespace UDMF
 } // namespace OHOS
