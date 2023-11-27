@@ -157,7 +157,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension001, TestSize.Level
     std::string filenameExtension = ".azw3";
     std::string blongsToType = "general.ebook";
     std::string currType;
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(currType, "com.amazon.azw3");
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtension001 end.");
@@ -174,7 +175,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension002, TestSize.Level
     std::string filenameExtension = ".png";
     std::string blongsToType = "general.image";
     std::string currType;
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(currType, "general.png");
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtension002 end.");
@@ -191,7 +193,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension003, TestSize.Level
     std::string filenameExtension = ".cpp";
     std::string blongsToType = "general.source-code";
     std::string currType;
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(currType, "general.c-plus-plus-source");
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtension003 end.");
@@ -208,7 +211,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension004, TestSize.Level
     std::string filenameExtension = "";
     std::string blongsToType = "general.plain-text";
     std::string currType;
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(currType, "");
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtension004 end.");
@@ -216,7 +220,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension004, TestSize.Level
 
 /**
 * @tc.name: GetUniformDataTypeByFilenameExtension005
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension£¬return invalid parameter
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension, return invalid parameter
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension005, TestSize.Level1)
@@ -225,7 +229,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension005, TestSize.Level
     std::string filenameExtension = ".test";
     std::string blongsToType = "general.test";
     std::string currType;
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
     EXPECT_EQ(status, E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtension005 end.");
 }
@@ -241,7 +246,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension006, TestSize.Level
     std::string filenameExtension = ".mp3";
     std::string blongsToType = "general.object";
     std::string currType;
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(currType, "");
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtension006 end.");
@@ -249,7 +255,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension006, TestSize.Level
 
 /**
 * @tc.name: GetUniformDataTypeByFilenameExtension007
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension£¬return invalid parameter
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension, return invalid parameter
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension007, TestSize.Level1)
@@ -258,8 +264,9 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension007, TestSize.Level
     std::string filenameExtension = ".mp3";
     std::string blongsToType = "test";
     std::string currType;
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
-     EXPECT_EQ(status, E_INVALID_PARAMETERS);
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtension007 end.");
 }
 
@@ -299,7 +306,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType002, TestSize.Level1)
 
 /**
 * @tc.name: GetUniformDataTypeByMIMEType003
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType£¬return invalid parameter
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType, return invalid parameter
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType003, TestSize.Level1)
@@ -315,7 +322,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType003, TestSize.Level1)
 
 /**
 * @tc.name: GetUniformDataTypeByMIMEType004
-* @tc.desc: BelongsTo is invalid£¬return invalid parameter
+* @tc.desc: BelongsTo is invalid, return invalid parameter
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType004, TestSize.Level1)
@@ -331,7 +338,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType004, TestSize.Level1)
 
 /**
 * @tc.name: GetUniformDataTypeByMIMEType005
-* @tc.desc: BelongsTo is invalid£¬return invalid parameter
+* @tc.desc: BelongsTo is invalid, return invalid parameter
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType005, TestSize.Level1)
@@ -347,7 +354,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType005, TestSize.Level1)
 
 /**
 * @tc.name: GetUniformDataTypeByMIMEType006
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType£¬return ""
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType, return ""
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType006, TestSize.Level1)
@@ -383,7 +390,7 @@ HWTEST_F(UtdClientTest, BelongsTo001, TestSize.Level1)
 
 /**
 * @tc.name: BelongsTo002
-* @tc.desc: Normal testcase of BelongsTo 
+* @tc.desc: Normal testcase of BelongsTo
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, BelongsTo002, TestSize.Level1)
@@ -463,7 +470,7 @@ HWTEST_F(UtdClientTest, BelongsTo005, TestSize.Level1)
 
 /**
 * @tc.name: BelongsTo006
-* @tc.desc: BelongsTo is invalid£¬return invalid parameter
+* @tc.desc: BelongsTo is invalid, return invalid parameter
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, BelongsTo006, TestSize.Level1)
