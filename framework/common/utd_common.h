@@ -37,6 +37,7 @@ struct TypeDescriptorCfg {
         return typeDescriptor.typeId == typeId;
     }
 };
+using CustomUtdCfgs = std::pair<std::vector<TypeDescriptorCfg>, std::vector<TypeDescriptorCfg>>;
 
 // UTD data category
 constexpr const char* UTD_CUSTOM_DECLAEEARION = "UniformDataTypeDeclarations";
