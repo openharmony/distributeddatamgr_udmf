@@ -101,7 +101,7 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::string &ou
 
     size_t maxLen = STR_MAX_LENGTH;
     status = napi_get_value_string_utf8(env, in, NULL, 0, &maxLen);
-    if (maxLen <= 0) {
+    if (maxLen == 0) {
         return status;
     }
     char *buf = new (std::nothrow) char[maxLen + STR_TAIL_LENGTH];

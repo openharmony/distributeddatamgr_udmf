@@ -50,7 +50,7 @@ int32_t UtdGraph::GetIndex(const std::string &node)
     return idx->second;
 }
 
-void UtdGraph::InitUtdGraph(std::vector<TypeDescriptorCfg> &descriptorCfgs)
+void UtdGraph::InitUtdGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs)
 {
     uint32_t descriptorsNum = static_cast<uint32_t>(descriptorCfgs.size());
     std::unique_lock<std::shared_mutex> Lock(graphMutex_);
@@ -58,7 +58,7 @@ void UtdGraph::InitUtdGraph(std::vector<TypeDescriptorCfg> &descriptorCfgs)
     for (uint32_t i = 0; i < descriptorsNum; i++) {
         typeIdIndex_.insert(std::make_pair(descriptorCfgs[i].typeId, i));
     }
-    for (auto &descriptorCfg : descriptorCfgs) {
+    for (const auto &descriptorCfg : descriptorCfgs) {
         std::set<std::string> belongsTo = descriptorCfg.belongingToTypes;
         for (auto belongsToType : belongsTo) {
             AddEdge(belongsToType, descriptorCfg.typeId);

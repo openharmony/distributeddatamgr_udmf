@@ -68,7 +68,7 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
         return Status::E_INVALID_PARAMETERS;
     }
 
-    for (auto &utdTypeCfg : descriptorCfgs_) {
+    for (const auto &utdTypeCfg : descriptorCfgs_) {
         std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
         if (find(fileExtensions.begin(), fileExtensions.end(), fileExtension) != fileExtensions.end()) {
             typeId = utdTypeCfg.typeId;
@@ -93,7 +93,7 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
         return Status::E_INVALID_PARAMETERS;
     }
 
-    for (auto &utdTypeCfg : descriptorCfgs_) {
+    for (const auto &utdTypeCfg : descriptorCfgs_) {
         std::vector<std::string> mimeTypes = utdTypeCfg.mimeTypes;
         if (find(mimeTypes.begin(), mimeTypes.end(), mimeType) != mimeTypes.end()) {
             typeId = utdTypeCfg.typeId;

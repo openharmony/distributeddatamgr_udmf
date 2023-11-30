@@ -31,7 +31,7 @@ class UtdGraph {
 public:
     static UtdGraph &GetInstance();
     bool IsValidType(const std::string &node);
-    void InitUtdGraph(std::vector<TypeDescriptorCfg> &descriptors);
+    void InitUtdGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs);
     bool IsLowerLevelType(const std::string &lowerLevelType, const std::string &heigitLevelType);
     bool IsDAG();
 private:
@@ -42,7 +42,7 @@ private:
     int32_t GetIndex(const std::string &node);
     void AddEdge(const std::string &startNode, const std::string &endNode);
     mutable std::shared_mutex graphMutex_;
-    Graph *graph_;
+    Graph *graph_ = nullptr;
     std::map<std::string, uint32_t> typeIdIndex_;
 };
 } // namespace UDMF
