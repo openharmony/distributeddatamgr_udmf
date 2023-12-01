@@ -13,37 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_UNIFIED_RECORD_H
-#define UDMF_UNIFIED_RECORD_H
+#ifndef UDMF_UNIFIED_DATA_HELPER_H
+#define UDMF_UNIFIED_DATA_HELPER_H
 
-#include <memory>
-#include <string>
-#include <variant>
-#include <vector>
-
-#include "unified_types.h"
+#include "unified_data.h"
 
 namespace OHOS {
 namespace UDMF {
-class UnifiedRecord {
+class UnifiedDataHelper {
 public:
-    UnifiedRecord();
-    explicit UnifiedRecord(UDType type);
-    virtual ~UnifiedRecord() = default;
-
-    UDType GetType() const;
-    void SetType(const UDType &type);
-    virtual int64_t GetSize();
-
-    std::string GetUid() const;
-    void SetUid(const std::string &id);
-
-protected:
-    UDType dataType_;
+    static bool ExceedKVSizeLimit(UnifiedData &data);
+    static bool IsTempUData(UnifiedData &data);
+    static bool Pack(UnifiedData &data);
+    static bool Unpack(UnifiedData &data);
 
 private:
-    std::string uid_; // unique identifier
+    static bool SaveUDataToFile(const std::string &dataFile, UnifiedData &data);
+    static bool LoadUDataFromFile(const std::string &dataFile, UnifiedData &data);
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_UNIFIED_RECORD_H
+#endif // UDMF_UNIFIED_DATA_HELPER_H

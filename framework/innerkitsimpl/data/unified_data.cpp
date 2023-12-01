@@ -102,12 +102,6 @@ bool UnifiedData::IsValid()
         LOG_ERROR(UDMF_FRAMEWORK, "Exceeded data limit!");
         return false;
     }
-    for (const auto &record : this->GetRecords()) {
-        if (record->GetSize() > UnifiedRecord::MAX_RECORD_SIZE) {
-            LOG_ERROR(UDMF_FRAMEWORK, "Exceeded record limit!");
-            return false;
-        }
-    }
     return true;
 }
 

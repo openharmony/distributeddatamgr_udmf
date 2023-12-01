@@ -41,7 +41,7 @@ public:
     bool IsValid();
     bool IsComplete();
 
-    static constexpr int32_t MAX_DATA_SIZE = 4 * 1024 * 1024;
+    static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;
 
 private:
     std::shared_ptr<Runtime> runtime_;
