@@ -16,6 +16,7 @@
 #ifndef UDMF_TLV_OBJECT_H
 #define UDMF_TLV_OBJECT_H
 
+#include <cstdio>
 #include "securec.h"
 #include "error_code.h"
 #include "unified_meta.h"
@@ -54,10 +55,19 @@ public:
         total_ += buffer.size();
         buffer_ = &buffer;
         cursor_ = 0;
+        file_ = nullptr;
+    }
+
+    void SetFile(::FILE *file)
+    {
+        file_ = file;
     }
 
     void UpdateSize()
     {
+        if (file_ != nullptr) {
+            return;
+        }
         buffer_->resize(total_);
     }
 
@@ -171,6 +181,7 @@ public:
     template<typename T>
     bool WriteBasic(uint16_t type, const T &value)
     {
+        PrepareBuffer(sizeof(TLVHead) + sizeof(value));
         if (!HasExpectBuffer(sizeof(TLVHead) + sizeof(value))) {
             return false;
         }
@@ -182,6 +193,7 @@ public:
         if (ret != EOK) {
             return false;
         }
+        SaveBufferToFile();
         cursor_ += sizeof(TLVHead) + sizeof(value);
         return true;
     }
@@ -199,6 +211,7 @@ public:
         if (!HasExpectBuffer(head.len)) {
             return false;
         }
+        LoadBuffer(head.len);
         auto ret = memcpy_s(&value, sizeof(T), buffer_->data() + cursor_, sizeof(T));
         if (ret != EOK) {
             return false;
@@ -210,6 +223,7 @@ public:
 
     bool WriteString(const std::string &value)
     {
+        PrepareBuffer(sizeof(TLVHead) + value.size());
         if (!HasExpectBuffer(sizeof(TLVHead) + value.size())) {
             return false;
         }
@@ -222,6 +236,7 @@ public:
                 return false;
             }
         }
+        SaveBufferToFile();
         cursor_ += sizeof(TLVHead) + value.size();
         return true;
     }
@@ -235,6 +250,7 @@ public:
         if (!HasExpectBuffer(head.len)) {
             return false;
         }
+        LoadBuffer(head.len);
         value.append(reinterpret_cast<const char *>(buffer_->data() + cursor_), head.len);
         cursor_ += head.len;
         return true;
@@ -242,9 +258,7 @@ public:
 
     bool WriteVector(const std::vector<uint8_t> &value)
     {
-        if (!HasExpectBuffer(sizeof(TLVHead) + value.size())) {
-            return false;
-        }
+        PrepareBuffer(sizeof(TLVHead) + value.size());
         WriteHead(TAG_VECTOR, cursor_, value.size());
         cursor_ += sizeof(TLVHead);
 
@@ -254,6 +268,7 @@ public:
                 return false;
             }
         }
+        SaveBufferToFile();
         cursor_ += value.size();
         return true;
     }
@@ -267,6 +282,7 @@ public:
         if (!HasExpectBuffer(head.len)) {
             return false;
         }
+        LoadBuffer(head.len);
         std::vector<uint8_t> buff(buffer_->data() + cursor_, buffer_->data() + cursor_ + head.len);
         value = std::move(buff);
         cursor_ += head.len;
@@ -324,7 +340,9 @@ public:
             }
             tag = TAG::TAG_VECTOR;
         }
+        PrepareHeader(cursor_, tagCursor, valueCursor);
         WriteHead(tag, tagCursor, cursor_ - valueCursor);
+        SaveBufferToFile();
         return true;
     }
 
@@ -403,16 +421,21 @@ public:
         cursor_ += sizeof(TLVHead);
         auto valueCursor = cursor_;
 
+        size_t total = 0;
         for (const auto &item : value) {
             if (!WriteString(item.first)) {
                 return false;
             }
+            total += cursor_;
+
             if (!WriteVariant(item.second)) {
                 return false;
             }
+            total += cursor_;
         }
-
+        PrepareHeader(total, tagCursor, valueCursor);
         WriteHead(TAG_MAP, tagCursor, cursor_ - valueCursor);
+        SaveBufferToFile();
         return true;
     }
 
@@ -424,6 +447,9 @@ public:
         }
         if (!HasExpectBuffer(head.len)) {
             return false;
+        }
+        if (file_ != nullptr) {
+            cursor_ = 0;
         }
         auto mapEnd = cursor_ + head.len;
         while (cursor_ < mapEnd) {
@@ -443,6 +469,7 @@ public:
 private:
     inline bool ReadHead(TLVHead &head)
     {
+        LoadBuffer(sizeof(TLVHead));
         if (!HasExpectBuffer(sizeof(TLVHead))) {
             return false;
         }
@@ -466,15 +493,57 @@ private:
 
     inline bool HasExpectBuffer(const uint32_t expectLen) const
     {
+        if (file_ != nullptr) {
+            return true;
+        }
         if (buffer_== nullptr) {
             return false;
         }
         return buffer_->size() >= cursor_ && buffer_->size() - cursor_ >= expectLen;
     }
 
+    inline void PrepareHeader(size_t size, size_t &tagCursor, size_t &valueCursor)
+    {
+        if (file_ != nullptr) {
+            cursor_ = size;
+            fseek(file_, -cursor_, SEEK_CUR);
+            buffer_->resize(sizeof(TLVHead));
+            tagCursor  = 0;
+            valueCursor = 0;
+        }
+    }
+
+    inline void PrepareBuffer(size_t size)
+    {
+        if (file_ == nullptr) {
+            return;
+        }
+        buffer_->resize(size);
+        cursor_ = 0;
+    }
+
+    inline void SaveBufferToFile()
+    {
+        if (file_ == nullptr) {
+            return;
+        }
+        fwrite(buffer_->data(), sizeof(uint8_t), buffer_->size(), file_);
+    }
+
+    inline void LoadBuffer(size_t size)
+    {
+        if (file_ == nullptr) {
+            return;
+        }
+        buffer_->resize(size);
+        fread(buffer_->data(), sizeof(uint8_t), buffer_->size(), file_);
+        cursor_ = 0;
+    }
+
     std::size_t total_ = 0;
     std::size_t cursor_ = 0;
     std::vector<std::uint8_t> *buffer_;
+    ::FILE *file_;
 };
 } // namespace UDMF
 } // namespace OHOS

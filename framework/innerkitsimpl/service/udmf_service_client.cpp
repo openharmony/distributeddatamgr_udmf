@@ -18,6 +18,7 @@
 #include "iservice_registry.h"
 #include "datamgr_service_proxy.h"
 #include "system_ability_definition.h"
+#include "unified_data_helper.h"
 
 #include "logger.h"
 
@@ -112,6 +113,12 @@ int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedDat
         LOG_ERROR(UDMF_SERVICE, "UnifiedData is invalid.");
         return E_INVALID_PARAMETERS;
     }
+    if (UnifiedDataHelper::ExceedKVSize(unifiedData)) {
+        UnifiedData tempData;
+        if (UnifiedDataHelper::ConvertToTempUData(unifiedData, tempData)) {
+            return udmfProxy_->SetData(option, tempData, key);
+        }
+    }
     return udmfProxy_->SetData(option, unifiedData, key);
 }
 
@@ -123,7 +130,14 @@ int32_t UdmfServiceClient::GetData(const QueryOption &query, UnifiedData &unifie
         LOG_ERROR(UDMF_SERVICE, "invalid key");
         return E_INVALID_PARAMETERS;
     }
-    return udmfProxy_->GetData(query, unifiedData);
+
+    auto err = udmfProxy_->GetData(query, unifiedData);
+    if (UnifiedDataHelper::IsTempUData(unifiedData)) {
+        UnifiedData tempData;
+        UnifiedDataHelper::RestoreFromTempUData(unifiedData, tempData);
+        unifiedData.SetRecords(tempData.GetRecords());
+    }
+    return err;
 }
 
 int32_t UdmfServiceClient::GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
