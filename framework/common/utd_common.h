@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace UDMF {
+using CustomUtdCfgs = std::pair<std::vector<TypeDescriptorCfg>, std::vector<TypeDescriptorCfg>>;
 struct TypeDescriptorCfg {
     std::string typeId;
     std::set<std::string> belongingToTypes;
@@ -37,7 +38,6 @@ struct TypeDescriptorCfg {
         return typeDescriptor.typeId == typeId;
     }
 };
-using CustomUtdCfgs = std::pair<std::vector<TypeDescriptorCfg>, std::vector<TypeDescriptorCfg>>;
 
 // UTD data category
 constexpr const char* UTD_CUSTOM_DECLAEEARION = "UniformDataTypeDeclarations";
