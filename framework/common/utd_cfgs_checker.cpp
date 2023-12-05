@@ -88,6 +88,13 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
             LOG_ERROR(UDMF_CLIENT, "BelongingToTypes can not be empty, bundleName: %{public}s.", bundleName.c_str());
             return false;
         }
+        for (std::string mimeType : typeCfg.mimeTypes) {
+            if (mimeType == "") {
+                LOG_ERROR(UDMF_CLIENT, "mimeType can not be an empty string, typeId: %{public}s.",
+                    typeCfg.typeId.c_str());
+                return false;
+            }
+        }
     }
     return true;
 }
@@ -136,6 +143,11 @@ bool UtdCfgsChecker::CheckBelongingToTypes(const std::vector<TypeDescriptorCfg> 
     }
     for (auto &inputCfg : typeCfgs) {
         for (std::string belongingToType : inputCfg.belongingToTypes) {
+            if (belongingToType == "") {
+                LOG_ERROR(UDMF_CLIENT, "BelongingToType can not be an empty string, typeId: %{public}s.",
+                    inputCfg.typeId.c_str());
+                return false;
+            }
             if (inputCfg.typeId == belongingToType) {
                 LOG_ERROR(UDMF_CLIENT, "TypeId cannot equals belongingToType, typeId: %{public}s.",
                     inputCfg.typeId.c_str());

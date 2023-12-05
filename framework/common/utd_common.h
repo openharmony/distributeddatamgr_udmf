@@ -39,6 +39,7 @@ struct TypeDescriptorCfg {
     }
 };
 
+
 // UTD data category
 constexpr const char* UTD_CUSTOM_DECLAEEARION = "UniformDataTypeDeclarations";
 constexpr const char* UTD_CUSTOM_REFERENCE = "ReferenceUniformDataTypeDeclarations";
