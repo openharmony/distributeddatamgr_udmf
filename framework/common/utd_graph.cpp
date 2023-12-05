@@ -52,6 +52,7 @@ int32_t UtdGraph::GetIndex(const std::string &node)
 
 void UtdGraph::InitUtdGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs)
 {
+    typeIdIndex_.clear();
     uint32_t descriptorsNum = static_cast<uint32_t>(descriptorCfgs.size());
     std::unique_lock<std::shared_mutex> Lock(graphMutex_);
     graph_ = new Graph(descriptorsNum);
