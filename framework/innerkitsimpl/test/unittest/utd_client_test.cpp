@@ -237,7 +237,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension005, TestSize.Level
 
 /**
 * @tc.name: GetUniformDataTypeByFilenameExtension006
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension, return ""
+* @tc.desc: Normal testcase of GetUniformDataTypeByFilenameExtension
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension006, TestSize.Level1)
@@ -249,7 +249,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension006, TestSize.Level
     auto status =
         UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
     EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(currType, "");
+    EXPECT_EQ(currType, "general.mp3");
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtension006 end.");
 }
 
