@@ -89,7 +89,7 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
             return false;
         }
         for (std::string mimeType : typeCfg.mimeTypes) {
-            if (mimeType == "") {
+            if (mimeType.empty()) {
                 LOG_ERROR(UDMF_CLIENT, "mimeType can not be an empty string, typeId: %{public}s.",
                     typeCfg.typeId.c_str());
                 return false;
@@ -143,7 +143,7 @@ bool UtdCfgsChecker::CheckBelongingToTypes(const std::vector<TypeDescriptorCfg> 
     }
     for (auto &inputCfg : typeCfgs) {
         for (std::string belongingToType : inputCfg.belongingToTypes) {
-            if (belongingToType == "") {
+            if (belongingToType.empty()) {
                 LOG_ERROR(UDMF_CLIENT, "BelongingToType can not be an empty string, typeId: %{public}s.",
                     inputCfg.typeId.c_str());
                 return false;
