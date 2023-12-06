@@ -24,6 +24,7 @@ namespace OHOS {
 namespace UDMF {
 constexpr const char *TYPE_ID_REGEX = "[a-zA-Z0-9/.-]+$";
 constexpr const char FILE_EXTENSION_PREFIX = '.';
+constexpr const int32_t MAX_UTD_SIZE = 50;
 
 UtdCfgsChecker::UtdCfgsChecker()
 {
@@ -112,6 +113,10 @@ bool UtdCfgsChecker::CheckTypesRelation(CustomUtdCfgs &typeCfgs, const std::vect
     std::vector<std::string> typeIds;
     for (auto &inputTypeCfg: inputTypeCfgs) {
         typeIds.push_back(inputTypeCfg.typeId);
+    }
+    if (typeIds.size() > MAX_UTD_SIZE) {
+        LOG_ERROR(UDMF_CLIENT, "Create more UTDs than limit.");
+        return false;
     }
     for (auto &presetCfg: presetCfgs) {
         typeIds.push_back(presetCfg.typeId);
