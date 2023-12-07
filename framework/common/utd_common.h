@@ -21,6 +21,8 @@
 
 namespace OHOS {
 namespace UDMF {
+struct TypeDescriptorCfg;
+using CustomUtdCfgs = std::pair<std::vector<TypeDescriptorCfg>, std::vector<TypeDescriptorCfg>>;
 struct TypeDescriptorCfg {
     std::string typeId;
     std::set<std::string> belongingToTypes;

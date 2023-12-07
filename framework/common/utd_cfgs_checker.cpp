@@ -22,8 +22,9 @@
 
 namespace OHOS {
 namespace UDMF {
-constexpr const char *TYPE_ID_REGEX = "[A_za-z0-9_.]+$";
+constexpr const char *TYPE_ID_REGEX = "[a-zA-Z0-9/.-]+$";
 constexpr const char FILE_EXTENSION_PREFIX = '.';
+constexpr const int32_t MAX_UTD_SIZE = 50;
 
 UtdCfgsChecker::UtdCfgsChecker()
 {
@@ -88,6 +89,13 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
             LOG_ERROR(UDMF_CLIENT, "BelongingToTypes can not be empty, bundleName: %{public}s.", bundleName.c_str());
             return false;
         }
+        for (std::string mimeType : typeCfg.mimeTypes) {
+            if (mimeType.empty()) {
+                LOG_ERROR(UDMF_CLIENT, "mimeType can not be an empty string, typeId: %{public}s.",
+                    typeCfg.typeId.c_str());
+                return false;
+            }
+        }
     }
     return true;
 }
@@ -105,6 +113,10 @@ bool UtdCfgsChecker::CheckTypesRelation(CustomUtdCfgs &typeCfgs, const std::vect
     std::vector<std::string> typeIds;
     for (auto &inputTypeCfg: inputTypeCfgs) {
         typeIds.push_back(inputTypeCfg.typeId);
+    }
+    if (typeIds.size() > MAX_UTD_SIZE) {
+        LOG_ERROR(UDMF_CLIENT, "Create more UTDs than limit.");
+        return false;
     }
     for (auto &presetCfg: presetCfgs) {
         typeIds.push_back(presetCfg.typeId);
@@ -136,6 +148,11 @@ bool UtdCfgsChecker::CheckBelongingToTypes(const std::vector<TypeDescriptorCfg> 
     }
     for (auto &inputCfg : typeCfgs) {
         for (std::string belongingToType : inputCfg.belongingToTypes) {
+            if (belongingToType.empty()) {
+                LOG_ERROR(UDMF_CLIENT, "BelongingToType can not be an empty string, typeId: %{public}s.",
+                    inputCfg.typeId.c_str());
+                return false;
+            }
             if (inputCfg.typeId == belongingToType) {
                 LOG_ERROR(UDMF_CLIENT, "TypeId cannot equals belongingToType, typeId: %{public}s.",
                     inputCfg.typeId.c_str());
