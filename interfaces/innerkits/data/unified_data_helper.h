@@ -17,6 +17,7 @@
 #define UDMF_UNIFIED_DATA_HELPER_H
 
 #include "unified_data.h"
+#include <sys/stat.h>
 
 namespace OHOS {
 namespace UDMF {
@@ -28,6 +29,7 @@ public:
     static bool Unpack(UnifiedData &data);
 
 private:
+    static void CreateDirIfNotExist(const std::string& dirPath, const mode_t& mode);
     static bool SaveUDataToFile(const std::string &dataFile, UnifiedData &data);
     static bool LoadUDataFromFile(const std::string &dataFile, UnifiedData &data);
 };

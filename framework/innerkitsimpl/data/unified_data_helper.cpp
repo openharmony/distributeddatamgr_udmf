@@ -17,6 +17,9 @@
 
 #include <cstdio>
 #include <string>
+#include <sys/stat.h>
+#include "directory_ex.h"
+#include "file_ex.h"
 #include "file_uri.h"
 #include "file.h"
 #include "logger.h"
@@ -25,6 +28,7 @@
 
 namespace OHOS {
 namespace UDMF {
+const mode_t MODE = 0700;
 static constexpr int64_t MAX_KV_RECORD_SIZE = 2 * 1024 * 1024;
 static constexpr int64_t MAX_KV_DATA_SIZE = 4 * 1024 * 1024;
 
@@ -68,10 +72,26 @@ bool UnifiedDataHelper::IsTempUData(UnifiedData &data)
     return true;
 }
 
+void UnifiedDataHelper::CreateDirIfNotExist(const std::string& dirPath, const mode_t& mode)
+{
+    if (!OHOS::FileExists(dirPath)) {
+        LOG_DEBUG(UDMF_FRAMEWORK, "ForceCreateDirectory, dir: %{public}s", dirPath.c_str());
+        bool success = OHOS::ForceCreateDirectory(dirPath);
+        if (!success) {
+            LOG_ERROR(UDMF_FRAMEWORK, "create dir %{public}s failed, errno: %{public}d.", dirPath.c_str(), errno);
+            return;
+        }
+        if (mode != 0) {
+            chmod(dirPath.c_str(), mode);
+        }
+    }
+}
+
 bool UnifiedDataHelper::Pack(UnifiedData &data)
 {
     int64_t now = std::chrono::duration_cast<std::chrono::milliseconds>
                     (std::chrono::system_clock::now().time_since_epoch()).count();
+    CreateDirIfNotExist(TEMP_UNIFIED_DATA_ROOT_PATH, MODE);
     std::string filePath = TEMP_UNIFIED_DATA_ROOT_PATH + std::to_string(now) + TEMP_UNIFIED_DATA_SUFFIX;
     if (!SaveUDataToFile(filePath, data)) {
         LOG_ERROR(UDMF_FRAMEWORK, "fail to save unified data to file");
