@@ -99,8 +99,7 @@ bool UnifiedDataHelper::Unpack(UnifiedData &data)
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid file record!");
         return false;
     }
-    LoadUDataFromFile(file->GetUri(), data);
-    return true;
+    return LoadUDataFromFile(file->GetUri(), data);
 }
 
 bool UnifiedDataHelper::SaveUDataToFile(const std::string &dataFile, UnifiedData &data)
@@ -116,7 +115,7 @@ bool UnifiedDataHelper::SaveUDataToFile(const std::string &dataFile, UnifiedData
     recordTlv.SetFile(file);
 
     if (!TLVUtil::Writing(data, recordTlv)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "TLV writing failed!");
+        LOG_ERROR(UDMF_FRAMEWORK, "TLV Writing failed!");
         fclose(file);
         return false;
     }
@@ -137,8 +136,8 @@ bool UnifiedDataHelper::LoadUDataFromFile(const std::string &dataFile, UnifiedDa
     recordTlv.SetFile(file);
 
     if (!TLVUtil::Reading(data, recordTlv)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "TLV writing failed!");
-		fclose(file);
+        LOG_ERROR(UDMF_FRAMEWORK, "TLV Reading failed!");
+        fclose(file);
         return false;
     }
     fclose(file);
