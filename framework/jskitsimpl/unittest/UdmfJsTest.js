@@ -28,6 +28,8 @@ let U8_ARRAY = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
 describe('UdmfJSTest', function () {
 
+  const optionsValid = { intention: 'DataHub', };
+
   /**
    * @tc.name UdmfTextTest
    * @tc.desc Test Js Api Text testcase
@@ -411,5 +413,937 @@ describe('UdmfJSTest', function () {
     expect(records[10].getType()).assertEqual(UTD.UniformDataType.OPENHARMONY_FORM);
     expect(records[11].getType()).assertEqual(UTD.UniformDataType.OPENHARMONY_APP_ITEM);
     console.info('UdmfAllRecordsTest end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MTest
+   * @tc.desc Test Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MTest', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MTest:';
+    console.info(TAG, 'start');
+    try {
+      let text = new UDC.Text();
+      text.details = {
+        title: '',
+        content: '11'.repeat((1024 * 1000 + 1)),
+      };
+      let unifiedData = new UDC.UnifiedData(text);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          expect(data[0].getRecords()[0].details.content).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MPlainText
+   * @tc.desc PlainText Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MPlainText', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MPlainText:';
+    console.info(TAG, 'start');
+    try {
+      let plainText = new UDC.PlainText();
+      plainText.textContent = '11'.repeat((1024 * 1000 + 1))
+      let unifiedData = new UDC.UnifiedData(plainText);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          expect(data[0].getRecords()[0].textContent).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MHyperlink
+   * @tc.desc Hyperlink Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MHyperlink', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MHyperlink:';
+    console.info(TAG, 'start');
+    try {
+      let link = new UDC.Hyperlink();
+      link.url = '11'.repeat((1024 * 1000 + 1))
+      let unifiedData = new UDC.UnifiedData(link);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          expect(data[0].getRecords()[0].url).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MHTML
+   * @tc.desc HTML Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MHTML', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MHTML:';
+    console.info(TAG, 'start');
+    try {
+      let html = new UDC.HTML();
+      html.htmlContent = '11'.repeat((1024 * 1000 + 1))
+      let unifiedData = new UDC.UnifiedData(html);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          expect(data[0].getRecords()[0].htmlContent).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MFile
+   * @tc.desc File Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MFile', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MFile:';
+    console.info(TAG, 'start');
+    try {
+      let file = new UDC.File();
+      file.uri = '11'.repeat((1024 * 1000 + 1))
+      let unifiedData = new UDC.UnifiedData(file);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          expect(data[0].getRecords()[0].uri).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MImage
+   * @tc.desc Image Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MImage', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MImage:';
+    console.info(TAG, 'start');
+    try {
+      let image = new UDC.Image();
+      image.imageUri = '11'.repeat((1024 * 1000 + 1))
+      let unifiedData = new UDC.UnifiedData(image);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          expect(data[0].getRecords()[0].imageUri).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MVideo
+   * @tc.desc Video Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MVideo', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MVideo:';
+    console.info(TAG, 'start');
+    try {
+      let video = new UDC.Video();
+      video.videoUri = '11'.repeat((1024 * 1000 + 1))
+      let unifiedData = new UDC.UnifiedData(video);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          expect(data[0].getRecords()[0].videoUri).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MAudio
+   * @tc.desc Audio Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MAudio', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MAudio:';
+    console.info(TAG, 'start');
+    try {
+      let audio = new UDC.Audio();
+      audio.audioUri = '11'.repeat((1024 * 1000 + 1))
+      let unifiedData = new UDC.UnifiedData(audio);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          expect(data[0].getRecords()[0].audioUri).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MFolder
+   * @tc.desc Folder Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MFolder', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MFolder:';
+    console.info(TAG, 'start');
+    try {
+      let folder = new UDC.Folder();
+      folder.folderUri = '11'.repeat((1024 * 1000 + 1))
+      let unifiedData = new UDC.UnifiedData(folder);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          expect(data[0].getRecords()[0].folderUri).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MSystemDefinedRecord
+   * @tc.desc SystemDefinedRecord Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MSystemDefinedRecord', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MSystemDefinedRecord:';
+    console.info(TAG, 'start');
+    try {
+      let systemDefinedRecord = new UDC.SystemDefinedRecord();
+      systemDefinedRecord.details = {
+        title: '',
+        content: '11'.repeat((1024 * 1000 + 1))
+      }
+      let unifiedData = new UDC.UnifiedData(systemDefinedRecord);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          expect(data[0].getRecords()[0].details.content).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MSystemDefinedForm
+   * @tc.desc SystemDefinedForm Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MSystemDefinedForm', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MSystemDefinedForm:';
+    console.info(TAG, 'start');
+    try {
+      let systemDefinedForm = new UDC.SystemDefinedForm();
+      systemDefinedForm.formId = 123;
+      systemDefinedForm.formName = '1';
+      systemDefinedForm.bundleName = 'MyBundleName';
+      systemDefinedForm.abilityName = 'abilityName';
+      systemDefinedForm.module = '11'.repeat((1024 * 1000 + 1))
+      let unifiedData = new UDC.UnifiedData(systemDefinedForm);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          console.info(TAG, 'formId= ' + data[0].getRecords()[0].formId);
+          console.info(TAG, 'formName= ' + data[0].getRecords()[0].formName);
+          console.info(TAG, 'bundleName= ' + data[0].getRecords()[0].bundleName);
+          console.info(TAG, 'abilityName= ' + data[0].getRecords()[0].abilityName);
+          expect(data[0].getRecords()[0].module).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MSystemDefinedAppItem
+   * @tc.desc SystemDefinedAppItem Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MSystemDefinedAppItem', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MSystemDefinedAppItem:';
+    console.info(TAG, 'start');
+    try {
+      let systemDefinedAppItem = new UDC.SystemDefinedAppItem();
+      systemDefinedAppItem.appId = '1';
+      systemDefinedAppItem.appName = '2';
+      systemDefinedAppItem.appIconId = '3';
+      systemDefinedAppItem.appLabelId = '4';
+      systemDefinedAppItem.bundleName = '5';
+      systemDefinedAppItem.abilityName = '11'.repeat((1024 * 1000 + 1))
+      let unifiedData = new UDC.UnifiedData(systemDefinedAppItem);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          console.info(TAG, 'appId= ' + data[0].getRecords()[0].appId);
+          console.info(TAG, 'appName= ' + data[0].getRecords()[0].appName);
+          console.info(TAG, 'appIconId= ' + data[0].getRecords()[0].appIconId);
+          console.info(TAG, 'appLabelId= ' + data[0].getRecords()[0].appLabelId);
+          console.info(TAG, 'bundleName= ' + data[0].getRecords()[0].bundleName);
+          expect(data[0].getRecords()[0].abilityName).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MSystemDefinedPixelMap
+   * @tc.desc SystemDefinedPixelMap Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MSystemDefinedPixelMap', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MSystemDefinedPixelMap:';
+    console.info(TAG, 'start');
+    try {
+      let text = new UDC.SystemDefinedPixelMap();
+      text.rawData = new Uint8Array(Math.pow(2, 21));
+      let unifiedData = new UDC.UnifiedData(text);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver2MApplicationDefinedRecord
+   * @tc.desc ApplicationDefinedRecord Over 2MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver2MApplicationDefinedRecord', 0, async function (done) {
+    const TAG = 'UdmfTextOver2MApplicationDefinedRecord:';
+    console.info(TAG, 'start');
+    try {
+      let text = new UDC.ApplicationDefinedRecord();
+      text.applicationDefinedType = '1';
+      text.rawData = new Uint8Array(Math.pow(2, 21));
+      let unifiedData = new UDC.UnifiedData(text);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver4M
+   * @tc.desc UdmfTextOver4M Over 4MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver4M', 0, async function (done) {
+    const TAG = 'UdmfTextOver4M:';
+    console.info(TAG, 'start');
+    try {
+      let text = new UDC.PlainText();
+      text.textContent = '11'.repeat((1024 * 1000 + 1))
+      let unifiedData = new UDC.UnifiedData(text);
+      let html = new UDC.HTML();
+      html.htmlContent = '11'.repeat((1024 * 1000 + 1))
+      unifiedData.addRecord(html);
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          console.info(TAG, `records.length = ${records.length}.`);
+          console.info(TAG, `records[0] = ${records[0].textContent === '11'.repeat((1024 * 1000 + 1))}.`);
+          console.info(TAG, `records[1] = ${records[1].htmlContent === '11'.repeat((1024 * 1000 + 1))}.`);
+          console.info(TAG, `records[0].getType() = ${records[0].getType()}.`);
+          console.info(TAG, `records[1].getType() = ${records[1].getType()}.`);
+          console.info(TAG, `records[0].getType() = ${records[0].getType() === UTD.UniformDataType.PLAIN_TEXT}.`);
+          console.info(TAG, `records[1].getType() = ${records[1].getType() === UTD.UniformDataType.HTML}.`);
+          expect(records[0].textContent).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          expect(records[1].htmlContent).assertEqual('11'.repeat((1024 * 1000 + 1)));
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextAll plaintext 190MB
+   * @tc.desc UdmfTextAll plaintext 190MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextAll', 0, async function (done) {
+    const TAG = 'UdmfTextAll:';
+    console.info(TAG, 'start');
+    try {
+      let text = new UDC.Text();
+      let unifiedData = new UDC.UnifiedData(text);
+      let link = new UDC.Hyperlink();
+      unifiedData.addRecord(link);
+      let html = new UDC.HTML();
+      unifiedData.addRecord(html);
+      let file = new UDC.File();
+      unifiedData.addRecord(file);
+      let folder = new UDC.Folder();
+      unifiedData.addRecord(folder);
+      let image = new UDC.Image();
+      unifiedData.addRecord(image);
+      let video = new UDC.Video();
+      unifiedData.addRecord(video);
+      let audio = new UDC.Audio();
+      unifiedData.addRecord(audio);
+      let systemDefinedRecord = new UDC.SystemDefinedRecord();
+      unifiedData.addRecord(systemDefinedRecord);
+      let systemDefinedPixelMap = new UDC.SystemDefinedPixelMap();
+      unifiedData.addRecord(systemDefinedPixelMap);
+      let form = new UDC.SystemDefinedForm();
+      unifiedData.addRecord(form);
+      let appItem = new UDC.SystemDefinedAppItem();
+      unifiedData.addRecord(appItem);
+      let applicationDefinedRecord = new UDC.ApplicationDefinedRecord();
+      unifiedData.addRecord(applicationDefinedRecord);
+      let plainText = new UDC.PlainText();
+      let longText = '0123456789'.repeat((1024 * 2000));
+      for (let i = 0; i < 10; i++) {
+        plainText.textContent = longText
+        unifiedData.addRecord(plainText)
+      }
+      await UDC.insertData(optionsValid, unifiedData).then(async (data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        await UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          console.info(TAG, `records.length = ${records.length}.`);
+          for (let i = 0; i < records.length; i++) {
+            console.info(TAG, `records[${i}].getType() = ${records[i].getType()}.`);
+            if (records[i].getType() === UTD.UniformDataType.PLAIN_TEXT) {
+              console.info(`content= ${records[i].textContent === '0123456789'.repeat((1024 * 2000))}`);
+            }
+          }
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+
+  /**
+   * @tc.name UdmfText200M
+   * @tc.desc UdmfText200M 200MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfText200M', 0, async function (done) {
+    const TAG = 'UdmfText200M:';
+    console.info(TAG, 'start');
+    try {
+      let plainText = new UDC.PlainText();
+      let unifiedData = new UDC.UnifiedData(plainText);
+      let longText = '0123456789'.repeat((1024 * 2000));
+      for (let i = 0; i < 10; i++) {
+        plainText.textContent = longText
+        unifiedData.addRecord(plainText)
+      }
+      await UDC.insertData(optionsValid, unifiedData).then(async (data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        await UDC.queryData(options).then(async (data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          console.info(TAG, `records.length = ${records.length}.`);
+          for (let i = 0; i < records.length; i++) {
+            if (ret[0].getRecords()[i].getType() === UTD.UniformDataType.PLAIN_TEXT) {
+              console.info(`textContent = ${ret[0].getRecords()[i].textContent === '0123456789'.repeat((1024 * 2000))}`);
+            }
+          }
+          await UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfTextOver200M
+   * @tc.desc UdmfTextOver200M over 200MB
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfTextOver200M', 0, async function (done) {
+    const TAG = 'UdmfTextOver200M:';
+    console.info(TAG, 'start');
+    try {
+      let plainText = new UDC.PlainText();
+      let unifiedData = new UDC.UnifiedData(plainText);
+      let longText = '0123456789'.repeat((1024 * 2000));
+      for (let i = 0; i < 20; i++) {
+        plainText.textContent = longText
+        unifiedData.addRecord(plainText)
+      }
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, 'Unreachable code! ====');
+        expect(null).assertFail();
+        done();
+      }).catch(() => {
+        console.error(TAG, `get fail. code is ${err.code},message is ${err.message} `);
+        expect(true).assertTrue();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, `get fail. code is ${err.code},message is ${err.message} `);
+      expect(true).assertTrue();
+      done();
+    }
+    console.info(TAG, 'end');
   });
 });

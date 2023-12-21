@@ -119,7 +119,13 @@ bool UnifiedDataHelper::Unpack(UnifiedData &data)
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid file record!");
         return false;
     }
-    return LoadUDataFromFile(file->GetUri(), data);
+    UnifiedData tempData;
+    if (!LoadUDataFromFile(file->GetUri(), tempData)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Fail to load udata from file!");
+        return false;
+    }
+    data.SetRecords(tempData.GetRecords());
+    return true;
 }
 
 bool UnifiedDataHelper::SaveUDataToFile(const std::string &dataFile, UnifiedData &data)
