@@ -142,10 +142,10 @@ bool UnifiedDataHelper::SaveUDataToFile(const std::string &dataFile, UnifiedData
 
     if (!TLVUtil::Writing(data, recordTlv)) {
         LOG_ERROR(UDMF_FRAMEWORK, "TLV Writing failed!");
-        fclose(file);
+        (void)fclose(file);
         return false;
     }
-    fclose(file);
+    (void)fclose(file);
     return true;
 }
 
@@ -163,10 +163,10 @@ bool UnifiedDataHelper::LoadUDataFromFile(const std::string &dataFile, UnifiedDa
 
     if (!TLVUtil::Reading(data, recordTlv)) {
         LOG_ERROR(UDMF_FRAMEWORK, "TLV Reading failed!");
-        fclose(file);
+        (void)fclose(file);
         return false;
     }
-    fclose(file);
+    (void)fclose(file);
     return true;
 }
 } // namespace UDMF

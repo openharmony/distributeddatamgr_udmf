@@ -16,8 +16,8 @@
 #ifndef UDMF_UNIFIED_DATA_HELPER_H
 #define UDMF_UNIFIED_DATA_HELPER_H
 
-#include "unified_data.h"
 #include <sys/stat.h>
+#include "unified_data.h"
 
 namespace OHOS {
 namespace UDMF {
