@@ -222,6 +222,9 @@ public:
         }
         value = NetToHost(value);
         cursor_ += sizeof(T);
+        if (file_ != nullptr) {
+            cursor_ += sizeof(TLVHead);
+        }
         return true;
     }
 
@@ -261,6 +264,9 @@ public:
         }
         value.append(reinterpret_cast<const char *>(buffer_->data() + cursor_), head.len);
         cursor_ += head.len;
+        if (file_ != nullptr) {
+            cursor_ += sizeof(TLVHead);
+        }
         return true;
     }
 
@@ -283,6 +289,9 @@ public:
             return false;
         }
         cursor_ += value.size();
+        if (file_ != nullptr) {
+            cursor_ += sizeof(TLVHead);
+        }
         return true;
     }
 
@@ -301,6 +310,9 @@ public:
         std::vector<uint8_t> buff(buffer_->data() + cursor_, buffer_->data() + cursor_ + head.len);
         value = std::move(buff);
         cursor_ += head.len;
+        if (file_ != nullptr) {
+            cursor_ += sizeof(TLVHead);
+        }
         return true;
     }
 
@@ -308,6 +320,13 @@ public:
     {
         if (!HasExpectBuffer(sizeof(TLVHead))) {
             return false;
+        }
+        if (file_ != nullptr) {
+            std::vector<uint8_t> reserved {};
+            reserved.resize(sizeof(TLVHead));
+            if (fwrite(reserved.data(), sizeof(uint8_t), reserved.size(), file_) != reserved.size()) {
+                return false;
+            }
         }
         auto tagCursor = cursor_;
         cursor_ += sizeof(TLVHead);
@@ -359,6 +378,10 @@ public:
         WriteHead(tag, tagCursor, cursor_ - valueCursor);
         if (!SaveBufferToFile()) {
             return false;
+        }
+        if (file_ != nullptr) {
+            fseek(file_, 0, SEEK_END);
+            cursor_ += sizeof(TLVHead);
         }
         return true;
     }
@@ -425,6 +448,9 @@ public:
                 return false;
             }
         }
+        if (file_ != nullptr) {
+            cursor_ += sizeof(TLVHead);
+        }
         return true;
     }
 
@@ -432,6 +458,13 @@ public:
     {
         if (!HasExpectBuffer(sizeof(TLVHead))) {
             return false;
+        }
+        if (file_ != nullptr) {
+            std::vector<uint8_t> reserved {};
+            reserved.resize(sizeof(TLVHead));
+            if (fwrite(reserved.data(), sizeof(uint8_t), reserved.size(), file_) != reserved.size()) {
+                return false;
+            }
         }
 
         auto tagCursor = cursor_;
@@ -455,6 +488,9 @@ public:
         if (!SaveBufferToFile()) {
             return false;
         }
+        if (file_ != nullptr) {
+            fseek(file_, 0, SEEK_END);
+        }
         return true;
     }
 
@@ -471,15 +507,18 @@ public:
             cursor_ = 0;
         }
         auto mapEnd = cursor_ + head.len;
-        while (cursor_ < mapEnd) {
-            std::string itemKey;
+        size_t total = 0;
+        while ((file_ == nullptr && cursor_ < mapEnd) || (file_ != nullptr && total < head.len)) {
+            std::string itemKey = "";
             if (!ReadString(itemKey)) {
                 return false;
             }
+            total += cursor_;
             UDVariant itemValue;
             if (!ReadVariant(itemValue)) {
                 return false;
             }
+            total += cursor_;
             value.emplace(itemKey, itemValue);
         }
         return true;
@@ -527,7 +566,7 @@ private:
     {
         if (file_ != nullptr) {
             cursor_ = size;
-            fseek(file_, -cursor_, SEEK_CUR);
+            fseek(file_, -cursor_ - sizeof(TLVHead), SEEK_CUR);
             buffer_->resize(sizeof(TLVHead));
             tagCursor  = 0;
             valueCursor = 0;
