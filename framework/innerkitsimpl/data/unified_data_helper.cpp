@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <string>
 #include <sys/stat.h>
+#include "common_func.h"
 #include "directory_ex.h"
 #include "file_ex.h"
 #include "file_uri.h"
@@ -97,7 +98,8 @@ bool UnifiedDataHelper::Pack(UnifiedData &data)
         LOG_ERROR(UDMF_FRAMEWORK, "fail to save unified data to file");
         return false;
     }
-    auto fileRecord = std::make_shared<File>(filePath);
+    std::string uri = AppFileService::CommonFunc::GetUriFromPath(filePath);
+    auto fileRecord = std::make_shared<File>(uri);
     UDDetails details;
     details.insert(std::make_pair(TEMP_UNIFIED_DATA_FLAG, true));
     fileRecord->SetDetails(details);
@@ -153,8 +155,9 @@ bool UnifiedDataHelper::LoadUDataFromFile(const std::string &dataFile, UnifiedDa
 {
     std::vector<uint8_t> dataBytes;
     auto recordTlv = TLVObject(dataBytes);
-
-    std::FILE *file = fopen(dataFile.c_str(), "r");
+    AppFileService::ModuleFileUri::FileUri fileUri(dataFile);
+    std::string path = fileUri.GetRealPath();
+    std::FILE *file = fopen(path.c_str(), "r");
     if (file == nullptr) {
         LOG_ERROR(UDMF_FRAMEWORK, "failed to open file");
         return false;
