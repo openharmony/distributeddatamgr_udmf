@@ -18,6 +18,7 @@
 #include "iservice_registry.h"
 #include "datamgr_service_proxy.h"
 #include "system_ability_definition.h"
+#include "unified_data_helper.h"
 
 #include "logger.h"
 
@@ -112,6 +113,12 @@ int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedDat
         LOG_ERROR(UDMF_SERVICE, "UnifiedData is invalid.");
         return E_INVALID_PARAMETERS;
     }
+    if (UnifiedDataHelper::ExceedKVSizeLimit(unifiedData)) {
+        if (!UnifiedDataHelper::Pack(unifiedData)) {
+            LOG_ERROR(UDMF_SERVICE, "Failed to pack unified data.");
+            return E_FS_ERROR;
+        }
+    }
     return udmfProxy_->SetData(option, unifiedData, key);
 }
 
@@ -123,7 +130,17 @@ int32_t UdmfServiceClient::GetData(const QueryOption &query, UnifiedData &unifie
         LOG_ERROR(UDMF_SERVICE, "invalid key");
         return E_INVALID_PARAMETERS;
     }
-    return udmfProxy_->GetData(query, unifiedData);
+
+    auto err = udmfProxy_->GetData(query, unifiedData);
+    if (err == E_OK) {
+        if (UnifiedDataHelper::IsTempUData(unifiedData)) {
+            if (!UnifiedDataHelper::Unpack(unifiedData)) {
+                LOG_ERROR(UDMF_SERVICE, "failed to unpack unified data");
+                return E_FS_ERROR;
+            }
+        }
+    }
+    return err;
 }
 
 int32_t UdmfServiceClient::GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
@@ -136,7 +153,21 @@ int32_t UdmfServiceClient::GetBatchData(const QueryOption &query, std::vector<Un
             intention.c_str());
         return E_INVALID_PARAMETERS;
     }
-    return udmfProxy_->GetBatchData(query, unifiedDataSet);
+    std::vector<UnifiedData> tempDataSet {};
+    auto err = udmfProxy_->GetBatchData(query, tempDataSet);
+    if (err != E_OK) {
+        return err;
+    }
+    for (auto &data : tempDataSet) {
+        if (UnifiedDataHelper::IsTempUData(data)) {
+            if (!UnifiedDataHelper::Unpack(data)) {
+                LOG_ERROR(UDMF_SERVICE, "failed to unpack unified data");
+                return E_FS_ERROR;
+            }
+        }
+        unifiedDataSet.emplace_back(data);
+    }
+    return E_OK;
 }
 
 int32_t UdmfServiceClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
@@ -151,6 +182,12 @@ int32_t UdmfServiceClient::UpdateData(const QueryOption &query, UnifiedData &uni
     if (!unifiedData.IsValid()) {
         LOG_ERROR(UDMF_SERVICE, "UnifiedData is invalid.");
         return E_INVALID_PARAMETERS;
+    }
+    if (UnifiedDataHelper::ExceedKVSizeLimit(unifiedData)) {
+        if (!UnifiedDataHelper::Pack(unifiedData)) {
+            LOG_ERROR(UDMF_SERVICE, "Failed to pack unified data.");
+            return E_FS_ERROR;
+        }
     }
     return udmfProxy_->UpdateData(query, unifiedData);
 }
