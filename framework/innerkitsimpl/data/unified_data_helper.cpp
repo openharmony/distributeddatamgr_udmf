@@ -36,6 +36,14 @@ static constexpr int64_t MAX_KV_DATA_SIZE = 4 * 1024 * 1024;
 const std::string TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/";
 const std::string TEMP_UNIFIED_DATA_SUFFIX = ".ud";
 const std::string TEMP_UNIFIED_DATA_FLAG = "temp_udmf_file_flag";
+
+std::string UnifiedDataHelper::rootPath_ = "";
+
+void UnifiedDataHelper::SetRootPath(const std::string &rootPath)
+{
+    rootPath_ = rootPath;
+}
+
 bool UnifiedDataHelper::ExceedKVSizeLimit(UnifiedData &data)
 {
     if (data.GetSize() > MAX_KV_DATA_SIZE) {
@@ -92,8 +100,8 @@ bool UnifiedDataHelper::Pack(UnifiedData &data)
 {
     int64_t now = std::chrono::duration_cast<std::chrono::milliseconds>
                     (std::chrono::system_clock::now().time_since_epoch()).count();
-    CreateDirIfNotExist(TEMP_UNIFIED_DATA_ROOT_PATH, MODE);
-    std::string filePath = TEMP_UNIFIED_DATA_ROOT_PATH + std::to_string(now) + TEMP_UNIFIED_DATA_SUFFIX;
+    CreateDirIfNotExist(GetRootPath(), MODE);
+    std::string filePath = GetRootPath() + std::to_string(now) + TEMP_UNIFIED_DATA_SUFFIX;
     if (!SaveUDataToFile(filePath, data)) {
         LOG_ERROR(UDMF_FRAMEWORK, "fail to save unified data to file");
         return false;
@@ -171,6 +179,14 @@ bool UnifiedDataHelper::LoadUDataFromFile(const std::string &dataFile, UnifiedDa
     }
     (void)fclose(file);
     return true;
+}
+
+std::string UnifiedDataHelper::GetRootPath()
+{
+    if (rootPath_ == "") {
+        return TEMP_UNIFIED_DATA_ROOT_PATH;
+    }
+    return rootPath_;
 }
 } // namespace UDMF
 } // namespace OHOS

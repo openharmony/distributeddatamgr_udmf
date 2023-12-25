@@ -271,7 +271,7 @@ bool Reading(T &output, TLVObject &data);
 template<>
 bool Writing(const int32_t &input, TLVObject &data)
 {
-    return data.WriteBasic(TAG_INT32, input);
+    return data.WriteBasic(TAG::TAG_INT32, input);
 }
 
 template<>
@@ -283,7 +283,7 @@ bool Reading(int32_t &output, TLVObject &data)
 template<>
 bool Writing(const int64_t &input, TLVObject &data)
 {
-    return data.WriteBasic(TAG_INT64, input);
+    return data.WriteBasic(TAG::TAG_INT64, input);
 }
 
 template<>
@@ -301,7 +301,7 @@ bool Reading(uint32_t &output, TLVObject &data)
 template<>
 bool Writing(const uint32_t &input, TLVObject &data)
 {
-    return data.WriteBasic(TAG_UINT32, input);
+    return data.WriteBasic(TAG::TAG_UINT32, input);
 }
 
 template<>
@@ -313,13 +313,13 @@ bool Reading(uint64_t &output, TLVObject &data)
 template<>
 bool Writing(const uint64_t &input, TLVObject &data)
 {
-    return data.WriteBasic(TAG_UINT64, input);
+    return data.WriteBasic(TAG::TAG_UINT64, input);
 }
 
 template<>
 bool Writing(const bool &input, TLVObject &data)
 {
-    return data.WriteBasic(TAG_BOOL, input);
+    return data.WriteBasic(TAG::TAG_BOOL, input);
 }
 
 template<>

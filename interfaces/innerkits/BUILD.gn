@@ -38,6 +38,7 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
     "${udmf_framework_path}/common/custom_utd_store.cpp",
     "${udmf_framework_path}/common/graph.cpp",
+    "${udmf_framework_path}/common/tlv_object.cpp",
     "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
     "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
