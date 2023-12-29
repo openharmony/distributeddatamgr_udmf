@@ -19,6 +19,7 @@
 
 #include "token_setproc.h"
 #include "accesstoken_kit.h"
+#include "directory_ex.h"
 #include "nativetoken_kit.h"
 
 #include "logger.h"
@@ -36,6 +37,7 @@
 #include "system_defined_pixelmap.h"
 #include "system_defined_record.h"
 #include "text.h"
+#include "unified_data_helper.h"
 #include "video.h"
 
 using namespace testing::ext;
@@ -1027,7 +1029,7 @@ HWTEST_F(UdmfClientTest, SetData018, TestSize.Level1)
 
 /**
 * @tc.name: SetData019
-* @tc.desc: Set one over 4MB record of data with valid params and get data
+* @tc.desc: Set one over 2MB record of data with valid params and get data
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfClientTest, SetData019, TestSize.Level1)
@@ -1041,7 +1043,7 @@ HWTEST_F(UdmfClientTest, SetData019, TestSize.Level1)
     std::string value;
     int64_t maxSize = 512 * 1024;
     for (int64_t i = 0; i < maxSize; ++i) {
-        value += "1111";
+        value += "11";
     }
     details.insert({ value, value });
     details.insert({ "udmf_key", "udmf_value" });
@@ -1050,8 +1052,16 @@ HWTEST_F(UdmfClientTest, SetData019, TestSize.Level1)
     std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
     inputData.AddRecord(record);
 
+    UnifiedDataHelper::SetRootPath("/data/udmf_test/");
     auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
-    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption queryOption = { .key = key };
+    UnifiedData outputData;
+    status = UdmfClient::GetInstance().GetData(queryOption, outputData);
+    ASSERT_EQ(status, E_OK);
+    OHOS::ForceRemoveDirectory("/data/udmf_test/");
+    UnifiedDataHelper::SetRootPath("");
 
     LOG_INFO(UDMF_TEST, "SetData019 end.");
 }
@@ -1816,5 +1826,123 @@ HWTEST_F(UdmfClientTest, DeleteData002, TestSize.Level1)
     status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
     ASSERT_TRUE(unifiedDataSet.empty());
     LOG_INFO(UDMF_TEST, "DeleteData002 end.");
+}
+
+/**
+* @tc.name: SetData022
+* @tc.desc: Set two over 2MB record of data with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData022, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData022 begin.");
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData inputData;
+    std::string key;
+    UDDetails details;
+    std::string value;
+    int64_t maxSize = 512 * 1024;
+    for (int64_t i = 0; i < maxSize; ++i) {
+        value += "11";
+    }
+    details.insert({ value, value });
+    details.insert({ "udmf_key", "udmf_value" });
+    Text text;
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
+    for (int i = 0; i < 2; ++i) {
+        inputData.AddRecord(record);
+    }
+    UnifiedDataHelper::SetRootPath("/data/udmf_test/");
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption queryOption = { .key = key };
+    UnifiedData outputData;
+    status = UdmfClient::GetInstance().GetData(queryOption, outputData);
+    ASSERT_EQ(status, E_OK);
+    OHOS::ForceRemoveDirectory("/data/udmf_test/");
+    UnifiedDataHelper::SetRootPath("");
+
+    LOG_INFO(UDMF_TEST, "SetData022 end.");
+}
+
+/**
+* @tc.name: SetData023
+* @tc.desc: Set 200MB record of data with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData023, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData023 begin.");
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData inputData;
+    std::string key;
+    UDDetails details;
+    std::string value;
+    int64_t maxSize = 512 * 1024;
+    for (int64_t i = 0; i < maxSize; ++i) {
+        value += "11";
+    }
+    details.insert({ value, value });
+    Text text;
+    text.SetDetails(details);
+    for (int64_t i = 0; i < 100; ++i) {
+        auto record = std::make_shared<Text>(text);
+        inputData.AddRecord(record);
+    }
+    auto records = inputData.GetRecords();
+    LOG_INFO(UDMF_TEST, "SetData023 inputData.size() = %{public}zu", records.size());
+    UnifiedDataHelper::SetRootPath("/data/udmf_test/");
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption queryOption = { .key = key };
+    UnifiedData outputData;
+    status = UdmfClient::GetInstance().GetData(queryOption, outputData);
+    ASSERT_EQ(status, E_OK);
+    OHOS::ForceRemoveDirectory("/data/udmf_test/");
+    UnifiedDataHelper::SetRootPath("");
+
+    LOG_INFO(UDMF_TEST, "SetData023 end.");
+}
+
+/**
+* @tc.name: SetData024
+* @tc.desc: Set over 200MB record of data with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData024, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData024 begin.");
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData inputData;
+    std::string key;
+    UDDetails details;
+    std::string value;
+    int64_t maxSize = 512 * 1024;
+    for (int64_t i = 0; i < maxSize; ++i) {
+        value += "11";
+    }
+    details.insert({ value, value });
+    Text text;
+    text.SetDetails(details);
+    for (int64_t i = 0; i < 101; ++i) {
+        auto record = std::make_shared<Text>(text);
+        inputData.AddRecord(record);
+    }
+    auto records = inputData.GetRecords();
+    LOG_INFO(UDMF_TEST, "SetData024 inputData.size() = %{public}zu", records.size());
+
+    UnifiedDataHelper::SetRootPath("/data/udmf_test/");
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+    OHOS::ForceRemoveDirectory("/data/udmf_test/");
+    UnifiedDataHelper::SetRootPath("");
+
+    LOG_INFO(UDMF_TEST, "SetData024 end.");
 }
 } // OHOS::Test

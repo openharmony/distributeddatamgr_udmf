@@ -17,8 +17,9 @@
 #define UDMF_ERROR_CODE_H
 
 #include <cstdint>
-
 #include <errors.h>
+#include <map>
+#include <string>
 
 namespace OHOS {
 namespace UDMF {
