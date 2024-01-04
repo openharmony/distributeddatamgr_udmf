@@ -26,6 +26,7 @@
 #include "logger.h"
 #include "tlv_object.h"
 #include "tlv_util.h"
+#include "unified_meta.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -33,7 +34,7 @@ const mode_t MODE = 0700;
 static constexpr int64_t MAX_KV_RECORD_SIZE = 2 * 1024 * 1024;
 static constexpr int64_t MAX_KV_DATA_SIZE = 4 * 1024 * 1024;
 
-const std::string TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/";
+const std::string TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/udata";
 const std::string TEMP_UNIFIED_DATA_SUFFIX = ".ud";
 const std::string TEMP_UNIFIED_DATA_FLAG = "temp_udmf_file_flag";
 
@@ -83,21 +84,42 @@ bool UnifiedDataHelper::IsTempUData(UnifiedData &data)
 
 void UnifiedDataHelper::CreateDirIfNotExist(const std::string& dirPath, const mode_t& mode)
 {
-    if (!OHOS::FileExists(dirPath)) {
-        LOG_DEBUG(UDMF_FRAMEWORK, "ForceCreateDirectory, dir: %{public}s", dirPath.c_str());
-        bool success = OHOS::ForceCreateDirectory(dirPath);
-        if (!success) {
-            LOG_ERROR(UDMF_FRAMEWORK, "create dir %{public}s failed, errno: %{public}d.", dirPath.c_str(), errno);
-            return;
+    if (OHOS::FileExists(dirPath)) {
+        if (!OHOS::ForceRemoveDirectory(dirPath)) {
+            LOG_ERROR(UDMF_FRAMEWORK, "remove dir %{public}s failed, errno: %{public}d.", dirPath.c_str(), errno);
         }
-        if (mode != 0) {
-            chmod(dirPath.c_str(), mode);
+    }
+    LOG_DEBUG(UDMF_FRAMEWORK, "ForceCreateDirectory, dir: %{public}s", dirPath.c_str());
+    bool success = OHOS::ForceCreateDirectory(dirPath);
+    if (!success) {
+        LOG_ERROR(UDMF_FRAMEWORK, "create dir %{public}s failed, errno: %{public}d.", dirPath.c_str(), errno);
+        return;
+    }
+    if (mode != 0) {
+        chmod(dirPath.c_str(), mode);
+    }
+}
+
+void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
+{
+    for (const auto &record : data.GetRecords()) {
+        int64_t recordSize = record->GetSize();
+        auto udType = UD_TYPE_MAP.at(record->GetType());
+        auto it = summary.summary.find(udType);
+        if (it == summary.summary.end()) {
+            summary.summary[udType] = recordSize;
+        } else {
+            summary.summary[udType] += recordSize;
         }
+        summary.totalSize += recordSize;
     }
 }
 
 bool UnifiedDataHelper::Pack(UnifiedData &data)
 {
+    Summary summary;
+    GetSummary(data, summary);
+
     int64_t now = std::chrono::duration_cast<std::chrono::milliseconds>
                     (std::chrono::system_clock::now().time_since_epoch()).count();
     CreateDirIfNotExist(GetRootPath(), MODE);
@@ -110,6 +132,9 @@ bool UnifiedDataHelper::Pack(UnifiedData &data)
     auto fileRecord = std::make_shared<File>(uri);
     UDDetails details;
     details.insert(std::make_pair(TEMP_UNIFIED_DATA_FLAG, true));
+    for (auto &item : summary.summary) {
+        details.insert(std::make_pair(item.first, item.second));
+    }
     fileRecord->SetDetails(details);
     std::vector<std::shared_ptr<UnifiedRecord>> records {};
     records.emplace_back(fileRecord);

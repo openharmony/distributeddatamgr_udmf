@@ -34,6 +34,7 @@ private:
     static bool SaveUDataToFile(const std::string &dataFile, UnifiedData &data);
     static bool LoadUDataFromFile(const std::string &dataFile, UnifiedData &data);
     static std::string GetRootPath();
+    static void GetSummary(const UnifiedData &data, Summary &summary);
 
 private:
     static std::string rootPath_;

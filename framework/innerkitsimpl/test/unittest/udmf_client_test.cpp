@@ -1060,7 +1060,6 @@ HWTEST_F(UdmfClientTest, SetData019, TestSize.Level1)
     UnifiedData outputData;
     status = UdmfClient::GetInstance().GetData(queryOption, outputData);
     ASSERT_EQ(status, E_OK);
-    OHOS::ForceRemoveDirectory("/data/udmf_test/");
     UnifiedDataHelper::SetRootPath("");
 
     LOG_INFO(UDMF_TEST, "SetData019 end.");
@@ -1862,7 +1861,6 @@ HWTEST_F(UdmfClientTest, SetData022, TestSize.Level1)
     UnifiedData outputData;
     status = UdmfClient::GetInstance().GetData(queryOption, outputData);
     ASSERT_EQ(status, E_OK);
-    OHOS::ForceRemoveDirectory("/data/udmf_test/");
     UnifiedDataHelper::SetRootPath("");
 
     LOG_INFO(UDMF_TEST, "SetData022 end.");
@@ -1903,7 +1901,6 @@ HWTEST_F(UdmfClientTest, SetData023, TestSize.Level1)
     UnifiedData outputData;
     status = UdmfClient::GetInstance().GetData(queryOption, outputData);
     ASSERT_EQ(status, E_OK);
-    OHOS::ForceRemoveDirectory("/data/udmf_test/");
     UnifiedDataHelper::SetRootPath("");
 
     LOG_INFO(UDMF_TEST, "SetData023 end.");
@@ -1940,9 +1937,62 @@ HWTEST_F(UdmfClientTest, SetData024, TestSize.Level1)
     UnifiedDataHelper::SetRootPath("/data/udmf_test/");
     auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
     ASSERT_EQ(status, E_INVALID_PARAMETERS);
-    OHOS::ForceRemoveDirectory("/data/udmf_test/");
     UnifiedDataHelper::SetRootPath("");
 
     LOG_INFO(UDMF_TEST, "SetData024 end.");
+}
+
+/**
+* @tc.name: GetSummary003
+* @tc.desc: Get summary data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetSummary003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary003 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::string value;
+    int64_t maxSize = 512 * 1024;
+    for (int64_t i = 0; i < maxSize; ++i) {
+        value += "11";
+    }
+    details.insert({ value, value });
+
+    Text text;
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Text>(text);
+    data.AddRecord(record1);
+
+    PlainText plainText;
+    plainText.SetDetails(details);
+    plainText.SetContent("content");
+    plainText.SetAbstract("abstract");
+    std::shared_ptr<UnifiedRecord> record2 = std::make_shared<PlainText>(plainText);
+    data.AddRecord(record2);
+
+    UnifiedDataHelper::SetRootPath("/data/udmf_test/");
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    UnifiedDataHelper::SetRootPath("");
+
+    QueryOption option2 = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+
+    auto size = record1->GetSize();
+    size += record2->GetSize();
+
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(summary.totalSize, size);
+    ASSERT_EQ(summary.summary["general.text"], record1->GetSize());
+    ASSERT_EQ(summary.summary["general.plain-text"], record2->GetSize());
+
+    LOG_INFO(UDMF_TEST, "GetSummary003 end.");
 }
 } // OHOS::Test
