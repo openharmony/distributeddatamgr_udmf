@@ -18,6 +18,9 @@
 #include "unistd.h"
 #include "error_code.h"
 #include "logger.h"
+#ifdef WITH_SELINUX
+#include <policycoreutils.h>
+#endif
 namespace OHOS {
 namespace UDMF {
 constexpr const char* UTD_CFG_FILE = "utd-adt.json";
@@ -102,7 +105,14 @@ bool CustomUtdStore::CreateDirectory(const std::string &path) const
         }
     } while (index != std::string::npos);
 
-    return access(path.c_str(), F_OK) == 0;
+    if (access(path.c_str(), F_OK) == 0) {
+#ifdef WITH_SELINUX
+        Restorecon(path.c_str());
+#endif
+        return true;
+    }
+
+    return false;
 }
 } // namespace UDMF
 } // namespace OHOS
