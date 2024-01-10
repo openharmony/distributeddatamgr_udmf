@@ -63,7 +63,7 @@ int32_t CustomUtdStore::SaveTypeCfgs(std::vector<TypeDescriptorCfg> &customUtdTy
     return 0;
 }
 
-int32_t CustomUtdStore::SavaCfgFile(const std::string &jsonData, const std::string cfgFilePath)
+int32_t CustomUtdStore::SavaCfgFile(const std::string &jsonData, const std::string &cfgFilePath)
 {
     std::ofstream ofs;
     LOG_DEBUG(UDMF_CLIENT, "set cfg start, path:%{public}s ", cfgFilePath.c_str());

@@ -33,13 +33,13 @@ public:
     bool ParseStoredCustomUtdJson(const std::string &jsonData, std::vector<TypeDescriptorCfg> &typesCfg);
     bool ParseUserCustomUtdJson(const std::string &jsonData, std::vector<TypeDescriptorCfg> &typesDeclarations,
                           std::vector<TypeDescriptorCfg> &typesReference);
-    bool ConvertUtdCfgsToJson(std::vector<TypeDescriptorCfg> &typesCfg, std::string &jsonData);
+    bool ConvertUtdCfgsToJson(const std::vector<TypeDescriptorCfg> &typesCfg, std::string &jsonData);
 
 private:
-    bool AddJsonStringArray(std::vector<std::string> &datas, const std::string &nodeName, json &node);
+    bool AddJsonStringArray(const std::vector<std::string> &datas, const std::string &nodeName, json &node);
     bool GetTypeDescriptors(const json &jsonRoot, const std::string &nodeName,
                             std::vector<TypeDescriptorCfg> &typesCfg);
-    std::string GetStringValue(const json &subNode, const std::string &nodeName);
+    std::string GetStringValue(const json &node, const std::string &nodeName);
     std::vector<std::string> GetStringArrayValue(const json &node, const std::string &nodeName);
 };
 } // namespace UDMF

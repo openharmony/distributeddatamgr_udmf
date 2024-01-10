@@ -69,7 +69,7 @@ bool CustomUtdJsonParser::ParseUserCustomUtdJson(const std::string &jsonData,
     return true;
 }
 
-bool CustomUtdJsonParser::ConvertUtdCfgsToJson(std::vector<TypeDescriptorCfg> &typesCfg, std::string &jsonData)
+bool CustomUtdJsonParser::ConvertUtdCfgsToJson(const std::vector<TypeDescriptorCfg> &typesCfg, std::string &jsonData)
 {
     json* root = cJSON_CreateObject();
     json* CustomUTDs = cJSON_CreateArray();
@@ -98,7 +98,8 @@ bool CustomUtdJsonParser::ConvertUtdCfgsToJson(std::vector<TypeDescriptorCfg> &t
     return true;
 }
 
-bool CustomUtdJsonParser::AddJsonStringArray(std::vector<std::string> &datas, const std::string &nodeName, json &node)
+bool CustomUtdJsonParser::AddJsonStringArray(const std::vector<std::string> &datas, const std::string &nodeName,
+                                             json &node)
 {
     json *arrayNode = cJSON_AddArrayToObject(&node, nodeName.c_str());
     for (const auto &data : datas) {
@@ -109,7 +110,7 @@ bool CustomUtdJsonParser::AddJsonStringArray(std::vector<std::string> &datas, co
 }
 
 bool CustomUtdJsonParser::GetTypeDescriptors(const json &jsonRoot, const std::string &nodeName,
-                                             std::vector<TypeDescriptorCfg> &typesCfgs)
+                                             std::vector<TypeDescriptorCfg> &typesCfg)
 {
     if (cJSON_HasObjectItem(&jsonRoot, nodeName.c_str())) {
         cJSON *subNode = cJSON_GetObjectItem(&jsonRoot, nodeName.c_str());
@@ -128,7 +129,7 @@ bool CustomUtdJsonParser::GetTypeDescriptors(const json &jsonRoot, const std::st
             typeCfg.ownerBundle = GetStringValue(*node, OWNER);
             std::vector<std::string> installerBundles = GetStringArrayValue(*node, INSTALLERS);
             typeCfg.installerBundles.insert(installerBundles.begin(), installerBundles.end());
-            typesCfgs.push_back(typeCfg);
+            typesCfg.push_back(typeCfg);
         }
     }
     return true;
