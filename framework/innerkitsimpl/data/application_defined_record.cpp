@@ -35,7 +35,7 @@ ApplicationDefinedRecord::ApplicationDefinedRecord(std::string type, std::vector
 
 int64_t ApplicationDefinedRecord::GetSize()
 {
-    return rawData_.size();
+    return rawData_.size() + applicationDefinedType.size();
 }
 
 std::string ApplicationDefinedRecord::GetApplicationDefinedType() const
