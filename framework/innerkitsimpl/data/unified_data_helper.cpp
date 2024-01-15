@@ -47,13 +47,14 @@ void UnifiedDataHelper::SetRootPath(const std::string &rootPath)
 
 bool UnifiedDataHelper::ExceedKVSizeLimit(UnifiedData &data)
 {
+    int64_t totalSize = data.GetSize();
     if (data.GetSize() > MAX_KV_DATA_SIZE) {
-        LOG_DEBUG(UDMF_FRAMEWORK, "Exceeded KV data limit!");
+        LOG_DEBUG(UDMF_FRAMEWORK, "Exceeded KV data limit, totalSize:%{public}lld !", totalSize);
         return true;
     }
     for (const auto &record : data.GetRecords()) {
         if (record->GetSize() > MAX_KV_RECORD_SIZE) {
-            LOG_DEBUG(UDMF_FRAMEWORK, "Exceeded KV record limit!");
+            LOG_DEBUG(UDMF_FRAMEWORK, "Exceeded KV record limit, recordSize:%{public}lld!", record->GetSize());
             return true;
         }
     }

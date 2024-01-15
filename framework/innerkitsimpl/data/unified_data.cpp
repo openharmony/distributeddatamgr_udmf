@@ -99,7 +99,7 @@ bool UnifiedData::IsValid()
         return false;
     }
     if (this->GetSize() > MAX_DATA_SIZE) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Exceeded data limit!");
+        LOG_ERROR(UDMF_FRAMEWORK, "Exceeded data limit, %{public}lld !", this->GetSize());
         return false;
     }
     return true;
