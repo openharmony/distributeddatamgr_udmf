@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <string>
 #include <sys/stat.h>
+#include <cinttypes>
 #include "common_func.h"
 #include "directory_ex.h"
 #include "file_ex.h"
@@ -49,12 +50,12 @@ bool UnifiedDataHelper::ExceedKVSizeLimit(UnifiedData &data)
 {
     int64_t totalSize = data.GetSize();
     if (data.GetSize() > MAX_KV_DATA_SIZE) {
-        LOG_DEBUG(UDMF_FRAMEWORK, "Exceeded KV data limit, totalSize:%{public}lld !", totalSize);
+        LOG_DEBUG(UDMF_FRAMEWORK, "Exceeded KV data limit, totalSize:%{public}" PRId64 " !", totalSize);
         return true;
     }
     for (const auto &record : data.GetRecords()) {
         if (record->GetSize() > MAX_KV_RECORD_SIZE) {
-            LOG_DEBUG(UDMF_FRAMEWORK, "Exceeded KV record limit, recordSize:%{public}lld!", record->GetSize());
+            LOG_DEBUG(UDMF_FRAMEWORK, "Exceeded KV record limit, recordSize:%{public}" PRId64 "!", record->GetSize());
             return true;
         }
     }
