@@ -14,7 +14,7 @@
  */
 
 #include "unified_data.h"
-
+#include <cinttypes>
 #include "logger.h"
 
 namespace OHOS {
@@ -99,7 +99,7 @@ bool UnifiedData::IsValid()
         return false;
     }
     if (this->GetSize() > MAX_DATA_SIZE) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Exceeded data limit, %{public}lld !", this->GetSize());
+        LOG_ERROR(UDMF_FRAMEWORK, "Exceeded data limit, UnifiedData size: %{public}" PRId64 " !", this->GetSize());
         return false;
     }
     return true;
