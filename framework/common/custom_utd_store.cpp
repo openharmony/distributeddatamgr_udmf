@@ -52,7 +52,8 @@ std::vector<TypeDescriptorCfg> CustomUtdStore::GetTypeCfgs(const std::string &cf
     return customUtdTypes;
 }
 
-int32_t CustomUtdStore::SaveTypeCfgs(std::vector<TypeDescriptorCfg> &customUtdTypes, const std::string &cfgFilePath)
+int32_t CustomUtdStore::SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes,
+                                     const std::string &cfgFilePath)
 {
     std::string jsonData;
     std::string cfgFileName = UTD_CFG_FILE;

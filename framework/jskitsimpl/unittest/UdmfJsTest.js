@@ -23,8 +23,10 @@ const VALUE_TEST_ELEMENT = 'TestValue';
 const TEST_ID = 123456;
 const TEST_ABILITY_NAME = 'MyAbilityName';
 const TEST_MODULE = 'MyModule';
-const LONG_TEST2M = 'a'.repeat((2 * 1024 * 1024));
-const LONG_TESTOVER2M = 'a'.repeat((2 * 1024 * 1024 + 1));
+const NUM_2M = 2 * 1024 * 1024;
+const NUM_4M = 4 * 1024 * 1024;
+const LONG_TEST2M = 'a'.repeat(NUM_2M);
+const LONG_TESTOVER2M = 'a'.repeat((NUM_2M + 1));
 
 let U8_ARRAY = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
@@ -836,9 +838,9 @@ describe('UdmfJSTest', function () {
     console.info(TAG, 'start');
     try {
       let text = new UDC.SystemDefinedPixelMap();
-      let LONG_U8_ARRAY = new Uint8Array(Math.pow(2, 22));
-      LONG_U8_ARRAY.fill(0);
-      text.rawData = LONG_U8_ARRAY;
+      let longU8ArrayData = new Uint8Array(NUM_4M);     // 4*1024*1024
+      longU8ArrayData.fill(0);
+      text.rawData = longU8ArrayData;
       text.details = {
         recordKey1: 'systemDefinedPixelMap' + KEY_TEST_ELEMENT,
         recordKey2: U8_ARRAY,
@@ -857,7 +859,7 @@ describe('UdmfJSTest', function () {
           for (let i = 0; i < U8_ARRAY.length; i++) {
             expect(records[0].details.recordKey2[i]).assertEqual(U8_ARRAY[i]);
           }
-          expect(records[0].rawData.toString()).assertEqual(LONG_U8_ARRAY.toString());
+          expect(records[0].rawData.toString()).assertEqual(longU8ArrayData.toString());
           UDC.deleteData(options).then((data) => {
             console.info(TAG, 'delete success.');
             expect(data.length).assertEqual(1);
@@ -897,7 +899,7 @@ describe('UdmfJSTest', function () {
     try {
       let text = new UDC.ApplicationDefinedRecord();
       text.applicationDefinedType = '1';
-      text.rawData = new Uint8Array(Math.pow(2, 22));
+      text.rawData = new Uint8Array(NUM_4M);  //  4*1024*1024
       let unifiedData = new UDC.UnifiedData(text);
       UDC.insertData(optionsValid, unifiedData).then((data) => {
         console.info(TAG, `insert success. The key: ${data}`);
