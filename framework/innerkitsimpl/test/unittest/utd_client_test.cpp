@@ -125,7 +125,7 @@ HWTEST_F(UtdClientTest, GetTypeDescriptor004, TestSize.Level1)
     EXPECT_EQ(descriptor->GetTypeId(), typeId);
     EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.archive");
     EXPECT_EQ(descriptor->GetDescription(), "Gzip archive.");
-    EXPECT_EQ(descriptor->GetIconFile(), "");
+    EXPECT_EQ(descriptor->GetIconFile(), "sys.media.ohos_ic_normal_white_grid_compress");
     LOG_INFO(UDMF_TEST, "GetTypeDescriptor004 end.");
 }
 

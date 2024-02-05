@@ -67,7 +67,7 @@ describe('UdmfUtdJSTest', function () {
     let equalStr = 'https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/' +
       'apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype';
     expect(typeObj.referenceURL).assertEqual(equalStr);
-    expect(typeObj.iconFile).assertEqual('');
+    expect(typeObj.iconFile).assertEqual('sys.media.ohos_ic_normal_white_grid_image');
     console.info(TAG, 'end');
   });
 
@@ -139,7 +139,7 @@ describe('UdmfUtdJSTest', function () {
     let equalStr = 'https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/' +
       'apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype';
     expect(typeObj.referenceURL).assertEqual(equalStr);
-    expect(typeObj.iconFile).assertEqual('');
+    expect(typeObj.iconFile).assertEqual('sys.media.ohos_ic_normal_white_grid_image');
     console.info(TAG, 'end');
   });
 
