@@ -35,7 +35,8 @@
         "kv_store",
         "napi",
         "samgr",
-        "app_file_service"
+        "app_file_service",
+        "selinux_adapter"
       ],
       "third_party": [
         "bounds_checking_function",
