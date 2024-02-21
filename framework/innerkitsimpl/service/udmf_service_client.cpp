@@ -73,7 +73,7 @@ sptr<DistributedKv::IKvStoreDataService> UdmfServiceClient::GetDistributedKvData
         LOG_ERROR(UDMF_SERVICE, "initialize proxy failed.");
         return nullptr;
     }
-    auto deathRecipientPtr = new (std::nothrow)ServiceDeathRecipient();
+    sptr<UdmfServiceClient::ServiceDeathRecipient> deathRecipientPtr = new (std::nothrow)ServiceDeathRecipient();
     if (deathRecipientPtr == nullptr) {
         return nullptr;
     }
