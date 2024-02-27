@@ -17,6 +17,7 @@
 #include "logger.h"
 #include "utd_graph.h"
 #include "custom_utd_store.h"
+#include <algorithm>
 namespace OHOS {
 namespace UDMF {
 constexpr const char* CUSTOM_TYPE_CFG_PATH = "/data/utd/utd-adt.json";
@@ -62,6 +63,8 @@ Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<T
 Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileExtension, std::string &typeId,
                                                         std::string belongsTo)
 {
+    std::string fileExtensionLower;
+    std::transform(fileExtension.begin(), fileExtension.end(), fileExtensionLower.begin(), ::tolower);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. fileExtension:%{public}s, belongsTo:%{public}s ",
                   fileExtension.c_str(), belongsTo.c_str());
@@ -70,7 +73,7 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
 
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
-        if (find(fileExtensions.begin(), fileExtensions.end(), fileExtension) != fileExtensions.end()) {
+        if (find(fileExtensions.begin(), fileExtensions.end(), fileExtensionLower) != fileExtensions.end()) {
             typeId = utdTypeCfg.typeId;
             break;
         }
@@ -81,12 +84,22 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
         !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
         typeId = "";
     }
+
+    if (typeId.empty()) {
+        if (fileExtensionLower[0] == '.') {
+            typeId = "dynamic" + fileExtensionLower;
+        } else {
+            typeId = "dynamic." + fileExtensionLower;
+        }
+    }
     return Status::E_OK;
 }
 
 Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std::string &typeId,
                                                std::string belongsTo)
 {
+    std::string mimeTypeLower;
+    std::transform(mimeType.begin(), mimeType.end(), mimeTypeLower.begin(), ::tolower);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. mimeType:%{public}s, belongsTo:%{public}s ",
                   mimeType.c_str(), belongsTo.c_str());
@@ -95,7 +108,7 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
 
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         std::vector<std::string> mimeTypes = utdTypeCfg.mimeTypes;
-        if (find(mimeTypes.begin(), mimeTypes.end(), mimeType) != mimeTypes.end()) {
+        if (find(mimeTypes.begin(), mimeTypes.end(), mimeTypeLower) != mimeTypes.end()) {
             typeId = utdTypeCfg.typeId;
             break;
         }
@@ -105,6 +118,11 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
         !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
         typeId = "";
     }
+    
+    if (typeId.empty()) {
+        typeId = "dynamic." + mimeTypeLower;
+    }
+
     return Status::E_OK;
 }
 } // namespace UDMF

@@ -33,7 +33,9 @@ napi_value TypeDescriptorNapi::Constructor(napi_env env)
         DECLARE_NAPI_GETTER_SETTER("belongingToTypes", GetBelongingToTypes, nullptr),
         DECLARE_NAPI_GETTER_SETTER("description", GetDescription, nullptr),
         DECLARE_NAPI_GETTER_SETTER("referenceURL", GetReferenceURL, nullptr),
-        DECLARE_NAPI_GETTER_SETTER("iconFile", GetIconFile, nullptr)
+        DECLARE_NAPI_GETTER_SETTER("iconFile", GetIconFile, nullptr),
+        DECLARE_NAPI_GETTER_SETTER("filenameExtensions", GetFilenameExtensions, nullptr),
+        DECLARE_NAPI_GETTER_SETTER("mimeTypes", GetMimeTypes, nullptr)
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "TypeDescriptor", properties, count, TypeDescriptorNapi::New);
@@ -224,6 +226,30 @@ napi_value TypeDescriptorNapi::GetIconFile(napi_env env, napi_callback_info info
                Status::E_INVALID_PARAMETERS, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, descriptorNapi->value_->GetIconFile(), ctxt->output);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set iconFile value failed!");
+    return ctxt->output;
+}
+
+napi_value TypeDescriptorNapi::GetFilenameExtensions(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "GetFilenameExtensions");
+    auto ctxt = std::make_shared<ContextBase>();
+    auto descriptorNapi = GetDescriptorNapi(env, info, ctxt);
+    ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
+               Status::E_INVALID_PARAMETERS, "invalid object!");
+    std::vector<std::string> filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
+    ctxt->status = NapiDataUtils::SetValue(env, filenameExtensions, ctxt->output);
+    return ctxt->output;
+}
+
+napi_value TypeDescriptorNapi::GetMimeTypes(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "GetMimeTypes");
+    auto ctxt = std::make_shared<ContextBase>();
+    auto descriptorNapi = GetDescriptorNapi(env, info, ctxt);
+    ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
+               Status::E_INVALID_PARAMETERS, "invalid object!");
+    std::vector<std::string> mimeTypes = descriptorNapi->value_->GetMimeTypes();
+    ctxt->status = NapiDataUtils::SetValue(env, mimeTypes, ctxt->output);
     return ctxt->output;
 }
 } // namespace UDMF
