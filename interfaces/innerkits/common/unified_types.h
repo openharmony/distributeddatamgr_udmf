@@ -34,8 +34,6 @@ enum DataStatus : int32_t {
 struct Summary {
     std::map<std::string, int64_t> summary;
     int64_t totalSize;
-    std::string deviceId;
-    bool isRemoteData = false;
 };
 
 struct Privilege {
