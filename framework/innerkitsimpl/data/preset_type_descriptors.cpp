@@ -595,7 +595,7 @@ void PresetTypeDescriptors::InitDescriptors()
          REFERENCE_URL,
          "sys.media.ohos_ic_normal_white_grid_image"},
         {"com.sun.java-archive",
-         {"general.archive"},
+         {"general.archive", "general.executable"},
          {".jar"},
          {"application/java-archive"},
          "Java archive.",

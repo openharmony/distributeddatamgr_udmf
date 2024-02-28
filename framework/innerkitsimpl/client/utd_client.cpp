@@ -63,7 +63,7 @@ Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<T
 Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileExtension, std::string &typeId,
                                                         std::string belongsTo)
 {
-    std::string fileExtensionLower;
+    std::string fileExtensionLower = fileExtension;
     std::transform(fileExtension.begin(), fileExtension.end(), fileExtensionLower.begin(), ::tolower);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. fileExtension:%{public}s, belongsTo:%{public}s ",
@@ -85,7 +85,7 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
         typeId = "";
     }
 
-    if (typeId.empty()) {
+    if (!typeId.empty()) {
         if (fileExtensionLower[0] == '.') {
             typeId = "dynamic" + fileExtensionLower;
         } else {
@@ -98,7 +98,7 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
 Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std::string &typeId,
                                                std::string belongsTo)
 {
-    std::string mimeTypeLower;
+    std::string mimeTypeLower = mimeType;
     std::transform(mimeType.begin(), mimeType.end(), mimeTypeLower.begin(), ::tolower);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. mimeType:%{public}s, belongsTo:%{public}s ",
@@ -119,7 +119,7 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
         typeId = "";
     }
     
-    if (typeId.empty()) {
+    if (!typeId.empty()) {
         typeId = "dynamic." + mimeTypeLower;
     }
 
