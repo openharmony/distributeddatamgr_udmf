@@ -838,7 +838,7 @@ describe('UdmfJSTest', function () {
     console.info(TAG, 'start');
     try {
       let text = new UDC.SystemDefinedPixelMap();
-      let longU8ArrayData = new Uint8Array(NUM_4M);     // 4*1024*1024
+      let longU8ArrayData = new Uint8Array(NUM_4M);
       longU8ArrayData.fill(0);
       text.rawData = longU8ArrayData;
       text.details = {
@@ -899,7 +899,7 @@ describe('UdmfJSTest', function () {
     try {
       let text = new UDC.ApplicationDefinedRecord();
       text.applicationDefinedType = '1';
-      text.rawData = new Uint8Array(NUM_4M);  //  4*1024*1024
+      text.rawData = new Uint8Array(NUM_4M);
       let unifiedData = new UDC.UnifiedData(text);
       UDC.insertData(optionsValid, unifiedData).then((data) => {
         console.info(TAG, `insert success. The key: ${data}`);
