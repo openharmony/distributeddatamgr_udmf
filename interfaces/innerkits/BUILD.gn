@@ -34,6 +34,12 @@ config("udmf_client_config") {
 }
 
 ohos_shared_library("udmf_client") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources = [
     "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
     "${udmf_framework_path}/common/custom_utd_store.cpp",
