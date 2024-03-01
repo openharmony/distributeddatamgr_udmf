@@ -237,5 +237,16 @@ int32_t UdmfServiceClient::Sync(const QueryOption &query, const std::vector<std:
     }
     return udmfProxy_->Sync(query, devices);
 }
+
+int32_t UdmfServiceClient::IsRemoteData(const QueryOption &query, bool &result)
+{
+    LOG_DEBUG(UDMF_SERVICE, "start, key: %{public}s", query.key.c_str());
+    UnifiedKey key(query.key);
+    if (!key.IsValid()) {
+        LOG_ERROR(UDMF_SERVICE, "invalid key");
+        return E_INVALID_PARAMETERS;
+    }
+    return udmfProxy_->IsRemoteData(query, result);
+}
 } // namespace UDMF
 } // namespace OHOS

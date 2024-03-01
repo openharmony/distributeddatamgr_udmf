@@ -28,6 +28,7 @@ enum class UdmfServiceInterfaceCode : uint32_t {
     GET_SUMMARY,
     ADD_PRIVILEGE,
     SYNC,
+    IS_REMOTE_DATA,
     CODE_BUTT
 };
 } // namespace OHOS::UDMF

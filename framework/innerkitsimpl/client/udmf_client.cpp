@@ -158,5 +158,21 @@ Status UdmfClient::Sync(const QueryOption &query, const std::vector<std::string>
     }
     return static_cast<Status>(ret);
 }
+
+Status UdmfClient::IsRemoteData(const QueryOption &query, bool &result)
+{
+    DdsTrace trace(
+        std::string(TAG) + std::string(__FUNCTION__), TraceSwitch::BYTRACE_ON | TraceSwitch::TRACE_CHAIN_ON);
+    auto service = UdmfServiceClient::GetInstance();
+    if (service == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        return E_IPC;
+    }
+    int32_t ret = service->IsRemoteData(query, result);
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
+    }
+    return static_cast<Status>(ret);
+}
 } // namespace UDMF
 } // namespace OHOS

@@ -1995,4 +1995,45 @@ HWTEST_F(UdmfClientTest, GetSummary003, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "GetSummary003 end.");
 }
+
+/**
+* @tc.name: IsRemoteData
+* @tc.desc: is remote data, result false: not remote data, true: remote data.
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, IsRemoteData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsRemoteData001 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+
+    Text text;
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Text>(text);
+    data.AddRecord(record1);
+
+    PlainText plainText;
+    plainText.SetDetails(details);
+    plainText.SetContent("content");
+    plainText.SetAbstract("abstract");
+    std::shared_ptr<UnifiedRecord> record2 = std::make_shared<PlainText>(plainText);
+    data.AddRecord(record2);
+
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    bool result = true;
+    status = UdmfClient::GetInstance().IsRemoteData(option2, result);
+
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(result, false);
+
+    LOG_INFO(UDMF_TEST, "IsRemoteData001 end.");
+}
 } // OHOS::Test

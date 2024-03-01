@@ -38,6 +38,7 @@ public:
     Status GetSummary(const QueryOption &query, Summary& summary);
     Status AddPrivilege(const QueryOption &query, Privilege &privilege);
     Status Sync(const QueryOption &query, const std::vector<std::string> &devices);
+    Status IsRemoteData(const QueryOption &query, bool &result);
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -165,6 +165,21 @@ int32_t UdmfServiceProxy::Sync(const QueryOption &query, const std::vector<std::
     return status;
 }
 
+int32_t UdmfServiceProxy::IsRemoteData(const QueryOption &query, bool &result)
+{
+    MessageParcel reply;
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::IS_REMOTE_DATA, reply, query);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s!", status, query.key.c_str());
+        return status;
+    }
+    if (!ITypesUtil::Unmarshal(reply, result)) {
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal result failed!");
+        return E_READ_PARCEL_ERROR;
+    }
+    return status;
+}
+
 int32_t UdmfServiceProxy::SendRequest(UdmfServiceInterfaceCode code, MessageParcel &data,
                                       MessageParcel &reply, MessageOption &option)
 {
