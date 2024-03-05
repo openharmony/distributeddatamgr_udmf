@@ -72,6 +72,8 @@ HWTEST_F(UtdClientTest, GetTypeDescriptor001, TestSize.Level1)
     EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.ebook");
     EXPECT_EQ(descriptor->GetDescription(), "AZW3 ebook.");
     EXPECT_EQ(descriptor->GetIconFile(), "");
+    EXPECT_EQ(descriptor->GetFilenameExtensions().begin(), ".azw3");
+    EXPECT_EQ(descriptor->GetMimeTypes().begin(), "application/vnd.amazon.mobi8-ebook");
     LOG_INFO(UDMF_TEST, "GetTypeDescriptor001 end.");
 }
 
@@ -144,6 +146,28 @@ HWTEST_F(UtdClientTest, GetTypeDescriptor005, TestSize.Level1)
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(descriptor, nullptr);
     LOG_INFO(UDMF_TEST, "GetTypeDescriptor005 end.");
+}
+
+/**
+* @tc.name: GetTypeDescriptor006
+* @tc.desc: Normal testcase of GetTypeDescriptor
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetTypeDescriptor006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor006 begin.");
+
+    std::shared_ptr<TypeDescriptor> descriptor;
+    std::string typeId = "general.fax";
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), typeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.image");
+    EXPECT_EQ(descriptor->GetDescription(), "Base type for fax images.");
+    EXPECT_EQ(descriptor->GetIconFile(), "");
+    EXPECT_EQ(descriptor->GetFilenameExtensions().empty(), true);
+    EXPECT_EQ(descriptor->GetMimeTypes().empty(), true);
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor006 end.");
 }
 
 /**

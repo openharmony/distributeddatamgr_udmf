@@ -136,11 +136,11 @@ enum UDType : int32_t {
     TRUETYPE_FONT,
     TRUETYPE_COLLECTION_FONT,
     OPENTYPE_FONT,
+    MARKDOWM,
     POSTSCRIPT_FONT,
     POSTSCRIPT_PFB_FONT,
     POSTSCRIPT_PFA_FONT,
-    WINDOWS_EXECUTABLE,
-    WINDOWS_DYNAMIC_LINK_LIBRARY,
+    PORTABLE_EXECUTABLE,
     SUN_JAVA_CLASS,
     TRUEVISION_TGA_IMAGE,
     SGI_SGI_IMAGE,
@@ -166,6 +166,7 @@ enum UDType : int32_t {
     OPENHARMONY_WANT,
     OPENHARMONY_HDOC,
     OPENHARMONY_HINOTE,
+    OPENHARMONY_STYLED_STRING,
     UD_BUTT
 };
 
@@ -276,11 +277,11 @@ static const std::unordered_map<int32_t, std::string> UD_TYPE_MAP {
     { TRUETYPE_FONT, "general.truetype-font" },
     { TRUETYPE_COLLECTION_FONT, "general.truetype-collection-font" },
     { OPENTYPE_FONT, "general.opentype-font" },
+    { MARKDOWM, "general.markdown" },
     { POSTSCRIPT_FONT, "com.adobe.postscript-font" },
     { POSTSCRIPT_PFB_FONT, "com.adobe.postscript-pfb-font" },
     { POSTSCRIPT_PFA_FONT, "com.adobe.postscript-pfa-font" },
-    { WINDOWS_EXECUTABLE, "com.microsoft.windows-executable" },
-    { WINDOWS_DYNAMIC_LINK_LIBRARY, "com.microsoft.windows-dynamic-link-library" },
+    { PORTABLE_EXECUTABLE, "com.microsoft.portable-excutable" },
     { SUN_JAVA_CLASS, "com.sun.java-class" },
     { TRUEVISION_TGA_IMAGE, "com.truevision.tga-image" },
     { SGI_SGI_IMAGE, "com.sgi.sgi-image" },
@@ -306,6 +307,7 @@ static const std::unordered_map<int32_t, std::string> UD_TYPE_MAP {
     { OPENHARMONY_WANT, "openharmony.want" },
     { OPENHARMONY_HDOC, "openharmony.hdoc" },
     { OPENHARMONY_HINOTE, "openharmony.hinote" },
+    { OPENHARMONY_STYLED_STRING, "openharmony.styled-string" },
     { UD_BUTT, "INVALID"}
 };
 
@@ -416,11 +418,11 @@ static const std::unordered_map<int32_t, std::string> JS_UD_TYPE_NAME_MAP {
     { TRUETYPE_FONT, "TRUETYPE_FONT" },
     { TRUETYPE_COLLECTION_FONT, "TRUETYPE_COLLECTION_FONT" },
     { OPENTYPE_FONT, "OPENTYPE_FONT" },
+    { MARKDOWM, "MARKDOWM" },
     { POSTSCRIPT_FONT, "POSTSCRIPT_FONT" },
     { POSTSCRIPT_PFB_FONT, "POSTSCRIPT_PFB_FONT" },
     { POSTSCRIPT_PFA_FONT, "POSTSCRIPT_PFA_FONT" },
-    { WINDOWS_EXECUTABLE, "WINDOWS_EXECUTABLE" },
-    { WINDOWS_DYNAMIC_LINK_LIBRARY, "WINDOWS_DYNAMIC_LINK_LIBRARY" },
+    { PORTABLE_EXECUTABLE, "PORTABLE_EXECUTABLE" },
     { SUN_JAVA_CLASS, "SUN_JAVA_CLASS" },
     { TRUEVISION_TGA_IMAGE, "TRUEVISION_TGA_IMAGE" },
     { SGI_SGI_IMAGE, "SGI_SGI_IMAGE" },
@@ -445,7 +447,8 @@ static const std::unordered_map<int32_t, std::string> JS_UD_TYPE_NAME_MAP {
     { OPENDOCUMENT_FORMULA, "OPENDOCUMENT_FORMULA" },
     { OPENHARMONY_WANT, "OPENHARMONY_WANT" },
     { OPENHARMONY_HDOC, "OPENHARMONY_HDOC" },
-    { OPENHARMONY_HINOTE, "OPENHARMONY_HINOTE" }
+    { OPENHARMONY_HINOTE, "OPENHARMONY_HINOTE" },
+    { OPENHARMONY_HINOTE, "OPENHARMONY_STYLED_STRING" }
 };
 
 /*
