@@ -72,8 +72,8 @@ HWTEST_F(UtdClientTest, GetTypeDescriptor001, TestSize.Level1)
     EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.ebook");
     EXPECT_EQ(descriptor->GetDescription(), "AZW3 ebook.");
     EXPECT_EQ(descriptor->GetIconFile(), "");
-    EXPECT_EQ(descriptor->GetFilenameExtensions().begin(), ".azw3");
-    EXPECT_EQ(descriptor->GetMimeTypes().begin(), "application/vnd.amazon.mobi8-ebook");
+    EXPECT_EQ(*(descriptor->GetFilenameExtensions().begin()), ".azw3");
+    EXPECT_EQ(*(descriptor->GetMimeTypes().begin()), "application/vnd.amazon.mobi8-ebook");
     LOG_INFO(UDMF_TEST, "GetTypeDescriptor001 end.");
 }
 
@@ -226,7 +226,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension003, TestSize.Level
 
 /**
 * @tc.name: GetUniformDataTypeByFilenameExtension004
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension, return ""
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension,
+* para empty string, return E_INVALID_PARAMETERS
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension004, TestSize.Level1)
@@ -237,8 +238,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension004, TestSize.Level
     std::string currType;
     auto status =
         UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
-    EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(currType, "");
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtension004 end.");
 }
 
@@ -292,6 +292,33 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension007, TestSize.Level
         UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
     EXPECT_EQ(status, E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtension007 end.");
+}
+
+
+/**
+* @tc.name: GetUniformDataTypeByFilenameExtension008
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension, return flexible type.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtension008 begin.");
+    std::string filenameExtension = ".auto-image";
+    std::string blongsToType = "general.image";
+    std::string currType;
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, currType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    std::shared_ptr<TypeDescriptor> descriptor;
+    status = UtdClient::GetInstance().GetTypeDescriptor(currType, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), currType);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.image");
+    EXPECT_EQ(descriptor->GetDescription().empty(), true);
+    EXPECT_EQ(descriptor->GetIconFile().empty(), true);
+    EXPECT_EQ(*(descriptor->GetFilenameExtensions().begin()), ".auto-image");
+    EXPECT_EQ(descriptor->GetMimeTypes().empty(), true);
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtension008 end.");
 }
 
 /**
@@ -378,7 +405,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType005, TestSize.Level1)
 
 /**
 * @tc.name: GetUniformDataTypeByMIMEType006
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType, return ""
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType,
+* para empty string, return E_INVALID_PARAMETERS
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType006, TestSize.Level1)
@@ -388,10 +416,36 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType006, TestSize.Level1)
     std::string blongsToType = "general.entity";
     std::string currType;
     auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, currType, blongsToType);
-    EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(currType, "");
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMEType006 end.");
 }
+
+/**
+* @tc.name: GetUniformDataTypeByMIMEType007
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType, return flexible type.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMEType007 begin.");
+    std::string mimeType = "image/auto-image";
+    std::string blongsToType = "general.image";
+    std::string currType;
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, currType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    std::shared_ptr<TypeDescriptor> descriptor;
+    status = UtdClient::GetInstance().GetTypeDescriptor(currType, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), currType);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.image");
+    EXPECT_EQ(descriptor->GetDescription().empty(), true);
+    EXPECT_EQ(descriptor->GetIconFile().empty(), true);
+    EXPECT_EQ(descriptor->GetFilenameExtensions().empty(), true);
+    EXPECT_EQ(*(descriptor->GetMimeTypes().begin()), "image/auto-image");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMEType007 end.");
+}
+
+
 /**
 * @tc.name: BelongsTo001
 * @tc.desc: Normal testcase of BelongsTo
@@ -714,5 +768,461 @@ HWTEST_F(UtdClientTest, TypeDescriptorGetAttr001, TestSize.Level1)
     EXPECT_EQ(*(descriptor->GetMimeTypes().begin()), "application/vnd.amazon.mobi8-ebook");
 
     LOG_INFO(UDMF_TEST, "TypeDescriptorGetAttr001 end.");
+}
+
+/**
+* @tc.name: TypeDescriptorGetAttr002
+* @tc.desc: Normal testcase of TypeDescriptorGetAttr
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, TypeDescriptorGetAttr002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "TypeDescriptorGetAttr002 begin.");
+    std::shared_ptr<TypeDescriptor> descriptor;
+    std::string typeId = "general.text";
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), typeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.object");
+    EXPECT_EQ(descriptor->GetDescription(), "Base type for all text.");
+    EXPECT_EQ(descriptor->GetIconFile(), "");
+    EXPECT_EQ(descriptor->GetFilenameExtensions().empty(), true);
+    EXPECT_EQ(*(descriptor->GetMimeTypes().begin()), "text/*");
+
+    LOG_INFO(UDMF_TEST, "TypeDescriptorGetAttr002 end.");
+}
+
+/**
+* @tc.name: TypeDescriptorGetAttr003
+* @tc.desc: Normal testcase of TypeDescriptorGetAttr
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, TypeDescriptorGetAttr003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "TypeDescriptorGetAttr003 begin.");
+    std::shared_ptr<TypeDescriptor> descriptor;
+    std::string typeId = "general.image";
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), typeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.media");
+    EXPECT_EQ(descriptor->GetDescription(), "Base type for images.");
+    EXPECT_EQ(descriptor->GetIconFile(), "sys.media.ohos_ic_normal_white_grid_image");
+    EXPECT_EQ(descriptor->GetFilenameExtensions().empty(), true);
+    EXPECT_EQ(*(descriptor->GetMimeTypes().begin()), "image/*");
+
+    LOG_INFO(UDMF_TEST, "TypeDescriptorGetAttr003 end.");
+}
+
+/**
+* @tc.name: TypeDescriptorGetAttr004
+* @tc.desc: Normal testcase of TypeDescriptorGetAttr
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, TypeDescriptorGetAttr004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "TypeDescriptorGetAttr004 begin.");
+    std::shared_ptr<TypeDescriptor> descriptor;
+    std::string typeId = "general.video";
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), typeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.media");
+    EXPECT_EQ(descriptor->GetDescription(), "Base type for video.");
+    EXPECT_EQ(descriptor->GetIconFile(), "sys.media.ohos_ic_normal_white_grid_video");
+    EXPECT_EQ(descriptor->GetFilenameExtensions().empty(), true);
+    EXPECT_EQ(*(descriptor->GetMimeTypes().begin()), "video/*");
+
+    LOG_INFO(UDMF_TEST, "TypeDescriptorGetAttr004 end.");
+}
+
+/**
+* @tc.name: TypeDescriptorGetAttr005
+* @tc.desc: Normal testcase of TypeDescriptorGetAttr
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, TypeDescriptorGetAttr005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "TypeDescriptorGetAttr005 begin.");
+    std::shared_ptr<TypeDescriptor> descriptor;
+    std::string typeId = "general.audio";
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), typeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.media");
+    EXPECT_EQ(descriptor->GetDescription(), "Base type for audio.");
+    EXPECT_EQ(descriptor->GetIconFile(), "sys.media.ohos_ic_normal_white_grid_audio");
+    EXPECT_EQ(descriptor->GetFilenameExtensions().empty(), true);
+    EXPECT_EQ(*(descriptor->GetMimeTypes().begin()), "audio/*");
+
+    LOG_INFO(UDMF_TEST, "TypeDescriptorGetAttr005 end.");
+}
+
+/**
+* @tc.name: FlexibleType001
+* @tc.desc: Normal testcase of flexibleType, flexibleType cmp with preset UTD.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, FlexibleType001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FlexibleType001 begin.");
+    std::string filenameExtension = ".mytext";
+    std::string blongsToType = "general.plain-text";
+    std::string flexTypeId;
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, flexTypeId, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType001, flexTypeId = %{public}s.", flexTypeId.c_str());
+    std::shared_ptr<TypeDescriptor> descriptor;
+    status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), flexTypeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.plain-text");
+    EXPECT_EQ(descriptor->GetDescription().empty(), true);
+    EXPECT_EQ(descriptor->GetIconFile().empty(), true);
+    EXPECT_EQ(descriptor->GetMimeTypes().empty(), true);
+    EXPECT_EQ(*(descriptor->GetFilenameExtensions().begin()), ".mytext");
+    bool checkRet = false;
+    ASSERT_NE(descriptor, nullptr);
+    status = descriptor->IsHigherLevelType("general.object", checkRet);    //  cmp with gengral type.
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(checkRet, false);
+    LOG_INFO(UDMF_TEST, "FlexibleType001 end.");
+}
+
+/**
+* @tc.name: FlexibleType002
+* @tc.desc: Normal testcase of flexibleType, flexibleType cmp with preset UTD.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, FlexibleType002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FlexibleType002 begin.");
+    std::string filenameExtension = ".mytext";
+    std::string blongsToType = "general.plain-text";
+    std::string flexTypeId1;
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, flexTypeId1, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType002, flexTypeId1 = %{public}s.", flexTypeId1.c_str());
+    std::shared_ptr<TypeDescriptor> descriptor1;
+    status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId1, descriptor1);
+    EXPECT_EQ(status, E_OK);
+    
+    std::string filenameExtension2 = ".myvideo";
+    std::string blongsToType2 = "general.video";
+    std::string flexTypeId2;
+    status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension2, flexTypeId2, blongsToType2);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType002, flexTypeId2 = %{public}s.", flexTypeId2.c_str());
+    std::shared_ptr<TypeDescriptor> descriptor2;
+    status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId2, descriptor2);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor2->GetTypeId(), flexTypeId2);
+    EXPECT_EQ(*(descriptor2->GetBelongingToTypes().begin()), "general.video");
+    EXPECT_EQ(descriptor2->GetDescription().empty(), true);
+    EXPECT_EQ(descriptor2->GetIconFile().empty(), true);
+    EXPECT_EQ(descriptor2->GetMimeTypes().empty(), true);
+    EXPECT_EQ(*(descriptor2->GetFilenameExtensions().begin()), ".myvideo");
+    bool checkRet = false;
+    ASSERT_NE(descriptor2, nullptr);
+    status = descriptor2->IsHigherLevelType(flexTypeId2, checkRet);   //  cmp with flexbile type.
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(checkRet, false);
+    LOG_INFO(UDMF_TEST, "FlexibleType002 end.");
+}
+
+/**
+* @tc.name: FlexibleType001
+* @tc.desc: Normal testcase of flexibleType, flexibleType cmp with preset UTD.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, FlexibleType003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FlexibleType003 begin.");
+    std::string filenameExtension = ".mytext";
+    std::string blongsToType = "general.plain-text";
+    std::string flexTypeId;
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, flexTypeId, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType003, flexTypeId = %{public}s.", flexTypeId.c_str());
+    std::shared_ptr<TypeDescriptor> descriptor;
+    status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), flexTypeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.plain-text");
+    EXPECT_EQ(descriptor->GetDescription().empty(), true);
+    EXPECT_EQ(descriptor->GetIconFile().empty(), true);
+    EXPECT_EQ(descriptor->GetMimeTypes().empty(), true);
+    EXPECT_EQ(*(descriptor->GetFilenameExtensions().begin()), ".mytext");
+    bool checkRet = false;
+    ASSERT_NE(descriptor, nullptr);
+    status = descriptor->IsHigherLevelType("general.invildType", checkRet);    //  cmp with invildType type.
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+    EXPECT_EQ(checkRet, false);
+    LOG_INFO(UDMF_TEST, "FlexibleType003 end.");
+}
+
+
+/**
+* @tc.name: FlexibleType011
+* @tc.desc: Normal testcase of flexibleType, flexibleType cmp with preset UTD.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, FlexibleType011, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FlexibleType011 begin.");
+    std::string filenameExtension = ".mytext";
+    std::string blongsToType = "general.plain-text";
+    std::string flexTypeId;
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, flexTypeId, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType011, flexTypeId = %{public}s.", flexTypeId.c_str());
+    std::shared_ptr<TypeDescriptor> descriptor;
+    status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), flexTypeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.plain-text");
+    EXPECT_EQ(descriptor->GetDescription().empty(), true);
+    EXPECT_EQ(descriptor->GetIconFile().empty(), true);
+    EXPECT_EQ(descriptor->GetMimeTypes().empty(), true);
+    EXPECT_EQ(*(descriptor->GetFilenameExtensions().begin()), ".mytext");
+    bool checkRet = false;
+    ASSERT_NE(descriptor, nullptr);
+    status = descriptor->IsLowerLevelType("general.object", checkRet);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(checkRet, true);
+    LOG_INFO(UDMF_TEST, "FlexibleType011 end.");
+}
+
+/**
+* @tc.name: FlexibleType012
+* @tc.desc: Normal testcase of flexibleType, flexibleType cmp with preset UTD.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, FlexibleType012, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FlexibleType012 begin.");
+    std::string filenameExtension = ".mytext";
+    std::string blongsToType = "general.plain-text";
+    std::string flexTypeId;
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, flexTypeId, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType012, flexTypeId = %{public}s.", flexTypeId.c_str());
+    std::shared_ptr<TypeDescriptor> descriptor;
+    status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), flexTypeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.plain-text");
+    EXPECT_EQ(descriptor->GetDescription().empty(), true);
+    EXPECT_EQ(descriptor->GetIconFile().empty(), true);
+    EXPECT_EQ(descriptor->GetMimeTypes().empty(), true);
+    EXPECT_EQ(*(descriptor->GetFilenameExtensions().begin()), ".mytext");
+    bool checkRet = false;
+    ASSERT_NE(descriptor, nullptr);
+    status = descriptor->IsLowerLevelType("general.video", checkRet);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(checkRet, false);
+    LOG_INFO(UDMF_TEST, "FlexibleType012 end.");
+}
+
+/**
+* @tc.name: FlexibleType013
+* @tc.desc: Normal testcase of flexibleType, flexibleType cmp with preset UTD.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, FlexibleType013, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FlexibleType013 begin.");
+    std::string filenameExtension = ".mytext";
+    std::string blongsToType = "general.plain-text";
+    std::string flexTypeId1;
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, flexTypeId1, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType013, flexTypeId1 = %{public}s.", flexTypeId1.c_str());
+    std::shared_ptr<TypeDescriptor> descriptor1;
+    status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId1, descriptor1);
+    EXPECT_EQ(status, E_OK);
+    
+    std::string filenameExtension2 = ".myvideo";
+    std::string blongsToType2 = "general.video";
+    std::string flexTypeId2;
+    status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension2, flexTypeId2, blongsToType2);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType013, flexTypeId2 = %{public}s.", flexTypeId2.c_str());
+    bool checkRet = false;
+    ASSERT_NE(descriptor1, nullptr);
+    status = descriptor1->IsLowerLevelType(flexTypeId2, checkRet);   //  cmp with flexbile type.
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(checkRet, false);
+    LOG_INFO(UDMF_TEST, "FlexibleType013 end.");
+}
+
+/**
+* @tc.name: FlexibleType014
+* @tc.desc: Normal testcase of flexibleType, flexibleType cmp with preset UTD.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, FlexibleType014, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FlexibleType014 begin.");
+    std::string filenameExtension = ".mytext";
+    std::string blongsToType = "general.plain-text";
+    std::string flexTypeId;
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, flexTypeId, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType014, flexTypeId = %{public}s.", flexTypeId.c_str());
+    std::shared_ptr<TypeDescriptor> descriptor;
+    status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), flexTypeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.plain-text");
+    EXPECT_EQ(descriptor->GetDescription().empty(), true);
+    EXPECT_EQ(descriptor->GetIconFile().empty(), true);
+    EXPECT_EQ(descriptor->GetMimeTypes().empty(), true);
+    EXPECT_EQ(*(descriptor->GetFilenameExtensions().begin()), ".mytext");
+    bool checkRet = false;
+    ASSERT_NE(descriptor, nullptr);
+    status = descriptor->IsLowerLevelType("general.invaildType", checkRet);   // cmp with invaild type.
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+    EXPECT_EQ(checkRet, false);
+    LOG_INFO(UDMF_TEST, "FlexibleType014 end.");
+}
+
+/**
+* @tc.name: FlexibleType021
+* @tc.desc: Normal testcase of flexibleType, flexibleType cmp with preset UTD.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, FlexibleType021, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FlexibleType021 begin.");
+    std::string filenameExtension = ".mytext";
+    std::string blongsToType = "general.plain-text";
+    std::string flexTypeId;
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, flexTypeId, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType021, flexTypeId = %{public}s.", flexTypeId.c_str());
+    std::shared_ptr<TypeDescriptor> descriptor;
+    status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), flexTypeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.plain-text");
+    EXPECT_EQ(descriptor->GetDescription().empty(), true);
+    EXPECT_EQ(descriptor->GetIconFile().empty(), true);
+    EXPECT_EQ(descriptor->GetMimeTypes().empty(), true);
+    EXPECT_EQ(*(descriptor->GetFilenameExtensions().begin()), ".mytext");
+    bool checkRet = false;
+    ASSERT_NE(descriptor, nullptr);
+    status = descriptor->BelongsTo("general.object", checkRet);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(checkRet, true);
+    LOG_INFO(UDMF_TEST, "FlexibleType021 end.");
+}
+
+/**
+* @tc.name: FlexibleType022
+* @tc.desc: Normal testcase of flexibleType, flexibleType cmp with preset UTD.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, FlexibleType022, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FlexibleType022 begin.");
+    std::string filenameExtension = ".mytext";
+    std::string blongsToType = "general.plain-text";
+    std::string flexTypeId;
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, flexTypeId, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType022, flexTypeId = %{public}s.", flexTypeId.c_str());
+    std::shared_ptr<TypeDescriptor> descriptor;
+    status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), flexTypeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.plain-text");
+    EXPECT_EQ(descriptor->GetDescription().empty(), true);
+    EXPECT_EQ(descriptor->GetIconFile().empty(), true);
+    EXPECT_EQ(descriptor->GetMimeTypes().empty(), true);
+    EXPECT_EQ(*(descriptor->GetFilenameExtensions().begin()), ".mytext");
+    bool checkRet = false;
+    ASSERT_NE(descriptor, nullptr);
+    status = descriptor->BelongsTo(flexTypeId, checkRet);   // cmp with self.
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(checkRet, true);
+    LOG_INFO(UDMF_TEST, "FlexibleType022 end.");
+}
+
+/**
+* @tc.name: FlexibleType023
+* @tc.desc: Normal testcase of flexibleType, flexibleType cmp with preset UTD.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, FlexibleType023, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FlexibleType023 begin.");
+    std::string filenameExtension = ".mytext";
+    std::string blongsToType = "general.plain-text";
+    std::string flexTypeId1;
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, flexTypeId1, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType023, flexTypeId1 = %{public}s.", flexTypeId1.c_str());
+    std::shared_ptr<TypeDescriptor> descriptor1;
+    status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId1, descriptor1);
+    EXPECT_EQ(status, E_OK);
+    
+    std::string filenameExtension2 = ".myvideo";
+    std::string blongsToType2 = "general.video";
+    std::string flexTypeId2;
+    status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension2, flexTypeId2, blongsToType2);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType023, flexTypeId2 = %{public}s.", flexTypeId2.c_str());
+    bool checkRet = false;
+    ASSERT_NE(descriptor1, nullptr);
+    status = descriptor1->BelongsTo(flexTypeId2, checkRet);   //  cmp with flexbile type.
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(checkRet, false);
+    LOG_INFO(UDMF_TEST, "FlexibleType023 end.");
+}
+
+
+/**
+* @tc.name: FlexibleType024
+* @tc.desc: Normal testcase of flexibleType, flexibleType cmp with preset UTD.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, FlexibleType024, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FlexibleType024 begin.");
+    std::string filenameExtension = ".mytext";
+    std::string blongsToType = "general.plain-text";
+    std::string flexTypeId;
+    auto status =
+        UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, flexTypeId, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    LOG_INFO(UDMF_TEST, "FlexibleType024, flexTypeId = %{public}s.", flexTypeId.c_str());
+    std::shared_ptr<TypeDescriptor> descriptor;
+    status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), flexTypeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.plain-text");
+    EXPECT_EQ(descriptor->GetDescription().empty(), true);
+    EXPECT_EQ(descriptor->GetIconFile().empty(), true);
+    EXPECT_EQ(descriptor->GetMimeTypes().empty(), true);
+    EXPECT_EQ(*(descriptor->GetFilenameExtensions().begin()), ".mytext");
+    bool checkRet = false;
+    ASSERT_NE(descriptor, nullptr);
+    status = descriptor->BelongsTo("general.invaildType", checkRet);   // cmp with invaild type.
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+    LOG_INFO(UDMF_TEST, "FlexibleType024 end.");
 }
 } // OHOS::Test

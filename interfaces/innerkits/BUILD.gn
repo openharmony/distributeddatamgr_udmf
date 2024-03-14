@@ -41,12 +41,14 @@ ohos_shared_library("udmf_client") {
     debug = false
   }
   sources = [
+    "${udmf_framework_path}/common/base32_utils.cpp",
     "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
     "${udmf_framework_path}/common/custom_utd_store.cpp",
     "${udmf_framework_path}/common/graph.cpp",
     "${udmf_framework_path}/common/tlv_object.cpp",
     "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
+    "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
     "${udmf_framework_path}/common/utd_graph.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
@@ -56,6 +58,7 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/flexible_type.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/image.cpp",

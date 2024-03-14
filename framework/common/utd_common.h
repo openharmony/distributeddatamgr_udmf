@@ -45,6 +45,8 @@ constexpr const char* UTD_CUSTOM_DECLAEEARION = "UniformDataTypeDeclarations";
 constexpr const char* UTD_CUSTOM_REFERENCE = "ReferenceUniformDataTypeDeclarations";
 
 constexpr const char* UTD_CUSTOM = "CustomUTDs";
+
+constexpr const char* DEFAULT_TYPE_ID = "#default";
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_UTD_TYPE

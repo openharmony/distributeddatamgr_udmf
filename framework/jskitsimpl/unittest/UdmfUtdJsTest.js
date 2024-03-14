@@ -56,6 +56,8 @@ describe('UdmfUtdJSTest', function () {
     let description = typeObj.description;
     let referenceURL = typeObj.referenceURL;
     let iconFile = typeObj.iconFile;
+    let filenameExtensions = typeObj.filenameExtensions;
+    let mimeTypes = typeObj.mimeTypes;
     console.info(TAG, ', typeId: ' + typeId + ', ' + Object.prototype.toString.call(typeId) +
       ', belongingToTypes: ' + belonging + ', ' + Object.prototype.toString.call(belonging));
     console.info(TAG, 'description: ' + typeObj.description + ', ' + Object.prototype.toString.call(description));
@@ -68,6 +70,8 @@ describe('UdmfUtdJSTest', function () {
       'apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype';
     expect(typeObj.referenceURL).assertEqual(equalStr);
     expect(typeObj.iconFile).assertEqual('sys.media.ohos_ic_normal_white_grid_image');
+    expect(typeObj.filenameExtensions[0]).assertEqual('.psd');
+    expect(typeObj.mimeTypes[0]).assertEqual('image/x-photoshop');
     console.info(TAG, 'end');
   });
 
@@ -414,11 +418,12 @@ describe('UdmfUtdJSTest', function () {
     console.info(TAG, 'start');
     try {
       let typeId = UTD.getUniformDataTypeByMIMEType('');
-      console.info(TAG, 'getUniformDataTypeByMIMEType, ret ' + typeId);
-      expect(typeId === null).assertTrue();
-    } catch (e) {
-      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      console.error(TAG, 'getUniformDataTypeByMIMEType, ret ' + typeId);
       expect().assertFail();
+    } catch (e) {
+      console.info(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertEqual(true);
+      
     }
     console.info(TAG, 'end');
   });
@@ -434,11 +439,11 @@ describe('UdmfUtdJSTest', function () {
     console.info(TAG, 'start');
     try {
       let typeId = UTD.getUniformDataTypeByFilenameExtension('');
-      console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + typeId);
-      expect(typeId === null).assertTrue();
-    } catch (e) {
-      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      console.error(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + typeId);
       expect().assertFail();
+    } catch (e) {
+      console.info(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertEqual(true);
     }
     console.info(TAG, 'end');
   });
@@ -649,11 +654,19 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor029:';
     console.info(TAG, 'start');
     try {
-      let typeId = UTD.getUniformDataTypeByFilenameExtension('invalidFilenameExtension');
-      console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + typeId);
-      expect(typeId === null).assertTrue();
+      let flexibleType = UTD.getUniformDataTypeByFilenameExtension('.invalidFilenameExtension');
+      console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + flexibleType);
+      let flexibleTypeObj = UTD.getTypeDescriptor(flexibleType);
+      console.info(TAG, 'UDMF,typeId:' + flexibleTypeObj.typeId);
+      console.info(TAG, 'belongingToTypes:' + flexibleTypeObj.belongingToTypes);
+      console.info(TAG, 'filenameExtension:' + flexibleTypeObj.filenameExtensions);
+      console.info(TAG, 'mimeTypes:' + flexibleTypeObj.mimeTypes);
+      expect(flexibleTypeObj.typeId).assertEqual(flexibleType);
+      expect(flexibleTypeObj.belongingToTypes.length).assertEqual(0);
+      expect(flexibleTypeObj.filenameExtensions[0]).assertEqual('.invalidfilenameextension');
+      expect(flexibleTypeObj.mimeTypes.length).assertEqual(0);
     } catch (e) {
-      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      console.error(TAG, `get e. code is ${e.code}, message is ${e.message} `);
       expect().assertFail();
     }
     console.info(TAG, 'end');
@@ -669,9 +682,17 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor030:';
     console.info(TAG, 'start');
     try {
-      let typeId = UTD.getUniformDataTypeByMIMEType('invalidMIMEType');
-      console.info(TAG, 'getUniformDataTypeByMIMEType, ret ' + typeId);
-      expect(typeId === null).assertTrue();
+      let flexibleType = UTD.getUniformDataTypeByMIMEType('invalidMIMEType');
+      console.info(TAG, 'flexibleType=====>' + flexibleType);
+      let flexibleTypeObj = UTD.getTypeDescriptor(flexibleType);
+      console.info(TAG, 'typeId:' + flexibleTypeObj.typeId);
+      console.info(TAG, 'belongingToTypes:' + flexibleTypeObj.belongingToTypes);
+      console.info(TAG, 'filenameExtension:' + flexibleTypeObj.filenameExtensions);
+      console.info(TAG, 'mimeTypes:' + flexibleTypeObj.mimeTypes);
+      expect(flexibleTypeObj.typeId).assertEqual(flexibleType);
+      expect(flexibleTypeObj.belongingToTypes.length).assertEqual(0);
+      expect(flexibleTypeObj.mimeTypes[0]).assertEqual('invalidmimetype');
+      expect(flexibleTypeObj.filenameExtensions.length).assertEqual(0);
     } catch (e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect().assertFail();
