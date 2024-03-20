@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define LOG_TAG "UdmfServiceClient"
 #include "udmf_service_client.h"
 
 #include "iservice_registry.h"

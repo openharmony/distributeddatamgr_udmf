@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define LOG_TAG "TypeDescriptorNapi"
 #include "type_descriptor_napi.h"
 #include "utd_client.h"
 #include "napi_data_utils.h"

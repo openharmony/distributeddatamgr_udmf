@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#define LOG_TAG "UnifiedDataChannelNapi"
 #include "unified_data_channel_napi.h"
 
 #include "napi_data_utils.h"

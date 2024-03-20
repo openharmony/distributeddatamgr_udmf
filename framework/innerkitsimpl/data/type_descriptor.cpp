@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define LOG_TAG "TypeDescriptor"
 #include "type_descriptor.h"
 #include "logger.h"
 #include "utd_graph.h"
