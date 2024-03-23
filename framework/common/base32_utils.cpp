@@ -61,8 +61,8 @@ std::string Base32::Decode(const std::string &input)
         }
         if (valbits >= ASCII_CHAR_LENGTH) {
             valbits -= ASCII_CHAR_LENGTH;
-            result += (char)(val >> valbits);
-            val &= (1 << valbits) -1;
+            result += static_cast<char>(val >> valbits);
+            val &= (1 << valbits) - 1;
         }
     }
     return result;
