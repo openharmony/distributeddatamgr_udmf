@@ -21,6 +21,8 @@
 #include <map>
 #include "utd_common.h"
 #include "preset_type_descriptors.h"
+#include "preset_type_descriptors.h"
+#include "flexible_type.h"
 #include "type_descriptor.h"
 #include "error_code.h"
 
@@ -42,7 +44,9 @@ private:
     UtdClient(const UtdClient &obj) = delete;
     UtdClient &operator=(const UtdClient &obj) = delete;
     void Init();
-    static constexpr const char* DEFAULT_TYPE_ID = "#default";
+    bool IsValidFileExtension(const std::string &fileExtension);
+    bool IsValidMimeType(const std::string &mimeType);
+    Status GetFlexibleTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
 };
 } // namespace UDMF

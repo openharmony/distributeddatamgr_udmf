@@ -34,6 +34,7 @@ public:
     Status BelongsTo(const std::string &typeId, bool &checkResult);
     Status IsLowerLevelType(const std::string &typeId, bool &checkResult);
     Status IsHigherLevelType(const std::string &typeId, bool &checkResult);
+
     bool Equals(std::shared_ptr<TypeDescriptor> descriptor);
     const std::string& GetTypeId() const;
     std::set<std::string> GetBelongingToTypes();
@@ -44,6 +45,8 @@ public:
     std::vector<std::string> GetMimeTypes();
 
 private:
+    bool CmpFlexibleTypeLevel(const std::string higherLevelTypeId, bool isFlexibleType);
+
     std::string typeId_;
     std::set<std::string> belongingToTypes_;
     std::vector<std::string> filenameExtensions_;
@@ -51,6 +54,7 @@ private:
     std::string description_;
     std::string referenceURL_;
     std::string iconFile_;
+    bool isFlexibleType_ = false;
 };
 } // namespace UDMF
 } // namespace OHOS

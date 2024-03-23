@@ -46,6 +46,8 @@ private:
     static napi_value GetDescription(napi_env env, napi_callback_info info);
     static napi_value GetIconFile(napi_env env, napi_callback_info info);
     static napi_value GetReferenceURL(napi_env env, napi_callback_info info);
+    static napi_value GetFilenameExtensions(napi_env env, napi_callback_info info);
+    static napi_value GetMimeTypes(napi_env env, napi_callback_info info);
 };
 } // namespace UDMF
 } // namespace OHOS
