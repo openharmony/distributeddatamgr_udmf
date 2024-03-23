@@ -18,14 +18,13 @@ namespace UDMF {
 namespace UTILS {
 std::vector<std::string> StrSplit(std::string str, std::string subStr)
 {
-    char *s = str.data();
-    const char *sub = subStr.c_str();
-    char *p = strtok(s, sub);
     std::vector<std::string> result;
+    char *s = str.data();
+    char *p = strtok(s, subStr.c_str());
     while (p) {
         std::string tmp = p;
         result.push_back(p);
-        p = strtok(NULL, sub);
+        p = strtok(NULL, subStr.c_str());
     }
     return result;
 }

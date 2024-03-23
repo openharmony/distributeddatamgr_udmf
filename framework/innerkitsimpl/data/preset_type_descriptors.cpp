@@ -770,7 +770,7 @@ void PresetTypeDescriptors::InitDescriptors()
          REFERENCE_URL,
          ""},
         {"org.oasis.opendocument.formula",
-         {"org.oasis.opendocument", "general.object"},
+         {"org.oasis.opendocument"},
          {".odf"},
          {"application/vnd.oasis.opendocument.formula"},
          "OpenDocument Formulat.",

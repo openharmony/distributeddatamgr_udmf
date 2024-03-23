@@ -113,7 +113,8 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
 
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
-        if (find(fileExtensions.begin(), fileExtensions.end(), lowerFileExtension) != fileExtensions.end()) {
+        if (find(fileExtensions.begin(), fileExtensions.end(), lowerFileExtension) != fileExtensions.end() ||
+            find(fileExtensions.begin(), fileExtensions.end(), fileExtension) != fileExtensions.end()) {
             typeId = utdTypeCfg.typeId;
             break;
         }
@@ -149,7 +150,8 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
 
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         std::vector<std::string> mimeTypes = utdTypeCfg.mimeTypes;
-        if (find(mimeTypes.begin(), mimeTypes.end(), lowerMimeType) != mimeTypes.end()) {
+        if (find(mimeTypes.begin(), mimeTypes.end(), lowerMimeType) != mimeTypes.end() ||
+            find(mimeTypes.begin(), mimeTypes.end(), mimeType) != mimeTypes.end()) {
             typeId = utdTypeCfg.typeId;
             break;
         }
