@@ -868,7 +868,7 @@ void PresetTypeDescriptors::InitDescriptors()
          REFERENCE_URL,
          ""},
         {"general.font",
-         {"general.entity"},
+         {"general.object"},
          {},
          {},
          "Base type for fonts.",
