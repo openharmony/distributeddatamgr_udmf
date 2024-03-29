@@ -12,7 +12,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
+#define LOG_TAG "UDMFUnifiedDataModule"
 #include "application_defined_record_napi.h"
 #include "audio_napi.h"
 #include "file_napi.h"

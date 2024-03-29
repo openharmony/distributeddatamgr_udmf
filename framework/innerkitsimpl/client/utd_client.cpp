@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define LOG_TAG "UtdClient"
 #include <algorithm>
 #include "utd_client.h"
 #include "logger.h"

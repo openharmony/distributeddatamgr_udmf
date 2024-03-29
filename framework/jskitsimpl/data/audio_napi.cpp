@@ -12,7 +12,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
+#define LOG_TAG "AudioNapi"
 #include "audio_napi.h"
 
 #include "audio.h"

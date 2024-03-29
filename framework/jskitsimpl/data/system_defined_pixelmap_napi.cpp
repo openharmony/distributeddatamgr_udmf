@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define LOG_TAG "SystemDefinedPixelMapNapi"
 #include "system_defined_pixelmap_napi.h"
 
 #include "system_defined_pixelmap.h"

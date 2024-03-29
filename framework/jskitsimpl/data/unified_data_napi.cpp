@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define LOG_TAG "UnifiedDataNapi"
 #include "unified_data_napi.h"
 
 #include "application_defined_record_napi.h"

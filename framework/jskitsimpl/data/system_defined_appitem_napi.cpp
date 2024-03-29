@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define LOG_TAG "SystemDefinedAppItemNapi"
 #include "system_defined_appitem_napi.h"
 
 #include "napi_data_utils.h"

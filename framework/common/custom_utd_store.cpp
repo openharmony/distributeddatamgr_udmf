@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#define LOG_TAG "CustomUtdStore"
 #include "custom_utd_store.h"
 #include <fstream>
 #include <sys/stat.h>

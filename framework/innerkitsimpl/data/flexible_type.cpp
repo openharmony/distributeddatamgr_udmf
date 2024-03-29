@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#define LOG_TAG "FlexibleType"
 #include "flexible_type.h"
 #include "logger.h"
 #include "udmf_utils.h"

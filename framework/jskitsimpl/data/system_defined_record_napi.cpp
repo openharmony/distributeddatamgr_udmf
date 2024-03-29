@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
+#define LOG_TAG "SystemDefinedRecordNapi"
 #include "system_defined_record_napi.h"
 
 #include "system_defined_record.h"
