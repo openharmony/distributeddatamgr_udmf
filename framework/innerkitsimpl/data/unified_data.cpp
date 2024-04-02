@@ -87,6 +87,25 @@ std::string UnifiedData::GetTypes()
     return types;
 }
 
+std::vector<std::string> UnifiedData::GetTypesVector()
+{
+    std::vector<std::string> types;
+    for (const std::shared_ptr<UnifiedRecord> &record : records_) {
+        types.push_back(UD_TYPE_MAP.at(record->GetType()));
+    }
+    return types;
+}
+
+bool UnifiedData::HasType(const std::string &type)
+{
+    for (const std::shared_ptr<UnifiedRecord> &record : records_) {
+        if (UD_TYPE_MAP.at(record->GetType()) == type) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool UnifiedData::IsEmpty() const
 {
     return records_.empty();

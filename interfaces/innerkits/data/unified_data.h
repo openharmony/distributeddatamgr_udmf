@@ -16,10 +16,22 @@
 #ifndef UDMF_UNIFIED_DATA_H
 #define UDMF_UNIFIED_DATA_H
 
+#include <string>
 #include "unified_record.h"
+#include "want_params.h"
 
 namespace OHOS {
 namespace UDMF {
+enum ShareOption { IN_APP, CROSS_APP };
+class UnifiedDataProperties {
+public: 
+    std::string tag;
+    AAFwk::WantParams extras;
+    ShareOption shareOption;
+    double timestamp;
+    std::function<void(std::string str)> call;
+};
+
 class UnifiedData {
 public:
     int64_t GetSize();
@@ -36,6 +48,8 @@ public:
 
     std::vector<UDType> GetUDTypes();
     std::string GetTypes();
+    std::vector<std::string> GetTypesVector();
+    bool HasType(const std::string &type);
 
     bool IsEmpty() const;
     bool IsValid();

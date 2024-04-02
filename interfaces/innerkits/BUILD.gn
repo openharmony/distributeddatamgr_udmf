@@ -82,6 +82,7 @@ ohos_shared_library("udmf_client") {
   public_configs = [ ":udmf_client_config" ]
 
   external_deps = [
+    "ability_base:want",
     "ability_base:zuri",
     "access_token:libaccesstoken_sdk",
     "app_file_service:fileuri_native",

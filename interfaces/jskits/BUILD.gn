@@ -76,6 +76,7 @@ ohos_shared_library("unifieddatachannel_napi") {
   ]
 
   external_deps = [
+    "ability_base:want",
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "hilog:libhilog",
@@ -164,6 +165,7 @@ ohos_shared_library("udmf_data_napi") {
   ]
 
   external_deps = [
+    "ability_base:want",
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "hilog:libhilog",

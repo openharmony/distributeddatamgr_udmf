@@ -40,8 +40,10 @@ static napi_value Init(napi_env env, napi_value exports)
 {
     OHOS::UDMF::UnifiedDataChannelNapi::UnifiedDataChannelInit(env, exports);
 
-    napi_status status =
-        napi_set_named_property(env, exports, "UnifiedData", OHOS::UDMF::UnifiedDataNapi::Constructor(env));
+    napi_status status = napi_ok;
+    status = napi_set_named_property(env, exports, "UnifiedDataProperties", OHOS::UDMF::UnifiedDataPropertiesNapi::Constructor(env));
+    LOG_INFO(UDMF_KITS_NAPI, "init UnifiedDataProperties %{public}d", status);
+    status = napi_set_named_property(env, exports, "UnifiedData", OHOS::UDMF::UnifiedDataNapi::Constructor(env));
     LOG_INFO(UDMF_KITS_NAPI, "init UnifiedData %{public}d", status);
     status = napi_set_named_property(env, exports, "Summary", OHOS::UDMF::SummaryNapi::Constructor(env));
     LOG_INFO(UDMF_KITS_NAPI, "init Summary %{public}d", status);
