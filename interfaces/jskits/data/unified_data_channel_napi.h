@@ -36,6 +36,7 @@ private:
     static napi_value QueryData(napi_env env, napi_callback_info info);
     static napi_value DeleteData(napi_env env, napi_callback_info info);
     static napi_status GetNamedProperty(napi_env env, napi_value &obj, const std::string &key, std::string &value);
+    static napi_value CreateShareOption(napi_env env, napi_callback_info info);
 };
 } // namespace UDMF
 } // namespace OHOS

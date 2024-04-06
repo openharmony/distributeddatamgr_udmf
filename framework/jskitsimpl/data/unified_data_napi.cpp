@@ -202,7 +202,6 @@ napi_value UnifiedDataPropertiesNapi::GetDelayData(napi_env env, napi_callback_i
 napi_value UnifiedDataPropertiesNapi::SetDelayData(napi_env env, napi_callback_info info)
 {
     auto ctxt = std::make_shared<ContextBase>();
-    // std::string vv;
     napi_value handler;
     napi_ref ref;
     auto input = [env, ctxt, &handler](size_t argc, napi_value* argv) {
@@ -214,24 +213,7 @@ napi_value UnifiedDataPropertiesNapi::SetDelayData(napi_env env, napi_callback_i
     auto properties = reinterpret_cast<UnifiedDataPropertiesNapi*>(ctxt->native);
     napi_create_reference(env, handler, 1, &ref);
     properties->delayDataRef_ = ref;
-    properties->value_->call = [env, ref](std::string str) {
-        ProcessGetDelayData(env, ref, str);
-    };
     return nullptr;
-}
-
-void UnifiedDataPropertiesNapi::ProcessGetDelayData(napi_env env, napi_ref delayDataRef, std::string str)
-{
-    constexpr static int8_t ARGV_SIZE = 1;
-    napi_value callback = nullptr;
-    napi_value global = nullptr;
-    napi_value param[ARGV_SIZE];
-    napi_value result;
-    napi_status status = napi_get_global(env, &global);
-
-    status = napi_get_reference_value(env, delayDataRef, &callback);
-    status = NapiDataUtils::SetValue(env, str, param[0]);
-    status = napi_call_function(env, global, callback, ARGV_SIZE, param, &result);
 }
 
 napi_value UnifiedDataNapi::Constructor(napi_env env)

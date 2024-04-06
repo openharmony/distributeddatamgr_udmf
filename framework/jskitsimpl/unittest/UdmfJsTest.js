@@ -994,4 +994,44 @@ describe('UdmfJSTest', function () {
     }
     console.info(TAG, 'end');
   });
+
+  /**
+   * @tc.name UnifiedDataPropertiesTest001
+   * @tc.desc Test Js UnifiedDataProperties testcase
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UnifiedDataPropertiesTest001', 0, function () {
+    const TAG = 'UnifiedDataPropertiesTest';
+    console.info(TAG, 'start');
+    let text = new UDC.Text();
+    let unifiedDatas = new UDC.UnifiedData(text);
+    let properties = unifiedDatas.properties;
+    expect(typeof properties).assertEqual('object');
+    expect(typeof properties.extras).assertEqual('object');
+    expect(typeof properties.tag).assertEqual('string');
+    expect(typeof properties.timestamp).assertEqual('object');
+    expect(typeof properties.shareOption).assertEqual('number');
+    expect(typeof properties.getDelayData).assertEqual('function');
+  });
+
+  /**
+   * @tc.name UnifiedDataPropertiesTest002
+   * @tc.desc Test Js UnifiedDataProperties testcase
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UnifiedDataPropertiesTest002', 0, function () {
+    const TAG = 'UnifiedDataPropertiesTest';
+    console.info(TAG, 'start');
+    let text = new UDC.Text();
+    let unifiedDatas = new UDC.UnifiedData(text);
+    let properties = new UDC.UnifiedDataProperties();
+    expect(properties.shareOption).assertEqual(UDC.ShareOption.IN_APP);
+    properties.shareOption = UDC.ShareOption.CROSS_APP;
+    unifiedDatas.properties = properties;
+    expect(unifiedDatas.properties.shareOption).assertEqual(UDC.ShareOption.CROSS_APP);
+    unifiedDatas.properties.shareOption = UDC.ShareOption.IN_APP;
+    expect(unifiedDatas.properties.shareOption).assertEqual(UDC.ShareOption.IN_APP);
+  });
 });
