@@ -138,6 +138,23 @@ private:
         }                                    \
     } while (0)
 
+#define ASSERT_CALL_DELETE_STATUS(env, theCall, object) \
+    do {                                                \
+        if ((theCall) != napi_ok) {                     \
+            delete (object);                            \
+            GET_AND_THROW_LAST_ERROR((env));            \
+            return (theCall);                           \
+        }                                               \
+    } while (0)
+
+#define ASSERT_CALL_STATUS(env, theCall)     \
+    do {                                     \
+        if ((theCall) != napi_ok) {          \
+            GET_AND_THROW_LAST_ERROR((env)); \
+            return (theCall);                \
+        }                                    \
+    } while (0)
+
 #define ASSERT_WITH_ERRCODE(ctxt, condition, errcode, message)                                     \
     do {                                                                                           \
         if (!(condition)) {                                                                        \

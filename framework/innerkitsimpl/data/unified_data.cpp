@@ -146,5 +146,14 @@ void UnifiedData::SetProperties(std::shared_ptr<UnifiedDataProperties> propertie
 std::shared_ptr<UnifiedDataProperties> UnifiedData::GetProperties(){
     return properties_;
 }
+
+void UnifiedData::AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>>& records) {
+    for (auto &record :records) {
+        if (record == nullptr) {
+            return;
+        }
+        this->records_.push_back(record);
+    }
+}
 } // namespace UDMF
 } // namespace OHOS

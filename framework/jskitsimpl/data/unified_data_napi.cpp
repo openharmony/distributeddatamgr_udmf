@@ -283,6 +283,17 @@ void UnifiedDataNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedData> in,
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, unifiedData, Destructor, nullptr, nullptr), unifiedData);
 }
 
+napi_status UnifiedDataNapi::NewInstance1(napi_env env, std::shared_ptr<UnifiedData> in, napi_value &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
+    ASSERT_CALL_STATUS(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
+    auto *unifiedData = new (std::nothrow) UnifiedDataNapi();
+    ASSERT_ERR_STATUS(env, unifiedData != nullptr, Status::E_ERROR, "no memory for unified data!");
+    unifiedData->value_ = in;
+    ASSERT_CALL_DELETE_STATUS(env, napi_wrap(env, out, unifiedData, Destructor, nullptr, nullptr), unifiedData);
+    return napi_ok;
+}
+
 UnifiedDataNapi *UnifiedDataNapi::GetUnifiedData(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");

@@ -56,6 +56,8 @@ public:
     void SetProperties(std::shared_ptr<UnifiedDataProperties> properties);
     std::shared_ptr<UnifiedDataProperties> GetProperties();
 
+    void AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>>& records);
+
     static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;
 
 private:

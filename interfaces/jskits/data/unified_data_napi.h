@@ -54,6 +54,7 @@ class UnifiedDataNapi {
 public:
     static napi_value Constructor(napi_env env);
     static void NewInstance(napi_env env, std::shared_ptr<UnifiedData> in, napi_value &out);
+    static napi_status NewInstance1(napi_env env, std::shared_ptr<UnifiedData> in, napi_value &out);
     std::shared_ptr<UnifiedData> value_;
 
 private:
