@@ -53,13 +53,15 @@ public:
     bool IsEmpty() const;
     bool IsValid();
     bool IsComplete();
+    void SetProperties(std::shared_ptr<UnifiedDataProperties> properties);
+    std::shared_ptr<UnifiedDataProperties> GetProperties();
 
-    static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;\
-    std::shared_ptr<UnifiedDataProperties> properties_;
+    static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;
 
 private:
     std::shared_ptr<Runtime> runtime_;
     std::vector<std::shared_ptr<UnifiedRecord>> records_;
+    std::shared_ptr<UnifiedDataProperties> properties_;
 };
 } // namespace UDMF
 } // namespace OHOS

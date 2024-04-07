@@ -261,7 +261,7 @@ napi_value UnifiedDataNapi::New(napi_env env, napi_callback_info info)
     napi_value argv[0] = {};
     uData->ref_ = NewWithRef(env, argc, argv,
         reinterpret_cast<void**>(&uData->propertiesNapi_), UnifiedDataPropertiesNapi::Constructor(env));
-    uData->value_->properties_ = uData->propertiesNapi_->value_;
+    uData->value_->SetProperties(uData->propertiesNapi_->value_);
     return ctxt->self;
 }
 
@@ -492,7 +492,7 @@ napi_value UnifiedDataNapi::SetProperties(napi_env env, napi_callback_info info)
         ctxt->status = napi_create_reference(env, argv[0], 1, &schema->ref_);
         // CHECK_STATUS_RETURN_VOID(ctxt, "napi_create_reference to FieldNode failed");
         schema->propertiesNapi_ = node;
-        schema->value_->properties_ = schema->propertiesNapi_->value_;
+        schema->value_->SetProperties(schema->propertiesNapi_->value_);
     };
     ctxt->GetCbInfoSync(env, info, input);
     NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");

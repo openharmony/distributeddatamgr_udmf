@@ -138,5 +138,13 @@ bool UnifiedData::IsComplete()
     }
     return true;
 }
+
+void UnifiedData::SetProperties(std::shared_ptr<UnifiedDataProperties> properties){
+    properties_ = properties;
+}
+
+std::shared_ptr<UnifiedDataProperties> UnifiedData::GetProperties(){
+    return properties_;
+}
 } // namespace UDMF
 } // namespace OHOS
