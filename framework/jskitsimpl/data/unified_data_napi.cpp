@@ -59,7 +59,7 @@ napi_value UnifiedDataPropertiesNapi::New(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");
 
     UnifiedDataPropertiesNapi* properties = new (std::nothrow) UnifiedDataPropertiesNapi();
-    NAPI_ASSERT(env, properties !=nullptr, "no memory for schema");
+    NAPI_ASSERT(env, properties != nullptr, "no memory for schema");
 
     auto finalize = [](napi_env env, void* data, void* hint) {
         LOG_DEBUG(UDMF_KITS_NAPI, "properties finalize.");
@@ -256,6 +256,12 @@ napi_value UnifiedDataNapi::New(napi_env env, napi_callback_info info)
         uData->value_->AddRecord(uRecord->value_);
     }
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, uData, Destructor, nullptr, nullptr), uData);
+
+    int argc = 0;
+    napi_value argv[0] = {};
+    uData->ref_ = NewWithRef(env, argc, argv,
+        reinterpret_cast<void**>(&uData->propertiesNapi_), UnifiedDataPropertiesNapi::Constructor(env));
+    uData->value_->properties_ = uData->propertiesNapi_->value_;
     return ctxt->self;
 }
 
@@ -463,13 +469,6 @@ napi_value UnifiedDataNapi::GetProperties(napi_env env, napi_callback_info info)
 {
     auto ctxt = std::make_shared<ContextBase>();
     auto unifiedData = GetUnifiedData(env, info);
-    // CHECK_RETURN(unifiedData != nullptr, "unifiedData is nullptr!", nullptr);
-    if (unifiedData->properties_ == nullptr) {
-        int argc = 0;
-        napi_value argv[0] = {};
-        unifiedData->ref_ = NewWithRef(env, argc, argv,
-            reinterpret_cast<void**>(&unifiedData->properties_), UnifiedDataPropertiesNapi::Constructor(env));
-    }
     NAPI_ASSERT(env, unifiedData->ref_ != nullptr, "no root, please set first!");
     NAPI_CALL(env, napi_get_reference_value(env, unifiedData->ref_, &ctxt->output));
     return ctxt->output;
@@ -492,7 +491,8 @@ napi_value UnifiedDataNapi::SetProperties(napi_env env, napi_callback_info info)
         }
         ctxt->status = napi_create_reference(env, argv[0], 1, &schema->ref_);
         // CHECK_STATUS_RETURN_VOID(ctxt, "napi_create_reference to FieldNode failed");
-        schema->properties_ = node;
+        schema->propertiesNapi_ = node;
+        schema->value_->properties_ = schema->propertiesNapi_->value_;
     };
     ctxt->GetCbInfoSync(env, info, input);
     NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");

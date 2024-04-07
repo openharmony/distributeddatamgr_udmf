@@ -29,7 +29,6 @@ public:
     AAFwk::WantParams extras;
     ShareOption shareOption;
     double timestamp;
-    std::function<void(std::string str)> call;
 };
 
 class UnifiedData {
@@ -55,7 +54,8 @@ public:
     bool IsValid();
     bool IsComplete();
 
-    static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;
+    static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;\
+    std::shared_ptr<UnifiedDataProperties> properties_;
 
 private:
     std::shared_ptr<Runtime> runtime_;

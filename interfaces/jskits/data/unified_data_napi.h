@@ -32,7 +32,6 @@ class UnifiedDataPropertiesNapi {
 public:
     static napi_value Constructor(napi_env env);
     std::shared_ptr<UnifiedDataProperties> value_;
-    napi_ref delayDataRef_ = nullptr;
 
 private:
     static napi_value New(napi_env env, napi_callback_info info);
@@ -47,8 +46,8 @@ private:
     static napi_value SetTimestamp(napi_env env, napi_callback_info info);
     static napi_value GetDelayData(napi_env env, napi_callback_info info);
     static napi_value SetDelayData(napi_env env, napi_callback_info info);
-    static void ProcessGetDelayData(napi_env env, napi_ref delayDataRef, std::string str);
 
+    napi_ref delayDataRef_ = nullptr;
 };
 
 class UnifiedDataNapi {
@@ -73,7 +72,7 @@ private:
     static napi_ref NewWithRef(napi_env env, size_t argc, napi_value* argv, void** out, napi_value constructor);
     static napi_status Unwrap(napi_env env, napi_value in, void** out, napi_value constructor);
 
-    UnifiedDataPropertiesNapi* properties_ = nullptr;
+    UnifiedDataPropertiesNapi* propertiesNapi_ = nullptr;
     napi_ref ref_ = nullptr;
 };
 } // namespace UDMF
