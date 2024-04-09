@@ -1002,7 +1002,7 @@ describe('UdmfJSTest', function () {
    * @tc.require:
    */
   it('UnifiedDataPropertiesTest001', 0, function () {
-    const TAG = 'UnifiedDataPropertiesTest';
+    const TAG = 'UnifiedDataPropertiesTest001';
     console.info(TAG, 'start');
     let text = new UDC.Text();
     let unifiedDatas = new UDC.UnifiedData(text);
@@ -1012,7 +1012,7 @@ describe('UdmfJSTest', function () {
     expect(typeof properties.tag).assertEqual('string');
     expect(typeof properties.timestamp).assertEqual('object');
     expect(typeof properties.shareOption).assertEqual('number');
-    expect(typeof properties.getDelayData).assertEqual('function');
+    expect(typeof properties.getDelayData).assertEqual('undefined');
   });
 
   /**
@@ -1022,16 +1022,63 @@ describe('UdmfJSTest', function () {
    * @tc.require:
    */
   it('UnifiedDataPropertiesTest002', 0, function () {
-    const TAG = 'UnifiedDataPropertiesTest';
+    const TAG = 'UnifiedDataPropertiesTest002';
     console.info(TAG, 'start');
     let text = new UDC.Text();
-    let unifiedDatas = new UDC.UnifiedData(text);
+    let unifiedData = new UDC.UnifiedData(text);
     let properties = new UDC.UnifiedDataProperties();
+
     expect(properties.shareOption).assertEqual(UDC.ShareOption.IN_APP);
     properties.shareOption = UDC.ShareOption.CROSS_APP;
-    unifiedDatas.properties = properties;
-    expect(unifiedDatas.properties.shareOption).assertEqual(UDC.ShareOption.CROSS_APP);
-    unifiedDatas.properties.shareOption = UDC.ShareOption.IN_APP;
-    expect(unifiedDatas.properties.shareOption).assertEqual(UDC.ShareOption.IN_APP);
+    unifiedData.properties = properties;
+    expect(unifiedData.properties.shareOption).assertEqual(UDC.ShareOption.CROSS_APP);
+    unifiedData.properties.shareOption = UDC.ShareOption.IN_APP;
+    expect(unifiedData.properties.shareOption).assertEqual(UDC.ShareOption.IN_APP);
+
+    expect(unifiedData.properties.tag).assertEqual("");
+    unifiedData.properties.tag = "DataTag";
+    expect(unifiedData.properties.tag).assertEqual("DataTag");
+
+    let now = new Date();
+    unifiedData.properties.timestamp = now;
+    expect(unifiedData.properties.timestamp.getTime()).assertEqual(now.getTime());
+
+    expect(Object.keys(unifiedData.properties.extras).length).assertEqual(0);
+    let person = {fname: "John", lname: "Doe", age: 25};
+    unifiedData.properties.extras = person;
+    expect(Object.keys(unifiedData.properties.extras).length).assertEqual(3);
+  });
+
+  /**
+   * @tc.name UnifiedDataPropertiesTest003
+   * @tc.desc Test Js UnifiedDataProperties testcase
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UnifiedDataPropertiesTest003', 0, function () {
+    const TAG = 'UnifiedDataPropertiesTest003';
+    console.info(TAG, 'start');
+    let text = new UDC.Text();
+    let unifiedData = new UDC.UnifiedData(text);
+    let properties = new UDC.UnifiedDataProperties();
+
+    function func(inputStr){
+      console.info(TAG, "execute func");
+      let text = new UDC.Text();
+      text.details = {
+        Key: inputStr + KEY_TEST_ELEMENT,
+        Value: inputStr + VALUE_TEST_ELEMENT,
+      };
+      let data = new UDC.UnifiedData(text);
+      data.properties.tag = "FileTag";
+      return data;
+    }
+    unifiedData.properties.getDelayData = func;
+    const data = unifiedData.properties.getDelayData("inputTest");
+    let records = data.getRecords();
+    expect(records.length).assertEqual(1);
+    expect(records[0].details.Key).assertEqual(inputStr + KEY_TEST_ELEMENT);
+    expect(records[0].details.Value).assertEqual(inputStr + VALUE_TEST_ELEMENT);
+    expect(data.properties.tag).assertEqual("FileTag");
   });
 });

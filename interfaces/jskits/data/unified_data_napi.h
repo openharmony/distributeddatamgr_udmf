@@ -72,6 +72,7 @@ private:
     static napi_value HasType(napi_env env, napi_callback_info info);
     static napi_value GetProperties(napi_env env, napi_callback_info info);
     static napi_value SetProperties(napi_env env, napi_callback_info info);
+    static UnifiedDataPropertiesNapi* GetPropertiesNapi(napi_env env, napi_callback_info info);
     static napi_ref NewWithRef(napi_env env, size_t argc, napi_value* argv, void** out, napi_value constructor);
     static napi_status Unwrap(napi_env env, napi_value in, void** out, napi_value constructor);
 };
