@@ -60,7 +60,7 @@ napi_value GenerateErrorMsg(napi_env env, NapiErrorCode jsInfo);
     do {                                                    \
         if (!(assertion)) {                                 \
             ThrowNapiError(env, errorcode, message);        \
-            return napi_generic_failure;                                         \
+            return napi_generic_failure;                    \
         }                                                   \
     } while (0)
 

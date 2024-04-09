@@ -41,13 +41,14 @@ public:
     void SetRuntime(Runtime &runtime);
 
     void AddRecord(const std::shared_ptr<UnifiedRecord> &record);
+    void AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>>& records);
     std::shared_ptr<UnifiedRecord> GetRecordAt(std::size_t index);
     void SetRecords(std::vector<std::shared_ptr<UnifiedRecord>> records);
     std::vector<std::shared_ptr<UnifiedRecord>> GetRecords() const;
 
     std::vector<UDType> GetUDTypes();
     std::string GetTypes();
-    std::vector<std::string> GetTypesVector();
+    std::vector<std::string> GetTypesLabels();
     bool HasType(const std::string &type);
 
     bool IsEmpty() const;
@@ -55,8 +56,6 @@ public:
     bool IsComplete();
     void SetProperties(std::shared_ptr<UnifiedDataProperties> properties);
     std::shared_ptr<UnifiedDataProperties> GetProperties();
-
-    void AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>>& records);
 
     static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;
 

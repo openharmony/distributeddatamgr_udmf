@@ -14,7 +14,6 @@
  */
 #define LOG_TAG "UnifiedDataNapi"
 #include "unified_data_napi.h"
-
 #include "application_defined_record_napi.h"
 #include "audio_napi.h"
 #include "file_napi.h"
@@ -24,7 +23,6 @@
 #include "link_napi.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
-#include "napi_queue.h"
 #include "plain_text_napi.h"
 #include "system_defined_appitem_napi.h"
 #include "system_defined_form_napi.h"
@@ -56,94 +54,108 @@ napi_value UnifiedDataPropertiesNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
-    UnifiedDataPropertiesNapi* properties = new (std::nothrow) UnifiedDataPropertiesNapi();
-    NAPI_ASSERT(env, properties != nullptr, "no memory for schema");
+    auto* properties = new (std::nothrow) UnifiedDataPropertiesNapi();
+    ASSERT_ERR(ctxt->env, properties != nullptr, Status::E_ERROR, "no memory for properties!");
 
-    auto finalize = [](napi_env env, void* data, void* hint) {
-        LOG_DEBUG(UDMF_KITS_NAPI, "properties finalize.");
-        auto* properties = reinterpret_cast<UnifiedDataPropertiesNapi*>(data);
-        // ASSERT_BUSINESS_ERR(ctxt, properties != nullptr, Status::E_INVALID_PARAMETERS, "properties is null!");
-        delete properties;
-    };
     properties->value_ = std::make_shared<UnifiedDataProperties>();
-    ASSERT_CALL(env, napi_wrap(env, ctxt->self, properties, finalize, nullptr, nullptr), properties);
+    ASSERT_CALL(env, napi_wrap(env, ctxt->self, properties, Destructor, nullptr, nullptr), properties);
     return ctxt->self;
 }
 
-UnifiedDataPropertiesNapi* UnifiedDataPropertiesNapi::GetPropertiesNapi(napi_env env, napi_callback_info info)
+void UnifiedDataPropertiesNapi::Destructor(napi_env env, void *data, void *hint)
 {
-    auto ctxt = std::make_shared<ContextBase>();
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi finalize.");
+    auto *properties = static_cast<UnifiedDataPropertiesNapi *>(data);
+    ASSERT_VOID(properties != nullptr, "finalize null!");
+    delete properties;
+}
+
+UnifiedDataPropertiesNapi* UnifiedDataPropertiesNapi::GetPropertiesNapi(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     ctxt->GetCbInfoSync(env, info);
-    NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     return reinterpret_cast<UnifiedDataPropertiesNapi*>(ctxt->native);
 }
 
 napi_value UnifiedDataPropertiesNapi::GetExtras(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "GetExtras");
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    auto properties = GetPropertiesNapi(env, info);
+    auto properties = GetPropertiesNapi(env, info, ctxt);
+    ASSERT_ERR(
+        ctxt->env, (properties != nullptr && properties->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
     ctxt->output = OHOS::AppExecFwk::WrapWantParams(env, properties->value_->extras);
     return ctxt->output;
 }
 
 napi_value UnifiedDataPropertiesNapi::SetExtras(napi_env env, napi_callback_info info)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    AAFwk::WantParams vv;
-    auto input = [env, ctxt, &vv](size_t argc, napi_value* argv) {
-        bool ret = OHOS::AppExecFwk::UnwrapWantParams(env, argv[0], vv);
+    AAFwk::WantParams value;
+    auto input = [env, ctxt, &value](size_t argc, napi_value* argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        bool ret = OHOS::AppExecFwk::UnwrapWantParams(env, argv[0], value);
         LOG_INFO(UDMF_KITS_NAPI, "extras ret = %{public}d", ret);
     };
     ctxt->GetCbInfoSync(env, info, input);
-    NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");
-
-    auto properties = reinterpret_cast<UnifiedDataPropertiesNapi*>(ctxt->native);
-    properties->value_->extras = vv;
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    auto properties = static_cast<UnifiedDataPropertiesNapi*>(ctxt->native);
+    ASSERT_ERR(
+        ctxt->env, (properties != nullptr && properties->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    properties->value_->extras = value;
     return nullptr;
 }
 
 napi_value UnifiedDataPropertiesNapi::GetTag(napi_env env, napi_callback_info info)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    auto properties = GetPropertiesNapi(env, info);
-    // CHECK_RETURN(fieldNode != nullptr, "getFieldNode nullptr!", nullptr);
-    NapiDataUtils::SetValue(env, properties->value_->tag, ctxt->output);
+    auto properties = GetPropertiesNapi(env, info, ctxt);
+    ASSERT_ERR(
+        ctxt->env, (properties != nullptr && properties->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    ctxt->status = NapiDataUtils::SetValue(env, properties->value_->tag, ctxt->output);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set properties tag failed!");
     return ctxt->output;
 }
 
 napi_value UnifiedDataPropertiesNapi::SetTag(napi_env env, napi_callback_info info)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    std::string vv;
-    auto input = [env, ctxt, &vv](size_t argc, napi_value* argv) {
-        // required 1 arguments :: <defaultValue>
-        // CHECK_ARGS_RETURN_VOID(ctxt, argc == 1, "invalid arguments!");
-        ctxt->status = NapiDataUtils::GetValue(env, argv[0], vv);
-        // CHECK_STATUS_RETURN_VOID(ctxt, "invalid arg[0], i.e. invalid defaultValue!");
+    std::string tag;
+    auto input = [env, ctxt, &tag](size_t argc, napi_value* argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], tag);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");
-
-    auto properties = reinterpret_cast<UnifiedDataPropertiesNapi*>(ctxt->native);
-    properties->value_->tag = vv;
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    auto properties = static_cast<UnifiedDataPropertiesNapi*>(ctxt->native);
+    ASSERT_ERR(
+        ctxt->env, (properties != nullptr && properties->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    properties->value_->tag = tag;
     return nullptr;
 }
 
 napi_value UnifiedDataPropertiesNapi::GetShareOption(napi_env env, napi_callback_info info)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    auto properties = GetPropertiesNapi(env, info);
-    // CHECK_RETURN(fieldNode != nullptr, "getFieldNode nullptr!", nullptr);
-    NapiDataUtils::SetValue(env, properties->value_->shareOption, ctxt->output);
+    auto properties = GetPropertiesNapi(env, info, ctxt);
+    ASSERT_ERR(
+        ctxt->env, (properties != nullptr && properties->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    ctxt->status = NapiDataUtils::SetValue(env, properties->value_->shareOption, ctxt->output);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set properties shareOption failed!");
     return ctxt->output;
 }
 
 napi_value UnifiedDataPropertiesNapi::SetShareOption(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "SetShareOption");
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
     int32_t shareOptionValue = ShareOption::IN_APP;
     auto input = [env, ctxt, &shareOptionValue](size_t argc, napi_value *argv) {
@@ -162,23 +174,24 @@ napi_value UnifiedDataPropertiesNapi::SetShareOption(napi_env env, napi_callback
 
 napi_value UnifiedDataPropertiesNapi::GetTimestamp(napi_env env, napi_callback_info info)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    auto properties = GetPropertiesNapi(env, info);
-    // CHECK_RETURN(fieldNode != nullptr, "getFieldNode nullptr!", nullptr);
-    // NapiDataUtils::SetValue(env, properties->value_->timestamp, ctxt->output);
-    napi_create_date(env, properties->value_->timestamp, &ctxt->output);
+    auto properties = GetPropertiesNapi(env, info, ctxt);
+    ASSERT_ERR(
+        ctxt->env, (properties != nullptr && properties->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    ctxt->status = napi_create_date(env, properties->value_->timestamp, &ctxt->output);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set properties timestamp failed!");
     return ctxt->output;
 }
 
 napi_value UnifiedDataPropertiesNapi::SetTimestamp(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "SetTimestamp");
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    double timestampValue = ShareOption::IN_APP;
+    double timestampValue;
     auto input = [env, ctxt, &timestampValue](size_t argc, napi_value *argv) {
         ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-        // ctxt->status = NapiDataUtils::GetValue(env, argv[0], shareOptionValue);
-        napi_get_date_value(env, argv[0], &timestampValue);
+        ctxt->status = napi_get_date_value(env, argv[0], &timestampValue);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
     ctxt->GetCbInfoSync(env, info, input);
@@ -192,26 +205,36 @@ napi_value UnifiedDataPropertiesNapi::SetTimestamp(napi_env env, napi_callback_i
 
 napi_value UnifiedDataPropertiesNapi::GetDelayData(napi_env env, napi_callback_info info)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    auto properties = GetPropertiesNapi(env, info);
-    // CHECK_RETURN(fieldNode != nullptr, "getFieldNode nullptr!", nullptr);
-    napi_get_reference_value(env, properties->delayDataRef_, &ctxt->output);
+    auto properties = GetPropertiesNapi(env, info, ctxt);
+    ASSERT_ERR(
+        ctxt->env, (properties != nullptr && properties->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    ctxt->status = napi_get_reference_value(env, properties->delayDataRef_, &ctxt->output);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set properties getDelayData failed!");
     return ctxt->output;
 }
 
 napi_value UnifiedDataPropertiesNapi::SetDelayData(napi_env env, napi_callback_info info)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
     napi_value handler;
     napi_ref ref;
     auto input = [env, ctxt, &handler](size_t argc, napi_value* argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        napi_valuetype valueType = napi_undefined;
+        napi_typeof(env, argv[0], &valueType);
+        ASSERT_BUSINESS_ERR(ctxt, valueType == napi_function, Status::E_INVALID_PARAMETERS, "callback is not a function");
         handler = argv[0];
     };
     ctxt->GetCbInfoSync(env, info, input);
-    NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");
-
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     auto properties = reinterpret_cast<UnifiedDataPropertiesNapi*>(ctxt->native);
-    napi_create_reference(env, handler, 1, &ref);
+    ASSERT_ERR(
+        ctxt->env, (properties != nullptr && properties->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    ctxt->status = napi_create_reference(env, handler, 1, &ref);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     properties->delayDataRef_ = ref;
     return nullptr;
 }
@@ -257,11 +280,13 @@ napi_value UnifiedDataNapi::New(napi_env env, napi_callback_info info)
     }
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, uData, Destructor, nullptr, nullptr), uData);
 
+    // Create and bind UnifiedDataPropertiesNapi
     int argc = 0;
     napi_value argv[0] = {};
+    UnifiedDataPropertiesNapi* propertiesNapi = nullptr;
     uData->ref_ = NewWithRef(env, argc, argv,
-        reinterpret_cast<void**>(&uData->propertiesNapi_), UnifiedDataPropertiesNapi::Constructor(env));
-    uData->value_->SetProperties(uData->propertiesNapi_->value_);
+        reinterpret_cast<void**>(&propertiesNapi), UnifiedDataPropertiesNapi::Constructor(env));
+    uData->value_->SetProperties(propertiesNapi->value_);
     return ctxt->self;
 }
 
@@ -273,17 +298,7 @@ void UnifiedDataNapi::Destructor(napi_env env, void *data, void *hint)
     delete uData;
 }
 
-void UnifiedDataNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedData> in, napi_value &out)
-{
-    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
-    ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *unifiedData = new (std::nothrow) UnifiedDataNapi();
-    ASSERT_ERR_VOID(env, unifiedData != nullptr, Status::E_ERROR, "no memory for unified data!");
-    unifiedData->value_ = in;
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, unifiedData, Destructor, nullptr, nullptr), unifiedData);
-}
-
-napi_status UnifiedDataNapi::NewInstance1(napi_env env, std::shared_ptr<UnifiedData> in, napi_value &out)
+napi_status UnifiedDataNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedData> in, napi_value &out)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     ASSERT_CALL_STATUS(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
@@ -412,6 +427,7 @@ void UnifiedDataNapi::GetRecord(napi_env env, std::shared_ptr<UnifiedRecord> in,
 
 napi_value UnifiedDataNapi::HasType(napi_env env, napi_callback_info info)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     napi_value thisVar = nullptr;
@@ -444,6 +460,7 @@ napi_value UnifiedDataNapi::HasType(napi_env env, napi_callback_info info)
 
 napi_value UnifiedDataNapi::GetTypes(napi_env env, napi_callback_info info)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     napi_value thisVar = nullptr;
@@ -457,7 +474,7 @@ napi_value UnifiedDataNapi::GetTypes(napi_env env, napi_callback_info info)
         // PASTEBOARD_HILOGE(PASTEBOARD_MODULE_JS_NAPI, "Get GetProperty object failed");
         return nullptr;
     }
-    std::vector<std::string> Types = obj->value_->GetTypesVector();
+    std::vector<std::string> Types = obj->value_->GetTypesLabels();
     if (Types.size() == 0) {
         return nullptr;
     }
@@ -478,35 +495,34 @@ napi_value UnifiedDataNapi::GetTypes(napi_env env, napi_callback_info info)
 
 napi_value UnifiedDataNapi::GetProperties(napi_env env, napi_callback_info info)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto unifiedData = GetUnifiedData(env, info);
-    NAPI_ASSERT(env, unifiedData->ref_ != nullptr, "no root, please set first!");
+    ASSERT_ERR(env, unifiedData->ref_ != nullptr, Status::E_NOT_FOUND, "no properties, please set first!");
     NAPI_CALL(env, napi_get_reference_value(env, unifiedData->ref_, &ctxt->output));
     return ctxt->output;
 }
 
 napi_value UnifiedDataNapi::SetProperties(napi_env env, napi_callback_info info)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, ctxt](size_t argc, napi_value* argv) {
-        // required 2 arguments :: <root-node>
-        // CHECK_ARGS_RETURN_VOID(ctxt, argc == 1, "invalid arguments!");
-        UnifiedDataPropertiesNapi* node = nullptr;
-        ctxt->status = Unwrap(env, argv[0], reinterpret_cast<void**>(&node), UnifiedDataPropertiesNapi::Constructor(env));
-        // CHECK_STATUS_RETURN_VOID(ctxt, "napi_unwrap to FieldNode failed");
-        // CHECK_ARGS_RETURN_VOID(ctxt, node != nullptr, "invalid arg[0], i.e. invalid node!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        UnifiedDataPropertiesNapi* propertiesNapi = nullptr;
+        ctxt->status = Unwrap(env, argv[0], reinterpret_cast<void**>(&propertiesNapi), UnifiedDataPropertiesNapi::Constructor(env));
+        ASSERT_BUSINESS_ERR(ctxt, propertiesNapi != nullptr, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
-        auto schema = reinterpret_cast<UnifiedDataNapi*>(ctxt->native);
-        if (schema->ref_ != nullptr) {
-            napi_delete_reference(env, schema->ref_);
+        auto uData = reinterpret_cast<UnifiedDataNapi*>(ctxt->native);
+        if (uData->ref_ != nullptr) {
+            napi_delete_reference(env, uData->ref_);
         }
-        ctxt->status = napi_create_reference(env, argv[0], 1, &schema->ref_);
-        // CHECK_STATUS_RETURN_VOID(ctxt, "napi_create_reference to FieldNode failed");
-        schema->propertiesNapi_ = node;
-        schema->value_->SetProperties(schema->propertiesNapi_->value_);
+        ctxt->status = napi_create_reference(env, argv[0], 1, &uData->ref_);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "napi_create_reference to properties failed!");
+        uData->value_->SetProperties(propertiesNapi->value_);
     };
     ctxt->GetCbInfoSync(env, info, input);
-    NAPI_ASSERT(env, ctxt->status == napi_ok, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     return ctxt->self;
 }
 
@@ -514,17 +530,14 @@ napi_ref UnifiedDataNapi::NewWithRef(napi_env env, size_t argc, napi_value* argv
 {
     napi_value object = nullptr;
     napi_status status = napi_new_instance(env, constructor, argc, argv, &object);
-    // CHECK_RETURN(status == napi_ok, "napi_new_instance failed", nullptr);
-    // CHECK_RETURN(object != nullptr, "napi_new_instance failed", nullptr);
+    ASSERT_ERR(env, status == napi_ok && object != nullptr, Status::E_ERROR, "napi_new_instance failed");
 
     status = napi_unwrap(env, object, out);
-    // CHECK_RETURN(status == napi_ok, "napi_unwrap failed", nullptr);
-    // CHECK_RETURN(out != nullptr, "napi_unwrap failed", nullptr);
+    ASSERT_ERR(env, status == napi_ok && out != nullptr, Status::E_ERROR, "napi_unwrap failed");
 
     napi_ref ref = nullptr;
     status = napi_create_reference(env, object, 1, &ref);
-    // CHECK_RETURN(status == napi_ok, "napi_create_referenc!e failed", nullptr);
-    // CHECK_RETURN(ref != nullptr, "napi_create_referenc!e failed", nullptr);
+    ASSERT_ERR(env, status == napi_ok && ref != nullptr, Status::E_ERROR, "napi_create_reference failed");
     return ref;
 }
 
@@ -534,7 +547,7 @@ napi_status UnifiedDataNapi::Unwrap(napi_env env, napi_value in, void** out, nap
         bool isInstance = false;
         napi_instanceof(env, in, constructor, &isInstance);
         if (!isInstance) {
-            // ZLOGE("not a instance of *");
+            LOG_ERROR(UDMF_KITS_NAPI, "not a instance of *");
             return napi_invalid_arg;
         }
     }

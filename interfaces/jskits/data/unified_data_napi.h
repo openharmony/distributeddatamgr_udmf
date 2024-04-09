@@ -21,6 +21,7 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "napi_queue.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -32,10 +33,12 @@ class UnifiedDataPropertiesNapi {
 public:
     static napi_value Constructor(napi_env env);
     std::shared_ptr<UnifiedDataProperties> value_;
+    napi_ref delayDataRef_ = nullptr;
 
 private:
     static napi_value New(napi_env env, napi_callback_info info);
-    static UnifiedDataPropertiesNapi* GetPropertiesNapi(napi_env env, napi_callback_info info);
+    static void Destructor(napi_env env, void *data, void *hint);
+    static UnifiedDataPropertiesNapi* GetPropertiesNapi(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt);
     static napi_value GetExtras(napi_env env, napi_callback_info info);
     static napi_value SetExtras(napi_env env, napi_callback_info info);
     static napi_value GetTag(napi_env env, napi_callback_info info);
@@ -46,16 +49,15 @@ private:
     static napi_value SetTimestamp(napi_env env, napi_callback_info info);
     static napi_value GetDelayData(napi_env env, napi_callback_info info);
     static napi_value SetDelayData(napi_env env, napi_callback_info info);
-
-    napi_ref delayDataRef_ = nullptr;
 };
 
 class UnifiedDataNapi {
 public:
     static napi_value Constructor(napi_env env);
-    static void NewInstance(napi_env env, std::shared_ptr<UnifiedData> in, napi_value &out);
-    static napi_status NewInstance1(napi_env env, std::shared_ptr<UnifiedData> in, napi_value &out);
+    static napi_status NewInstance(napi_env env, std::shared_ptr<UnifiedData> in, napi_value &out);
+    
     std::shared_ptr<UnifiedData> value_;
+    napi_ref ref_ = nullptr;
 
 private:
     static napi_value New(napi_env env, napi_callback_info info);
@@ -72,9 +74,6 @@ private:
     static napi_value SetProperties(napi_env env, napi_callback_info info);
     static napi_ref NewWithRef(napi_env env, size_t argc, napi_value* argv, void** out, napi_value constructor);
     static napi_status Unwrap(napi_env env, napi_value in, void** out, napi_value constructor);
-
-    UnifiedDataPropertiesNapi* propertiesNapi_ = nullptr;
-    napi_ref ref_ = nullptr;
 };
 } // namespace UDMF
 } // namespace OHOS
