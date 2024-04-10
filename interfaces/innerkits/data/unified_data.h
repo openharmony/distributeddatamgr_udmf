@@ -16,7 +16,6 @@
 #ifndef UDMF_UNIFIED_DATA_H
 #define UDMF_UNIFIED_DATA_H
 
-#include <string>
 #include "unified_record.h"
 #include "want_params.h"
 

@@ -287,7 +287,7 @@ napi_value UnifiedDataNapi::New(napi_env env, napi_callback_info info)
     int argc = 0;
     napi_value argv[0] = {};
     UnifiedDataPropertiesNapi* propertiesNapi = nullptr;
-    uData->ref_ = NewWithRef(env, argc, argv, reinterpret_cast<void **>(&propertiesNapi), UnifiedDataPropertiesNapi::Constructor(env));
+    uData->propertyRef_ = NewWithRef(env, argc, argv, reinterpret_cast<void **>(&propertiesNapi), UnifiedDataPropertiesNapi::Constructor(env));
 
     uData->value_ = std::make_shared<UnifiedData>(propertiesNapi->value_);
     if (uRecord) {
@@ -480,22 +480,17 @@ napi_value UnifiedDataNapi::GetProperties(napi_env env, napi_callback_info info)
     napi_value value;
     auto uData = GetUnifiedData(env, info);
     ASSERT_ERR(env, (uData != nullptr && uData->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
-    NAPI_CALL(env, napi_get_reference_value(env, uData->ref_, &value));
+    NAPI_CALL(env, napi_get_reference_value(env, uData->propertyRef_, &value));
     return value;
 }
 
 UnifiedDataPropertiesNapi* UnifiedDataNapi::GetPropertiesNapi(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
-    napi_value value;
-    auto uData = GetUnifiedData(env, info);
-    ASSERT_ERR(env, (uData != nullptr && uData->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
-    NAPI_CALL(env, napi_get_reference_value(env, uData->ref_, &value));
-
-    void** out = nullptr;
-    napi_status status = napi_unwrap(env, value, out);
+    napi_value value = GetProperties(env, info);
+    UnifiedDataPropertiesNapi* out = nullptr;
+    napi_status status = napi_unwrap(env, value, reinterpret_cast<void**>(&out));
     ASSERT_ERR(env, status == napi_ok && out != nullptr, Status::E_ERROR, "napi_unwrap failed");
-    return static_cast<UnifiedDataPropertiesNapi*>(*out);
+    return out;
 }
 
 napi_value UnifiedDataNapi::SetProperties(napi_env env, napi_callback_info info)
@@ -509,10 +504,10 @@ napi_value UnifiedDataNapi::SetProperties(napi_env env, napi_callback_info info)
         ASSERT_BUSINESS_ERR(ctxt, propertiesNapi != nullptr, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
         auto uData = static_cast<UnifiedDataNapi*>(ctxt->native);
-        if (uData->ref_ != nullptr) {
-            napi_delete_reference(env, uData->ref_);
+        if (uData->propertyRef_ != nullptr) {
+            napi_delete_reference(env, uData->propertyRef_);
         }
-        ctxt->status = napi_create_reference(env, argv[0], 1, &uData->ref_);
+        ctxt->status = napi_create_reference(env, argv[0], 1, &uData->propertyRef_);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "napi_create_reference to properties failed!");
         uData->value_->SetProperties(propertiesNapi->value_);
     };
