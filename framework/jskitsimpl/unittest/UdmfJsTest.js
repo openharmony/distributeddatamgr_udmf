@@ -1028,12 +1028,12 @@ describe('UdmfJSTest', function () {
     let unifiedData = new UDC.UnifiedData(text);
     let properties = new UDC.UnifiedDataProperties();
 
-    expect(properties.shareOption).assertEqual(UDC.ShareOption.IN_APP);
-    properties.shareOption = UDC.ShareOption.CROSS_APP;
+    expect(properties.shareOption).assertEqual(UDC.ShareOption.CROSS_APP);
+    properties.shareOption = UDC.ShareOption.IN_APP;
     unifiedData.properties = properties;
-    expect(unifiedData.properties.shareOption).assertEqual(UDC.ShareOption.CROSS_APP);
-    unifiedData.properties.shareOption = UDC.ShareOption.IN_APP;
     expect(unifiedData.properties.shareOption).assertEqual(UDC.ShareOption.IN_APP);
+    unifiedData.properties.shareOption = UDC.ShareOption.CROSS_APP;
+    expect(unifiedData.properties.shareOption).assertEqual(UDC.ShareOption.CROSS_APP);
 
     expect(unifiedData.properties.tag).assertEqual("");
     unifiedData.properties.tag = "DataTag";
@@ -1091,23 +1091,27 @@ describe('UdmfJSTest', function () {
   it('UnifiedDataHasType', 0, function () {
     const TAG = 'UnifiedDataHasType';
     console.info(TAG, 'start');
+    const textType = "general.text";
+    const plaintextType = "general.plain-text";
+    const htmlType = "general.html";
+
     let text = new UDC.Text();
     let unifiedData = new UDC.UnifiedData(text);
-    expect(unifiedData.hasType("TEXT")).assertEqual(true);
-    expect(unifiedData.hasType("HTML")).assertEqual(false);
-    expect(unifiedData.hasType("PLAIN_TEXT")).assertEqual(false);
+    expect(unifiedData.hasType(textType)).assertEqual(true);
+    expect(unifiedData.hasType(htmlType)).assertEqual(false);
+    expect(unifiedData.hasType(plaintextType)).assertEqual(false);
     let types = unifiedData.getTypes();
     expect(types.length).assertEqual(1);
-    expect(types[0]).assertEqual("TEXT");
+    expect(types[0]).assertEqual(textType);
 
     let html = new UDC.HTML();
     unifiedData.addRecord(html);
-    expect(unifiedData.hasType("TEXT")).assertEqual(true);
-    expect(unifiedData.hasType("HTML")).assertEqual(true);
-    expect(unifiedData.hasType("PLAIN_TEXT")).assertEqual(false);
+    expect(unifiedData.hasType(textType)).assertEqual(true);
+    expect(unifiedData.hasType(htmlType)).assertEqual(true);
+    expect(unifiedData.hasType(plaintextType)).assertEqual(false);
     types = unifiedData.getTypes();
     expect(types.length).assertEqual(2);
-    expect(types[0]).assertEqual("TEXT");
-    expect(types[1]).assertEqual("HTML");
+    expect(types[0]).assertEqual(textType);
+    expect(types[1]).assertEqual(htmlType);
   });
 });

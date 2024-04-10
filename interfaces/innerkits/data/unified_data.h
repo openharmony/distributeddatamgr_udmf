@@ -27,7 +27,7 @@ class UnifiedDataProperties {
 public: 
     std::string tag;
     AAFwk::WantParams extras;
-    ShareOption shareOption;
+    ShareOption shareOption = CROSS_APP;
     double timestamp;
 };
 

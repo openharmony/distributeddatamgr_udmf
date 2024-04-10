@@ -252,6 +252,8 @@ napi_value UnifiedDataNapi::Constructor(napi_env env)
         /* UnifiedData properties */
         DECLARE_NAPI_FUNCTION("addRecord", AddRecord),
         DECLARE_NAPI_FUNCTION("getRecords", GetRecords),
+        DECLARE_NAPI_FUNCTION("hasType", HasType),
+        DECLARE_NAPI_FUNCTION("getTypes", GetTypes),
         DECLARE_NAPI_GETTER_SETTER("properties", GetProperties, SetProperties),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);

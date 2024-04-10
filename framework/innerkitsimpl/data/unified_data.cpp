@@ -61,7 +61,8 @@ void UnifiedData::AddRecord(const std::shared_ptr<UnifiedRecord> &record)
     this->records_.push_back(record);
 }
 
-void UnifiedData::AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>>& records) {
+void UnifiedData::AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>>& records)
+{
     for (auto &record :records) {
         if (record == nullptr) {
             return;
