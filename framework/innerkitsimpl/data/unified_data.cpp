@@ -19,6 +19,16 @@
 
 namespace OHOS {
 namespace UDMF {
+UnifiedData::UnifiedData() noexcept
+{
+    properties_ = std::make_shared<UnifiedDataProperties>();
+}
+
+UnifiedData::UnifiedData(std::shared_ptr<UnifiedDataProperties> properties)
+{
+    properties_ = properties;
+}
+
 int64_t UnifiedData::GetSize()
 {
     int64_t totalSize = 0;

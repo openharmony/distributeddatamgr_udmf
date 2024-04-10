@@ -280,18 +280,18 @@ napi_value UnifiedDataNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     auto *uData = new (std::nothrow) UnifiedDataNapi();
     ASSERT_ERR(ctxt->env, uData != nullptr, Status::E_ERROR, "no memory for unified data!");
-    uData->value_ = std::make_shared<UnifiedData>();
-    if (uRecord) {
-        uData->value_->AddRecord(uRecord->value_);
-    }
-    ASSERT_CALL(env, napi_wrap(env, ctxt->self, uData, Destructor, nullptr, nullptr), uData);
 
     // Create and bind UnifiedDataPropertiesNapi
     int argc = 0;
     napi_value argv[0] = {};
     UnifiedDataPropertiesNapi* propertiesNapi = nullptr;
     uData->ref_ = NewWithRef(env, argc, argv, reinterpret_cast<void **>(&propertiesNapi), UnifiedDataPropertiesNapi::Constructor(env));
-    uData->value_->SetProperties(propertiesNapi->value_);
+
+    uData->value_ = std::make_shared<UnifiedData>(propertiesNapi->value_);
+    if (uRecord) {
+        uData->value_->AddRecord(uRecord->value_);
+    }
+    ASSERT_CALL(env, napi_wrap(env, ctxt->self, uData, Destructor, nullptr, nullptr), uData);
     return ctxt->self;
 }
 

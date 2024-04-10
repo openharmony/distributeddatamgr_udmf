@@ -1077,8 +1077,37 @@ describe('UdmfJSTest', function () {
     const data = unifiedData.properties.getDelayData("inputTest");
     let records = data.getRecords();
     expect(records.length).assertEqual(1);
-    expect(records[0].details.Key).assertEqual(inputStr + KEY_TEST_ELEMENT);
-    expect(records[0].details.Value).assertEqual(inputStr + VALUE_TEST_ELEMENT);
+    expect(records[0].details.Key).assertEqual("inputTest" + KEY_TEST_ELEMENT);
+    expect(records[0].details.Value).assertEqual("inputTest" + VALUE_TEST_ELEMENT);
     expect(data.properties.tag).assertEqual("FileTag");
+  });
+
+  /**
+   * @tc.name UnifiedDataHasType
+   * @tc.desc Test Js UnifiedDataProperties testcase
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UnifiedDataHasType', 0, function () {
+    const TAG = 'UnifiedDataHasType';
+    console.info(TAG, 'start');
+    let text = new UDC.Text();
+    let unifiedData = new UDC.UnifiedData(text);
+    expect(unifiedData.hasType("TEXT")).assertEqual(true);
+    expect(unifiedData.hasType("HTML")).assertEqual(false);
+    expect(unifiedData.hasType("PLAIN_TEXT")).assertEqual(false);
+    let types = unifiedData.getTypes();
+    expect(types.length).assertEqual(1);
+    expect(types[0]).assertEqual("TEXT");
+
+    let html = new UDC.HTML();
+    unifiedData.addRecord(html);
+    expect(unifiedData.hasType("TEXT")).assertEqual(true);
+    expect(unifiedData.hasType("HTML")).assertEqual(true);
+    expect(unifiedData.hasType("PLAIN_TEXT")).assertEqual(false);
+    types = unifiedData.getTypes();
+    expect(types.length).assertEqual(2);
+    expect(types[0]).assertEqual("TEXT");
+    expect(types[1]).assertEqual("HTML");
   });
 });

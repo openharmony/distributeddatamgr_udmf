@@ -33,8 +33,10 @@ public:
 
 class UnifiedData {
 public:
-    int64_t GetSize();
+    UnifiedData() noexcept;
+    explicit UnifiedData(std::shared_ptr<UnifiedDataProperties> properties);
 
+    int64_t GetSize();
     std::string GetGroupId() const;
 
     std::shared_ptr<Runtime> GetRuntime() const;
@@ -54,6 +56,7 @@ public:
     bool IsEmpty() const;
     bool IsValid();
     bool IsComplete();
+
     void SetProperties(std::shared_ptr<UnifiedDataProperties> properties);
     std::shared_ptr<UnifiedDataProperties> GetProperties();
 
