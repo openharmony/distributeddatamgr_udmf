@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <cstdint>
+#include <vector>
 #define LOG_TAG "UnifiedRecordNapi"
 #include "unified_record_napi.h"
 
@@ -63,7 +65,7 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
     return ctxt->self;
 }
 
-void UnifiedRecordNapi::AddValue(napi_env env, UnifiedRecordNapi *udRecord, std::string type, napi_value value){
+void UnifiedRecordNapi::AddValue(napi_env env, UnifiedRecordNapi *udRecord, std::string type, napi_value valueNapi){
     auto ctxt = std::make_shared<ContextBase>();
     std::unordered_map<std::string, int32_t> type_map;
     for (const auto& pair : UD_TYPE_MAP) {
@@ -72,36 +74,31 @@ void UnifiedRecordNapi::AddValue(napi_env env, UnifiedRecordNapi *udRecord, std:
     UDType utdType = static_cast<UDType>(type_map[type]);
 
     bool isArrayBuffer = false;
-    NAPI_CALL_RETURN_VOID(env, napi_is_arraybuffer(env, value, &isArrayBuffer));
+    NAPI_CALL_RETURN_VOID(env, napi_is_arraybuffer(env, valueNapi, &isArrayBuffer));
     napi_valuetype valueType = napi_undefined;
-    ctxt->status = napi_typeof(env, value, &valueType);
+    ctxt->status = napi_typeof(env, valueNapi, &valueType);
     ASSERT_ERR_VOID(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+
+    ValueType value;
     if (type == "openharmony.pixel-map") {
-        UnifiedRecord record(utdType, Media::PixelMapNapi::GetPixelMap(env, value));
-        udRecord->value_ = std::make_shared<UnifiedRecord>(utdType, Media::PixelMapNapi::GetPixelMap(env, value));
+        std::shared_ptr<OHOS::Media::PixelMap> data;
+        value = data;
     } else if (type == "openharmony.want") {
-        OHOS::AAFwk::Want want;
-        AppExecFwk::UnwrapWant(env, value, want);
-        udRecord->value_ = std::make_shared<UnifiedRecord>(utdType, std::make_shared<OHOS::AAFwk::Want>(want));
+        std::shared_ptr<OHOS::AAFwk::Want> data;
+        value = data;
     } else if (isArrayBuffer) {
-        void *data = nullptr;
-        size_t dataLen = 0;
-        NAPI_CALL_RETURN_VOID(env, napi_get_arraybuffer_info(env, value, &data, &dataLen));
-        auto dataU8 = std::vector<uint8_t>(reinterpret_cast<uint8_t *>(data), reinterpret_cast<uint8_t *>(data) + dataLen);
-        udRecord->value_ = std::make_shared<UnifiedRecord>(utdType, dataU8);
+        value = std::vector<uint8_t>();
     } else if (valueType == napi_string) {
-        std::string data;
-        ctxt->status = NapiDataUtils::GetValue(env, value, data);
-        ASSERT_ERR_VOID(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-        udRecord->value_ = std::make_shared<UnifiedRecord>(utdType, data);
+        value = std::string();
     } else if (valueType == napi_number) {
-        std::vector<uint8_t> data;
-        ctxt->status = NapiDataUtils::GetValue(env, value, data);
-        ASSERT_ERR_VOID(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-        udRecord->value_ = std::make_shared<UnifiedRecord>(utdType, data);
+        value = double();
     } else {
         LOG_ERROR(UDMF_KITS_NAPI, "invalid arguments!");
+        return;
     }
+    std::visit([&](auto& value) { ctxt->status = NapiDataUtils::GetValue(env, valueNapi, value); }, value);
+    ASSERT_ERR_VOID(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    udRecord->value_ = std::make_shared<UnifiedRecord>(utdType, value);
 }
 
 void UnifiedRecordNapi::Destructor(napi_env env, void *data, void *hint)
