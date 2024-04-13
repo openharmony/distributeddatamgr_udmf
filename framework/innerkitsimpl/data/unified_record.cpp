@@ -63,5 +63,10 @@ void UnifiedRecord::SetUid(const std::string &id)
 {
     this->uid_ = id;
 }
+
+ValueType UnifiedRecord::GetValue()
+{
+    return value_;
+}
 } // namespace UDMF
 } // namespace OHOS

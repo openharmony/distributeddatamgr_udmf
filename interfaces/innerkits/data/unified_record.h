@@ -42,13 +42,14 @@ public:
 
     std::string GetUid() const;
     void SetUid(const std::string &id);
+    ValueType GetValue();
 
-    ValueType value_;
 protected:
     UDType dataType_;
 
 private:
     std::string uid_; // unique identifier
+    ValueType value_;
 };
 } // namespace UDMF
 } // namespace OHOS
