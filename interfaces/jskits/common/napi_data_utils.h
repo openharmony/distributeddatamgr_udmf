@@ -33,6 +33,7 @@
 #include "unified_meta.h"
 #include "type_descriptor.h"
 #include "type_descriptor_napi.h"
+#include "pixel_map_napi.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -87,6 +88,9 @@ public:
     static napi_status SetValue(napi_env env, const UDDetails &in, napi_value &out);
 
     static napi_status GetValue(napi_env env, napi_value in, std::shared_ptr<TypeDescriptor> &descriptor);
+
+    static napi_status SetValue(napi_env env, const std::shared_ptr<OHOS::Media::PixelMap>& in, napi_value& out);
+    static napi_status SetValue(napi_env env, const std::shared_ptr<OHOS::AAFwk::Want>& in, napi_value& out);
 
     static bool IsTypeForNapiValue(napi_env env, napi_value param, napi_valuetype expectType);
 

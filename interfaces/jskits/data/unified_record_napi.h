@@ -18,8 +18,12 @@
 
 #include <memory>
 
+#include "napi/native_common.h"
+#include "napi_common_want.h"
+#include "napi_data_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "pixel_map_napi.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -29,6 +33,7 @@ class UnifiedRecordNapi {
 public:
     static napi_value Constructor(napi_env env);
     static napi_value GetType(napi_env env, napi_callback_info info);
+    static napi_value GetValue(napi_env env, napi_callback_info info);
     std::shared_ptr<UnifiedRecord> value_;
 
 private:
@@ -36,7 +41,14 @@ private:
     static void Destructor(napi_env env, void *nativeObject, void *finalize_hint);
     static UnifiedRecordNapi *GetUnifiedRecord(
         napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt);
+    static void AddValue(napi_env env, UnifiedRecordNapi *udRecord, std::string type, napi_value value);
 };
+
+template<typename T>
+napi_status SetValueWrapper(napi_env env, const T& in, napi_value& out) {
+    return NapiDataUtils::SetValue(env, in, out);
+}
+
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_UNIFIED_RECORD_NAPI_H

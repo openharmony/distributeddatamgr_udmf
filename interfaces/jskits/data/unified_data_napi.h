@@ -54,7 +54,7 @@ class UnifiedDataNapi {
 public:
     static napi_value Constructor(napi_env env);
     static napi_status NewInstance(napi_env env, std::shared_ptr<UnifiedData> in, napi_value &out);
-    static UnifiedDataPropertiesNapi* GetPropertiesNapi(napi_env env, napi_callback_info info);
+    UnifiedDataPropertiesNapi* GetPropertiesNapi(napi_env env);
     
     std::shared_ptr<UnifiedData> value_;
     napi_ref propertyRef_ = nullptr;

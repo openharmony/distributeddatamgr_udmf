@@ -14,6 +14,7 @@
  */
 #define LOG_TAG "UnifiedDataNapi"
 #include "unified_data_napi.h"
+
 #include "application_defined_record_napi.h"
 #include "audio_napi.h"
 #include "file_napi.h"
@@ -230,8 +231,8 @@ napi_value UnifiedDataPropertiesNapi::SetDelayData(napi_env env, napi_callback_i
     auto input = [env, ctxt, &handler](size_t argc, napi_value* argv) {
         ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         napi_valuetype valueType = napi_undefined;
-        napi_typeof(env, argv[0], &valueType);
-        ASSERT_BUSINESS_ERR(ctxt, valueType == napi_function, Status::E_INVALID_PARAMETERS, "callback is not a function");
+        ctxt->status = napi_typeof(env, argv[0], &valueType);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && valueType == napi_function, Status::E_INVALID_PARAMETERS, "callback is not a function");
         handler = argv[0];
     };
     ctxt->GetCbInfoSync(env, info, input);
@@ -484,9 +485,10 @@ napi_value UnifiedDataNapi::GetProperties(napi_env env, napi_callback_info info)
     return value;
 }
 
-UnifiedDataPropertiesNapi* UnifiedDataNapi::GetPropertiesNapi(napi_env env, napi_callback_info info)
+UnifiedDataPropertiesNapi* UnifiedDataNapi::GetPropertiesNapi(napi_env env)
 {
-    napi_value value = GetProperties(env, info);
+    napi_value value;
+    NAPI_CALL(env, napi_get_reference_value(env, propertyRef_, &value));
     UnifiedDataPropertiesNapi* out = nullptr;
     napi_status status = napi_unwrap(env, value, reinterpret_cast<void**>(&out));
     ASSERT_ERR(env, status == napi_ok && out != nullptr, Status::E_ERROR, "napi_unwrap failed");

@@ -30,6 +30,15 @@ UnifiedRecord::UnifiedRecord(UDType type)
     dataType_ = type;
 }
 
+UnifiedRecord::UnifiedRecord(UDType type, ValueType value)
+{
+    if (type < ENTITY || type > UD_BUTT) {
+        dataType_ = UD_BUTT;
+    }
+    dataType_ = type;
+    value_ = value;
+}
+
 UDType UnifiedRecord::GetType() const
 {
     return this->dataType_;
