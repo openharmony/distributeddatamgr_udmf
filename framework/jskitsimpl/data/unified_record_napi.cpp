@@ -14,6 +14,7 @@
  */
 #define LOG_TAG "UnifiedRecordNapi"
 #include "unified_record_napi.h"
+
 #include "napi_common_want.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
@@ -138,7 +139,7 @@ napi_value UnifiedRecordNapi::GetValue(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto uRecord = GetUnifiedRecord(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
-    std::visit([&](const auto& value) { SetValueWrapper(env, value, ctxt->output); }, uRecord->value_->GetValue());
+    std::visit([&](const auto& value) { NapiDataUtils::SetValue(env, value, ctxt->output); }, uRecord->value_->GetValue());
     return ctxt->output;
 }
 } // namespace UDMF
