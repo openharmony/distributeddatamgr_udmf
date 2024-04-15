@@ -37,12 +37,22 @@ public:
     std::string GetModule() const;
     void SetModule(const std::string &module);
 
+    void SetItems(UDDetails& details);
+    UDDetails GetItems();
+
 private:
     int32_t formId_;
     std::string formName_;
     std::string bundleName_;
     std::string abilityName_;
     std::string module_;
+
+    constexpr static const char *FORMID = "formId";
+    constexpr static const char *FORMNAME = "formName";
+    constexpr static const char *MODULE = "module";
+    constexpr static const char *BUNDLENAME = "bundleName";
+    constexpr static const char *ABILITYNAME = "abilityName";
+    UDDetails items_;
 };
 } // namespace UDMF
 } // namespace OHOS

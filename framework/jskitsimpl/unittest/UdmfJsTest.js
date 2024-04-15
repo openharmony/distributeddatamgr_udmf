@@ -1117,7 +1117,7 @@ describe('UdmfJSTest', function () {
 
   /**
    * @tc.name UnifiedRecordGetValue
-   * @tc.desc Test Js UnifiedDataProperties testcase
+   * @tc.desc Test Js UnifiedRecord testcase
    * @tc.type: FUNC
    * @tc.require:
    */

@@ -39,6 +39,9 @@ public:
     std::string GetAbilityName() const;
     void SetAbilityName(const std::string &abilityName);
 
+    void SetItems(UDDetails& details);
+    UDDetails GetItems();
+
 private:
     std::string appId_;
     std::string appName_;
@@ -46,6 +49,15 @@ private:
     std::string appLabelId_;
     std::string bundleName_;
     std::string abilityName_;
+
+    constexpr static const char *APPID = "appId";
+    constexpr static const char *APPNAME = "appName";
+    constexpr static const char *APPICONID = "appIconId";
+    constexpr static const char *APPLABELID = "appLabelId";
+    constexpr static const char *BUNDLENAME = "bundleName";
+    constexpr static const char *ABILITYNAME = "abilityName";
+
+    UDDetails items_;
 };
 } // namespace UDMF
 } // namespace OHOS

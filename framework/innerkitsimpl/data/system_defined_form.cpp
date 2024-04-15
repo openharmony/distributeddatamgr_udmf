@@ -36,6 +36,7 @@ int32_t SystemDefinedForm::GetFormId() const
 void SystemDefinedForm::SetFormId(const int32_t &formId)
 {
     this->formId_ = formId;
+    this->items_[FORMID] = formId;
 }
 
 std::string SystemDefinedForm::GetFormName() const
@@ -46,6 +47,7 @@ std::string SystemDefinedForm::GetFormName() const
 void SystemDefinedForm::SetFormName(const std::string &formName)
 {
     this->formName_ = formName;
+    this->items_[FORMNAME] = formName;
 }
 
 std::string SystemDefinedForm::GetBundleName() const
@@ -56,6 +58,7 @@ std::string SystemDefinedForm::GetBundleName() const
 void SystemDefinedForm::SetBundleName(const std::string &bundleName)
 {
     this->bundleName_ = bundleName;
+    this->items_[BUNDLENAME] = bundleName;
 }
 
 std::string SystemDefinedForm::GetAbilityName() const
@@ -66,6 +69,7 @@ std::string SystemDefinedForm::GetAbilityName() const
 void SystemDefinedForm::SetAbilityName(const std::string &abilityName)
 {
     this->abilityName_ = abilityName;
+    this->items_[ABILITYNAME] = this->abilityName_;
 }
 
 std::string SystemDefinedForm::GetModule() const
@@ -76,6 +80,41 @@ std::string SystemDefinedForm::GetModule() const
 void SystemDefinedForm::SetModule(const std::string &module)
 {
     this->module_ = module;
+    this->items_[MODULE] = module;
+}
+
+void SystemDefinedForm::SetItems(UDDetails& details) {
+    for (auto &item : details) {
+        auto* value = std::get_if<std::string>(&item.second);
+        auto* intValue = std::get_if<int32_t>(&item.second);
+        if (value == nullptr && intValue == nullptr) {
+            continue;
+        }
+        if (intValue != nullptr && item.first == FORMID) {
+            SetFormId(*intValue);
+            continue;
+        }
+        if (value == nullptr) {
+            continue;
+        }
+        if (item.first == FORMNAME) {
+            SetFormName(*value);
+        }
+        if (item.first == MODULE) {
+            SetModule(*value);
+        }
+        if (item.first == BUNDLENAME) {
+            SetBundleName(*value);
+        }
+        if (item.first == ABILITYNAME) {
+            SetAbilityName(*value);
+        }
+    }
+}
+
+UDDetails SystemDefinedForm::GetItems()
+{
+    return this->items_;
 }
 } // namespace UDMF
 } // namespace OHOS
