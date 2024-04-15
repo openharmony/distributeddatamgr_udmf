@@ -16,6 +16,7 @@
 import { describe, beforeAll, beforeEach, afterEach, afterAll, it, expect } from 'deccjsunit/index';
 import UDC from '@ohos.data.unifiedDataChannel';
 import UTD from '@ohos.data.uniformTypeDescriptor';
+import image from '@ohos.multimedia.image';
 
 const TEST_BUNDLE_NAME = 'MyBundleName';
 const KEY_TEST_ELEMENT = 'TestKey';
@@ -1112,5 +1113,63 @@ describe('UdmfJSTest', function () {
     expect(types.length).assertEqual(2);
     expect(types[0]).assertEqual(textType);
     expect(types[1]).assertEqual(htmlType);
+  });
+
+  /**
+   * @tc.name UnifiedRecordGetValue
+   * @tc.desc Test Js UnifiedDataProperties testcase
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UnifiedRecordGetValue', 0, async function () {
+    const TAG = 'UnifiedRecordGetValue';
+    console.info(TAG, 'start');
+
+    const dataUri = new ArrayBuffer(256);
+    let view1 = new Uint32Array(dataUri);
+    view1[0] = 123456;
+    let record1 = new UDC.UnifiedRecord('general.message', dataUri);
+    const data1 = record1.getValue();
+    expect(data1.byteLength).assertEqual(256);
+    let view2 = new Uint32Array(data1);
+    expect(view1[0]).assertEqual(view2[0]);
+
+    let record2 = new UDC.UnifiedRecord('general.message', "https://www.xxx.com/");
+    const data2 = record2.getValue();
+    expect(data2).assertEqual("https://www.xxx.com/");
+
+    let record3 = new UDC.UnifiedRecord('general.message', 8899);
+    const data3 = record3.getValue();
+    expect(data3).assertEqual(8899);
+
+    let record4 = new UDC.UnifiedRecord('general.message', 8899.7788);
+    const data4 = record4.getValue();
+    expect(data4).assertEqual(8899.7788);
+
+    const buffer = new ArrayBuffer(128);
+    const opt = {
+      size: { height: 5, width: 5 },
+      pixelFormat: 3,
+      editable: true,
+      alphaType: 1,
+      scaleMode: 1,
+    };
+    const pixelMap = image.createPixelMap(buffer, opt);
+    let record5 = new UDC.UnifiedRecord('openharmony.pixel-map', pixelMap);
+    const data5 = record5.getValue();
+    data5.getImageInfo().then((imageInfo)=>{
+      expect(imageInfo.size.height).assertEqual(opt.size.height);
+      expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
+    });
+    
+
+    const wantText = {
+      bundleName: 'com.example.myapplication1',
+      abilityName: 'com.example.myapplication1.MainAbility',
+    };
+    let record6 = new UDC.UnifiedRecord('openharmony.want', wantText);
+    const data6 = record6.getValue();
+    expect(data6.bundleName).assertEqual(wantText.bundleName);
+    expect(data6.abilityName).assertEqual(wantText.abilityName);
   });
 });

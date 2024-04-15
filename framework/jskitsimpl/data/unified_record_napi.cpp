@@ -55,28 +55,39 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
     
     auto *udRecord = new (std::nothrow) UnifiedRecordNapi();
     ASSERT_ERR(ctxt->env, udRecord != nullptr, Status::E_ERROR, "no memory for unified record!");
-    ASSERT_CALL(env, napi_wrap(env, ctxt->self, udRecord, Destructor, nullptr, nullptr), udRecord);
 
     if(value != nullptr) {
         AddValue(env, udRecord, type, value);
     }
+    ASSERT_CALL(env, napi_wrap(env, ctxt->self, udRecord, Destructor, nullptr, nullptr), udRecord);
     return ctxt->self;
 }
 
 void UnifiedRecordNapi::AddValue(napi_env env, UnifiedRecordNapi *udRecord, std::string type, napi_value valueNapi){
     auto ctxt = std::make_shared<ContextBase>();
-    std::unordered_map<std::string, int32_t> type_map;
-    for (const auto& pair : UD_TYPE_MAP) {
-        type_map[pair.second] = pair.first;
+    auto it = std::find_if(UD_TYPE_MAP.begin(), UD_TYPE_MAP.end(), [&](const auto& pair) {
+        return pair.second == type;
+    });
+    if (it != UD_TYPE_MAP.end()) {
+        LOG_ERROR(UDMF_KITS_NAPI, "invalid type arguments!");
+        return;
     }
-    UDType utdType = static_cast<UDType>(type_map[type]);
+    UDType utdType = static_cast<UDType>(it->first);
 
     bool isArrayBuffer = false;
     NAPI_CALL_RETURN_VOID(env, napi_is_arraybuffer(env, valueNapi, &isArrayBuffer));
+    if(isArrayBuffer){
+        void *data = nullptr;
+        size_t dataLen = 0;
+        NAPI_CALL_RETURN_VOID(env, napi_get_arraybuffer_info(env, valueNapi, &data, &dataLen));
+        auto dataU8 = std::vector<uint8_t>(reinterpret_cast<uint8_t *>(data), reinterpret_cast<uint8_t *>(data) + dataLen);
+        udRecord->value_ = std::make_shared<UnifiedRecord>(utdType, dataU8);
+        return;
+    }
+
     napi_valuetype valueType = napi_undefined;
     ctxt->status = napi_typeof(env, valueNapi, &valueType);
     ASSERT_ERR_VOID(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-
     ValueType value;
     if (type == "openharmony.pixel-map") {
         std::shared_ptr<OHOS::Media::PixelMap> data;
@@ -84,8 +95,6 @@ void UnifiedRecordNapi::AddValue(napi_env env, UnifiedRecordNapi *udRecord, std:
     } else if (type == "openharmony.want") {
         std::shared_ptr<OHOS::AAFwk::Want> data;
         value = data;
-    } else if (isArrayBuffer) {
-        value = std::vector<uint8_t>();
     } else if (valueType == napi_string) {
         value = std::string();
     } else if (valueType == napi_number) {
