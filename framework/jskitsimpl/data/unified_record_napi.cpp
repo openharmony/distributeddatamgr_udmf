@@ -69,7 +69,7 @@ void UnifiedRecordNapi::AddValue(napi_env env, UnifiedRecordNapi *udRecord, std:
     auto it = std::find_if(UD_TYPE_MAP.begin(), UD_TYPE_MAP.end(), [&](const auto& pair) {
         return pair.second == type;
     });
-    if (it != UD_TYPE_MAP.end()) {
+    if (it == UD_TYPE_MAP.end()) {
         LOG_ERROR(UDMF_KITS_NAPI, "invalid type arguments!");
         return;
     }

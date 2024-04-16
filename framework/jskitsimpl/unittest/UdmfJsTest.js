@@ -1048,6 +1048,7 @@ describe('UdmfJSTest', function () {
     let person = {fname: "John", lname: "Doe", age: 25};
     unifiedData.properties.extras = person;
     expect(Object.keys(unifiedData.properties.extras).length).assertEqual(3);
+    expect(unifiedData.properties.extras.fname).assertEqual(person.fname);
   });
 
   /**
@@ -1162,13 +1163,77 @@ describe('UdmfJSTest', function () {
       expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
     });
     
-
     const wantText = {
       bundleName: 'com.example.myapplication1',
       abilityName: 'com.example.myapplication1.MainAbility',
     };
     let record6 = new UDC.UnifiedRecord('openharmony.want', wantText);
     const data6 = record6.getValue();
+    expect(data6.bundleName).assertEqual(wantText.bundleName);
+    expect(data6.abilityName).assertEqual(wantText.abilityName);
+  });
+
+  /**
+   * @tc.name UnifiedDataGetRecords
+   * @tc.desc Test Js UnifiedData GetRecords testcase
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UnifiedDataGetRecords', 0, async function () {
+    const TAG = 'UnifiedDataGetRecords';
+    console.info(TAG, 'start');
+
+    const dataUri = new ArrayBuffer(256);
+    let view1 = new Uint32Array(dataUri);
+    view1[0] = 123456;
+    let record1 = new UDC.UnifiedRecord('general.message', dataUri);
+
+    let unifiedData = new UDC.UnifiedData(record1);
+    let records = unifiedData.getRecords();
+    expect(records.length).assertEqual(1);
+
+    let record2 = new UDC.UnifiedRecord('general.message', "https://www.xxx.com/");
+    unifiedData.addRecord(record2);
+    let record3 = new UDC.UnifiedRecord('general.message', 8899);
+    unifiedData.addRecord(record3);
+    let record4 = new UDC.UnifiedRecord('general.message', 8899.7788);
+    unifiedData.addRecord(record4);
+    const buffer = new ArrayBuffer(128);
+    const opt = {
+      size: { height: 5, width: 5 },
+      pixelFormat: 3,
+      editable: true,
+      alphaType: 1,
+      scaleMode: 1,
+    };
+    const pixelMap = image.createPixelMap(buffer, opt);
+    let record5 = new UDC.UnifiedRecord('openharmony.pixel-map', pixelMap);
+    unifiedData.addRecord(record5);
+    const wantText = {
+      bundleName: 'com.example.myapplication1',
+      abilityName: 'com.example.myapplication1.MainAbility',
+    };
+    let record6 = new UDC.UnifiedRecord('openharmony.want', wantText);
+    unifiedData.addRecord(record6);
+    
+    records = unifiedData.getRecords();
+    expect(records.length).assertEqual(6);
+    const data1 = records[0].getValue();
+    expect(data1.byteLength).assertEqual(256);
+    let view2 = new Uint32Array(data1);
+    expect(view1[0]).assertEqual(view2[0]);
+    const data2 = records[1].getValue();
+    expect(data2).assertEqual("https://www.xxx.com/");
+    const data3 = records[2].getValue();
+    expect(data3).assertEqual(8899);
+    const data4 = records[3].getValue();
+    expect(data4).assertEqual(8899.7788);
+    const data5 = records[4].getValue();
+    data5.getImageInfo().then((imageInfo)=>{
+      expect(imageInfo.size.height).assertEqual(opt.size.height);
+      expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
+    });
+    const data6 = records[5].getValue();
     expect(data6.bundleName).assertEqual(wantText.bundleName);
     expect(data6.abilityName).assertEqual(wantText.abilityName);
   });

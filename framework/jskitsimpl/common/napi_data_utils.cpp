@@ -387,6 +387,31 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
     return napi_ok;
 }
 
+napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr<OHOS::Media::PixelMap> &pixelMap)
+{
+    pixelMap = OHOS::Media::PixelMapNapi::GetPixelMap(env, in);
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<OHOS::Media::PixelMap>& in, napi_value& out)
+{
+    out = OHOS::Media::PixelMapNapi::CreatePixelMap(env, in);
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr<OHOS::AAFwk::Want> &wantPtr)
+{
+    OHOS::AAFwk::Want want;
+    AppExecFwk::UnwrapWant(env, in, want);
+    wantPtr = std::make_shared<OHOS::AAFwk::Want>(want);
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<OHOS::AAFwk::Want>& in, napi_value &out) {
+    out = OHOS::AppExecFwk::WrapWant(env, *in);
+    return napi_ok;
+}
+
 bool NapiDataUtils::IsTypeForNapiValue(napi_env env, napi_value param, napi_valuetype expectType)
 {
     napi_valuetype valueType = napi_undefined;
@@ -457,31 +482,6 @@ napi_value NapiDataUtils::DefineClass(napi_env env, const std::string &name,
         LOG_DEBUG(UDMF_KITS_NAPI, "save constructor to data.distributeddata.%{public}s", propName.c_str());
     }
     return constructor;
-}
-
-napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr<OHOS::Media::PixelMap> &pixelMap)
-{
-    pixelMap = OHOS::Media::PixelMapNapi::GetPixelMap(env, in);
-    return napi_ok;
-}
-
-napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<OHOS::Media::PixelMap>& in, napi_value& out)
-{
-    out = OHOS::Media::PixelMapNapi::CreatePixelMap(env, in);
-    return napi_ok;
-}
-
-napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr<OHOS::AAFwk::Want> &wantPtr)
-{
-    OHOS::AAFwk::Want want;
-    AppExecFwk::UnwrapWant(env, in, want);
-    wantPtr = std::make_shared<OHOS::AAFwk::Want>(want);
-    return napi_ok;
-}
-
-napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<OHOS::AAFwk::Want>& in, napi_value &out) {
-    out = OHOS::AppExecFwk::WrapWant(env, *in);
-    return napi_ok;
 }
 } // namespace UDMF
 } // namespace OHOS

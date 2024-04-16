@@ -421,16 +421,11 @@ void UnifiedDataNapi::GetRecord(napi_env env, std::shared_ptr<UnifiedRecord> in,
         }
         case SYSTEM_DEFINED_PIXEL_MAP: {
             // SystemDefinedPixelMapNapi::NewInstance(env, in, out);
-
             UnifiedRecordNapi::NewInstance(env, in, out);
             break;
         }
         case APPLICATION_DEFINED_RECORD: {
             ApplicationDefinedRecordNapi::NewInstance(env, in, out);
-            break;
-        }
-        case OPENHARMONY_WANT: {
-            UnifiedRecordNapi::NewInstance(env, in, out);
             break;
         }
         default:
