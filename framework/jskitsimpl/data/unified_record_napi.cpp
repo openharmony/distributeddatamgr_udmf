@@ -46,7 +46,7 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
         ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc == 2, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         if (argc == 2) {
             ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
-            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS, "invalid arg[0] arguments!");
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS, "invalid arguments!");
             value = argv[1];
         }
     };
@@ -58,6 +58,8 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
 
     if(value != nullptr) {
         AddValue(env, udRecord, type, value);
+    } else {
+        udRecord->value_ = std::make_shared<UnifiedRecord>();
     }
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, udRecord, Destructor, nullptr, nullptr), udRecord);
     return ctxt->self;
