@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace UDMF {
 using ValueType = std::variant<int32_t, int64_t, double, bool, std::string, std::vector<uint8_t>,
-        std::shared_ptr<OHOS::AAFwk::Want>, std::shared_ptr<OHOS::Media::PixelMap>>;
+    std::shared_ptr<OHOS::AAFwk::Want>, std::shared_ptr<OHOS::Media::PixelMap>>;
 class UnifiedRecord {
 public:
     UnifiedRecord();

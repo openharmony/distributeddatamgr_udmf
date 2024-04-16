@@ -32,6 +32,7 @@ class UnifiedRecord;
 class UnifiedRecordNapi {
 public:
     static napi_value Constructor(napi_env env);
+    static void NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out);
     static napi_value GetType(napi_env env, napi_callback_info info);
     static napi_value GetValue(napi_env env, napi_callback_info info);
     std::shared_ptr<UnifiedRecord> value_;

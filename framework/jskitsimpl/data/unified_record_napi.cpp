@@ -64,6 +64,7 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
 }
 
 void UnifiedRecordNapi::AddValue(napi_env env, UnifiedRecordNapi *udRecord, std::string type, napi_value valueNapi){
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto it = std::find_if(UD_TYPE_MAP.begin(), UD_TYPE_MAP.end(), [&](const auto& pair) {
         return pair.second == type;
@@ -108,6 +109,16 @@ void UnifiedRecordNapi::AddValue(napi_env env, UnifiedRecordNapi *udRecord, std:
     udRecord->value_ = std::make_shared<UnifiedRecord>(utdType, value);
 }
 
+void UnifiedRecordNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
+    ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
+    auto *record = new (std::nothrow) UnifiedRecordNapi();
+    ASSERT_ERR_VOID(env, record != nullptr, Status::E_ERROR, "no memory for text!");
+    record->value_ = in;
+    ASSERT_CALL_DELETE(env, napi_wrap(env, out, record, Destructor, nullptr, nullptr), record);
+}
+
 void UnifiedRecordNapi::Destructor(napi_env env, void *data, void *hint)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi finalize.");
@@ -143,7 +154,18 @@ napi_value UnifiedRecordNapi::GetValue(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto uRecord = GetUnifiedRecord(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
-    std::visit([&](const auto& value) { NapiDataUtils::SetValue(env, value, ctxt->output); }, uRecord->value_->GetValue());
+    if (std::holds_alternative<std::vector<uint8_t>>(uRecord->value_->GetValue())) {
+        auto value = std::get<std::vector<uint8_t>>(uRecord->value_->GetValue());
+        void *data = nullptr;
+        size_t len = value.size();
+        NAPI_CALL(env, napi_create_arraybuffer(env, len, &data, &ctxt->output));
+        if (memcpy_s(data, len, reinterpret_cast<const void *>(value.data()), len) != 0) {
+            LOG_ERROR(UDMF_KITS_NAPI, "invalid arrayBuffer!");
+            return nullptr;
+        }
+    } else {
+        std::visit([&](const auto& value) { NapiDataUtils::SetValue(env, value, ctxt->output); }, uRecord->value_->GetValue());
+    }
     return ctxt->output;
 }
 } // namespace UDMF

@@ -336,7 +336,7 @@ napi_value UnifiedDataNapi::AddRecord(napi_env env, napi_callback_info info)
         ctxt->status = napi_unwrap(env, *argv, reinterpret_cast<void **>(&uRecord));
         ASSERT_BUSINESS_ERR(ctxt, (ctxt->status == napi_ok && uRecord != nullptr && uRecord->value_ != nullptr),
             Status::E_INVALID_PARAMETERS, "invalid object!");
-        ctxt->status = UnifiedDataUtils::IsValidType(uRecord->value_->GetType()) ? napi_ok : napi_invalid_arg;
+        // ctxt->status = UnifiedDataUtils::IsValidType(uRecord->value_->GetType()) ? napi_ok : napi_invalid_arg;
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid type!");
     };
     ctxt->GetCbInfoSync(env, info, input);
@@ -420,14 +420,21 @@ void UnifiedDataNapi::GetRecord(napi_env env, std::shared_ptr<UnifiedRecord> in,
             break;
         }
         case SYSTEM_DEFINED_PIXEL_MAP: {
-            SystemDefinedPixelMapNapi::NewInstance(env, in, out);
+            // SystemDefinedPixelMapNapi::NewInstance(env, in, out);
+
+            UnifiedRecordNapi::NewInstance(env, in, out);
             break;
         }
         case APPLICATION_DEFINED_RECORD: {
             ApplicationDefinedRecordNapi::NewInstance(env, in, out);
             break;
         }
+        case OPENHARMONY_WANT: {
+            UnifiedRecordNapi::NewInstance(env, in, out);
+            break;
+        }
         default:
+            UnifiedRecordNapi::NewInstance(env, in, out);
             LOG_INFO(UDMF_KITS_NAPI, "GetRecord default");
             break;
     }
