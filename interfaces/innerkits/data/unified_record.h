@@ -46,10 +46,9 @@ public:
 
 protected:
     UDType dataType_;
-
+    ValueType value_;
 private:
     std::string uid_; // unique identifier
-    ValueType value_;
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -26,6 +26,8 @@ File::File(const std::string &uri) : UnifiedRecord(FILE)
     this->oriUri_ = uri;
 }
 
+File::File(UDType type, ValueType value) : UnifiedRecord(type, value) {}
+
 int64_t File::GetSize()
 {
     return this->oriUri_.size() + this->remoteUri_.size();

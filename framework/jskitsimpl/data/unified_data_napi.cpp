@@ -158,7 +158,7 @@ napi_value UnifiedDataPropertiesNapi::SetShareOption(napi_env env, napi_callback
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    int32_t shareOptionValue = ShareOption::IN_APP;
+    int32_t shareOptionValue = ShareOption::CROSS_APP;
     auto input = [env, ctxt, &shareOptionValue](size_t argc, napi_value *argv) {
         ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], shareOptionValue);
@@ -336,7 +336,7 @@ napi_value UnifiedDataNapi::AddRecord(napi_env env, napi_callback_info info)
         ctxt->status = napi_unwrap(env, *argv, reinterpret_cast<void **>(&uRecord));
         ASSERT_BUSINESS_ERR(ctxt, (ctxt->status == napi_ok && uRecord != nullptr && uRecord->value_ != nullptr),
             Status::E_INVALID_PARAMETERS, "invalid object!");
-        // ctxt->status = UnifiedDataUtils::IsValidType(uRecord->value_->GetType()) ? napi_ok : napi_invalid_arg;
+        ctxt->status = UnifiedDataUtils::IsValidType(uRecord->value_->GetType()) ? napi_ok : napi_invalid_arg;
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid type!");
     };
     ctxt->GetCbInfoSync(env, info, input);
@@ -420,8 +420,7 @@ void UnifiedDataNapi::GetRecord(napi_env env, std::shared_ptr<UnifiedRecord> in,
             break;
         }
         case SYSTEM_DEFINED_PIXEL_MAP: {
-            // SystemDefinedPixelMapNapi::NewInstance(env, in, out);
-            UnifiedRecordNapi::NewInstance(env, in, out);
+            SystemDefinedPixelMapNapi::NewInstance(env, in, out);
             break;
         }
         case APPLICATION_DEFINED_RECORD: {

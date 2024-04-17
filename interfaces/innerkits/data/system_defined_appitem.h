@@ -23,6 +23,7 @@ namespace UDMF {
 class SystemDefinedAppItem : public SystemDefinedRecord {
 public:
     SystemDefinedAppItem();
+    SystemDefinedAppItem(UDType type, ValueType value);
 
     int64_t GetSize() override;
 

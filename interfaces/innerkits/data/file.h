@@ -24,6 +24,7 @@ class File : public UnifiedRecord {
 public:
     File();
     explicit File(const std::string &uri);
+    File(UDType type, ValueType value);
     int64_t GetSize() override;
 
     std::string GetUri() const;

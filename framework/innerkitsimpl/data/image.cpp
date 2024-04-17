@@ -14,6 +14,7 @@
  */
 
 #include "image.h"
+#include "file.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -25,5 +26,7 @@ Image::Image(const std::string &uri) : File(uri)
 {
     this->dataType_ = IMAGE;
 }
+
+Image::Image(UDType type, ValueType value) : File(type, value) {}
 } // namespace UDMF
 } // namespace OHOS

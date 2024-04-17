@@ -14,6 +14,7 @@
  */
 
 #include "plain_text.h"
+#include "text.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -30,6 +31,9 @@ PlainText::PlainText(const std::string &content, const std::string &abstract)
     this->content_ = content;
     this->abstract_ = abstract;
 }
+
+PlainText::PlainText(UDType type, ValueType value) : Text(type, value) {}
+
 
 int64_t PlainText::GetSize()
 {

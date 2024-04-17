@@ -23,6 +23,7 @@ namespace UDMF {
 class SystemDefinedForm : public SystemDefinedRecord {
 public:
     SystemDefinedForm();
+    SystemDefinedForm(UDType type, ValueType value);
 
     int64_t GetSize() override;
 

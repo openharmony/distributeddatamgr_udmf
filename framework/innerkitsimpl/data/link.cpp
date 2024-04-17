@@ -14,6 +14,7 @@
  */
 
 #include "link.h"
+#include "text.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -24,6 +25,8 @@ Link::Link() : Link("", "")
 Link::Link(const std::string &url) : Link(url, "")
 {
 }
+
+Link::Link(UDType type, ValueType value) : Text(type, value) {}
 
 Link::Link(const std::string &url, const std::string &description)
 {

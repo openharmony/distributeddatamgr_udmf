@@ -25,6 +25,7 @@ public:
     Link();
     explicit Link(const std::string &url);
     explicit Link(const std::string &url, const std::string &description);
+    Link(UDType type, ValueType value);
 
     int64_t GetSize() override;
 

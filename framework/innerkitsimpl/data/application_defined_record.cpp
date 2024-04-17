@@ -33,6 +33,8 @@ ApplicationDefinedRecord::ApplicationDefinedRecord(std::string type, std::vector
     this->rawData_ = std::move(data);
 }
 
+ApplicationDefinedRecord::ApplicationDefinedRecord(UDType type, ValueType value) : UnifiedRecord(type, value) {}
+
 int64_t ApplicationDefinedRecord::GetSize()
 {
     return rawData_.size() + applicationDefinedType.size();

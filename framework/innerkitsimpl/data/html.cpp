@@ -14,6 +14,7 @@
  */
 
 #include "html.h"
+#include "text.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -31,6 +32,8 @@ Html::Html(const std::string &htmlContent, const std::string &plainContent)
     this->htmlContent_ = htmlContent;
     this->plainContent_ = plainContent;
 }
+
+Html::Html(UDType type, ValueType value) : Text(type, value) {}
 
 int64_t Html::GetSize()
 {

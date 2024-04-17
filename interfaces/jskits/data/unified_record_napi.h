@@ -24,11 +24,10 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "pixel_map_napi.h"
+#include "unified_record.h"
 
 namespace OHOS {
 namespace UDMF {
-struct ContextBase;
-class UnifiedRecord;
 class UnifiedRecordNapi {
 public:
     static napi_value Constructor(napi_env env);
@@ -43,6 +42,7 @@ private:
     static UnifiedRecordNapi *GetUnifiedRecord(
         napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt);
     static void AddValue(napi_env env, UnifiedRecordNapi *udRecord, std::string type, napi_value value);
+    static void GetNativeValue(napi_env env, std::string type, napi_value valueNapi, ValueType &value);
 };
 } // namespace UDMF
 } // namespace OHOS

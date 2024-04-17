@@ -24,6 +24,7 @@ class Image : public File {
 public:
     Image();
     explicit Image(const std::string &uri);
+    Image(UDType type, ValueType value);
 };
 } // namespace UDMF
 } // namespace OHOS

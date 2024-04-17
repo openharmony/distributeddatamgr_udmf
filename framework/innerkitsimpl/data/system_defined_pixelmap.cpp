@@ -28,6 +28,8 @@ SystemDefinedPixelMap::SystemDefinedPixelMap(std::vector<uint8_t> &data)
     this->rawData_ = std::move(data);
 }
 
+SystemDefinedPixelMap::SystemDefinedPixelMap(UDType type, ValueType value) : SystemDefinedRecord(type, value) {}
+
 int64_t SystemDefinedPixelMap::GetSize()
 {
     return UnifiedDataUtils::GetDetailsSize(this->details_) + rawData_.size();

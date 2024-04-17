@@ -25,5 +25,7 @@ Video::Video(const std::string &uri) : File(uri)
 {
     this->dataType_ = VIDEO;
 }
+
+Video::Video(UDType type, ValueType value) : File(type, value) {}
 } // namespace UDMF
 } // namespace OHOS

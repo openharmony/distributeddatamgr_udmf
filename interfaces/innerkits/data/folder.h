@@ -24,6 +24,7 @@ class Folder : public File {
 public:
     Folder();
     explicit Folder(const std::string &uri);
+    Folder(UDType type, ValueType value);
 };
 } // namespace UDMF
 } // namespace OHOS

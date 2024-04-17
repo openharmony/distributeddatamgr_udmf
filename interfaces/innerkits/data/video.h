@@ -24,6 +24,7 @@ class Video : public File {
 public:
     Video();
     explicit Video(const std::string &uri);
+    Video(UDType type, ValueType value);
 };
 } // namespace UDMF
 } // namespace OHOS

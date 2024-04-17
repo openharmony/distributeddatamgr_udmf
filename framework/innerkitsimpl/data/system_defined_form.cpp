@@ -22,6 +22,8 @@ SystemDefinedForm::SystemDefinedForm()
     this->dataType_ = SYSTEM_DEFINED_FORM;
 }
 
+SystemDefinedForm::SystemDefinedForm(UDType type, ValueType value) : SystemDefinedRecord(type, value) {}
+
 int64_t SystemDefinedForm::GetSize()
 {
     return UnifiedDataUtils::GetDetailsSize(this->details_) + sizeof(formId_) + this->formName_.size()

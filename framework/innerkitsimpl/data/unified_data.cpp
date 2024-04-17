@@ -89,7 +89,7 @@ std::vector<std::shared_ptr<UnifiedRecord>> UnifiedData::GetRecords() const
     return this->records_;
 }
 
-std::vector<UDType> UnifiedData::GetUDTypes()
+std::vector<UDType> UnifiedData::GetUDTypes() const
 {
     std::vector<UDType> typeSet;
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
@@ -107,7 +107,7 @@ std::string UnifiedData::GetTypes()
     return types;
 }
 
-std::vector<std::string> UnifiedData::GetTypesLabels()
+std::vector<std::string> UnifiedData::GetTypesLabels() const
 {
     std::vector<std::string> types;
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
@@ -116,7 +116,7 @@ std::vector<std::string> UnifiedData::GetTypesLabels()
     return types;
 }
 
-bool UnifiedData::HasType(const std::string &type)
+bool UnifiedData::HasType(const std::string &type) const
 {
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
         if (UD_TYPE_MAP.at(record->GetType()) == type) {
@@ -163,7 +163,8 @@ void UnifiedData::SetProperties(std::shared_ptr<UnifiedDataProperties> propertie
     properties_ = properties;
 }
 
-std::shared_ptr<UnifiedDataProperties> UnifiedData::GetProperties(){
+std::shared_ptr<UnifiedDataProperties> UnifiedData::GetProperties() const
+{
     return properties_;
 }
 } // namespace UDMF

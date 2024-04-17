@@ -22,6 +22,8 @@ SystemDefinedAppItem::SystemDefinedAppItem()
     this->dataType_ = SYSTEM_DEFINED_APP_ITEM;
 }
 
+SystemDefinedAppItem::SystemDefinedAppItem(UDType type, ValueType value) : SystemDefinedRecord(type, value) {}
+
 int64_t SystemDefinedAppItem::GetSize()
 {
     return UnifiedDataUtils::GetDetailsSize(this->details_) + this->appId_.size() + this->appName_.size()
