@@ -55,8 +55,8 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
     std::string type;
     napi_value value = nullptr;
     auto input = [env, ctxt, &type, &value](size_t argc, napi_value* argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc == 2, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-        if (argc == 2) {
+        ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc >= 2, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        if (argc >= 2) {
             ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
             ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS, "invalid arguments!");
             value = argv[1];
@@ -69,7 +69,7 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, udRecord != nullptr, Status::E_ERROR, "no memory for unified record!");
 
     if(value != nullptr) {
-        AddValue(env, udRecord, type, value);
+        udRecord->value_ = GetNativeRecord(env, type, value);
     } else {
         udRecord->value_ = std::make_shared<UnifiedRecord>();
     }
@@ -77,7 +77,8 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
     return ctxt->self;
 }
 
-void UnifiedRecordNapi::AddValue(napi_env env, UnifiedRecordNapi *udRecord, std::string type, napi_value valueNapi){
+std::shared_ptr<UnifiedRecord> UnifiedRecordNapi::GetNativeRecord(napi_env env, std::string type, napi_value valueNapi)
+{
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     ValueType value;
     GetNativeValue(env, type, valueNapi, value);
@@ -90,39 +91,33 @@ void UnifiedRecordNapi::AddValue(napi_env env, UnifiedRecordNapi *udRecord, std:
         utdType = static_cast<UDType>(it->first);
     }
 
-    if (utdType == TEXT) {
-        udRecord->value_ = std::make_shared<Text>(utdType, value);
-    } else if (utdType == PLAIN_TEXT) {
-        udRecord->value_ = std::make_shared<PlainText>(utdType, value);
-    } else if (utdType == HTML) {
-        udRecord->value_ = std::make_shared<Html>(utdType, value);
-    } else if (utdType == HYPERLINK) {
-        udRecord->value_ = std::make_shared<Link>(utdType, value);
-    } else if (utdType == FILE) {
-        udRecord->value_ = std::make_shared<File>(utdType, value);
-    } else if (utdType == IMAGE) {
-        udRecord->value_ = std::make_shared<Image>(utdType, value);
-    } else if (utdType == VIDEO) {
-        udRecord->value_ = std::make_shared<Video>(utdType, value);
-    } else if (utdType == AUDIO) {
-        udRecord->value_ = std::make_shared<Audio>(utdType, value);
-    } else if (utdType == FOLDER) {
-        udRecord->value_ = std::make_shared<Folder>(utdType, value);
-    } else if (utdType == SYSTEM_DEFINED_RECORD) {
-        udRecord->value_ = std::make_shared<SystemDefinedRecord>(utdType, value);
-    } else if (utdType == SYSTEM_DEFINED_APP_ITEM) {
-        udRecord->value_ = std::make_shared<SystemDefinedAppItem>(utdType, value);
-    } else if (utdType == SYSTEM_DEFINED_FORM) {
-        udRecord->value_ = std::make_shared<SystemDefinedForm>(utdType, value);
-    } else if (utdType == SYSTEM_DEFINED_PIXEL_MAP && std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(value)) {
-        udRecord->value_ = std::make_shared<SystemDefinedPixelMap>(utdType, value);
-    } else if (utdType == APPLICATION_DEFINED_RECORD) {
-        auto applicationDefinedRecord = std::make_shared<ApplicationDefinedRecord>(utdType, value);
-        applicationDefinedRecord->SetApplicationDefinedType(type);
-        udRecord->value_ = applicationDefinedRecord;
-    } else{
-        udRecord->value_ = std::make_shared<UnifiedRecord>(utdType, value);
+    std::map<UDType, std::function<std::shared_ptr<UnifiedRecord>(UDType, ValueType)>> constructors = {
+        {TEXT, [](UDType type, ValueType value) { return std::make_shared<Text>(type, value); }},
+        {PLAIN_TEXT, [](UDType type, ValueType value) { return std::make_shared<PlainText>(type, value); }},
+        {HTML, [](UDType type, ValueType value) { return std::make_shared<Html>(type, value); }},
+        {HYPERLINK, [](UDType type, ValueType value) { return std::make_shared<Link>(type, value); }},
+        {FILE, [](UDType type, ValueType value) { return std::make_shared<File>(type, value); }},
+        {IMAGE, [](UDType type, ValueType value) { return std::make_shared<Image>(type, value); }},
+        {VIDEO, [](UDType type, ValueType value) { return std::make_shared<Video>(type, value); }},
+        {AUDIO, [](UDType type, ValueType value) { return std::make_shared<Audio>(type, value); }},
+        {FOLDER, [](UDType type, ValueType value) { return std::make_shared<Folder>(type, value); }},
+        {SYSTEM_DEFINED_RECORD, [](UDType type, ValueType value) { return std::make_shared<SystemDefinedRecord>(type, value); }},
+        {SYSTEM_DEFINED_APP_ITEM, [](UDType type, ValueType value) { return std::make_shared<SystemDefinedAppItem>(type, value); }},
+        {SYSTEM_DEFINED_FORM, [](UDType type, ValueType value) { return std::make_shared<SystemDefinedForm>(type, value); }},
+        {SYSTEM_DEFINED_PIXEL_MAP, [](UDType type, ValueType value) { return std::make_shared<SystemDefinedPixelMap>(type, value); }},
+        {APPLICATION_DEFINED_RECORD, [](UDType type, ValueType value) { return std::make_shared<ApplicationDefinedRecord>(type, value); }},
+    };
+
+    auto constructor = constructors.find(utdType);
+    if (constructor == constructors.end()) {
+        return std::make_shared<UnifiedRecord>(utdType, value);
     }
+    auto uRecord = constructor->second(utdType, value);
+    if (utdType == APPLICATION_DEFINED_RECORD) {
+        std::shared_ptr<ApplicationDefinedRecord> applicationDefinedRecord = std::static_pointer_cast<ApplicationDefinedRecord>(uRecord);
+        applicationDefinedRecord->SetApplicationDefinedType(type);
+    }
+    return uRecord;
 }
 
 void UnifiedRecordNapi::GetNativeValue(napi_env env, std::string type, napi_value valueNapi, ValueType &value)

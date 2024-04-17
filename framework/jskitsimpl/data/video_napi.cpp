@@ -44,12 +44,27 @@ napi_value VideoNapi::New(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "VideoNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    ctxt->GetCbInfoSync(env, info);
+    std::string type;
+    napi_value value = nullptr;
+    auto input = [env, ctxt, &type, &value](size_t argc, napi_value* argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc >= 2, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        if (argc >= 2) {
+            ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS, "invalid arguments!");
+            value = argv[1];
+        }
+    };
+    ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *video = new (std::nothrow) VideoNapi();
     ASSERT_ERR(ctxt->env, video != nullptr, Status::E_ERROR, "no memory for video!");
-    video->value_ = std::make_shared<Video>();
+    if(value != nullptr) {
+        ASSERT_ERR(ctxt->env, type == UD_TYPE_MAP.at(UDType::VIDEO), Status::E_ERROR, "invalid arguments!");
+        video->value_ = std::static_pointer_cast<Video>(UnifiedRecordNapi::GetNativeRecord(ctxt->env, type, value));
+    } else {
+        video->value_ = std::make_shared<Video>();
+    }
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, video, Destructor, nullptr, nullptr), video);
     return ctxt->self;
 }

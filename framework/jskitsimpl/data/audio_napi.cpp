@@ -44,12 +44,27 @@ napi_value AudioNapi::New(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "AudioNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    ctxt->GetCbInfoSync(env, info);
+    std::string type;
+    napi_value value = nullptr;
+    auto input = [env, ctxt, &type, &value](size_t argc, napi_value* argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc >= 2, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        if (argc >= 2) {
+            ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS, "invalid arguments!");
+            value = argv[1];
+        }
+    };
+    ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *audio = new (std::nothrow) AudioNapi();
     ASSERT_ERR(ctxt->env, audio != nullptr, Status::E_ERROR, "no memory for audio!");
-    audio->value_ = std::make_shared<Audio>();
+    if(value != nullptr) {
+        ASSERT_ERR(ctxt->env, type == UD_TYPE_MAP.at(UDType::AUDIO), Status::E_ERROR, "invalid arguments!");
+        audio->value_ = std::static_pointer_cast<Audio>(UnifiedRecordNapi::GetNativeRecord(ctxt->env, type, value));
+    } else {
+        audio->value_ = std::make_shared<Audio>();
+    }
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, audio, Destructor, nullptr, nullptr), audio);
     return ctxt->self;
 }

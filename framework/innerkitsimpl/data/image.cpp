@@ -14,7 +14,6 @@
  */
 
 #include "image.h"
-#include "file.h"
 
 namespace OHOS {
 namespace UDMF {

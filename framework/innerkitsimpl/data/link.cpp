@@ -14,7 +14,6 @@
  */
 
 #include "link.h"
-#include "text.h"
 
 namespace OHOS {
 namespace UDMF {

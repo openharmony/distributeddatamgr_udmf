@@ -47,12 +47,27 @@ napi_value SystemDefinedFormNapi::New(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    ctxt->GetCbInfoSync(env, info);
+    std::string type;
+    napi_value value = nullptr;
+    auto input = [env, ctxt, &type, &value](size_t argc, napi_value* argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc >= 2, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        if (argc >= 2) {
+            ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS, "invalid arguments!");
+            value = argv[1];
+        }
+    };
+    ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *sdForm = new (std::nothrow) SystemDefinedFormNapi();
     ASSERT_ERR(ctxt->env, sdForm != nullptr, Status::E_ERROR, "no memory for system defined form!");
-    sdForm->value_ = std::make_shared<SystemDefinedForm>();
+    if(value != nullptr) {
+        ASSERT_ERR(ctxt->env, type == UD_TYPE_MAP.at(UDType::SYSTEM_DEFINED_FORM), Status::E_ERROR, "invalid arguments!");
+        sdForm->value_ = std::static_pointer_cast<SystemDefinedForm>(UnifiedRecordNapi::GetNativeRecord(ctxt->env, type, value));
+    } else {
+        sdForm->value_ = std::make_shared<SystemDefinedForm>();
+    }
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, sdForm, Destructor, nullptr, nullptr), sdForm);
     return ctxt->self;
 }
