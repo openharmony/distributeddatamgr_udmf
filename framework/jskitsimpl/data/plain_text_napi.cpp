@@ -42,6 +42,7 @@ napi_value PlainTextNapi::Constructor(napi_env env)
 
 napi_value PlainTextNapi::New(napi_env env, napi_callback_info info)
 {
+    LOG_DEBUG(UDMF_KITS_NAPI, "PlainTextNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::string type;
     napi_value value = nullptr;

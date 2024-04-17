@@ -59,7 +59,6 @@ napi_value HtmlNapi::New(napi_env env, napi_callback_info info)
 
     auto *html = new (std::nothrow) HtmlNapi();
     ASSERT_ERR(ctxt->env, html != nullptr, Status::E_ERROR, "no memory for html!");
-    
     if(value != nullptr) {
         ASSERT_ERR(ctxt->env, type == UD_TYPE_MAP.at(UDType::HTML), Status::E_ERROR, "invalid arguments!");
         html->value_ = std::static_pointer_cast<Html>(UnifiedRecordNapi::GetNativeRecord(ctxt->env, type, value));
