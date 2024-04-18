@@ -1117,13 +1117,13 @@ describe('UdmfJSTest', function () {
   });
 
   /**
-   * @tc.name UnifiedRecordGetValue
+   * @tc.name UnifiedRecordConstruct001
    * @tc.desc Test Js UnifiedRecord testcase
    * @tc.type: FUNC
    * @tc.require:
    */
-  it('UnifiedRecordGetValue', 0, async function () {
-    const TAG = 'UnifiedRecordGetValue';
+  it('UnifiedRecordConstruct001', 0, async function () {
+    const TAG = 'UnifiedRecordConstruct001';
     console.info(TAG, 'start');
 
     const dataUri = new ArrayBuffer(256);
@@ -1155,7 +1155,7 @@ describe('UdmfJSTest', function () {
       alphaType: 1,
       scaleMode: 1,
     };
-    const pixelMap = image.createPixelMap(buffer, opt);
+    const pixelMap = await image.createPixelMap(buffer, opt);
     let record5 = new UDC.UnifiedRecord('openharmony.pixel-map', pixelMap);
     const data5 = record5.getValue();
     data5.getImageInfo().then((imageInfo)=>{
@@ -1174,13 +1174,13 @@ describe('UdmfJSTest', function () {
   });
 
   /**
-   * @tc.name UnifiedDataGetRecords
+   * @tc.name UnifiedRecordConstruct002
    * @tc.desc Test Js UnifiedData GetRecords testcase
    * @tc.type: FUNC
    * @tc.require:
    */
-  it('UnifiedDataGetRecords', 0, async function () {
-    const TAG = 'UnifiedDataGetRecords';
+  it('UnifiedRecordConstruct002', 0, async function () {
+    const TAG = 'UnifiedRecordConstruct002';
     console.info(TAG, 'start');
 
     const dataUri = new ArrayBuffer(256);
@@ -1206,7 +1206,7 @@ describe('UdmfJSTest', function () {
       alphaType: 1,
       scaleMode: 1,
     };
-    const pixelMap = image.createPixelMap(buffer, opt);
+    const pixelMap = await image.createPixelMap(buffer, opt);
     let record5 = new UDC.UnifiedRecord('openharmony.pixel-map', pixelMap);
     unifiedData.addRecord(record5);
     const wantText = {
@@ -1236,5 +1236,77 @@ describe('UdmfJSTest', function () {
     const data6 = records[5].getValue();
     expect(data6.bundleName).assertEqual(wantText.bundleName);
     expect(data6.abilityName).assertEqual(wantText.abilityName);
+  });
+
+  /**
+   * @tc.name UnifiedRecordConstruct003
+   * @tc.desc Test Js UnifiedData GetRecords testcase
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UnifiedRecordConstruct003', 0, async function () {
+    const TAG = 'UnifiedRecordConstruct003';
+    console.info(TAG, 'start');
+
+    const dataUri = new ArrayBuffer(256);
+    let view1 = new Uint32Array(dataUri);
+    view1[0] = 123456;
+    let record1 = new UDC.UnifiedRecord('general.text', dataUri);
+    let unifiedData = new UDC.UnifiedData(record1);
+    let record2 = new UDC.UnifiedRecord('general.text', "https://www.xxx.com/");
+    unifiedData.addRecord(record2);
+    let record3 = new UDC.UnifiedRecord('general.text', 8899);
+    unifiedData.addRecord(record3);
+    let record4 = new UDC.UnifiedRecord('general.text', 8899.7788);
+    unifiedData.addRecord(record4);
+
+    let records = unifiedData.getRecords();
+    expect(records.length).assertEqual(4);
+    const data1 = records[0].getValue();
+    expect(data1.byteLength).assertEqual(256);
+    let view2 = new Uint32Array(data1);
+    expect(view1[0]).assertEqual(view2[0]);
+    const data2 = records[1].getValue();
+    expect(data2).assertEqual("https://www.xxx.com/");
+    const data3 = records[2].getValue();
+    expect(data3).assertEqual(8899);
+    const data4 = records[3].getValue();
+    expect(data4).assertEqual(8899.7788);
+  });
+
+  /**
+   * @tc.name UnifiedRecordConstruct004
+   * @tc.desc Test Js UnifiedData GetRecords testcase
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UnifiedRecordConstruct004', 0, async function () {
+    const TAG = 'UnifiedRecordConstruct004';
+    console.info(TAG, 'start');
+
+    const dataUri = new ArrayBuffer(256);
+    let view1 = new Uint32Array(dataUri);
+    view1[0] = 123456;
+    let record1 = new UDC.UnifiedRecord('otherType', dataUri);
+    let unifiedData = new UDC.UnifiedData(record1);
+    let record2 = new UDC.UnifiedRecord('otherType', "https://www.xxx.com/");
+    unifiedData.addRecord(record2);
+    let record3 = new UDC.UnifiedRecord('otherType', 8899);
+    unifiedData.addRecord(record3);
+    let record4 = new UDC.UnifiedRecord('otherType', 8899.7788);
+    unifiedData.addRecord(record4);
+
+    let records = unifiedData.getRecords();
+    expect(records.length).assertEqual(4);
+    const data1 = records[0].getValue();
+    expect(data1.byteLength).assertEqual(256);
+    let view2 = new Uint32Array(data1);
+    expect(view1[0]).assertEqual(view2[0]);
+    const data2 = records[1].getValue();
+    expect(data2).assertEqual("https://www.xxx.com/");
+    const data3 = records[2].getValue();
+    expect(data3).assertEqual(8899);
+    const data4 = records[3].getValue();
+    expect(data4).assertEqual(8899.7788);
   });
 });
