@@ -62,7 +62,7 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    
+
     auto *udRecord = new (std::nothrow) UnifiedRecordNapi();
     ASSERT_ERR(ctxt->env, udRecord != nullptr, Status::E_ERROR, "no memory for unified record!");
     if(value != nullptr) {
@@ -201,8 +201,8 @@ napi_value UnifiedRecordNapi::GetValue(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto uRecord = GetUnifiedRecord(env, info, ctxt);
-    ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr),
-        Status::E_INVALID_PARAMETERS, "invalid object!");
+    ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_INVALID_PARAMETERS,
+        "invalid object!");
     if (std::holds_alternative<std::vector<uint8_t>>(uRecord->value_->GetValue())) {
         auto value = std::get<std::vector<uint8_t>>(uRecord->value_->GetValue());
         void *data = nullptr;

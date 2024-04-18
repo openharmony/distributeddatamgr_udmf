@@ -29,6 +29,7 @@ napi_value TextNapi::Constructor(napi_env env)
     napi_property_descriptor properties[] = {
         /* Text extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
+        DECLARE_NAPI_FUNCTION("getValue", UnifiedRecordNapi::GetValue),
         /* Text properties */
         DECLARE_NAPI_GETTER_SETTER("details", GetDetails, SetDetails),
     };

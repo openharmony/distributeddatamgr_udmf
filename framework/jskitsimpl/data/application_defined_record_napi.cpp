@@ -29,6 +29,7 @@ napi_value ApplicationDefinedRecordNapi::Constructor(napi_env env)
     napi_property_descriptor properties[] = {
         /* ApplicationDefinedRecord extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
+        DECLARE_NAPI_FUNCTION("getValue", UnifiedRecordNapi::GetValue),
         /* ApplicationDefinedRecord properties */
         DECLARE_NAPI_GETTER_SETTER("applicationDefinedType", GetApplicationDefinedType, SetApplicationDefinedType),
         DECLARE_NAPI_GETTER_SETTER("rawData", GetRawData, SetRawData),

@@ -30,6 +30,7 @@ napi_value SystemDefinedPixelMapNapi::Constructor(napi_env env)
     napi_property_descriptor properties[] = {
         /* SystemDefinedPixelMap extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
+        DECLARE_NAPI_FUNCTION("getValue", UnifiedRecordNapi::GetValue),
         /* SystemDefinedPixelMap extends SystemDefinedRecord */
         DECLARE_NAPI_GETTER_SETTER("details", SystemDefinedRecordNapi::GetDetails, SystemDefinedRecordNapi::SetDetails),
         /* SystemDefinedPixelMap properties */
