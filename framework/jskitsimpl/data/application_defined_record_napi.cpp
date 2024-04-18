@@ -42,27 +42,12 @@ napi_value ApplicationDefinedRecordNapi::New(napi_env env, napi_callback_info in
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    std::string type;
-    napi_value value = nullptr;
-    auto input = [env, ctxt, &type, &value](size_t argc, napi_value* argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc >= 2, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-        if (argc >= 2) {
-            ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
-            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS, "invalid arguments!");
-            value = argv[1];
-        }
-    };
-    ctxt->GetCbInfoSync(env, info, input);
+    ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *record = new (std::nothrow) ApplicationDefinedRecordNapi();
     ASSERT_ERR(ctxt->env, record != nullptr, Status::E_ERROR, "no memory for application defined record!");
-    if(value != nullptr) {
-        ASSERT_ERR(ctxt->env, type == UD_TYPE_MAP.at(UDType::APPLICATION_DEFINED_RECORD), Status::E_ERROR, "invalid arguments!");
-        record->value_ = std::static_pointer_cast<ApplicationDefinedRecord>(UnifiedRecordNapi::GetNativeRecord(ctxt->env, type, value));
-    } else {
-        record->value_ = std::make_shared<ApplicationDefinedRecord>();
-    }
+    record->value_ = std::make_shared<ApplicationDefinedRecord>();
     ASSERT_CALL(ctxt->env, napi_wrap(env, ctxt->self, record, Destructor, nullptr, nullptr), record);
     return ctxt->self;
 }

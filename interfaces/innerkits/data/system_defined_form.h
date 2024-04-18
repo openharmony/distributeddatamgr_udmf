@@ -38,7 +38,7 @@ public:
     std::string GetModule() const;
     void SetModule(const std::string &module);
 
-    void SetItems(UDDetails& details);
+    void SetItems(UDDetails &details);
     UDDetails GetItems();
 
 private:

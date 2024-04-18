@@ -44,27 +44,12 @@ napi_value FolderNapi::New(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    std::string type;
-    napi_value value = nullptr;
-    auto input = [env, ctxt, &type, &value](size_t argc, napi_value* argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc >= 2, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-        if (argc >= 2) {
-            ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
-            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS, "invalid arguments!");
-            value = argv[1];
-        }
-    };
-    ctxt->GetCbInfoSync(env, info, input);
+    ctxt->GetCbInfoSync(env, info);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 
     auto *folder = new (std::nothrow) FolderNapi();
     ASSERT_ERR(ctxt->env, folder != nullptr, Status::E_ERROR, "no memory for folder!");
-    if(value != nullptr) {
-        ASSERT_ERR(ctxt->env, type == UD_TYPE_MAP.at(UDType::FOLDER), Status::E_ERROR, "invalid arguments!");
-        folder->value_ = std::static_pointer_cast<Folder>(UnifiedRecordNapi::GetNativeRecord(ctxt->env, type, value));
-    } else {
-        folder->value_ = std::make_shared<Folder>();
-    }
+    folder->value_ = std::make_shared<Folder>();
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, folder, Destructor, nullptr, nullptr), folder);
     return ctxt->self;
 }

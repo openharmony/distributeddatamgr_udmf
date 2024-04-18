@@ -16,45 +16,17 @@
 #ifndef UDMF_UNIFIED_DATA_NAPI_H
 #define UDMF_UNIFIED_DATA_NAPI_H
 
-#include <memory>
-
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
-#include "napi_queue.h"
+#include "unified_data_properties_napi.h"
 
 namespace OHOS {
 namespace UDMF {
 class UnifiedData;
 class UnifiedRecord;
-class UnifiedDataProperties;
-
-class UnifiedDataPropertiesNapi {
-public:
-    static napi_value Constructor(napi_env env);
-    std::shared_ptr<UnifiedDataProperties> value_;
-    napi_ref delayDataRef_ = nullptr;
-
-private:
-    static napi_value New(napi_env env, napi_callback_info info);
-    static void Destructor(napi_env env, void *data, void *hint);
-    static UnifiedDataPropertiesNapi* GetPropertiesNapi(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt);
-    static napi_value GetExtras(napi_env env, napi_callback_info info);
-    static napi_value SetExtras(napi_env env, napi_callback_info info);
-    static napi_value GetTag(napi_env env, napi_callback_info info);
-    static napi_value SetTag(napi_env env, napi_callback_info info);
-    static napi_value GetShareOption(napi_env env, napi_callback_info info);
-    static napi_value SetShareOption(napi_env env, napi_callback_info info);
-    static napi_value GetTimestamp(napi_env env, napi_callback_info info);
-    static napi_value SetTimestamp(napi_env env, napi_callback_info info);
-    static napi_value GetDelayData(napi_env env, napi_callback_info info);
-    static napi_value SetDelayData(napi_env env, napi_callback_info info);
-};
-
 class UnifiedDataNapi {
 public:
     static napi_value Constructor(napi_env env);
     static napi_status NewInstance(napi_env env, std::shared_ptr<UnifiedData> in, napi_value &out);
-    UnifiedDataPropertiesNapi* GetPropertiesNapi(napi_env env);
+    UnifiedDataPropertiesNapi *GetPropertiesNapi(napi_env env);
     
     std::shared_ptr<UnifiedData> value_;
     napi_ref propertyRef_ = nullptr;
@@ -72,8 +44,8 @@ private:
     static napi_value HasType(napi_env env, napi_callback_info info);
     static napi_value GetProperties(napi_env env, napi_callback_info info);
     static napi_value SetProperties(napi_env env, napi_callback_info info);
-    static napi_ref NewWithRef(napi_env env, size_t argc, napi_value* argv, void** out, napi_value constructor);
-    static napi_status Unwrap(napi_env env, napi_value in, void** out, napi_value constructor);
+    static napi_ref NewWithRef(napi_env env, size_t argc, napi_value *argv, void **out, napi_value constructor);
+    static napi_status Unwrap(napi_env env, napi_value in, void **out, napi_value constructor);
 };
 } // namespace UDMF
 } // namespace OHOS

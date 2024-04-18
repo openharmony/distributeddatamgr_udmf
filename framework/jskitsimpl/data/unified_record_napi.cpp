@@ -15,12 +15,9 @@
 #define LOG_TAG "UnifiedRecordNapi"
 #include "unified_record_napi.h"
 
-#include "napi_common_want.h"
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "napi_queue.h"
-#include "pixel_map_napi.h"
-#include "unified_record.h"
 
 #include "plain_text.h"
 #include "html.h"
@@ -54,11 +51,12 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string type;
     napi_value value = nullptr;
-    auto input = [env, ctxt, &type, &value](size_t argc, napi_value* argv) {
+    auto input = [env, ctxt, &type, &value](size_t argc, napi_value *argv) {
         ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc >= 2, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         if (argc >= 2) {
             ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
-            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS, "invalid arguments!");
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !type.empty(),
+                E_INVALID_PARAMETERS, "invalid arguments!");
             value = argv[1];
         }
     };
@@ -67,9 +65,8 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
     
     auto *udRecord = new (std::nothrow) UnifiedRecordNapi();
     ASSERT_ERR(ctxt->env, udRecord != nullptr, Status::E_ERROR, "no memory for unified record!");
-
     if(value != nullptr) {
-        udRecord->value_ = GetNativeRecord(env, type, value);
+        udRecord->value_ = GenerateNativeRecord(env, type, value);
     } else {
         udRecord->value_ = std::make_shared<UnifiedRecord>();
     }
@@ -77,7 +74,7 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
     return ctxt->self;
 }
 
-std::shared_ptr<UnifiedRecord> UnifiedRecordNapi::GetNativeRecord(napi_env env, std::string type, napi_value valueNapi)
+std::shared_ptr<UnifiedRecord> UnifiedRecordNapi::GenerateNativeRecord(napi_env env, std::string type, napi_value valueNapi)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     ValueType value;
@@ -101,11 +98,16 @@ std::shared_ptr<UnifiedRecord> UnifiedRecordNapi::GetNativeRecord(napi_env env, 
         {VIDEO, [](UDType type, ValueType value) { return std::make_shared<Video>(type, value); }},
         {AUDIO, [](UDType type, ValueType value) { return std::make_shared<Audio>(type, value); }},
         {FOLDER, [](UDType type, ValueType value) { return std::make_shared<Folder>(type, value); }},
-        {SYSTEM_DEFINED_RECORD, [](UDType type, ValueType value) { return std::make_shared<SystemDefinedRecord>(type, value); }},
-        {SYSTEM_DEFINED_APP_ITEM, [](UDType type, ValueType value) { return std::make_shared<SystemDefinedAppItem>(type, value); }},
-        {SYSTEM_DEFINED_FORM, [](UDType type, ValueType value) { return std::make_shared<SystemDefinedForm>(type, value); }},
-        {SYSTEM_DEFINED_PIXEL_MAP, [](UDType type, ValueType value) { return std::make_shared<SystemDefinedPixelMap>(type, value); }},
-        {APPLICATION_DEFINED_RECORD, [](UDType type, ValueType value) { return std::make_shared<ApplicationDefinedRecord>(type, value); }},
+        {SYSTEM_DEFINED_RECORD,
+            [](UDType type, ValueType value) { return std::make_shared<SystemDefinedRecord>(type, value); }},
+        {SYSTEM_DEFINED_APP_ITEM,
+            [](UDType type, ValueType value) { return std::make_shared<SystemDefinedAppItem>(type, value); }},
+        {SYSTEM_DEFINED_FORM,
+            [](UDType type, ValueType value) { return std::make_shared<SystemDefinedForm>(type, value); }},
+        {SYSTEM_DEFINED_PIXEL_MAP,
+            [](UDType type, ValueType value) { return std::make_shared<SystemDefinedPixelMap>(type, value); }},
+        {APPLICATION_DEFINED_RECORD,
+            [](UDType type, ValueType value) { return std::make_shared<ApplicationDefinedRecord>(type, value); }},
     };
 
     auto constructor = constructors.find(utdType);
@@ -137,7 +139,8 @@ void UnifiedRecordNapi::GetNativeValue(napi_env env, std::string type, napi_valu
     status = napi_typeof(env, valueNapi, &valueType);
     ASSERT_ERR_VOID(env, status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     if (valueType == napi_object) {
-        ASSERT_ERR_VOID(env, type == "openharmony.pixel-map" || type == "openharmony.want", Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_ERR_VOID(env, type == "openharmony.pixel-map" || type == "openharmony.want",
+            Status::E_INVALID_PARAMETERS, "invalid arguments!");
         if (type == "openharmony.pixel-map") {
             std::shared_ptr<OHOS::Media::PixelMap> data;
             value = data;
@@ -150,7 +153,7 @@ void UnifiedRecordNapi::GetNativeValue(napi_env env, std::string type, napi_valu
     } else if (valueType == napi_number) {
         value = double();
     }
-    std::visit([&](auto& value) { status = NapiDataUtils::GetValue(env, valueNapi, value); }, value);
+    std::visit([&](auto &value) { status = NapiDataUtils::GetValue(env, valueNapi, value); }, value);
     ASSERT_ERR_VOID(env, status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
 }
 
@@ -198,7 +201,8 @@ napi_value UnifiedRecordNapi::GetValue(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto uRecord = GetUnifiedRecord(env, info, ctxt);
-    ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr),
+        Status::E_INVALID_PARAMETERS, "invalid object!");
     if (std::holds_alternative<std::vector<uint8_t>>(uRecord->value_->GetValue())) {
         auto value = std::get<std::vector<uint8_t>>(uRecord->value_->GetValue());
         void *data = nullptr;
@@ -209,7 +213,8 @@ napi_value UnifiedRecordNapi::GetValue(napi_env env, napi_callback_info info)
             return nullptr;
         }
     } else {
-        std::visit([&](const auto& value) { NapiDataUtils::SetValue(env, value, ctxt->output); }, uRecord->value_->GetValue());
+        std::visit([&](const auto &value) { NapiDataUtils::SetValue(env, value, ctxt->output); },
+            uRecord->value_->GetValue());
     }
     return ctxt->output;
 }

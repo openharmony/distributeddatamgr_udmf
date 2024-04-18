@@ -23,7 +23,6 @@
 #include "napi_data_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "pixel_map_napi.h"
 #include "unified_record.h"
 
 namespace OHOS {
@@ -35,7 +34,7 @@ public:
     static void NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out);
     static napi_value GetType(napi_env env, napi_callback_info info);
     static napi_value GetValue(napi_env env, napi_callback_info info);
-    static std::shared_ptr<UnifiedRecord> GetNativeRecord(napi_env env, std::string type, napi_value valueNapi);
+    static std::shared_ptr<UnifiedRecord> GenerateNativeRecord(napi_env env, std::string type, napi_value valueNapi);
     std::shared_ptr<UnifiedRecord> value_;
 
 private:

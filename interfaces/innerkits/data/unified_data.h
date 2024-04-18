@@ -16,23 +16,14 @@
 #ifndef UDMF_UNIFIED_DATA_H
 #define UDMF_UNIFIED_DATA_H
 
+#include "unified_data_properties.h"
 #include "unified_record.h"
-#include "want_params.h"
 
 namespace OHOS {
 namespace UDMF {
-enum ShareOption { IN_APP, CROSS_APP };
-class UnifiedDataProperties {
-public: 
-    std::string tag;
-    AAFwk::WantParams extras;
-    ShareOption shareOption = CROSS_APP;
-    double timestamp;
-};
-
 class UnifiedData {
 public:
-    UnifiedData() noexcept;
+    UnifiedData();
     explicit UnifiedData(std::shared_ptr<UnifiedDataProperties> properties);
 
     int64_t GetSize();
@@ -42,7 +33,7 @@ public:
     void SetRuntime(Runtime &runtime);
 
     void AddRecord(const std::shared_ptr<UnifiedRecord> &record);
-    void AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>>& records);
+    void AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>> &records);
     std::shared_ptr<UnifiedRecord> GetRecordAt(std::size_t index);
     void SetRecords(std::vector<std::shared_ptr<UnifiedRecord>> records);
     std::vector<std::shared_ptr<UnifiedRecord>> GetRecords() const;

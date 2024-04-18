@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace UDMF {
-UnifiedData::UnifiedData() noexcept
+UnifiedData::UnifiedData()
 {
     properties_ = std::make_shared<UnifiedDataProperties>();
 }
@@ -61,7 +61,7 @@ void UnifiedData::AddRecord(const std::shared_ptr<UnifiedRecord> &record)
     this->records_.push_back(record);
 }
 
-void UnifiedData::AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>>& records)
+void UnifiedData::AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>> &records)
 {
     for (auto &record :records) {
         if (record == nullptr) {
@@ -159,7 +159,8 @@ bool UnifiedData::IsComplete()
     return true;
 }
 
-void UnifiedData::SetProperties(std::shared_ptr<UnifiedDataProperties> properties){
+void UnifiedData::SetProperties(std::shared_ptr<UnifiedDataProperties> properties)
+{
     properties_ = properties;
 }
 

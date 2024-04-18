@@ -393,7 +393,7 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
     return napi_ok;
 }
 
-napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<OHOS::Media::PixelMap>& in, napi_value& out)
+napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<OHOS::Media::PixelMap> &in, napi_value &out)
 {
     out = OHOS::Media::PixelMapNapi::CreatePixelMap(env, in);
     return napi_ok;
@@ -407,7 +407,7 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
     return napi_ok;
 }
 
-napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<OHOS::AAFwk::Want>& in, napi_value &out) {
+napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<OHOS::AAFwk::Want> &in, napi_value &out) {
     out = OHOS::AppExecFwk::WrapWant(env, *in);
     return napi_ok;
 }

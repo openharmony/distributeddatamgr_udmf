@@ -33,7 +33,6 @@ PlainText::PlainText(const std::string &content, const std::string &abstract)
 
 PlainText::PlainText(UDType type, ValueType value) : Text(type, value) {}
 
-
 int64_t PlainText::GetSize()
 {
     return UnifiedDataUtils::GetDetailsSize(this->details_) + this->content_.size() + this->abstract_.size();

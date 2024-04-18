@@ -96,7 +96,7 @@ void SystemDefinedAppItem::SetAbilityName(const std::string &abilityName)
     this->items_[ABILITYNAME] = this->abilityName_;
 }
 
-void SystemDefinedAppItem::SetItems(UDDetails& details) {
+void SystemDefinedAppItem::SetItems(UDDetails &details) {
     for (auto &item : details) {
         auto* value = std::get_if<std::string>(&item.second);
         if (value == nullptr) {
