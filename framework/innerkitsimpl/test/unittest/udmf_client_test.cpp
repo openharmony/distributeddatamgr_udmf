@@ -2042,9 +2042,9 @@ HWTEST_F(UdmfClientTest, IsRemoteData001, TestSize.Level1)
 * @tc.desc: test GetTypesLabels
 * @tc.type: FUNC
 */
-HWTEST_F(UdmfClientTest, uProperties002, TestSize.Level1)
+HWTEST_F(UdmfClientTest, GetTypesLabels001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "uProperties001 begin.");
+    LOG_INFO(UDMF_TEST, "GetTypesLabels001 begin.");
     UnifiedData data;
     UDDetails details;
     details.insert({ "udmf_key", "udmf_value" });

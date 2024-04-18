@@ -65,7 +65,7 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
 
     auto *udRecord = new (std::nothrow) UnifiedRecordNapi();
     ASSERT_ERR(ctxt->env, udRecord != nullptr, Status::E_ERROR, "no memory for unified record!");
-    if(value != nullptr) {
+    if (value != nullptr) {
         udRecord->value_ = GenerateNativeRecord(env, type, value);
     } else {
         udRecord->value_ = std::make_shared<UnifiedRecord>();
@@ -74,7 +74,8 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
     return ctxt->self;
 }
 
-std::shared_ptr<UnifiedRecord> UnifiedRecordNapi::GenerateNativeRecord(napi_env env, std::string type, napi_value valueNapi)
+std::shared_ptr<UnifiedRecord> UnifiedRecordNapi::GenerateNativeRecord(napi_env env, std::string type,
+    napi_value valueNapi)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     ValueType value;
@@ -116,7 +117,8 @@ std::shared_ptr<UnifiedRecord> UnifiedRecordNapi::GenerateNativeRecord(napi_env 
     }
     auto uRecord = constructor->second(utdType, value);
     if (utdType == APPLICATION_DEFINED_RECORD) {
-        std::shared_ptr<ApplicationDefinedRecord> applicationDefinedRecord = std::static_pointer_cast<ApplicationDefinedRecord>(uRecord);
+        std::shared_ptr<ApplicationDefinedRecord> applicationDefinedRecord =
+            std::static_pointer_cast<ApplicationDefinedRecord>(uRecord);
         applicationDefinedRecord->SetApplicationDefinedType(type);
     }
     return uRecord;

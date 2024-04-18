@@ -86,7 +86,7 @@ napi_value UnifiedDataPropertiesNapi::SetExtras(napi_env env, napi_callback_info
     auto input = [env, ctxt, &value](size_t argc, napi_value* argv) {
         ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         bool ret = OHOS::AppExecFwk::UnwrapWantParams(env, argv[0], value);
-        LOG_INFO(UDMF_KITS_NAPI, "extras ret = %{public}d", ret);
+        ASSERT_BUSINESS_ERR(ctxt, ret, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");

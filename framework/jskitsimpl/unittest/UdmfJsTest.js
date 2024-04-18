@@ -1006,7 +1006,8 @@ describe('UdmfJSTest', function () {
     const TAG = 'UnifiedDataPropertiesTest001';
     console.info(TAG, 'start');
     let text = new UDC.Text();
-    let unifiedDatas = new UDC.UnifiedData(text);
+    let unifiedDatas = new UDC.UnifiedData();
+    unifiedDatas.addRecord(text);
     let properties = unifiedDatas.properties;
     expect(typeof properties).assertEqual('object');
     expect(typeof properties.extras).assertEqual('object');

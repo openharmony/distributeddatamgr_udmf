@@ -21,7 +21,7 @@ namespace OHOS {
 namespace UDMF {
 enum ShareOption { IN_APP, CROSS_APP };
 class UnifiedDataProperties {
-public: 
+public:
     std::string tag;
     AAFwk::WantParams extras;
     ShareOption shareOption = CROSS_APP;

@@ -80,7 +80,8 @@ void SystemDefinedForm::SetModule(const std::string &module)
     this->module_ = module;
 }
 
-void SystemDefinedForm::SetItems(UDDetails& details) {
+void SystemDefinedForm::SetItems(UDDetails& details)
+{
     for (auto &item : details) {
         auto* value = std::get_if<std::string>(&item.second);
         auto* intValue = std::get_if<int32_t>(&item.second);
