@@ -38,7 +38,6 @@ std::string SystemDefinedAppItem::GetAppId() const
 void SystemDefinedAppItem::SetAppId(const std::string &appId)
 {
     this->appId_ = appId;
-    this->items_[APPID] = appId;
 }
 
 std::string SystemDefinedAppItem::GetAppName() const
@@ -49,7 +48,6 @@ std::string SystemDefinedAppItem::GetAppName() const
 void SystemDefinedAppItem::SetAppName(const std::string &appName)
 {
     this->appName_ = appName;
-    this->items_[APPNAME] = appName;
 }
 
 std::string SystemDefinedAppItem::GetAppIconId() const
@@ -60,7 +58,6 @@ std::string SystemDefinedAppItem::GetAppIconId() const
 void SystemDefinedAppItem::SetAppIconId(const std::string &appIconId)
 {
     this->appIconId_ = appIconId;
-    this->items_[APPICONID] = appIconId;
 }
 
 std::string SystemDefinedAppItem::GetAppLabelId() const
@@ -71,7 +68,6 @@ std::string SystemDefinedAppItem::GetAppLabelId() const
 void SystemDefinedAppItem::SetAppLabelId(const std::string &appLabelId)
 {
     this->appLabelId_ = appLabelId;
-    this->items_[APPLABELID] = appLabelId;
 }
 
 std::string SystemDefinedAppItem::GetBundleName() const
@@ -82,7 +78,6 @@ std::string SystemDefinedAppItem::GetBundleName() const
 void SystemDefinedAppItem::SetBundleName(const std::string &bundleName)
 {
     this->bundleName_ = bundleName;
-    this->items_[BUNDLENAME] = bundleName;
 }
 
 std::string SystemDefinedAppItem::GetAbilityName() const
@@ -93,7 +88,6 @@ std::string SystemDefinedAppItem::GetAbilityName() const
 void SystemDefinedAppItem::SetAbilityName(const std::string &abilityName)
 {
     this->abilityName_ = abilityName;
-    this->items_[ABILITYNAME] = this->abilityName_;
 }
 
 void SystemDefinedAppItem::SetItems(UDDetails &details) {
@@ -125,8 +119,14 @@ void SystemDefinedAppItem::SetItems(UDDetails &details) {
 
 UDDetails SystemDefinedAppItem::GetItems()
 {
-    this->items_[ABILITYNAME] = this->abilityName_;
-    return this->items_;
+    UDDetails items;
+    items[APPID] = GetAppId();
+    items[APPNAME] = GetAppName();
+    items[APPICONID] = GetAppIconId();
+    items[APPLABELID] = GetAppLabelId();
+    items[BUNDLENAME] = GetBundleName();
+    items[ABILITYNAME] = GetAbilityName();
+    return items;
 }
 } // namespace UDMF
 } // namespace OHOS

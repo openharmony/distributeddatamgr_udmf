@@ -55,7 +55,6 @@ private:
     std::string appLabelId_;
     std::string bundleName_;
     std::string abilityName_;
-    UDDetails items_;
 };
 } // namespace UDMF
 } // namespace OHOS

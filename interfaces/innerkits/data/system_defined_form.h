@@ -53,7 +53,6 @@ private:
     constexpr static const char *MODULE = "module";
     constexpr static const char *BUNDLENAME = "bundleName";
     constexpr static const char *ABILITYNAME = "abilityName";
-    UDDetails items_;
 };
 } // namespace UDMF
 } // namespace OHOS
