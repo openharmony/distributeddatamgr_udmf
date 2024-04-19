@@ -33,7 +33,7 @@ PlainText::PlainText(const std::string &content, const std::string &abstract)
 
 PlainText::PlainText(UDType type, ValueType value) : Text(type, value)
 {
-    if(std::holds_alternative<std::string>(value)){
+    if (std::holds_alternative<std::string>(value)) {
         content_ = std::get<std::string>(value);
     }
 }

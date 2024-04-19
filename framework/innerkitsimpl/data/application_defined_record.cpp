@@ -35,7 +35,7 @@ ApplicationDefinedRecord::ApplicationDefinedRecord(std::string type, std::vector
 
 ApplicationDefinedRecord::ApplicationDefinedRecord(UDType type, ValueType value) : UnifiedRecord(type, value)
 {
-    if(std::holds_alternative<std::vector<uint8_t>>(value)){
+    if (std::holds_alternative<std::vector<uint8_t>>(value)) {
         rawData_ = std::get<std::vector<uint8_t>>(value);
     }
 }

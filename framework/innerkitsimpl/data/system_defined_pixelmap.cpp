@@ -30,7 +30,7 @@ SystemDefinedPixelMap::SystemDefinedPixelMap(std::vector<uint8_t> &data)
 
 SystemDefinedPixelMap::SystemDefinedPixelMap(UDType type, ValueType value) : SystemDefinedRecord(type, value)
 {
-    if(std::holds_alternative<std::vector<uint8_t>>(value)){
+    if (std::holds_alternative<std::vector<uint8_t>>(value)) {
         rawData_ = std::get<std::vector<uint8_t>>(value);
     }
 }
