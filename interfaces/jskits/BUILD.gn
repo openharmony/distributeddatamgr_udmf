@@ -33,6 +33,7 @@ config("udmf_napi_config") {
     "${aafwk_napi_path}/inner/napi_common",
     "${aafwk_service_path}/abilitymgr/include",
     "${aafwk_service_path}/common/include",
+    "${image_framework_path}/kits/js/common/include",
   ]
 }
 
