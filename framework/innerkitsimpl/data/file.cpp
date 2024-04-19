@@ -26,7 +26,12 @@ File::File(const std::string &uri) : UnifiedRecord(FILE)
     this->oriUri_ = uri;
 }
 
-File::File(UDType type, ValueType value) : UnifiedRecord(type, value) {}
+File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
+{
+    if(std::holds_alternative<std::string>(value)){
+        oriUri_ = std::get<std::string>(value);
+    }
+}
 
 int64_t File::GetSize()
 {
