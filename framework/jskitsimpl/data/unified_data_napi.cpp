@@ -210,7 +210,12 @@ void UnifiedDataNapi::GetRecord(napi_env env, std::shared_ptr<UnifiedRecord> in,
             break;
         }
         case SYSTEM_DEFINED_PIXEL_MAP: {
-            SystemDefinedPixelMapNapi::NewInstance(env, in, out);
+            auto value = in->GetValue();
+            if (std::get_if<std::shared_ptr<OHOS::Media::PixelMap>>(&value)) {
+                UnifiedRecordNapi::NewInstance(env, in, out);
+            } else {
+                SystemDefinedPixelMapNapi::NewInstance(env, in, out);
+            }
             break;
         }
         case APPLICATION_DEFINED_RECORD: {
