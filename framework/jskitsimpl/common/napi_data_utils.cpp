@@ -387,6 +387,36 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
     return napi_ok;
 }
 
+napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr<OHOS::Media::PixelMap> &pixelMap)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> std::shared_ptr<OHOS::Media::PixelMap>");
+    pixelMap = OHOS::Media::PixelMapNapi::GetPixelMap(env, in);
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<OHOS::Media::PixelMap> &in, napi_value &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value <- std::shared_ptr<OHOS::Media::PixelMap>");
+    out = OHOS::Media::PixelMapNapi::CreatePixelMap(env, in);
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr<OHOS::AAFwk::Want> &wantPtr)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> std::shared_ptr<OHOS::AAFwk::Want>");
+    OHOS::AAFwk::Want want;
+    AppExecFwk::UnwrapWant(env, in, want);
+    wantPtr = std::make_shared<OHOS::AAFwk::Want>(want);
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<OHOS::AAFwk::Want> &in, napi_value &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value <- std::shared_ptr<OHOS::AAFwk::Want>");
+    out = OHOS::AppExecFwk::WrapWant(env, *in);
+    return napi_ok;
+}
+
 bool NapiDataUtils::IsTypeForNapiValue(napi_env env, napi_value param, napi_valuetype expectType)
 {
     napi_valuetype valueType = napi_undefined;

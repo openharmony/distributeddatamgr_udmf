@@ -19,6 +19,16 @@
 
 namespace OHOS {
 namespace UDMF {
+UnifiedData::UnifiedData()
+{
+    properties_ = std::make_shared<UnifiedDataProperties>();
+}
+
+UnifiedData::UnifiedData(std::shared_ptr<UnifiedDataProperties> properties)
+{
+    properties_ = properties;
+}
+
 int64_t UnifiedData::GetSize()
 {
     int64_t totalSize = 0;
@@ -51,6 +61,16 @@ void UnifiedData::AddRecord(const std::shared_ptr<UnifiedRecord> &record)
     this->records_.push_back(record);
 }
 
+void UnifiedData::AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>> &records)
+{
+    for (auto &record :records) {
+        if (record == nullptr) {
+            return;
+        }
+        this->records_.push_back(record);
+    }
+}
+
 std::shared_ptr<UnifiedRecord> UnifiedData::GetRecordAt(std::size_t index)
 {
     if (records_.size() > index) {
@@ -69,7 +89,7 @@ std::vector<std::shared_ptr<UnifiedRecord>> UnifiedData::GetRecords() const
     return this->records_;
 }
 
-std::vector<UDType> UnifiedData::GetUDTypes()
+std::vector<UDType> UnifiedData::GetUDTypes() const
 {
     std::vector<UDType> typeSet;
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
@@ -85,6 +105,25 @@ std::string UnifiedData::GetTypes()
         types.append("-").append(UD_TYPE_MAP.at(record->GetType()));
     }
     return types;
+}
+
+std::vector<std::string> UnifiedData::GetTypesLabels() const
+{
+    std::vector<std::string> types;
+    for (const std::shared_ptr<UnifiedRecord> &record : records_) {
+        types.push_back(UD_TYPE_MAP.at(record->GetType()));
+    }
+    return types;
+}
+
+bool UnifiedData::HasType(const std::string &type) const
+{
+    for (const std::shared_ptr<UnifiedRecord> &record : records_) {
+        if (UD_TYPE_MAP.at(record->GetType()) == type) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool UnifiedData::IsEmpty() const
@@ -118,6 +157,16 @@ bool UnifiedData::IsComplete()
         return false;
     }
     return true;
+}
+
+void UnifiedData::SetProperties(std::shared_ptr<UnifiedDataProperties> properties)
+{
+    properties_ = properties;
+}
+
+std::shared_ptr<UnifiedDataProperties> UnifiedData::GetProperties() const
+{
+    return properties_;
 }
 } // namespace UDMF
 } // namespace OHOS

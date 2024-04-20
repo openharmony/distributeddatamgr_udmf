@@ -25,6 +25,7 @@ class Text : public UnifiedRecord {
 public:
     Text();
     explicit Text(UDDetails &variantMap);
+    Text(UDType type, ValueType value);
 
     int64_t GetSize() override;
 

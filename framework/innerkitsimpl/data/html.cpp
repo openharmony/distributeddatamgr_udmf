@@ -32,6 +32,13 @@ Html::Html(const std::string &htmlContent, const std::string &plainContent)
     this->plainContent_ = plainContent;
 }
 
+Html::Html(UDType type, ValueType value) : Text(type, value)
+{
+    if (std::holds_alternative<std::string>(value)) {
+        htmlContent_ = std::get<std::string>(value);
+    }
+}
+
 int64_t Html::GetSize()
 {
     return UnifiedDataUtils::GetDetailsSize(this->details_) + this->htmlContent_.size() + this->plainContent_.size();

@@ -30,6 +30,15 @@ UnifiedRecord::UnifiedRecord(UDType type)
     dataType_ = type;
 }
 
+UnifiedRecord::UnifiedRecord(UDType type, ValueType value)
+{
+    if (type < ENTITY || type > UD_BUTT) {
+        dataType_ = UD_BUTT;
+    }
+    dataType_ = type;
+    value_ = value;
+}
+
 UDType UnifiedRecord::GetType() const
 {
     return this->dataType_;
@@ -53,6 +62,11 @@ std::string UnifiedRecord::GetUid() const
 void UnifiedRecord::SetUid(const std::string &id)
 {
     this->uid_ = id;
+}
+
+ValueType UnifiedRecord::GetValue()
+{
+    return value_;
 }
 } // namespace UDMF
 } // namespace OHOS

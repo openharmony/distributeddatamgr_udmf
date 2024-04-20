@@ -24,6 +24,7 @@ class Audio : public File {
 public:
     Audio();
     explicit Audio(const std::string &uri);
+    Audio(UDType type, ValueType value);
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -23,6 +23,7 @@ namespace UDMF {
 class SystemDefinedAppItem : public SystemDefinedRecord {
 public:
     SystemDefinedAppItem();
+    SystemDefinedAppItem(UDType type, ValueType value);
 
     int64_t GetSize() override;
 
@@ -38,8 +39,16 @@ public:
     void SetBundleName(const std::string &bundleName);
     std::string GetAbilityName() const;
     void SetAbilityName(const std::string &abilityName);
+    void SetItems(UDDetails &details);
+    UDDetails GetItems();
 
 private:
+    constexpr static const char *APPID = "appId";
+    constexpr static const char *APPNAME = "appName";
+    constexpr static const char *APPICONID = "appIconId";
+    constexpr static const char *APPLABELID = "appLabelId";
+    constexpr static const char *BUNDLENAME = "bundleName";
+    constexpr static const char *ABILITYNAME = "abilityName";
     std::string appId_;
     std::string appName_;
     std::string appIconId_;

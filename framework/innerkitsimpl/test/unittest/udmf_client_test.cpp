@@ -2036,4 +2036,31 @@ HWTEST_F(UdmfClientTest, IsRemoteData001, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "IsRemoteData001 end.");
 }
+
+/**
+* @tc.name: GetTypesLabels001
+* @tc.desc: test GetTypesLabels
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetTypesLabels001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypesLabels001 begin.");
+    UnifiedData data;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    Text text;
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Text>(text);
+    PlainText plainText;
+    plainText.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record2 = std::make_shared<PlainText>(plainText);
+    std::vector<std::shared_ptr<UnifiedRecord>> records = {record1, record2};
+    data.AddRecords(records);
+
+    std::vector<std::string> types = {"general.text", "general.plain-text"};
+    ASSERT_EQ(data.GetTypesLabels(), types);
+    ASSERT_EQ(data.HasType("general.text"), true);
+    ASSERT_EQ(data.HasType("general.plain-text"), true);
+    ASSERT_EQ(data.HasType("general.html"), false);
+}
 } // OHOS::Test

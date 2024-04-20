@@ -60,6 +60,7 @@ ohos_shared_library("unifieddatachannel_napi") {
     "${udmf_framework_path}/jskitsimpl/data/text_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/unified_data_channel_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/unified_data_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/unified_data_properties_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/unified_record_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/video_napi.cpp",
     "${udmf_interfaces_path}/jskits/module/unified_data_channel_napi_module.cpp",
@@ -76,9 +77,11 @@ ohos_shared_library("unifieddatachannel_napi") {
   ]
 
   external_deps = [
+    "ability_base:want",
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "hilog:libhilog",
+    "image_framework:image",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
@@ -115,6 +118,7 @@ ohos_shared_library("uniformtypedescriptor_napi") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "hilog:libhilog",
+    "image_framework:image",
     "ipc:ipc_core",
     "napi:ace_napi",
   ]
@@ -148,6 +152,7 @@ ohos_shared_library("udmf_data_napi") {
     "${udmf_framework_path}/jskitsimpl/data/text_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/unified_data_channel_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/unified_data_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/unified_data_properties_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/unified_record_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/video_napi.cpp",
     "${udmf_interfaces_path}/jskits/module/unified_data_channel_napi_module.cpp",
@@ -164,9 +169,11 @@ ohos_shared_library("udmf_data_napi") {
   ]
 
   external_deps = [
+    "ability_base:want",
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "hilog:libhilog",
+    "image_framework:image",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
@@ -198,6 +205,7 @@ ohos_static_library("udmf_js_common") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "hilog:libhilog",
+    "image_framework:image",
     "napi:ace_napi",
   ]
   subsystem_name = "distributeddatamgr"

@@ -31,6 +31,7 @@
         "c_utils",
         "hilog",
         "hitrace",
+        "image_framework",
         "ipc",
         "kv_store",
         "napi",

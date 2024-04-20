@@ -26,6 +26,8 @@ Text::Text(UDDetails &variantMap) : UnifiedRecord(TEXT)
     this->details_ = variantMap;
 }
 
+Text::Text(UDType type, ValueType value) : UnifiedRecord(type, value) {}
+
 int64_t Text::GetSize()
 {
     return UnifiedDataUtils::GetDetailsSize(this->details_);

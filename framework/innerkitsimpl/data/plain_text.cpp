@@ -31,6 +31,13 @@ PlainText::PlainText(const std::string &content, const std::string &abstract)
     this->abstract_ = abstract;
 }
 
+PlainText::PlainText(UDType type, ValueType value) : Text(type, value)
+{
+    if (std::holds_alternative<std::string>(value)) {
+        content_ = std::get<std::string>(value);
+    }
+}
+
 int64_t PlainText::GetSize()
 {
     return UnifiedDataUtils::GetDetailsSize(this->details_) + this->content_.size() + this->abstract_.size();

@@ -34,6 +34,7 @@ napi_value UnifiedDataChannelNapi::UnifiedDataChannelInit(napi_env env, napi_val
         DECLARE_NAPI_FUNCTION("updateData", UpdateData),
         DECLARE_NAPI_FUNCTION("queryData", QueryData),
         DECLARE_NAPI_FUNCTION("deleteData", DeleteData),
+        DECLARE_NAPI_GETTER("ShareOption", CreateShareOption),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
@@ -268,6 +269,21 @@ napi_status UnifiedDataChannelNapi::GetNamedProperty(napi_env env, napi_value &o
     }
     LOG_DEBUG(UDMF_KITS_NAPI, "Param parse successful, Options.%{public}s = %{public}s", key.c_str(), value.c_str());
     return status;
+}
+
+napi_value UnifiedDataChannelNapi::CreateShareOption(napi_env env, napi_callback_info info)
+{
+    napi_value jsShareOption = nullptr;
+    napi_create_object(env, &jsShareOption);
+
+    napi_value jsInApp;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(ShareOption::IN_APP), jsInApp);
+    NAPI_CALL(env, napi_set_named_property(env, jsShareOption, "IN_APP", jsInApp));
+
+    napi_value jsCrossDevice;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(ShareOption::CROSS_APP), jsCrossDevice);
+    NAPI_CALL(env, napi_set_named_property(env, jsShareOption, "CROSS_APP", jsCrossDevice));
+    return jsShareOption;
 }
 } // namespace UDMF
 } // namespace OHOS

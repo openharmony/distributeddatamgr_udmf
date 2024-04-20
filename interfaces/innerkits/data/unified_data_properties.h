@@ -12,35 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef UDMF_UNIFIED_DATA_PROPERTIES_H
+#define UDMF_UNIFIED_DATA_PROPERTIES_H
 
-#ifndef UDMF_FILE_H
-#define UDMF_FILE_H
-
-#include "unified_record.h"
+#include "want_params.h"
 
 namespace OHOS {
 namespace UDMF {
-class File : public UnifiedRecord {
+enum ShareOption { IN_APP, CROSS_APP };
+class UnifiedDataProperties {
 public:
-    File();
-    explicit File(const std::string &uri);
-    File(UDType type, ValueType value);
-    int64_t GetSize() override;
-
-    std::string GetUri() const;
-    void SetUri(const std::string &uri);
-
-    std::string GetRemoteUri() const;
-    void SetRemoteUri(const std::string &uri);
-
-    void SetDetails(UDDetails &variantMap);
-    UDDetails GetDetails() const;
-
-protected:
-    std::string oriUri_;
-    std::string remoteUri_;
-    UDDetails details_;
+    std::string tag;
+    AAFwk::WantParams extras;
+    ShareOption shareOption = CROSS_APP;
+    double timestamp;
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_FILE_H
+#endif // UDMF_UNIFIED_DATA_PROPERTIES_H

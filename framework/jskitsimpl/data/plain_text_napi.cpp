@@ -30,6 +30,7 @@ napi_value PlainTextNapi::Constructor(napi_env env)
     napi_property_descriptor properties[] = {
         /* PlainText extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
+        DECLARE_NAPI_FUNCTION("getValue", UnifiedRecordNapi::GetValue),
         /* PlainText extends Text */
         DECLARE_NAPI_GETTER_SETTER("details", TextNapi::GetDetails, TextNapi::SetDetails),
         /* PlainText properties */

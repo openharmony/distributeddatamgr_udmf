@@ -29,6 +29,7 @@ napi_value FileNapi::Constructor(napi_env env)
     napi_property_descriptor properties[] = {
         /* File extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
+        DECLARE_NAPI_FUNCTION("getValue", UnifiedRecordNapi::GetValue),
         /* File properties */
         DECLARE_NAPI_GETTER_SETTER("details", GetDetails, SetDetails),
         DECLARE_NAPI_GETTER_SETTER("uri", GetUri, SetUri),

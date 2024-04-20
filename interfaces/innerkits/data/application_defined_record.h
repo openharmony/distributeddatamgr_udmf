@@ -25,6 +25,7 @@ public:
     ApplicationDefinedRecord();
     explicit ApplicationDefinedRecord(std::string type);
     explicit ApplicationDefinedRecord(std::string type, std::vector<uint8_t> &data);
+    ApplicationDefinedRecord(UDType type, ValueType value);
 
     int64_t GetSize() override;
 

@@ -25,6 +25,13 @@ Link::Link(const std::string &url) : Link(url, "")
 {
 }
 
+Link::Link(UDType type, ValueType value) : Text(type, value)
+{
+    if (std::holds_alternative<std::string>(value)) {
+        url_ = std::get<std::string>(value);
+    }
+}
+
 Link::Link(const std::string &url, const std::string &description)
 {
     if (url.length() >= MAX_TEXT_LEN || description.length() >= MAX_TEXT_LEN) {

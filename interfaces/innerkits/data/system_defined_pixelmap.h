@@ -24,6 +24,7 @@ class SystemDefinedPixelMap : public SystemDefinedRecord {
 public:
     SystemDefinedPixelMap();
     explicit SystemDefinedPixelMap(std::vector<uint8_t> &data);
+    SystemDefinedPixelMap(UDType type, ValueType value);
 
     int64_t GetSize() override;
 

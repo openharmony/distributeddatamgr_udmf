@@ -24,6 +24,7 @@ class Html : public Text {
 public:
     Html();
     explicit Html(const std::string &htmlContent, const std::string &plainContent);
+    Html(UDType type, ValueType value);
 
     int64_t GetSize() override;
 

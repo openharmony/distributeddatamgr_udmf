@@ -22,6 +22,8 @@ SystemDefinedAppItem::SystemDefinedAppItem()
     this->dataType_ = SYSTEM_DEFINED_APP_ITEM;
 }
 
+SystemDefinedAppItem::SystemDefinedAppItem(UDType type, ValueType value) : SystemDefinedRecord(type, value) {}
+
 int64_t SystemDefinedAppItem::GetSize()
 {
     return UnifiedDataUtils::GetDetailsSize(this->details_) + this->appId_.size() + this->appName_.size()
@@ -86,6 +88,46 @@ std::string SystemDefinedAppItem::GetAbilityName() const
 void SystemDefinedAppItem::SetAbilityName(const std::string &abilityName)
 {
     this->abilityName_ = abilityName;
+}
+
+void SystemDefinedAppItem::SetItems(UDDetails &details)
+{
+    for (auto &item : details) {
+        auto* value = std::get_if<std::string>(&item.second);
+        if (value == nullptr) {
+            continue;
+        }
+        if (item.first == APPID) {
+            SetAppId(*value);
+        }
+        if (item.first == APPNAME) {
+            SetAppName(*value);
+        }
+        if (item.first == APPICONID) {
+            SetAppIconId(*value);
+        }
+        if (item.first == APPLABELID) {
+            SetAppLabelId(*value);
+        }
+        if (item.first == BUNDLENAME) {
+            SetBundleName(*value);
+        }
+        if (item.first == ABILITYNAME) {
+            SetAbilityName(*value);
+        }
+    }
+}
+
+UDDetails SystemDefinedAppItem::GetItems()
+{
+    UDDetails items;
+    items[APPID] = GetAppId();
+    items[APPNAME] = GetAppName();
+    items[APPICONID] = GetAppIconId();
+    items[APPLABELID] = GetAppLabelId();
+    items[BUNDLENAME] = GetBundleName();
+    items[ABILITYNAME] = GetAbilityName();
+    return items;
 }
 } // namespace UDMF
 } // namespace OHOS

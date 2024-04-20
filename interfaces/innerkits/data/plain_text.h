@@ -24,6 +24,7 @@ class PlainText : public Text {
 public:
     PlainText();
     explicit PlainText(const std::string &content, const std::string &abstract);
+    PlainText(UDType type, ValueType value);
 
     int64_t GetSize() override;
 

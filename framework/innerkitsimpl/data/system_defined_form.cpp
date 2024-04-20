@@ -22,6 +22,8 @@ SystemDefinedForm::SystemDefinedForm()
     this->dataType_ = SYSTEM_DEFINED_FORM;
 }
 
+SystemDefinedForm::SystemDefinedForm(UDType type, ValueType value) : SystemDefinedRecord(type, value) {}
+
 int64_t SystemDefinedForm::GetSize()
 {
     return UnifiedDataUtils::GetDetailsSize(this->details_) + sizeof(formId_) + this->formName_.size()
@@ -76,6 +78,47 @@ std::string SystemDefinedForm::GetModule() const
 void SystemDefinedForm::SetModule(const std::string &module)
 {
     this->module_ = module;
+}
+
+void SystemDefinedForm::SetItems(UDDetails& details)
+{
+    for (auto &item : details) {
+        auto* value = std::get_if<std::string>(&item.second);
+        auto* intValue = std::get_if<int32_t>(&item.second);
+        if (value == nullptr && intValue == nullptr) {
+            continue;
+        }
+        if (intValue != nullptr && item.first == FORMID) {
+            SetFormId(*intValue);
+            continue;
+        }
+        if (value == nullptr) {
+            continue;
+        }
+        if (item.first == FORMNAME) {
+            SetFormName(*value);
+        }
+        if (item.first == MODULE) {
+            SetModule(*value);
+        }
+        if (item.first == BUNDLENAME) {
+            SetBundleName(*value);
+        }
+        if (item.first == ABILITYNAME) {
+            SetAbilityName(*value);
+        }
+    }
+}
+
+UDDetails SystemDefinedForm::GetItems()
+{
+    UDDetails items;
+    items[FORMID] = GetFormId();
+    items[FORMNAME] = GetFormName();
+    items[MODULE] = GetModule();
+    items[BUNDLENAME] = GetBundleName();
+    items[ABILITYNAME] = GetAbilityName();
+    return items;
 }
 } // namespace UDMF
 } // namespace OHOS

@@ -30,6 +30,7 @@ napi_value ImageNapi::Constructor(napi_env env)
     napi_property_descriptor properties[] = {
         /* Image extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
+        DECLARE_NAPI_FUNCTION("getValue", UnifiedRecordNapi::GetValue),
         /* Image extends File */
         DECLARE_NAPI_GETTER_SETTER("details", FileNapi::GetDetails, FileNapi::SetDetails),
         DECLARE_NAPI_GETTER_SETTER("uri", FileNapi::GetUri, FileNapi::SetUri),

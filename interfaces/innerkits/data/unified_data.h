@@ -16,36 +16,46 @@
 #ifndef UDMF_UNIFIED_DATA_H
 #define UDMF_UNIFIED_DATA_H
 
+#include "unified_data_properties.h"
 #include "unified_record.h"
 
 namespace OHOS {
 namespace UDMF {
 class UnifiedData {
 public:
-    int64_t GetSize();
+    UnifiedData();
+    explicit UnifiedData(std::shared_ptr<UnifiedDataProperties> properties);
 
+    int64_t GetSize();
     std::string GetGroupId() const;
 
     std::shared_ptr<Runtime> GetRuntime() const;
     void SetRuntime(Runtime &runtime);
 
     void AddRecord(const std::shared_ptr<UnifiedRecord> &record);
+    void AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>> &records);
     std::shared_ptr<UnifiedRecord> GetRecordAt(std::size_t index);
     void SetRecords(std::vector<std::shared_ptr<UnifiedRecord>> records);
     std::vector<std::shared_ptr<UnifiedRecord>> GetRecords() const;
 
-    std::vector<UDType> GetUDTypes();
+    std::vector<UDType> GetUDTypes() const;
     std::string GetTypes();
+    std::vector<std::string> GetTypesLabels() const;
+    bool HasType(const std::string &type) const;
 
     bool IsEmpty() const;
     bool IsValid();
     bool IsComplete();
+
+    void SetProperties(std::shared_ptr<UnifiedDataProperties> properties);
+    std::shared_ptr<UnifiedDataProperties> GetProperties() const;
 
     static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;
 
 private:
     std::shared_ptr<Runtime> runtime_;
     std::vector<std::shared_ptr<UnifiedRecord>> records_;
+    std::shared_ptr<UnifiedDataProperties> properties_;
 };
 } // namespace UDMF
 } // namespace OHOS

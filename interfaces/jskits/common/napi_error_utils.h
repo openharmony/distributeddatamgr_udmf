@@ -56,6 +56,14 @@ napi_value GenerateErrorMsg(napi_env env, NapiErrorCode jsInfo);
         }                                                   \
     } while (0)
 
+#define ASSERT_ERR_STATUS(env, assertion, errorcode, message) \
+    do {                                                    \
+        if (!(assertion)) {                                 \
+            ThrowNapiError(env, errorcode, message);        \
+            return napi_generic_failure;                    \
+        }                                                   \
+    } while (0)
+
 #define ASSERT_BUSINESS_ERR(ctxt, assertion, errorcode, message) \
     do {                                                         \
         if (!(assertion)) {                                      \

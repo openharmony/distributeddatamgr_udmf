@@ -23,6 +23,7 @@ namespace UDMF {
 class SystemDefinedRecord : public UnifiedRecord {
 public:
     explicit SystemDefinedRecord();
+    SystemDefinedRecord(UDType type, ValueType value);
 
     int64_t GetSize() override;
 

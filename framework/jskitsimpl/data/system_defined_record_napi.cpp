@@ -29,6 +29,7 @@ napi_value SystemDefinedRecordNapi::Constructor(napi_env env)
     napi_property_descriptor properties[] = {
         /* SystemDefinedRecord extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
+        DECLARE_NAPI_FUNCTION("getValue", UnifiedRecordNapi::GetValue),
         /* SystemDefinedRecord properties */
         DECLARE_NAPI_GETTER_SETTER("details", GetDetails, SetDetails),
     };
