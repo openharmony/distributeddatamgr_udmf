@@ -140,18 +140,20 @@ private:
 
 #define ASSERT_CALL_DELETE_STATUS(env, theCall, object) \
     do {                                                \
-        if ((theCall) != napi_ok) {                     \
+        napi_status status = (theCall);                 \
+        if (status != napi_ok) {                        \
             delete (object);                            \
             GET_AND_THROW_LAST_ERROR((env));            \
-            return (theCall);                           \
+            return status;                              \
         }                                               \
     } while (0)
 
 #define ASSERT_CALL_STATUS(env, theCall)     \
     do {                                     \
-        if ((theCall) != napi_ok) {          \
+        napi_status status = (theCall);      \
+        if (status != napi_ok) {             \
             GET_AND_THROW_LAST_ERROR((env)); \
-            return (theCall);                \
+            return status;                   \
         }                                    \
     } while (0)
 

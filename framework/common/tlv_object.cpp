@@ -509,7 +509,7 @@ void TLVObject::PrepareHeader(size_t size, size_t &tagCursor, size_t &valueCurso
 {
     if (file_ != nullptr) {
         cursor_ = size;
-        fseek(file_, -cursor_ - sizeof(TLVHead), SEEK_CUR);
+        fseek(file_, -static_cast<long long>(cursor_) - sizeof(TLVHead), SEEK_CUR);
         buffer_->resize(sizeof(TLVHead));
         tagCursor  = 0;
         valueCursor = 0;

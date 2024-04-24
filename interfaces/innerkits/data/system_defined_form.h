@@ -42,7 +42,7 @@ public:
     UDDetails GetItems();
 
 private:
-    int32_t formId_;
+    int32_t formId_{-1};
     std::string formName_;
     std::string bundleName_;
     std::string abilityName_;

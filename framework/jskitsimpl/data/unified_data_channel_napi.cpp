@@ -34,7 +34,7 @@ napi_value UnifiedDataChannelNapi::UnifiedDataChannelInit(napi_env env, napi_val
         DECLARE_NAPI_FUNCTION("updateData", UpdateData),
         DECLARE_NAPI_FUNCTION("queryData", QueryData),
         DECLARE_NAPI_FUNCTION("deleteData", DeleteData),
-        DECLARE_NAPI_GETTER("ShareOption", CreateShareOption),
+        DECLARE_NAPI_GETTER("ShareOptions", CreateShareOption),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
@@ -71,7 +71,7 @@ napi_value UnifiedDataChannelNapi::InsertData(napi_env env, napi_callback_info i
         std::shared_ptr<UnifiedData> unifiedData;
     };
     std::string intention;
-    auto unifiedDataNapi = new (std::nothrow) UnifiedDataNapi();
+    UnifiedDataNapi *unifiedDataNapi = nullptr;
     auto ctxt = std::make_shared<InsertContext>();
     auto input = [env, ctxt, &intention, &unifiedDataNapi](size_t argc, napi_value *argv) {
         // require 2 arguments <options, unifiedData>
@@ -108,7 +108,7 @@ napi_value UnifiedDataChannelNapi::UpdateData(napi_env env, napi_callback_info i
         std::shared_ptr<UnifiedData> unifiedData;
     };
     std::string key;
-    auto unifiedDataNapi = new (std::nothrow) UnifiedDataNapi();
+    UnifiedDataNapi *unifiedDataNapi = nullptr;
     auto ctxt = std::make_shared<UpdateContext>();
     auto input = [env, ctxt, &unifiedDataNapi](size_t argc, napi_value *argv) {
         // require 2 arguments <options, unifiedData>

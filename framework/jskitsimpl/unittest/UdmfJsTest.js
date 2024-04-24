@@ -1013,7 +1013,7 @@ describe('UdmfJSTest', function () {
     expect(typeof properties.extras).assertEqual('object');
     expect(typeof properties.tag).assertEqual('string');
     expect(typeof properties.timestamp).assertEqual('object');
-    expect(typeof properties.shareOption).assertEqual('number');
+    expect(typeof properties.shareOptions).assertEqual('number');
     expect(typeof properties.getDelayData).assertEqual('undefined');
   });
 
@@ -1030,23 +1030,23 @@ describe('UdmfJSTest', function () {
     let unifiedData = new UDC.UnifiedData(text);
     let properties = new UDC.UnifiedDataProperties();
 
-    expect(properties.shareOption).assertEqual(UDC.ShareOption.CROSS_APP);
-    properties.shareOption = UDC.ShareOption.IN_APP;
+    expect(properties.shareOptions).assertEqual(UDC.ShareOptions.CROSS_APP);
+    properties.shareOptions = UDC.ShareOptions.IN_APP;
     unifiedData.properties = properties;
-    expect(unifiedData.properties.shareOption).assertEqual(UDC.ShareOption.IN_APP);
-    unifiedData.properties.shareOption = UDC.ShareOption.CROSS_APP;
-    expect(unifiedData.properties.shareOption).assertEqual(UDC.ShareOption.CROSS_APP);
+    expect(unifiedData.properties.shareOptions).assertEqual(UDC.ShareOptions.IN_APP);
+    unifiedData.properties.shareOptions = UDC.ShareOptions.CROSS_APP;
+    expect(unifiedData.properties.shareOptions).assertEqual(UDC.ShareOptions.CROSS_APP);
 
-    expect(unifiedData.properties.tag).assertEqual("");
-    unifiedData.properties.tag = "DataTag";
-    expect(unifiedData.properties.tag).assertEqual("DataTag");
+    expect(unifiedData.properties.tag).assertEqual('');
+    unifiedData.properties.tag = 'DataTag';
+    expect(unifiedData.properties.tag).assertEqual('DataTag');
 
     let now = new Date();
     unifiedData.properties.timestamp = now;
     expect(unifiedData.properties.timestamp.getTime()).assertEqual(now.getTime());
 
     expect(Object.keys(unifiedData.properties.extras).length).assertEqual(0);
-    let person = {fname: "John", lname: "Doe", age: 25};
+    let person = {fname: 'John', lname: 'Doe', age: 25};
     unifiedData.properties.extras = person;
     expect(Object.keys(unifiedData.properties.extras).length).assertEqual(3);
     expect(unifiedData.properties.extras.fname).assertEqual(person.fname);
@@ -1065,23 +1065,23 @@ describe('UdmfJSTest', function () {
     let unifiedData = new UDC.UnifiedData(text);
 
     function func(inputStr){
-      console.info(TAG, "execute func");
+      console.info(TAG, 'execute func');
       let text = new UDC.Text();
       text.details = {
         Key: inputStr + KEY_TEST_ELEMENT,
         Value: inputStr + VALUE_TEST_ELEMENT,
       };
       let data = new UDC.UnifiedData(text);
-      data.properties.tag = "FileTag";
+      data.properties.tag = 'FileTag';
       return data;
     }
     unifiedData.properties.getDelayData = func;
-    const data = unifiedData.properties.getDelayData("inputTest");
+    const data = unifiedData.properties.getDelayData('inputTest');
     let records = data.getRecords();
     expect(records.length).assertEqual(1);
-    expect(records[0].details.Key).assertEqual("inputTest" + KEY_TEST_ELEMENT);
-    expect(records[0].details.Value).assertEqual("inputTest" + VALUE_TEST_ELEMENT);
-    expect(data.properties.tag).assertEqual("FileTag");
+    expect(records[0].details.Key).assertEqual('inputTest' + KEY_TEST_ELEMENT);
+    expect(records[0].details.Value).assertEqual('inputTest' + VALUE_TEST_ELEMENT);
+    expect(data.properties.tag).assertEqual('FileTag');
   });
 
   /**
@@ -1093,9 +1093,9 @@ describe('UdmfJSTest', function () {
   it('UnifiedDataHasType', 0, function () {
     const TAG = 'UnifiedDataHasType';
     console.info(TAG, 'start');
-    const textType = "general.text";
-    const plaintextType = "general.plain-text";
-    const htmlType = "general.html";
+    const textType = 'general.text';
+    const plaintextType = 'general.plain-text';
+    const htmlType = 'general.html';
 
     let text = new UDC.Text();
     let unifiedData = new UDC.UnifiedData(text);
@@ -1136,9 +1136,9 @@ describe('UdmfJSTest', function () {
     let view2 = new Uint32Array(data1);
     expect(view1[0]).assertEqual(view2[0]);
 
-    let record2 = new UDC.UnifiedRecord('general.message', "https://www.xxx.com/");
+    let record2 = new UDC.UnifiedRecord('general.message', 'xxx.com');
     const data2 = record2.getValue();
-    expect(data2).assertEqual("https://www.xxx.com/");
+    expect(data2).assertEqual('xxx.com');
 
     let record3 = new UDC.UnifiedRecord('general.message', 8899);
     const data3 = record3.getValue();
@@ -1193,7 +1193,7 @@ describe('UdmfJSTest', function () {
     let records = unifiedData.getRecords();
     expect(records.length).assertEqual(1);
 
-    let record2 = new UDC.UnifiedRecord('general.message', "https://www.xxx.com/");
+    let record2 = new UDC.UnifiedRecord('general.message', 'xxx.com');
     unifiedData.addRecord(record2);
     let record3 = new UDC.UnifiedRecord('general.message', 8899);
     unifiedData.addRecord(record3);
@@ -1224,7 +1224,7 @@ describe('UdmfJSTest', function () {
     let view2 = new Uint32Array(data1);
     expect(view1[0]).assertEqual(view2[0]);
     const data2 = records[1].getValue();
-    expect(data2).assertEqual("https://www.xxx.com/");
+    expect(data2).assertEqual('xxx.com');
     const data3 = records[2].getValue();
     expect(data3).assertEqual(8899);
     const data4 = records[3].getValue();
@@ -1254,7 +1254,7 @@ describe('UdmfJSTest', function () {
     view1[0] = 123456;
     let record1 = new UDC.UnifiedRecord('general.text', dataUri);
     let unifiedData = new UDC.UnifiedData(record1);
-    let record2 = new UDC.UnifiedRecord('general.text', "https://www.xxx.com/");
+    let record2 = new UDC.UnifiedRecord('general.text', 'xxx.com');
     unifiedData.addRecord(record2);
     let record3 = new UDC.UnifiedRecord('general.text', 8899);
     unifiedData.addRecord(record3);
@@ -1268,7 +1268,7 @@ describe('UdmfJSTest', function () {
     let view2 = new Uint32Array(data1);
     expect(view1[0]).assertEqual(view2[0]);
     const data2 = records[1].getValue();
-    expect(data2).assertEqual("https://www.xxx.com/");
+    expect(data2).assertEqual('xxx.com');
     const data3 = records[2].getValue();
     expect(data3).assertEqual(8899);
     const data4 = records[3].getValue();
@@ -1290,7 +1290,7 @@ describe('UdmfJSTest', function () {
     view1[0] = 123456;
     let record1 = new UDC.UnifiedRecord('otherType', dataUri);
     let unifiedData = new UDC.UnifiedData(record1);
-    let record2 = new UDC.UnifiedRecord('otherType', "https://www.xxx.com/");
+    let record2 = new UDC.UnifiedRecord('otherType', 'xxx.com');
     unifiedData.addRecord(record2);
     let record3 = new UDC.UnifiedRecord('otherType', 8899);
     unifiedData.addRecord(record3);
@@ -1304,7 +1304,7 @@ describe('UdmfJSTest', function () {
     let view2 = new Uint32Array(data1);
     expect(view1[0]).assertEqual(view2[0]);
     const data2 = records[1].getValue();
-    expect(data2).assertEqual("https://www.xxx.com/");
+    expect(data2).assertEqual('xxx.com');
     const data3 = records[2].getValue();
     expect(data3).assertEqual(8899);
     const data4 = records[3].getValue();

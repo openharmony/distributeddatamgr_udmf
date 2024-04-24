@@ -27,7 +27,7 @@ napi_value UnifiedDataPropertiesNapi::Constructor(napi_env env)
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_GETTER_SETTER("extras", GetExtras, SetExtras),
         DECLARE_NAPI_GETTER_SETTER("tag", GetTag, SetTag),
-        DECLARE_NAPI_GETTER_SETTER("shareOption", GetShareOption, SetShareOption),
+        DECLARE_NAPI_GETTER_SETTER("shareOptions", GetShareOption, SetShareOption),
         DECLARE_NAPI_GETTER_SETTER("timestamp", GetTimestamp, SetTimestamp),
         DECLARE_NAPI_GETTER_SETTER("getDelayData", GetDelayData, SetDelayData),
     };
@@ -175,7 +175,7 @@ napi_value UnifiedDataPropertiesNapi::SetTimestamp(napi_env env, napi_callback_i
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    double timestampValue;
+    double timestampValue = 0;
     auto input = [env, ctxt, &timestampValue](size_t argc, napi_value *argv) {
         ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         ctxt->status = napi_get_date_value(env, argv[0], &timestampValue);
