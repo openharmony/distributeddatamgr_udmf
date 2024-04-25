@@ -1064,7 +1064,7 @@ describe('UdmfJSTest', function () {
     let text = new UDC.Text();
     let unifiedData = new UDC.UnifiedData(text);
 
-    function func(inputStr){
+    function func(inputStr) {
       console.info(TAG, 'execute func');
       let text = new UDC.Text();
       text.details = {
