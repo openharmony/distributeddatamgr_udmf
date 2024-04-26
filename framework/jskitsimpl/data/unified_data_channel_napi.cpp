@@ -34,7 +34,7 @@ napi_value UnifiedDataChannelNapi::UnifiedDataChannelInit(napi_env env, napi_val
         DECLARE_NAPI_FUNCTION("updateData", UpdateData),
         DECLARE_NAPI_FUNCTION("queryData", QueryData),
         DECLARE_NAPI_FUNCTION("deleteData", DeleteData),
-        DECLARE_NAPI_GETTER("ShareOption", CreateShareOption),
+        DECLARE_NAPI_GETTER("ShareOptions", CreateShareOption),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));

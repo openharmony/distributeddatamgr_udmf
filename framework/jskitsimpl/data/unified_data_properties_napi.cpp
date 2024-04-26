@@ -27,7 +27,7 @@ napi_value UnifiedDataPropertiesNapi::Constructor(napi_env env)
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_GETTER_SETTER("extras", GetExtras, SetExtras),
         DECLARE_NAPI_GETTER_SETTER("tag", GetTag, SetTag),
-        DECLARE_NAPI_GETTER_SETTER("shareOption", GetShareOption, SetShareOption),
+        DECLARE_NAPI_GETTER_SETTER("shareOptions", GetShareOption, SetShareOption),
         DECLARE_NAPI_GETTER_SETTER("timestamp", GetTimestamp, SetTimestamp),
         DECLARE_NAPI_GETTER_SETTER("getDelayData", GetDelayData, SetDelayData),
     };

@@ -1013,7 +1013,7 @@ describe('UdmfJSTest', function () {
     expect(typeof properties.extras).assertEqual('object');
     expect(typeof properties.tag).assertEqual('string');
     expect(typeof properties.timestamp).assertEqual('object');
-    expect(typeof properties.shareOption).assertEqual('number');
+    expect(typeof properties.shareOptions).assertEqual('number');
     expect(typeof properties.getDelayData).assertEqual('undefined');
   });
 
@@ -1030,12 +1030,12 @@ describe('UdmfJSTest', function () {
     let unifiedData = new UDC.UnifiedData(text);
     let properties = new UDC.UnifiedDataProperties();
 
-    expect(properties.shareOption).assertEqual(UDC.ShareOption.CROSS_APP);
-    properties.shareOption = UDC.ShareOption.IN_APP;
+    expect(properties.shareOptions).assertEqual(UDC.ShareOptions.CROSS_APP);
+    properties.shareOptions = UDC.ShareOptions.IN_APP;
     unifiedData.properties = properties;
-    expect(unifiedData.properties.shareOption).assertEqual(UDC.ShareOption.IN_APP);
-    unifiedData.properties.shareOption = UDC.ShareOption.CROSS_APP;
-    expect(unifiedData.properties.shareOption).assertEqual(UDC.ShareOption.CROSS_APP);
+    expect(unifiedData.properties.shareOptions).assertEqual(UDC.ShareOptions.IN_APP);
+    unifiedData.properties.shareOptions = UDC.ShareOptions.CROSS_APP;
+    expect(unifiedData.properties.shareOptions).assertEqual(UDC.ShareOptions.CROSS_APP);
 
     expect(unifiedData.properties.tag).assertEqual("");
     unifiedData.properties.tag = "DataTag";
