@@ -81,7 +81,6 @@ ohos_shared_library("unifieddatachannel_napi") {
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "hilog:libhilog",
-    "image_framework:image",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
@@ -118,7 +117,6 @@ ohos_shared_library("uniformtypedescriptor_napi") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "hilog:libhilog",
-    "image_framework:image",
     "ipc:ipc_core",
     "napi:ace_napi",
   ]
@@ -173,7 +171,6 @@ ohos_shared_library("udmf_data_napi") {
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "hilog:libhilog",
-    "image_framework:image",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
@@ -205,8 +202,10 @@ ohos_static_library("udmf_js_common") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "hilog:libhilog",
-    "image_framework:image",
     "napi:ace_napi",
+  ]
+  public_external_deps = [
+    "image_framework:image",
   ]
   subsystem_name = "distributeddatamgr"
   part_name = "udmf"

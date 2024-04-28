@@ -19,13 +19,13 @@
 
 namespace OHOS {
 namespace UDMF {
-enum ShareOption { IN_APP, CROSS_APP };
+enum ShareOptions { IN_APP, CROSS_APP };
 class UnifiedDataProperties {
 public:
     std::string tag;
     AAFwk::WantParams extras;
-    ShareOption shareOption = CROSS_APP;
-    double timestamp;
+    ShareOptions shareOptions = CROSS_APP;
+    std::int64_t timestamp;
 };
 } // namespace UDMF
 } // namespace OHOS
