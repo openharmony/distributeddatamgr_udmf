@@ -14,6 +14,7 @@
  */
 #define LOG_TAG "UnifiedData"
 #include "unified_data.h"
+#include <chrono>
 #include <cinttypes>
 #include "logger.h"
 
@@ -22,6 +23,7 @@ namespace UDMF {
 UnifiedData::UnifiedData()
 {
     properties_ = std::make_shared<UnifiedDataProperties>();
+    properties_->timestamp = std::chrono::steady_clock::now().time_since_epoch().count();
 }
 
 UnifiedData::UnifiedData(std::shared_ptr<UnifiedDataProperties> properties)

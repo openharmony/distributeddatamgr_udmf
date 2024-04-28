@@ -40,10 +40,9 @@ private:
     static napi_value SetExtras(napi_env env, napi_callback_info info);
     static napi_value GetTag(napi_env env, napi_callback_info info);
     static napi_value SetTag(napi_env env, napi_callback_info info);
-    static napi_value GetShareOption(napi_env env, napi_callback_info info);
-    static napi_value SetShareOption(napi_env env, napi_callback_info info);
+    static napi_value GetShareOptions(napi_env env, napi_callback_info info);
+    static napi_value SetShareOptions(napi_env env, napi_callback_info info);
     static napi_value GetTimestamp(napi_env env, napi_callback_info info);
-    static napi_value SetTimestamp(napi_env env, napi_callback_info info);
     static napi_value GetDelayData(napi_env env, napi_callback_info info);
     static napi_value SetDelayData(napi_env env, napi_callback_info info);
 };

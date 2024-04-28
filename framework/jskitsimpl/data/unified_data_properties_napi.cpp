@@ -27,8 +27,8 @@ napi_value UnifiedDataPropertiesNapi::Constructor(napi_env env)
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_GETTER_SETTER("extras", GetExtras, SetExtras),
         DECLARE_NAPI_GETTER_SETTER("tag", GetTag, SetTag),
-        DECLARE_NAPI_GETTER_SETTER("shareOption", GetShareOption, SetShareOption),
-        DECLARE_NAPI_GETTER_SETTER("timestamp", GetTimestamp, SetTimestamp),
+        DECLARE_NAPI_GETTER_SETTER("shareOptions", GetShareOptions, SetShareOptions),
+        DECLARE_NAPI_GETTER("timestamp", GetTimestamp),
         DECLARE_NAPI_GETTER_SETTER("getDelayData", GetDelayData, SetDelayData),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
@@ -128,26 +128,26 @@ napi_value UnifiedDataPropertiesNapi::SetTag(napi_env env, napi_callback_info in
     return nullptr;
 }
 
-napi_value UnifiedDataPropertiesNapi::GetShareOption(napi_env env, napi_callback_info info)
+napi_value UnifiedDataPropertiesNapi::GetShareOptions(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto properties = GetPropertiesNapi(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (properties != nullptr && properties->value_ != nullptr),
         Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    ctxt->status = NapiDataUtils::SetValue(env, properties->value_->shareOption, ctxt->output);
+    ctxt->status = NapiDataUtils::SetValue(env, properties->value_->shareOptions, ctxt->output);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     return ctxt->output;
 }
 
-napi_value UnifiedDataPropertiesNapi::SetShareOption(napi_env env, napi_callback_info info)
+napi_value UnifiedDataPropertiesNapi::SetShareOptions(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
-    int32_t shareOptionValue = ShareOption::CROSS_APP;
-    auto input = [env, ctxt, &shareOptionValue](size_t argc, napi_value *argv) {
+    int32_t shareOptionsValue = ShareOptions::CROSS_APP;
+    auto input = [env, ctxt, &shareOptionsValue](size_t argc, napi_value *argv) {
         ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-        ctxt->status = NapiDataUtils::GetValue(env, argv[0], shareOptionValue);
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], shareOptionsValue);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     };
     ctxt->GetCbInfoSync(env, info, input);
@@ -155,7 +155,7 @@ napi_value UnifiedDataPropertiesNapi::SetShareOption(napi_env env, napi_callback
     auto properties = static_cast<UnifiedDataPropertiesNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (properties != nullptr && properties->value_ != nullptr),
         Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    properties->value_->shareOption = static_cast<ShareOption>(shareOptionValue);
+    properties->value_->shareOptions = static_cast<ShareOptions>(shareOptionsValue);
     return nullptr;
 }
 
@@ -169,25 +169,6 @@ napi_value UnifiedDataPropertiesNapi::GetTimestamp(napi_env env, napi_callback_i
     ctxt->status = napi_create_date(env, properties->value_->timestamp, &ctxt->output);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
     return ctxt->output;
-}
-
-napi_value UnifiedDataPropertiesNapi::SetTimestamp(napi_env env, napi_callback_info info)
-{
-    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
-    auto ctxt = std::make_shared<ContextBase>();
-    double timestampValue;
-    auto input = [env, ctxt, &timestampValue](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-        ctxt->status = napi_get_date_value(env, argv[0], &timestampValue);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    };
-    ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    auto properties = static_cast<UnifiedDataPropertiesNapi *>(ctxt->native);
-    ASSERT_ERR(ctxt->env, (properties != nullptr && properties->value_ != nullptr),
-        Status::E_INVALID_PARAMETERS, "invalid arguments!");
-    properties->value_->timestamp = timestampValue;
-    return nullptr;
 }
 
 napi_value UnifiedDataPropertiesNapi::GetDelayData(napi_env env, napi_callback_info info)
