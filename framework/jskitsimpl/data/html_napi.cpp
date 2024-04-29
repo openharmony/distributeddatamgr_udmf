@@ -99,9 +99,11 @@ napi_value HtmlNapi::SetPlainContent(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string plainContent;
     auto input = [env, ctxt, &plainContent](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], plainContent);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter plainContent type must be string");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter plainContent type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
@@ -130,9 +132,11 @@ napi_value HtmlNapi::SetHtmlContent(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string htmlContent;
     auto input = [env, ctxt, &htmlContent](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], htmlContent);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter htmlContent type must be string");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter htmlContent type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);

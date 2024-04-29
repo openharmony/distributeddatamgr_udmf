@@ -99,9 +99,11 @@ napi_value VideoNapi::SetVideoUri(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string uri;
     auto input = [env, ctxt, &uri](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], uri);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter uri type must be string");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter uri type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);

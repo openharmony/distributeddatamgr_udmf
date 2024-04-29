@@ -103,9 +103,11 @@ napi_value SystemDefinedFormNapi::SetFormId(napi_env env, napi_callback_info inf
     auto ctxt = std::make_shared<ContextBase>();
     int32_t formId = 0;
     auto input = [env, ctxt, &formId](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], formId);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter formId type must be number");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter formId type must be number");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
@@ -134,9 +136,11 @@ napi_value SystemDefinedFormNapi::SetFormName(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<ContextBase>();
     std::string formName;
     auto input = [env, ctxt, &formName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], formName);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter formName type must be string");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter formName type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
@@ -165,9 +169,11 @@ napi_value SystemDefinedFormNapi::SetBundleName(napi_env env, napi_callback_info
     auto ctxt = std::make_shared<ContextBase>();
     std::string bundleName;
     auto input = [env, ctxt, &bundleName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], bundleName);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter bundleName type must be string");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter bundleName type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
@@ -196,9 +202,11 @@ napi_value SystemDefinedFormNapi::SetAbilityName(napi_env env, napi_callback_inf
     auto ctxt = std::make_shared<ContextBase>();
     std::string abilityName;
     auto input = [env, ctxt, &abilityName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], abilityName);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter abilityName type must be string");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter abilityName type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
@@ -227,9 +235,11 @@ napi_value SystemDefinedFormNapi::SetModule(napi_env env, napi_callback_info inf
     auto ctxt = std::make_shared<ContextBase>();
     std::string module;
     auto input = [env, ctxt, &module](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], module);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter module type must be string");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter module type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);

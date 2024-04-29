@@ -148,7 +148,8 @@ napi_value UnifiedDataPropertiesNapi::SetShareOptions(napi_env env, napi_callbac
     auto input = [env, ctxt, &shareOptionsValue](size_t argc, napi_value *argv) {
         ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_ERROR, "Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], shareOptionsValue);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_ERROR, "parameter shareOptions type must be ShareOptions");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_ERROR, "parameter shareOptions type must be ShareOptions");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);

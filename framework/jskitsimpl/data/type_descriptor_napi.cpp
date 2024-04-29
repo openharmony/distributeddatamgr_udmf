@@ -89,10 +89,11 @@ napi_value TypeDescriptorNapi::BelongsTo(napi_env env, napi_callback_info info)
     std::string typeId;
     auto input = [env, ctxt, &typeId](size_t argc, napi_value* argv) {
         // required 1 arguments : descriptor
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS,
-            "Parameter error: parameter type type must be string");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, 
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter type type must be string");
     };
 
     ctxt->GetCbInfoSync(env, info, input);
@@ -111,10 +112,11 @@ napi_value TypeDescriptorNapi::IsLowerLevelType(napi_env env, napi_callback_info
     std::string typeId;
     auto input = [env, ctxt, &typeId](size_t argc, napi_value* argv) {
         // required 1 arguments : descriptor
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS,
-            "Parameter error: parameter type type must be string");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter type type must be string");
     };
 
     ctxt->GetCbInfoSync(env, info, input);
@@ -133,10 +135,11 @@ napi_value TypeDescriptorNapi::IsHigherLevelType(napi_env env, napi_callback_inf
     std::string typeId;
     auto input = [env, ctxt, &typeId](size_t argc, napi_value* argv) {
         // required 1 arguments : descriptor
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS,
-            "Parameter error: parameter field type must be string");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter field type must be string");
     };
 
     ctxt->GetCbInfoSync(env, info, input);
@@ -155,7 +158,8 @@ napi_value TypeDescriptorNapi::Equals(napi_env env, napi_callback_info info)
     std::shared_ptr<TypeDescriptor> typeDescriptor;
     auto input = [env, ctxt, &typeDescriptor](size_t argc, napi_value* argv) {
         // required 1 arguments : descriptor
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeDescriptor);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS,
             "Parameter error: parameter typeDescriptor type must be TypeDescriptor");

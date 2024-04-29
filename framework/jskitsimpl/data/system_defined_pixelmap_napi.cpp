@@ -99,9 +99,11 @@ napi_value SystemDefinedPixelMapNapi::SetRawData(napi_env env, napi_callback_inf
     auto ctxt = std::make_shared<ContextBase>();
     std::vector<uint8_t> pixelMap;
     auto input = [env, ctxt, &pixelMap](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], pixelMap);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter rawData type must be Uint8Array");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter rawData type must be Uint8Array");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);

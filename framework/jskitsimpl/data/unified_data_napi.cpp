@@ -120,7 +120,8 @@ napi_value UnifiedDataNapi::AddRecord(napi_env env, napi_callback_info info)
     UnifiedRecordNapi *uRecord = nullptr;
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, info, ctxt, &uRecord](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = napi_unwrap(env, *argv, reinterpret_cast<void **>(&uRecord));
         ASSERT_BUSINESS_ERR(ctxt, (ctxt->status == napi_ok && uRecord != nullptr && uRecord->value_ != nullptr),
             Status::E_INVALID_PARAMETERS, "Parameter error: parameter record type must be UnifiedRecord");
@@ -233,9 +234,11 @@ napi_value UnifiedDataNapi::HasType(napi_env env, napi_callback_info info)
     std::string type;
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, info, ctxt, &type](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter type type must be string");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter type type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
@@ -294,11 +297,13 @@ napi_value UnifiedDataNapi::SetProperties(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, ctxt](size_t argc, napi_value* argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         UnifiedDataPropertiesNapi* propertiesNapi = nullptr;
         ctxt->status = Unwrap(env, argv[0], reinterpret_cast<void**>(&propertiesNapi),
             UnifiedDataPropertiesNapi::Constructor(env));
-        ASSERT_BUSINESS_ERR(ctxt, propertiesNapi != nullptr, Status::E_INVALID_PARAMETERS, "Parameter error: parameter properties type must be UnifiedDataProperties");
+        ASSERT_BUSINESS_ERR(ctxt, propertiesNapi != nullptr,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter properties type must be UnifiedDataProperties");
 
         auto uData = static_cast<UnifiedDataNapi*>(ctxt->native);
         if (uData->propertyRef_ != nullptr) {

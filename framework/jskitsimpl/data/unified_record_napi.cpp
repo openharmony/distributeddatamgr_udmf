@@ -52,7 +52,8 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
     std::string type;
     napi_value value = nullptr;
     auto input = [env, ctxt, &type, &value](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc >= 2, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc >= 2,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         if (argc >= 2) {
             ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
             ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !type.empty(),
@@ -139,10 +140,12 @@ void UnifiedRecordNapi::GetNativeValue(napi_env env, std::string type, napi_valu
     napi_status status;
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, valueNapi, &valueType);
-    ASSERT_ERR_VOID(env, status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter value type must be ValueType");
+    ASSERT_ERR_VOID(env, status == napi_ok,
+        Status::E_INVALID_PARAMETERS, "Parameter error: parameter value type must be ValueType");
     if (valueType == napi_object) {
         ASSERT_ERR_VOID(env, type == "openharmony.pixel-map" || type == "openharmony.want",
-            Status::E_INVALID_PARAMETERS, "Parameter error: when type of value is object, parameter type must be pixel-map or want UTD type");
+            Status::E_INVALID_PARAMETERS,
+            "Parameter error: when type of value is object, parameter type must be pixel-map or want UTD type");
         if (type == "openharmony.pixel-map") {
             std::shared_ptr<OHOS::Media::PixelMap> data;
             value = data;

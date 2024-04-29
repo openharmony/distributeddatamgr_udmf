@@ -75,7 +75,8 @@ napi_value UnifiedDataChannelNapi::InsertData(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<InsertContext>();
     auto input = [env, ctxt, &intention, &unifiedDataNapi](size_t argc, napi_value *argv) {
         // require 2 arguments <options, unifiedData>
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 2, E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 2,
+            E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = GetNamedProperty(env, argv[0], "intention", intention);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && UnifiedDataUtils::IsPersist(intention),
             E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
@@ -112,7 +113,8 @@ napi_value UnifiedDataChannelNapi::UpdateData(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<UpdateContext>();
     auto input = [env, ctxt, &unifiedDataNapi](size_t argc, napi_value *argv) {
         // require 2 arguments <options, unifiedData>
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 2, E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 2,
+            E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = GetNamedProperty(env, argv[0], "key", ctxt->key);
         UnifiedKey key(ctxt->key);
         ASSERT_BUSINESS_ERR(ctxt,
@@ -145,7 +147,8 @@ napi_value UnifiedDataChannelNapi::QueryData(napi_env env, napi_callback_info in
     auto ctxt = std::make_shared<QueryContext>();
     auto input = [env, ctxt, &intention](size_t argc, napi_value *argv) {
         // require 1 arguments <options>
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         napi_status keyStatus;
         napi_status intentionStatus;
         auto options = argv[0];
@@ -198,7 +201,8 @@ napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<DeleteContext>();
     auto input = [env, ctxt, &intention](size_t argc, napi_value *argv) {
         // require 1 arguments <options>
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         napi_status keyStatus;
         napi_status intentionStatus;
         napi_value options = argv[0];
