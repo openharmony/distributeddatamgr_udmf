@@ -92,7 +92,7 @@ napi_value TypeDescriptorNapi::BelongsTo(napi_env env, napi_callback_info info)
         ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
             Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, 
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
             Status::E_INVALID_PARAMETERS, "Parameter error: parameter type type must be string");
     };
 

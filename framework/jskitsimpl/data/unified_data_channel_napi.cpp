@@ -154,9 +154,8 @@ napi_value UnifiedDataChannelNapi::QueryData(napi_env env, napi_callback_info in
         auto options = argv[0];
         keyStatus = GetNamedProperty(env, options, "key", ctxt->key);
         intentionStatus = GetNamedProperty(env, options, "intention", intention);
-        ASSERT_BUSINESS_ERR(ctxt,
-            (keyStatus == napi_ok || intentionStatus == napi_ok) &&
-                UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
+        ASSERT_BUSINESS_ERR(ctxt, (keyStatus == napi_ok || intentionStatus == napi_ok) &&
+            UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
             E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
     };
     ctxt->GetCbInfo(env, info, input);
