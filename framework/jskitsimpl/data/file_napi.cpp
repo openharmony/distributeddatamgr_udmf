@@ -43,7 +43,7 @@ napi_value FileNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *file = new (std::nothrow) FileNapi();
     ASSERT_ERR(ctxt->env, file != nullptr, Status::E_ERROR, "no memory for file!");
@@ -74,7 +74,7 @@ FileNapi *FileNapi::GetFile(napi_env env, napi_callback_info info, std::shared_p
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<FileNapi *>(ctxt->native);
 }
 
@@ -84,9 +84,9 @@ napi_value FileNapi::GetDetails(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto file = GetFile(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, file->value_->GetDetails(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set details failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set details failed!");
     return ctxt->output;
 }
 
@@ -96,15 +96,15 @@ napi_value FileNapi::SetDetails(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     UDDetails details;
     auto input = [env, ctxt, &details](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], details);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter details type must be Record<string, string>");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto file = static_cast<FileNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_ERROR, "invalid object!");
     file->value_->SetDetails(details);
     return nullptr;
 }
@@ -115,9 +115,9 @@ napi_value FileNapi::GetUri(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto file = GetFile(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, file->value_->GetUri(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set uri failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set uri failed!");
     return ctxt->output;
 }
 
@@ -127,15 +127,15 @@ napi_value FileNapi::SetUri(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string uri;
     auto input = [env, ctxt, &uri](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], uri);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter uri type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto file = static_cast<FileNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_ERROR, "invalid object!");
     file->value_->SetUri(uri);
     return nullptr;
 }

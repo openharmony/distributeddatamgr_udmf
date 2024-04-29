@@ -46,7 +46,7 @@ napi_value TypeDescriptorNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "TypeDescriptorNapi.");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *descriptorNapi = new (std::nothrow) TypeDescriptorNapi();
     ASSERT_ERR(ctxt->env, descriptorNapi != nullptr, Status::E_ERROR, "no memory for descriptorNapi!");
@@ -78,7 +78,7 @@ TypeDescriptorNapi *TypeDescriptorNapi::GetDescriptorNapi(napi_env env, napi_cal
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "GetDescriptorNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<TypeDescriptorNapi *>(ctxt->native);
 }
 
@@ -89,10 +89,10 @@ napi_value TypeDescriptorNapi::BelongsTo(napi_env env, napi_callback_info info)
     std::string typeId;
     auto input = [env, ctxt, &typeId](size_t argc, napi_value* argv) {
         // required 1 arguments : descriptor
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
-            "invalid arg[0], i.e. invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS,
+            "Parameter error: parameter type type must be string");
     };
 
     ctxt->GetCbInfoSync(env, info, input);
@@ -111,10 +111,10 @@ napi_value TypeDescriptorNapi::IsLowerLevelType(napi_env env, napi_callback_info
     std::string typeId;
     auto input = [env, ctxt, &typeId](size_t argc, napi_value* argv) {
         // required 1 arguments : descriptor
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
-            "invalid arg[0], i.e. invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS,
+            "Parameter error: parameter type type must be string");
     };
 
     ctxt->GetCbInfoSync(env, info, input);
@@ -133,10 +133,10 @@ napi_value TypeDescriptorNapi::IsHigherLevelType(napi_env env, napi_callback_inf
     std::string typeId;
     auto input = [env, ctxt, &typeId](size_t argc, napi_value* argv) {
         // required 1 arguments : descriptor
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
-            "invalid arg[0], i.e. invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS,
+            "Parameter error: parameter field type must be string");
     };
 
     ctxt->GetCbInfoSync(env, info, input);
@@ -155,10 +155,10 @@ napi_value TypeDescriptorNapi::Equals(napi_env env, napi_callback_info info)
     std::shared_ptr<TypeDescriptor> typeDescriptor;
     auto input = [env, ctxt, &typeDescriptor](size_t argc, napi_value* argv) {
         // required 1 arguments : descriptor
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeDescriptor);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
-            "invalid arg[0], i.e. invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS,
+            "Parameter error: parameter typeDescriptor type must be TypeDescriptor");
     };
 
     ctxt->GetCbInfoSync(env, info, input);
@@ -174,9 +174,9 @@ napi_value TypeDescriptorNapi::GetTypeId(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto descriptorNapi = GetDescriptorNapi(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
-               Status::E_INVALID_PARAMETERS, "invalid object!");
+               Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, descriptorNapi->value_->GetTypeId(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set typeId value failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set typeId value failed!");
     return ctxt->output;
 }
 
@@ -186,7 +186,7 @@ napi_value TypeDescriptorNapi::GetBelongingToTypes(napi_env env, napi_callback_i
     auto ctxt = std::make_shared<ContextBase>();
     auto descriptorNapi = GetDescriptorNapi(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
-               Status::E_INVALID_PARAMETERS, "invalid object!");
+               Status::E_ERROR, "invalid object!");
     std::set<std::string> upTypes = descriptorNapi->value_->GetBelongingToTypes();
     std::vector<std::string> belongingTypes(upTypes.begin(), upTypes.end());
     ctxt->status = NapiDataUtils::SetValue(env, belongingTypes, ctxt->output);
@@ -199,9 +199,9 @@ napi_value TypeDescriptorNapi::GetDescription(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<ContextBase>();
     auto descriptorNapi = GetDescriptorNapi(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
-               Status::E_INVALID_PARAMETERS, "invalid object!");
+               Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, descriptorNapi->value_->GetDescription(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set description value failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set description value failed!");
     return ctxt->output;
 }
 
@@ -211,9 +211,9 @@ napi_value TypeDescriptorNapi::GetReferenceURL(napi_env env, napi_callback_info 
     auto ctxt = std::make_shared<ContextBase>();
     auto descriptorNapi = GetDescriptorNapi(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
-               Status::E_INVALID_PARAMETERS, "invalid object!");
+               Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, descriptorNapi->value_->GetReferenceURL(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set referenceURL value failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set referenceURL value failed!");
     return ctxt->output;
 }
 
@@ -223,9 +223,9 @@ napi_value TypeDescriptorNapi::GetIconFile(napi_env env, napi_callback_info info
     auto ctxt = std::make_shared<ContextBase>();
     auto descriptorNapi = GetDescriptorNapi(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
-               Status::E_INVALID_PARAMETERS, "invalid object!");
+               Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, descriptorNapi->value_->GetIconFile(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set iconFile value failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set iconFile value failed!");
     return ctxt->output;
 }
 
@@ -235,7 +235,7 @@ napi_value TypeDescriptorNapi::GetFilenameExtensions(napi_env env, napi_callback
     auto ctxt = std::make_shared<ContextBase>();
     auto descriptorNapi = GetDescriptorNapi(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
-               Status::E_INVALID_PARAMETERS, "invalid object!");
+               Status::E_ERROR, "invalid object!");
     std::vector<std::string> filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
     ctxt->status = NapiDataUtils::SetValue(env, filenameExtensions, ctxt->output);
     return ctxt->output;
@@ -247,7 +247,7 @@ napi_value TypeDescriptorNapi::GetMimeTypes(napi_env env, napi_callback_info inf
     auto ctxt = std::make_shared<ContextBase>();
     auto descriptorNapi = GetDescriptorNapi(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
-               Status::E_INVALID_PARAMETERS, "invalid object!");
+               Status::E_ERROR, "invalid object!");
     std::vector<std::string> mimeTypes = descriptorNapi->value_->GetMimeTypes();
     ctxt->status = NapiDataUtils::SetValue(env, mimeTypes, ctxt->output);
     return ctxt->output;

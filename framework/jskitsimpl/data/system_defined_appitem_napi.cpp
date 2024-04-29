@@ -50,7 +50,7 @@ napi_value SystemDefinedAppItemNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedAppItemNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *sdAppItem = new (std::nothrow) SystemDefinedAppItemNapi();
     ASSERT_ERR(ctxt->env, sdAppItem != nullptr, Status::E_ERROR, "no memory for system defined appitem!");
@@ -82,7 +82,7 @@ SystemDefinedAppItemNapi *SystemDefinedAppItemNapi::GetSystemDefinedAppItem(
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedAppItemNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<SystemDefinedAppItemNapi *>(ctxt->native);
 }
 
@@ -91,10 +91,10 @@ napi_value SystemDefinedAppItemNapi::GetAppId(napi_env env, napi_callback_info i
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedAppItemNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto sdAppItem = GetSystemDefinedAppItem(env, info, ctxt);
-    ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_INVALID_PARAMETERS,
+    ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_ERROR,
         "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, sdAppItem->value_->GetAppId(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set app id failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set app id failed!");
     return ctxt->output;
 }
 
@@ -104,14 +104,14 @@ napi_value SystemDefinedAppItemNapi::SetAppId(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<ContextBase>();
     std::string appId;
     auto input = [env, ctxt, &appId](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], appId);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter appId type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto sdAppItem = static_cast<SystemDefinedAppItemNapi *>(ctxt->native);
-    ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_INVALID_PARAMETERS,
+    ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_ERROR,
         "invalid object!");
     sdAppItem->value_->SetAppId(appId);
     return nullptr;
@@ -123,9 +123,9 @@ napi_value SystemDefinedAppItemNapi::GetAppName(napi_env env, napi_callback_info
     auto ctxt = std::make_shared<ContextBase>();
     auto sdAppItem = GetSystemDefinedAppItem(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+        "Parameter error: SystemDefinedAppItem is null");
     ctxt->status = NapiDataUtils::SetValue(env, sdAppItem->value_->GetAppName(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set app name failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: output app name failed!");
     return ctxt->output;
 }
 
@@ -135,15 +135,15 @@ napi_value SystemDefinedAppItemNapi::SetAppName(napi_env env, napi_callback_info
     auto ctxt = std::make_shared<ContextBase>();
     std::string appName;
     auto input = [env, ctxt, &appName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], appName);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter appName type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto sdAppItem = static_cast<SystemDefinedAppItemNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+        "Parameter error: SystemDefinedAppItem is null");
     sdAppItem->value_->SetAppName(appName);
     return nullptr;
 }
@@ -154,9 +154,9 @@ napi_value SystemDefinedAppItemNapi::GetAppIconId(napi_env env, napi_callback_in
     auto ctxt = std::make_shared<ContextBase>();
     auto sdAppItem = GetSystemDefinedAppItem(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+        "Parameter error: SystemDefinedAppItem is null");
     ctxt->status = NapiDataUtils::SetValue(env, sdAppItem->value_->GetAppIconId(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set app icon id failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: output app icon id failed!");
     return ctxt->output;
 }
 
@@ -166,15 +166,15 @@ napi_value SystemDefinedAppItemNapi::SetAppIconId(napi_env env, napi_callback_in
     auto ctxt = std::make_shared<ContextBase>();
     std::string appIconId;
     auto input = [env, ctxt, &appIconId](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], appIconId);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter appIconId type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto sdAppItem = static_cast<SystemDefinedAppItemNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+        "Parameter error: SystemDefinedAppItem is null");
     sdAppItem->value_->SetAppIconId(appIconId);
     return nullptr;
 }
@@ -185,9 +185,9 @@ napi_value SystemDefinedAppItemNapi::GetAppLabelId(napi_env env, napi_callback_i
     auto ctxt = std::make_shared<ContextBase>();
     auto sdAppItem = GetSystemDefinedAppItem(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+        "Parameter error: SystemDefinedAppItem is null");
     ctxt->status = NapiDataUtils::SetValue(env, sdAppItem->value_->GetAppLabelId(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set app label id failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: output app label id failed!");
     return ctxt->output;
 }
 
@@ -197,15 +197,15 @@ napi_value SystemDefinedAppItemNapi::SetAppLabelId(napi_env env, napi_callback_i
     auto ctxt = std::make_shared<ContextBase>();
     std::string appLabelId;
     auto input = [env, ctxt, &appLabelId](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], appLabelId);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter appLabelId type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto sdAppItem = static_cast<SystemDefinedAppItemNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+        "Parameter error: SystemDefinedAppItem is null");
     sdAppItem->value_->SetAppLabelId(appLabelId);
     return nullptr;
 }
@@ -216,9 +216,9 @@ napi_value SystemDefinedAppItemNapi::GetBundleName(napi_env env, napi_callback_i
     auto ctxt = std::make_shared<ContextBase>();
     auto sdAppItem = GetSystemDefinedAppItem(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+        "Parameter error: SystemDefinedAppItem is null");
     ctxt->status = NapiDataUtils::SetValue(env, sdAppItem->value_->GetBundleName(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set bundle name failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: output bundle name failed!");
     return ctxt->output;
 }
 
@@ -228,15 +228,15 @@ napi_value SystemDefinedAppItemNapi::SetBundleName(napi_env env, napi_callback_i
     auto ctxt = std::make_shared<ContextBase>();
     std::string bundleName;
     auto input = [env, ctxt, &bundleName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], bundleName);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter bundleName type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto sdAppItem = static_cast<SystemDefinedAppItemNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+        "Parameter error: SystemDefinedAppItem is null");
     sdAppItem->value_->SetBundleName(bundleName);
     return nullptr;
 }
@@ -247,9 +247,9 @@ napi_value SystemDefinedAppItemNapi::GetAbilityName(napi_env env, napi_callback_
     auto ctxt = std::make_shared<ContextBase>();
     auto sdAppItem = GetSystemDefinedAppItem(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+        "Parameter error: SystemDefinedAppItem is null");
     ctxt->status = NapiDataUtils::SetValue(env, sdAppItem->value_->GetAbilityName(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set ability name failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: output ability name failed!");
     return ctxt->output;
 }
 
@@ -259,15 +259,15 @@ napi_value SystemDefinedAppItemNapi::SetAbilityName(napi_env env, napi_callback_
     auto ctxt = std::make_shared<ContextBase>();
     std::string abilityName;
     auto input = [env, ctxt, &abilityName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], abilityName);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter abilityName type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto sdAppItem = static_cast<SystemDefinedAppItemNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (sdAppItem != nullptr && sdAppItem->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+        "Parameter error: SystemDefinedAppItem is null");
     sdAppItem->value_->SetAbilityName(abilityName);
     return nullptr;
 }

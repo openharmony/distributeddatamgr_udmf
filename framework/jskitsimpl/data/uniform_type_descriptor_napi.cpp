@@ -69,10 +69,10 @@ napi_value UniformTypeDescriptorNapi::GetTypeDescriptor(napi_env env, napi_callb
     auto input = [env, ctxt, &typeId](size_t argc, napi_value* argv) {
         LOG_DEBUG(UDMF_KITS_NAPI, "GetTypeDescriptor, argc = %{public}zu !", argc);
         // required 1 arguments : typeId
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
-            "invalid arg[0], i.e. invalid arguments!");
+            "Parameter error: parameter type type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "GetTypeDescriptor Exit");
@@ -95,14 +95,14 @@ napi_value UniformTypeDescriptorNapi::GetUniformDataTypeByFilenameExtension(napi
     auto input = [env, ctxt, &filenameExtension, &belongsTo](size_t argc, napi_value* argv) {
         LOG_DEBUG(UDMF_KITS_NAPI, "get utd type by fileExtention, argc = %{public}zu !", argc);
         // required 1 arguments : typeId
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], filenameExtension);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
-            "invalid arg[0], i.e. invalid arguments!");
+            "Parameter error: parameter filenameExtension type must be string");
         if (argc > 1) {
             ctxt->status = NapiDataUtils::GetValue(env, argv[1], belongsTo);
             ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !belongsTo.empty(), E_INVALID_PARAMETERS,
-                                "invalid arg[1], i.e. invalid arguments!");
+                                "Parameter error: parameter belongsTo type must be string");
         }
     };
     ctxt->GetCbInfoSync(env, info, input);
@@ -132,14 +132,14 @@ napi_value UniformTypeDescriptorNapi::GetUniformDataTypeByMIMEType(napi_env env,
     auto input = [env, ctxt, &mimeType, &belongsTo](size_t argc, napi_value* argv) {
         LOG_DEBUG(UDMF_KITS_NAPI, "get utd type by MIMEType, argc = %{public}zu !", argc);
         // required 1 arguments : typeId
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], mimeType);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
-            "invalid arg[0], i.e. invalid arguments!");
+            "Parameter error: parameter mimeType type must be string");
         if (argc > 1) {
             ctxt->status = NapiDataUtils::GetValue(env, argv[1], belongsTo);
             ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !belongsTo.empty(), E_INVALID_PARAMETERS,
-                                "invalid arg[1], i.e. invalid arguments!");
+                                "Parameter error: parameter belongsTo type must be string");
         }
     };
     ctxt->GetCbInfoSync(env, info, input);

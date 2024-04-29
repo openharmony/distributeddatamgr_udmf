@@ -47,7 +47,7 @@ napi_value LinkNapi::New(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
 
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *link = new (std::nothrow) LinkNapi();
     ASSERT_ERR(ctxt->env, link != nullptr, Status::E_ERROR, "no memory for link!");
@@ -78,7 +78,7 @@ LinkNapi *LinkNapi::GetLink(napi_env env, napi_callback_info info, std::shared_p
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "LinkNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<LinkNapi *>(ctxt->native);
 }
 
@@ -88,9 +88,9 @@ napi_value LinkNapi::GetUrl(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto link = GetLink(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (link != nullptr && link->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (link != nullptr && link->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, link->value_->GetUrl(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set url failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set url failed!");
     return ctxt->output;
 }
 
@@ -100,15 +100,15 @@ napi_value LinkNapi::SetUrl(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string url;
     auto input = [env, ctxt, &url](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], url);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter url type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto link = static_cast<LinkNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (link != nullptr && link->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (link != nullptr && link->value_ != nullptr), Status::E_ERROR, "invalid object!");
     link->value_->SetUrl(url);
     return nullptr;
 }
@@ -119,9 +119,9 @@ napi_value LinkNapi::GetDescription(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto link = GetLink(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (link != nullptr && link->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (link != nullptr && link->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, link->value_->GetDescription(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set description failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set description failed!");
     return ctxt->output;
 }
 
@@ -131,15 +131,15 @@ napi_value LinkNapi::SetDescription(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string description;
     auto input = [env, ctxt, &description](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], description);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter description type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto link = static_cast<LinkNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (link != nullptr && link->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (link != nullptr && link->value_ != nullptr), Status::E_ERROR, "invalid object!");
     link->value_->SetDescription(description);
     return nullptr;
 }

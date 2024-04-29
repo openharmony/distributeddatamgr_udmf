@@ -57,20 +57,18 @@ napi_value UnifiedDataNapi::New(napi_env env, napi_callback_info info)
     UnifiedRecordNapi *uRecord = nullptr;
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, info, ctxt, &uRecord](size_t argc, napi_value *argv) {
-        // required 1 arguments :: <UnifiedRecord*>
-        ASSERT_BUSINESS_ERR(ctxt, argc <= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
         if (argc == 1) {
             ctxt->status = napi_unwrap(env, *argv, reinterpret_cast<void **>(&uRecord));
             ASSERT_BUSINESS_ERR(ctxt, (ctxt->status == napi_ok && uRecord != nullptr && uRecord->value_ != nullptr),
-                Status::E_INVALID_PARAMETERS, "invalid object!");
+                Status::E_INVALID_PARAMETERS, "Parameter error: parameter record type must be UnifiedRecord");
             ctxt->status = UnifiedDataUtils::IsValidType(uRecord->value_->GetType()) ? napi_ok : napi_invalid_arg;
-            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid type!");
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_ERROR, "invalid type!");
         }
     };
 
     // Parsing input parameters
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto *uData = new (std::nothrow) UnifiedDataNapi();
     ASSERT_ERR(ctxt->env, uData != nullptr, Status::E_ERROR, "no memory for unified data!");
 
@@ -112,7 +110,7 @@ UnifiedDataNapi *UnifiedDataNapi::GetUnifiedData(napi_env env, napi_callback_inf
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<UnifiedDataNapi *>(ctxt->native);
 }
 
@@ -122,18 +120,18 @@ napi_value UnifiedDataNapi::AddRecord(napi_env env, napi_callback_info info)
     UnifiedRecordNapi *uRecord = nullptr;
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, info, ctxt, &uRecord](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = napi_unwrap(env, *argv, reinterpret_cast<void **>(&uRecord));
         ASSERT_BUSINESS_ERR(ctxt, (ctxt->status == napi_ok && uRecord != nullptr && uRecord->value_ != nullptr),
-            Status::E_INVALID_PARAMETERS, "invalid object!");
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter record type must be UnifiedRecord");
         ctxt->status = UnifiedDataUtils::IsValidType(uRecord->value_->GetType()) ? napi_ok : napi_invalid_arg;
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid type!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_ERROR, "invalid type!");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto *uData = static_cast<UnifiedDataNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (uData != nullptr && uData->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (uData != nullptr && uData->value_ != nullptr), Status::E_ERROR, "invalid object!");
     uData->value_->AddRecord(uRecord->value_);
     return nullptr;
 }
@@ -144,7 +142,7 @@ napi_value UnifiedDataNapi::GetRecords(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto uData = GetUnifiedData(env, info);
     ASSERT_ERR(
-        ctxt->env, (uData != nullptr && uData->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (uData != nullptr && uData->value_ != nullptr), Status::E_ERROR, "invalid object!");
     std::vector<std::shared_ptr<UnifiedRecord>> records = uData->value_->GetRecords();
     napi_status status = napi_create_array_with_length(env, records.size(), &ctxt->output);
     ASSERT_ERR(ctxt->env, status == napi_ok, Status::E_ERROR, "init array failed!");
@@ -235,15 +233,15 @@ napi_value UnifiedDataNapi::HasType(napi_env env, napi_callback_info info)
     std::string type;
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, info, ctxt, &type](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter type type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto *uData = static_cast<UnifiedDataNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (uData != nullptr && uData->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (uData != nullptr && uData->value_ != nullptr), Status::E_ERROR, "invalid object!");
     bool ret = uData->value_->HasType(type);
     napi_value result = nullptr;
     napi_get_boolean(env, ret, &result);
@@ -254,7 +252,7 @@ napi_value UnifiedDataNapi::GetTypes(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     auto uData = GetUnifiedData(env, info);
-    ASSERT_ERR(env, (uData != nullptr && uData->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    ASSERT_ERR(env, (uData != nullptr && uData->value_ != nullptr), Status::E_ERROR, "invalid object!");
 
     std::vector<std::string> Types = uData->value_->GetTypesLabels();
     napi_value nTypes = nullptr;
@@ -276,7 +274,7 @@ napi_value UnifiedDataNapi::GetProperties(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     napi_value value;
     auto uData = GetUnifiedData(env, info);
-    ASSERT_ERR(env, (uData != nullptr && uData->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+    ASSERT_ERR(env, (uData != nullptr && uData->value_ != nullptr), Status::E_ERROR, "invalid object!");
     NAPI_CALL(env, napi_get_reference_value(env, uData->propertyRef_, &value));
     return value;
 }
@@ -296,11 +294,11 @@ napi_value UnifiedDataNapi::SetProperties(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, ctxt](size_t argc, napi_value* argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         UnifiedDataPropertiesNapi* propertiesNapi = nullptr;
         ctxt->status = Unwrap(env, argv[0], reinterpret_cast<void**>(&propertiesNapi),
             UnifiedDataPropertiesNapi::Constructor(env));
-        ASSERT_BUSINESS_ERR(ctxt, propertiesNapi != nullptr, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, propertiesNapi != nullptr, Status::E_INVALID_PARAMETERS, "Parameter error: parameter properties type must be UnifiedDataProperties");
 
         auto uData = static_cast<UnifiedDataNapi*>(ctxt->native);
         if (uData->propertyRef_ != nullptr) {
@@ -308,11 +306,11 @@ napi_value UnifiedDataNapi::SetProperties(napi_env env, napi_callback_info info)
         }
         ctxt->status = napi_create_reference(env, argv[0], 1, &uData->propertyRef_);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
-            Status::E_INVALID_PARAMETERS, "napi_create_reference to properties failed!");
+            Status::E_ERROR, "napi_create_reference to properties failed!");
         uData->value_->SetProperties(propertiesNapi->value_);
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return ctxt->self;
 }
 

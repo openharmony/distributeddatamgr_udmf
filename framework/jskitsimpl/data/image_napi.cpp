@@ -46,7 +46,7 @@ napi_value ImageNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "ImageNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *image = new (std::nothrow) ImageNapi();
     ASSERT_ERR(ctxt->env, image != nullptr, Status::E_ERROR, "no memory for image!");
@@ -77,7 +77,7 @@ ImageNapi *ImageNapi::GetImage(napi_env env, napi_callback_info info, std::share
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "ImageNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<ImageNapi *>(ctxt->native);
 }
 
@@ -87,9 +87,9 @@ napi_value ImageNapi::GetImageUri(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto image = GetImage(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (image != nullptr && image->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (image != nullptr && image->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, image->value_->GetUri(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set image uri failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set image uri failed!");
     return ctxt->output;
 }
 
@@ -99,15 +99,15 @@ napi_value ImageNapi::SetImageUri(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string uri;
     auto input = [env, ctxt, &uri](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], uri);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter imageUri type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto image = static_cast<ImageNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (image != nullptr && image->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (image != nullptr && image->value_ != nullptr), Status::E_ERROR, "invalid object!");
     image->value_->SetUri(uri);
     return nullptr;
 }

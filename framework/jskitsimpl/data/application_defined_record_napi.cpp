@@ -44,7 +44,7 @@ napi_value ApplicationDefinedRecordNapi::New(napi_env env, napi_callback_info in
     LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *record = new (std::nothrow) ApplicationDefinedRecordNapi();
     ASSERT_ERR(ctxt->env, record != nullptr, Status::E_ERROR, "no memory for application defined record!");
@@ -76,7 +76,7 @@ ApplicationDefinedRecordNapi *ApplicationDefinedRecordNapi::GetApplicationDefine
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<ApplicationDefinedRecordNapi *>(ctxt->native);
 }
 
@@ -86,9 +86,9 @@ napi_value ApplicationDefinedRecordNapi::GetApplicationDefinedType(napi_env env,
     auto ctxt = std::make_shared<ContextBase>();
     auto record = GetApplicationDefinedRecord(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, record->value_->GetApplicationDefinedType(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set type failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set type failed!");
     return ctxt->output;
 }
 
@@ -98,15 +98,15 @@ napi_value ApplicationDefinedRecordNapi::SetApplicationDefinedType(napi_env env,
     auto ctxt = std::make_shared<ContextBase>();
     std::string type;
     auto input = [env, ctxt, &type](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter applicationDefinedType type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto record = static_cast<ApplicationDefinedRecordNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_ERROR, "invalid object!");
     record->value_->SetApplicationDefinedType(type);
     return nullptr;
 }
@@ -117,9 +117,9 @@ napi_value ApplicationDefinedRecordNapi::GetRawData(napi_env env, napi_callback_
     auto ctxt = std::make_shared<ContextBase>();
     auto record = GetApplicationDefinedRecord(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, record->value_->GetRawData(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set rawData failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set rawData failed!");
     return ctxt->output;
 }
 
@@ -129,15 +129,15 @@ napi_value ApplicationDefinedRecordNapi::SetRawData(napi_env env, napi_callback_
     auto ctxt = std::make_shared<ContextBase>();
     std::vector<uint8_t> rawData;
     auto input = [env, ctxt, &rawData](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], rawData);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter rawData type must be Uint8Array");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto record = static_cast<ApplicationDefinedRecordNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (record != nullptr && record->value_ != nullptr), Status::E_ERROR, "invalid object!");
     record->value_->SetRawData(rawData);
     return nullptr;
 }

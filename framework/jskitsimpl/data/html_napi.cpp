@@ -46,7 +46,7 @@ napi_value HtmlNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *html = new (std::nothrow) HtmlNapi();
     ASSERT_ERR(ctxt->env, html != nullptr, Status::E_ERROR, "no memory for html!");
@@ -77,7 +77,7 @@ HtmlNapi *HtmlNapi::GetHtml(napi_env env, napi_callback_info info, std::shared_p
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<HtmlNapi *>(ctxt->native);
 }
 
@@ -87,9 +87,9 @@ napi_value HtmlNapi::GetPlainContent(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto html = GetHtml(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, html->value_->GetPlainContent(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set plain content failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set plain content failed!");
     return ctxt->output;
 }
 
@@ -99,15 +99,15 @@ napi_value HtmlNapi::SetPlainContent(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string plainContent;
     auto input = [env, ctxt, &plainContent](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], plainContent);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter plainContent type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto html = static_cast<HtmlNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_ERROR, "invalid object!");
     html->value_->SetPlainContent(plainContent);
     return nullptr;
 }
@@ -118,9 +118,9 @@ napi_value HtmlNapi::GetHtmlContent(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto html = GetHtml(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, html->value_->GetHtmlContent(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set html failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set html failed!");
     return ctxt->output;
 }
 
@@ -130,15 +130,15 @@ napi_value HtmlNapi::SetHtmlContent(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string htmlContent;
     auto input = [env, ctxt, &htmlContent](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], htmlContent);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "Parameter error: parameter htmlContent type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto html = static_cast<HtmlNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_ERROR, "invalid object!");
     html->value_->SetHtmlContent(htmlContent);
     return nullptr;
 }
