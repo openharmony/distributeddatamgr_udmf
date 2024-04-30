@@ -46,7 +46,7 @@ napi_value FolderNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *folder = new (std::nothrow) FolderNapi();
     ASSERT_ERR(ctxt->env, folder != nullptr, Status::E_ERROR, "no memory for folder!");
@@ -77,7 +77,7 @@ FolderNapi *FolderNapi::GetFolder(napi_env env, napi_callback_info info, std::sh
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<FolderNapi *>(ctxt->native);
 }
 
@@ -87,9 +87,9 @@ napi_value FolderNapi::GetFolderUri(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto folder = GetFolder(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (folder != nullptr && folder->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (folder != nullptr && folder->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, folder->value_->GetUri(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set folder uri failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set folder uri failed!");
     return ctxt->output;
 }
 
@@ -99,15 +99,17 @@ napi_value FolderNapi::SetFolderUri(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string uri;
     auto input = [env, ctxt, &uri](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], uri);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter folderUri type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto folder = static_cast<FolderNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (folder != nullptr && folder->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (folder != nullptr && folder->value_ != nullptr), Status::E_ERROR, "invalid object!");
     folder->value_->SetUri(uri);
     return nullptr;
 }

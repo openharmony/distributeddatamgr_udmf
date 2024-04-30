@@ -34,7 +34,7 @@ napi_value UnifiedDataChannelNapi::UnifiedDataChannelInit(napi_env env, napi_val
         DECLARE_NAPI_FUNCTION("updateData", UpdateData),
         DECLARE_NAPI_FUNCTION("queryData", QueryData),
         DECLARE_NAPI_FUNCTION("deleteData", DeleteData),
-        DECLARE_NAPI_GETTER("ShareOptions", CreateShareOption),
+        DECLARE_NAPI_GETTER("ShareOptions", CreateShareOptions),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
@@ -75,13 +75,14 @@ napi_value UnifiedDataChannelNapi::InsertData(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<InsertContext>();
     auto input = [env, ctxt, &intention, &unifiedDataNapi](size_t argc, napi_value *argv) {
         // require 2 arguments <options, unifiedData>
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 2, E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 2,
+            E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = GetNamedProperty(env, argv[0], "intention", intention);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && UnifiedDataUtils::IsPersist(intention),
-            E_INVALID_PARAMETERS, "invalid arg[0], i.e. invalid intention!");
+            E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
         ctxt->status = napi_unwrap(env, argv[1], reinterpret_cast<void **>(&unifiedDataNapi));
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
-            "invalid arg[1], i.e. invalid unifiedData!");
+            "Parameter error: parameter data type must be UnifiedData");
     };
     ctxt->GetCbInfo(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "Insert Exit");
@@ -112,15 +113,16 @@ napi_value UnifiedDataChannelNapi::UpdateData(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<UpdateContext>();
     auto input = [env, ctxt, &unifiedDataNapi](size_t argc, napi_value *argv) {
         // require 2 arguments <options, unifiedData>
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 2, E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 2,
+            E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = GetNamedProperty(env, argv[0], "key", ctxt->key);
         UnifiedKey key(ctxt->key);
         ASSERT_BUSINESS_ERR(ctxt,
             ctxt->status == napi_ok && key.IsValid() && UnifiedDataUtils::IsPersist(key.intention),
-            E_INVALID_PARAMETERS, "invalid arg[0], i.e. invalid key!");
+            E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
         ctxt->status = napi_unwrap(env, argv[1], reinterpret_cast<void **>(&unifiedDataNapi));
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
-            "invalid arg[1], i.e. invalid unifiedData!");
+            "Parameter error: parameter data type must be UnifiedData");
     };
     ctxt->GetCbInfo(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "Update Exit");
@@ -145,16 +147,16 @@ napi_value UnifiedDataChannelNapi::QueryData(napi_env env, napi_callback_info in
     auto ctxt = std::make_shared<QueryContext>();
     auto input = [env, ctxt, &intention](size_t argc, napi_value *argv) {
         // require 1 arguments <options>
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         napi_status keyStatus;
         napi_status intentionStatus;
         auto options = argv[0];
         keyStatus = GetNamedProperty(env, options, "key", ctxt->key);
         intentionStatus = GetNamedProperty(env, options, "intention", intention);
-        ASSERT_BUSINESS_ERR(ctxt,
-            (keyStatus == napi_ok || intentionStatus == napi_ok) &&
-                UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
-            E_INVALID_PARAMETERS, "invalid arg[0], i.e. invalid options!");
+        ASSERT_BUSINESS_ERR(ctxt, (keyStatus == napi_ok || intentionStatus == napi_ok) &&
+            UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
+            E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
     };
     ctxt->GetCbInfo(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "Query Exit");
@@ -198,7 +200,8 @@ napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<DeleteContext>();
     auto input = [env, ctxt, &intention](size_t argc, napi_value *argv) {
         // require 1 arguments <options>
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         napi_status keyStatus;
         napi_status intentionStatus;
         napi_value options = argv[0];
@@ -207,7 +210,7 @@ napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info i
         ASSERT_BUSINESS_ERR(ctxt,
             (keyStatus == napi_ok || intentionStatus == napi_ok) &&
                 UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
-            E_INVALID_PARAMETERS, "invalid arg[0], i.e. invalid options!");
+            E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
     };
     ctxt->GetCbInfo(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "Delete Exit");
@@ -271,19 +274,19 @@ napi_status UnifiedDataChannelNapi::GetNamedProperty(napi_env env, napi_value &o
     return status;
 }
 
-napi_value UnifiedDataChannelNapi::CreateShareOption(napi_env env, napi_callback_info info)
+napi_value UnifiedDataChannelNapi::CreateShareOptions(napi_env env, napi_callback_info info)
 {
-    napi_value jsShareOption = nullptr;
-    napi_create_object(env, &jsShareOption);
+    napi_value jsShareOptions = nullptr;
+    napi_create_object(env, &jsShareOptions);
 
     napi_value jsInApp;
-    NapiDataUtils::SetValue(env, static_cast<int32_t>(ShareOption::IN_APP), jsInApp);
-    NAPI_CALL(env, napi_set_named_property(env, jsShareOption, "IN_APP", jsInApp));
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(ShareOptions::IN_APP), jsInApp);
+    NAPI_CALL(env, napi_set_named_property(env, jsShareOptions, "IN_APP", jsInApp));
 
     napi_value jsCrossDevice;
-    NapiDataUtils::SetValue(env, static_cast<int32_t>(ShareOption::CROSS_APP), jsCrossDevice);
-    NAPI_CALL(env, napi_set_named_property(env, jsShareOption, "CROSS_APP", jsCrossDevice));
-    return jsShareOption;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(ShareOptions::CROSS_APP), jsCrossDevice);
+    NAPI_CALL(env, napi_set_named_property(env, jsShareOptions, "CROSS_APP", jsCrossDevice));
+    return jsShareOptions;
 }
 } // namespace UDMF
 } // namespace OHOS

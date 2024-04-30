@@ -42,7 +42,7 @@ napi_value TextNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "TextNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *text = new (std::nothrow) TextNapi();
     ASSERT_ERR(ctxt->env, text != nullptr, Status::E_ERROR, "no memory for text!");
@@ -73,7 +73,7 @@ TextNapi *TextNapi::GetText(napi_env env, napi_callback_info info, std::shared_p
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "TextNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<TextNapi *>(ctxt->native);
 }
 
@@ -83,9 +83,9 @@ napi_value TextNapi::GetDetails(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto text = GetText(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (text != nullptr && text->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (text != nullptr && text->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, text->value_->GetDetails(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set details failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set details failed!");
     return ctxt->output;
 }
 
@@ -95,15 +95,17 @@ napi_value TextNapi::SetDetails(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     UDDetails details;
     auto input = [env, ctxt, &details](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], details);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter details type must be Record<string, string>");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto text = static_cast<TextNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (text != nullptr && text->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (text != nullptr && text->value_ != nullptr), Status::E_ERROR, "invalid object!");
     text->value_->SetDetails(details);
     return nullptr;
 }

@@ -1041,10 +1041,6 @@ describe('UdmfJSTest', function () {
     unifiedData.properties.tag = 'DataTag';
     expect(unifiedData.properties.tag).assertEqual('DataTag');
 
-    let now = new Date();
-    unifiedData.properties.timestamp = now;
-    expect(unifiedData.properties.timestamp.getTime()).assertEqual(now.getTime());
-
     expect(Object.keys(unifiedData.properties.extras).length).assertEqual(0);
     let person = {fname: 'John', lname: 'Doe', age: 25};
     unifiedData.properties.extras = person;

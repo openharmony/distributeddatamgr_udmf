@@ -38,7 +38,7 @@ napi_value SummaryNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *summary = new (std::nothrow) SummaryNapi();
     ASSERT_ERR(ctxt->env, summary != nullptr, Status::E_ERROR, "no memory for summary!");
@@ -69,7 +69,7 @@ SummaryNapi *SummaryNapi::GetDataSummary(napi_env env, napi_callback_info info, 
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<SummaryNapi *>(ctxt->native);
 }
 
@@ -78,10 +78,10 @@ napi_value SummaryNapi::GetSummary(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto summary = GetDataSummary(env, info, ctxt);
-    ASSERT_ERR(ctxt->env, (summary != nullptr && summary->value_ != nullptr), Status::E_INVALID_PARAMETERS,
+    ASSERT_ERR(ctxt->env, (summary != nullptr && summary->value_ != nullptr), Status::E_ERROR,
         "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, summary->value_->summary, ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set summery failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set summery failed!");
     return ctxt->output;
 }
 
@@ -90,10 +90,10 @@ napi_value SummaryNapi::GetTotal(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto summary = GetDataSummary(env, info, ctxt);
-    ASSERT_ERR(ctxt->env, (summary != nullptr && summary->value_ != nullptr), Status::E_INVALID_PARAMETERS,
+    ASSERT_ERR(ctxt->env, (summary != nullptr && summary->value_ != nullptr), Status::E_ERROR,
         "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, summary->value_->totalSize, ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set total failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set total failed!");
     return ctxt->output;
 }
 } // namespace UDMF

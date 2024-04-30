@@ -52,16 +52,17 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
     std::string type;
     napi_value value = nullptr;
     auto input = [env, ctxt, &type, &value](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc >= 2, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc >= 2,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         if (argc >= 2) {
             ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
             ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !type.empty(),
-                E_INVALID_PARAMETERS, "invalid arguments!");
+                Status::E_INVALID_PARAMETERS, "Parameter error: parameter type type must be string");
             value = argv[1];
         }
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *udRecord = new (std::nothrow) UnifiedRecordNapi();
     ASSERT_ERR(ctxt->env, udRecord != nullptr, Status::E_ERROR, "no memory for unified record!");
@@ -139,10 +140,12 @@ void UnifiedRecordNapi::GetNativeValue(napi_env env, std::string type, napi_valu
     napi_status status;
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, valueNapi, &valueType);
-    ASSERT_ERR_VOID(env, status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR_VOID(env, status == napi_ok,
+        Status::E_INVALID_PARAMETERS, "Parameter error: parameter value type must be ValueType");
     if (valueType == napi_object) {
         ASSERT_ERR_VOID(env, type == "openharmony.pixel-map" || type == "openharmony.want",
-            Status::E_INVALID_PARAMETERS, "invalid arguments!");
+            Status::E_INVALID_PARAMETERS,
+            "Parameter error: when type of value is object, parameter type must be pixel-map or want UTD type");
         if (type == "openharmony.pixel-map") {
             std::shared_ptr<OHOS::Media::PixelMap> data;
             value = data;
@@ -156,7 +159,7 @@ void UnifiedRecordNapi::GetNativeValue(napi_env env, std::string type, napi_valu
         value = double();
     }
     std::visit([&](auto &value) { status = NapiDataUtils::GetValue(env, valueNapi, value); }, value);
-    ASSERT_ERR_VOID(env, status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR_VOID(env, status == napi_ok, Status::E_ERROR, "get unifiedRecord failed");
 }
 
 void UnifiedRecordNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
@@ -164,7 +167,7 @@ void UnifiedRecordNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord>
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
     auto *record = new (std::nothrow) UnifiedRecordNapi();
-    ASSERT_ERR_VOID(env, record != nullptr, Status::E_ERROR, "no memory for text!");
+    ASSERT_ERR_VOID(env, record != nullptr, Status::E_ERROR, "no memory for unified record");
     record->value_ = in;
     ASSERT_CALL_DELETE(env, napi_wrap(env, out, record, Destructor, nullptr, nullptr), record);
 }
@@ -182,7 +185,7 @@ UnifiedRecordNapi *UnifiedRecordNapi::GetUnifiedRecord(
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<UnifiedRecordNapi *>(ctxt->native);
 }
 
@@ -191,10 +194,9 @@ napi_value UnifiedRecordNapi::GetType(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto uRecord = GetUnifiedRecord(env, info, ctxt);
-    ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+    ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, UD_TYPE_MAP.at(uRecord->value_->GetType()), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set type failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set type failed!");
     return ctxt->output;
 }
 
@@ -203,15 +205,14 @@ napi_value UnifiedRecordNapi::GetValue(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto uRecord = GetUnifiedRecord(env, info, ctxt);
-    ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_INVALID_PARAMETERS,
-        "invalid object!");
+    ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_ERROR, "invalid object!");
     if (std::holds_alternative<std::vector<uint8_t>>(uRecord->value_->GetValue())) {
         auto value = std::get<std::vector<uint8_t>>(uRecord->value_->GetValue());
         void *data = nullptr;
         size_t len = value.size();
         NAPI_CALL(env, napi_create_arraybuffer(env, len, &data, &ctxt->output));
         if (memcpy_s(data, len, reinterpret_cast<const void *>(value.data()), len) != 0) {
-            LOG_ERROR(UDMF_KITS_NAPI, "invalid arrayBuffer!");
+            LOG_ERROR(UDMF_KITS_NAPI, "memcpy_s failed");
             return nullptr;
         }
     } else {

@@ -49,7 +49,7 @@ napi_value SystemDefinedFormNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *sdForm = new (std::nothrow) SystemDefinedFormNapi();
     ASSERT_ERR(ctxt->env, sdForm != nullptr, Status::E_ERROR, "no memory for system defined form!");
@@ -81,7 +81,7 @@ SystemDefinedFormNapi *SystemDefinedFormNapi::GetSystemDefinedForm(
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<SystemDefinedFormNapi *>(ctxt->native);
 }
 
@@ -91,9 +91,9 @@ napi_value SystemDefinedFormNapi::GetFormId(napi_env env, napi_callback_info inf
     auto ctxt = std::make_shared<ContextBase>();
     auto sdForm = GetSystemDefinedForm(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, sdForm->value_->GetFormId(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set form id failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set form id failed!");
     return ctxt->output;
 }
 
@@ -103,15 +103,17 @@ napi_value SystemDefinedFormNapi::SetFormId(napi_env env, napi_callback_info inf
     auto ctxt = std::make_shared<ContextBase>();
     int32_t formId = 0;
     auto input = [env, ctxt, &formId](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], formId);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter formId type must be number");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto sdForm = static_cast<SystemDefinedFormNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_ERROR, "invalid object!");
     sdForm->value_->SetFormId(formId);
     return nullptr;
 }
@@ -122,9 +124,9 @@ napi_value SystemDefinedFormNapi::GetFormName(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<ContextBase>();
     auto sdForm = GetSystemDefinedForm(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, sdForm->value_->GetFormName(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set form name failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set form name failed!");
     return ctxt->output;
 }
 
@@ -134,15 +136,17 @@ napi_value SystemDefinedFormNapi::SetFormName(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<ContextBase>();
     std::string formName;
     auto input = [env, ctxt, &formName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], formName);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter formName type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto sdForm = static_cast<SystemDefinedFormNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_ERROR, "invalid object!");
     sdForm->value_->SetFormName(formName);
     return nullptr;
 }
@@ -153,9 +157,9 @@ napi_value SystemDefinedFormNapi::GetBundleName(napi_env env, napi_callback_info
     auto ctxt = std::make_shared<ContextBase>();
     auto sdForm = GetSystemDefinedForm(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, sdForm->value_->GetBundleName(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set bundle name failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set bundle name failed!");
     return ctxt->output;
 }
 
@@ -165,15 +169,17 @@ napi_value SystemDefinedFormNapi::SetBundleName(napi_env env, napi_callback_info
     auto ctxt = std::make_shared<ContextBase>();
     std::string bundleName;
     auto input = [env, ctxt, &bundleName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], bundleName);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter bundleName type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto sdForm = static_cast<SystemDefinedFormNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_ERROR, "invalid object!");
     sdForm->value_->SetBundleName(bundleName);
     return nullptr;
 }
@@ -184,9 +190,9 @@ napi_value SystemDefinedFormNapi::GetAbilityName(napi_env env, napi_callback_inf
     auto ctxt = std::make_shared<ContextBase>();
     auto sdForm = GetSystemDefinedForm(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, sdForm->value_->GetAbilityName(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set ability name failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set ability name failed!");
     return ctxt->output;
 }
 
@@ -196,15 +202,17 @@ napi_value SystemDefinedFormNapi::SetAbilityName(napi_env env, napi_callback_inf
     auto ctxt = std::make_shared<ContextBase>();
     std::string abilityName;
     auto input = [env, ctxt, &abilityName](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], abilityName);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter abilityName type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto sdForm = static_cast<SystemDefinedFormNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_ERROR, "invalid object!");
     sdForm->value_->SetAbilityName(abilityName);
     return nullptr;
 }
@@ -215,9 +223,9 @@ napi_value SystemDefinedFormNapi::GetModule(napi_env env, napi_callback_info inf
     auto ctxt = std::make_shared<ContextBase>();
     auto sdForm = GetSystemDefinedForm(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, sdForm->value_->GetModule(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set module failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set module failed!");
     return ctxt->output;
 }
 
@@ -227,15 +235,17 @@ napi_value SystemDefinedFormNapi::SetModule(napi_env env, napi_callback_info inf
     auto ctxt = std::make_shared<ContextBase>();
     std::string module;
     auto input = [env, ctxt, &module](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], module);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter module type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto sdForm = static_cast<SystemDefinedFormNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (sdForm != nullptr && sdForm->value_ != nullptr), Status::E_ERROR, "invalid object!");
     sdForm->value_->SetModule(module);
     return nullptr;
 }

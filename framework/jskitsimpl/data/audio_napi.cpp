@@ -46,7 +46,7 @@ napi_value AudioNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "AudioNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *audio = new (std::nothrow) AudioNapi();
     ASSERT_ERR(ctxt->env, audio != nullptr, Status::E_ERROR, "no memory for audio!");
@@ -77,7 +77,7 @@ AudioNapi *AudioNapi::GetAudio(napi_env env, napi_callback_info info, std::share
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "AudioNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<AudioNapi *>(ctxt->native);
 }
 
@@ -87,9 +87,9 @@ napi_value AudioNapi::GetAudioUri(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto audio = GetAudio(env, info, ctxt);
     ASSERT_ERR(
-        ctxt->env, (audio != nullptr && audio->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (audio != nullptr && audio->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, audio->value_->GetUri(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set audio uri failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set audio uri failed!");
     return ctxt->output;
 }
 
@@ -99,15 +99,17 @@ napi_value AudioNapi::SetAudioUri(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string uri;
     auto input = [env, ctxt, &uri](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], uri);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter audioUri type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto audio = static_cast<AudioNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (audio != nullptr && audio->value_ != nullptr), Status::E_INVALID_PARAMETERS, "invalid object!");
+        ctxt->env, (audio != nullptr && audio->value_ != nullptr), Status::E_ERROR, "invalid object!");
     audio->value_->SetUri(uri);
     return nullptr;
 }
