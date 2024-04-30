@@ -42,7 +42,7 @@ napi_value SystemDefinedRecordNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *sdRecord = new (std::nothrow) SystemDefinedRecordNapi();
     ASSERT_ERR(ctxt->env, sdRecord != nullptr, Status::E_ERROR, "no memory for system defined record!");
@@ -74,7 +74,7 @@ SystemDefinedRecordNapi *SystemDefinedRecordNapi::GetSystemDefinedRecord(
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedRecordNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<SystemDefinedRecordNapi *>(ctxt->native);
 }
 
@@ -83,10 +83,10 @@ napi_value SystemDefinedRecordNapi::GetDetails(napi_env env, napi_callback_info 
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto sdRecord = GetSystemDefinedRecord(env, info, ctxt);
-    ASSERT_ERR(ctxt->env, (sdRecord != nullptr && sdRecord->value_ != nullptr), Status::E_INVALID_PARAMETERS,
+    ASSERT_ERR(ctxt->env, (sdRecord != nullptr && sdRecord->value_ != nullptr), Status::E_ERROR,
         "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, sdRecord->value_->GetDetails(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set details failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set details failed!");
     return ctxt->output;
 }
 
@@ -97,15 +97,17 @@ napi_value SystemDefinedRecordNapi::SetDetails(napi_env env, napi_callback_info 
 
     UDDetails details;
     auto input = [env, ctxt, &details](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], details);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS,
+            "Parameter error: parameter details type must be Record<string, number | string | Uint8Array>");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto sdRecord = static_cast<SystemDefinedRecordNapi *>(ctxt->native);
     ASSERT_ERR(
-        ctxt->env, (sdRecord != nullptr && sdRecord->value_ != nullptr), Status::E_INVALID_PARAMETERS,
+        ctxt->env, (sdRecord != nullptr && sdRecord->value_ != nullptr), Status::E_ERROR,
         "invalid object!");
     sdRecord->value_->SetDetails(details);
     return nullptr;

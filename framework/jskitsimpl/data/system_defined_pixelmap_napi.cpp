@@ -45,7 +45,7 @@ napi_value SystemDefinedPixelMapNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedPixelMapNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *sdPixelMap = new (std::nothrow) SystemDefinedPixelMapNapi();
     ASSERT_ERR(ctxt->env, sdPixelMap != nullptr, Status::E_ERROR, "no memory for system defined pixel map!");
@@ -77,7 +77,7 @@ SystemDefinedPixelMapNapi *SystemDefinedPixelMapNapi::GetSystemDefinedPixelMap(
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedPixelMapNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<SystemDefinedPixelMapNapi *>(ctxt->native);
 }
 
@@ -86,10 +86,10 @@ napi_value SystemDefinedPixelMapNapi::GetRawData(napi_env env, napi_callback_inf
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedPixelMapNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto sdPixelMap = GetSystemDefinedPixelMap(env, info, ctxt);
-    ASSERT_ERR(ctxt->env, (sdPixelMap != nullptr && sdPixelMap->value_ != nullptr), Status::E_INVALID_PARAMETERS,
+    ASSERT_ERR(ctxt->env, (sdPixelMap != nullptr && sdPixelMap->value_ != nullptr), Status::E_ERROR,
         "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, sdPixelMap->value_->GetRawData(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set raw data failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set raw data failed!");
     return ctxt->output;
 }
 
@@ -99,14 +99,16 @@ napi_value SystemDefinedPixelMapNapi::SetRawData(napi_env env, napi_callback_inf
     auto ctxt = std::make_shared<ContextBase>();
     std::vector<uint8_t> pixelMap;
     auto input = [env, ctxt, &pixelMap](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], pixelMap);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter rawData type must be Uint8Array");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto sdPixelMap = static_cast<SystemDefinedPixelMapNapi *>(ctxt->native);
-    ASSERT_ERR(ctxt->env, (sdPixelMap != nullptr && sdPixelMap->value_ != nullptr), Status::E_INVALID_PARAMETERS,
+    ASSERT_ERR(ctxt->env, (sdPixelMap != nullptr && sdPixelMap->value_ != nullptr), Status::E_ERROR,
         "invalid object!");
     sdPixelMap->value_->SetRawData(pixelMap);
     return nullptr;

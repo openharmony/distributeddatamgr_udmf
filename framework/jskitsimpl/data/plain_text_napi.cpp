@@ -46,7 +46,7 @@ napi_value PlainTextNapi::New(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "PlainTextNapi");
     auto ctxt = std::make_shared<ContextBase>();
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
 
     auto *plainText = new (std::nothrow) PlainTextNapi();
     ASSERT_ERR(ctxt->env, plainText != nullptr, Status::E_ERROR, "no memory for plain text!");
@@ -77,7 +77,7 @@ PlainTextNapi *PlainTextNapi::GetPlainText(napi_env env, napi_callback_info info
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "PlainTextNapi");
     ctxt->GetCbInfoSync(env, info);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     return static_cast<PlainTextNapi *>(ctxt->native);
 }
 
@@ -86,10 +86,10 @@ napi_value PlainTextNapi::GetContent(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "PlainTextNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto plainText = GetPlainText(env, info, ctxt);
-    ASSERT_ERR(ctxt->env, (plainText != nullptr && plainText->value_ != nullptr), Status::E_INVALID_PARAMETERS,
+    ASSERT_ERR(ctxt->env, (plainText != nullptr && plainText->value_ != nullptr), Status::E_ERROR,
         "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, plainText->value_->GetContent(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set text content failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set text content failed!");
     return ctxt->output;
 }
 
@@ -99,14 +99,16 @@ napi_value PlainTextNapi::SetContent(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string content;
     auto input = [env, ctxt, &content](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], content);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter content type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto plainText = static_cast<PlainTextNapi *>(ctxt->native);
-    ASSERT_ERR(ctxt->env, (plainText != nullptr && plainText->value_ != nullptr), Status::E_INVALID_PARAMETERS,
+    ASSERT_ERR(ctxt->env, (plainText != nullptr && plainText->value_ != nullptr), Status::E_ERROR,
         "invalid object!");
     plainText->value_->SetContent(content);
     return nullptr;
@@ -117,10 +119,10 @@ napi_value PlainTextNapi::GetAbstract(napi_env env, napi_callback_info info)
     LOG_DEBUG(UDMF_KITS_NAPI, "PlainTextNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto plainText = GetPlainText(env, info, ctxt);
-    ASSERT_ERR(ctxt->env, (plainText != nullptr && plainText->value_ != nullptr), Status::E_INVALID_PARAMETERS,
+    ASSERT_ERR(ctxt->env, (plainText != nullptr && plainText->value_ != nullptr), Status::E_ERROR,
         "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, plainText->value_->GetAbstract(), ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "set abstract failed!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set abstract failed!");
     return ctxt->output;
 }
 
@@ -130,14 +132,16 @@ napi_value PlainTextNapi::SetAbstract(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     std::string abstract;
     auto input = [env, ctxt, &abstract](size_t argc, napi_value *argv) {
-        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], abstract);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter abstract type must be string");
     };
     ctxt->GetCbInfoSync(env, info, input);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_INVALID_PARAMETERS, "invalid arguments!");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto plainText = static_cast<PlainTextNapi *>(ctxt->native);
-    ASSERT_ERR(ctxt->env, (plainText != nullptr && plainText->value_ != nullptr), Status::E_INVALID_PARAMETERS,
+    ASSERT_ERR(ctxt->env, (plainText != nullptr && plainText->value_ != nullptr), Status::E_ERROR,
         "invalid object!");
     plainText->value_->SetAbstract(abstract);
     return nullptr;
