@@ -83,11 +83,16 @@ void UtdGraph::AddEdge(const std::string &startNode, const std::string &endNode)
 bool UtdGraph::IsLowerLevelType(const std::string &lowerLevelType, const std::string &heigitLevelType)
 {
     bool isFind = false;
-    uint32_t start = GetIndex(lowerLevelType);
-    uint32_t end = GetIndex(heigitLevelType);
+    int32_t start = GetIndex(lowerLevelType);
+    int32_t end = GetIndex(heigitLevelType);
+    if (start < 0 || end < 0) {
+        return false;
+    }
+    uint32_t uStart = static_cast<uint32_t>(start);
+    uint32_t uEnd = static_cast<uint32_t>(end);
     std::shared_lock<decltype(graphMutex_)> Lock(graphMutex_);
-    graph_->Dfs(start, [&isFind, &end](uint32_t currNode)-> bool {
-        if (end == currNode) {
+    graph_->Dfs(uStart, [&isFind, &uEnd](uint32_t currNode)-> bool {
+        if (uEnd == currNode) {
             isFind = true;
             return true;
         }

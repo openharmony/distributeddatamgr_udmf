@@ -48,12 +48,13 @@ bool Unmarshalling(UnifiedData &output, MessageParcel &parcel)
         LOG_ERROR(UDMF_SERVICE, "UnifiedData is empty!");
         return false;
     }
-    const uint8_t *rawData = reinterpret_cast<const uint8_t *>(parcel.ReadRawData(size));
+    auto rawData = parcel.ReadRawData(size);
     if (rawData == nullptr) {
         LOG_ERROR(UDMF_SERVICE, "RawData is null!");
         return false;
     }
-    std::vector<uint8_t> dataBytes(rawData, rawData + size);
+    const uint8_t *data = reinterpret_cast<const uint8_t *>(rawData);
+    std::vector<uint8_t> dataBytes(data, data + size);
     auto recordTlv = TLVObject(dataBytes);
     if (!TLVUtil::Reading(output, recordTlv)) {
         LOG_ERROR(UDMF_SERVICE, "Unmarshall unified data failed!");

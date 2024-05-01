@@ -25,28 +25,28 @@ namespace OHOS {
 namespace UDMF {
 #define IPC_SEND(code, reply, ...)                                                           \
     ({                                                                                       \
-        int32_t __status = E_OK;                                                             \
+        int32_t ipcStatus = E_OK;                                                            \
         do {                                                                                 \
             MessageParcel request;                                                           \
             if (!request.WriteInterfaceToken(GetDescriptor())) {                             \
-                __status = E_WRITE_PARCEL_ERROR;                                             \
+                ipcStatus = E_WRITE_PARCEL_ERROR;                                            \
                 break;                                                                       \
             }                                                                                \
             if (!ITypesUtil::Marshal(request, ##__VA_ARGS__)) {                              \
-                __status = E_WRITE_PARCEL_ERROR;                                             \
+                ipcStatus = E_WRITE_PARCEL_ERROR;                                            \
                 break;                                                                       \
             }                                                                                \
             MessageOption option;                                                            \
             auto result = SendRequest(code, request, reply, option);                         \
             if (result != 0) {                                                               \
                 LOG_ERROR(UDMF_SERVICE, "SendRequest failed, result = %{public}d!", result); \
-                __status = E_IPC;                                                            \
+                ipcStatus = E_IPC;                                                           \
                 break;                                                                       \
             }                                                                                \
                                                                                              \
-            ITypesUtil::Unmarshal(reply, __status);                                          \
+            ITypesUtil::Unmarshal(reply, ipcStatus);                                         \
         } while (0);                                                                         \
-        __status;                                                                            \
+        ipcStatus;                                                                           \
     })
 
 UdmfServiceProxy::UdmfServiceProxy(const sptr<IRemoteObject> &object) : IRemoteProxy<IUdmfService>(object)
