@@ -16,6 +16,8 @@
 #include <gtest/gtest.h>
 
 #include <unistd.h>
+#include <thread>
+#include <chrono>
 
 #include "token_setproc.h"
 #include "accesstoken_kit.h"
@@ -45,6 +47,7 @@ using namespace OHOS::Security::AccessToken;
 using namespace OHOS::UDMF;
 using namespace OHOS;
 namespace OHOS::Test {
+constexpr int SLEEP_TIME = 50;   // 50 ms
 class UdmfClientTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -208,6 +211,7 @@ void UdmfClientTest::CompareDetails(const UDDetails &details)
 void UdmfClientTest::GetEmptyData(QueryOption &option)
 {
     UnifiedData data;
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
     auto status = UdmfClient::GetInstance().GetData(option, data);
     EXPECT_EQ(status, E_NOT_FOUND);
 }
@@ -1439,6 +1443,56 @@ HWTEST_F(UdmfClientTest, AddPrivilege004, TestSize.Level1)
     status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
     ASSERT_EQ(status, E_NO_PERMISSION);
     LOG_INFO(UDMF_TEST, "AddPrivilege004 end.");
+}
+
+/**
+* @tc.name: AddPrivilege005
+* @tc.desc: Add privilege with valid params
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, AddPrivilege005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "AddPrivilege005 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    Text text;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    text.SetDetails(details);
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
+    data.AddRecord(record);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    Privilege privilege;
+    SetHapToken2();
+    privilege.tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo2", 0);
+    privilege.readPermission = "readAndKeep";
+    privilege.writePermission = "writePermission";
+    SetNativeToken("msdp_sa");
+    status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
+    ASSERT_EQ(status, E_OK);
+
+    SetHapToken2();
+    UnifiedData data1;
+    status = UdmfClient::GetInstance().GetData(option2, data1);
+    ASSERT_EQ(status, E_OK);
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
+    UnifiedData data2;
+    status = UdmfClient::GetInstance().GetData(option2, data2);
+    ASSERT_EQ(status, E_OK);
+    std::shared_ptr<UnifiedRecord> record2 = data2.GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    auto type = record2->GetType();
+    ASSERT_EQ(type, UDType::TEXT);
+    auto text2 = static_cast<Text *>(record2.get());
+    ASSERT_NE(text2, nullptr);
+    CompareDetails(text2->GetDetails());   // Can be read repeatedly.
+    LOG_INFO(UDMF_TEST, "AddPrivilege005 end.");
 }
 
 /**
