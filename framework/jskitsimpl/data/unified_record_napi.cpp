@@ -82,12 +82,9 @@ std::shared_ptr<UnifiedRecord> UnifiedRecordNapi::GenerateNativeRecord(napi_env 
     ValueType value;
     GetNativeValue(env, type, valueNapi, value);
 
-    auto it = std::find_if(UD_TYPE_MAP.begin(), UD_TYPE_MAP.end(), [&](const auto& pair) {
-        return pair.second == type;
-    });
     UDType utdType = APPLICATION_DEFINED_RECORD;
-    if (it != UD_TYPE_MAP.end()) {
-        utdType = static_cast<UDType>(it->first);
+    if (UtdUtils::IsValidUtdType(type)) {
+        utdType = static_cast<UDType>(UtdUtils::ConvertJsUtdTypeToUtdType(type));
     }
 
     std::map<UDType, std::function<std::shared_ptr<UnifiedRecord>(UDType, ValueType)>> constructors = {
@@ -195,7 +192,8 @@ napi_value UnifiedRecordNapi::GetType(napi_env env, napi_callback_info info)
     auto ctxt = std::make_shared<ContextBase>();
     auto uRecord = GetUnifiedRecord(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_ERROR, "invalid object!");
-    ctxt->status = NapiDataUtils::SetValue(env, UD_TYPE_MAP.at(uRecord->value_->GetType()), ctxt->output);
+    ctxt->status = NapiDataUtils::SetValue(env, UtdUtils::ConvertUtdTypeToJsUtdType(uRecord->value_->GetType()),
+                                           ctxt->output);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set type failed!");
     return ctxt->output;
 }
