@@ -16,6 +16,7 @@
 #include "udmf_client.h"
 
 #include "dds_trace.h"
+#include "udmf_radar_reporter.h"
 
 #include "error_code.h"
 #include "logger.h"
@@ -35,6 +36,8 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
 {
     DdsTrace trace(
         std::string(TAG) + std::string(__FUNCTION__), TraceSwitch::BYTRACE_ON | TraceSwitch::TRACE_CHAIN_ON);
+    RADAR_REPORT(RadarReporter::DFX_SET_PASTEBOARD, RadarReporter::DFX_SET_BIZ_SCENE, RadarReporter::DFX_SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::DFX_BEGIN);
     auto service = UdmfServiceClient::GetInstance();
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
