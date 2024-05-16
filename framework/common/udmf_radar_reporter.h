@@ -24,44 +24,54 @@ namespace RadarReporter {
 enum BizScene : std::int32_t {
     SET_DATA = 1,
     SYNC_DATA = 2,
-    GET_DATA = 3, 
+    GET_DATA = 3,
+    UTD_REGISTER = 4
 };
 
-enum BizStage : std::int32_t {
-    SAVE_OBJECT = 1,
+enum SetDataStage : std::int32_t {
+    SET_DATA_BEGIN = 1,
+    VERIFY_SHARE_PERMISSIONS = 2,
+    GERERATE_DFS_URI = 3,
+    SET_DATA_END = 4
 };
+
+enum SyncDataStage : std::int32_t {
+    SYNC_BEGIN = 1,
+    SYNC_END = 2
+};
+
+enum GetDataStage : std::int32_t {
+    GET_DATA_BEGIN = 1,
+    VERIFY_PRIVILEGE = 2,
+    GRANT_URI_PERMISSION = 3,
+    GET_DATA_END = 4
+};
+
+enum UtdRegisterStage : std::int32_t {
+    UTD_REGISTER_BEGIN = 1,
+    UTD_REGISTER_END = 2,
+};
+
 enum StageRes : std::int32_t {
     IDLE = 0,
     SUCCESS = 1,
     FAILED = 2,
-    CANCELLED = 3,
+    CANCELLED = 3
 };
 enum BizState : std::int32_t {
-    START = 1,
-    FINISHED = 2,
+    DFX_BEGIN = 0,
+    DFX_NORMAL_END = 1,
+    DFX_ABNORMAL_END = 2
 };
 
-enum ErrorCode : int32_t {
-    OFFSET = 27721728,
-    DUPLICATE_CREATE = OFFSET,
-    WRITE_PARCEL_ERROR = OFFSET,
-    READ_PARCEL_ERROR,
-    IPC,
-    NO_PERMISSION,
-    INVALID_PARAMETERS,
-    DB_ERROR,
-    FS_ERROR,
-    NOT_FOUND,
-    
-};
-const constexpr char* BIZ_STATE = "BIZ_STATE";
-const constexpr char* ERROR_CODE = "ERROR_CODE";
+const constexpr char BIZ_STATE[] = "BIZ_STATE";
+const constexpr char ERROR_CODE[] = "ERROR_CODE";
 } // namespace RadarReporter
 
-const constexpr char* DOMAIN = "DISTDATAMGR";
-const constexpr char* EVENT_NAME = "DISTRIBUTED_UDMF_BEHAVIOR";
+const constexpr char DOMAIN[] = "DISTDATAMGR";
+const constexpr char EVENT_NAME[] = "DISTRIBUTED_UDMF_BEHAVIOR";
 const constexpr HiviewDFX::HiSysEvent::EventType TYPE = HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
-const constexpr char* ORG_PKG = "distributeddata";
+const constexpr char ORG_PKG[] = "distributeddata";
 
 #define RADAR_REPORT(bizScene, bizStage, stageRes, ...)                                            \
 ({                                                                                                 \

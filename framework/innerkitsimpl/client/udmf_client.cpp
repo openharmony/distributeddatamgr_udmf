@@ -26,6 +26,7 @@ namespace OHOS {
 namespace UDMF {
 const std::string TAG = "UdmfClient::";
 using namespace OHOS::DistributedDataDfx;
+using namespace RadarReporter;
 UdmfClient &UdmfClient::GetInstance()
 {
     static auto instance_ = new UdmfClient();
@@ -36,17 +37,22 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
 {
     DdsTrace trace(
         std::string(TAG) + std::string(__FUNCTION__), TraceSwitch::BYTRACE_ON | TraceSwitch::TRACE_CHAIN_ON);
-    RADAR_REPORT(RadarReporter::DFX_SET_PASTEBOARD, RadarReporter::DFX_SET_BIZ_SCENE, RadarReporter::DFX_SUCCESS,
-        RadarReporter::BIZ_STATE, RadarReporter::DFX_BEGIN);
+    RADAR_REPORT(BizScene::SET_DATA, SetDataStage::SET_DATA_BEGIN, StageRes::IDLE, BIZ_STATE, BizState::DFX_BEGIN);
     auto service = UdmfServiceClient::GetInstance();
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        RADAR_REPORT(BizScene::SET_DATA, SetDataStage::SET_DATA_BEGIN, StageRes::FAILED, ERROR_CODE, E_IPC,
+                     BIZ_STATE, BizState::DFX_ABNORMAL_END);
         return E_IPC;
     }
     int32_t ret = service->SetData(option, unifiedData, key);
     if (ret != E_OK) {
+        RADAR_REPORT(BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::FAILED, ERROR_CODE, ret,
+                     BIZ_STATE, BizState::DFX_ABNORMAL_END);
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
     }
+    RADAR_REPORT(BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::SUCCESS,
+                 BIZ_STATE, BizState::DFX_NORMAL_END);
     return static_cast<Status>(ret);
 }
 
@@ -54,15 +60,22 @@ Status UdmfClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
 {
     DdsTrace trace(
         std::string(TAG) + std::string(__FUNCTION__), TraceSwitch::BYTRACE_ON | TraceSwitch::TRACE_CHAIN_ON);
+    RADAR_REPORT(BizScene::GET_DATA, GetDataStage::GET_DATA_BEGIN, StageRes::IDLE, BIZ_STATE, BizState::DFX_BEGIN);
     auto service = UdmfServiceClient::GetInstance();
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        RADAR_REPORT(BizScene::GET_DATA, GetDataStage::GET_DATA_BEGIN, StageRes::FAILED, ERROR_CODE, E_IPC,
+                     BIZ_STATE, BizState::DFX_ABNORMAL_END);
         return E_IPC;
     }
     int32_t ret = service->GetData(query, unifiedData);
     if (ret != E_OK) {
+        RADAR_REPORT(BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::FAILED, ERROR_CODE, ret,
+                     BIZ_STATE, BizState::DFX_ABNORMAL_END);
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
     }
+    RADAR_REPORT(BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::SUCCESS,
+                 BIZ_STATE, BizState::DFX_NORMAL_END);
     return static_cast<Status>(ret);
 }
 
