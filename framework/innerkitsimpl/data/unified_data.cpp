@@ -23,12 +23,15 @@ namespace UDMF {
 UnifiedData::UnifiedData()
 {
     properties_ = std::make_shared<UnifiedDataProperties>();
-    properties_->timestamp = std::chrono::steady_clock::now().time_since_epoch().count();
+    auto duration = std::chrono::system_clock::now().time_since_epoch();
+    properties_->timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
 }
 
 UnifiedData::UnifiedData(std::shared_ptr<UnifiedDataProperties> properties)
 {
     properties_ = properties;
+    auto duration = std::chrono::system_clock::now().time_since_epoch();
+    properties_->timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
 }
 
 int64_t UnifiedData::GetSize()
@@ -163,6 +166,7 @@ bool UnifiedData::IsComplete()
 
 void UnifiedData::SetProperties(std::shared_ptr<UnifiedDataProperties> properties)
 {
+    properties->timestamp = properties_->timestamp;
     properties_ = properties;
 }
 
