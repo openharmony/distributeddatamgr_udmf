@@ -17,10 +17,10 @@
 #define UDMF_SYSTEM_DEFINED_RECORD_H
 
 #include "unified_record.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class SystemDefinedRecord : public UnifiedRecord {
+class API_EXPORT SystemDefinedRecord : public UnifiedRecord {
 public:
     explicit SystemDefinedRecord();
     SystemDefinedRecord(UDType type, ValueType value);

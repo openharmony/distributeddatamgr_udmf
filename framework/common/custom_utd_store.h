@@ -25,7 +25,7 @@
 #include "custom_utd_json_parser.h"
 namespace OHOS {
 namespace UDMF {
-class CustomUtdStore {
+class API_EXPORT CustomUtdStore {
 public:
     static CustomUtdStore &GetInstance();
     std::vector<TypeDescriptorCfg> GetTypeCfgs(const std::string &cfgFilePath);

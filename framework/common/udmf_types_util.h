@@ -15,7 +15,7 @@
 
 #ifndef UDMF_TYPES_UTIL_H
 #define UDMF_TYPES_UTIL_H
-
+#include "visibility.h"
 #include "itypes_util.h"
 
 #include "unified_data.h"
@@ -33,44 +33,44 @@ using UDType = UDMF::UDType;
 using Intention = UDMF::Intention;
 
 template<>
-bool Marshalling(const UnifiedData &input, MessageParcel &parcel);
+bool API_EXPORT Marshalling(const UnifiedData &input, MessageParcel &parcel);
 template<>
-bool Unmarshalling(UnifiedData &output, MessageParcel &parcel);
+bool API_EXPORT Unmarshalling(UnifiedData &output, MessageParcel &parcel);
 
 template<>
-bool Marshalling(const std::vector<UnifiedData> &input, MessageParcel &parcel);
+bool API_EXPORT Marshalling(const std::vector<UnifiedData> &input, MessageParcel &parcel);
 template<>
-bool Unmarshalling(std::vector<UnifiedData> &output, MessageParcel &parcel);
+bool API_EXPORT Unmarshalling(std::vector<UnifiedData> &output, MessageParcel &parcel);
 
 template<>
-bool Marshalling(const Summary &input, MessageParcel &parcel);
+bool API_EXPORT Marshalling(const Summary &input, MessageParcel &parcel);
 template<>
-bool Unmarshalling(Summary &output, MessageParcel &parcel);
+bool API_EXPORT Unmarshalling(Summary &output, MessageParcel &parcel);
 
 template<>
-bool Marshalling(const Privilege &input, MessageParcel &parcel);
+bool API_EXPORT Marshalling(const Privilege &input, MessageParcel &parcel);
 template<>
-bool Unmarshalling(Privilege &output, MessageParcel &parcel);
+bool API_EXPORT Unmarshalling(Privilege &output, MessageParcel &parcel);
 
 template<>
-bool Marshalling(const CustomOption &input, MessageParcel &parcel);
+bool API_EXPORT Marshalling(const CustomOption &input, MessageParcel &parcel);
 template<>
-bool Unmarshalling(CustomOption &output, MessageParcel &parcel);
+bool API_EXPORT Unmarshalling(CustomOption &output, MessageParcel &parcel);
 
 template<>
-bool Marshalling(const QueryOption &input, MessageParcel &parcel);
+bool API_EXPORT Marshalling(const QueryOption &input, MessageParcel &parcel);
 template<>
-bool Unmarshalling(QueryOption &output, MessageParcel &parcel);
+bool API_EXPORT Unmarshalling(QueryOption &output, MessageParcel &parcel);
 
 template<>
-bool Marshalling(const UDType &input, MessageParcel &parcel);
+bool API_EXPORT Marshalling(const UDType &input, MessageParcel &parcel);
 template<>
-bool Unmarshalling(UDType &output, MessageParcel &parcel);
+bool API_EXPORT Unmarshalling(UDType &output, MessageParcel &parcel);
 
 template<>
-bool Marshalling(const Intention &input, MessageParcel &parcel);
+bool API_EXPORT Marshalling(const Intention &input, MessageParcel &parcel);
 template<>
-bool Unmarshalling(Intention &output, MessageParcel &parcel);
+bool API_EXPORT Unmarshalling(Intention &output, MessageParcel &parcel);
 } // namespace ITypesUtil
 } // namespace OHOS
 #endif // UDMF_TYPES_UTIL_H

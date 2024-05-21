@@ -17,10 +17,10 @@
 #define UDMF_FOLDER_H
 
 #include "file.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class Folder : public File {
+class API_EXPORT Folder : public File {
 public:
     Folder();
     explicit Folder(const std::string &uri);

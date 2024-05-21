@@ -24,7 +24,7 @@
 #include <unordered_map>
 #include <variant>
 #include <vector>
-
+#include "visibility.h"
 #include "string_ex.h"
 
 namespace OHOS {
@@ -171,16 +171,16 @@ enum UDType : int32_t {
 };
 
 struct UtdType {
-    int32_t utdEnumNum;
-    const char* jsUtdEnumName;
-    const char* jsUtdEnumValue;
+    int32_t UtdEnum;
+    const char *UtdEnumName;
+    const char *UtdId;
 };
 
 namespace UtdUtils {
-    bool IsValidUtdType(const std::string &jsUtdType);
-    int32_t ConvertJsUtdTypeToUtdType(const std::string &jsUtdType);
-    std::string ConvertUtdTypeToJsUtdType(int32_t utdType);
-    std::vector<UtdType> GetUtdTypes();
+    bool API_EXPORT IsValidUtdId(const std::string &utdId);
+    int32_t API_EXPORT GetUtdEnumFromUtdId(const std::string &utdId);
+    std::string API_EXPORT GetUtdIdFromUtdEnum(int32_t utdType);
+    std::vector<UtdType> API_EXPORT GetUtdTypes();
 } // namespace UtdUtils
 
 /*
@@ -207,7 +207,7 @@ static const std::unordered_map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
     { UD_INTENTION_DATA_HUB, "DATA_HUB" },
 };
 
-class UnifiedDataUtils {
+class API_EXPORT UnifiedDataUtils {
 public:
     static bool IsValidType(int32_t value);
     static bool IsValidIntention(int32_t value);

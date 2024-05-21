@@ -17,10 +17,10 @@
 #define UDMF_VIDEO_H
 
 #include "file.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class Video : public File {
+class API_EXPORT Video : public File {
 public:
     Video();
     explicit Video(const std::string &uri);

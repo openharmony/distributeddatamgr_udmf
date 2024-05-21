@@ -17,10 +17,11 @@
 #define UDMF_IMAGE_H
 
 #include "file.h"
+#include "visibility.h"
 
 namespace OHOS {
 namespace UDMF {
-class Image : public File {
+class API_EXPORT Image : public File {
 public:
     Image();
     explicit Image(const std::string &uri);

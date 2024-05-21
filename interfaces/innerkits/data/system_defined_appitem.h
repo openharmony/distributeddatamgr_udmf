@@ -17,10 +17,11 @@
 #define UDMF_SYSTEM_DEFINED_APPITEM_H
 
 #include "system_defined_record.h"
+#include "visibility.h"
 
 namespace OHOS {
 namespace UDMF {
-class SystemDefinedAppItem : public SystemDefinedRecord {
+class API_EXPORT SystemDefinedAppItem : public SystemDefinedRecord {
 public:
     SystemDefinedAppItem();
     SystemDefinedAppItem(UDType type, ValueType value);

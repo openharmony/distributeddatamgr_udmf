@@ -46,7 +46,7 @@ napi_value UniformTypeDescriptorNapi::CreateUniformDataType(napi_env env)
     napi_create_object(env, &uniformDataType);
     auto allUtdTypes = UtdUtils::GetUtdTypes();
     for (auto utdType : allUtdTypes) {
-        SetNamedProperty(env, uniformDataType, utdType.jsType, utdType.jsTypeValue);
+        SetNamedProperty(env, uniformDataType, utdType.UtdEnumName, utdType.UtdId);
     }
     napi_object_freeze(env, uniformDataType);
     return uniformDataType;

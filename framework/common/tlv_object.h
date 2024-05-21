@@ -22,7 +22,7 @@
 #include "unified_meta.h"
 #include "unified_types.h"
 #include "endian_converter.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
 enum class TAG {
@@ -46,7 +46,7 @@ struct TLVHead {
 };
 #pragma pack()
 
-class TLVObject {
+class API_EXPORT TLVObject {
 public:
     TLVObject() = default;
     ~TLVObject() = default;

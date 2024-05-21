@@ -25,11 +25,11 @@
 #include "flexible_type.h"
 #include "type_descriptor.h"
 #include "error_code.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
 class TypeDescriptor;
-class UtdClient {
+class API_EXPORT UtdClient {
 public:
     static UtdClient &GetInstance();
     Status GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);

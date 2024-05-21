@@ -106,7 +106,7 @@ void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
 {
     for (const auto &record : data.GetRecords()) {
         int64_t recordSize = record->GetSize();
-        auto udType = UtdUtils::ConvertUtdTypeToJsUtdType(record->GetType());
+        auto udType = UtdUtils::GetUtdIdFromUtdEnum(record->GetType());
         auto it = summary.summary.find(udType);
         if (it == summary.summary.end()) {
             summary.summary[udType] = recordSize;

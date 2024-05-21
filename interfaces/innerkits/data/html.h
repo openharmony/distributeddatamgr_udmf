@@ -17,10 +17,11 @@
 #define UDMF_HTML_H
 
 #include "text.h"
+#include "visibility.h"
 
 namespace OHOS {
 namespace UDMF {
-class Html : public Text {
+class API_EXPORT Html : public Text {
 public:
     Html();
     explicit Html(const std::string &htmlContent, const std::string &plainContent);

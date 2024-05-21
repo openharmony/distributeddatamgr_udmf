@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace UDMF {
-static constexpr UtdType UTD_TYPE_MAP[] = {
+static constexpr UtdType UTD_TYPES[] = {
     { ENTITY, "ENTITY", "general.entity" },
     { OBJECT, "OBJECT", "general.object" },
     { COMPOSITE_OBJECT, "COMPOSITE_OBJECT", "general.composite-object" },
@@ -162,31 +162,31 @@ static constexpr UtdType UTD_TYPE_MAP[] = {
 };
 
 namespace UtdUtils {
-bool IsValidUtdType(const std::string& jsUtdType)
+bool IsValidUtdId(const std::string &utdId)
 {
-    for (const auto &item : UTD_TYPE_MAP) {
-        if (item.jsUtdEnumName == jsUtdType) {
+    for (const auto &item : UTD_TYPES) {
+        if (item.UtdId == utdId) {
             return true;
         }
     }
     return false;
 }
 
-int32_t ConvertJsUtdTypeToUtdType(const std::string& jsUtdType)
+int32_t GetUtdEnumFromUtdId(const std::string &utdId)
 {
-    for (const auto &item : UTD_TYPE_MAP) {
-        if (item.jsUtdEnumName == jsUtdType) {
-            return item.utdEnumNum;
+    for (const auto &item : UTD_TYPES) {
+        if (item.UtdId == utdId) {
+            return item.UtdEnum;
         }
     }
     return UD_BUTT;
 }
 
-std::string ConvertUtdTypeToJsUtdType(int32_t utdType)
+std::string GetUtdIdFromUtdEnum(int32_t utdType)
 {
-    for (const auto &item : UTD_TYPE_MAP) {
-        if (item.utdEnumNum == utdType) {
-            return item.jsUtdEnumName;
+    for (const auto &item : UTD_TYPES) {
+        if (item.UtdEnum == utdType) {
+            return item.UtdId;
         }
     }
     return "";
@@ -194,7 +194,7 @@ std::string ConvertUtdTypeToJsUtdType(int32_t utdType)
 
 std::vector<UtdType> GetUtdTypes()
 {
-    std::vector<UtdType> utdTypes(UTD_TYPE_MAP, UTD_TYPE_MAP + sizeof(UTD_TYPE_MAP) / sizeof(UtdType));
+    std::vector<UtdType> utdTypes(UTD_TYPES, UTD_TYPES + sizeof(UTD_TYPES) / sizeof(UtdType));
     return utdTypes;
 }
 } // namespace UtdUtils

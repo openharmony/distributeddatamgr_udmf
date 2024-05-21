@@ -17,10 +17,10 @@
 #define UDMF_PLAIN_TEXT_H
 
 #include "text.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class PlainText : public Text {
+class API_EXPORT PlainText : public Text {
 public:
     PlainText();
     explicit PlainText(const std::string &content, const std::string &abstract);

@@ -17,10 +17,10 @@
 #define UDMF_SYSTEM_DEFINED_PIXELMAP_H
 
 #include "system_defined_record.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class SystemDefinedPixelMap : public SystemDefinedRecord {
+class API_EXPORT SystemDefinedPixelMap : public SystemDefinedRecord {
 public:
     SystemDefinedPixelMap();
     explicit SystemDefinedPixelMap(std::vector<uint8_t> &data);
