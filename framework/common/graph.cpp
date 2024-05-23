@@ -61,7 +61,7 @@ bool Graph::Dfs(uint32_t startNode, Action action, bool isInit)
                 edge = edge->next;
             }
         }
-        visited_[nodes.top()] = 2;  // all edge of the adj is visited.
+        visited_[nodes.top()] = 2;  // 2: all edge of the adj is visited.
         nodes.pop();
     }
     return true;
