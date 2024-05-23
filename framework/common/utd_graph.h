@@ -41,7 +41,7 @@ private:
     UtdGraph &operator=(const UtdGraph &obj) = delete;
     int32_t GetIndex(const std::string &node);
     void AddEdge(const std::string &startNode, const std::string &endNode);
-    mutable std::shared_mutex graphMutex_;
+    std::mutex graphMutex_;
     Graph *graph_ = nullptr;
     std::map<std::string, uint32_t> typeIdIndex_;
 };

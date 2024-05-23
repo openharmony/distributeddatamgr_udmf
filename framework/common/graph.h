@@ -43,7 +43,6 @@ private:
     uint32_t vertexNum_;
     std::vector<VertexNode> adjList_;  // Adjacency List
     std::vector<uint32_t> visited_;    // Determine whether the vertex has been accessed, index=vertex value
-    std::vector<uint32_t> result_;
 };
 } // namespace UDMF
 } // namespace OHOS

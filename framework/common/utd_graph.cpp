@@ -54,7 +54,7 @@ void UtdGraph::InitUtdGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs
 {
     typeIdIndex_.clear();
     uint32_t descriptorsNum = static_cast<uint32_t>(descriptorCfgs.size());
-    std::unique_lock<std::shared_mutex> Lock(graphMutex_);
+    std::unique_lock<std::mutex> Lock(graphMutex_);
     graph_ = new Graph(descriptorsNum);
     for (uint32_t i = 0; i < descriptorsNum; i++) {
         typeIdIndex_.insert(std::make_pair(descriptorCfgs[i].typeId, i));
@@ -90,7 +90,7 @@ bool UtdGraph::IsLowerLevelType(const std::string &lowerLevelType, const std::st
     }
     uint32_t uStart = static_cast<uint32_t>(start);
     uint32_t uEnd = static_cast<uint32_t>(end);
-    std::shared_lock<decltype(graphMutex_)> Lock(graphMutex_);
+    std::unique_lock<std::mutex> Lock(graphMutex_);
     graph_->Dfs(uStart, [&isFind, &uEnd](uint32_t currNode)-> bool {
         if (uEnd == currNode) {
             isFind = true;
@@ -103,7 +103,7 @@ bool UtdGraph::IsLowerLevelType(const std::string &lowerLevelType, const std::st
 
 bool UtdGraph::IsDAG()
 {
-    std::shared_lock<decltype(graphMutex_)> Lock(graphMutex_);
+    std::unique_lock<std::mutex> Lock(graphMutex_);
     return graph_->DfsUnconnectedGraph([&](uint32_t currNode) -> bool {return false; });
 }
 } // namespace UDMF
