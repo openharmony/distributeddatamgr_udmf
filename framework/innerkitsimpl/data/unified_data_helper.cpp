@@ -194,7 +194,10 @@ bool UnifiedDataHelper::LoadUDataFromFile(const std::string &dataFile, UnifiedDa
     std::string path = fileUri.GetRealPath();
     std::FILE *file = fopen(path.c_str(), "r");
     if (file == nullptr) {
-        LOG_ERROR(UDMF_FRAMEWORK, "failed to open file");
+        LOG_ERROR(UDMF_FRAMEWORK, "failed to open file, error:%{public}s, srcdir:%{public}s, relPath:%{public}s",
+                  std::strerror(errno),
+                  dataFile.c_str(),
+                  path.c_str());
         return false;
     }
     recordTlv.SetFile(file);
