@@ -50,24 +50,19 @@ bool Graph::Dfs(uint32_t startNode, Action action, bool isInit)
         while (edge) {
             if (visited_[edge->adjIndex] == 0) {
                 visited_[edge->adjIndex] = 1;
-                if (adjList_[edge->adjIndex].firstEdge != nullptr) {
-                    if (visited_[adjList_[edge->adjIndex].firstEdge->adjIndex] == 1) {
-                        return false;     // current node, iscycle
-                    }
-                }
+                nodes.push(edge->adjIndex);
                 if (action(adjList_[edge->adjIndex].value)) {
                     return true;
                 }
-                nodes.push(edge->adjIndex);
                 edge = adjList_[edge->adjIndex].firstEdge;
+            } else if (visited_[edge->adjIndex] == 1) {
+                return false;
             } else {
                 edge = edge->next;
             }
         }
-        if (edge == nullptr) {
-            visited_[nodes.top()] = 2;  // 2: all edge of the adj is visited.
-            nodes.pop();
-        }
+        visited_[nodes.top()] = 2;  // all edge of the adj is visited.
+        nodes.pop();
     }
     return true;
 }

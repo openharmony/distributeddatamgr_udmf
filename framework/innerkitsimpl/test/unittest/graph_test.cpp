@@ -82,16 +82,15 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph001, TestSize.Level1)
 
 /**
 * @tc.name: DfsUnconnectedGraph002
-* @tc.desc: is connectedGraph: A -> B -> C -> A
+* @tc.desc: is connectedGraph: A -> B -> A
 * @tc.type: FUNC
 */
 HWTEST_F(GraphTest, DfsUnconnectedGraph002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "DfsUnconnectedGraph002 begin.");
-    uint32_t vextexNum = 3;  // total point
+    uint32_t vextexNum = 2;
     vector<vector<uint32_t>> edges={{TestNodes::POINT_A, TestNodes::POINT_B},
-                                    {TestNodes::POINT_B, TestNodes::POINT_C},
-                                    {TestNodes::POINT_C, TestNodes::POINT_A}
+                                    {TestNodes::POINT_B, TestNodes::POINT_A},
     };
     Graph graph(vextexNum);
     for (uint32_t i = 0; i < edges.size(); i++) {
@@ -105,16 +104,16 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph002, TestSize.Level1)
 
 /**
 * @tc.name: DfsUnconnectedGraph003
-* @tc.desc: is connectedGraph: A -> B -> C -> B
+* @tc.desc: is connectedGraph: A -> B -> C -> A
 * @tc.type: FUNC
 */
 HWTEST_F(GraphTest, DfsUnconnectedGraph003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "DfsUnconnectedGraph003 begin.");
-    uint32_t vextexNum = 3;
+    uint32_t vextexNum = 3;  // total point
     vector<vector<uint32_t>> edges={{TestNodes::POINT_A, TestNodes::POINT_B},
                                     {TestNodes::POINT_B, TestNodes::POINT_C},
-                                    {TestNodes::POINT_C, TestNodes::POINT_B},
+                                    {TestNodes::POINT_C, TestNodes::POINT_A}
     };
     Graph graph(vextexNum);
     for (uint32_t i = 0; i < edges.size(); i++) {
@@ -128,15 +127,16 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph003, TestSize.Level1)
 
 /**
 * @tc.name: DfsUnconnectedGraph004
-* @tc.desc: is connectedGraph: A -> B -> A
+* @tc.desc: is connectedGraph: A -> B -> C -> B
 * @tc.type: FUNC
 */
 HWTEST_F(GraphTest, DfsUnconnectedGraph004, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "DfsUnconnectedGraph004 begin.");
-    uint32_t vextexNum = 2;
+    uint32_t vextexNum = 3;
     vector<vector<uint32_t>> edges={{TestNodes::POINT_A, TestNodes::POINT_B},
-                                    {TestNodes::POINT_B, TestNodes::POINT_A},
+                                    {TestNodes::POINT_B, TestNodes::POINT_C},
+                                    {TestNodes::POINT_C, TestNodes::POINT_B},
     };
     Graph graph(vextexNum);
     for (uint32_t i = 0; i < edges.size(); i++) {
@@ -157,17 +157,17 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph005, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "DfsUnconnectedGraph005 begin.");
     uint32_t vextexNum = 8;
-        vector<vector<uint32_t>> edges = {
-            {TestNodes::POINT_A, TestNodes::POINT_B},
-            {TestNodes::POINT_B, TestNodes::POINT_C},
-            {TestNodes::POINT_C, TestNodes::POINT_D},
-            {TestNodes::POINT_D, TestNodes::POINT_E},
-            {TestNodes::POINT_D, TestNodes::POINT_E},
-            {TestNodes::POINT_E, TestNodes::POINT_F},
-            {TestNodes::POINT_E, TestNodes::POINT_G},
-            {TestNodes::POINT_G, TestNodes::POINT_H},
-            {TestNodes::POINT_H, TestNodes::POINT_E},
-        };
+    vector<vector<uint32_t>> edges = {
+        {TestNodes::POINT_A, TestNodes::POINT_B},
+        {TestNodes::POINT_B, TestNodes::POINT_C},
+        {TestNodes::POINT_C, TestNodes::POINT_D},
+        {TestNodes::POINT_D, TestNodes::POINT_E},
+        {TestNodes::POINT_D, TestNodes::POINT_E},
+        {TestNodes::POINT_E, TestNodes::POINT_F},
+        {TestNodes::POINT_E, TestNodes::POINT_G},
+        {TestNodes::POINT_G, TestNodes::POINT_H},
+        {TestNodes::POINT_H, TestNodes::POINT_E},
+    };
     Graph graph(vextexNum);
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
@@ -187,16 +187,16 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph006, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "DfsUnconnectedGraph006 begin.");
     uint32_t vextexNum = 8;
-        vector<vector<uint32_t>> edges = {
-            {TestNodes::POINT_A, TestNodes::POINT_B},
-            {TestNodes::POINT_B, TestNodes::POINT_C},
-            {TestNodes::POINT_C, TestNodes::POINT_D},
-            {TestNodes::POINT_D, TestNodes::POINT_E},
-            {TestNodes::POINT_D, TestNodes::POINT_E},
-            {TestNodes::POINT_E, TestNodes::POINT_F},
-            {TestNodes::POINT_E, TestNodes::POINT_G},
-            {TestNodes::POINT_G, TestNodes::POINT_H},
-        };
+    vector<vector<uint32_t>> edges = {
+        {TestNodes::POINT_A, TestNodes::POINT_B},
+        {TestNodes::POINT_B, TestNodes::POINT_C},
+        {TestNodes::POINT_C, TestNodes::POINT_D},
+        {TestNodes::POINT_D, TestNodes::POINT_E},
+        {TestNodes::POINT_D, TestNodes::POINT_E},
+        {TestNodes::POINT_E, TestNodes::POINT_F},
+        {TestNodes::POINT_E, TestNodes::POINT_G},
+        {TestNodes::POINT_G, TestNodes::POINT_H},
+    };
     Graph graph(vextexNum);
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
@@ -209,19 +209,20 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph006, TestSize.Level1)
 
 /**
 * @tc.name: DfsUnconnectedGraph007
-* @tc.desc: is not connectedGraph: A -> B   A -> C   B -> D   C -> D
+* @tc.desc: is not connectedGraph: A -> B   A -> C   B -> D   C -> D   B -> C
 * @tc.type: FUNC
 */
 HWTEST_F(GraphTest, DfsUnconnectedGraph007, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "DfsUnconnectedGraph007 begin.");
     uint32_t vextexNum = 4;
-        vector<vector<uint32_t>> edges = {
-            {TestNodes::POINT_A, TestNodes::POINT_B},
-            {TestNodes::POINT_A, TestNodes::POINT_C},
-            {TestNodes::POINT_B, TestNodes::POINT_D},
-            {TestNodes::POINT_C, TestNodes::POINT_D},
-        };
+    vector<vector<uint32_t>> edges = {
+        {TestNodes::POINT_A, TestNodes::POINT_B},
+        {TestNodes::POINT_A, TestNodes::POINT_C},
+        {TestNodes::POINT_B, TestNodes::POINT_D},
+        {TestNodes::POINT_C, TestNodes::POINT_D},
+        {TestNodes::POINT_B, TestNodes::POINT_C},
+    };
     Graph graph(vextexNum);
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
@@ -230,5 +231,73 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph007, TestSize.Level1)
                                                   { return false; });
     EXPECT_EQ(isDAGFlag, true);
     LOG_INFO(UDMF_TEST, "DfsUnconnectedGraph007 end.");
+}
+
+/**
+* @tc.name: DfsUnconnectedGraph008
+* @tc.desc: is not connectedGraph: A -> B -> C   D -> E   F -> G -> H
+* @tc.type: FUNC
+*/
+HWTEST_F(GraphTest, DfsUnconnectedGraph008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "DfsUnconnectedGraph008 begin.");
+    uint32_t vextexNum = 8;
+    vector<vector<uint32_t>> edges = {
+        {TestNodes::POINT_A, TestNodes::POINT_B},
+        {TestNodes::POINT_B, TestNodes::POINT_C},
+        {TestNodes::POINT_D, TestNodes::POINT_E},
+        {TestNodes::POINT_F, TestNodes::POINT_G},
+        {TestNodes::POINT_G, TestNodes::POINT_H},
+    };
+    Graph graph(vextexNum);
+    for (uint32_t i = 0; i < edges.size(); i++) {
+        graph.AddEdge(edges[i][0], edges[i][1]);
+    }
+    bool isDAGFlag = graph.DfsUnconnectedGraph([&](uint32_t currNode) -> bool
+                                                  { return false; });
+    EXPECT_EQ(isDAGFlag, true);
+    LOG_INFO(UDMF_TEST, "DfsUnconnectedGraph008 end.");
+}
+
+/**
+* @tc.name: DfsHasData001
+* @tc.desc: is not connectedGraph: A -> B -> C -> D -> E -> F   D -> E -> G -> H
+* @tc.type: FUNC
+*/
+HWTEST_F(GraphTest, DfsHasData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "DfsHasData001 begin.");
+    uint32_t vextexNum = 8;
+    vector<vector<uint32_t>> edges = {
+        {TestNodes::POINT_A, TestNodes::POINT_B},
+        {TestNodes::POINT_B, TestNodes::POINT_C},
+        {TestNodes::POINT_C, TestNodes::POINT_D},
+        {TestNodes::POINT_D, TestNodes::POINT_E},
+        {TestNodes::POINT_D, TestNodes::POINT_E},
+        {TestNodes::POINT_E, TestNodes::POINT_F},
+        {TestNodes::POINT_E, TestNodes::POINT_G},
+        {TestNodes::POINT_G, TestNodes::POINT_H},
+    };
+    Graph graph(vextexNum);
+    for (uint32_t i = 0; i < edges.size(); i++) {
+        graph.AddEdge(edges[i][0], edges[i][1]);
+    }
+
+    bool hasData1 = graph.Dfs(TestNodes::POINT_A, [&](uint32_t currNode) -> bool
+        { return currNode == TestNodes::POINT_H; }, true);
+    EXPECT_EQ(hasData1, true);
+
+    bool hasData2 = graph.Dfs(TestNodes::POINT_A, [&](uint32_t currNode) -> bool
+        { return currNode == TestNodes::POINT_F; }, true);
+    EXPECT_EQ(hasData2, true);
+
+    bool hasData3 = graph.Dfs(TestNodes::POINT_E, [&](uint32_t currNode) -> bool
+        { return currNode == TestNodes::POINT_D; }, true);
+    EXPECT_EQ(hasData3, false);
+
+    bool hasData4 = graph.Dfs(TestNodes::POINT_E, [&](uint32_t currNode) -> bool
+        { return currNode == TestNodes::POINT_B; }, true);
+    EXPECT_EQ(hasData4, false);
+    LOG_INFO(UDMF_TEST, "DfsHasData001 end.");
 }
 } // OHOS::Test
