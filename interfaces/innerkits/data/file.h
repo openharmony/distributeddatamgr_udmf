@@ -17,10 +17,10 @@
 #define UDMF_FILE_H
 
 #include "unified_record.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class File : public UnifiedRecord {
+class API_EXPORT File : public UnifiedRecord {
 public:
     File();
     explicit File(const std::string &uri);

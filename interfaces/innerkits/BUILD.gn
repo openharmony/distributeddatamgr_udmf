@@ -105,7 +105,7 @@ ohos_shared_library("udmf_client") {
   subsystem_name = "distributeddatamgr"
 
   part_name = "udmf"
-
+  cflags_cc = [ "-fvisibility=hidden" ]
   if (build_selinux) {
     cflags = [ "-DWITH_SELINUX" ]
     external_deps += [ "selinux_adapter:librestorecon" ]

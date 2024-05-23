@@ -18,11 +18,11 @@
 
 #include <bitset>
 #include <string>
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
 constexpr int MAX_BIT_SIZE = 128;
-struct UnifiedKey {
+struct API_EXPORT UnifiedKey {
     UnifiedKey() = default;
     explicit UnifiedKey(std::string key);
     UnifiedKey(std::string intention, std::string bundle, std::string groupId);

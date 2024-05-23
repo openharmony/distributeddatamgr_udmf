@@ -19,6 +19,7 @@
 #include <vector>
 #include "error_code.h"
 #include "utd_common.h"
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
 constexpr const char* FLEXIBLE_TYPE_FLAG = "flex.z";
@@ -28,7 +29,7 @@ enum FlexibleTypeAttr : int32_t {
     FILE_EXTENTSION,
     INVALID_BUT
 };
-class FlexibleType {
+class API_EXPORT FlexibleType {
 public:
     static std::string EscapeStr(const std::string &chs);
     static bool ParseFlexibleUtd(const std::string &typeId, TypeDescriptorCfg &flexibleTypeDescriptorCfg);

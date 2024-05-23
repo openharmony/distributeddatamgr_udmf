@@ -25,7 +25,7 @@
 #include "utd_common.h"
 namespace OHOS {
 namespace UDMF {
-class CustomUtdJsonParser {
+class API_EXPORT CustomUtdJsonParser {
 public:
     using json = cJSON;
     CustomUtdJsonParser();

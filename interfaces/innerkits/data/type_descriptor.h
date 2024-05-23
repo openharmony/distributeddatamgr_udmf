@@ -22,9 +22,10 @@
 #include <map>
 #include "error_code.h"
 #include "utd_common.h"
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class TypeDescriptor {
+class API_EXPORT TypeDescriptor {
 public:
     TypeDescriptor(const std::string &typeId, const std::set<std::string> &belongingToTypes,
                    const std::vector<std::string> &filenameExtensions, const std::vector<std::string> &mimeTypes,

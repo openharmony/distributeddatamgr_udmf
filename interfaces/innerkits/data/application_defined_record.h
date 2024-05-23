@@ -17,10 +17,10 @@
 #define UDMF_APPLICATION_DEFINED_RECORD_H
 
 #include "unified_record.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class ApplicationDefinedRecord : public UnifiedRecord {
+class API_EXPORT ApplicationDefinedRecord : public UnifiedRecord {
 public:
     ApplicationDefinedRecord();
     explicit ApplicationDefinedRecord(std::string type);

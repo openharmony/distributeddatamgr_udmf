@@ -17,10 +17,10 @@
 #include <string>
 #include "error_code.h"
 #include "utd_common.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class PresetTypeDescriptors {
+class API_EXPORT PresetTypeDescriptors {
 public:
     static PresetTypeDescriptors &GetInstance();
     std::vector<TypeDescriptorCfg> &GetPresetTypes();

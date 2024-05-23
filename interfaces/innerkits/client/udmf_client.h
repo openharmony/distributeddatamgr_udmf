@@ -23,10 +23,10 @@
 #include "error_code.h"
 #include "unified_meta.h"
 #include "unified_types.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class UdmfClient {
+class API_EXPORT UdmfClient {
 public:
     static UdmfClient &GetInstance();
 

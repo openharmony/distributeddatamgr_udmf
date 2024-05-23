@@ -18,10 +18,10 @@
 
 #include "unified_data_properties.h"
 #include "unified_record.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class UnifiedData {
+class API_EXPORT UnifiedData {
 public:
     UnifiedData();
     explicit UnifiedData(std::shared_ptr<UnifiedDataProperties> properties);

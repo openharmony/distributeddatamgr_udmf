@@ -20,7 +20,7 @@
 #include <string>
 #include <variant>
 #include <vector>
-
+#include "visibility.h"
 #include "pixel_map.h"
 #include "unified_types.h"
 #include "want.h"
@@ -29,7 +29,7 @@ namespace OHOS {
 namespace UDMF {
 using ValueType = std::variant<int32_t, int64_t, double, bool, std::string, std::vector<uint8_t>,
     std::shared_ptr<OHOS::AAFwk::Want>, std::shared_ptr<OHOS::Media::PixelMap>>;
-class UnifiedRecord {
+class API_EXPORT UnifiedRecord {
 public:
     UnifiedRecord();
     explicit UnifiedRecord(UDType type);

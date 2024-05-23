@@ -17,10 +17,10 @@
 #define UDMF_SYSTEM_DEFINED_FORM_H
 
 #include "system_defined_record.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class SystemDefinedForm : public SystemDefinedRecord {
+class API_EXPORT SystemDefinedForm : public SystemDefinedRecord {
 public:
     SystemDefinedForm();
     SystemDefinedForm(UDType type, ValueType value);

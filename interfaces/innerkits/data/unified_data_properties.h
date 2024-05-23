@@ -16,11 +16,11 @@
 #define UDMF_UNIFIED_DATA_PROPERTIES_H
 
 #include "want_params.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
 enum ShareOptions { IN_APP, CROSS_APP };
-class UnifiedDataProperties {
+class API_EXPORT UnifiedDataProperties {
 public:
     std::string tag;
     AAFwk::WantParams extras;

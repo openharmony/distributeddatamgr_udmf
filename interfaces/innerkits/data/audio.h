@@ -17,10 +17,10 @@
 #define UDMF_AUDIO_H
 
 #include "file.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class Audio : public File {
+class API_EXPORT Audio : public File {
 public:
     Audio();
     explicit Audio(const std::string &uri);

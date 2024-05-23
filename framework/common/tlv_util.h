@@ -17,7 +17,7 @@
 #define UDMF_TLV_UTIL_H
 
 #include <type_traits>
-
+#include "visibility.h"
 #include "application_defined_record.h"
 #include "audio.h"
 #include "file.h"
@@ -43,181 +43,181 @@ namespace OHOS {
 namespace TLVUtil {
 using namespace OHOS::UDMF;
 template<typename T>
-bool CountBufferSize(const T &input, TLVObject &data);
+bool API_EXPORT CountBufferSize(const T &input, TLVObject &data);
 
 template<>
-bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data);
+bool API_EXPORT CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data);
 
 template<>
-bool CountBufferSize(const Runtime &input, TLVObject &data);
+bool API_EXPORT CountBufferSize(const Runtime &input, TLVObject &data);
 
 template<>
-bool CountBufferSize(const UnifiedData &input, TLVObject &data);
+bool API_EXPORT CountBufferSize(const UnifiedData &input, TLVObject &data);
 
 template<>
-bool CountBufferSize(const std::vector<UnifiedData> &input, TLVObject &data);
+bool API_EXPORT CountBufferSize(const std::vector<UnifiedData> &input, TLVObject &data);
 
 template<typename T>
-bool Writing(const T &input, TLVObject &data);
+bool API_EXPORT Writing(const T &input, TLVObject &data);
 template<typename T>
-bool Reading(T &output, TLVObject &data);
+bool API_EXPORT Reading(T &output, TLVObject &data);
 
 template<>
-bool Writing(const int32_t &input, TLVObject &data);
+bool API_EXPORT Writing(const int32_t &input, TLVObject &data);
 template<>
-bool Reading(int32_t &output, TLVObject &data);
+bool API_EXPORT Reading(int32_t &output, TLVObject &data);
 
 template<>
-bool Writing(const int64_t &input, TLVObject &data);
+bool API_EXPORT Writing(const int64_t &input, TLVObject &data);
 template<>
-bool Reading(int64_t &output, TLVObject &data);
+bool API_EXPORT Reading(int64_t &output, TLVObject &data);
 
 template<>
-bool Writing(const bool &input, TLVObject &data);
+bool API_EXPORT Writing(const bool &input, TLVObject &data);
 template<>
-bool Reading(bool &output, TLVObject &data);
+bool API_EXPORT Reading(bool &output, TLVObject &data);
 
 template<>
-bool Reading(uint32_t &output, TLVObject &data);
+bool API_EXPORT Reading(uint32_t &output, TLVObject &data);
 
 template<>
-bool Writing(const uint32_t &input, TLVObject &data);
+bool API_EXPORT Writing(const uint32_t &input, TLVObject &data);
 
 template<>
-bool Reading(uint64_t &output, TLVObject &data);
+bool API_EXPORT Reading(uint64_t &output, TLVObject &data);
 
 template<>
-bool Writing(const uint64_t &input, TLVObject &data);
+bool API_EXPORT Writing(const uint64_t &input, TLVObject &data);
 
 template<>
-bool Writing(const std::string &input, TLVObject &data);
+bool API_EXPORT Writing(const std::string &input, TLVObject &data);
 template<>
-bool Reading(std::string &output, TLVObject &data);
+bool API_EXPORT Reading(std::string &output, TLVObject &data);
 
 template<>
-bool Writing(const std::vector<uint8_t> &input, TLVObject &data);
+bool API_EXPORT Writing(const std::vector<uint8_t> &input, TLVObject &data);
 template<>
-bool Reading(std::vector<uint8_t> &output, TLVObject &data);
+bool API_EXPORT Reading(std::vector<uint8_t> &output, TLVObject &data);
 
 template<>
-bool Writing(const UDVariant &input, TLVObject &data);
+bool API_EXPORT Writing(const UDVariant &input, TLVObject &data);
 template<>
-bool Reading(UDVariant &output, TLVObject &data);
+bool API_EXPORT Reading(UDVariant &output, TLVObject &data);
 
 template<>
-bool Writing(const UDDetails &input, TLVObject &data);
+bool API_EXPORT Writing(const UDDetails &input, TLVObject &data);
 template<>
-bool Reading(UDDetails &output, TLVObject &data);
+bool API_EXPORT Reading(UDDetails &output, TLVObject &data);
 
 template<>
-bool Writing(const UDType &input, TLVObject &data);
+bool API_EXPORT Writing(const UDType &input, TLVObject &data);
 template<>
-bool Reading(UDType &output, TLVObject &data);
+bool API_EXPORT Reading(UDType &output, TLVObject &data);
 
 template<>
-bool Writing(const Text &input, TLVObject &data);
+bool API_EXPORT Writing(const Text &input, TLVObject &data);
 template<>
-bool Reading(Text &output, TLVObject &data);
+bool API_EXPORT Reading(Text &output, TLVObject &data);
 
 template<>
-bool Writing(const PlainText &input, TLVObject &data);
+bool API_EXPORT Writing(const PlainText &input, TLVObject &data);
 template<>
-bool Reading(PlainText &output, TLVObject &data);
+bool API_EXPORT Reading(PlainText &output, TLVObject &data);
 
 template<>
-bool Writing(const Html &input, TLVObject &data);
+bool API_EXPORT Writing(const Html &input, TLVObject &data);
 template<>
-bool Reading(Html &output, TLVObject &data);
+bool API_EXPORT Reading(Html &output, TLVObject &data);
 
 template<>
-bool Writing(const Link &input, TLVObject &data);
+bool API_EXPORT Writing(const Link &input, TLVObject &data);
 template<>
-bool Reading(Link &output, TLVObject &data);
+bool API_EXPORT Reading(Link &output, TLVObject &data);
 
 template<>
-bool Writing(const File &input, TLVObject &data);
+bool API_EXPORT Writing(const File &input, TLVObject &data);
 template<>
-bool Reading(File &output, TLVObject &data);
+bool API_EXPORT Reading(File &output, TLVObject &data);
 
 template<>
-bool Writing(const Image &input, TLVObject &data);
+bool API_EXPORT Writing(const Image &input, TLVObject &data);
 template<>
-bool Reading(Image &output, TLVObject &data);
+bool API_EXPORT Reading(Image &output, TLVObject &data);
 
 template<>
-bool Writing(const Video &input, TLVObject &data);
+bool API_EXPORT Writing(const Video &input, TLVObject &data);
 template<>
-bool Reading(Video &output, TLVObject &data);
+bool API_EXPORT Reading(Video &output, TLVObject &data);
 
 template<>
-bool Writing(const Audio &input, TLVObject &data);
+bool API_EXPORT Writing(const Audio &input, TLVObject &data);
 template<>
-bool Reading(Audio &output, TLVObject &data);
+bool API_EXPORT Reading(Audio &output, TLVObject &data);
 
 template<>
-bool Writing(const Folder &input, TLVObject &data);
+bool API_EXPORT Writing(const Folder &input, TLVObject &data);
 template<>
-bool Reading(Folder &output, TLVObject &data);
+bool API_EXPORT Reading(Folder &output, TLVObject &data);
 
 template<>
-bool Writing(const SystemDefinedRecord &input, TLVObject &data);
+bool API_EXPORT Writing(const SystemDefinedRecord &input, TLVObject &data);
 template<>
-bool Reading(SystemDefinedRecord &output, TLVObject &data);
+bool API_EXPORT Reading(SystemDefinedRecord &output, TLVObject &data);
 
 template<>
-bool Writing(const SystemDefinedForm &input, TLVObject &data);
+bool API_EXPORT Writing(const SystemDefinedForm &input, TLVObject &data);
 template<>
-bool Reading(SystemDefinedForm &output, TLVObject &data);
+bool API_EXPORT Reading(SystemDefinedForm &output, TLVObject &data);
 
 template<>
-bool Writing(const SystemDefinedAppItem &input, TLVObject &data);
+bool API_EXPORT Writing(const SystemDefinedAppItem &input, TLVObject &data);
 template<>
-bool Reading(SystemDefinedAppItem &output, TLVObject &data);
+bool API_EXPORT Reading(SystemDefinedAppItem &output, TLVObject &data);
 
 template<>
-bool Writing(const SystemDefinedPixelMap &input, TLVObject &data);
+bool API_EXPORT Writing(const SystemDefinedPixelMap &input, TLVObject &data);
 template<>
-bool Reading(SystemDefinedPixelMap &output, TLVObject &data);
+bool API_EXPORT Reading(SystemDefinedPixelMap &output, TLVObject &data);
 
 template<>
-bool Writing(const ApplicationDefinedRecord &input, TLVObject &data);
+bool API_EXPORT Writing(const ApplicationDefinedRecord &input, TLVObject &data);
 template<>
-bool Reading(ApplicationDefinedRecord &output, TLVObject &data);
+bool API_EXPORT Reading(ApplicationDefinedRecord &output, TLVObject &data);
 
 template<>
-bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data);
+bool API_EXPORT Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data);
 template<>
-bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data);
+bool API_EXPORT Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data);
 
 template<>
-bool Writing(const UnifiedData &input, TLVObject &data);
+bool API_EXPORT Writing(const UnifiedData &input, TLVObject &data);
 template<>
-bool Reading(UnifiedData &output, TLVObject &data);
+bool API_EXPORT Reading(UnifiedData &output, TLVObject &data);
 
 template<>
-bool Writing(const std::vector<UnifiedData> &input, TLVObject &data);
+bool API_EXPORT Writing(const std::vector<UnifiedData> &input, TLVObject &data);
 template<>
-bool Reading(std::vector<UnifiedData> &output, TLVObject &data);
+bool API_EXPORT Reading(std::vector<UnifiedData> &output, TLVObject &data);
 
 template<>
-bool Writing(const UnifiedKey &input, TLVObject &data);
+bool API_EXPORT Writing(const UnifiedKey &input, TLVObject &data);
 template<>
-bool Reading(UnifiedKey &output, TLVObject &data);
+bool API_EXPORT Reading(UnifiedKey &output, TLVObject &data);
 
 template<>
-bool Writing(const Privilege &input, TLVObject &data);
+bool API_EXPORT Writing(const Privilege &input, TLVObject &data);
 template<>
-bool Reading(Privilege &output, TLVObject &data);
+bool API_EXPORT Reading(Privilege &output, TLVObject &data);
 
 template<>
-bool Writing(const DataStatus &input, TLVObject &data);
+bool API_EXPORT Writing(const DataStatus &input, TLVObject &data);
 template<>
-bool Reading(DataStatus &output, TLVObject &data);
+bool API_EXPORT Reading(DataStatus &output, TLVObject &data);
 
 template<>
-bool Writing(const Runtime &input, TLVObject &data);
+bool API_EXPORT Writing(const Runtime &input, TLVObject &data);
 template<>
-bool Reading(Runtime &output, TLVObject &data);
+bool API_EXPORT Reading(Runtime &output, TLVObject &data);
 } // namespace TLVUtil
 } // namespace OHOS
 #endif // UDMF_TLV_UTIL_H

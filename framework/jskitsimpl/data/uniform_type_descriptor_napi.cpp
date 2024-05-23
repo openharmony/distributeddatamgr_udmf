@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace UDMF {
+
 napi_value UniformTypeDescriptorNapi::UniformTypeDescriptorInit(napi_env env, napi_value exports)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UniformTypeDescriptorNapi");
@@ -43,8 +44,9 @@ napi_value UniformTypeDescriptorNapi::CreateUniformDataType(napi_env env)
 {
     napi_value uniformDataType = nullptr;
     napi_create_object(env, &uniformDataType);
-    for (auto &[utdTypeKey, utdTypeValue] : JS_UD_TYPE_NAME_MAP) {
-        SetNamedProperty(env, uniformDataType, utdTypeValue, UD_TYPE_MAP.at(utdTypeKey));
+    auto allUtdTypes = UtdUtils::GetUtdTypes();
+    for (auto utdType : allUtdTypes) {
+        SetNamedProperty(env, uniformDataType, utdType.UtdEnumName, utdType.UtdId);
     }
     napi_object_freeze(env, uniformDataType);
     return uniformDataType;

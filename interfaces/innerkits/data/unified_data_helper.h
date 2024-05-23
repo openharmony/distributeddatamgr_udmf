@@ -18,10 +18,10 @@
 
 #include <sys/stat.h>
 #include "unified_data.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class UnifiedDataHelper {
+class API_EXPORT UnifiedDataHelper {
 public:
     static void SetRootPath(const std::string &rootPath);
     static bool ExceedKVSizeLimit(UnifiedData &data);

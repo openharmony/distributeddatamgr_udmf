@@ -107,7 +107,7 @@ std::string UnifiedData::GetTypes()
 {
     std::string types;
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
-        types.append("-").append(UD_TYPE_MAP.at(record->GetType()));
+        types.append("-").append(UtdUtils::GetUtdIdFromUtdEnum(record->GetType()));
     }
     return types;
 }
@@ -116,7 +116,7 @@ std::vector<std::string> UnifiedData::GetTypesLabels() const
 {
     std::vector<std::string> types;
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
-        types.push_back(UD_TYPE_MAP.at(record->GetType()));
+        types.push_back(UtdUtils::GetUtdIdFromUtdEnum(record->GetType()));
     }
     return types;
 }
@@ -124,7 +124,7 @@ std::vector<std::string> UnifiedData::GetTypesLabels() const
 bool UnifiedData::HasType(const std::string &type) const
 {
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
-        if (UD_TYPE_MAP.at(record->GetType()) == type) {
+        if (UtdUtils::GetUtdIdFromUtdEnum(record->GetType()) == type) {
             return true;
         }
     }

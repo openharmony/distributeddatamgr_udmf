@@ -17,11 +17,11 @@
 #define UDMF_TEXT_H
 
 #include "unified_record.h"
-
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
 constexpr int MAX_TEXT_LEN = 20 * 1024 * 1024;
-class Text : public UnifiedRecord {
+class API_EXPORT Text : public UnifiedRecord {
 public:
     Text();
     explicit Text(UDDetails &variantMap);

@@ -17,10 +17,11 @@
 #define UDMF_LINK_H
 
 #include "text.h"
+#include "visibility.h"
 
 namespace OHOS {
 namespace UDMF {
-class Link : public Text {
+class API_EXPORT Link : public Text {
 public:
     Link();
     explicit Link(const std::string &url);
