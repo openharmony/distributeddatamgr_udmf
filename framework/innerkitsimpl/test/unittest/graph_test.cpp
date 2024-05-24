@@ -283,21 +283,45 @@ HWTEST_F(GraphTest, DfsHasData001, TestSize.Level1)
         graph.AddEdge(edges[i][0], edges[i][1]);
     }
 
-    bool hasData1 = graph.Dfs(TestNodes::POINT_A, [&](uint32_t currNode) -> bool
-        { return currNode == TestNodes::POINT_H; }, true);
-    EXPECT_EQ(hasData1, true);
+    bool isFind = false;
+    graph.Dfs(TestNodes::POINT_A, [&](uint32_t currNode) -> bool {
+        if (currNode == TestNodes::POINT_H) {
+            isFind = true;
+            return true;
+        }
+        return false;
+    });
+    EXPECT_EQ(isFind, true);
 
-    bool hasData2 = graph.Dfs(TestNodes::POINT_A, [&](uint32_t currNode) -> bool
-        { return currNode == TestNodes::POINT_F; }, true);
-    EXPECT_EQ(hasData2, true);
+    isFind = false;
+    graph.Dfs(TestNodes::POINT_A, [&](uint32_t currNode) -> bool {
+        if (currNode == TestNodes::POINT_F) {
+            isFind = true;
+            return true;
+        }
+        return false;
+    });
+    EXPECT_EQ(isFind, true);
 
-    bool hasData3 = graph.Dfs(TestNodes::POINT_E, [&](uint32_t currNode) -> bool
-        { return currNode == TestNodes::POINT_D; }, true);
-    EXPECT_EQ(hasData3, false);
+    isFind = false;
+    graph.Dfs(TestNodes::POINT_E, [&](uint32_t currNode) -> bool {
+        if (currNode == TestNodes::POINT_D) {
+            isFind = true;
+            return true;
+        }
+        return false;
+    });
+    EXPECT_EQ(isFind, false);
 
-    bool hasData4 = graph.Dfs(TestNodes::POINT_E, [&](uint32_t currNode) -> bool
-        { return currNode == TestNodes::POINT_B; }, true);
-    EXPECT_EQ(hasData4, false);
+    isFind = false;
+    graph.Dfs(TestNodes::POINT_E, [&](uint32_t currNode) -> bool {
+        if (currNode == TestNodes::POINT_B) {
+            isFind = true;
+            return true;
+        }
+        return false;
+    });
+    EXPECT_EQ(isFind, false);
     LOG_INFO(UDMF_TEST, "DfsHasData001 end.");
 }
 } // OHOS::Test
