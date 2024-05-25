@@ -30,6 +30,7 @@
         "bundle_framework",
         "c_utils",
         "hilog",
+        "hisysevent",
         "hitrace",
         "image_framework",
         "ipc",
