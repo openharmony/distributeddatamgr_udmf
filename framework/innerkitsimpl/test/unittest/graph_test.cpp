@@ -282,7 +282,7 @@ HWTEST_F(GraphTest, DfsHasData001, TestSize.Level1)
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
     }
-
+    
     bool isFind = false;
     graph.Dfs(TestNodes::POINT_A, [&](uint32_t currNode) -> bool {
         if (currNode == TestNodes::POINT_H) {
@@ -312,16 +312,49 @@ HWTEST_F(GraphTest, DfsHasData001, TestSize.Level1)
         return false;
     });
     EXPECT_EQ(isFind, false);
+    LOG_INFO(UDMF_TEST, "DfsHasData001 end.");
+}
+
+/**
+* @tc.name: DfsHasData002
+* @tc.desc: is not connectedGraph: A -> B -> C   D -> E   F -> G -> H
+* @tc.type: FUNC
+*/
+HWTEST_F(GraphTest, DfsHasData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "DfsHasData002 begin.");
+    uint32_t vextexNum = 8;
+    vector<vector<uint32_t>> edges = {
+        {TestNodes::POINT_A, TestNodes::POINT_B},
+        {TestNodes::POINT_B, TestNodes::POINT_C},
+        {TestNodes::POINT_D, TestNodes::POINT_E},
+        {TestNodes::POINT_F, TestNodes::POINT_G},
+        {TestNodes::POINT_G, TestNodes::POINT_H},
+    };
+    Graph graph(vextexNum);
+    for (uint32_t i = 0; i < edges.size(); i++) {
+        graph.AddEdge(edges[i][0], edges[i][1]);
+    }
+
+    bool isFind = false;
+    graph.Dfs(TestNodes::POINT_F, [&](uint32_t currNode) -> bool {
+        if (currNode == TestNodes::POINT_H) {
+            isFind = true;
+            return true;
+        }
+        return false;
+    });
+    EXPECT_EQ(isFind, true);
 
     isFind = false;
-    graph.Dfs(TestNodes::POINT_E, [&](uint32_t currNode) -> bool {
-        if (currNode == TestNodes::POINT_B) {
+    graph.Dfs(TestNodes::POINT_A, [&](uint32_t currNode) -> bool {
+        if (currNode == TestNodes::POINT_H) {
             isFind = true;
             return true;
         }
         return false;
     });
     EXPECT_EQ(isFind, false);
-    LOG_INFO(UDMF_TEST, "DfsHasData001 end.");
+    LOG_INFO(UDMF_TEST, "DfsHasData002 end.");
 }
 } // OHOS::Test
