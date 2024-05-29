@@ -42,7 +42,6 @@ bool Graph::Dfs(uint32_t startNode, Action action, bool isInit)
     EdgeNode *edge = nullptr;
     visited_[startNode] = 1;
     nodes.push(startNode);
-    result_.push_back(startNode);
     if (action(adjList_[startNode].value)) {
         return true;
     }
@@ -51,26 +50,19 @@ bool Graph::Dfs(uint32_t startNode, Action action, bool isInit)
         while (edge) {
             if (visited_[edge->adjIndex] == 0) {
                 visited_[edge->adjIndex] = 1;
-                if (adjList_[edge->adjIndex].firstEdge != nullptr) {
-                    auto iter = find(result_.begin(), result_.end(), adjList_[edge->adjIndex].firstEdge->adjIndex);
-                    if (iter != result_.end() && visited_[adjList_[edge->adjIndex].firstEdge->adjIndex] == 1) {
-                        return false;     // current node, iscycle
-                    }
-                }
+                nodes.push(edge->adjIndex);
                 if (action(adjList_[edge->adjIndex].value)) {
                     return true;
                 }
-                result_.push_back(startNode);
-                nodes.push(edge->adjIndex);
                 edge = adjList_[edge->adjIndex].firstEdge;
+            } else if (visited_[edge->adjIndex] == 1) {
+                return false;
             } else {
                 edge = edge->next;
             }
         }
-        if (edge == nullptr) {
-            visited_[nodes.top()] = 2;  // 2: all edge of the adj is visited.
-            nodes.pop();
-        }
+        visited_[nodes.top()] = 2;  // 2: all edge of the adj is visited.
+        nodes.pop();
     }
     return true;
 }
@@ -79,7 +71,6 @@ bool Graph::DfsUnconnectedGraph(Action action)
 {
     visited_.resize(vertexNum_);
     fill(visited_.begin(), visited_.end(), 0);
-    result_.clear();
     for (uint32_t node = 0; node < vertexNum_; node++) {
         if (!visited_[node]) {
             if (!Dfs(node, action, false)) {
