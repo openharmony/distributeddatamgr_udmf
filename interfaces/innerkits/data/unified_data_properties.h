@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace UDMF {
-enum ShareOptions { IN_APP, CROSS_APP };
 class UnifiedDataProperties {
 public:
     std::string tag;

@@ -473,6 +473,17 @@ static const std::unordered_map<int32_t, std::string> UD_INTENTION_MAP {
 
 static const std::unordered_map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
     { UD_INTENTION_DATA_HUB, "DATA_HUB" },
+    { UD_INTENTION_DRAG, "DRAG" },
+};
+
+enum ShareOptions : int32_t {
+    IN_APP,
+    CROSS_APP
+};
+
+static const std::unordered_map<int32_t, std::string> APP_SHARE_OPTION_MAP {
+    { IN_APP, "IN_APP" },
+    { CROSS_APP, "CROSS_APP" }
 };
 
 class UnifiedDataUtils {
