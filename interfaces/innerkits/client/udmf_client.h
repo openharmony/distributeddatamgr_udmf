@@ -18,11 +18,14 @@
 
 #include <string>
 #include <vector>
+#include <map>
+#include <shared_mutex>
 
 #include "unified_data.h"
 #include "error_code.h"
 #include "unified_meta.h"
 #include "unified_types.h"
+#include "unified_data_properties.h"
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
@@ -39,6 +42,17 @@ public:
     Status AddPrivilege(const QueryOption &query, Privilege &privilege);
     Status Sync(const QueryOption &query, const std::vector<std::string> &devices);
     Status IsRemoteData(const QueryOption &query, bool &result);
+    Status SetAppShareOption(const std::string &intention, const std::string &shareOption);
+    Status GetAppShareOption(const std::string &intention, std::string &shareOption);
+    Status RemoveAppShareOption(const std::string &intention);
+private:
+    Status GetShareOption(const std::string &intention, std::string &shareOption);
+    void SetUnifiedData(const std::string key, const UnifiedData &unifiedData);
+    Status GetUnifiedDatas(const std::string key, UnifiedData &unifiedData);
+    void ClearUnifiedDatas(const std::string key);
+
+    mutable std::shared_mutex mutex_ {};
+    std::map<std::string, UnifiedData> unifiedDatas;
 };
 } // namespace UDMF
 } // namespace OHOS
