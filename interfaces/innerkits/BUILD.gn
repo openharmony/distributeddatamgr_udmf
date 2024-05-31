@@ -36,7 +36,6 @@ config("udmf_client_config") {
 ohos_shared_library("udmf_client") {
   branch_protector_ret = "pac_ret"
   sanitize = {
-    integer_overflow = true
     ubsan = true
     boundary_sanitize = true
     cfi = true
