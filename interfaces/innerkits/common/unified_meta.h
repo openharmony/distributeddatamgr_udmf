@@ -471,6 +471,10 @@ static const std::unordered_map<int32_t, std::string> UD_INTENTION_MAP {
     { UD_INTENTION_DATA_HUB, "DataHub" },
 };
 
+static const std::unordered_map<int32_t, std::string> UD_SYSTEM_INTENTION_MAP {
+    { UD_INTENTION_DRAG, "Drag" },
+};
+
 static const std::unordered_map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
     { UD_INTENTION_DATA_HUB, "DATA_HUB" },
     { UD_INTENTION_DRAG, "DRAG" },

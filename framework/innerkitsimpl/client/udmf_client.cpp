@@ -21,6 +21,9 @@
 #include "logger.h"
 #include "udmf_service_client.h"
 #include "udmf_utils.h"
+#include "unified_data_cache.h"
+#include "accesstoken_kit.h"
+#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -28,8 +31,8 @@ const std::string TAG = "UdmfClient::";
 using namespace OHOS::DistributedDataDfx;
 UdmfClient &UdmfClient::GetInstance()
 {
-    static auto instance_ = new UdmfClient();
-    return *instance_;
+    static UdmfClient instance;
+    return instance;
 }
 
 Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
@@ -44,12 +47,15 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
     std::string shareOption;
     GetAppShareOption(UD_INTENTION_MAP.at(option.intention), shareOption);
     if (shareOption == "IN_APP") {
-        UnifiedKey udKey = UnifiedKey(UD_INTENTION_MAP.at(option.intention), "IN_APP", UTILS::GenerateId());
+        std::string bundleName = GetSelfBundleName();
+        if (bundleName.empty()) {
+            LOG_ERROR(UDMF_CLIENT, "get self bundleName empty.");
+            return E_ERROR;
+        }
+        UnifiedKey udKey = UnifiedKey(UD_INTENTION_MAP.at(option.intention), bundleName, UTILS::GenerateId());
         key = udKey.GetUnifiedKey();
-        SetUnifiedData(key, unifiedData);
+        UnifiedDataCache::GetInstance().SetUnifiedData(key, unifiedData);
         LOG_INFO(UDMF_CLIENT, "SetData in app success.");
-        RADAR_REPORT(BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::SUCCESS,
-                     BIZ_STATE, BizState::DFX_NORMAL_END);
         return E_OK;
     }
     
@@ -69,51 +75,32 @@ Status UdmfClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         return E_IPC;
     }
-
+    LOG_ERROR(UDMF_CLIENT, "glxtest GetData 2");
     UnifiedKey udKey = UnifiedKey(query.key);
+    LOG_ERROR(UDMF_CLIENT, "glxtest GetData 3");
+    if (!udKey.IsValid()) {
+        LOG_ERROR(UDMF_CLIENT, "query.key is invalid, %{public}s.", query.key.c_str());
+        return E_ERROR;
+    }
     std::string shareOption;
-    GetAppShareOption(UD_INTENTION_MAP.at(query.intention), shareOption);
+    GetAppShareOption(udKey.intention, shareOption);
+    LOG_ERROR(UDMF_CLIENT, "glxtest GetData 4");
     if (shareOption == "IN_APP") {
-        auto status = GetUnifiedDatas(query.key, unifiedData);
+        auto status = UnifiedDataCache::GetInstance().GetUnifiedDatas(query.key, unifiedData);
         if (status != E_OK) {
+            LOG_ERROR(UDMF_CLIENT, "failed! status = %{public}d", status);
             return E_NOT_FOUND;
         }
-        ClearUnifiedDatas(query.key);
-        RADAR_REPORT(BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::SUCCESS,
-                     BIZ_STATE, BizState::DFX_NORMAL_END);
+        UnifiedDataCache::GetInstance().ClearUnifiedDatas(query.key);
         return E_OK;
     }
+    LOG_ERROR(UDMF_CLIENT, "glxtest GetData 4");
 
     int32_t ret = service->GetData(query, unifiedData);
     if (ret != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
     }
     return static_cast<Status>(ret);
-}
-
-void UdmfClient::SetUnifiedData(const std::string key, const UnifiedData &unifiedData)
-{
-    std::unique_lock<std::shared_mutex> lock(mutex_);
-    unifiedDatas.insert({key, unifiedData});
-}
-
-Status UdmfClient::GetUnifiedDatas(const std::string key, UnifiedData &unifiedData)
-{
-    std::shared_lock<std::shared_mutex> lock(mutex_);
-    auto iter = unifiedDatas.find(key);
-    if (iter != unifiedDatas.end()) {
-        unifiedData = iter->second;
-        return E_OK;
-    }
-    return E_ERROR;
-}
-
-void UdmfClient::ClearUnifiedDatas(const std::string key)
-{
-    if (unifiedDatas.find(key) != unifiedDatas.end()) {
-        std::unique_lock<std::shared_mutex> lock(mutex_);
-        unifiedDatas.erase(key);
-    }
 }
 
 Status UdmfClient::GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
@@ -275,6 +262,17 @@ Status UdmfClient::RemoveAppShareOption(const std::string &intention)
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
     }
     return static_cast<Status>(ret);
+}
+
+std::string UdmfClient::GetSelfBundleName()
+{
+    uint32_t tokenId = IPCSkeleton::GetSelfTokenID();
+    Security::AccessToken::HapTokenInfo hapInfo;
+    if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo)
+        != Security::AccessToken::AccessTokenKitRet::RET_SUCCESS) {
+        return "";
+    }
+    return hapInfo.bundleName;
 }
 } // namespace UDMF
 } // namespace OHOS

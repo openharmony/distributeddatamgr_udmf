@@ -36,8 +36,8 @@ napi_value UnifiedDataChannelNapi::UnifiedDataChannelInit(napi_env env, napi_val
         DECLARE_NAPI_FUNCTION("queryData", QueryData),
         DECLARE_NAPI_FUNCTION("deleteData", DeleteData),
         DECLARE_NAPI_GETTER("ShareOptions", CreateShareOptions),
-        DECLARE_NAPI_GETTER("setAppShareOptions", SetAppShareOptions),
-        DECLARE_NAPI_GETTER("removeAppShareOptions", RemoveAppShareOptions),
+        DECLARE_NAPI_FUNCTION("setAppShareOptions", SetAppShareOptions),
+        DECLARE_NAPI_FUNCTION("removeAppShareOptions", RemoveAppShareOptions),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
@@ -51,7 +51,7 @@ napi_value UnifiedDataChannelNapi::CreateIntention(napi_env env)
     SetNamedProperty(env, intention, JS_UD_INTENTION_NAME_MAP.at(UD_INTENTION_DATA_HUB),
         UD_INTENTION_MAP.at(UD_INTENTION_DATA_HUB));
     SetNamedProperty(env, intention, JS_UD_INTENTION_NAME_MAP.at(UD_INTENTION_DRAG),
-        UD_INTENTION_MAP.at(UD_INTENTION_DRAG));
+        UD_SYSTEM_INTENTION_MAP.at(UD_INTENTION_DRAG));
     napi_object_freeze(env, intention);
     return intention;
 }
@@ -298,7 +298,7 @@ napi_value UnifiedDataChannelNapi::SetAppShareOptions(napi_env env, napi_callbac
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "SetAppShareOption is called!");
     std::string intention;
-    int32_t shareOption;
+    int32_t shareOption = ShareOptions::CROSS_APP;
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, ctxt, &intention, &shareOption](size_t argc, napi_value* argv) {
         LOG_DEBUG(UDMF_KITS_NAPI, "set appShareOption, argc = %{public}zu !", argc);
@@ -307,19 +307,21 @@ napi_value UnifiedDataChannelNapi::SetAppShareOptions(napi_env env, napi_callbac
             Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], intention);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
-            "Parameter error: parameter shareOptions must be string");
-
+            "Parameter error:The parameter intention must be within the scope of the Intention enumeration.");
         ctxt->status = NapiDataUtils::GetValue(env, argv[1], shareOption);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
-                            "Parameter error: parameter intention must be string");
+            "Parameter error:The parameter shareOption must be within the scope of the ShareOptions enumeration.");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "SetAppShareOption Exit");
     auto status = E_OK;
-    ASSERT_ERR(ctxt->env, !(intention =="Drag"),
+    LOG_INFO(UDMF_KITS_NAPI, "set appShareOption, argc, intention = %{public}s !", intention.c_str());
+    LOG_INFO(UDMF_KITS_NAPI, "set appShareOption, argc, shareOption = %{public}d !", shareOption);
+    ASSERT_ERR(ctxt->env, intention =="Drag",
                E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid!");
-    ASSERT_ERR(ctxt->env, !(shareOption >= IN_APP && shareOption <= CROSS_APP),
+    ASSERT_ERR(ctxt->env, (shareOption >= IN_APP && shareOption <= CROSS_APP),
                E_INVALID_PARAMETERS, "Parameter error: The shareOptions parameter is invalid!");
+    std::transform(intention.begin(), intention.end(), intention.begin(), ::tolower); // js : Drag --> drag
     status = UdmfClient::GetInstance().SetAppShareOption(intention, APP_SHARE_OPTION_MAP.at(shareOption));
     ASSERT_ERR(ctxt->env, !(status == E_REPEAT_SETTINGS), status, "Settings already exist!");
     ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
@@ -338,12 +340,13 @@ napi_value UnifiedDataChannelNapi::RemoveAppShareOptions(napi_env env, napi_call
             Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], intention);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
-            "Parameter error: parameter shareOptions must be string");
+            "Parameter error:The parameter intention must be within the scope of the Intention enumeration.");
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "RemoveAppShareOption Exit");
-    ASSERT_ERR(ctxt->env, !(intention == "Drag"),
+    ASSERT_ERR(ctxt->env, intention == "Drag",
                E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid!");
+    std::transform(intention.begin(), intention.end(), intention.begin(), ::tolower); // js : Drag --> drag
     auto status = E_OK;
     status = UdmfClient::GetInstance().RemoveAppShareOption(intention);
     ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");

@@ -25,6 +25,7 @@
 #include "error_code.h"
 #include "unified_meta.h"
 #include "unified_types.h"
+
 namespace OHOS {
 namespace UDMF {
 class UdmfClient {
@@ -44,10 +45,12 @@ public:
     Status GetAppShareOption(const std::string &intention, std::string &shareOption);
     Status RemoveAppShareOption(const std::string &intention);
 private:
-    Status GetShareOption(const std::string &intention, std::string &shareOption);
-    void SetUnifiedData(const std::string key, const UnifiedData &unifiedData);
-    Status GetUnifiedDatas(const std::string key, UnifiedData &unifiedData);
+    UdmfClient() = default;
+    ~UdmfClient() = default;
+    UdmfClient(const UdmfClient &obj) = delete;
+    UdmfClient &operator=(const UdmfClient &obj) = delete;
     void ClearUnifiedDatas(const std::string key);
+    std::string GetSelfBundleName();
 
     mutable std::shared_mutex mutex_ {};
     std::map<std::string, UnifiedData> unifiedDatas;
