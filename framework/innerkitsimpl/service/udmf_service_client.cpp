@@ -262,9 +262,8 @@ int32_t UdmfServiceClient::SetAppShareOption(const std::string &intention, const
 
 int32_t UdmfServiceClient::GetAppShareOption(const std::string &intention, std::string &shareOption)
 {
-    LOG_DEBUG(UDMF_SERVICE, "start, shareOption: %{public}s, intention: %{public}s",
-              shareOption.c_str(), intention.c_str());
-    if (shareOption.empty() || intention.empty()) {
+    LOG_DEBUG(UDMF_SERVICE, "start, intention: %{public}s", intention.c_str());
+    if (intention.empty()) {
         LOG_ERROR(UDMF_SERVICE, "invalid parameters");
         return E_INVALID_PARAMETERS;
     }

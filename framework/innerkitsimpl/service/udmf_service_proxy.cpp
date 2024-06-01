@@ -183,7 +183,7 @@ int32_t UdmfServiceProxy::IsRemoteData(const QueryOption &query, bool &result)
 int32_t UdmfServiceProxy::SetAppShareOption(const std::string &intention, const std::string &shareOption)
 {
     MessageParcel reply;
-    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_APP_SHARE_OPTION, reply, shareOption, intention);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_APP_SHARE_OPTION, reply, intention, shareOption);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x!", status);
         return status;
@@ -195,7 +195,7 @@ int32_t UdmfServiceProxy::SetAppShareOption(const std::string &intention, const 
 int32_t UdmfServiceProxy::GetAppShareOption(const std::string &intention, std::string &shareOption)
 {
     MessageParcel reply;
-    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::REMOVE_APP_SHARE_OPTION, reply, intention);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::GET_APP_SHARE_OPTION, reply, intention);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x!", status);
         return status;
