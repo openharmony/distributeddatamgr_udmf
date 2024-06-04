@@ -249,7 +249,7 @@ int32_t UdmfServiceClient::IsRemoteData(const QueryOption &query, bool &result)
     return udmfProxy_->IsRemoteData(query, result);
 }
 
-int32_t UdmfServiceClient::SetAppShareOption(const std::string &intention, const int32_t &shareOption)
+int32_t UdmfServiceClient::SetAppShareOption(const std::string &intention, int32_t shareOption)
 {
     LOG_DEBUG(UDMF_SERVICE, "start, intention: %{public}s, shareOption: %{public}d",
               intention.c_str(), shareOption);

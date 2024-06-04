@@ -43,9 +43,10 @@ public:
     Status AddPrivilege(const QueryOption &query, Privilege &privilege);
     Status Sync(const QueryOption &query, const std::vector<std::string> &devices);
     Status IsRemoteData(const QueryOption &query, bool &result);
-    Status SetAppShareOption(const std::string &intention, const int32_t &shareOption);
-    Status GetAppShareOption(const std::string &intention, int32_t &shareOption);
+    Status SetAppShareOption(const std::string &intention, enum ShareOptions shareOption);
     Status RemoveAppShareOption(const std::string &intention);
+    Status GetAppShareOption(const std::string &intention, enum ShareOptions &shareOption);
+
 private:
     UdmfClient() = default;
     ~UdmfClient() = default;
@@ -53,7 +54,7 @@ private:
     UdmfClient &operator=(const UdmfClient &obj) = delete;
     std::string GetSelfBundleName();
 
-    ConcurrentMap<std::string, UnifiedData> unifiedDatas;
+    ConcurrentMap<std::string, UnifiedData> dataCache_;
 };
 } // namespace UDMF
 } // namespace OHOS
