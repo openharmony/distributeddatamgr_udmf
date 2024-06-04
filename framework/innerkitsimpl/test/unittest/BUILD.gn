@@ -61,10 +61,25 @@ ohos_unittest("UdmfClientTest") {
   external_deps = common_external_deps
 }
 
+ohos_unittest("UdmfClientSystemHapTest") {
+  module_out_path = module_output_path
+
+  sources = [ "udmf_client_system_hap_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
 
-  deps = [ ":UdmfClientTest" ]
+  deps = [
+    ":UdmfClientSystemHapTest",
+    ":UdmfClientTest",
+  ]
 }
 ###############################################################################

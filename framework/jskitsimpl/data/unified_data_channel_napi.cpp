@@ -298,9 +298,9 @@ napi_value UnifiedDataChannelNapi::SetAppShareOptions(napi_env env, napi_callbac
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "SetAppShareOption is called!");
     std::string intention;
-    int32_t shareOption = ShareOptions::CROSS_APP;
+    int32_t shareOptionValue = ShareOptions::CROSS_APP;
     auto ctxt = std::make_shared<ContextBase>();
-    auto input = [env, ctxt, &intention, &shareOption](size_t argc, napi_value* argv) {
+    auto input = [env, ctxt, &intention, &shareOptionValue](size_t argc, napi_value* argv) {
         LOG_DEBUG(UDMF_KITS_NAPI, "set appShareOption, argc = %{public}zu !", argc);
         // required 2 arguments : intention, shareOption
         ASSERT_BUSINESS_ERR(ctxt, argc > 1,
@@ -308,7 +308,7 @@ napi_value UnifiedDataChannelNapi::SetAppShareOptions(napi_env env, napi_callbac
         ctxt->status = NapiDataUtils::GetValue(env, argv[0], intention);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
             "Parameter error:The parameter intention must be within the scope of the Intention enumeration.");
-        ctxt->status = NapiDataUtils::GetValue(env, argv[1], shareOption);
+        ctxt->status = NapiDataUtils::GetValue(env, argv[1], shareOptionValue);
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
             "Parameter error:The parameter shareOption must be within the scope of the ShareOptions enumeration.");
     };
@@ -317,10 +317,10 @@ napi_value UnifiedDataChannelNapi::SetAppShareOptions(napi_env env, napi_callbac
     auto status = E_OK;
     ASSERT_ERR(ctxt->env, intention =="Drag",
                E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid!");
-    ASSERT_ERR(ctxt->env, (shareOption >= IN_APP && shareOption <= CROSS_APP),
+    ASSERT_ERR(ctxt->env, (shareOptionValue >= IN_APP && shareOptionValue < SHARE_OPTIONS_BUTT),
                E_INVALID_PARAMETERS, "Parameter error: The shareOptions parameter is invalid!");
     std::transform(intention.begin(), intention.end(), intention.begin(), ::tolower); // js : Drag --> drag
-    status = UdmfClient::GetInstance().SetAppShareOption(intention, shareOption);
+    status = UdmfClient::GetInstance().SetAppShareOption(intention, static_cast<ShareOptions>(shareOptionValue));
     ASSERT_ERR(ctxt->env, !(status == E_SETTINGS_EXISTED), status, "Settings already exist!");
     ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
     return nullptr;
