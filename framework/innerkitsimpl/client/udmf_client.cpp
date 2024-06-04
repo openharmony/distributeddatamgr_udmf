@@ -21,7 +21,6 @@
 #include "logger.h"
 #include "udmf_service_client.h"
 #include "udmf_utils.h"
-#include "unified_data_cache.h"
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
 
@@ -44,9 +43,14 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         return E_IPC;
     }
-    std::string shareOption;
-    GetAppShareOption(UD_INTENTION_MAP.at(option.intention), shareOption);
-    if (shareOption == "IN_APP") {
+    int32_t shareOption = SHARE_OPTIONS_BUTT;
+    auto status = GetAppShareOption(UD_INTENTION_MAP.at(option.intention), shareOption);
+    if (status != E_NOT_FOUND && status != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "get appShareOption fail, intention:%{public}s",
+                  UD_INTENTION_MAP.at(option.intention).c_str());
+        return static_cast<Status>(status);
+    }
+    if (shareOption == ShareOptions::IN_APP) {
         std::string bundleName = GetSelfBundleName();
         if (bundleName.empty()) {
             LOG_ERROR(UDMF_CLIENT, "get self bundleName empty.");
@@ -54,8 +58,8 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
         }
         UnifiedKey udKey = UnifiedKey(UD_INTENTION_MAP.at(option.intention), bundleName, UTILS::GenerateId());
         key = udKey.GetUnifiedKey();
-        UnifiedDataCache::GetInstance().SetUnifiedData(key, unifiedData);
-        LOG_INFO(UDMF_CLIENT, "SetData in app success.");
+        unifiedDatas.Insert(key, unifiedData);
+        LOG_INFO(UDMF_CLIENT, "SetData in app success, bundleName:%{public}s.", bundleName.c_str());
         return E_OK;
     }
     
@@ -75,26 +79,27 @@ Status UdmfClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         return E_IPC;
     }
-    LOG_ERROR(UDMF_CLIENT, "glxtest GetData 2");
     UnifiedKey udKey = UnifiedKey(query.key);
-    LOG_ERROR(UDMF_CLIENT, "glxtest GetData 3");
     if (!udKey.IsValid()) {
         LOG_ERROR(UDMF_CLIENT, "query.key is invalid, %{public}s.", query.key.c_str());
         return E_ERROR;
     }
-    std::string shareOption;
-    GetAppShareOption(udKey.intention, shareOption);
-    LOG_ERROR(UDMF_CLIENT, "glxtest GetData 4");
-    if (shareOption == "IN_APP") {
-        auto status = UnifiedDataCache::GetInstance().GetUnifiedDatas(query.key, unifiedData);
-        if (status != E_OK) {
-            LOG_ERROR(UDMF_CLIENT, "failed! status = %{public}d", status);
+    int32_t shareOption = SHARE_OPTIONS_BUTT;
+    auto status = GetAppShareOption(udKey.intention, shareOption);
+    if (status != E_NOT_FOUND && status != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "get appShareOption fail, key:%{public}s", query.key.c_str());
+        return static_cast<Status>(status);
+    }
+    if (shareOption == ShareOptions::IN_APP) {
+        auto it = unifiedDatas.Find(query.key);
+        if (!it.first) {
+            LOG_ERROR(UDMF_CLIENT, "query data from cache failed! key = %{public}s", query.key.c_str());
             return E_NOT_FOUND;
         }
-        UnifiedDataCache::GetInstance().ClearUnifiedDatas(query.key);
+        unifiedData = it.second;
+        unifiedDatas.Erase(query.key);
         return E_OK;
     }
-    LOG_ERROR(UDMF_CLIENT, "glxtest GetData 4");
 
     int32_t ret = service->GetData(query, unifiedData);
     if (ret != E_OK) {
@@ -215,7 +220,7 @@ Status UdmfClient::IsRemoteData(const QueryOption &query, bool &result)
     return static_cast<Status>(ret);
 }
 
-Status UdmfClient::SetAppShareOption(const std::string &intention, const std::string &shareOption)
+Status UdmfClient::SetAppShareOption(const std::string &intention, const int32_t &shareOption)
 {
     DdsTrace trace(
         std::string(TAG) + std::string(__FUNCTION__), TraceSwitch::BYTRACE_ON | TraceSwitch::TRACE_CHAIN_ON);
@@ -231,7 +236,7 @@ Status UdmfClient::SetAppShareOption(const std::string &intention, const std::st
     return static_cast<Status>(ret);
 }
 
-Status UdmfClient::GetAppShareOption(const std::string &intention, std::string &shareOption)
+Status UdmfClient::GetAppShareOption(const std::string &intention, int32_t &shareOption)
 {
     DdsTrace trace(
         std::string(TAG) + std::string(__FUNCTION__), TraceSwitch::BYTRACE_ON | TraceSwitch::TRACE_CHAIN_ON);

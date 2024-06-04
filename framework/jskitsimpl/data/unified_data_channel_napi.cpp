@@ -315,15 +315,13 @@ napi_value UnifiedDataChannelNapi::SetAppShareOptions(napi_env env, napi_callbac
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "SetAppShareOption Exit");
     auto status = E_OK;
-    LOG_INFO(UDMF_KITS_NAPI, "set appShareOption, argc, intention = %{public}s !", intention.c_str());
-    LOG_INFO(UDMF_KITS_NAPI, "set appShareOption, argc, shareOption = %{public}d !", shareOption);
     ASSERT_ERR(ctxt->env, intention =="Drag",
                E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid!");
     ASSERT_ERR(ctxt->env, (shareOption >= IN_APP && shareOption <= CROSS_APP),
                E_INVALID_PARAMETERS, "Parameter error: The shareOptions parameter is invalid!");
     std::transform(intention.begin(), intention.end(), intention.begin(), ::tolower); // js : Drag --> drag
-    status = UdmfClient::GetInstance().SetAppShareOption(intention, APP_SHARE_OPTION_MAP.at(shareOption));
-    ASSERT_ERR(ctxt->env, !(status == E_REPEAT_SETTINGS), status, "Settings already exist!");
+    status = UdmfClient::GetInstance().SetAppShareOption(intention, shareOption);
+    ASSERT_ERR(ctxt->env, !(status == E_SETTINGS_EXISTED), status, "Settings already exist!");
     ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
     return nullptr;
 }

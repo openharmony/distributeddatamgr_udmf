@@ -64,8 +64,6 @@ ohos_unittest("UdmfClientTest") {
 group("unittest") {
   testonly = true
 
-  deps = [ 
-    ":UdmfClientTest"
-  ]
+  deps = [ ":UdmfClientTest" ]
 }
 ###############################################################################

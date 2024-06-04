@@ -29,6 +29,39 @@ bool UnifiedDataUtils::IsValidIntention(int32_t value)
     return value > UD_INTENTION_BASE && value < UD_INTENTION_BUTT;
 }
 
+static constexpr AppShareOption APP_SHARE_OPTIONS[] = {
+    { IN_APP, "IN_APP"},
+    { CROSS_APP, "CROSS_APP"},
+};
+
+bool ShareOptionsUtil::IsValid(int32_t shareOption)
+{
+    if (shareOption < 0 || shareOption >= SHARE_OPTIONS_BUTT) {
+        return false;
+    }
+    return true;
+}
+
+int32_t ShareOptionsUtil::GetEnumNum(const std::string &shareOption)
+{
+    for (const auto &item : APP_SHARE_OPTIONS) {
+        if (item.enumStr == shareOption) {
+            return item.enumNum;
+        }
+    }
+    return SHARE_OPTIONS_BUTT;
+}
+
+std::string ShareOptionsUtil::GetEnumStr(int32_t shareOption)
+{
+    for (const auto &item : APP_SHARE_OPTIONS) {
+        if (item.enumNum == shareOption) {
+            return item.enumStr;
+        }
+    }
+    return "";
+}
+
 size_t UnifiedDataUtils::GetVariantSize(UDVariant &variant)
 {
     auto int32Value = std::get_if<int32_t>(&variant);
