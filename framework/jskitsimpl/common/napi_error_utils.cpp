@@ -24,7 +24,7 @@ using NapiErrorCode = OHOS::UDMF::NapiErrorCode;
 static const NapiErrorCode JS_ERROR_CODE_MSGS[] = {
     { Status::E_NO_PERMISSION, 201, "Permission denied!" },
     { Status::E_INVALID_PARAMETERS, 401, "Parameter error." },
-    { Status::E_REPEAT_SETTINGS, 20400001, "Settings already exist." },
+    { Status::E_SETTINGS_EXISTED, 20400001, "Settings already exist." },
 };
 
 const std::optional<NapiErrorCode> GetErrorCode(int32_t errorCode)

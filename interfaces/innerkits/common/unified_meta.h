@@ -214,13 +214,20 @@ static const std::unordered_map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
 
 enum ShareOptions : int32_t {
     IN_APP,
-    CROSS_APP
+    CROSS_APP,
+    SHARE_OPTIONS_BUTT,
 };
 
-static const std::unordered_map<int32_t, std::string> APP_SHARE_OPTION_MAP {
-    { IN_APP, "IN_APP" },
-    { CROSS_APP, "CROSS_APP" }
+struct AppShareOption {
+    int32_t enumNum;
+    const char *enumStr;
 };
+
+namespace ShareOptionsUtil {
+    bool API_EXPORT IsValid(int32_t shareOption);
+    int32_t API_EXPORT GetEnumNum(const std::string &shareOption);
+    std::string API_EXPORT GetEnumStr(int32_t shareOption);
+} // namespace ShareOptionsUtil
 
 class API_EXPORT UnifiedDataUtils {
 public:

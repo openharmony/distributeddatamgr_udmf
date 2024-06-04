@@ -41,8 +41,7 @@ enum Status : int32_t {
     E_DB_ERROR,
     E_FS_ERROR,
     E_NOT_FOUND,
-    E_REPEAT_SETTINGS,
-    E_NO_SYSTEM_PERMISSION,
+    E_SETTINGS_EXISTED,
     E_BUTT,
 };
 
@@ -57,7 +56,7 @@ static const std::unordered_map<int32_t, std::string> ERROR_MAP {
     { Status::E_DB_ERROR, "E_DB_ERROR" },
     { Status::E_FS_ERROR, "E_FS_ERROR" },
     { Status::E_NOT_FOUND, "E_NOT_FOUND" },
-    { Status::E_REPEAT_SETTINGS, "E_REPEAT_SETTINGS" }
+    { Status::E_SETTINGS_EXISTED, "E_SETTINGS_EXISTED" }
 };
 } // namespace UDMF
 } // namespace OHOS

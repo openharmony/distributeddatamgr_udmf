@@ -21,6 +21,8 @@
 #include <map>
 #include <shared_mutex>
 
+#include "concurrent_map.h"
+
 #include "unified_data.h"
 #include "error_code.h"
 #include "unified_meta.h"
@@ -41,19 +43,17 @@ public:
     Status AddPrivilege(const QueryOption &query, Privilege &privilege);
     Status Sync(const QueryOption &query, const std::vector<std::string> &devices);
     Status IsRemoteData(const QueryOption &query, bool &result);
-    Status SetAppShareOption(const std::string &intention, const std::string &shareOption);
-    Status GetAppShareOption(const std::string &intention, std::string &shareOption);
+    Status SetAppShareOption(const std::string &intention, const int32_t &shareOption);
+    Status GetAppShareOption(const std::string &intention, int32_t &shareOption);
     Status RemoveAppShareOption(const std::string &intention);
 private:
     UdmfClient() = default;
     ~UdmfClient() = default;
     UdmfClient(const UdmfClient &obj) = delete;
     UdmfClient &operator=(const UdmfClient &obj) = delete;
-    void ClearUnifiedDatas(const std::string key);
     std::string GetSelfBundleName();
 
-    mutable std::shared_mutex mutex_ {};
-    std::map<std::string, UnifiedData> unifiedDatas;
+    ConcurrentMap<std::string, UnifiedData> unifiedDatas;
 };
 } // namespace UDMF
 } // namespace OHOS
