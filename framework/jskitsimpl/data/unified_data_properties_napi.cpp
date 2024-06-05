@@ -18,6 +18,7 @@
 #include "napi_data_utils.h"
 #include "napi_error_utils.h"
 #include "unified_data.h"
+#include "unified_meta.h"
 
 namespace OHOS {
 namespace UDMF {

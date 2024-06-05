@@ -203,9 +203,31 @@ static const std::unordered_map<int32_t, std::string> UD_INTENTION_MAP {
     { UD_INTENTION_DATA_HUB, "DataHub" },
 };
 
+static const std::unordered_map<int32_t, std::string> UD_SYSTEM_INTENTION_MAP {
+    { UD_INTENTION_DRAG, "Drag" },
+};
+
 static const std::unordered_map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
     { UD_INTENTION_DATA_HUB, "DATA_HUB" },
+    { UD_INTENTION_DRAG, "DRAG" },
 };
+
+enum ShareOptions : int32_t {
+    IN_APP,
+    CROSS_APP,
+    SHARE_OPTIONS_BUTT,
+};
+
+struct AppShareOption {
+    int32_t enumNum;
+    const char *enumStr;
+};
+
+namespace ShareOptionsUtil {
+    bool API_EXPORT IsValid(int32_t shareOption);
+    int32_t API_EXPORT GetEnumNum(const std::string &shareOption);
+    std::string API_EXPORT GetEnumStr(int32_t shareOption);
+} // namespace ShareOptionsUtil
 
 class API_EXPORT UnifiedDataUtils {
 public:

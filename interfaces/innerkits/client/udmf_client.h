@@ -18,6 +18,10 @@
 
 #include <string>
 #include <vector>
+#include <map>
+#include <shared_mutex>
+
+#include "concurrent_map.h"
 
 #include "unified_data.h"
 #include "error_code.h"
@@ -39,6 +43,18 @@ public:
     Status AddPrivilege(const QueryOption &query, Privilege &privilege);
     Status Sync(const QueryOption &query, const std::vector<std::string> &devices);
     Status IsRemoteData(const QueryOption &query, bool &result);
+    Status SetAppShareOption(const std::string &intention, enum ShareOptions shareOption);
+    Status RemoveAppShareOption(const std::string &intention);
+    Status GetAppShareOption(const std::string &intention, enum ShareOptions &shareOption);
+
+private:
+    UdmfClient() = default;
+    ~UdmfClient() = default;
+    UdmfClient(const UdmfClient &obj) = delete;
+    UdmfClient &operator=(const UdmfClient &obj) = delete;
+    std::string GetSelfBundleName();
+
+    ConcurrentMap<std::string, UnifiedData> dataCache_;
 };
 } // namespace UDMF
 } // namespace OHOS

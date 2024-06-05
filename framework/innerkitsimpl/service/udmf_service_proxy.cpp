@@ -180,6 +180,47 @@ int32_t UdmfServiceProxy::IsRemoteData(const QueryOption &query, bool &result)
     return status;
 }
 
+int32_t UdmfServiceProxy::SetAppShareOption(const std::string &intention, int32_t shareOption)
+{
+    MessageParcel reply;
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_APP_SHARE_OPTION, reply, intention, shareOption);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x!", status);
+        return status;
+    }
+    LOG_DEBUG(UDMF_SERVICE, "end.");
+    return status;
+}
+
+int32_t UdmfServiceProxy::GetAppShareOption(const std::string &intention, int32_t &shareOption)
+{
+    MessageParcel reply;
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::GET_APP_SHARE_OPTION, reply, intention);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x!", status);
+        return status;
+    }
+
+    if (!ITypesUtil::Unmarshal(reply, shareOption)) {
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal shareOption failed!");
+        return E_READ_PARCEL_ERROR;
+    }
+    LOG_DEBUG(UDMF_SERVICE, "end.");
+    return status;
+}
+
+int32_t UdmfServiceProxy::RemoveAppShareOption(const std::string &intention)
+{
+    MessageParcel reply;
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::REMOVE_APP_SHARE_OPTION, reply, intention);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x!", status);
+        return status;
+    }
+    LOG_DEBUG(UDMF_SERVICE, "end.");
+    return status;
+}
+
 int32_t UdmfServiceProxy::SendRequest(UdmfServiceInterfaceCode code, MessageParcel &data,
                                       MessageParcel &reply, MessageOption &option)
 {
