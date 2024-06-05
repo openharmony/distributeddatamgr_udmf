@@ -89,6 +89,7 @@ ohos_shared_library("udmf_client") {
     "access_token:libaccesstoken_sdk",
     "app_file_service:fileuri_native",
     "bundle_framework:appexecfwk_core",
+    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
@@ -101,16 +102,73 @@ ohos_shared_library("udmf_client") {
     "samgr:samgr_proxy",
   ]
 
-  public_configs += [ "//third_party/cJSON:cJSON_config" ]
-  deps = [ "//third_party/cJSON:cjson" ]
+  public_external_deps = [ "cJSON:cjson" ]
 
   innerapi_tags = [ "platformsdk" ]
   subsystem_name = "distributeddatamgr"
 
   part_name = "udmf"
+  use_exceptions = true
   cflags_cc = [ "-fvisibility=hidden" ]
   if (build_selinux) {
     cflags = [ "-DWITH_SELINUX" ]
     external_deps += [ "selinux_adapter:librestorecon" ]
   }
+}
+
+config("utd_client_config") {
+  include_dirs = [
+    "${udmf_interfaces_path}/innerkits/client",
+    "${udmf_interfaces_path}/innerkits/common",
+    "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_framework_path}/common",
+    "${udmf_framework_path}/innerkitsimpl/data",
+    "${udmf_framework_path}/innerkitsimpl/service",
+  ]
+}
+
+ohos_shared_library("utd_client") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  include_dirs = [
+    "${udmf_interfaces_path}/innerkits/client",
+    "${udmf_interfaces_path}/innerkits/common",
+    "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_framework_path}/common",
+    "${udmf_framework_path}/innerkitsimpl/data",
+  ]
+
+  sources = [
+    "${udmf_framework_path}/common/base32_utils.cpp",
+    "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
+    "${udmf_framework_path}/common/custom_utd_store.cpp",
+    "${udmf_framework_path}/common/graph.cpp",
+    "${udmf_framework_path}/common/udmf_utils.cpp",
+    "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
+    "${udmf_framework_path}/common/utd_graph.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/utd_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/flexible_type.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/type_descriptor.cpp",
+  ]
+
+  public_configs = [ ":utd_client_config" ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+
+  public_external_deps = [ "cJSON:cjson" ]
+  use_exceptions = true
+  innerapi_tags = [ "platformsdk" ]
+  subsystem_name = "distributeddatamgr"
+
+  part_name = "udmf"
+  cflags_cc = [ "-fvisibility=hidden" ]
 }

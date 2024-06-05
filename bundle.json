@@ -28,6 +28,7 @@
         "ability_runtime",
         "access_token",
         "bundle_framework",
+        "cJSON",
         "c_utils",
         "hilog",
         "hisysevent",
@@ -41,8 +42,7 @@
         "selinux_adapter"
       ],
       "third_party": [
-        "bounds_checking_function",
-        "cJSON"
+        "bounds_checking_function"
       ]
     },
     "build": {
@@ -115,6 +115,24 @@
               "napi_queue.h"
             ],
             "header_base":"//foundation/distributeddatamgr/udmf/interfaces/jskits/common"
+          }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:utd_client",
+          "header": {
+            "header_files": [
+              "utd_client.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/client"
+          }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:utd_client",
+          "header": {
+            "header_files": [
+              "type_descriptor.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/data"
           }
         }
       ],

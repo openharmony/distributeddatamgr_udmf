@@ -51,7 +51,7 @@ void PresetTypeDescriptors::InitDescriptors()
         {"general.object",
          {},
          {},
-         {},
+         {"*/*"},
          "Base type for logical hierarchy.",
          REFERENCE_URL,
          ""},
