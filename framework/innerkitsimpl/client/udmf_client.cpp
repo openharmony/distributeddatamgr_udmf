@@ -97,31 +97,15 @@ Status UdmfClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
                      BIZ_STATE, BizState::DFX_ABNORMAL_END);
         return E_IPC;
     }
-    UnifiedKey udKey = UnifiedKey(query.key);
-    if (!udKey.IsValid()) {
-        LOG_ERROR(UDMF_CLIENT, "query.key is invalid, %{public}s.", query.key.c_str());
-        return E_INVALID_PARAMETERS;
+    auto it = dataCache_.Find(query.key);
+    if (it.first) {
+        unifiedData = it.second;
+        dataCache_.Erase(query.key);
+        RADAR_REPORT(BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::SUCCESS,
+                     BIZ_STATE, BizState::DFX_NORMAL_END);
+        return E_OK;
     }
-    if (udKey.intention == UD_INTENTION_MAP.at(UD_INTENTION_DRAG)) {
-        ShareOptions shareOption = SHARE_OPTIONS_BUTT;
-        auto status = GetAppShareOption(udKey.intention, shareOption);
-        if (status != E_NOT_FOUND && status != E_OK) {
-            LOG_ERROR(UDMF_CLIENT, "get appShareOption fail, key:%{public}s", query.key.c_str());
-            return static_cast<Status>(status);
-        }
-        if (shareOption == ShareOptions::IN_APP) {
-            auto it = dataCache_.Find(query.key);
-            if (!it.first) {
-                LOG_ERROR(UDMF_CLIENT, "query data from cache failed! key = %{public}s", query.key.c_str());
-                return E_NOT_FOUND;
-            }
-            unifiedData = it.second;
-            dataCache_.Erase(query.key);
-            RADAR_REPORT(BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::SUCCESS,
-                         BIZ_STATE, BizState::DFX_NORMAL_END);
-            return E_OK;
-        }
-    }
+    LOG_WARN(UDMF_CLIENT, "query data from cache failed! key = %{public}s", query.key.c_str());
     int32_t ret = service->GetData(query, unifiedData);
     if (ret != E_OK) {
         RADAR_REPORT(BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::FAILED, ERROR_CODE, ret,
