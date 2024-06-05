@@ -28,13 +28,13 @@ public:
     static bool IsTempUData(UnifiedData &data);
     static bool Pack(UnifiedData &data);
     static bool Unpack(UnifiedData &data);
+    static void GetSummary(const UnifiedData &data, Summary &summary);
 
 private:
     static void CreateDirIfNotExist(const std::string& dirPath, const mode_t& mode);
     static bool SaveUDataToFile(const std::string &dataFile, UnifiedData &data);
     static bool LoadUDataFromFile(const std::string &dataFile, UnifiedData &data);
     static std::string GetRootPath();
-    static void GetSummary(const UnifiedData &data, Summary &summary);
 
 private:
     static std::string rootPath_;

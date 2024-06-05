@@ -24,6 +24,7 @@
 #include "udmf_utils.h"
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
+#include "unified_data_helper.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -58,11 +59,7 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
             return static_cast<Status>(status);
         }
         if (shareOption == ShareOptions::IN_APP) {
-            std::string bundleName = GetSelfBundleName();
-            if (bundleName.empty()) {
-                LOG_ERROR(UDMF_CLIENT, "get self bundleName empty.");
-                return E_ERROR;
-            }
+            std::string bundleName = "udmf.inapp.data";
             UnifiedKey udKey = UnifiedKey(UD_INTENTION_MAP.at(option.intention), bundleName, UTILS::GenerateId());
             key = udKey.GetUnifiedKey();
             dataCache_.Clear();
@@ -174,6 +171,13 @@ Status UdmfClient::GetSummary(const QueryOption &query, Summary &summary)
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         return E_IPC;
     }
+    auto it = dataCache_.Find(query.key);
+    if (it.first) {
+        UnifiedDataHelper::GetSummary(it.second, summary);
+        LOG_INFO(UDMF_CLIENT, "GetSummary in cache! key = %{public}s", query.key.c_str());
+        return E_OK;
+    }
+
     int32_t ret = service->GetSummary(query, summary);
     if (ret != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
