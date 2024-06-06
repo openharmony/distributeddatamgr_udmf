@@ -492,12 +492,12 @@ struct AppShareOption {
 };
 
 namespace ShareOptionsUtil {
-    bool API_EXPORT IsValid(int32_t shareOption);
-    int32_t API_EXPORT GetEnumNum(const std::string &shareOption);
-    std::string API_EXPORT GetEnumStr(int32_t shareOption);
+    bool IsValid(int32_t shareOption);
+    int32_t GetEnumNum(const std::string &shareOption);
+    std::string GetEnumStr(int32_t shareOption);
 } // namespace ShareOptionsUtil
 
-class API_EXPORT UnifiedDataUtils {
+class UnifiedDataUtils {
 public:
     static bool IsValidType(int32_t value);
     static bool IsValidIntention(int32_t value);

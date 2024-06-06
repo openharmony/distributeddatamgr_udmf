@@ -16,7 +16,7 @@
 #define UDMF_UNIFIED_DATA_PROPERTIES_H
 
 #include "want_params.h"
-
+#include "unified_meta.h"
 namespace OHOS {
 namespace UDMF {
 class UnifiedDataProperties {
