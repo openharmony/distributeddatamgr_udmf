@@ -24,7 +24,7 @@
 #include "logger.h"
 #include "utd_client.h"
 #include "type_descriptor.h"
-
+#include "preset_type_descriptors.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
@@ -1224,5 +1224,47 @@ HWTEST_F(UtdClientTest, FlexibleType024, TestSize.Level1)
     status = descriptor->BelongsTo("general.invaildType", checkRet);   // cmp with invaild type.
     EXPECT_EQ(status, E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "FlexibleType024 end.");
+}
+
+/**
+* @tc.name: IsUtd001
+* @tc.desc: IsUtd
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsUtd001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsUtd001 begin.");
+    bool result = false;
+    auto status = UtdClient::GetInstance().IsUtd("*/*", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("text/*", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd(".txt", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("abcdef", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("hello.text", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("system.demo", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("general.mp3", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("com.amazon.azw3", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    std::vector<TypeDescriptorCfg> allUTD = PresetTypeDescriptors::GetInstance().GetPresetTypes();
+    for (auto item : allUTD) {
+        status = UtdClient::GetInstance().IsUtd(item.typeId, result);
+        EXPECT_EQ(status, E_OK);
+        EXPECT_EQ(result, true);
+    }
+    LOG_INFO(UDMF_TEST, "IsUtd001 end.");
 }
 } // OHOS::Test

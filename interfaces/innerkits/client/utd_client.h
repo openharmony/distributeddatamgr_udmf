@@ -37,6 +37,7 @@ public:
                                                  std::string belongsTo = DEFAULT_TYPE_ID);
     Status GetUniformDataTypeByMIMEType(const std::string &mimeType, std::string &typeId,
                                         std::string belongsTo = DEFAULT_TYPE_ID);
+    Status IsUtd(std::string typeId, bool &result);
 
 private:
     UtdClient();

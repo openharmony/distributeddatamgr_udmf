@@ -14,6 +14,7 @@
  */
 #define LOG_TAG "UtdClient"
 #include <algorithm>
+#include <regex>
 #include "utd_client.h"
 #include "logger.h"
 #include "utd_graph.h"
@@ -173,5 +174,36 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
 
     return Status::E_OK;
 }
+
+Status UtdClient::IsUtd(std::string typeId, bool &result)
+{
+    try {
+        if (typeId.empty()) {
+            result = false;
+            return Status::E_INVALID_PARAMETERS;
+        }
+        if (typeId[0] == '.' || find(typeId.begin(), typeId.end(), '/') != typeId.end()) {
+            result = false;
+            return Status::E_OK;
+        }
+        const std::regex preSetUtdRegexRule("^(general|openharmony|org|com)\\.[a-z0-9]+([.-]?[a-z0-9]+)*$");
+        if (std::regex_match(typeId, preSetUtdRegexRule)) {
+            result = true;
+            return Status::E_OK;
+        }
+        const std::regex customUtdRegexRule("^([a-zA-Z][a-zA-Z0-9]*)(.[a-zA-Z0-9]+)*.[a-zA-Z0-9]+$");
+        if (std::regex_match(typeId, std::regex(customUtdRegexRule))) {
+            result = true;
+            return Status::E_OK;
+        }
+        result = false;
+    } catch (...) {
+        LOG_ERROR(UDMF_CLIENT, "exception, typeId:%{public}s", typeId.c_str());
+        result = false;
+        return Status::E_ERROR;
+    }
+    return Status::E_OK;
+}
+
 } // namespace UDMF
 } // namespace OHOS

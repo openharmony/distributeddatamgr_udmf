@@ -211,7 +211,6 @@ ohos_static_library("udmf_js_common") {
 
   ldflags = [ "-Wl,--exclude-libs=ALL" ]
   cflags = [ "-fvisibility=hidden" ]
-
   include_dirs = [ "${udmf_interfaces_path}/jskits/common" ]
 
   public_configs = [ ":udmf_napi_config" ]
