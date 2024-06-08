@@ -206,7 +206,7 @@ enum UDType : int32_t {
     RGB_IMAGE,
     SVG_IMAGE,
     WBMP_IMAGE,
-    XPIXMP,
+    XPIXMP_IMAGE,
     XWINDOWDUMP_IMAGE,
     HEIF,
     HEIC,
