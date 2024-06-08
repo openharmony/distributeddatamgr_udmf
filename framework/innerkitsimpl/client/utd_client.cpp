@@ -186,12 +186,14 @@ Status UtdClient::IsUtd(std::string typeId, bool &result)
             result = false;
             return Status::E_OK;
         }
-        const std::regex preSetUtdRegexRule("^(general|openharmony|org|com)\\.[a-z0-9]+([.-]?[a-z0-9]+)*$");
-        if (std::regex_match(typeId, preSetUtdRegexRule)) {
+        constexpr const char *preSetTypeIdRegexRule =
+                R"(^(general\.|openharmony\.|org\.|com\.)[a-z0-9-\.]+(\-[a-z0-9-]+)*$)";
+        if (std::regex_match(typeId, std::regex(preSetTypeIdRegexRule))) {
             result = true;
             return Status::E_OK;
         }
-        const std::regex customUtdRegexRule("^([a-zA-Z][a-zA-Z0-9]*)(.[a-zA-Z0-9]+)*.[a-zA-Z0-9]+$");
+        constexpr const char *customUtdRegexRule =
+                R"(^([a-zA-Z][a-zA-Z0-9]*)(\\.[a-zA-Z0-9]+)*\\.[a-zA-Z0-9]+$)";
         if (std::regex_match(typeId, std::regex(customUtdRegexRule))) {
             result = true;
             return Status::E_OK;
@@ -202,6 +204,7 @@ Status UtdClient::IsUtd(std::string typeId, bool &result)
         result = false;
         return Status::E_ERROR;
     }
+    LOG_ERROR(UDMF_CLIENT, "is not utd, typeId:%{public}s", typeId.c_str());
     return Status::E_OK;
 }
 

@@ -1235,36 +1235,183 @@ HWTEST_F(UtdClientTest, IsUtd001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "IsUtd001 begin.");
     bool result = false;
+    auto status = UtdClient::GetInstance().IsUtd("general.mp3", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("com.amazon.azw3", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("general.cer-certificate", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("general.system", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("com.example.demo.mytype-azw3", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("com.example.demo.mytype", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("com.example.demo.mytype3", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("com.example.demo2.mytype3", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("system.haha", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("hello.text", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    std::vector<TypeDescriptorCfg> allUTD = PresetTypeDescriptors::GetInstance().GetPresetTypes();
+    for (auto item : allUTD) {
+        status = UtdClient::GetInstance().IsUtd(item.typeId, result);
+        EXPECT_EQ(status, E_OK);
+        if (!result) {
+            LOG_ERROR(UDMF_TEST, "IsUtd001 item is %{public}s is check fail. ", item.typeId.c_str());
+        }
+        EXPECT_EQ(result, true);
+    }
+    LOG_INFO(UDMF_TEST, "IsUtd001 end.");
+}
+
+/**
+* @tc.name: IsUtd002
+* @tc.desc: IsUtd
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsUtd002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsUtd002 begin.");
+    bool result = false;
+    auto status = UtdClient::GetInstance().IsUtd("BROWSER", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("IMAGE", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("AUDIO", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("VIDEO", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("PDF", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("WORD", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("EXCEL", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("PPT", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("EMAIL", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("txt", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("abcdef", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    std::vector<TypeDescriptorCfg> allUTD = PresetTypeDescriptors::GetInstance().GetPresetTypes();
+    for (auto item : allUTD) {
+        status = UtdClient::GetInstance().IsUtd(item.typeId, result);
+        EXPECT_EQ(status, E_OK);
+        if (!result) {
+            LOG_ERROR(UDMF_TEST, "IsUtd002 item is %{public}s is check fail. ", item.typeId.c_str());
+        }
+        EXPECT_EQ(result, true);
+    }
+    LOG_INFO(UDMF_TEST, "IsUtd002 end.");
+}
+
+/**
+* @tc.name: IsUtd003
+* @tc.desc: IsUtd
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsUtd003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsUtd003 begin.");
+    bool result = false;
     auto status = UtdClient::GetInstance().IsUtd("*/*", result);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(result, false);
     status = UtdClient::GetInstance().IsUtd("text/*", result);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("image/*", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("video/*", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("audio/*", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("audio/aiff", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    std::vector<TypeDescriptorCfg> allUTD = PresetTypeDescriptors::GetInstance().GetPresetTypes();
+    for (auto item : allUTD) {
+        status = UtdClient::GetInstance().IsUtd(item.typeId, result);
+        EXPECT_EQ(status, E_OK);
+        if (!result) {
+            LOG_ERROR(UDMF_TEST, "IsUtd001 item is %{public}s is check fail. ", item.typeId.c_str());
+        }
+        EXPECT_EQ(result, true);
+    }
+    LOG_INFO(UDMF_TEST, "IsUtd001 end.");
+}
+
+/**
+* @tc.name: IsUtd004
+* @tc.desc: IsUtd
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsUtd004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsUtd004 begin.");
+    bool result = false;
+    auto status = UtdClient::GetInstance().IsUtd(".TXT", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd(".MP3", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd(".3gp", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
     status = UtdClient::GetInstance().IsUtd(".txt", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd(".TXT", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd(".MP3", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd(".3gp", result);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(result, false);
     status = UtdClient::GetInstance().IsUtd("abcdef", result);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(result, false);
-    status = UtdClient::GetInstance().IsUtd("hello.text", result);
-    EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(result, false);
-    status = UtdClient::GetInstance().IsUtd("system.demo", result);
-    EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(result, false);
-    status = UtdClient::GetInstance().IsUtd("general.mp3", result);
-    EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(result, true);
-    status = UtdClient::GetInstance().IsUtd("com.amazon.azw3", result);
-    EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(result, true);
     std::vector<TypeDescriptorCfg> allUTD = PresetTypeDescriptors::GetInstance().GetPresetTypes();
     for (auto item : allUTD) {
         status = UtdClient::GetInstance().IsUtd(item.typeId, result);
         EXPECT_EQ(status, E_OK);
+        if (!result) {
+            LOG_ERROR(UDMF_TEST, "IsUtd004 item is %{public}s is check fail. ", item.typeId.c_str());
+        }
         EXPECT_EQ(result, true);
     }
-    LOG_INFO(UDMF_TEST, "IsUtd001 end.");
+    LOG_INFO(UDMF_TEST, "IsUtd004 end.");
 }
 } // OHOS::Test
