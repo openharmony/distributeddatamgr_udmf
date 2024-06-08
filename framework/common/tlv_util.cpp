@@ -233,6 +233,7 @@ bool CountBufferSize(const Runtime &input, TLVObject &data)
     data.Count(input.createPackage);
     data.Count(input.deviceId);
     data.Count(input.recordTotalNum);
+    data.Count(input.tokenId);
     return true;
 }
 
