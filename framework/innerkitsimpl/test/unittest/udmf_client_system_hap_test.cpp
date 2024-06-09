@@ -318,7 +318,7 @@ HWTEST_F(UdmfClientSystemHapTest, systemAppSetData002, TestSize.Level1)
     QueryOption queryOption = { .key = key };
     UnifiedData outputData;
     status = UdmfClient::GetInstance().GetData(queryOption, outputData);
-    ASSERT_EQ(status, E_NOT_FOUND);
+    ASSERT_EQ(status, E_OK);
 
     LOG_INFO(UDMF_TEST, "systemAppSetData002 end.");
 }
