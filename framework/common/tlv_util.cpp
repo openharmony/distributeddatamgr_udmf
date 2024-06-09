@@ -1401,6 +1401,9 @@ bool Writing(const Runtime &input, TLVObject &data)
     if (!Writing(input.recordTotalNum, data)) {
         return false;
     }
+    if (!Writing(input.tokenId, data)) {
+        return false;
+    }
     return true;
 }
 
@@ -1419,6 +1422,7 @@ bool Reading(Runtime &output, TLVObject &data)
     std::string createPackage;
     std::string deviceId;
     uint32_t recordTotalNum;
+    uint32_t tokenId;
     if (!Reading(key, data)) {
         return false;
     }
@@ -1459,6 +1463,9 @@ bool Reading(Runtime &output, TLVObject &data)
     if (!Reading(recordTotalNum, data)) {
         return false;
     }
+    if (!Reading(tokenId, data)) {
+        return false;
+    }
     output.key = key;
     output.isPrivate = isPrivate;
     output.privileges = privileges;
@@ -1470,6 +1477,7 @@ bool Reading(Runtime &output, TLVObject &data)
     output.createPackage = createPackage;
     output.deviceId = deviceId;
     output.recordTotalNum = recordTotalNum;
+    output.tokenId = tokenId;
     return true;
 }
 } // namespace TLVUtil
