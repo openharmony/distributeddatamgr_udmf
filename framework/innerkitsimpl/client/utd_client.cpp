@@ -187,7 +187,7 @@ Status UtdClient::IsUtd(std::string typeId, bool &result)
             return Status::E_OK;
         }
         constexpr const char *preSetTypeIdRegexRule =
-                R"(^(general\.|openharmony\.|org\.|com\.)[a-z0-9-\.]+(\-[a-z0-9-]+)*$)";
+                R"(^(general\.|openharmony\.|org\.|com\.|macos\.|debian\.|io\.|de\.|net\.)[a-z0-9-\.]+(\-[a-z0-9-]+)*$)";
         if (std::regex_match(typeId, std::regex(preSetTypeIdRegexRule))) {
             result = true;
             return Status::E_OK;

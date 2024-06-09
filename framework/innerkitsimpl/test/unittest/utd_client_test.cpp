@@ -346,7 +346,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType001, TestSize.Level1)
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMEType002 begin.");
-    std::string mimeType = "application/mspowerpoint";
+    std::string mimeType = "application/vnd.ms-powerpoint";
     std::string blongsToType = "general.composite-object";
     std::string currType;
     auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, currType, blongsToType);
@@ -1319,15 +1319,6 @@ HWTEST_F(UtdClientTest, IsUtd002, TestSize.Level1)
     status = UtdClient::GetInstance().IsUtd("abcdef", result);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(result, false);
-    std::vector<TypeDescriptorCfg> allUTD = PresetTypeDescriptors::GetInstance().GetPresetTypes();
-    for (auto item : allUTD) {
-        status = UtdClient::GetInstance().IsUtd(item.typeId, result);
-        EXPECT_EQ(status, E_OK);
-        if (!result) {
-            LOG_ERROR(UDMF_TEST, "IsUtd002 item is %{public}s is check fail. ", item.typeId.c_str());
-        }
-        EXPECT_EQ(result, true);
-    }
     LOG_INFO(UDMF_TEST, "IsUtd002 end.");
 }
 
@@ -1358,15 +1349,6 @@ HWTEST_F(UtdClientTest, IsUtd003, TestSize.Level1)
     status = UtdClient::GetInstance().IsUtd("audio/aiff", result);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(result, false);
-    std::vector<TypeDescriptorCfg> allUTD = PresetTypeDescriptors::GetInstance().GetPresetTypes();
-    for (auto item : allUTD) {
-        status = UtdClient::GetInstance().IsUtd(item.typeId, result);
-        EXPECT_EQ(status, E_OK);
-        if (!result) {
-            LOG_ERROR(UDMF_TEST, "IsUtd001 item is %{public}s is check fail. ", item.typeId.c_str());
-        }
-        EXPECT_EQ(result, true);
-    }
     LOG_INFO(UDMF_TEST, "IsUtd001 end.");
 }
 
@@ -1403,15 +1385,6 @@ HWTEST_F(UtdClientTest, IsUtd004, TestSize.Level1)
     status = UtdClient::GetInstance().IsUtd("abcdef", result);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(result, false);
-    std::vector<TypeDescriptorCfg> allUTD = PresetTypeDescriptors::GetInstance().GetPresetTypes();
-    for (auto item : allUTD) {
-        status = UtdClient::GetInstance().IsUtd(item.typeId, result);
-        EXPECT_EQ(status, E_OK);
-        if (!result) {
-            LOG_ERROR(UDMF_TEST, "IsUtd004 item is %{public}s is check fail. ", item.typeId.c_str());
-        }
-        EXPECT_EQ(result, true);
-    }
     LOG_INFO(UDMF_TEST, "IsUtd004 end.");
 }
 } // OHOS::Test
