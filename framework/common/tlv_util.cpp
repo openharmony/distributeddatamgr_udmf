@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define LOG_TAG "TlvUtil"
 #include "tlv_util.h"
+
+#include "logger.h"
 
 namespace OHOS {
 namespace TLVUtil {
@@ -1422,7 +1424,7 @@ bool Reading(Runtime &output, TLVObject &data)
     std::string createPackage;
     std::string deviceId;
     uint32_t recordTotalNum;
-    uint32_t tokenId;
+    uint32_t tokenId = 0;
     if (!Reading(key, data)) {
         return false;
     }
@@ -1464,7 +1466,7 @@ bool Reading(Runtime &output, TLVObject &data)
         return false;
     }
     if (!Reading(tokenId, data)) {
-        return false;
+        LOG_WARN(UDMF_CLIENT, "Reading tokenId empty.");
     }
     output.key = key;
     output.isPrivate = isPrivate;
