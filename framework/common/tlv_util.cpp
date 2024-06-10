@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define LOG_TAG "TlvUtil"
 #include "tlv_util.h"
+
+#include "logger.h"
 
 namespace OHOS {
 namespace TLVUtil {
@@ -233,6 +235,7 @@ bool CountBufferSize(const Runtime &input, TLVObject &data)
     data.Count(input.createPackage);
     data.Count(input.deviceId);
     data.Count(input.recordTotalNum);
+    data.Count(input.tokenId);
     return true;
 }
 
@@ -1400,6 +1403,9 @@ bool Writing(const Runtime &input, TLVObject &data)
     if (!Writing(input.recordTotalNum, data)) {
         return false;
     }
+    if (!Writing(input.tokenId, data)) {
+        return false;
+    }
     return true;
 }
 
@@ -1418,6 +1424,7 @@ bool Reading(Runtime &output, TLVObject &data)
     std::string createPackage;
     std::string deviceId;
     uint32_t recordTotalNum;
+    uint32_t tokenId = 0;
     if (!Reading(key, data)) {
         return false;
     }
@@ -1458,6 +1465,9 @@ bool Reading(Runtime &output, TLVObject &data)
     if (!Reading(recordTotalNum, data)) {
         return false;
     }
+    if (!Reading(tokenId, data)) {
+        LOG_WARN(UDMF_CLIENT, "Reading tokenId empty.");
+    }
     output.key = key;
     output.isPrivate = isPrivate;
     output.privileges = privileges;
@@ -1469,6 +1479,7 @@ bool Reading(Runtime &output, TLVObject &data)
     output.createPackage = createPackage;
     output.deviceId = deviceId;
     output.recordTotalNum = recordTotalNum;
+    output.tokenId = tokenId;
     return true;
 }
 } // namespace TLVUtil

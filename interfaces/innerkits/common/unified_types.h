@@ -61,6 +61,7 @@ struct Runtime {
     // device ID of the data source
     std::string deviceId;
     std::uint32_t recordTotalNum {};
+    uint32_t tokenId;
 };
 
 /*
