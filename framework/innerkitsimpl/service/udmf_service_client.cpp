@@ -248,5 +248,36 @@ int32_t UdmfServiceClient::IsRemoteData(const QueryOption &query, bool &result)
     }
     return udmfProxy_->IsRemoteData(query, result);
 }
+
+int32_t UdmfServiceClient::SetAppShareOption(const std::string &intention, int32_t shareOption)
+{
+    LOG_DEBUG(UDMF_SERVICE, "start, intention: %{public}s, shareOption: %{public}d",
+              intention.c_str(), shareOption);
+    if (intention.empty() || shareOption < IN_APP || shareOption > CROSS_APP) {
+        LOG_ERROR(UDMF_SERVICE, "invalid parameters");
+        return E_INVALID_PARAMETERS;
+    }
+    return udmfProxy_->SetAppShareOption(intention, shareOption);
+}
+
+int32_t UdmfServiceClient::GetAppShareOption(const std::string &intention, int32_t &shareOption)
+{
+    LOG_DEBUG(UDMF_SERVICE, "start, intention: %{public}s", intention.c_str());
+    if (intention.empty()) {
+        LOG_ERROR(UDMF_SERVICE, "invalid parameters");
+        return E_INVALID_PARAMETERS;
+    }
+    return udmfProxy_->GetAppShareOption(intention, shareOption);
+}
+
+int32_t UdmfServiceClient::RemoveAppShareOption(const std::string &intention)
+{
+    LOG_DEBUG(UDMF_SERVICE, "start, intention: %{public}s", intention.c_str());
+    if (intention.empty()) {
+        LOG_ERROR(UDMF_SERVICE, "invalid parameters");
+        return E_INVALID_PARAMETERS;
+    }
+    return udmfProxy_->RemoveAppShareOption(intention);
+}
 } // namespace UDMF
 } // namespace OHOS

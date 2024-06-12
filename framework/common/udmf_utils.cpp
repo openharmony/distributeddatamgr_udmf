@@ -13,9 +13,17 @@
  * limitations under the License.
  */
 #include "udmf_utils.h"
+#include <random>
+#include <sstream>
+
 namespace OHOS {
 namespace UDMF {
 namespace UTILS {
+static constexpr int ID_LEN = 32;
+static constexpr int MINIMUM = 48;
+static constexpr int MAXIMUM = 121;
+const char SPECIAL = '^';
+
 std::vector<std::string> StrSplit(std::string str, std::string subStr)
 {
     std::vector<std::string> result;
@@ -27,6 +35,29 @@ std::vector<std::string> StrSplit(std::string str, std::string subStr)
         p = strtok(NULL, subStr.c_str());
     }
     return result;
+}
+
+std::vector<uint8_t> Random(int32_t len, int32_t minimum, int32_t maximum)
+{
+    std::random_device randomDevice;
+    std::uniform_int_distribution<int> distribution(minimum, maximum);
+    std::vector<uint8_t> key(len);
+    for (int32_t i = 0; i < len; i++) {
+        key[i] = static_cast<uint8_t>(distribution(randomDevice));
+    }
+    return key;
+}
+
+std::string GenerateId()
+{
+    std::vector<uint8_t> randomDevices = Random(ID_LEN, MINIMUM, MAXIMUM);
+    std::stringstream idStr;
+    for (auto &randomDevice : randomDevices) {
+        auto asc = randomDevice;
+        asc = asc >= SPECIAL ? asc + 1 : asc;
+        idStr << static_cast<uint8_t>(asc);
+    }
+    return idStr.str();
 }
 } // namespace UTILS
 } // namespace UDMF

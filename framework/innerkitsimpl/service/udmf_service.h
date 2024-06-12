@@ -46,6 +46,9 @@ public:
     virtual int32_t AddPrivilege(const QueryOption &query, Privilege &privilege) = 0;
     virtual int32_t Sync(const QueryOption &query, const std::vector<std::string> &devices) = 0;
     virtual int32_t IsRemoteData(const QueryOption &query, bool &result) = 0;
+    virtual int32_t SetAppShareOption(const std::string &intention, int32_t shareOption) = 0;
+    virtual int32_t GetAppShareOption(const std::string &intention, int32_t &shareOption) = 0;
+    virtual int32_t RemoveAppShareOption(const std::string &intention) = 0;
 };
 } // namespace UDMF
 } // namespace OHOS

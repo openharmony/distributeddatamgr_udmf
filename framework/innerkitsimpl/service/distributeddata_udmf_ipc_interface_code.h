@@ -29,6 +29,9 @@ enum class UdmfServiceInterfaceCode : uint32_t {
     ADD_PRIVILEGE,
     SYNC,
     IS_REMOTE_DATA,
+    SET_APP_SHARE_OPTION,
+    GET_APP_SHARE_OPTION,
+    REMOVE_APP_SHARE_OPTION,
     CODE_BUTT
 };
 } // namespace OHOS::UDMF
