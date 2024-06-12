@@ -191,8 +191,7 @@ napi_value TypeDescriptorNapi::GetBelongingToTypes(napi_env env, napi_callback_i
     auto descriptorNapi = GetDescriptorNapi(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
                Status::E_ERROR, "invalid object!");
-    std::set<std::string> upTypes = descriptorNapi->value_->GetBelongingToTypes();
-    std::vector<std::string> belongingTypes(upTypes.begin(), upTypes.end());
+    std::vector<std::string> belongingTypes = descriptorNapi->value_->GetBelongingToTypes();
     ctxt->status = NapiDataUtils::SetValue(env, belongingTypes, ctxt->output);
     return ctxt->output;
 }

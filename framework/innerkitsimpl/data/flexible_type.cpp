@@ -50,7 +50,7 @@ bool FlexibleType::ParseFlexibleUtd(const std::string &typeId, TypeDescriptorCfg
         std::vector<std::string> attrkv = UTILS::StrSplit(attr, "=");
         std::string attrName = attrkv[0];
         if (attrName.find(std::to_string(BELONGINGTO_TYPE)) != attrName.npos) {
-            flexibleTypeDescriptorCfg.belongingToTypes.insert(attrkv[1]);
+            flexibleTypeDescriptorCfg.belongingToTypes.push_back(attrkv[1]);
         } else if (attrName.find(std::to_string(MIMETYPE)) != attrName.npos) {
             flexibleTypeDescriptorCfg.mimeTypes.push_back(attrkv[1]);
         } else if (attrName.find(std::to_string(FILE_EXTENTSION)) != attrName.npos) {

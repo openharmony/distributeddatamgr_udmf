@@ -19,7 +19,7 @@
 #include "flexible_type.h"
 namespace OHOS {
 namespace UDMF {
-TypeDescriptor::TypeDescriptor(const std::string &typeId, const std::set<std::string> &belongingToTypes,
+TypeDescriptor::TypeDescriptor(const std::string &typeId, const std::vector<std::string> &belongingToTypes,
     const std::vector<std::string> &filenameExtensions, const std::vector<std::string> &mimeTypes,
     const std::string &description, const std::string &referenceURL, const std::string &iconFile) : typeId_(typeId),
     belongingToTypes_(belongingToTypes), filenameExtensions_(filenameExtensions), mimeTypes_(mimeTypes),
@@ -138,7 +138,7 @@ const std::string& TypeDescriptor::GetTypeId() const
     return typeId_;
 }
 
-std::set<std::string> TypeDescriptor::GetBelongingToTypes()
+std::vector<std::string> TypeDescriptor::GetBelongingToTypes()
 {
     return belongingToTypes_;
 }
