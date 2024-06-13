@@ -27,7 +27,7 @@ namespace OHOS {
 namespace UDMF {
 class API_EXPORT TypeDescriptor {
 public:
-    TypeDescriptor(const std::string &typeId, const std::set<std::string> &belongingToTypes,
+    TypeDescriptor(const std::string &typeId, const std::vector<std::string> &belongingToTypes,
                    const std::vector<std::string> &filenameExtensions, const std::vector<std::string> &mimeTypes,
                    const std::string &description, const std::string &referenceURL, const std::string &iconFile);
     TypeDescriptor(const TypeDescriptorCfg& typeDescriptorCfg);
@@ -38,7 +38,7 @@ public:
 
     bool Equals(std::shared_ptr<TypeDescriptor> descriptor);
     const std::string& GetTypeId() const;
-    std::set<std::string> GetBelongingToTypes();
+    std::vector<std::string> GetBelongingToTypes();
     std::string GetIconFile();
     std::string GetDescription();
     std::string GetReferenceURL();
@@ -49,7 +49,7 @@ private:
     bool CmpFlexibleTypeLevel(const std::string higherLevelTypeId, bool isFlexibleType);
 
     std::string typeId_;
-    std::set<std::string> belongingToTypes_;
+    std::vector<std::string> belongingToTypes_;
     std::vector<std::string> filenameExtensions_;
     std::vector<std::string> mimeTypes_;
     std::string description_;

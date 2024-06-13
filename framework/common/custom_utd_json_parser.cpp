@@ -121,8 +121,7 @@ bool CustomUtdJsonParser::GetTypeDescriptors(const json &jsonRoot, const std::st
             cJSON *node = cJSON_GetArrayItem(subNode, i);
             TypeDescriptorCfg typeCfg;
             typeCfg.typeId = GetStringValue(*node, TYPEID);
-            std::vector<std::string> belongingToTypes = GetStringArrayValue(*node, BELONGINGTOTYPES);
-            typeCfg.belongingToTypes.insert(belongingToTypes.begin(), belongingToTypes.end());
+            typeCfg.belongingToTypes = GetStringArrayValue(*node, BELONGINGTOTYPES);
             typeCfg.filenameExtensions = GetStringArrayValue(*node, FILE_NAME_EXTENSTENSIONS);
             typeCfg.mimeTypes = GetStringArrayValue(*node, MIME_TYPES);
             typeCfg.description = GetStringValue(*node, DESCRIPTION);

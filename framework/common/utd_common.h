@@ -25,7 +25,7 @@ struct TypeDescriptorCfg;
 using CustomUtdCfgs = std::pair<std::vector<TypeDescriptorCfg>, std::vector<TypeDescriptorCfg>>;
 struct TypeDescriptorCfg {
     std::string typeId;
-    std::set<std::string> belongingToTypes;
+    std::vector<std::string> belongingToTypes;
     std::vector<std::string> filenameExtensions;
     std::vector<std::string> mimeTypes;
     std::string description;

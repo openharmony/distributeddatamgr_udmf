@@ -60,7 +60,7 @@ void UtdGraph::InitUtdGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs
         typeIdIndex_.insert(std::make_pair(descriptorCfgs[i].typeId, i));
     }
     for (const auto &descriptorCfg : descriptorCfgs) {
-        std::set<std::string> belongsTo = descriptorCfg.belongingToTypes;
+        std::vector<std::string> belongsTo = descriptorCfg.belongingToTypes;
         for (auto belongsToType : belongsTo) {
             AddEdge(belongsToType, descriptorCfg.typeId);
         }
