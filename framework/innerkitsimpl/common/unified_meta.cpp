@@ -376,7 +376,7 @@ static constexpr UtdType UTD_TYPES[] = {
     { RED_BEAN_SGF, "RED_BEAN_SGF", "com.red-bean.sgf" },
     { SIT_ARCHIVE, "SIT_ARCHIVE", "com.stuffit.sit-archive" },
     { FUTURESPLASH, "FUTURESPLASH", "com.adobe.futuresplash" },
-    { ADOBE_FLASH, "ADOBE_FLASH", "com.adobe.flash" },
+    { FLASH, "FLASH", "com.adobe.flash" },
     { TEXINFO, "TEXINFO", "org.gnu.texinfo" },
     { TORRENT, "TORRENT", "org.bittorrent.torrent" },
     { DOOM, "DOOM", "com.idsoftware.doom" },
