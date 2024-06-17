@@ -370,7 +370,7 @@ enum UDType : int32_t {
     RED_BEAN_SGF,
     SIT_ARCHIVE,
     FUTURESPLASH,
-    ADOBE_FLASH,
+    FLASH,
     TEXINFO,
     TORRENT,
     DOOM,
