@@ -73,13 +73,13 @@ napi_value GenerateErrorMsg(napi_env env, NapiErrorCode jsInfo);
         }                                                        \
     } while (0)
 
-#define ASSERT_PERMISSION_ERR(ctxt, assertion, errorCode, message)  \
-    do {                                                            \
-        if (!(assertion)) {                                         \
-            (ctxt)->isThrowError = true;                            \
-            ThrowNapiError((ctxt)->env, errorCode, message, false); \
-            return;                                                 \
-        }                                                           \
+#define ASSERT_BUSINESS_ERR_VOID(ctxt, assertion, errorCode, message)  \
+    do {                                                               \
+        if (!(assertion)) {                                            \
+            (ctxt)->isThrowError = true;                               \
+            ThrowNapiError((ctxt)->env, errorCode, message, false);    \
+            return nullptr;                                            \
+        }                                                              \
     } while (0)
 } // namespace UDMF
 } // namespace OHOS

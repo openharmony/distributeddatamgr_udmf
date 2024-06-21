@@ -315,13 +315,14 @@ napi_value UnifiedDataChannelNapi::SetAppShareOptions(napi_env env, napi_callbac
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "SetAppShareOption Exit");
     auto status = E_OK;
-    ASSERT_ERR(ctxt->env, intention =="Drag",
+    ASSERT_ERR(ctxt->env, intention == "Drag",
                E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid!");
     ASSERT_ERR(ctxt->env, (shareOptionValue >= IN_APP && shareOptionValue < SHARE_OPTIONS_BUTT),
                E_INVALID_PARAMETERS, "Parameter error: The shareOptions parameter is invalid!");
     std::transform(intention.begin(), intention.end(), intention.begin(), ::tolower); // js : Drag --> drag
     status = UdmfClient::GetInstance().SetAppShareOption(intention, static_cast<ShareOptions>(shareOptionValue));
-    ASSERT_ERR(ctxt->env, !(status == E_SETTINGS_EXISTED), status, "Settings already exist!");
+    ASSERT_BUSINESS_ERR_VOID(ctxt, !(status == E_SETTINGS_EXISTED), E_SETTINGS_EXISTED, "Settings already exist!");
+    ASSERT_BUSINESS_ERR_VOID(ctxt, !(status == E_NO_PERMISSION), E_NO_SYSTEM_PERMISSION, "Permission denied!");
     ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
     return nullptr;
 }
@@ -347,6 +348,7 @@ napi_value UnifiedDataChannelNapi::RemoveAppShareOptions(napi_env env, napi_call
     std::transform(intention.begin(), intention.end(), intention.begin(), ::tolower); // js : Drag --> drag
     auto status = E_OK;
     status = UdmfClient::GetInstance().RemoveAppShareOption(intention);
+    ASSERT_BUSINESS_ERR_VOID(ctxt, !(status == E_NO_PERMISSION), E_NO_SYSTEM_PERMISSION, "Permission denied!");
     ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
     return nullptr;
 }

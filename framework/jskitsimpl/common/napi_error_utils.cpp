@@ -25,6 +25,8 @@ static const NapiErrorCode JS_ERROR_CODE_MSGS[] = {
     { Status::E_NO_PERMISSION, 201, "Permission denied!" },
     { Status::E_INVALID_PARAMETERS, 401, "Parameter error." },
     { Status::E_SETTINGS_EXISTED, 20400001, "Settings already exist." },
+    { Status::E_NO_SYSTEM_PERMISSION, 202,
+      "Permission denied, application which is not a system application uses system API." },
 };
 
 const std::optional<NapiErrorCode> GetErrorCode(int32_t errorCode)
@@ -63,7 +65,6 @@ Status GenerateNapiError(Status error, int32_t &errCode, std::string &errMessage
 
 void ThrowNapiError(napi_env env, int32_t status, const std::string &errMessage, bool isParamsCheck)
 {
-    LOG_INFO(UDMF_KITS_NAPI, "ThrowNapiError message: %{public}s", errMessage.c_str());
     if (status == Status::E_OK) {
         return;
     }
@@ -89,6 +90,8 @@ void ThrowNapiError(napi_env env, int32_t status, const std::string &errMessage,
     } else {
         jsCode = std::to_string(napiError.jsCode);
     }
+    LOG_INFO(UDMF_KITS_NAPI, "ThrowNapiError, status:%{public}d, jsCode: %{public}s, message: %{public}s",
+             status, jsCode.c_str(), errMessage.c_str());
     napi_throw_error(env, jsCode.c_str(), message.c_str());
 }
 } // namespace UDMF
