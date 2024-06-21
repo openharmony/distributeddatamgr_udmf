@@ -37,6 +37,15 @@ std::vector<std::string> StrSplit(std::string str, std::string subStr)
     return result;
 }
 
+void ReplaceString(std::string &str, const std::string &from, const std::string &to)
+{
+    size_t startPos = 0;
+    while ((startPos = str.find(from, startPos)) != std::string::npos) {
+        str.replace(startPos, from.length(), to);
+        startPos += to.length();
+    }
+}
+
 std::vector<uint8_t> Random(int32_t len, int32_t minimum, int32_t maximum)
 {
     std::random_device randomDevice;

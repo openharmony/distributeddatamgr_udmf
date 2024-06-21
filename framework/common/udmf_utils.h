@@ -22,6 +22,7 @@ namespace OHOS {
 namespace UDMF {
 namespace UTILS {
 std::vector<std::string> StrSplit(std::string str, std::string subStr);
+void ReplaceString(std::string& str, const std::string& from, const std::string& to);
 std::vector<uint8_t> Random(int32_t len, int32_t minimum = 0,
                             int32_t maximum = std::numeric_limits<uint8_t>::max());
 std::string GenerateId();

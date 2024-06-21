@@ -159,9 +159,11 @@ ohos_shared_library("utd_client") {
   public_configs = [ ":utd_client_config" ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
+    "ipc:ipc_core",
   ]
 
   public_external_deps = [ "cJSON:cjson" ]
