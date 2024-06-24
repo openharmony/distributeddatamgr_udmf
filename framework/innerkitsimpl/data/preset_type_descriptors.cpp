@@ -1052,7 +1052,7 @@ void PresetTypeDescriptors::InitDescriptors()
         {"general.vob",
          {"general.video"},
          {".vob"},
-         {"video/mpeg"},
+         {"video/mpeg", "video/x-ms-vob"},
          "",
          REFERENCE_URL,
          ""},
