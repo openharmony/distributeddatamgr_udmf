@@ -27,8 +27,8 @@
 namespace OHOS {
 namespace UDMF {
 constexpr const char* CUSTOM_UTD_HAP_PATH = "/data/utd/utd-adt.json";
-constexpr const char* CUSTOM_UTD_SA_PATH = "/data/service/el1/defaultUserId/distributeddata/utd/utd-adt.json";
-constexpr const char* DEFAULT_USER = "defaultUserId";
+constexpr const char* CUSTOM_UTD_SA_PATH_PRE = "/data/service/el1/defaultUserId/";
+constexpr const char* CUSTOM_UTD_SA_FILE = "/utd/utd-adt.json";
 UtdClient::UtdClient()
 {
     Init();
@@ -45,14 +45,14 @@ UtdClient &UtdClient::GetInstance()
     return *instance;
 }
 
-void UtdClient::Init(int32_t userId)
+void UtdClient::Init()
 {
     descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
-    std::string customUtdPath = GetCustomUtdPath(userId);
+    std::string customUtdPath = GetCustomUtdPath();
     std::vector<TypeDescriptorCfg> customTypes =
         CustomUtdStore::GetInstance().GetTypeCfgs(customUtdPath);
-    LOG_INFO(UDMF_CLIENT, "get customUtd. userId:%{public}d, path:%{public}s, %{public}zu ",
-             userId, customUtdPath.c_str(), customTypes.size());
+    LOG_INFO(UDMF_CLIENT, "get customUtd. path:%{public}s, %{public}zu",
+             customUtdPath.c_str(), customTypes.size());
     descriptorCfgs_.insert(descriptorCfgs_.end(), customTypes.begin(), customTypes.end());
 
     UtdGraph::GetInstance().InitUtdGraph(descriptorCfgs_);
@@ -217,7 +217,7 @@ Status UtdClient::IsUtd(std::string typeId, bool &result)
 
 bool UtdClient::IsHapTokenTypeFlag()
 {
-    uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
+    uint32_t tokenId = IPCSkeleton::GetSelfTokenID();
     auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     if (tokenType == Security::AccessToken::TypeATokenTypeEnum::TOKEN_HAP) {
         return true;
@@ -226,13 +226,13 @@ bool UtdClient::IsHapTokenTypeFlag()
     return false;
 }
 
-std::string UtdClient::GetCustomUtdPath(int32_t userId)
+std::string UtdClient::GetCustomUtdPath()
 {
     if (IsHapTokenTypeFlag()) {
         return std::string(CUSTOM_UTD_HAP_PATH);
     }
-    std::string customUtdSaPath = CUSTOM_UTD_SA_PATH;
-    UTILS::ReplaceString(customUtdSaPath, DEFAULT_USER, std::to_string(userId));
+    int32_t userId = DEFAULT_USER_ID;
+    std::string customUtdSaPath = CUSTOM_UTD_SA_PATH_PRE + userId + CUSTOM_UTD_SA_FILE;
     return customUtdSaPath;
 }
 } // namespace UDMF

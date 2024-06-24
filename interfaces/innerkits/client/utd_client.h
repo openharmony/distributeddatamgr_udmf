@@ -44,9 +44,9 @@ private:
     ~UtdClient();
     UtdClient(const UtdClient &obj) = delete;
     UtdClient &operator=(const UtdClient &obj) = delete;
-    void Init(int32_t userId = DEFAULT_USER_ID);
+    void Init();
     bool IsHapTokenTypeFlag();
-    std::string GetCustomUtdPath(int32_t userId);
+    std::string GetCustomUtdPath();
     bool IsValidFileExtension(const std::string &fileExtension);
     bool IsValidMimeType(const std::string &mimeType);
     Status GetFlexibleTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
