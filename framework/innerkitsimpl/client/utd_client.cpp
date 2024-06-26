@@ -27,8 +27,8 @@
 namespace OHOS {
 namespace UDMF {
 constexpr const char* CUSTOM_UTD_HAP_PATH = "/data/utd/utd-adt.json";
-constexpr const char* CUSTOM_UTD_SA_PATH_PRE = "/data/service/el1/defaultUserId/";
-constexpr const char* CUSTOM_UTD_SA_FILE = "/utd/utd-adt.json";
+constexpr const char* CUSTOM_UTD_SA_PATH = "/data/service/el1/defaultUserId/userid/utd/utd-adt.json";
+constexpr const char* USER_ID = "userid";
 UtdClient::UtdClient()
 {
     Init();
@@ -53,8 +53,9 @@ void UtdClient::Init()
         CustomUtdStore::GetInstance().GetTypeCfgs(customUtdPath);
     LOG_INFO(UDMF_CLIENT, "get customUtd. path:%{public}s, %{public}zu",
              customUtdPath.c_str(), customTypes.size());
-    descriptorCfgs_.insert(descriptorCfgs_.end(), customTypes.begin(), customTypes.end());
-
+    if (!customTypes.empty()) {
+        descriptorCfgs_.insert(descriptorCfgs_.end(), customTypes.begin(), customTypes.end());
+    }
     UtdGraph::GetInstance().InitUtdGraph(descriptorCfgs_);
 }
 
@@ -219,10 +220,10 @@ bool UtdClient::IsHapTokenTypeFlag()
 {
     uint32_t tokenId = IPCSkeleton::GetSelfTokenID();
     auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    LOG_DEBUG(UDMF_CLIENT, "GetTokenTypeFlag, tokenType = %{public}d.", tokenType);
     if (tokenType == Security::AccessToken::TypeATokenTypeEnum::TOKEN_HAP) {
         return true;
     }
-    LOG_ERROR(UDMF_CLIENT, "GetTokenTypeFlag, tokenType = %{public}d.", tokenType);
     return false;
 }
 
@@ -232,7 +233,8 @@ std::string UtdClient::GetCustomUtdPath()
         return std::string(CUSTOM_UTD_HAP_PATH);
     }
     int32_t userId = DEFAULT_USER_ID;
-    std::string customUtdSaPath = CUSTOM_UTD_SA_PATH_PRE + userId + CUSTOM_UTD_SA_FILE;
+    std::string customUtdSaPath = CUSTOM_UTD_SA_PATH;
+    UTILS::ReplaceString(customUtdSaPath, USER_ID, std::to_string(userId));
     return customUtdSaPath;
 }
 } // namespace UDMF
