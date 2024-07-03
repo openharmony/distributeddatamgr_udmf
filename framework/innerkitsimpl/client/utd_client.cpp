@@ -110,7 +110,6 @@ Status UtdClient::GetFlexibleTypeDescriptor(const std::string &typeId, std::shar
 Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileExtension, std::string &typeId,
                                                         std::string belongsTo)
 {
-    LOG_INFO(UDMF_CLIENT, "fileExtension:%{public}s, belongsTo:%{public}s", fileExtension.c_str(), belongsTo.c_str());
     std::string lowerFileExtension = fileExtension;
     std::transform(lowerFileExtension.begin(), lowerFileExtension.end(), lowerFileExtension.begin(), ::tolower);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
@@ -141,6 +140,7 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
             return Status::E_INVALID_PARAMETERS;
         }
         typeId = FlexibleType::GenFlexibleUtd("", lowerFileExtension, belongsTo);
+        LOG_INFO(UDMF_CLIENT, "FlexibleUtd typeId is: %{public}s", typeId.c_str());
     }
     return Status::E_OK;
 }

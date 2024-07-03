@@ -37,20 +37,27 @@ bool FlexibleType::ParseFlexibleUtd(const std::string &typeId, TypeDescriptorCfg
     flexibleTypeDescriptorCfg.typeId = typeId;
     std::string flexibleUtd = typeId;
     std::string flexibleFlag = FLEXIBLE_TYPE_FLAG;
-    
-    try{
-        flexibleUtd.erase(0, flexibleFlag.size());
-        std::string flexibleUtdDecode = Base32::Decode(flexibleUtd);
-        
+    flexibleUtd.erase(0, flexibleFlag.size());
+
+    std::string flexibleUtdDecode;
+    try {
+        flexibleUtdDecode = Base32::Decode(flexibleUtd);
         LOG_INFO(UDMF_CLIENT, "The typeId be parsed, flexibleUtdDecode: %{public}s ", flexibleUtdDecode.c_str());
-        if (flexibleUtdDecode[0] != '?' || flexibleUtdDecode.find("=") == flexibleUtdDecode.npos) {
+        if (flexibleUtdDecode.length() < 1 || flexibleUtdDecode[0] != '?' ||
+                flexibleUtdDecode.find("=") == flexibleUtdDecode.npos) {
             LOG_WARN(UDMF_CLIENT, "The typeId cannot be parsed, %{public}s ", typeId.c_str());
             return false;
         }
+    } catch (...) {
+        LOG_ERROR(UDMF_CLIENT, "Decode exception, typeId:%{public}s", typeId.c_str());
+        return false;
+    }
+
+    try {
         std::vector<std::string> flexibleTypeAttrs = UTILS::StrSplit(flexibleUtdDecode, ":");
         for (auto attr : flexibleTypeAttrs) {
             std::vector<std::string> attrkv = UTILS::StrSplit(attr, "=");
-            if (attrkv.size() < 2) {
+            if (attrkv.size() != 2) {
                 LOG_ERROR(UDMF_CLIENT, "The attribute split error, attribute is: %{public}s ", attr.c_str());
                 return false;
             }
@@ -64,7 +71,7 @@ bool FlexibleType::ParseFlexibleUtd(const std::string &typeId, TypeDescriptorCfg
             }
         }
     } catch (...) {
-        LOG_ERROR(UDMF_CLIENT, "exception, typeId:%{public}s", typeId.c_str());
+        LOG_ERROR(UDMF_CLIENT, "Split exception, typeId:%{public}s", typeId.c_str());
         return false;
     }
     return true;
@@ -83,6 +90,7 @@ std::string FlexibleType::GenFlexibleUtd(const std::string &mimeType, const std:
     if (!fileExtension.empty()) {
         flexibleUtd += ":" + std::to_string(FILE_EXTENTSION) + "=" + fileExtension;
     }
+    LOG_INFO(UDMF_CLIENT, "FlexibleUtd typeId is: %{public}s", flexibleUtd.c_str());
     return FLEXIBLE_TYPE_FLAG + Base32::Encode(flexibleUtd);
 }
 
