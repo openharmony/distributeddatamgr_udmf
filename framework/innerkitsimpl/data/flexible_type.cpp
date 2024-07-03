@@ -37,25 +37,35 @@ bool FlexibleType::ParseFlexibleUtd(const std::string &typeId, TypeDescriptorCfg
     flexibleTypeDescriptorCfg.typeId = typeId;
     std::string flexibleUtd = typeId;
     std::string flexibleFlag = FLEXIBLE_TYPE_FLAG;
-    flexibleUtd.erase(0, flexibleFlag.size());
-    std::string flexibleUtdDecode = Base32::Decode(flexibleUtd);
     
-    LOG_INFO(UDMF_CLIENT, "The typeId be parsed, flexibleUtdDecode：%{public}s ", flexibleUtdDecode.c_str());
-    if (flexibleUtdDecode[0] != '?' || flexibleUtdDecode.find("=") == flexibleUtdDecode.npos) {
-        LOG_WARN(UDMF_CLIENT, "The typeId cannot be parsed, %{public}s ", typeId.c_str());
-        return false;
-    }
-    std::vector<std::string> flexibleTypeAttrs = UTILS::StrSplit(flexibleUtdDecode, ":");
-    for (auto attr : flexibleTypeAttrs) {
-        std::vector<std::string> attrkv = UTILS::StrSplit(attr, "=");
-        std::string attrName = attrkv[0];
-        if (attrName.find(std::to_string(BELONGINGTO_TYPE)) != attrName.npos) {
-            flexibleTypeDescriptorCfg.belongingToTypes.push_back(attrkv[1]);
-        } else if (attrName.find(std::to_string(MIMETYPE)) != attrName.npos) {
-            flexibleTypeDescriptorCfg.mimeTypes.push_back(attrkv[1]);
-        } else if (attrName.find(std::to_string(FILE_EXTENTSION)) != attrName.npos) {
-            flexibleTypeDescriptorCfg.filenameExtensions.push_back(attrkv[1]);
+    try{
+        flexibleUtd.erase(0, flexibleFlag.size());
+        std::string flexibleUtdDecode = Base32::Decode(flexibleUtd);
+        
+        LOG_INFO(UDMF_CLIENT, "The typeId be parsed, flexibleUtdDecode: %{public}s ", flexibleUtdDecode.c_str());
+        if (flexibleUtdDecode[0] != '?' || flexibleUtdDecode.find("=") == flexibleUtdDecode.npos) {
+            LOG_WARN(UDMF_CLIENT, "The typeId cannot be parsed, %{public}s ", typeId.c_str());
+            return false;
         }
+        std::vector<std::string> flexibleTypeAttrs = UTILS::StrSplit(flexibleUtdDecode, ":");
+        for (auto attr : flexibleTypeAttrs) {
+            std::vector<std::string> attrkv = UTILS::StrSplit(attr, "=");
+            if (attrkv.size() < 2) {
+                LOG_ERROR(UDMF_CLIENT, "The attribute split error, attribute is: %{public}s ", attr.c_str());
+                return false;
+            }
+            std::string attrName = attrkv[0];
+            if (attrName.find(std::to_string(BELONGINGTO_TYPE)) != attrName.npos) {
+                flexibleTypeDescriptorCfg.belongingToTypes.push_back(attrkv[1]);
+            } else if (attrName.find(std::to_string(MIMETYPE)) != attrName.npos) {
+                flexibleTypeDescriptorCfg.mimeTypes.push_back(attrkv[1]);
+            } else if (attrName.find(std::to_string(FILE_EXTENTSION)) != attrName.npos) {
+                flexibleTypeDescriptorCfg.filenameExtensions.push_back(attrkv[1]);
+            }
+        }
+    } catch (...) {
+        LOG_ERROR(UDMF_CLIENT, "exception, typeId:%{public}s", typeId.c_str());
+        return false;
     }
     return true;
 }

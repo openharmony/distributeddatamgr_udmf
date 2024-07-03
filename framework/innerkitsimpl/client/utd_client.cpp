@@ -53,6 +53,10 @@ void UtdClient::Init()
 
 Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor)
 {
+    if (typeId.empty()) {
+        LOG_ERROR(UDMF_CLIENT, "typeId is empty.");
+        return Status::E_ERROR;
+    }
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         if (utdTypeCfg.typeId == typeId) {
             descriptor = std::make_shared<TypeDescriptor>(utdTypeCfg);
@@ -62,7 +66,7 @@ Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<T
     }
     if (typeId.find(FLEXIBLE_TYPE_FLAG) != typeId.npos) {
         LOG_INFO(UDMF_CLIENT, "get flexible descriptor. %{public}s ", typeId.c_str());
-        GetFlexibleTypeDescriptor(typeId, descriptor);
+        return GetFlexibleTypeDescriptor(typeId, descriptor);
     }
     return Status::E_OK;
 }
@@ -96,7 +100,9 @@ bool UtdClient::IsValidMimeType(const std::string &mimeType)
 Status UtdClient::GetFlexibleTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor)
 {
     TypeDescriptorCfg flexibleTypeDescriptorCfg;
-    FlexibleType::ParseFlexibleUtd(typeId, flexibleTypeDescriptorCfg);
+    if (!FlexibleType::ParseFlexibleUtd(typeId, flexibleTypeDescriptorCfg)) {
+        return Status::E_ERROR;
+    }
     descriptor = std::make_shared<TypeDescriptor>(flexibleTypeDescriptorCfg);
     return Status::E_OK;
 }
