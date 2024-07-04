@@ -50,8 +50,8 @@ bool FlexibleType::ParseFlexibleUtd(const std::string &typeId, TypeDescriptorCfg
     for (auto attr : flexibleTypeAttrs) {
         std::vector<std::string> attrkv = UTILS::StrSplit(attr, "=");
         if (attrkv.size() != ATTRIBUTE_PAIR_SIZE || attrkv[1].length() > MAX_TYPE_SIZE) {
-            LOG_ERROR(UDMF_CLIENT, "The attribute split error, attribute is: %{public}s ", attr.c_str());
-            return false;
+            LOG_WARN(UDMF_CLIENT, "The attribute split error, attribute is: %{public}s ", attr.c_str());
+            continue;
         }
         std::string attrName = attrkv[0];
         if (attrName.find(std::to_string(BELONGINGTO_TYPE)) != attrName.npos) {
