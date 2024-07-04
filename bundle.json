@@ -51,6 +51,17 @@
       ],
       "inner_kits": [
         {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/ndk:udmf_ndk",
+          "header": {
+            "header_files": [
+              "udmf_meta.h",
+              "uds.h",
+              "utd.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/ndk/data"
+          }
+        },
+        {
           "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
           "header": {
             "header_files": [

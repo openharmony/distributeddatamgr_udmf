@@ -1,0 +1,52 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+import("//foundation/distributeddatamgr/udmf/udmf.gni")
+
+ohos_shared_library("udmf_ndk") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  include_dirs = [
+    "${udmf_interfaces_path}/ndk/data",
+    "${udmf_interfaces_path}/innerkits/client",
+    "${udmf_interfaces_path}/innerkits/common",
+    "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_framework_path}/common",
+  ]
+  sources = [
+    "${udmf_framework_path}/ndkimpl/data/uds.cpp",
+    "${udmf_framework_path}/ndkimpl/data/utd.cpp",
+  ]
+
+  defines = [ "API_EXPORT=__attribute__((visibility (\"default\")))" ]
+
+  deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
+
+  external_deps = [
+    "ability_base:base",
+    "ability_base:want",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "image_framework:image",
+  ]
+
+  relative_install_dir="ndk"
+  part_name = "udmf"
+  subsystem_name = "distributeddatamgr"
+  output_extension = "so"
+}
