@@ -24,7 +24,8 @@ static constexpr int MINIMUM = 48;
 static constexpr int MAXIMUM = 121;
 const char SPECIAL = '^';
 
-std::vector<std::string> StrSplit(const std::string &str, const std::string &delimiter) {
+std::vector<std::string> StrSplit(const std::string &str, const std::string &delimiter)
+{
     std::vector<std::string> result;
     size_t start = 0;
     size_t end = str.find(delimiter);
