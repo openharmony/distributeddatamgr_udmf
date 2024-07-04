@@ -36,6 +36,7 @@ public:
     static std::string GenFlexibleUtd(const std::string &mimeType, const std::string &fileExtension,
                                      const std::string &belongsTo);
     static constexpr size_t MAX_TYPE_SIZE = 128;
+    static constexpr size_t ATTRIBUTE_PAIR_SIZE = 2;
 };
 } // namespace UDMF
 } // namespace OHOS
