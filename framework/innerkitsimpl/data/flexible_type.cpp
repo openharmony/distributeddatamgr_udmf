@@ -38,41 +38,29 @@ bool FlexibleType::ParseFlexibleUtd(const std::string &typeId, TypeDescriptorCfg
     std::string flexibleUtd = typeId;
     std::string flexibleFlag = FLEXIBLE_TYPE_FLAG;
     flexibleUtd.erase(0, flexibleFlag.size());
+    std::string flexibleUtdDecode = Base32::Decode(flexibleUtd);
 
-    std::string flexibleUtdDecode;
-    try {
-        flexibleUtdDecode = Base32::Decode(flexibleUtd);
-        LOG_INFO(UDMF_CLIENT, "The typeId be parsed, flexibleUtdDecode: %{public}s ", flexibleUtdDecode.c_str());
-        if (flexibleUtdDecode.length() < 1 || flexibleUtdDecode[0] != '?' ||
-                flexibleUtdDecode.find("=") == flexibleUtdDecode.npos) {
-            LOG_WARN(UDMF_CLIENT, "The typeId cannot be parsed, %{public}s ", typeId.c_str());
-            return false;
-        }
-    } catch (...) {
-        LOG_ERROR(UDMF_CLIENT, "Decode exception, typeId:%{public}s", typeId.c_str());
+    LOG_INFO(UDMF_CLIENT, "The typeId be parsed, flexibleUtdDecode: %{public}s", flexibleUtdDecode.c_str());
+    if (flexibleUtdDecode.empty() || flexibleUtdDecode[0] != '?' ||
+            flexibleUtdDecode.find("=") == flexibleUtdDecode.npos) {
+        LOG_WARN(UDMF_CLIENT, "The typeId cannot be parsed, %{public}s ", typeId.c_str());
         return false;
     }
-
-    try {
-        std::vector<std::string> flexibleTypeAttrs = UTILS::StrSplit(flexibleUtdDecode, ":");
-        for (auto attr : flexibleTypeAttrs) {
-            std::vector<std::string> attrkv = UTILS::StrSplit(attr, "=");
-            if (attrkv.size() != 2) {
-                LOG_ERROR(UDMF_CLIENT, "The attribute split error, attribute is: %{public}s ", attr.c_str());
-                return false;
-            }
-            std::string attrName = attrkv[0];
-            if (attrName.find(std::to_string(BELONGINGTO_TYPE)) != attrName.npos) {
-                flexibleTypeDescriptorCfg.belongingToTypes.push_back(attrkv[1]);
-            } else if (attrName.find(std::to_string(MIMETYPE)) != attrName.npos) {
-                flexibleTypeDescriptorCfg.mimeTypes.push_back(attrkv[1]);
-            } else if (attrName.find(std::to_string(FILE_EXTENTSION)) != attrName.npos) {
-                flexibleTypeDescriptorCfg.filenameExtensions.push_back(attrkv[1]);
-            }
+    std::vector<std::string> flexibleTypeAttrs = UTILS::StrSplit(flexibleUtdDecode, ":");
+    for (auto attr : flexibleTypeAttrs) {
+        std::vector<std::string> attrkv = UTILS::StrSplit(attr, "=");
+        if (attrkv.size() != 2 || attrkv[1].length() > MAX_TYPE_SIZE) {
+            LOG_ERROR(UDMF_CLIENT, "The attribute split error, attribute is: %{public}s ", attr.c_str());
+            return false;
         }
-    } catch (...) {
-        LOG_ERROR(UDMF_CLIENT, "Split exception, typeId:%{public}s", typeId.c_str());
-        return false;
+        std::string attrName = attrkv[0];
+        if (attrName.find(std::to_string(BELONGINGTO_TYPE)) != attrName.npos) {
+            flexibleTypeDescriptorCfg.belongingToTypes.push_back(attrkv[1]);
+        } else if (attrName.find(std::to_string(MIMETYPE)) != attrName.npos) {
+            flexibleTypeDescriptorCfg.mimeTypes.push_back(attrkv[1]);
+        } else if (attrName.find(std::to_string(FILE_EXTENTSION)) != attrName.npos) {
+            flexibleTypeDescriptorCfg.filenameExtensions.push_back(attrkv[1]);
+        }
     }
     return true;
 }
@@ -90,8 +78,10 @@ std::string FlexibleType::GenFlexibleUtd(const std::string &mimeType, const std:
     if (!fileExtension.empty()) {
         flexibleUtd += ":" + std::to_string(FILE_EXTENTSION) + "=" + fileExtension;
     }
-    LOG_INFO(UDMF_CLIENT, "FlexibleUtd typeId is: %{public}s", flexibleUtd.c_str());
-    return FLEXIBLE_TYPE_FLAG + Base32::Encode(flexibleUtd);
+    std::string encodeUtd = Base32::Encode(flexibleUtd);
+    LOG_INFO(UDMF_CLIENT, "FlexibleUtd typeId is: %{public}s, encodeUtd is: %{public}s",
+        flexibleUtd.c_str(), encodeUtd.c_str());
+    return FLEXIBLE_TYPE_FLAG + encodeUtd;
 }
 
 } // namespace UDMF

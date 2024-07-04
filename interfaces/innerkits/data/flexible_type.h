@@ -35,6 +35,7 @@ public:
     static bool ParseFlexibleUtd(const std::string &typeId, TypeDescriptorCfg &flexibleTypeDescriptorCfg);
     static std::string GenFlexibleUtd(const std::string &mimeType, const std::string &fileExtension,
                                      const std::string &belongsTo);
+    static constexpr size_t MAX_TYPE_SIZE = 128;
 };
 } // namespace UDMF
 } // namespace OHOS

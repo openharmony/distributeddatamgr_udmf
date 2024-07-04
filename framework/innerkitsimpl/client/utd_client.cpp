@@ -101,6 +101,7 @@ Status UtdClient::GetFlexibleTypeDescriptor(const std::string &typeId, std::shar
 {
     TypeDescriptorCfg flexibleTypeDescriptorCfg;
     if (!FlexibleType::ParseFlexibleUtd(typeId, flexibleTypeDescriptorCfg)) {
+        LOG_ERROR(UDMF_CLIENT, "ParseFlexibleUtd failed, invalid typeId: %{public}s", typeId.c_str());
         return Status::E_ERROR;
     }
     descriptor = std::make_shared<TypeDescriptor>(flexibleTypeDescriptorCfg);
@@ -140,7 +141,6 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
             return Status::E_INVALID_PARAMETERS;
         }
         typeId = FlexibleType::GenFlexibleUtd("", lowerFileExtension, belongsTo);
-        LOG_INFO(UDMF_CLIENT, "FlexibleUtd typeId is: %{public}s", typeId.c_str());
     }
     return Status::E_OK;
 }
