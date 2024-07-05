@@ -82,7 +82,7 @@ std::string FlexibleType::GenFlexibleUtd(const std::string &mimeType, const std:
         flexibleUtd += ":" + std::to_string(FILE_EXTENTSION) + "=" + fileExtension;
     }
     std::string encodeUtd = Base32::Encode(flexibleUtd);
-    LOG_INFO(UDMF_CLIENT, "FlexibleUtd typeId is: %{public}s, encodeUtd is: %{public}s",
+    LOG_DEBUG(UDMF_CLIENT, "FlexibleUtd typeId is: %{public}s, encodeUtd is: %{public}s",
         flexibleUtd.c_str(), encodeUtd.c_str());
     return FLEXIBLE_TYPE_FLAG + encodeUtd;
 }
