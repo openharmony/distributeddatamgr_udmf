@@ -53,10 +53,6 @@ void UtdClient::Init()
 
 Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor)
 {
-    if (typeId.empty()) {
-        LOG_ERROR(UDMF_CLIENT, "typeId is empty.");
-        return Status::E_ERROR;
-    }
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         if (utdTypeCfg.typeId == typeId) {
             descriptor = std::make_shared<TypeDescriptor>(utdTypeCfg);
