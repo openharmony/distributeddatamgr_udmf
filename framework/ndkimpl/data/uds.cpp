@@ -14,9 +14,9 @@
  */
 #define LOG_TAG "Uds"
 
+#include "uds.h"
 #include <string>
 #include "logger.h"
-#include "uds.h"
 #include "utd_common.h"
 #include "unified_record.h"
 #include "udmf_ndk_common.h"
@@ -25,18 +25,9 @@
 
 using namespace OHOS::UDMF;
 
-static bool IsInvalidUdsObjectPtr(const Uds_Object_Ptr* const &pThis, const int id)
+bool IsInvalidUdsObjectPtr(const Uds_Object_Ptr* pThis, int id)
 {
     return pThis == nullptr || pThis->id != id || pThis->obj == nullptr;
-}
-
-const char* Uds_Object_Ptr::GetUdsValue(const char* const &paramName)
-{
-    if(obj->value_.find(paramName) == obj->value_.end()) {
-        LOG_ERROR(UDMF_NDK, "Don't have property %{public}s.", paramName);
-        return nullptr;
-    }
-    return (std::get_if<std::string>(&(obj->value_[paramName])))->c_str();
 }
 
 Uds_Object_Ptr::Uds_Object_Ptr(const int id) : id(id) {}
@@ -49,7 +40,16 @@ OH_UdsHtml::OH_UdsHtml() : Uds_Object_Ptr(UDS_HTML_STRUCT_ID) {}
 
 OH_UdsAppItem::OH_UdsAppItem() : Uds_Object_Ptr(UDS_APP_ITEM_STRUCT_ID) {}
 
-int Uds_Object_Ptr::SetUdsValue(const char* const &paramName, const char* const &pramValue)
+const char* Uds_Object_Ptr::GetUdsValue(const char* paramName)
+{
+    if(obj->value_.find(paramName) == obj->value_.end()) {
+        LOG_ERROR(UDMF_NDK, "Don't have property %{public}s.", paramName);
+        return nullptr;
+    }
+    return (std::get_if<std::string>(&(obj->value_[paramName])))->c_str();
+}
+
+int Uds_Object_Ptr::SetUdsValue(const char* paramName, const char* pramValue)
 {
     if(obj->value_.find(paramName) == obj->value_.end()) {
         LOG_ERROR(UDMF_NDK, "Can't set property %{public}s.", paramName);

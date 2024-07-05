@@ -56,7 +56,8 @@
             "header_files": [
               "udmf_meta.h",
               "uds.h",
-              "utd.h"
+              "utd.h",
+              "udmf_err_code.h"
             ],
             "header_base":"//foundation/distributeddatamgr/udmf/interfaces/ndk/data"
           }

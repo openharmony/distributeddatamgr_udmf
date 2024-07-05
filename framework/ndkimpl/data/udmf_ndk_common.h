@@ -21,14 +21,13 @@
 #include <mutex>
 #include <cstdint>
 
-
 struct Uds_Object_Ptr {
     const int64_t id;
     std::shared_ptr<OHOS::UDMF::Object> obj;
     std::mutex mutex;
     Uds_Object_Ptr(int id);
-    const char* GetUdsValue(const char* const &paramName);
-    int SetUdsValue(const char* const &paramName, const char* const &pramValue);
+    const char* GetUdsValue(const char* paramName);
+    int SetUdsValue(const char* paramName, const char* pramValue);
 };
 
 enum UDMF_NdkStructId : std::int64_t {
@@ -46,12 +45,12 @@ struct OH_Utd {
     const int64_t id = UTD_STRUCT_ID;
     std::mutex mutex;
     std::string typeId;
-    const char** belongingToTypes;
-    unsigned int belongingToTypesCount;
-    const char** filenameExtensions;
-    unsigned int filenameExtensionsCount;
-    const char** mimeTypes;
-    unsigned int mimeTypeCount;
+    const char** belongingToTypes{nullptr};
+    unsigned int belongingToTypesCount{0};
+    const char** filenameExtensions{nullptr};
+    unsigned int filenameExtensionsCount{0};
+    const char** mimeTypes{nullptr};
+    unsigned int mimeTypeCount{0};
     std::string description;
     std::string referenceURL;
     std::string iconFile;
@@ -70,22 +69,20 @@ struct OH_UdsAppItem : public Uds_Object_Ptr {
     OH_UdsAppItem();
 };
 
-
-
 constexpr const char* UNIFORM_DATA_TYPE = "uniformDataType";
-
 constexpr const char* CONTENT = "content";
 constexpr const char* ABSTRACT = "abstract";
 constexpr const char* URL = "url";
 constexpr const char* DESCRIPTION = "description";
 constexpr const char* HTML_CONTENT = "htmlContent";
 constexpr const char* PLAIN_CONTENT = "plainContent";
-
 constexpr const char* APP_ID = "appId";
 constexpr const char* APP_NAME = "appName";
 constexpr const char* APP_ICON_ID = "appIconId";
 constexpr const char* APP_LABEL_ID = "appLabelId";
 constexpr const char* BUNDLE_NAME = "bundleName";
 constexpr const char* ABILITY_NAME = "abilityName";
+
+bool IsInvalidUdsObjectPtr(const Uds_Object_Ptr* pThis, int id);
 
 #endif

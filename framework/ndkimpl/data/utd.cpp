@@ -15,18 +15,18 @@
 
 #define LOG_TAG "Utd"
 
+#include "utd.h"
 #include <cstring>
 #include <vector>
 #include "securec.h"
 #include "logger.h"
-#include "utd.h"
 #include "utd_client.h"
 #include "udmf_ndk_common.h"
 #include "udmf_err_code.h"
 
 using namespace OHOS::UDMF;
 
-typedef Status (UtdClient::*FuncPtr)(const std::string&, std::string&, std::string);
+typedef Status (UtdClient::*GetUtdByConditionPtr)(const std::string&, std::string&, std::string);
 
 static void DestroyArrayPtr(const char** &arrayPtr, unsigned int& count)
 {
@@ -48,17 +48,19 @@ static void DestroyArrayPtr(const char** &arrayPtr, unsigned int& count)
 
 static const char** CreateStrArrByVector(const std::vector<std::string>& paramVector, unsigned int* count)
 {
-    *count = paramVector.size();
-    auto charPtr = new char *[*count];
-    for (unsigned int i = 0; i < *count; i++) {
+    unsigned int size = paramVector.size();
+    auto charPtr = new char *[size];
+    for (unsigned int i = 0; i < size; i++) {
         charPtr[i] = new char[paramVector[i].size() + 1];
         if (strcpy_s(charPtr[i], paramVector[i].size() + 1, paramVector[i].c_str()) != UDMF_E_OK) {
             LOG_ERROR(UDMF_NDK, "str copy error!");
             const char** arrayPtr = const_cast<const char**>(charPtr);
-            DestroyArrayPtr(arrayPtr, *count);
+            DestroyArrayPtr(arrayPtr, size);
+            *count = 0;
             return nullptr;
         }
     }
+    *count = size;
     return const_cast<const char**>(charPtr);
 }
 
@@ -74,7 +76,7 @@ static bool IsUtdInvalid(OH_Utd* pThis)
     return pThis == nullptr || pThis->id != UTD_STRUCT_ID;
 }
 
-static const char** GetTypesByCondition(const char* condition, unsigned int* count, FuncPtr funcPtr)
+static const char** GetTypesByCondition(const char* condition, unsigned int* count, GetUtdByConditionPtr funcPtr)
 {
     if (condition == nullptr || count == nullptr) {
         return nullptr;
@@ -194,13 +196,13 @@ const char** OH_Utd_GetMimeTypes(OH_Utd* pThis, unsigned int* count)
 
 const char** OH_Utd_GetTypesByFilenameExtension(const char* extension, unsigned int* count)
 {
-    FuncPtr funcPtr = &UtdClient::GetUniformDataTypeByFilenameExtension;
+    GetUtdByConditionPtr funcPtr = &UtdClient::GetUniformDataTypeByFilenameExtension;
     return  GetTypesByCondition(extension, count, funcPtr);
 }
 
 const char** OH_Utd_GetTypesByMimeType(const char* mimeType, unsigned int* count)
 {
-    FuncPtr funcPtr = &UtdClient::GetUniformDataTypeByMIMEType;
+    GetUtdByConditionPtr funcPtr = &UtdClient::GetUniformDataTypeByMIMEType;
     return  GetTypesByCondition(mimeType, count, funcPtr);
 }
 

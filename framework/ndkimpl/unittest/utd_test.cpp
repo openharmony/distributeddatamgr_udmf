@@ -158,20 +158,19 @@ HWTEST_F(UtdTest, OH_Utd_GetIconFile_001, TestSize.Level1)
 HWTEST_F(UtdTest, OH_Utd_GetBelongingToTypes_001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "OH_Utd_GetBelongingToTypes_001 begin.");
-    unsigned int* count = new unsigned int;
-    auto belongingToTypes = OH_Utd_GetBelongingToTypes(utd, count);
+    unsigned int count = 0;
+    auto belongingToTypes = OH_Utd_GetBelongingToTypes(utd, &count);
     std::string belongingToType(belongingToTypes[0]);
     EXPECT_EQ(UDMF_META_TEXT, belongingToType);
-    EXPECT_EQ(1, *count);
+    EXPECT_EQ(1, count);
 
     OH_Utd* utdNullptr = nullptr;
-    auto belongingToTypeNullptr = OH_Utd_GetBelongingToTypes(utdNullptr, count);
+    auto belongingToTypeNullptr = OH_Utd_GetBelongingToTypes(utdNullptr, &count);
     EXPECT_EQ(nullptr, belongingToTypeNullptr);
 
     unsigned int* countNullptr = nullptr;
     auto belongingToTypeNullptr2 = OH_Utd_GetBelongingToTypes(utd, countNullptr);
     EXPECT_EQ(nullptr, belongingToTypeNullptr2);
-    delete count;
     LOG_INFO(UDMF_TEST, "OH_Utd_GetBelongingToTypes_001 end.");
 }
 
@@ -183,20 +182,19 @@ HWTEST_F(UtdTest, OH_Utd_GetBelongingToTypes_001, TestSize.Level1)
 HWTEST_F(UtdTest, OH_Utd_GetFilenameExtensions_001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "OH_Utd_GetFilenameExtensions_001 begin.");
-    unsigned int* count = new unsigned int;
-    auto filenameExtensions = OH_Utd_GetFilenameExtensions(utd, count);
+    unsigned int count = 0;
+    auto filenameExtensions = OH_Utd_GetFilenameExtensions(utd, &count);
     std::string filenameExtension(filenameExtensions[0]);
     EXPECT_EQ(".txt", filenameExtension);
-    EXPECT_EQ(2, *count);
+    EXPECT_EQ(2, count);
 
     OH_Utd* utdNullptr = nullptr;
-    auto filenameExtensionsNullptr = OH_Utd_GetFilenameExtensions(utdNullptr, count);
+    auto filenameExtensionsNullptr = OH_Utd_GetFilenameExtensions(utdNullptr, &count);
     EXPECT_EQ(nullptr, filenameExtensionsNullptr);
 
     unsigned int* countNullptr = nullptr;
     auto filenameExtensionsNullptr2 = OH_Utd_GetFilenameExtensions(utd, countNullptr);
     EXPECT_EQ(nullptr, filenameExtensionsNullptr2);
-    delete count;
     LOG_INFO(UDMF_TEST, "OH_Utd_GetFilenameExtensions_001 end.");
 }
 
@@ -208,20 +206,19 @@ HWTEST_F(UtdTest, OH_Utd_GetFilenameExtensions_001, TestSize.Level1)
 HWTEST_F(UtdTest, OH_Utd_GetMimeTypes_001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "OH_Utd_GetMimeTypes_001 begin.");
-    unsigned int* count = new unsigned int;
-    auto mimeTypes = OH_Utd_GetMimeTypes(utd, count);
+    unsigned int count = 0;
+    auto mimeTypes = OH_Utd_GetMimeTypes(utd, &count);
     std::string mimeType(mimeTypes[0]);
     EXPECT_EQ("text/plain", mimeType);
-    EXPECT_EQ(1, *count);
+    EXPECT_EQ(1, count);
 
     OH_Utd* utdNullptr = nullptr;
-    auto mimeTypeNullptr = OH_Utd_GetMimeTypes(utdNullptr, count);
+    auto mimeTypeNullptr = OH_Utd_GetMimeTypes(utdNullptr, &count);
     EXPECT_EQ(nullptr, mimeTypeNullptr);
 
     unsigned int* countNullptr = nullptr;
     auto mimeTypeNullptr2 = OH_Utd_GetMimeTypes(utd, countNullptr);
     EXPECT_EQ(nullptr, mimeTypeNullptr2);
-    delete count;
     LOG_INFO(UDMF_TEST, "OH_Utd_GetMimeTypes_001 end.");
 }
 
@@ -233,21 +230,20 @@ HWTEST_F(UtdTest, OH_Utd_GetMimeTypes_001, TestSize.Level1)
 HWTEST_F(UtdTest, OH_Utd_GetTypesByFilenameExtension_001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "OH_Utd_GetTypesByFilenameExtension_001 begin.");
-    unsigned int* count = new unsigned int;
-    auto typeIds = OH_Utd_GetTypesByFilenameExtension(".txt", count);
+    unsigned int count = 0;
+    auto typeIds = OH_Utd_GetTypesByFilenameExtension(".txt", &count);
     std::string typeId(typeIds[0]);
     EXPECT_EQ(UDMF_META_PLAIN_TEXT, typeId);
-    EXPECT_EQ(1, *count);
-    OH_Utd_DestroyStringList(typeIds, *count);
+    EXPECT_EQ(1, count);
+    OH_Utd_DestroyStringList(typeIds, count);
 
     const char* extensionNullptr = nullptr;
-    auto typeIdsNullptr = OH_Utd_GetTypesByFilenameExtension(extensionNullptr, count);
+    auto typeIdsNullptr = OH_Utd_GetTypesByFilenameExtension(extensionNullptr, &count);
     EXPECT_EQ(nullptr, typeIdsNullptr);
 
     unsigned int* countNullptr = nullptr;
     typeIds = OH_Utd_GetTypesByFilenameExtension(".txt", countNullptr);
     EXPECT_EQ(nullptr, typeIds);
-    delete count;
     LOG_INFO(UDMF_TEST, "OH_Utd_GetTypesByFilenameExtension_001 end.");
 }
 
@@ -259,21 +255,20 @@ HWTEST_F(UtdTest, OH_Utd_GetTypesByFilenameExtension_001, TestSize.Level1)
 HWTEST_F(UtdTest, OH_Utd_GetTypesByMimeType_001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "OH_Utd_GetTypesByMimeType_001 begin.");
-    unsigned int* count = new unsigned int;
-    auto typeIds = OH_Utd_GetTypesByMimeType("text/plain", count);
+    unsigned int count = 0;
+    auto typeIds = OH_Utd_GetTypesByMimeType("text/plain", &count);
     std::string typeId(typeIds[0]);
     EXPECT_EQ(UDMF_META_PLAIN_TEXT, typeId);
-    EXPECT_EQ(1, *count);
-    OH_Utd_DestroyStringList(typeIds, *count);
+    EXPECT_EQ(1, count);
+    OH_Utd_DestroyStringList(typeIds, count);
 
     const char* extensionNullptr = nullptr;
-    auto typeIdsNullptr = OH_Utd_GetTypesByMimeType(extensionNullptr, count);
+    auto typeIdsNullptr = OH_Utd_GetTypesByMimeType(extensionNullptr, &count);
     EXPECT_EQ(nullptr, typeIdsNullptr);
 
     unsigned int* countNullptr = nullptr;
     auto typeIdsNullptr2 = OH_Utd_GetTypesByMimeType("text/plain", countNullptr);
     EXPECT_EQ(nullptr, typeIdsNullptr2);
-    delete count;
     LOG_INFO(UDMF_TEST, "OH_Utd_GetTypesByMimeType_001 end.");
 }
 
