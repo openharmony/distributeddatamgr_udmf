@@ -24,16 +24,17 @@ static constexpr int MINIMUM = 48;
 static constexpr int MAXIMUM = 121;
 const char SPECIAL = '^';
 
-std::vector<std::string> StrSplit(std::string str, std::string subStr)
+std::vector<std::string> StrSplit(const std::string &str, const std::string &delimiter)
 {
     std::vector<std::string> result;
-    char *s = str.data();
-    char *p = strtok(s, subStr.c_str());
-    while (p) {
-        std::string tmp = p;
-        result.push_back(p);
-        p = strtok(NULL, subStr.c_str());
+    size_t start = 0;
+    size_t end = str.find(delimiter);
+    while (end != std::string::npos) {
+        result.push_back(str.substr(start, end - start));
+        start = end + delimiter.length();
+        end = str.find(delimiter, start);
     }
+    result.push_back(str.substr(start));
     return result;
 }
 
