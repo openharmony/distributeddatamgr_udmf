@@ -39,6 +39,7 @@
         "napi",
         "samgr",
         "app_file_service",
+        "os_account",
         "selinux_adapter"
       ],
       "third_party": [

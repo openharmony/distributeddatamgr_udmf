@@ -99,6 +99,7 @@ ohos_shared_library("udmf_client") {
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "kv_store:distributeddata_mgr",
+    "os_account:os_account_innerkits",
     "samgr:samgr_proxy",
   ]
 
@@ -159,9 +160,12 @@ ohos_shared_library("utd_client") {
   public_configs = [ ":utd_client_config" ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
+    "ipc:ipc_core",
+    "os_account:os_account_innerkits",
   ]
 
   public_external_deps = [ "cJSON:cjson" ]

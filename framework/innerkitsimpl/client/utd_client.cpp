@@ -21,9 +21,15 @@
 #include "custom_utd_store.h"
 #include "base32_utils.h"
 #include "udmf_utils.h"
+#include "accesstoken_kit.h"
+#include "access_token.h"
+#include "ipc_skeleton.h"
+#include "os_account_manager.h"
 namespace OHOS {
 namespace UDMF {
-constexpr const char* CUSTOM_TYPE_CFG_PATH = "/data/utd/utd-adt.json";
+constexpr const char* CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
+constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/defaultUserId/";
+constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/utd/utd-adt.json";
 UtdClient::UtdClient()
 {
     Init();
@@ -43,10 +49,15 @@ UtdClient &UtdClient::GetInstance()
 void UtdClient::Init()
 {
     descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
-    std::vector<TypeDescriptorCfg> customTypes =
-        CustomUtdStore::GetInstance().GetTypeCfgs(CUSTOM_TYPE_CFG_PATH);
-    if (!customTypes.empty()) {
-        descriptorCfgs_.insert(descriptorCfgs_.end(), customTypes.begin(), customTypes.end());
+    std::string customUtdPath = GetCustomUtdPath();
+    if (!customUtdPath.empty()) {
+        std::vector<TypeDescriptorCfg> customTypes =
+            CustomUtdStore::GetInstance().GetTypeCfgs(customUtdPath);
+        LOG_INFO(UDMF_CLIENT, "get customUtd. path:%{public}s, size:%{public}zu",
+                 customUtdPath.c_str(), customTypes.size());
+        if (!customTypes.empty()) {
+            descriptorCfgs_.insert(descriptorCfgs_.end(), customTypes.begin(), customTypes.end());
+        }
     }
     UtdGraph::GetInstance().InitUtdGraph(descriptorCfgs_);
 }
@@ -208,5 +219,40 @@ Status UtdClient::IsUtd(std::string typeId, bool &result)
     return Status::E_OK;
 }
 
+bool UtdClient::IsHapTokenType()
+{
+    uint32_t tokenId = IPCSkeleton::GetSelfTokenID();
+    auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    LOG_DEBUG(UDMF_CLIENT, "GetTokenTypeFlag, tokenType = %{public}d.", tokenType);
+    if (tokenType == Security::AccessToken::TypeATokenTypeEnum::TOKEN_HAP) {
+        return true;
+    }
+    return false;
+}
+
+std::string UtdClient::GetCustomUtdPath()
+{
+    if (IsHapTokenType()) {
+        return std::string(CUSTOM_UTD_HAP_DIR);
+    }
+    int32_t userId = DEFAULT_USER_ID;
+    if (GetCurrentActiveUserId(userId) != Status::E_OK) {
+        return "";
+    }
+    std::string customUtdSaPath = std::string(CUSTOM_UTD_SA_DIR) +
+                                  std::to_string(userId) + std::string(CUSTOM_UTD_SA_SUB_DIR);
+    return customUtdSaPath;
+}
+
+Status UtdClient::GetCurrentActiveUserId(int32_t& userId)
+{
+    int32_t localId;
+    int32_t status = OHOS::AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(localId);
+    if (status != Status::E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "GetForegroundOsAccountLocalId fail, status:%{public}d", status);
+        return Status::E_ERROR;
+    }
+    return Status::E_OK;
+}
 } // namespace UDMF
 } // namespace OHOS
