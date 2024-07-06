@@ -68,5 +68,10 @@ ValueType UnifiedRecord::GetValue()
 {
     return value_;
 }
+
+void UnifiedRecord::SetValue(const ValueType &value)
+{
+    value_ = value;
+}
 } // namespace UDMF
 } // namespace OHOS

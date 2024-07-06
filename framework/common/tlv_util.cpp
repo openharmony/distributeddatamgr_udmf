@@ -27,6 +27,7 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
     }
     data.Count(input->GetType());
     data.Count(input->GetUid());
+    data.Count(input->GetValue());
     auto type = input->GetType();
     switch (type) {
         case UDType::TEXT: {
@@ -363,6 +364,18 @@ bool Writing(const UDVariant &input, TLVObject &data)
 
 template<>
 bool Reading(UDVariant &output, TLVObject &data)
+{
+    return data.ReadVariant(output);
+}
+
+template<>
+bool Writing(const ValueType &input, TLVObject &data)
+{
+    return data.WriteVariant(input);
+}
+
+template<>
+bool Reading(ValueType &output, TLVObject &data)
 {
     return data.ReadVariant(output);
 }
@@ -871,6 +884,9 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
     if (!Writing(input->GetUid(), data)) {
         return false;
     }
+    if (!Writing(input->GetValue(), data)) {
+        return false;
+    }
     auto type = input->GetType();
     switch (type) {
         case UDType::TEXT: {
@@ -1058,6 +1074,10 @@ bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data)
     if (!Reading(uid, data)) {
         return false;
     }
+    ValueType value;
+    if (!Reading(value, data)) {
+        return false;
+    }
     switch (type) {
         case UDType::TEXT: {
             std::shared_ptr<Text> text = std::make_shared<Text>();
@@ -1177,6 +1197,7 @@ bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data)
     }
     output->SetUid(uid);
     output->SetType(type);
+    output->SetValue(value);
     return true;
 }
 

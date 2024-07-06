@@ -25,7 +25,9 @@
 #include <variant>
 #include <vector>
 #include "visibility.h"
+#include "pixel_map.h"
 #include "string_ex.h"
+#include "want.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -487,6 +489,14 @@ public:
     static bool IsPersist(const std::string &intention);
     static Intention GetIntentionByString(const std::string &intention);
     static bool IsValidOptions(const std::string &key, std::string &intention);
+};
+
+struct Object;
+using ValueType = std::variant<std::monostate, int32_t, int64_t, double, bool, std::string, std::vector<uint8_t>,
+    std::shared_ptr<OHOS::AAFwk::Want>, std::shared_ptr<OHOS::Media::PixelMap>, std::shared_ptr<Object>>;
+
+struct Object {
+    std::map<std::string, ValueType> value_;
 };
 } // namespace UDMF
 } // namespace OHOS

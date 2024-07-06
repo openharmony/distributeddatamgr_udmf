@@ -35,6 +35,9 @@ enum class TAG {
     TAG_STRING,
     TAG_VECTOR,
     TAG_MAP,
+    TAG_WANT,
+    TAG_PIXELMAP,
+    TAG_OBJECT,
     TAG_BUTT,
 };
 
@@ -62,10 +65,19 @@ public:
     void Count(const double value);
     void Count(const std::string &value);
     void Count(const std::vector<uint8_t> &value);
-    void Count(const UDVariant &value);
     void Count(const UDDetails &value);
     void Count(const UnifiedKey &value);
     void Count(const Privilege &value);
+    void Count(const OHOS::AAFwk::Want &value);
+    void Count(const OHOS::Media::PixelMap &value);
+    void Count(const Object &value);
+    void Count(const std::monostate &value);
+    template<typename T> void Count(const std::shared_ptr<T> value);
+    template<typename _InTp> void CountVariant(uint32_t step, const _InTp& input);
+    template<typename _InTp, typename _First, typename... _Rest>
+    void CountVariant(uint32_t step, const _InTp& input);
+    template<typename... _Types> void Count(const std::variant<_Types...>& input);
+
     template<typename T> bool WriteBasic(TAG type, const T &value);
     template<typename T> bool ReadBasic(T &value);
     bool WriteString(const std::string &value);
@@ -74,12 +86,22 @@ public:
     bool ReadVector(std::vector<uint8_t> &value);
     bool WriteVariant(const UDVariant &value);
     bool ReadVariant(UDVariant &value);
+    bool WriteVariant(const ValueType &value);
+    bool ReadVariant(ValueType &value);
     bool WriteMap(const UDDetails &value);
     bool ReadMap(UDDetails &value);
+    bool WriteMap(const std::shared_ptr<Object> &value);
+    bool ReadMap(std::shared_ptr<Object> &value);
+    bool WriteWant(const std::shared_ptr<OHOS::AAFwk::Want> &value);
+    bool ReadWant(std::shared_ptr<OHOS::AAFwk::Want> &value);
+    bool WritePixelMap(const std::shared_ptr<OHOS::Media::PixelMap> &value);
+    bool ReadPixelMap(std::shared_ptr<OHOS::Media::PixelMap> &value);
 
 private:
     bool WriteVariantInner(TAG &tag, const UDVariant &value);
     bool ReadVariantInner(uint16_t tag, UDVariant &value);
+    bool WriteVariantInner(TAG &tag, const ValueType &value);
+    bool ReadVariantInner(uint16_t tag, ValueType &value);
     bool ReadHead(TLVHead &head);
     void WriteHead(uint16_t type, size_t tagCursor, uint32_t len);
     bool HasExpectBuffer(const uint32_t expectLen) const;
@@ -146,6 +168,37 @@ bool TLVObject::ReadBasic(T &value)
     return true;
 }
 
+template<typename T>
+void TLVObject::Count(const std::shared_ptr<T> value)
+{
+    if (value == nullptr) {
+        return;
+    }
+    Count(*value);
+}
+
+template<typename _InTp>
+void TLVObject::CountVariant(uint32_t step, const _InTp& input)
+{
+    total_ += sizeof(TLVHead);
+}
+
+template<typename _InTp, typename _First, typename... _Rest>
+void TLVObject::CountVariant(uint32_t step, const _InTp& input)
+{
+    if (step == input.index()) {
+        this->Count(std::get<_First>(input));
+        return;
+    }
+    CountVariant<_InTp, _Rest...>(step + 1, input);
+}
+
+template<typename... _Types>
+void TLVObject::Count(const std::variant<_Types...>& input)
+{
+    total_ += sizeof(TLVHead);
+    CountVariant<decltype(input), _Types...>(0, input);
+}
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_TLV_OBJECT_H
