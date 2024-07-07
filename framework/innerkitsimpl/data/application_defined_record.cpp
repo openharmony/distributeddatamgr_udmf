@@ -33,8 +33,10 @@ ApplicationDefinedRecord::ApplicationDefinedRecord(std::string type, std::vector
     this->rawData_ = std::move(data);
 }
 
-ApplicationDefinedRecord::ApplicationDefinedRecord(UDType type, ValueType value) : UnifiedRecord(type, value)
+ApplicationDefinedRecord::ApplicationDefinedRecord(UDType type, ValueType value)
+    : UnifiedRecord(type, value)
 {
+    this->dataType_ = APPLICATION_DEFINED_RECORD;
     if (std::holds_alternative<std::vector<uint8_t>>(value)) {
         rawData_ = std::get<std::vector<uint8_t>>(value);
     }

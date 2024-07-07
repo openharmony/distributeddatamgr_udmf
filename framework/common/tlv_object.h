@@ -38,6 +38,8 @@ enum class TAG {
     TAG_WANT,
     TAG_PIXELMAP,
     TAG_OBJECT,
+    TAG_NULL,
+    TAG_UNDEFINED,
     TAG_BUTT,
 };
 
@@ -72,6 +74,7 @@ public:
     void Count(const OHOS::Media::PixelMap &value);
     void Count(const Object &value);
     void Count(const std::monostate &value);
+    void Count(const void *value);
     template<typename T> void Count(const std::shared_ptr<T> value);
     template<typename _InTp> void CountVariant(uint32_t step, const _InTp& input);
     template<typename _InTp, typename _First, typename... _Rest>
@@ -96,6 +99,10 @@ public:
     bool ReadWant(std::shared_ptr<OHOS::AAFwk::Want> &value);
     bool WritePixelMap(const std::shared_ptr<OHOS::Media::PixelMap> &value);
     bool ReadPixelMap(std::shared_ptr<OHOS::Media::PixelMap> &value);
+    bool WriteUndefined(const std::monostate &value);
+    bool ReadUndefined(std::monostate &value);
+    bool WriteNull(const void *value);
+    bool ReadNull(void *value);
 
 private:
     bool WriteVariantInner(TAG &tag, const UDVariant &value);

@@ -43,7 +43,9 @@ public:
     void SetItems(UDDetails &details);
     UDDetails GetItems();
 
+    static bool CheckValue(const ValueType &value);
 private:
+    void InitObject();
     constexpr static const char *APPID = "appId";
     constexpr static const char *APPNAME = "appName";
     constexpr static const char *APPICONID = "appIconId";

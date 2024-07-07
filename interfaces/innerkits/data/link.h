@@ -35,7 +35,13 @@ public:
     std::string GetDescription() const;
     void SetDescription(const std::string &description);
 
+    static bool CheckValue(const ValueType &value);
+    
 private:
+    void InitObject();
+
+    constexpr static const char *URL = "url";
+    constexpr static const char *DESCRIPTION = "description";
     std::string url_;
     std::string description_;
 };

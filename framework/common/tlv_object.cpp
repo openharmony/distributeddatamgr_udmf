@@ -151,6 +151,11 @@ void TLVObject::Count(const std::monostate &value)
     total_ += sizeof(TLVHead);
 }
 
+void TLVObject::Count(const void *value)
+{
+    total_ += sizeof(TLVHead);
+}
+
 bool TLVObject::WriteString(const std::string &value)
 {
     PrepareBuffer(sizeof(TLVHead) + value.size());
@@ -404,68 +409,61 @@ bool TLVObject::ReadVariant(UDVariant &value)
 
 bool TLVObject::WriteVariantInner(TAG &tag, const ValueType &value)
 {
-    auto int32Value = std::get_if<int32_t>(&value);
-    if (int32Value != nullptr) {
+    if (std::get_if<int32_t>(&value) != nullptr) {
         if (!WriteBasic(TAG::TAG_INT32, std::get<int32_t>(value))) {
             return false;
         }
         tag = TAG::TAG_INT32;
-    }
-    auto int64Value = std::get_if<int64_t>(&value);
-    if (int64Value != nullptr) {
+    } else if (std::get_if<int64_t>(&value) != nullptr) {
         if (!WriteBasic(TAG::TAG_INT64, std::get<int64_t>(value))) {
             return false;
         }
         tag = TAG::TAG_INT64;
-    }
-    auto boolValue = std::get_if<bool>(&value);
-    if (boolValue != nullptr) {
+    } else if (std::get_if<bool>(&value) != nullptr) {
         if (!WriteBasic(TAG::TAG_BOOL, std::get<bool>(value))) {
             return false;
         }
         tag = TAG::TAG_BOOL;
-    }
-    auto doubleValue = std::get_if<double>(&value);
-    if (doubleValue != nullptr) {
+    } else if (std::get_if<double>(&value) != nullptr) {
         if (!WriteBasic(TAG::TAG_DOUBLE, std::get<double>(value))) {
             return false;
         }
         tag = TAG::TAG_DOUBLE;
-    }
-    auto stringValue = std::get_if<std::string>(&value);
-    if (stringValue != nullptr) {
+    } else if (std::get_if<std::string>(&value) != nullptr) {
         if (!WriteString(std::get<std::string>(value))) {
             return false;
         }
         tag = TAG::TAG_STRING;
-    }
-    auto vectorValue = std::get_if<std::vector<uint8_t>>(&value);
-    if (vectorValue != nullptr) {
+    } else if (std::get_if<std::vector<uint8_t>>(&value) != nullptr) {
         if (!WriteVector(std::get<std::vector<uint8_t>>(value))) {
             return false;
         }
         tag = TAG::TAG_VECTOR;
-    }
-    auto wantValue = std::get_if<std::shared_ptr<OHOS::AAFwk::Want>>(&value);
-    if (wantValue != nullptr) {
+    } else if (std::get_if<std::shared_ptr<OHOS::AAFwk::Want>>(&value) != nullptr) {
         if (!WriteWant(std::get<std::shared_ptr<OHOS::AAFwk::Want>>(value))) {
             return false;
         }
         tag = TAG::TAG_WANT;
-    }
-    auto pixelMapValue = std::get_if<std::shared_ptr<OHOS::Media::PixelMap>>(&value);
-    if (pixelMapValue != nullptr) {
+    } else if (std::get_if<std::shared_ptr<OHOS::Media::PixelMap>>(&value) != nullptr) {
         if (!WritePixelMap(std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value))) {
             return false;
         }
         tag = TAG::TAG_PIXELMAP;
-    }
-    auto objectValue = std::get_if<std::shared_ptr<Object>>(&value);
-    if (objectValue != nullptr) {
-        if (!WriteMap(std::get<std::shared_ptr<Object>>(value))) {
+    } else if (std::get_if<std::shared_ptr<Object>>(&value) != nullptr) {
+        if (!WriteMap(std::get<std::shared_ptr<Object>>(value))){
             return false;
         }
         tag = TAG::TAG_OBJECT;
+    } else if (std::get_if<std::monostate>(&value) != nullptr) {
+        if (!WriteUndefined(std::get<std::monostate>(value))) {
+            return false;
+        }
+        tag = TAG::TAG_UNDEFINED;
+    } else if (std::get_if<nullptr_t>(&value) != nullptr) {
+        if (!WriteNull(nullptr)){
+            return false;
+        }
+        tag = TAG::TAG_NULL;
     }
     return true;
 }
@@ -600,6 +598,22 @@ bool TLVObject::ReadVariant(ValueType &value)
                 return false;
             }
             value.emplace<std::shared_ptr<Object>>(objectValue);
+            break;
+        }
+        case static_cast<uint16_t>(TAG::TAG_UNDEFINED): {
+            std::monostate monoValue;
+            if (!ReadUndefined(monoValue)) {
+                return false;
+            }
+            value.emplace<std::monostate>(monoValue);
+            break;
+        }
+        case static_cast<uint16_t>(TAG::TAG_NULL): {
+            nullptr_t nullValue = nullptr;
+            if (!ReadNull(nullValue)) {
+                return false;
+            }
+            value.emplace<nullptr_t>(nullValue);
             break;
         }
         default: {
@@ -862,6 +876,75 @@ bool TLVObject::ReadPixelMap(std::shared_ptr<OHOS::Media::PixelMap> &value)
     if (file_ != nullptr) {
         cursor_ += sizeof(TLVHead);
     }
+    return true;
+}
+
+bool TLVObject::WriteUndefined(const std::monostate &value)
+{
+    PrepareBuffer(sizeof(TLVHead));
+    if (!HasExpectBuffer(sizeof(TLVHead))) {
+        return false;
+    }
+    auto *tlvHead = reinterpret_cast<TLVHead *>(buffer_->data() + cursor_);
+    tlvHead->tag = HostToNet(static_cast<uint16_t>(TAG::TAG_UNDEFINED));
+    tlvHead->len = HostToNet((uint32_t)0);
+    if (!SaveBufferToFile()) {
+        return false;
+    }
+    cursor_ += sizeof(TLVHead);
+    return true;
+}
+
+bool TLVObject::ReadUndefined(std::monostate &value)
+{
+    TLVHead head {};
+    if (!ReadHead(head)) {
+        return false;
+    }
+    if (!HasExpectBuffer(head.len)) {
+        return false;
+    }
+    if (!LoadBufferFormFile(head.len)) {
+        return false;
+    }
+    if (file_ != nullptr) {
+        cursor_ += sizeof(TLVHead);
+    }
+    return true;
+}
+
+bool TLVObject::WriteNull(const void *value)
+{
+    PrepareBuffer(sizeof(TLVHead));
+    if (!HasExpectBuffer(sizeof(TLVHead))) {
+        return false;
+    }
+    auto *tlvHead = reinterpret_cast<TLVHead *>(buffer_->data() + cursor_);
+    tlvHead->tag = HostToNet(static_cast<uint16_t>(TAG::TAG_NULL));
+    tlvHead->len = HostToNet((uint32_t)0);
+    if (!SaveBufferToFile()) {
+        return false;
+    }
+    cursor_ += sizeof(TLVHead);
+    return true;
+}
+
+bool TLVObject::ReadNull(void *value)
+{
+    TLVHead head {};
+    if (!ReadHead(head)) {
+        return false;
+    }
+    if (!HasExpectBuffer(head.len)) {
+        return false;
+    }
+    if (!LoadBufferFormFile(head.len)) {
+        return false;
+    }
+    if (file_ != nullptr) {
+        cursor_ += sizeof(TLVHead);
+    }
+    value = nullptr;
     return true;
 }
 

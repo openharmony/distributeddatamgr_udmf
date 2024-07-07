@@ -493,11 +493,34 @@ public:
 
 struct Object;
 using ValueType = std::variant<std::monostate, int32_t, int64_t, double, bool, std::string, std::vector<uint8_t>,
-    std::shared_ptr<OHOS::AAFwk::Want>, std::shared_ptr<OHOS::Media::PixelMap>, std::shared_ptr<Object>>;
+    std::shared_ptr<OHOS::AAFwk::Want>, std::shared_ptr<OHOS::Media::PixelMap>, std::shared_ptr<Object>, nullptr_t>;
 
 struct Object {
+    bool HasStrValue(const std::string &key);
+    bool GetValue(const std::string &key, std::string &value);
+    bool GetValue(const std::string &key, std::shared_ptr<Object> &value);
+
     std::map<std::string, ValueType> value_;
 };
+
+namespace ObjectUtils {
+    std::shared_ptr<Object> ConvertToObject(UDDetails &details);
+    UDDetails ConvertToUDDetails(std::shared_ptr<Object> object);
+
+    template<typename T, typename... Types>
+    bool ConvertVariant(T &&input, std::variant<Types...> &output)
+    {
+        bool converted = false;
+        std::visit([&output, &converted](auto &&val) {
+            using BasicType = std::decay_t<decltype(val)>;
+            if constexpr ((std::is_same_v<BasicType, Types> || ...)) {
+                output = std::variant<Types...>(std::move(val));
+                converted = true;
+            }
+        }, input);
+        return converted;
+    }
+} // namespace ObjectUtils
 } // namespace UDMF
 } // namespace OHOS
 #endif // UNIFIED_META_H

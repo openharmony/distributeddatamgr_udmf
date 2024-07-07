@@ -41,6 +41,8 @@ public:
     void SetValue(const ValueType &value);
 
 protected:
+    static constexpr const char *UNIFORM_DATA_TYPE = "uniformDataType";
+    static constexpr const char *DETAILS = "details";
     UDType dataType_;
     ValueType value_;
 private:

@@ -29,12 +29,22 @@ PlainText::PlainText(const std::string &content, const std::string &abstract)
     this->dataType_ = PLAIN_TEXT;
     this->content_ = content;
     this->abstract_ = abstract;
+    InitObject();
 }
 
 PlainText::PlainText(UDType type, ValueType value) : Text(type, value)
 {
+    this->dataType_ = PLAIN_TEXT;
     if (std::holds_alternative<std::string>(value)) {
         content_ = std::get<std::string>(value);
+    } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        auto object = std::get<std::shared_ptr<Object>>(value);
+        object->GetValue(TEXT_CONTENT, content_);
+        object->GetValue(ABSTRACT, abstract_);
+        std::shared_ptr<Object> detailObj = nullptr;
+        if (object->GetValue(DETAILS, detailObj)) {
+            details_ = ObjectUtils::ConvertToUDDetails(detailObj);
+        }
     }
 }
 
@@ -54,6 +64,7 @@ void PlainText::SetContent(const std::string &text)
         return;
     }
     this->content_ = text;
+    InitObject();
 }
 
 std::string PlainText::GetAbstract() const
@@ -67,6 +78,48 @@ void PlainText::SetAbstract(const std::string &abstract)
         return;
     }
     this->abstract_ = abstract;
+    InitObject();
+}
+
+void PlainText::InitObject()
+{
+    if (std::holds_alternative<std::monostate>(value_)) {
+        value_ = std::make_shared<Object>();
+    }
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
+        object->value_[TEXT_CONTENT] = content_;
+        object->value_[ABSTRACT] = abstract_;
+        object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+    }
+}
+
+bool PlainText::CheckValue(const ValueType &value)
+{
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        return true;
+    }
+    auto object = std::get<std::shared_ptr<Object>>(value);
+
+    bool IsValid = true;
+    IsValid = IsValid && object->HasStrValue(UNIFORM_DATA_TYPE);
+    IsValid = IsValid && object->HasStrValue(TEXT_CONTENT);
+
+    auto isValidDetail = [](const auto& pair) {
+        return std::holds_alternative<std::string>(pair.second);
+    };
+    std::shared_ptr<Object> detailObj = nullptr;
+    if (object->GetValue(DETAILS, detailObj)) {
+        IsValid = IsValid && std::all_of(detailObj->value_.begin(), detailObj->value_.end(), isValidDetail);
+    }
+
+    auto isValidKey = [](const auto& pair) {
+        const std::string& key = pair.first;
+        return key == UNIFORM_DATA_TYPE || key == TEXT_CONTENT || key == ABSTRACT || key == DETAILS;
+    };
+    IsValid = IsValid && std::all_of(object->value_.begin(), object->value_.end(), isValidKey);
+    return IsValid;
 }
 } // namespace UDMF
 } // namespace OHOS

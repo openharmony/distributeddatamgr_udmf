@@ -105,6 +105,10 @@ public:
     static napi_status GetValue(napi_env env, napi_value in, std::monostate &out);
     static napi_status SetValue(napi_env env, const std::monostate &in, napi_value &out);
 
+    /* napi_value <-> null */
+    static napi_status GetValue(napi_env env, napi_value in, nullptr_t &out);
+    static napi_status SetValue(napi_env env, const nullptr_t &in, napi_value &out);
+
     static bool IsTypeForNapiValue(napi_env env, napi_value param, napi_valuetype expectType);
 
     static bool IsNull(napi_env env, napi_value value);

@@ -33,7 +33,11 @@ public:
     std::string GetAbstract() const;
     void SetAbstract(const std::string &abstract);
 
+    static bool CheckValue(const ValueType &value);
 private:
+    void InitObject();
+    constexpr static const char *TEXT_CONTENT = "textContent";
+    constexpr static const char *ABSTRACT = "abstract";
     std::string content_;
     std::string abstract_;
 };

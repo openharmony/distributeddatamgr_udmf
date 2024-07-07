@@ -461,6 +461,9 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
             case napi_valuetype::napi_undefined:
                 object->value_[attributeName] = std::monostate();
                 break;
+            case napi_valuetype::napi_null:
+                object->value_[attributeName] = nullptr;
+                break;
             default:
                 return napi_invalid_arg;
         }
@@ -497,6 +500,19 @@ napi_status NapiDataUtils::SetValue(napi_env env, const std::monostate &in, napi
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "napi_value <- std::monostate");
     return napi_get_undefined(env, &out);
+}
+
+napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, nullptr_t &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> null");
+    out = nullptr;
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::SetValue(napi_env env, const nullptr_t &in, napi_value &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value <- null");
+    return napi_get_null(env, &out);
 }
 
 bool NapiDataUtils::IsTypeForNapiValue(napi_env env, napi_value param, napi_valuetype expectType)

@@ -141,11 +141,9 @@ void UnifiedRecordNapi::GetNativeValue(napi_env env, std::string type, napi_valu
         Status::E_INVALID_PARAMETERS, "Parameter error: parameter value type must be ValueType");
     if (valueType == napi_object) {
         if (type == "openharmony.pixel-map") {
-            std::shared_ptr<OHOS::Media::PixelMap> data;
-            value = data;
+            value = std::shared_ptr<OHOS::Media::PixelMap>(nullptr);
         } else if (type == "openharmony.want") {
-            std::shared_ptr<OHOS::AAFwk::Want> data;
-            value = data;
+            value = std::shared_ptr<OHOS::AAFwk::Want>(nullptr);
         } else {
             value = std::make_shared<Object>();
         }
@@ -157,6 +155,8 @@ void UnifiedRecordNapi::GetNativeValue(napi_env env, std::string type, napi_valu
         value = bool();
     } else if (valueType == napi_undefined) {
         value = std::monostate();
+    } else if (valueType == napi_null) {
+        value = nullptr;
     }
     std::visit([&](auto &value) { status = NapiDataUtils::GetValue(env, valueNapi, value); }, value);
     ASSERT_ERR_VOID(env, status == napi_ok, Status::E_ERROR, "get unifiedRecord failed");

@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define LOG_TAG "UnifiedRecord"
 #include "unified_record.h"
+
+#include "logger.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -24,17 +26,11 @@ UnifiedRecord::UnifiedRecord()
 
 UnifiedRecord::UnifiedRecord(UDType type)
 {
-    if (type < ENTITY || type > UD_BUTT) {
-        dataType_ = UD_BUTT;
-    }
     dataType_ = type;
 }
 
 UnifiedRecord::UnifiedRecord(UDType type, ValueType value)
 {
-    if (type < ENTITY || type > UD_BUTT) {
-        dataType_ = UD_BUTT;
-    }
     dataType_ = type;
     value_ = value;
 }

@@ -26,7 +26,10 @@ int64_t SystemDefinedRecord::GetSize()
     return UnifiedDataUtils::GetDetailsSize(this->details_);
 }
 
-SystemDefinedRecord::SystemDefinedRecord(UDType type, ValueType value) : UnifiedRecord(type, value) {}
+SystemDefinedRecord::SystemDefinedRecord(UDType type, ValueType value) : UnifiedRecord(type, value)
+{
+    this->dataType_ = SYSTEM_DEFINED_RECORD;
+}
 
 void SystemDefinedRecord::AddProperty(const std::string &property, UDVariant &value)
 {

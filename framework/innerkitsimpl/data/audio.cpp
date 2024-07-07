@@ -26,6 +26,9 @@ Audio::Audio(const std::string &uri) : File(uri)
     this->dataType_ = AUDIO;
 }
 
-Audio::Audio(UDType type, ValueType value) : File(type, value) {}
+Audio::Audio(UDType type, ValueType value) : File(type, value)
+{
+    this->dataType_ = AUDIO;
+}
 } // namespace UDMF
 } // namespace OHOS
