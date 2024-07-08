@@ -2117,4 +2117,311 @@ HWTEST_F(UdmfClientTest, GetTypesLabels001, TestSize.Level1)
     ASSERT_EQ(data.HasType("general.plain-text"), true);
     ASSERT_EQ(data.HasType("general.html"), false);
 }
+
+/**
+* @tc.name: QueryUDSData001
+* @tc.desc: QueryUDSData001
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, QueryUDSData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "QueryUDSData001 begin.");
+
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_TRUE(unifiedDataSet.empty());
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "plainTextContent");
+    data.AddRecord(record1);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    query = { .key = key };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), 1);
+    std::shared_ptr<UnifiedRecord> record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    ASSERT_EQ(record2->GetType(), UDType::PLAIN_TEXT);
+    ValueType value = record2->GetValue();
+    ASSERT_NE(std::get_if<std::string>(&value), nullptr);
+    ASSERT_EQ(std::get<std::string>(value), "plainTextContent");
+    LOG_INFO(UDMF_TEST, "QueryUDSData001 end.");
+}
+
+/**
+* @tc.name: QueryUDSData002
+* @tc.desc: QueryUDSData002
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, QueryUDSData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "QueryUDSData002 begin.");
+
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_TRUE(unifiedDataSet.empty());
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    auto obj = std::make_shared<Object>();
+    obj->value_["uniformDataType"] = "general.plain-text";
+    obj->value_["textContent"] = "plainTextContent";
+    obj->value_["abstract"] = "plainTextAbstract";
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_["detail1"] = "detail1";
+    obj2->value_["detail2"] = "detail2";
+    obj->value_["details"] = obj2;
+    auto record = std::make_shared<PlainText>(UDType::PLAIN_TEXT, obj);
+    data.AddRecord(record);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    unifiedDataSet.clear();
+    query = { .key = key, .intention = UD_INTENTION_DATA_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), 1);
+    auto record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    ASSERT_EQ(record2->GetType(), UDType::PLAIN_TEXT);
+    auto value = record2->GetValue();
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&value), nullptr);
+    obj = std::get<std::shared_ptr<Object>>(value);
+
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["uniformDataType"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["uniformDataType"]), "general.plain-text");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["textContent"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["textContent"]), "plainTextContent");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["abstract"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["abstract"]), "plainTextAbstract");
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&obj->value_["details"]), nullptr);
+    obj2 = std::get<std::shared_ptr<Object>>(obj->value_["details"]);
+
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail1"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail1"]), "detail1");
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail2"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail2"]), "detail2");
+    LOG_INFO(UDMF_TEST, "QueryUDSData002 end.");
+}
+
+/**
+* @tc.name: QueryUDSData003
+* @tc.desc: QueryUDSData003
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, QueryUDSData003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "QueryUDSData003 begin.");
+
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_TRUE(unifiedDataSet.empty());
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    auto obj = std::make_shared<Object>();
+    obj->value_["uniformDataType"] = "general.hyperlink";
+    obj->value_["url"] = "www.xxx";
+    obj->value_["description"] = "hyperlinkDescription";
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_["detail1"] = "detail1";
+    obj2->value_["detail2"] = "detail2";
+    obj->value_["details"] = obj2;
+    auto record = std::make_shared<Link>(UDType::HYPERLINK, obj);
+    data.AddRecord(record);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    unifiedDataSet.clear();
+    query = { .key = key, .intention = UD_INTENTION_DATA_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), 1);
+    auto record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    ASSERT_EQ(record2->GetType(), UDType::HYPERLINK);
+    auto value = record2->GetValue();
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&value), nullptr);
+    obj = std::get<std::shared_ptr<Object>>(value);
+
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["uniformDataType"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["uniformDataType"]), "general.hyperlink");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["url"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["url"]), "www.xxx");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["description"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["description"]), "hyperlinkDescription");
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&obj->value_["details"]), nullptr);
+    obj2 = std::get<std::shared_ptr<Object>>(obj->value_["details"]);
+
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail1"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail1"]), "detail1");
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail2"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail2"]), "detail2");
+    LOG_INFO(UDMF_TEST, "QueryUDSData003 end.");
+}
+
+/**
+* @tc.name: QueryUDSData004
+* @tc.desc: QueryUDSData004
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, QueryUDSData004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "QueryUDSData004 begin.");
+
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_TRUE(unifiedDataSet.empty());
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    auto obj = std::make_shared<Object>();
+    obj->value_["uniformDataType"] = "general.html";
+    obj->value_["htmlContent"] = "www.xxx";
+    obj->value_["plainContent"] = "htmlPlainContent";
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_["detail1"] = "detail1";
+    obj2->value_["detail2"] = "detail2";
+    obj->value_["details"] = obj2;
+    auto record = std::make_shared<Html>(UDType::HTML, obj);
+    data.AddRecord(record);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    unifiedDataSet.clear();
+    query = { .key = key, .intention = UD_INTENTION_DATA_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), 1);
+    auto record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    ASSERT_EQ(record2->GetType(), UDType::HTML);
+    auto value = record2->GetValue();
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&value), nullptr);
+    obj = std::get<std::shared_ptr<Object>>(value);
+
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["uniformDataType"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["uniformDataType"]), "general.html");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["htmlContent"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["htmlContent"]), "www.xxx");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["plainContent"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["plainContent"]), "htmlPlainContent");
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&obj->value_["details"]), nullptr);
+    obj2 = std::get<std::shared_ptr<Object>>(obj->value_["details"]);
+
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail1"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail1"]), "detail1");
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail2"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail2"]), "detail2");
+    LOG_INFO(UDMF_TEST, "QueryUDSData004 end.");
+}
+
+/**
+* @tc.name: QueryUDSData005
+* @tc.desc: QueryUDSData005
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, QueryUDSData005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "QueryUDSData005 begin.");
+
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_TRUE(unifiedDataSet.empty());
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    auto obj = std::make_shared<Object>();
+    obj->value_["uniformDataType"] = "openharmony.app-item";
+    obj->value_["appId"] = "app-itemAppId";
+    obj->value_["appName"] = "app-itemAppName";
+    obj->value_["appIconId"] = "app-itemAppIconId";
+    obj->value_["appLabelId"] = "app-itemAppLabelId";
+    obj->value_["bundleName"] = "app-itemBundleName";
+    obj->value_["abilityName"] = "app-itemAbilityName";
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_["detail1"] = "detail1";
+    obj2->value_["detail2"] = 1234;
+    obj->value_["details"] = obj2;
+    auto record = std::make_shared<SystemDefinedAppItem>(UDType::SYSTEM_DEFINED_APP_ITEM, obj);
+    data.AddRecord(record);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    unifiedDataSet.clear();
+    query = { .key = key, .intention = UD_INTENTION_DATA_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), 1);
+    auto record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    ASSERT_EQ(record2->GetType(), UDType::SYSTEM_DEFINED_APP_ITEM);
+    auto value = record2->GetValue();
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&value), nullptr);
+    obj = std::get<std::shared_ptr<Object>>(value);
+
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["uniformDataType"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["uniformDataType"]), "general.plain-text");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["appId"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["appId"]), "app-itemAppId");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["appName"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["appName"]), "app-itemAppName");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["appIconId"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["appIconId"]), "app-itemAppIconId");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["appLabelId"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["appLabelId"]), "app-itemAppLabelId");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["bundleName"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["bundleName"]), "app-itemBundleName");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["abilityName"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["abilityName"]), "app-itemAbilityName");
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&obj->value_["details"]), nullptr);
+    obj2 = std::get<std::shared_ptr<Object>>(obj->value_["details"]);
+
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail1"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail1"]), "detail1");
+    ASSERT_NE(std::get_if<int32_t>(&obj2->value_["detail2"]), nullptr);
+    ASSERT_EQ(std::get<int32_t>(obj2->value_["detail2"]), 1234);
+    LOG_INFO(UDMF_TEST, "QueryUDSData005 end.");
+}
 } // OHOS::Test
