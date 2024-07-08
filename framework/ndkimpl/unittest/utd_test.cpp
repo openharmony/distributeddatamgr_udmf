@@ -47,16 +47,18 @@ public:
     void TearDown();
 };
 
-void UtdTest::SetUpTestCase(void){}
+void UtdTest::SetUpTestCase(void) {}
 
-void UtdTest::TearDownTestCase(void){}
+void UtdTest::TearDownTestCase(void) {}
 
-void UtdTest::SetUp(void){
+void UtdTest::SetUp(void)
+{
     LOG_INFO(UDMF_TEST, "test case will be start");
     utd = OH_Utd_Create(UDMF_META_PLAIN_TEXT);
 }
 
-void UtdTest::TearDown(void){
+void UtdTest::TearDown(void)
+{
     OH_Utd_Destroy(utd);
     utd = nullptr;
     LOG_INFO(UDMF_TEST, "test case is complete");

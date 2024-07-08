@@ -25,7 +25,7 @@ struct Uds_Object_Ptr {
     const int64_t id;
     std::shared_ptr<OHOS::UDMF::Object> obj;
     std::mutex mutex;
-    Uds_Object_Ptr(int id);
+    explicit Uds_Object_Ptr(int id);
     const char* GetUdsValue(const char* paramName);
     int SetUdsValue(const char* paramName, const char* pramValue);
 };

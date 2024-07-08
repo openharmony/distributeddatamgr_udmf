@@ -124,10 +124,10 @@ const char* OH_UdsPlainText_GetAbstract(OH_UdsPlainText* pThis);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsPlainText}.
  * @param content Represents a new content string.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
- * @see OH_UdsPlainText Udmf_ErrCode
+ * @see OH_UdsPlainText UdmfErrCode
  * @since 12
  */
 int OH_UdsPlainText_SetContent(OH_UdsPlainText* pThis, const char* content);
@@ -137,10 +137,10 @@ int OH_UdsPlainText_SetContent(OH_UdsPlainText* pThis, const char* content);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsPlainText}.
  * @param abstract Represents a new string value.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
- * @see OH_UdsPlainText Udmf_ErrCode
+ * @see OH_UdsPlainText UdmfErrCode
  * @since 12
  */
 int OH_UdsPlainText_SetAbstract(OH_UdsPlainText* pThis, const char* abstract);
@@ -199,10 +199,10 @@ const char* OH_UdsHyperlink_GetDescription(OH_UdsHyperlink* pThis);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsHyperlink}.
  * @param url Represents a new string value.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
- * @see OH_UdsHyperlink Udmf_ErrCode
+ * @see OH_UdsHyperlink UdmfErrCode
  * @since 12
  */
 int OH_UdsHyperlink_SetUrl(OH_UdsHyperlink* pThis, const char* url);
@@ -212,10 +212,10 @@ int OH_UdsHyperlink_SetUrl(OH_UdsHyperlink* pThis, const char* url);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsHyperlink}.
  * @param description Represents a new string value.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
- * @see OH_UdsHyperlink Udmf_ErrCode
+ * @see OH_UdsHyperlink UdmfErrCode
  * @since 12
  */
 int OH_UdsHyperlink_SetDescription(OH_UdsHyperlink* pThis, const char* description);
@@ -274,10 +274,10 @@ const char* OH_UdsHtml_GetPlainContent(OH_UdsHtml* pThis);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsHtml}.
  * @param content Represents a new string value.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
- * @see OH_UdsHtml Udmf_ErrCode
+ * @see OH_UdsHtml UdmfErrCode
  * @since 12
  */
 int OH_UdsHtml_SetContent(OH_UdsHtml* pThis, const char* content);
@@ -287,10 +287,10 @@ int OH_UdsHtml_SetContent(OH_UdsHtml* pThis, const char* content);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsHtml}.
  * @param plainContent Represents a new string value.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
- * @see OH_UdsHtml Udmf_ErrCode
+ * @see OH_UdsHtml UdmfErrCode
  * @since 12
  */
 int OH_UdsHtml_SetPlainContent(OH_UdsHtml* pThis, const char* plainContent);
@@ -389,10 +389,10 @@ const char* OH_UdsAppItem_GetAbilityName(OH_UdsAppItem* pThis);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsAppItem}.
  * @param appId Represents a new string value.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
- * @see OH_UdsAppItem Udmf_ErrCode
+ * @see OH_UdsAppItem UdmfErrCode
  * @since 12
  */
 int OH_UdsAppItem_SetId(OH_UdsAppItem* pThis, const char* appId);
@@ -402,10 +402,10 @@ int OH_UdsAppItem_SetId(OH_UdsAppItem* pThis, const char* appId);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsAppItem}.
  * @param appName Represents a new string value.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
- * @see OH_UdsAppItem Udmf_ErrCode
+ * @see OH_UdsAppItem UdmfErrCode
  * @since 12
  */
 int OH_UdsAppItem_SetName(OH_UdsAppItem* pThis, const char* appName);
@@ -415,10 +415,10 @@ int OH_UdsAppItem_SetName(OH_UdsAppItem* pThis, const char* appName);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsAppItem}.
  * @param appIconId Represents a new string value.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
- * @see OH_UdsAppItem Udmf_ErrCode
+ * @see OH_UdsAppItem UdmfErrCode
  * @since 12
  */
 int OH_UdsAppItem_SetIconId(OH_UdsAppItem* pThis, const char* appIconId);
@@ -428,10 +428,10 @@ int OH_UdsAppItem_SetIconId(OH_UdsAppItem* pThis, const char* appIconId);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsAppItem}.
  * @param appLabelId Represents a new string value.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
- * @see OH_UdsAppItem Udmf_ErrCode
+ * @see OH_UdsAppItem UdmfErrCode
  * @since 12
  */
 int OH_UdsAppItem_SetLabelId(OH_UdsAppItem* pThis, const char* appLabelId);
@@ -441,10 +441,10 @@ int OH_UdsAppItem_SetLabelId(OH_UdsAppItem* pThis, const char* appLabelId);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsAppItem}.
  * @param bundleName Represents a new string value.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
- * @see OH_UdsAppItem Udmf_ErrCode
+ * @see OH_UdsAppItem UdmfErrCode
  * @since 12
  */
 int OH_UdsAppItem_SetBundleName(OH_UdsAppItem* pThis, const char* bundleName);
@@ -454,10 +454,10 @@ int OH_UdsAppItem_SetBundleName(OH_UdsAppItem* pThis, const char* bundleName);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsAppItem}.
  * @param abilityName Represents a new string value.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
- * @see OH_UdsAppItem Udmf_ErrCode
+ * @see OH_UdsAppItem UdmfErrCode
  * @since 12
  */
 int OH_UdsAppItem_SetAbilityName(OH_UdsAppItem* pThis, const char* abilityName);

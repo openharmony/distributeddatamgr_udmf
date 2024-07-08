@@ -42,7 +42,7 @@ OH_UdsAppItem::OH_UdsAppItem() : Uds_Object_Ptr(UDS_APP_ITEM_STRUCT_ID) {}
 
 const char* Uds_Object_Ptr::GetUdsValue(const char* paramName)
 {
-    if(obj->value_.find(paramName) == obj->value_.end()) {
+    if (obj->value_.find(paramName) == obj->value_.end()) {
         LOG_ERROR(UDMF_NDK, "Don't have property %{public}s.", paramName);
         return nullptr;
     }
@@ -51,7 +51,7 @@ const char* Uds_Object_Ptr::GetUdsValue(const char* paramName)
 
 int Uds_Object_Ptr::SetUdsValue(const char* paramName, const char* pramValue)
 {
-    if(obj->value_.find(paramName) == obj->value_.end()) {
+    if (obj->value_.find(paramName) == obj->value_.end()) {
         LOG_ERROR(UDMF_NDK, "Can't set property %{public}s.", paramName);
         return UDMF_E_INVAILD_PARAM;
     }

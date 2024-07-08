@@ -45,9 +45,7 @@ common_external_deps = [
 ohos_unittest("UtdTest") {
   module_out_path = module_output_path
 
-  sources = [
-    "utd_test.cpp"
-  ]
+  sources = [ "utd_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
@@ -59,9 +57,7 @@ ohos_unittest("UtdTest") {
 ohos_unittest("UdsTest") {
   module_out_path = module_output_path
 
-  sources = [
-    "uds_test.cpp"
-  ]
+  sources = [ "uds_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
@@ -75,8 +71,8 @@ group("unittest") {
   testonly = true
 
   deps = [
+    ":UdsTest",
     ":UtdTest",
-    ":UdsTest"
   ]
 }
 ###############################################################################

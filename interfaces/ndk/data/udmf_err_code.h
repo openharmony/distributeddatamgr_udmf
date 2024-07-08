@@ -49,7 +49,7 @@ extern "C" {
  *
  * @since 12
  */
-typedef enum Udmf_ErrCode {
+typedef enum UdmfErrCode {
     /**
      * The error code in the correct case.
      */
@@ -70,7 +70,7 @@ typedef enum Udmf_ErrCode {
      * @brief The error code for common invalid args.
      */
     UDMF_E_INVAILD_PARAM = (UDMF_ERR + 2),
-} Udmf_ErrCode;
+} UdmfErrCode;
 
 #ifdef __cplusplus
 };

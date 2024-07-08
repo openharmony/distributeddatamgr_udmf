@@ -42,13 +42,13 @@ public:
     void TearDown();
 };
 
-void UdsTest::SetUpTestCase(void){}
+void UdsTest::SetUpTestCase(void) {}
 
-void UdsTest::TearDownTestCase(void){}
+void UdsTest::TearDownTestCase(void) {}
 
-void UdsTest::SetUp(void){}
+void UdsTest::SetUp(void) {}
 
-void UdsTest::TearDown(void){}
+void UdsTest::TearDown(void) {}
 
 /**
  * @tc.name: OH_UdsPlainText_Create_001
@@ -225,8 +225,8 @@ HWTEST_F(UdsTest, OH_UdsHyperlink_GetUrl_001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "OH_UdsHyperlink_GetUrl_001 begin.");
     auto hyperlink = OH_UdsHyperlink_Create();
-    hyperlink->obj->value_[URL] = "www.huawei.com";
-    EXPECT_EQ("www.huawei.com", std::string(OH_UdsHyperlink_GetUrl(hyperlink)));
+    hyperlink->obj->value_[URL] = "www.xxx.com";
+    EXPECT_EQ("www.xxx.com", std::string(OH_UdsHyperlink_GetUrl(hyperlink)));
     OH_UdsHyperlink_Destroy(hyperlink);
 
     OH_UdsHyperlink* hyperlinkNullptr = nullptr;
@@ -269,18 +269,18 @@ HWTEST_F(UdsTest, OH_UdsHyperlink_SetUrl_001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "OH_UdsHyperlink_SetUrl_001 begin.");
     auto hyperlink = OH_UdsHyperlink_Create();
-    int result = OH_UdsHyperlink_SetUrl(hyperlink, "www.huawei.com");
+    int result = OH_UdsHyperlink_SetUrl(hyperlink, "www.xxx.com");
     EXPECT_EQ(UDMF_E_OK, result);
-    EXPECT_EQ("www.huawei.com", std::string(OH_UdsHyperlink_GetUrl(hyperlink)));
+    EXPECT_EQ("www.xxx.com", std::string(OH_UdsHyperlink_GetUrl(hyperlink)));
 
-    result = OH_UdsHyperlink_SetUrl(nullptr, "www.huawei.com");
+    result = OH_UdsHyperlink_SetUrl(nullptr, "www.xxx.com");
     EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
 
     result = OH_UdsHyperlink_SetUrl(hyperlink, nullptr);
     EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
 
     hyperlink->obj = nullptr;
-    result = OH_UdsHyperlink_SetUrl(hyperlink, "www.huawei.com");
+    result = OH_UdsHyperlink_SetUrl(hyperlink, "www.xxx.com");
     EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
     OH_UdsHyperlink_Destroy(hyperlink);
     LOG_INFO(UDMF_TEST, "OH_UdsHyperlink_SetUrl_001 end.");
@@ -487,8 +487,8 @@ HWTEST_F(UdsTest, OH_UdsAppItem_GetId_001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "OH_UdsAppItem_GetId_001 begin.");
     auto appItem = OH_UdsAppItem_Create();
-    appItem->obj->value_[APP_ID] = "com.huawei";
-    EXPECT_EQ("com.huawei", std::string(OH_UdsAppItem_GetId(appItem)));
+    appItem->obj->value_[APP_ID] = "com.xxx";
+    EXPECT_EQ("com.xxx", std::string(OH_UdsAppItem_GetId(appItem)));
     OH_UdsAppItem_Destroy(appItem);
 
     OH_UdsAppItem* appItemNullptr = nullptr;
@@ -619,18 +619,18 @@ HWTEST_F(UdsTest, OH_UdsAppItem_SetId_001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "OH_UdsAppItem_SetId_001 begin.");
     auto appItem = OH_UdsAppItem_Create();
-    int result = OH_UdsAppItem_SetId(appItem, "com.huawei");
+    int result = OH_UdsAppItem_SetId(appItem, "com.xxx");
     EXPECT_EQ(UDMF_E_OK, result);
-    EXPECT_EQ("com.huawei", std::string(OH_UdsAppItem_GetId(appItem)));
+    EXPECT_EQ("com.xxx", std::string(OH_UdsAppItem_GetId(appItem)));
 
-    result = OH_UdsAppItem_SetId(nullptr, "com.huawei");
+    result = OH_UdsAppItem_SetId(nullptr, "com.xxx");
     EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
 
     result = OH_UdsAppItem_SetId(appItem, nullptr);
     EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
 
     appItem->obj = nullptr;
-    result = OH_UdsAppItem_SetId(appItem, "com.huawei");
+    result = OH_UdsAppItem_SetId(appItem, "com.xxx");
     EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
     OH_UdsAppItem_Destroy(appItem);
     LOG_INFO(UDMF_TEST, "OH_UdsAppItem_SetId_001 end.");

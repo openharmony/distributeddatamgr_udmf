@@ -45,7 +45,7 @@ ohos_shared_library("udmf_ndk") {
     "image_framework:image",
   ]
 
-  relative_install_dir="ndk"
+  relative_install_dir = "ndk"
   part_name = "udmf"
   subsystem_name = "distributeddatamgr"
   output_extension = "so"
