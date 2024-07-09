@@ -34,6 +34,8 @@ public:
 
 protected:
     UDDetails details_;
+private:
+    void InitObject();
 };
 } // namespace UDMF
 } // namespace OHOS

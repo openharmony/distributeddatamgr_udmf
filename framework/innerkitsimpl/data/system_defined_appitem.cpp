@@ -153,11 +153,17 @@ UDDetails SystemDefinedAppItem::GetItems()
     return items;
 }
 
-void SystemDefinedAppItem::InitObject()
+ValueType SystemDefinedAppItem::GetValue()
 {
     if (std::holds_alternative<std::monostate>(value_)) {
         value_ = std::make_shared<Object>();
     }
+    InitObject();
+    return value_;
+}
+
+void SystemDefinedAppItem::InitObject()
+{
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);

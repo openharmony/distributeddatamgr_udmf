@@ -1327,7 +1327,7 @@ describe('UdmfJSTest', function () {
       abstract: 'this is abstract',
       details: plainTextDetails
     }
-    let record1 = new unifiedDataChannel.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plainText);
+    let record1 = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plainText);
     let unifiedData = new UDC.UnifiedData(record1);
     let records = unifiedData.getRecords();
     expect(records.length).assertEqual(1);
@@ -1346,7 +1346,7 @@ describe('UdmfJSTest', function () {
    * @tc.type: FUNC
    * @tc.require:
    */
-  it('UDSTest002', 0, async function () {
+  it('UDSTest002', 0, async function (done) {
     const TAG = 'UDSTest002';
     console.info(TAG, 'start');
 
@@ -1360,7 +1360,7 @@ describe('UdmfJSTest', function () {
       abstract: 'this is abstract',
       details: plainTextDetails
     }
-    let record1 = new unifiedDataChannel.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plainText);
+    let record1 = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plainText);
     let unifiedData = new UDC.UnifiedData(record1);
     
     try {
@@ -1371,11 +1371,14 @@ describe('UdmfJSTest', function () {
         UDC.queryData(options).then((data) => {
           console.info(TAG, 'query success.');
           expect(data.length).assertEqual(1);
-          expect(data[0].getRecords()[0].uniformDataType).assertEqual(plainText.uniformDataType);
-          expect(data[0].getRecords()[0].textContent).assertEqual(plainText.textContent);
-          expect(data[0].getRecords()[0].abstract).assertEqual(plainText.abstract);
-          expect(data[0].getRecords()[0].details.key1).assertEqual(plainText.details.key1);
-          expect(data[0].getRecords()[0].details.key2).assertEqual(plainText.details.key2);
+          let records = data[0].getRecords();
+          expect(records.length).assertEqual(1);
+          let value = records[0].getValue();
+          expect(value.uniformDataType).assertEqual(plainText.uniformDataType);
+          expect(value.textContent).assertEqual(plainText.textContent);
+          expect(value.abstract).assertEqual(plainText.abstract);
+          expect(value.details.key1).assertEqual(plainText.details.key1);
+          expect(value.details.key2).assertEqual(plainText.details.key2);
           UDC.deleteData(options).then((data) => {
             console.info(TAG, 'delete success.');
             expect(data.length).assertEqual(1);

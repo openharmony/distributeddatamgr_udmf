@@ -27,7 +27,7 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
     }
     data.Count(input->GetType());
     data.Count(input->GetUid());
-    data.Count(input->GetValue());
+    data.Count(input->GetOriginValue());
     auto type = input->GetType();
     switch (type) {
         case UDType::TEXT: {
@@ -884,7 +884,7 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
     if (!Writing(input->GetUid(), data)) {
         return false;
     }
-    if (!Writing(input->GetValue(), data)) {
+    if (!Writing(input->GetOriginValue(), data)) {
         return false;
     }
     auto type = input->GetType();

@@ -37,8 +37,9 @@ public:
 
     std::string GetUid() const;
     void SetUid(const std::string &id);
-    ValueType GetValue();
+    virtual ValueType GetValue();
     void SetValue(const ValueType &value);
+    ValueType GetOriginValue();
 
 protected:
     static constexpr const char *UNIFORM_DATA_TYPE = "uniformDataType";

@@ -34,9 +34,9 @@ public:
     void SetUrl(const std::string &url);
     std::string GetDescription() const;
     void SetDescription(const std::string &description);
+    ValueType GetValue() override;
 
     static bool CheckValue(const ValueType &value);
-    
 private:
     void InitObject();
 

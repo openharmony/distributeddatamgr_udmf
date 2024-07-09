@@ -39,11 +39,20 @@ int64_t Text::GetSize()
 void Text::SetDetails(UDDetails &variantMap)
 {
     this->details_ = variantMap;
+    InitObject();
 }
 
 UDDetails Text::GetDetails() const
 {
     return this->details_;
+}
+
+void Text::InitObject()
+{
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+    }
 }
 } // namespace UDMF
 } // namespace OHOS

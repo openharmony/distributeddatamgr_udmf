@@ -2401,7 +2401,7 @@ HWTEST_F(UdmfClientTest, QueryUDSData005, TestSize.Level1)
     obj = std::get<std::shared_ptr<Object>>(value);
 
     ASSERT_NE(std::get_if<std::string>(&obj->value_["uniformDataType"]), nullptr);
-    ASSERT_EQ(std::get<std::string>(obj->value_["uniformDataType"]), "general.plain-text");
+    ASSERT_EQ(std::get<std::string>(obj->value_["uniformDataType"]), "openharmony.app-item");
     ASSERT_NE(std::get_if<std::string>(&obj->value_["appId"]), nullptr);
     ASSERT_EQ(std::get<std::string>(obj->value_["appId"]), "app-itemAppId");
     ASSERT_NE(std::get_if<std::string>(&obj->value_["appName"]), nullptr);

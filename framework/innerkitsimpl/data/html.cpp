@@ -30,7 +30,6 @@ Html::Html(const std::string &htmlContent, const std::string &plainContent)
     this->dataType_ = HTML;
     this->htmlContent_ = htmlContent;
     this->plainContent_ = plainContent;
-    InitObject();
 }
 
 Html::Html(UDType type, ValueType value) : Text(type, value)
@@ -82,11 +81,17 @@ void Html::SetPlainContent(const std::string &plainContent)
     InitObject();
 }
 
-void Html::InitObject()
+ValueType Html::GetValue()
 {
     if (std::holds_alternative<std::monostate>(value_)) {
         value_ = std::make_shared<Object>();
     }
+    InitObject();
+    return value_;
+}
+
+void Html::InitObject()
+{
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);

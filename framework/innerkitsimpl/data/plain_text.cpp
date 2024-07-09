@@ -29,7 +29,6 @@ PlainText::PlainText(const std::string &content, const std::string &abstract)
     this->dataType_ = PLAIN_TEXT;
     this->content_ = content;
     this->abstract_ = abstract;
-    InitObject();
 }
 
 PlainText::PlainText(UDType type, ValueType value) : Text(type, value)
@@ -81,11 +80,17 @@ void PlainText::SetAbstract(const std::string &abstract)
     InitObject();
 }
 
-void PlainText::InitObject()
+ValueType PlainText::GetValue()
 {
     if (std::holds_alternative<std::monostate>(value_)) {
         value_ = std::make_shared<Object>();
     }
+    InitObject();
+    return value_;
+}
+
+void PlainText::InitObject()
+{
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);

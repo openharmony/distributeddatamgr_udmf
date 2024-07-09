@@ -49,7 +49,6 @@ Link::Link(const std::string &url, const std::string &description)
     this->dataType_ = HYPERLINK;
     this->url_ = url;
     this->description_ = description;
-	InitObject();
 }
 
 int64_t Link::GetSize()
@@ -85,11 +84,17 @@ void Link::SetDescription(const std::string &description)
     InitObject();
 }
 
-void Link::InitObject()
+ValueType Link::GetValue()
 {
     if (std::holds_alternative<std::monostate>(value_)) {
         value_ = std::make_shared<Object>();
     }
+    InitObject();
+    return value_;
+}
+
+void Link::InitObject()
+{
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
