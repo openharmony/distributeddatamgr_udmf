@@ -99,32 +99,5 @@ void PlainText::InitObject()
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
     }
 }
-
-bool PlainText::CheckValue(const ValueType &value)
-{
-    if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
-        return true;
-    }
-    auto object = std::get<std::shared_ptr<Object>>(value);
-
-    bool IsValid = true;
-    IsValid = IsValid && object->HasStrValue(UNIFORM_DATA_TYPE);
-    IsValid = IsValid && object->HasStrValue(TEXT_CONTENT);
-
-    auto isValidDetail = [](const auto& pair) {
-        return std::holds_alternative<std::string>(pair.second);
-    };
-    std::shared_ptr<Object> detailObj = nullptr;
-    if (object->GetValue(DETAILS, detailObj)) {
-        IsValid = IsValid && std::all_of(detailObj->value_.begin(), detailObj->value_.end(), isValidDetail);
-    }
-
-    auto isValidKey = [](const auto& pair) {
-        const std::string& key = pair.first;
-        return key == UNIFORM_DATA_TYPE || key == TEXT_CONTENT || key == ABSTRACT || key == DETAILS;
-    };
-    IsValid = IsValid && std::all_of(object->value_.begin(), object->value_.end(), isValidKey);
-    return IsValid;
-}
 } // namespace UDMF
 } // namespace OHOS

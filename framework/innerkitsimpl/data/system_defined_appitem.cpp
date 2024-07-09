@@ -176,41 +176,5 @@ void SystemDefinedAppItem::InitObject()
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
     }
 }
-
-bool SystemDefinedAppItem::CheckValue(const ValueType &value)
-{
-    if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
-        return true;
-    }
-    auto object = std::get<std::shared_ptr<Object>>(value);
-
-    bool IsValid = true;
-    IsValid = IsValid && object->HasStrValue(UNIFORM_DATA_TYPE);
-    IsValid = IsValid && object->HasStrValue(APPID);
-    IsValid = IsValid && object->HasStrValue(APPNAME);
-    IsValid = IsValid && object->HasStrValue(APPICONID);
-    IsValid = IsValid && object->HasStrValue(APPLABELID);
-    IsValid = IsValid && object->HasStrValue(BUNDLENAME);
-    IsValid = IsValid && object->HasStrValue(ABILITYNAME);
-
-    auto isValidDetail = [](const auto& pair) {
-        const ValueType& value = pair.second;
-        return std::holds_alternative<int32_t>(value) || std::holds_alternative<int64_t>(value) ||
-               std::holds_alternative<double>(value) || std::holds_alternative<std::string>(value) ||
-               std::holds_alternative<std::vector<uint8_t>>(value);
-    };
-    std::shared_ptr<Object> detailObj = nullptr;
-    if (object->GetValue(DETAILS, detailObj)) {
-        IsValid = IsValid && std::all_of(detailObj->value_.begin(), detailObj->value_.end(), isValidDetail);
-    }
-
-    auto isValidKey = [](const auto& pair) {
-        const std::string& key = pair.first;
-        return key == UNIFORM_DATA_TYPE || key == APPID || key == APPNAME || key == APPICONID ||
-                key == APPLABELID || key == BUNDLENAME || key == ABILITYNAME || key == DETAILS;
-    };
-    IsValid = IsValid && std::all_of(object->value_.begin(), object->value_.end(), isValidKey);
-    return IsValid;
-}
 } // namespace UDMF
 } // namespace OHOS

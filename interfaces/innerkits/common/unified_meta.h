@@ -496,7 +496,6 @@ using ValueType = std::variant<std::monostate, int32_t, int64_t, double, bool, s
     std::shared_ptr<OHOS::AAFwk::Want>, std::shared_ptr<OHOS::Media::PixelMap>, std::shared_ptr<Object>, nullptr_t>;
 
 struct Object {
-    bool HasStrValue(const std::string &key);
     bool GetValue(const std::string &key, std::string &value);
     bool GetValue(const std::string &key, std::shared_ptr<Object> &value);
 

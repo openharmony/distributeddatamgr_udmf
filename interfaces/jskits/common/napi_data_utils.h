@@ -123,7 +123,7 @@ private:
         TUPLE_VALUE,
         TUPLE_SIZE
     };
-    static const int32_t STR_MAX_SIZE = 256;
+    static constexpr int32_t STR_MAX_SIZE = 256;
 };
 
 #define LOG_ERROR_RETURN(condition, message, retVal)                             \

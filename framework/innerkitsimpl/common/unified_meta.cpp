@@ -582,16 +582,6 @@ bool UnifiedDataUtils::IsValidOptions(const std::string &key, std::string &inten
     return false;
 }
 
-bool Object::HasStrValue(const std::string &key)
-{
-    if (value_.find(key) != value_.end()) {
-        if(std::holds_alternative<std::string>(value_[key])) {
-            return true;
-        }
-    }
-    return false;
-}
-
 bool Object::GetValue(const std::string &key, std::string &value)
 {
     if (value_.find(key) != value_.end()) {
