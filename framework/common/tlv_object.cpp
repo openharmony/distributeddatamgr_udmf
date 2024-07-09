@@ -89,6 +89,103 @@ void TLVObject::Count(const std::vector<uint8_t> &value)
     total_ += expectSize;
 }
 
+void TLVObject::Count(const UDVariant &value)
+{
+    total_ += sizeof(TLVHead);
+    auto int32Value = std::get_if<int32_t>(&value);
+    if (int32Value != nullptr) {
+        Count(std::get<int32_t>(value));
+        return;
+    }
+    auto int64Value = std::get_if<int64_t>(&value);
+    if (int64Value != nullptr) {
+        Count(std::get<int64_t>(value));
+        return;
+    }
+    auto boolValue = std::get_if<bool>(&value);
+    if (boolValue != nullptr) {
+        Count(std::get<bool>(value));
+        return;
+    }
+    auto doubleValue = std::get_if<double>(&value);
+    if (doubleValue != nullptr) {
+        Count(std::get<double>(value));
+        return;
+    }
+    auto strValue = std::get_if<std::string>(&value);
+    if (strValue != nullptr) {
+        Count(std::get<std::string>(value));
+        return;
+    }
+    auto vecValue = std::get_if<std::vector<uint8_t>>(&value);
+    if (vecValue != nullptr) {
+        Count(std::get<std::vector<uint8_t>>(value));
+        return;
+    }
+    total_ += sizeof(TLVHead);
+}
+
+void TLVObject::Count(const ValueType &value)
+{
+    total_ += sizeof(TLVHead);
+    auto int32Value = std::get_if<int32_t>(&value);
+    if (int32Value != nullptr) {
+        Count(std::get<int32_t>(value));
+        return;
+    }
+    auto int64Value = std::get_if<int64_t>(&value);
+    if (int64Value != nullptr) {
+        Count(std::get<int64_t>(value));
+        return;
+    }
+    auto boolValue = std::get_if<bool>(&value);
+    if (boolValue != nullptr) {
+        Count(std::get<bool>(value));
+        return;
+    }
+    auto doubleValue = std::get_if<double>(&value);
+    if (doubleValue != nullptr) {
+        Count(std::get<double>(value));
+        return;
+    }
+    auto strValue = std::get_if<std::string>(&value);
+    if (strValue != nullptr) {
+        Count(std::get<std::string>(value));
+        return;
+    }
+    auto vecValue = std::get_if<std::vector<uint8_t>>(&value);
+    if (vecValue != nullptr) {
+        Count(std::get<std::vector<uint8_t>>(value));
+        return;
+    }
+    auto wantValue = std::get_if<std::shared_ptr<OHOS::AAFwk::Want>>(&value);
+    if (wantValue != nullptr) {
+        Count(std::get<std::shared_ptr<OHOS::AAFwk::Want>>(value));
+        return;
+    }
+    auto pixelMapValue = std::get_if<std::shared_ptr<OHOS::Media::PixelMap>>(&value);
+    if (pixelMapValue != nullptr) {
+        Count(std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value));
+        return;
+    }
+    auto objectValue = std::get_if<std::shared_ptr<Object>>(&value);
+    if (objectValue != nullptr) {
+        Count(std::get<std::shared_ptr<Object>>(value));
+        return;
+    }
+    auto undefinedValue = std::get_if<std::monostate>(&value);
+    if (undefinedValue != nullptr) {
+        Count(std::get<std::monostate>(value));
+        return;
+    }
+    auto nullValue = std::get_if<nullptr_t>(&value);
+    if (nullValue != nullptr) {
+        Count(std::get<nullptr_t>(value));
+        return;
+    }
+    total_ += sizeof(TLVHead);
+}
+
 void TLVObject::Count(const UDDetails &value)
 {
     for (auto &item : value) {
@@ -113,11 +210,11 @@ void TLVObject::Count(const Privilege &value)
     Count(value.writePermission);
 }
 
-void TLVObject::Count(const OHOS::AAFwk::Want &value)
+void TLVObject::Count(const std::shared_ptr<OHOS::AAFwk::Want> &value)
 {
     std::size_t expectSize = sizeof(TLVHead);
     Parcel parcel;
-    if (!value.Marshalling(parcel)) {
+    if (!value->Marshalling(parcel)) {
         LOG_ERROR(TlvObject, "Marshalling Want failed.");
         return;
     }
@@ -125,11 +222,11 @@ void TLVObject::Count(const OHOS::AAFwk::Want &value)
     total_ += expectSize;
 }
 
-void TLVObject::Count(const OHOS::Media::PixelMap &value)
+void TLVObject::Count(const std::shared_ptr<OHOS::Media::PixelMap> &value)
 {
     std::size_t expectSize = sizeof(TLVHead);
     std::vector<std::uint8_t> val;
-    if (!value.EncodeTlv(val)) {
+    if (!value->EncodeTlv(val)) {
         LOG_ERROR(TlvObject, "Marshalling PixelMap failed.");
         return;
     }
@@ -137,9 +234,9 @@ void TLVObject::Count(const OHOS::Media::PixelMap &value)
     total_ += expectSize;
 }
 
-void TLVObject::Count(const Object &value)
+void TLVObject::Count(const std::shared_ptr<Object> &value)
 {
-    for (auto &item : value.value_) {
+    for (auto &item : value->value_) {
         Count(item.first);
         Count(item.second);
     }
@@ -450,7 +547,7 @@ bool TLVObject::WriteVariantInner(TAG &tag, const ValueType &value)
         }
         tag = TAG::TAG_PIXELMAP;
     } else if (std::get_if<std::shared_ptr<Object>>(&value) != nullptr) {
-        if (!WriteMap(std::get<std::shared_ptr<Object>>(value))){
+        if (!WriteObject(std::get<std::shared_ptr<Object>>(value))){
             return false;
         }
         tag = TAG::TAG_OBJECT;
@@ -594,7 +691,7 @@ bool TLVObject::ReadVariant(ValueType &value)
         }
         case static_cast<uint16_t>(TAG::TAG_OBJECT): {
             std::shared_ptr<Object> objectValue = nullptr;
-            if (!ReadMap(objectValue)) {
+            if (!ReadObject(objectValue)) {
                 return false;
             }
             value.emplace<std::shared_ptr<Object>>(objectValue);
@@ -696,7 +793,7 @@ bool TLVObject::ReadMap(UDDetails &value)
     return true;
 }
 
-bool TLVObject::WriteMap(const std::shared_ptr<Object> &value)
+bool TLVObject::WriteObject(const std::shared_ptr<Object> &value)
 {
     if (!HasExpectBuffer(sizeof(TLVHead))) {
         return false;
@@ -726,7 +823,7 @@ bool TLVObject::WriteMap(const std::shared_ptr<Object> &value)
         total += cursor_;
     }
     PrepareHeader(total, tagCursor, valueCursor);
-    WriteHead(static_cast<uint16_t>(TAG::TAG_MAP), tagCursor, cursor_ - valueCursor);
+    WriteHead(static_cast<uint16_t>(TAG::TAG_OBJECT), tagCursor, cursor_ - valueCursor);
     if (!SaveBufferToFile()) {
         return false;
     }
@@ -736,7 +833,7 @@ bool TLVObject::WriteMap(const std::shared_ptr<Object> &value)
     return true;
 }
 
-bool TLVObject::ReadMap(std::shared_ptr<Object> &value)
+bool TLVObject::ReadObject(std::shared_ptr<Object> &value)
 {
     TLVHead head {};
     if (!ReadHead(head)) {

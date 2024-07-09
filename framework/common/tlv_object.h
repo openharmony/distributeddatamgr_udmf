@@ -67,19 +67,16 @@ public:
     void Count(const double value);
     void Count(const std::string &value);
     void Count(const std::vector<uint8_t> &value);
+    void Count(const UDVariant &value);
+    void Count(const ValueType &value);
     void Count(const UDDetails &value);
     void Count(const UnifiedKey &value);
     void Count(const Privilege &value);
-    void Count(const OHOS::AAFwk::Want &value);
-    void Count(const OHOS::Media::PixelMap &value);
-    void Count(const Object &value);
+    void Count(const std::shared_ptr<OHOS::AAFwk::Want> &value);
+    void Count(const std::shared_ptr<OHOS::Media::PixelMap> &value);
+    void Count(const std::shared_ptr<Object> &value);
     void Count(const std::monostate &value);
     void Count(const void *value);
-    template<typename T> void Count(const std::shared_ptr<T> value);
-    template<typename _InTp> void CountVariant(uint32_t step, const _InTp& input);
-    template<typename _InTp, typename _First, typename... _Rest>
-    void CountVariant(uint32_t step, const _InTp& input);
-    template<typename... _Types> void Count(const std::variant<_Types...>& input);
 
     template<typename T> bool WriteBasic(TAG type, const T &value);
     template<typename T> bool ReadBasic(T &value);
@@ -93,8 +90,8 @@ public:
     bool ReadVariant(ValueType &value);
     bool WriteMap(const UDDetails &value);
     bool ReadMap(UDDetails &value);
-    bool WriteMap(const std::shared_ptr<Object> &value);
-    bool ReadMap(std::shared_ptr<Object> &value);
+    bool WriteObject(const std::shared_ptr<Object> &value);
+    bool ReadObject(std::shared_ptr<Object> &value);
     bool WriteWant(const std::shared_ptr<OHOS::AAFwk::Want> &value);
     bool ReadWant(std::shared_ptr<OHOS::AAFwk::Want> &value);
     bool WritePixelMap(const std::shared_ptr<OHOS::Media::PixelMap> &value);
@@ -175,37 +172,6 @@ bool TLVObject::ReadBasic(T &value)
     return true;
 }
 
-template<typename T>
-void TLVObject::Count(const std::shared_ptr<T> value)
-{
-    if (value == nullptr) {
-        return;
-    }
-    Count(*value);
-}
-
-template<typename _InTp>
-void TLVObject::CountVariant(uint32_t step, const _InTp& input)
-{
-    total_ += sizeof(TLVHead);
-}
-
-template<typename _InTp, typename _First, typename... _Rest>
-void TLVObject::CountVariant(uint32_t step, const _InTp& input)
-{
-    if (step == input.index()) {
-        this->Count(std::get<_First>(input));
-        return;
-    }
-    CountVariant<_InTp, _Rest...>(step + 1, input);
-}
-
-template<typename... _Types>
-void TLVObject::Count(const std::variant<_Types...>& input)
-{
-    total_ += sizeof(TLVHead);
-    CountVariant<decltype(input), _Types...>(0, input);
-}
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_TLV_OBJECT_H
