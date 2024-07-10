@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -126,7 +126,7 @@ const char* OH_UdsPlainText_GetAbstract(OH_UdsPlainText* pThis);
  * @param content Represents a new content string.
  * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsPlainText UdmfErrCode
  * @since 12
  */
@@ -139,7 +139,7 @@ int OH_UdsPlainText_SetContent(OH_UdsPlainText* pThis, const char* content);
  * @param abstract Represents a new string value.
  * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsPlainText UdmfErrCode
  * @since 12
  */
@@ -201,7 +201,7 @@ const char* OH_UdsHyperlink_GetDescription(OH_UdsHyperlink* pThis);
  * @param url Represents a new string value.
  * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsHyperlink UdmfErrCode
  * @since 12
  */
@@ -214,7 +214,7 @@ int OH_UdsHyperlink_SetUrl(OH_UdsHyperlink* pThis, const char* url);
  * @param description Represents a new string value.
  * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsHyperlink UdmfErrCode
  * @since 12
  */
@@ -276,7 +276,7 @@ const char* OH_UdsHtml_GetPlainContent(OH_UdsHtml* pThis);
  * @param content Represents a new string value.
  * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsHtml UdmfErrCode
  * @since 12
  */
@@ -289,7 +289,7 @@ int OH_UdsHtml_SetContent(OH_UdsHtml* pThis, const char* content);
  * @param plainContent Represents a new string value.
  * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsHtml UdmfErrCode
  * @since 12
  */
@@ -391,7 +391,7 @@ const char* OH_UdsAppItem_GetAbilityName(OH_UdsAppItem* pThis);
  * @param appId Represents a new string value.
  * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsAppItem UdmfErrCode
  * @since 12
  */
@@ -404,7 +404,7 @@ int OH_UdsAppItem_SetId(OH_UdsAppItem* pThis, const char* appId);
  * @param appName Represents a new string value.
  * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsAppItem UdmfErrCode
  * @since 12
  */
@@ -417,7 +417,7 @@ int OH_UdsAppItem_SetName(OH_UdsAppItem* pThis, const char* appName);
  * @param appIconId Represents a new string value.
  * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsAppItem UdmfErrCode
  * @since 12
  */
@@ -430,7 +430,7 @@ int OH_UdsAppItem_SetIconId(OH_UdsAppItem* pThis, const char* appIconId);
  * @param appLabelId Represents a new string value.
  * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsAppItem UdmfErrCode
  * @since 12
  */
@@ -443,7 +443,7 @@ int OH_UdsAppItem_SetLabelId(OH_UdsAppItem* pThis, const char* appLabelId);
  * @param bundleName Represents a new string value.
  * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsAppItem UdmfErrCode
  * @since 12
  */
@@ -456,7 +456,7 @@ int OH_UdsAppItem_SetBundleName(OH_UdsAppItem* pThis, const char* bundleName);
  * @param abilityName Represents a new string value.
  * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVAILD_PARAM} The error code for common invalid args.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsAppItem UdmfErrCode
  * @since 12
  */

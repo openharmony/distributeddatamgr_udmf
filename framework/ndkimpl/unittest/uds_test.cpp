@@ -143,14 +143,14 @@ HWTEST_F(UdsTest, OH_UdsPlainText_SetContent_001, TestSize.Level1)
     EXPECT_EQ("doing something", std::string(OH_UdsPlainText_GetContent(plainText)));
 
     result = OH_UdsPlainText_SetContent(nullptr, "doing something");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     result = OH_UdsPlainText_SetContent(plainText, nullptr);
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     plainText->obj = nullptr;
     result = OH_UdsPlainText_SetContent(plainText, "doing something");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsPlainText_Destroy(plainText);
     LOG_INFO(UDMF_TEST, "OH_UdsPlainText_SetContent_001 end.");
 }
@@ -169,14 +169,14 @@ HWTEST_F(UdsTest, OH_UdsPlainText_SetAbstract_001, TestSize.Level1)
     EXPECT_EQ("doing something", std::string(OH_UdsPlainText_GetAbstract(plainText)));
 
     result = OH_UdsPlainText_SetAbstract(nullptr, "doing something");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     result = OH_UdsPlainText_SetAbstract(plainText, nullptr);
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     plainText->obj = nullptr;
     result = OH_UdsPlainText_SetAbstract(plainText, "doing something");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsPlainText_Destroy(plainText);
     LOG_INFO(UDMF_TEST, "OH_UdsPlainText_SetAbstract_001 end.");
 }
@@ -274,14 +274,14 @@ HWTEST_F(UdsTest, OH_UdsHyperlink_SetUrl_001, TestSize.Level1)
     EXPECT_EQ("www.xxx.com", std::string(OH_UdsHyperlink_GetUrl(hyperlink)));
 
     result = OH_UdsHyperlink_SetUrl(nullptr, "www.xxx.com");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     result = OH_UdsHyperlink_SetUrl(hyperlink, nullptr);
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     hyperlink->obj = nullptr;
     result = OH_UdsHyperlink_SetUrl(hyperlink, "www.xxx.com");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsHyperlink_Destroy(hyperlink);
     LOG_INFO(UDMF_TEST, "OH_UdsHyperlink_SetUrl_001 end.");
 }
@@ -300,14 +300,14 @@ HWTEST_F(UdsTest, OH_UdsHyperlink_SetDescription_001, TestSize.Level1)
     EXPECT_EQ("doing something", std::string(OH_UdsHyperlink_GetDescription(hyperlink)));
 
     result = OH_UdsHyperlink_SetDescription(nullptr, "doing something");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     result = OH_UdsHyperlink_SetDescription(hyperlink, nullptr);
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     hyperlink->obj = nullptr;
     result = OH_UdsHyperlink_SetDescription(hyperlink, "doing something");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsHyperlink_Destroy(hyperlink);
     LOG_INFO(UDMF_TEST, "OH_UdsHyperlink_SetDescription_001 end.");
 }
@@ -405,14 +405,14 @@ HWTEST_F(UdsTest, OH_UdsHtml_SetContent_001, TestSize.Level1)
     EXPECT_EQ("htmlxxx", std::string(OH_UdsHtml_GetContent(html)));
 
     result = OH_UdsHtml_SetContent(nullptr, "htmlxxx");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     result = OH_UdsHtml_SetContent(html, nullptr);
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     html->obj = nullptr;
     result = OH_UdsHtml_SetContent(html, "htmlxxx");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsHtml_Destroy(html);
     LOG_INFO(UDMF_TEST, "OH_UdsHtml_SetContent_001 end.");
 }
@@ -431,14 +431,14 @@ HWTEST_F(UdsTest, OH_UdsHtml_SetPlainContent_001, TestSize.Level1)
     EXPECT_EQ("doing something", std::string(OH_UdsHtml_GetPlainContent(html)));
 
     result = OH_UdsHtml_SetPlainContent(nullptr, "doing something");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     result = OH_UdsHtml_SetPlainContent(html, nullptr);
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     html->obj = nullptr;
     result = OH_UdsHtml_SetPlainContent(html, "doing something");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsHtml_Destroy(html);
     LOG_INFO(UDMF_TEST, "OH_UdsHtml_SetPlainContent_001 end.");
 }
@@ -624,14 +624,14 @@ HWTEST_F(UdsTest, OH_UdsAppItem_SetId_001, TestSize.Level1)
     EXPECT_EQ("com.xxx", std::string(OH_UdsAppItem_GetId(appItem)));
 
     result = OH_UdsAppItem_SetId(nullptr, "com.xxx");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     result = OH_UdsAppItem_SetId(appItem, nullptr);
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     appItem->obj = nullptr;
     result = OH_UdsAppItem_SetId(appItem, "com.xxx");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsAppItem_Destroy(appItem);
     LOG_INFO(UDMF_TEST, "OH_UdsAppItem_SetId_001 end.");
 }
@@ -650,14 +650,14 @@ HWTEST_F(UdsTest, OH_UdsAppItem_SetName_001, TestSize.Level1)
     EXPECT_EQ("OH", std::string(OH_UdsAppItem_GetName(appItem)));
 
     result = OH_UdsAppItem_SetName(nullptr, "OH");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     result = OH_UdsAppItem_SetName(appItem, nullptr);
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     appItem->obj = nullptr;
     result = OH_UdsAppItem_SetName(appItem, "OH");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsAppItem_Destroy(appItem);
     LOG_INFO(UDMF_TEST, "OH_UdsAppItem_SetName_001 end.");
 }
@@ -676,14 +676,14 @@ HWTEST_F(UdsTest, OH_UdsAppItem_SetIconId_001, TestSize.Level1)
     EXPECT_EQ("icon", std::string(OH_UdsAppItem_GetIconId(appItem)));
 
     result = OH_UdsAppItem_SetIconId(nullptr, "icon");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     result = OH_UdsAppItem_SetIconId(appItem, nullptr);
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     appItem->obj = nullptr;
     result = OH_UdsAppItem_SetIconId(appItem, "icon");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsAppItem_Destroy(appItem);
     LOG_INFO(UDMF_TEST, "OH_UdsAppItem_SetIconId_001 end.");
 }
@@ -702,14 +702,14 @@ HWTEST_F(UdsTest, OH_UdsAppItem_SetLabelId_001, TestSize.Level1)
     EXPECT_EQ("label", std::string(OH_UdsAppItem_GetLabelId(appItem)));
 
     result = OH_UdsAppItem_SetLabelId(nullptr, "label");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     result = OH_UdsAppItem_SetLabelId(appItem, nullptr);
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     appItem->obj = nullptr;
     result = OH_UdsAppItem_SetLabelId(appItem, "label");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsAppItem_Destroy(appItem);
     LOG_INFO(UDMF_TEST, "OH_UdsAppItem_SetLabelId_001 end.");
 }
@@ -728,14 +728,14 @@ HWTEST_F(UdsTest, OH_UdsAppItem_SetBundleName_001, TestSize.Level1)
     EXPECT_EQ("bundle", std::string(OH_UdsAppItem_GetBundleName(appItem)));
 
     result = OH_UdsAppItem_SetBundleName(nullptr, "bundle");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     result = OH_UdsAppItem_SetBundleName(appItem, nullptr);
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     appItem->obj = nullptr;
     result = OH_UdsAppItem_SetBundleName(appItem, "bundle");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsAppItem_Destroy(appItem);
     LOG_INFO(UDMF_TEST, "OH_UdsAppItem_SetBundleName_001 end.");
 }
@@ -754,14 +754,14 @@ HWTEST_F(UdsTest, OH_UdsAppItem_SetAbilityName_001, TestSize.Level1)
     EXPECT_EQ("ability", std::string(OH_UdsAppItem_GetAbilityName(appItem)));
 
     result = OH_UdsAppItem_SetAbilityName(nullptr, "ability");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     result = OH_UdsAppItem_SetAbilityName(appItem, nullptr);
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     appItem->obj = nullptr;
     result = OH_UdsAppItem_SetAbilityName(appItem, "ability");
-    EXPECT_EQ(UDMF_E_INVAILD_PARAM, result);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsAppItem_Destroy(appItem);
     LOG_INFO(UDMF_TEST, "OH_UdsAppItem_SetAbilityName_001 end.");
 }

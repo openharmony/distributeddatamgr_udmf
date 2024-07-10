@@ -14,8 +14,8 @@
  */
 
 #define LOG_TAG "Utd"
-
 #include "utd.h"
+
 #include <cstring>
 #include <vector>
 #include "securec.h"
@@ -52,6 +52,7 @@ static const char** CreateStrArrByVector(const std::vector<std::string>& paramVe
 {
     unsigned int size = paramVector.size();
     if (size <= 0 || size > MAX_UTD_SIZE) {
+        LOG_ERROR(UDMF_NDK, "Cannot create array, because size is illegal or exceeds the max value of UTD.");
         *count = 0;
         return nullptr;
     }
@@ -64,7 +65,7 @@ static const char** CreateStrArrByVector(const std::vector<std::string>& paramVe
         charPtr[i] = new char[paramVector[i].size() + 1];
         if (charPtr[i] == nullptr ||
             strcpy_s(charPtr[i], paramVector[i].size() + 1, paramVector[i].c_str()) != UDMF_E_OK) {
-            LOG_ERROR(UDMF_NDK, "str copy error!");
+            LOG_ERROR(UDMF_NDK, "obtain the memory error, or str copy error!");
             const char** arrayPtr = const_cast<const char**>(charPtr);
             DestroyArrayPtr(arrayPtr, size);
             *count = 0;
@@ -84,12 +85,12 @@ static std::shared_ptr<TypeDescriptor> GetTypeDescriptorByUtdClient(const char* 
 
 static bool IsUtdInvalid(OH_Utd* pThis)
 {
-    return pThis == nullptr || pThis->id != UTD_STRUCT_ID;
+    return pThis == nullptr || pThis->id != NdkStructId::UTD_STRUCT_ID;
 }
 
 static const char** GetTypesByCondition(const char* condition, unsigned int* count, GetUtdByConditionPtr funcPtr)
 {
-    if (condition == nullptr || count == nullptr) {
+    if (condition == nullptr || count == nullptr || funcPtr == nullptr) {
         return nullptr;
     }
     std::string typeIdStr;
@@ -97,14 +98,14 @@ static const char** GetTypesByCondition(const char* condition, unsigned int* cou
     if (typeIdStr.empty()) {
         return nullptr;
     }
-    char* typeId = new char[typeIdStr.size() + 1];
+    auto typeId = new char[typeIdStr.size() + 1];
     if (strcpy_s(typeId, typeIdStr.size() + 1, typeIdStr.c_str()) != UDMF_E_OK) {
         LOG_ERROR(UDMF_NDK, "str copy error!");
         delete[] typeId;
         return nullptr;
     }
     *count = 1;
-    char **typeIds = new char *[*count];
+    auto typeIds = new char* [*count];
     typeIds[0] = typeId;
     return const_cast<const char**>(typeIds);
 }
@@ -114,7 +115,7 @@ OH_Utd* OH_Utd_Create(const char* typeId)
     if (typeId == nullptr) {
         return nullptr;
     }
-    OH_Utd* pThis = new (std::nothrow) OH_Utd();
+    auto pThis = new (std::nothrow) OH_Utd();
     if (pThis == nullptr) {
         LOG_ERROR(UDMF_NDK, "Failed to apply for memory.");
         return nullptr;
@@ -147,34 +148,22 @@ void OH_Utd_Destroy(OH_Utd* pThis)
 
 const char* OH_Utd_GetTypeId(OH_Utd* pThis)
 {
-    if (IsUtdInvalid(pThis)) {
-        return nullptr;
-    }
-    return pThis->typeId.c_str();
+    return IsUtdInvalid(pThis) ? nullptr : pThis->typeId.c_str();
 }
 
 const char* OH_Utd_GetDescription(OH_Utd* pThis)
 {
-    if (IsUtdInvalid(pThis)) {
-        return nullptr;
-    }
-    return pThis->description.c_str();
+    return IsUtdInvalid(pThis) ? nullptr : pThis->description.c_str();
 }
 
 const char* OH_Utd_GetReferenceURL(OH_Utd* pThis)
 {
-    if (IsUtdInvalid(pThis)) {
-        return nullptr;
-    }
-    return pThis->referenceURL.c_str();
+    return IsUtdInvalid(pThis) ? nullptr : pThis->referenceURL.c_str();
 }
 
 const char* OH_Utd_GetIconFile(OH_Utd* pThis)
 {
-    if (IsUtdInvalid(pThis)) {
-        return nullptr;
-    }
-    return pThis->iconFile.c_str();
+    return IsUtdInvalid(pThis) ? nullptr : pThis->iconFile.c_str();
 }
 
 const char** OH_Utd_GetBelongingToTypes(OH_Utd* pThis, unsigned int* count)
@@ -217,10 +206,11 @@ const char** OH_Utd_GetTypesByMimeType(const char* mimeType, unsigned int* count
 bool OH_Utd_IsBelongsTo(const char* srcTypeId, const char* destTypeId)
 {
     if (srcTypeId == nullptr || destTypeId == nullptr) {
+        LOG_ERROR(UDMF_NDK, "The input parameter is nullptr");
         return false;
     }
     auto typeDescriptor = GetTypeDescriptorByUtdClient(srcTypeId);
-    bool checkResult = false;
+    bool checkResult{false};
     typeDescriptor->BelongsTo(destTypeId, checkResult);
     return checkResult;
 }
@@ -228,10 +218,11 @@ bool OH_Utd_IsBelongsTo(const char* srcTypeId, const char* destTypeId)
 bool OH_Utd_IsLowerLevelType(const char* srcTypeId, const char* destTypeId)
 {
     if (srcTypeId == nullptr || destTypeId == nullptr) {
+        LOG_ERROR(UDMF_NDK, "The input parameter is nullptr");
         return false;
     }
     auto typeDescriptor = GetTypeDescriptorByUtdClient(srcTypeId);
-    bool checkResult = false;
+    bool checkResult{false};
     typeDescriptor->IsLowerLevelType(destTypeId, checkResult);
     return checkResult;
 }
@@ -239,10 +230,11 @@ bool OH_Utd_IsLowerLevelType(const char* srcTypeId, const char* destTypeId)
 bool OH_Utd_IsHigherLevelType(const char* srcTypeId, const char* destTypeId)
 {
     if (srcTypeId == nullptr || destTypeId == nullptr) {
+        LOG_ERROR(UDMF_NDK, "The input parameter is nullptr");
         return false;
     }
     auto typeDescriptor = GetTypeDescriptorByUtdClient(srcTypeId);
-    bool checkResult = false;
+    bool checkResult{false};
     typeDescriptor->IsHigherLevelType(destTypeId, checkResult);
     return checkResult;
 }
@@ -250,6 +242,7 @@ bool OH_Utd_IsHigherLevelType(const char* srcTypeId, const char* destTypeId)
 bool OH_Utd_IsEquals(OH_Utd* utd1, OH_Utd* utd2)
 {
     if (IsUtdInvalid(utd1) || IsUtdInvalid(utd2)) {
+        LOG_ERROR(UDMF_NDK, "The input parameter is invalid");
         return false;
     }
     return GetTypeDescriptorByUtdClient(utd1->typeId.c_str())
