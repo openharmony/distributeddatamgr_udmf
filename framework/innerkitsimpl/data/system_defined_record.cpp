@@ -26,7 +26,10 @@ int64_t SystemDefinedRecord::GetSize()
     return UnifiedDataUtils::GetDetailsSize(this->details_);
 }
 
-SystemDefinedRecord::SystemDefinedRecord(UDType type, ValueType value) : UnifiedRecord(type, value) {}
+SystemDefinedRecord::SystemDefinedRecord(UDType type, ValueType value) : UnifiedRecord(type, value)
+{
+    this->dataType_ = SYSTEM_DEFINED_RECORD;
+}
 
 void SystemDefinedRecord::AddProperty(const std::string &property, UDVariant &value)
 {
@@ -36,6 +39,7 @@ void SystemDefinedRecord::AddProperty(const std::string &property, UDVariant &va
     } else {
         details_[property] = value;
     }
+    InitObject();
 }
 
 UDVariant SystemDefinedRecord::GetPropertyByName(const std::string &property) const
@@ -50,11 +54,20 @@ UDVariant SystemDefinedRecord::GetPropertyByName(const std::string &property) co
 void SystemDefinedRecord::SetDetails(UDDetails &details)
 {
     this->details_ = details;
+    InitObject();
 }
 
 UDDetails SystemDefinedRecord::GetDetails() const
 {
     return this->details_;
+}
+
+void SystemDefinedRecord::InitObject()
+{
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+    }
 }
 } // namespace UDMF
 } // namespace OHOS

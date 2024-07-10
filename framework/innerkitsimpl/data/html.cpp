@@ -34,8 +34,17 @@ Html::Html(const std::string &htmlContent, const std::string &plainContent)
 
 Html::Html(UDType type, ValueType value) : Text(type, value)
 {
+    this->dataType_ = HTML;
     if (std::holds_alternative<std::string>(value)) {
         htmlContent_ = std::get<std::string>(value);
+    } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        auto object = std::get<std::shared_ptr<Object>>(value);
+        object->GetValue(HTML_CONTENT, htmlContent_);
+        object->GetValue(PLAINT_CONTENT, plainContent_);
+        std::shared_ptr<Object> detailObj = nullptr;
+        if (object->GetValue(DETAILS, detailObj)) {
+            details_ = ObjectUtils::ConvertToUDDetails(detailObj);
+        }
     }
 }
 
@@ -55,6 +64,7 @@ void Html::SetHtmlContent(const std::string &htmlContent)
         return;
     }
     this->htmlContent_ = htmlContent;
+    InitObject();
 }
 
 std::string Html::GetPlainContent() const
@@ -68,6 +78,27 @@ void Html::SetPlainContent(const std::string &plainContent)
         return;
     }
     this->plainContent_ = plainContent;
+    InitObject();
+}
+
+ValueType Html::GetValue()
+{
+    if (std::holds_alternative<std::monostate>(value_)) {
+        value_ = std::make_shared<Object>();
+    }
+    InitObject();
+    return value_;
+}
+
+void Html::InitObject()
+{
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
+        object->value_[HTML_CONTENT] = htmlContent_;
+        object->value_[PLAINT_CONTENT] = plainContent_;
+        object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+    }
 }
 } // namespace UDMF
 } // namespace OHOS

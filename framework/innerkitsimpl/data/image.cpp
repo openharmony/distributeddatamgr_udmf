@@ -26,6 +26,9 @@ Image::Image(const std::string &uri) : File(uri)
     this->dataType_ = IMAGE;
 }
 
-Image::Image(UDType type, ValueType value) : File(type, value) {}
+Image::Image(UDType type, ValueType value) : File(type, value)
+{
+    this->dataType_ = IMAGE;
+}
 } // namespace UDMF
 } // namespace OHOS

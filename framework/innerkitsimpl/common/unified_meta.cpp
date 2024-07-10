@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "UnifiedMeta"
 #include "unified_meta.h"
 
+#include "logger.h"
 #include "unified_key.h"
 
 namespace OHOS {
@@ -578,6 +580,46 @@ bool UnifiedDataUtils::IsValidOptions(const std::string &key, std::string &inten
         return true;
     }
     return false;
+}
+
+bool Object::GetValue(const std::string &key, std::string &value)
+{
+    auto it = value_.find(key);
+    if (it != value_.end() && std::holds_alternative<std::string>(it->second)) {
+        value = std::get<std::string>(it->second);
+        return true;
+    }
+    return false;
+}
+
+bool Object::GetValue(const std::string &key, std::shared_ptr<Object> &value)
+{
+    auto it = value_.find(key);
+    if (it != value_.end() && std::holds_alternative<std::shared_ptr<Object>>(it->second)) {
+        value = std::get<std::shared_ptr<Object>>(it->second);
+        return true;
+    }
+    return false;
+}
+
+std::shared_ptr<Object> ObjectUtils::ConvertToObject(UDDetails &details)
+{
+    Object object;
+    for (auto [key, value] : details) {
+        ConvertVariant(std::move(value), object.value_[key]);
+    }
+    return std::make_shared<Object>(object);
+}
+
+UDDetails ObjectUtils::ConvertToUDDetails(std::shared_ptr<Object> object)
+{
+    UDDetails details;
+    for (auto [key, value] : object->value_) {
+        if (!ConvertVariant(std::move(value), details[key])) {
+            LOG_ERROR(UnifiedRecord, "object convert to UDDetails failed, object key is %{public}s", key.c_str());
+        }
+    }
+    return details;
 }
 } // namespace UDMF
 } // namespace OHOS

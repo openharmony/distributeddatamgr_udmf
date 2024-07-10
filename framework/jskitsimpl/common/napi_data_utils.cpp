@@ -417,6 +417,117 @@ napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<OHOS::AA
     return napi_ok;
 }
 
+napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr<Object> &object)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> std::GetValue Object");
+    napi_value attributeNames = nullptr;
+    NAPI_CALL_BASE(env, napi_get_property_names(env, in, &attributeNames), napi_invalid_arg);
+    uint32_t attributesNum = 0;
+    NAPI_CALL_BASE(env, napi_get_array_length(env, attributeNames, &attributesNum), napi_invalid_arg);
+    for (uint32_t i = 0; i < attributesNum; i++) {
+        napi_value attributeNameNapi = nullptr;
+        NAPI_CALL_BASE(env, napi_get_element(env, attributeNames, i, &attributeNameNapi), napi_invalid_arg);
+        size_t len = 0;
+        char str[STR_MAX_SIZE] = { 0 };
+        NAPI_CALL_BASE(env, napi_get_value_string_utf8(
+            env, attributeNameNapi, str, STR_MAX_SIZE, &len), napi_invalid_arg);
+        std::string attributeName = str;
+        napi_value attributeValueNapi = nullptr;
+        NAPI_CALL_BASE(env, napi_get_named_property(env, in, str, &attributeValueNapi), napi_invalid_arg);
+
+        bool isArrayBuffer = false;
+        NAPI_CALL_BASE(env, napi_is_arraybuffer(env, attributeValueNapi, &isArrayBuffer), napi_invalid_arg);
+        if (isArrayBuffer) {
+            void *data = nullptr;
+            size_t dataLen = 0;
+            NAPI_CALL_BASE(env, napi_get_arraybuffer_info(env, attributeValueNapi, &data, &dataLen), napi_invalid_arg);
+            object->value_[attributeName] = std::vector<uint8_t>(
+                reinterpret_cast<uint8_t *>(data), reinterpret_cast<uint8_t *>(data) + dataLen);
+            continue;
+        }
+        napi_valuetype valueType = napi_undefined;
+        NAPI_CALL_BASE(env, napi_typeof(env, attributeValueNapi, &valueType), napi_invalid_arg);
+        switch (valueType) {
+            case napi_valuetype::napi_object:
+                object->value_[attributeName] = std::make_shared<Object>();
+                break;
+            case napi_valuetype::napi_number:
+                object->value_[attributeName] = double();
+                break;
+            case napi_valuetype::napi_string:
+                object->value_[attributeName] = std::string();
+                break;
+            case napi_valuetype::napi_boolean:
+                object->value_[attributeName] = bool();
+                break;
+            case napi_valuetype::napi_undefined:
+                object->value_[attributeName] = std::monostate();
+                break;
+            case napi_valuetype::napi_null:
+                object->value_[attributeName] = nullptr;
+                break;
+            default:
+                return napi_invalid_arg;
+        }
+        napi_status status = napi_ok;
+        std::visit([&](auto &value) {status = NapiDataUtils::GetValue(env, attributeValueNapi, value);},
+            object->value_[attributeName]);
+        if (status != napi_ok) {
+            return status;
+        }
+    }
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<Object> &object, napi_value &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> std::GetValue Object");
+    napi_create_object(env, &out);
+    for (auto &[key, value] : object->value_) {
+        napi_value valueNapi = nullptr;
+        if (std::holds_alternative<std::vector<uint8_t>>(value)) {
+            auto array = std::get<std::vector<uint8_t>>(value);
+            void *data = nullptr;
+            size_t len = array.size();
+            NAPI_CALL_BASE(env, napi_create_arraybuffer(env, len, &data, &valueNapi), napi_generic_failure);
+            if (memcpy_s(data, len, reinterpret_cast<const void *>(array.data()), len) != 0) {
+                LOG_ERROR(UDMF_KITS_NAPI, "memcpy_s failed");
+                return napi_generic_failure;
+            }
+        } else {
+            std::visit([&](const auto &value) {NapiDataUtils::SetValue(env, value, valueNapi);}, value);
+        }
+        napi_set_named_property(env, out, key.c_str(), valueNapi);
+    }
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::monostate &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> std::monostate");
+    out = std::monostate{};
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::SetValue(napi_env env, const std::monostate &in, napi_value &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value <- std::monostate");
+    return napi_get_undefined(env, &out);
+}
+
+napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, nullptr_t &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> null");
+    out = nullptr;
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::SetValue(napi_env env, const nullptr_t &in, napi_value &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value <- null");
+    return napi_get_null(env, &out);
+}
+
 bool NapiDataUtils::IsTypeForNapiValue(napi_env env, napi_value param, napi_valuetype expectType)
 {
     napi_valuetype valueType = napi_undefined;

@@ -34,8 +34,14 @@ public:
     void SetUrl(const std::string &url);
     std::string GetDescription() const;
     void SetDescription(const std::string &description);
+    ValueType GetValue() override;
 
+    static bool CheckValue(const ValueType &value);
 private:
+    void InitObject();
+
+    constexpr static const char *URL = "url";
+    constexpr static const char *DESCRIPTION = "description";
     std::string url_;
     std::string description_;
 };

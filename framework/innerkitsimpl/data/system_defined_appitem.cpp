@@ -22,7 +22,23 @@ SystemDefinedAppItem::SystemDefinedAppItem()
     this->dataType_ = SYSTEM_DEFINED_APP_ITEM;
 }
 
-SystemDefinedAppItem::SystemDefinedAppItem(UDType type, ValueType value) : SystemDefinedRecord(type, value) {}
+SystemDefinedAppItem::SystemDefinedAppItem(UDType type, ValueType value) : SystemDefinedRecord(type, value)
+{
+    this->dataType_ = SYSTEM_DEFINED_APP_ITEM;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        auto object = std::get<std::shared_ptr<Object>>(value);
+        object->GetValue(APPID, appId_);
+        object->GetValue(APPNAME, appName_);
+        object->GetValue(APPICONID, appIconId_);
+        object->GetValue(APPLABELID, appLabelId_);
+        object->GetValue(BUNDLENAME, bundleName_);
+        object->GetValue(ABILITYNAME, abilityName_);
+        std::shared_ptr<Object> detailObj = nullptr;
+        if (object->GetValue(DETAILS, detailObj)) {
+            details_ = ObjectUtils::ConvertToUDDetails(detailObj);
+        }
+    }
+}
 
 int64_t SystemDefinedAppItem::GetSize()
 {
@@ -38,6 +54,7 @@ std::string SystemDefinedAppItem::GetAppId() const
 void SystemDefinedAppItem::SetAppId(const std::string &appId)
 {
     this->appId_ = appId;
+    InitObject();
 }
 
 std::string SystemDefinedAppItem::GetAppName() const
@@ -48,6 +65,7 @@ std::string SystemDefinedAppItem::GetAppName() const
 void SystemDefinedAppItem::SetAppName(const std::string &appName)
 {
     this->appName_ = appName;
+    InitObject();
 }
 
 std::string SystemDefinedAppItem::GetAppIconId() const
@@ -58,6 +76,7 @@ std::string SystemDefinedAppItem::GetAppIconId() const
 void SystemDefinedAppItem::SetAppIconId(const std::string &appIconId)
 {
     this->appIconId_ = appIconId;
+    InitObject();
 }
 
 std::string SystemDefinedAppItem::GetAppLabelId() const
@@ -68,6 +87,7 @@ std::string SystemDefinedAppItem::GetAppLabelId() const
 void SystemDefinedAppItem::SetAppLabelId(const std::string &appLabelId)
 {
     this->appLabelId_ = appLabelId;
+    InitObject();
 }
 
 std::string SystemDefinedAppItem::GetBundleName() const
@@ -78,6 +98,7 @@ std::string SystemDefinedAppItem::GetBundleName() const
 void SystemDefinedAppItem::SetBundleName(const std::string &bundleName)
 {
     this->bundleName_ = bundleName;
+    InitObject();
 }
 
 std::string SystemDefinedAppItem::GetAbilityName() const
@@ -88,6 +109,7 @@ std::string SystemDefinedAppItem::GetAbilityName() const
 void SystemDefinedAppItem::SetAbilityName(const std::string &abilityName)
 {
     this->abilityName_ = abilityName;
+    InitObject();
 }
 
 void SystemDefinedAppItem::SetItems(UDDetails &details)
@@ -116,6 +138,7 @@ void SystemDefinedAppItem::SetItems(UDDetails &details)
             SetAbilityName(*value);
         }
     }
+    InitObject();
 }
 
 UDDetails SystemDefinedAppItem::GetItems()
@@ -128,6 +151,30 @@ UDDetails SystemDefinedAppItem::GetItems()
     items[BUNDLENAME] = GetBundleName();
     items[ABILITYNAME] = GetAbilityName();
     return items;
+}
+
+ValueType SystemDefinedAppItem::GetValue()
+{
+    if (std::holds_alternative<std::monostate>(value_)) {
+        value_ = std::make_shared<Object>();
+    }
+    InitObject();
+    return value_;
+}
+
+void SystemDefinedAppItem::InitObject()
+{
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
+        object->value_[APPID] = appId_;
+        object->value_[APPNAME] = appName_;
+        object->value_[APPICONID] = appIconId_;
+        object->value_[APPLABELID] = appLabelId_;
+        object->value_[BUNDLENAME] = bundleName_;
+        object->value_[ABILITYNAME] = abilityName_;
+        object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+    }
 }
 } // namespace UDMF
 } // namespace OHOS
