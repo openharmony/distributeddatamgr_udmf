@@ -1607,4 +1607,88 @@ describe('UdmfJSTest', function () {
       done();
     }
   });
+
+  /**
+   * @tc.name ObjectTest001
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('ObjectTest001', 0, async function (done) {
+    const TAG = 'ObjectTest001';
+    console.info(TAG, 'start');
+
+    const data = new ArrayBuffer(256);
+    let view1 = new Uint32Array(data);
+    view1[0] = 123456;
+
+    let ObjectDetails1 = {
+      'key1': 'value001',
+      'key2': data,
+      'key3': undefined,
+      'key4': null,
+    }
+    let ObjectDetails2 = {
+      'key1': 'value100',
+      'key2': data,
+      'key3': undefined,
+      'key4': null,
+      details: ObjectDetails1
+    }
+    let systemDefined = {
+      labelId: 'LabelId',
+      details: ObjectDetails2
+    }
+    let record1 = new UDC.UnifiedRecord('self_defined_type', systemDefined);
+    let unifiedData = new UDC.UnifiedData(record1);
+
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          expect(records.length).assertEqual(1);
+          let value = records[0].getValue();
+          expect(value.labelId).assertEqual(systemDefined.labelId);
+          expect(value.details.key1).assertEqual(systemDefined.details.key1);
+          expect(value.details.key2.byteLength).assertEqual(systemDefined.details.key2.byteLength);
+          let view2 = new Uint32Array(value.details.key2);
+          expect(view2[0]).assertEqual(view1[0]);
+          expect(value.details.key3).assertEqual(systemDefined.details.key3);
+          expect(value.details.key4).assertEqual(systemDefined.details.key4);
+          expect(value.details.details.key1).assertEqual(systemDefined.details.details.key1);
+          expect(value.details.details.key2.byteLength).assertEqual(systemDefined.details.details.key2.byteLength);
+          let view3 = new Uint32Array(value.details.details.key2);
+          expect(view3[0]).assertEqual(view1[0]);
+          expect(value.details.details.key3).assertEqual(systemDefined.details.details.key3);
+          expect(value.details.details.key4).assertEqual(systemDefined.details.details.key4);
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
 });

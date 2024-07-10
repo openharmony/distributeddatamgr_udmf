@@ -438,9 +438,10 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
         bool isArrayBuffer = false;
         NAPI_CALL_BASE(env, napi_is_arraybuffer(env, attributeValueNapi, &isArrayBuffer), napi_invalid_arg);
         if (isArrayBuffer) {
-            std::vector<uint8_t> array;
-            NapiDataUtils::GetValue(env, attributeValueNapi, array);
-            object->value_[attributeName] = array;
+            void *data = nullptr;
+            size_t dataLen = 0;
+            NAPI_CALL_BASE(env, napi_get_arraybuffer_info(env, attributeValueNapi, &data, &dataLen), napi_invalid_arg);
+            object->value_[attributeName] = std::vector<uint8_t>(reinterpret_cast<uint8_t *>(data), reinterpret_cast<uint8_t *>(data) + dataLen);
             continue;
         }
         napi_valuetype valueType = napi_undefined;
@@ -483,7 +484,18 @@ napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<Object> 
     napi_create_object(env, &out);
     for (auto &[key, value] : object->value_) {
         napi_value valueNapi = nullptr;
-        std::visit([&](const auto &value) {NapiDataUtils::SetValue(env, value, valueNapi);}, value);
+        if (std::holds_alternative<std::vector<uint8_t>>(value)) {
+            auto array = std::get<std::vector<uint8_t>>(value);
+            void *data = nullptr;
+            size_t len = array.size();
+            NAPI_CALL_BASE(env, napi_create_arraybuffer(env, len, &data, &valueNapi), napi_generic_failure);
+            if (memcpy_s(data, len, reinterpret_cast<const void *>(array.data()), len) != 0) {
+                LOG_ERROR(UDMF_KITS_NAPI, "memcpy_s failed");
+                return napi_generic_failure;
+            }
+        } else {
+            std::visit([&](const auto &value) {NapiDataUtils::SetValue(env, value, valueNapi);}, value);
+        }
         napi_set_named_property(env, out, key.c_str(), valueNapi);
     }
     return napi_ok;
