@@ -26,6 +26,9 @@ Folder::Folder(const std::string &uri) : File(uri)
     this->dataType_ = FOLDER;
 }
 
-Folder::Folder(UDType type, ValueType value) : File(type, value) {}
+Folder::Folder(UDType type, ValueType value) : File(type, value)
+{
+    this->dataType_ = FOLDER;
+}
 } // namespace UDMF
 } // namespace OHOS

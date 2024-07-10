@@ -1306,4 +1306,389 @@ describe('UdmfJSTest', function () {
     const data4 = records[3].getValue();
     expect(data4).assertEqual(8899.7788);
   });
+
+  /**
+   * @tc.name UDSTest001
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UDSTest001', 0, async function () {
+    const TAG = 'UDSTest001';
+    console.info(TAG, 'start');
+
+    let plainTextDetails = {
+      'key1': 'value1',
+      'key2': 'value2',
+    };
+    let plainText = {
+      uniformDataType: UTD.UniformDataType.PLAIN_TEXT,
+      textContent: 'This is plainText textContent example',
+      abstract: 'this is abstract',
+      details: plainTextDetails
+    };
+    let record1 = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plainText);
+    let unifiedData = new UDC.UnifiedData(record1);
+    let records = unifiedData.getRecords();
+    expect(records.length).assertEqual(1);
+    const value1 = records[0].getValue();
+
+    expect(value1.uniformDataType).assertEqual(plainText.uniformDataType);
+    expect(value1.textContent).assertEqual(plainText.textContent);
+    expect(value1.abstract).assertEqual(plainText.abstract);
+    expect(value1.details.key1).assertEqual(plainText.details.key1);
+    expect(value1.details.key2).assertEqual(plainText.details.key2);
+  });
+
+  /**
+   * @tc.name UDSTest002
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UDSTest002', 0, async function (done) {
+    const TAG = 'UDSTest002';
+    console.info(TAG, 'start');
+
+    let plainTextDetails = {
+      'key1': 'value1',
+      'key2': 'value2',
+    };
+    let plainText = {
+      uniformDataType: UTD.UniformDataType.PLAIN_TEXT,
+      textContent: 'This is plainText textContent example',
+      abstract: 'this is abstract',
+      details: plainTextDetails
+    };
+    let record1 = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plainText);
+    let unifiedData = new UDC.UnifiedData(record1);
+    
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          expect(records.length).assertEqual(1);
+          let value = records[0].getValue();
+          expect(value.uniformDataType).assertEqual(plainText.uniformDataType);
+          expect(value.textContent).assertEqual(plainText.textContent);
+          expect(value.abstract).assertEqual(plainText.abstract);
+          expect(value.details.key1).assertEqual(plainText.details.key1);
+          expect(value.details.key2).assertEqual(plainText.details.key2);
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
+
+  /**
+   * @tc.name UDSTest003
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UDSTest003', 0, async function (done) {
+    const TAG = 'UDSTest003';
+    console.info(TAG, 'start');
+
+    let hyperLinkDetails = {
+      'key1': 'value1',
+      'key2': 'value2',
+    };
+    let hyperLink = {
+      uniformDataType: UTD.UniformDataType.HYPERLINK,
+      url: 'www.xxx',
+      description: 'hyperlinkDescription',
+      details: hyperLinkDetails
+    };
+    let record1 = new UDC.UnifiedRecord(UTD.UniformDataType.HYPERLINK, hyperLink);
+    let unifiedData = new UDC.UnifiedData(record1);
+    
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          expect(records.length).assertEqual(1);
+          let value = records[0].getValue();
+          expect(value.uniformDataType).assertEqual(hyperLink.uniformDataType);
+          expect(value.url).assertEqual(hyperLink.url);
+          expect(value.description).assertEqual(hyperLink.description);
+          expect(value.details.key1).assertEqual(hyperLink.details.key1);
+          expect(value.details.key2).assertEqual(hyperLink.details.key2);
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
+
+  /**
+   * @tc.name UDSTest004
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UDSTest004', 0, async function (done) {
+    const TAG = 'UDSTest004';
+    console.info(TAG, 'start');
+
+    let htmlDetails = {
+      'key1': 'value1',
+      'key2': 'value2',
+    };
+    let html = {
+      uniformDataType: UTD.UniformDataType.HTML,
+      htmlContent: 'www.xxx',
+      plainContent: 'htmlDescription',
+      details: htmlDetails
+    };
+    let record1 = new UDC.UnifiedRecord(UTD.UniformDataType.HTML, html);
+    let unifiedData = new UDC.UnifiedData(record1);
+    
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          expect(records.length).assertEqual(1);
+          let value = records[0].getValue();
+          expect(value.uniformDataType).assertEqual(html.uniformDataType);
+          expect(value.htmlContent).assertEqual(html.htmlContent);
+          expect(value.plainContent).assertEqual(html.plainContent);
+          expect(value.details.key1).assertEqual(html.details.key1);
+          expect(value.details.key2).assertEqual(html.details.key2);
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
+
+  /**
+   * @tc.name UDSTest005
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UDSTest005', 0, async function (done) {
+    const TAG = 'UDSTest005';
+    console.info(TAG, 'start');
+
+    let systemDefinedDetails = {
+      'key1': 'value1',
+      'key2': 'value2',
+    };
+    let systemDefined = {
+      uniformDataType: 'openharmony.app-item',
+      appId: 'app-itemAppId',
+      appName: 'app-itemAppName',
+      appIconId: 'app-itemAppIconId',
+      appLabelId: 'app-itemAppLabelId',
+      bundleName: 'app-itemBundleName',
+      abilityName: 'app-itemAbilityName',
+      details: systemDefinedDetails
+    };
+    let record1 = new UDC.UnifiedRecord('openharmony.app-item', systemDefined);
+    let unifiedData = new UDC.UnifiedData(record1);
+    
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          expect(records.length).assertEqual(1);
+          let value = records[0].getValue();
+          expect(value.uniformDataType).assertEqual(systemDefined.uniformDataType);
+          expect(value.appId).assertEqual(systemDefined.appId);
+          expect(value.appName).assertEqual(systemDefined.appName);
+          expect(value.appIconId).assertEqual(systemDefined.appIconId);
+          expect(value.appLabelId).assertEqual(systemDefined.appLabelId);
+          expect(value.bundleName).assertEqual(systemDefined.bundleName);
+          expect(value.abilityName).assertEqual(systemDefined.abilityName);
+          expect(value.details.key1).assertEqual(systemDefined.details.key1);
+          expect(value.details.key2).assertEqual(systemDefined.details.key2);
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
+
+  /**
+   * @tc.name ObjectTest001
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('ObjectTest001', 0, async function (done) {
+    const TAG = 'ObjectTest001';
+    console.info(TAG, 'start');
+
+    const data = new ArrayBuffer(256);
+    let view1 = new Uint32Array(data);
+    view1[0] = 123456;
+
+    let ObjectDetails1 = {
+      'key1': 'value001',
+      'key2': data,
+      'key3': undefined,
+      'key4': null,
+    };
+    let ObjectDetails2 = {
+      'key1': 'value100',
+      'key2': data,
+      'key3': undefined,
+      'key4': null,
+      details: ObjectDetails1
+    };
+    let systemDefined = {
+      labelId: 'LabelId',
+      details: ObjectDetails2
+    };
+    let record1 = new UDC.UnifiedRecord('self_defined_type', systemDefined);
+    let unifiedData = new UDC.UnifiedData(record1);
+
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          expect(records.length).assertEqual(1);
+          let value = records[0].getValue();
+          expect(value.labelId).assertEqual(systemDefined.labelId);
+          expect(value.details.key1).assertEqual(systemDefined.details.key1);
+          expect(value.details.key2.byteLength).assertEqual(systemDefined.details.key2.byteLength);
+          let view2 = new Uint32Array(value.details.key2);
+          expect(view2[0]).assertEqual(view1[0]);
+          expect(value.details.key3).assertEqual(systemDefined.details.key3);
+          expect(value.details.key4).assertEqual(systemDefined.details.key4);
+          expect(value.details.details.key1).assertEqual(systemDefined.details.details.key1);
+          expect(value.details.details.key2.byteLength).assertEqual(systemDefined.details.details.key2.byteLength);
+          let view3 = new Uint32Array(value.details.details.key2);
+          expect(view3[0]).assertEqual(view1[0]);
+          expect(value.details.details.key3).assertEqual(systemDefined.details.details.key3);
+          expect(value.details.details.key4).assertEqual(systemDefined.details.details.key4);
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
 });

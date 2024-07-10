@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "TlvObject"
 #include "tlv_object.h"
 #include <string>
 #include <map>
+#include "logger.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -123,6 +125,67 @@ void TLVObject::Count(const UDVariant &value)
     total_ += sizeof(TLVHead);
 }
 
+void TLVObject::Count(const ValueType &value)
+{
+    total_ += sizeof(TLVHead);
+    auto int32Value = std::get_if<int32_t>(&value);
+    if (int32Value != nullptr) {
+        Count(std::get<int32_t>(value));
+        return;
+    }
+    auto int64Value = std::get_if<int64_t>(&value);
+    if (int64Value != nullptr) {
+        Count(std::get<int64_t>(value));
+        return;
+    }
+    auto boolValue = std::get_if<bool>(&value);
+    if (boolValue != nullptr) {
+        Count(std::get<bool>(value));
+        return;
+    }
+    auto doubleValue = std::get_if<double>(&value);
+    if (doubleValue != nullptr) {
+        Count(std::get<double>(value));
+        return;
+    }
+    auto strValue = std::get_if<std::string>(&value);
+    if (strValue != nullptr) {
+        Count(std::get<std::string>(value));
+        return;
+    }
+    auto vecValue = std::get_if<std::vector<uint8_t>>(&value);
+    if (vecValue != nullptr) {
+        Count(std::get<std::vector<uint8_t>>(value));
+        return;
+    }
+    auto wantValue = std::get_if<std::shared_ptr<OHOS::AAFwk::Want>>(&value);
+    if (wantValue != nullptr) {
+        Count(std::get<std::shared_ptr<OHOS::AAFwk::Want>>(value));
+        return;
+    }
+    auto pixelMapValue = std::get_if<std::shared_ptr<OHOS::Media::PixelMap>>(&value);
+    if (pixelMapValue != nullptr) {
+        Count(std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value));
+        return;
+    }
+    auto objectValue = std::get_if<std::shared_ptr<Object>>(&value);
+    if (objectValue != nullptr) {
+        Count(std::get<std::shared_ptr<Object>>(value));
+        return;
+    }
+    auto undefinedValue = std::get_if<std::monostate>(&value);
+    if (undefinedValue != nullptr) {
+        Count(std::get<std::monostate>(value));
+        return;
+    }
+    auto nullValue = std::get_if<nullptr_t>(&value);
+    if (nullValue != nullptr) {
+        Count(std::get<nullptr_t>(value));
+        return;
+    }
+    total_ += sizeof(TLVHead);
+}
+
 void TLVObject::Count(const UDDetails &value)
 {
     for (auto &item : value) {
@@ -145,6 +208,49 @@ void TLVObject::Count(const Privilege &value)
     Count(value.tokenId);
     Count(value.readPermission);
     Count(value.writePermission);
+}
+
+void TLVObject::Count(const std::shared_ptr<OHOS::AAFwk::Want> &value)
+{
+    std::size_t expectSize = sizeof(TLVHead);
+    Parcel parcel;
+    if (!value->Marshalling(parcel)) {
+        LOG_ERROR(TlvObject, "Marshalling Want failed.");
+        return;
+    }
+    expectSize += parcel.GetDataSize();
+    total_ += expectSize;
+}
+
+void TLVObject::Count(const std::shared_ptr<OHOS::Media::PixelMap> &value)
+{
+    std::size_t expectSize = sizeof(TLVHead);
+    std::vector<std::uint8_t> val;
+    if (!value->EncodeTlv(val)) {
+        LOG_ERROR(TlvObject, "Marshalling PixelMap failed.");
+        return;
+    }
+    expectSize += val.size();
+    total_ += expectSize;
+}
+
+void TLVObject::Count(const std::shared_ptr<Object> &value)
+{
+    for (auto &item : value->value_) {
+        Count(item.first);
+        Count(item.second);
+    }
+    total_ += sizeof(TLVHead);
+}
+
+void TLVObject::Count(const std::monostate &value)
+{
+    total_ += sizeof(TLVHead);
+}
+
+void TLVObject::Count(const void *value)
+{
+    total_ += sizeof(TLVHead);
 }
 
 bool TLVObject::WriteString(const std::string &value)
@@ -398,6 +504,225 @@ bool TLVObject::ReadVariant(UDVariant &value)
     return true;
 }
 
+bool TLVObject::WriteVariantInner(TAG &tag, const ValueType &value)
+{
+    if (std::get_if<int32_t>(&value) != nullptr) {
+        if (!WriteBasic(TAG::TAG_INT32, std::get<int32_t>(value))) {
+            return false;
+        }
+        tag = TAG::TAG_INT32;
+    } else if (std::get_if<int64_t>(&value) != nullptr) {
+        if (!WriteBasic(TAG::TAG_INT64, std::get<int64_t>(value))) {
+            return false;
+        }
+        tag = TAG::TAG_INT64;
+    } else if (std::get_if<bool>(&value) != nullptr) {
+        if (!WriteBasic(TAG::TAG_BOOL, std::get<bool>(value))) {
+            return false;
+        }
+        tag = TAG::TAG_BOOL;
+    } else if (std::get_if<double>(&value) != nullptr) {
+        if (!WriteBasic(TAG::TAG_DOUBLE, std::get<double>(value))) {
+            return false;
+        }
+        tag = TAG::TAG_DOUBLE;
+    } else if (std::get_if<std::string>(&value) != nullptr) {
+        if (!WriteString(std::get<std::string>(value))) {
+            return false;
+        }
+        tag = TAG::TAG_STRING;
+    } else if (std::get_if<std::vector<uint8_t>>(&value) != nullptr) {
+        if (!WriteVector(std::get<std::vector<uint8_t>>(value))) {
+            return false;
+        }
+        tag = TAG::TAG_VECTOR;
+    } else if (std::get_if<std::shared_ptr<OHOS::AAFwk::Want>>(&value) != nullptr) {
+        if (!WriteWant(std::get<std::shared_ptr<OHOS::AAFwk::Want>>(value))) {
+            return false;
+        }
+        tag = TAG::TAG_WANT;
+    } else if (std::get_if<std::shared_ptr<OHOS::Media::PixelMap>>(&value) != nullptr) {
+        if (!WritePixelMap(std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value))) {
+            return false;
+        }
+        tag = TAG::TAG_PIXELMAP;
+    } else if (std::get_if<std::shared_ptr<Object>>(&value) != nullptr) {
+        if (!WriteObject(std::get<std::shared_ptr<Object>>(value))) {
+            return false;
+        }
+        tag = TAG::TAG_OBJECT;
+    } else if (std::get_if<std::monostate>(&value) != nullptr) {
+        if (!WriteUndefined(std::get<std::monostate>(value))) {
+            return false;
+        }
+        tag = TAG::TAG_UNDEFINED;
+    } else if (std::get_if<nullptr_t>(&value) != nullptr) {
+        if (!WriteNull(nullptr)) {
+            return false;
+        }
+        tag = TAG::TAG_NULL;
+    }
+    return true;
+}
+
+bool TLVObject::WriteVariant(const ValueType &value)
+{
+    if (!HasExpectBuffer(sizeof(TLVHead))) {
+        return false;
+    }
+    if (file_ != nullptr) {
+        std::vector<uint8_t> reserved {};
+        reserved.resize(sizeof(TLVHead));
+        if (fwrite(reserved.data(), sizeof(uint8_t), reserved.size(), file_) != reserved.size()) {
+            return false;
+        }
+    }
+    auto tagCursor = cursor_;
+    cursor_ += sizeof(TLVHead);
+    auto valueCursor = cursor_;
+    TAG tag = TAG::TAG_BUTT;
+    if (!WriteVariantInner(tag, value)) {
+        return false;
+    }
+    PrepareHeader(cursor_, tagCursor, valueCursor);
+    WriteHead(static_cast<uint16_t>(tag), tagCursor, cursor_ - valueCursor);
+    if (!SaveBufferToFile()) {
+        return false;
+    }
+    if (file_ != nullptr) {
+        fseek(file_, 0, SEEK_END);
+        cursor_ += sizeof(TLVHead);
+    }
+    return true;
+}
+
+bool TLVObject::ReadVariantInner(uint16_t tag, ValueType &value)
+{
+    switch (tag) {
+        case static_cast<uint16_t>(TAG::TAG_INT32): {
+            int32_t int32Value;
+            if (!ReadBasic(int32Value)) {
+                return false;
+            }
+            value.emplace<int32_t>(int32Value);
+            break;
+        }
+        case static_cast<uint16_t>(TAG::TAG_INT64): {
+            int64_t int64Value;
+            if (!ReadBasic(int64Value)) {
+                return false;
+            }
+            value.emplace<int64_t>(int64Value);
+            break;
+        }
+        case static_cast<uint16_t>(TAG::TAG_BOOL): {
+            bool boolValue;
+            if (!ReadBasic(boolValue)) {
+                return false;
+            }
+            value.emplace<bool>(boolValue);
+            break;
+        }
+        case static_cast<uint16_t>(TAG::TAG_DOUBLE): {
+            double doubleValue;
+            if (!ReadBasic(doubleValue)) {
+                return false;
+            }
+            value.emplace<double>(doubleValue);
+            break;
+        }
+        default: {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool TLVObject::ReadVariant(ValueType &value)
+{
+    TLVHead head {};
+    if (!ReadHead(head)) {
+        return false;
+    }
+    if (!HasExpectBuffer(head.len)) {
+        return false;
+    }
+    switch (head.tag) {
+        case static_cast<uint16_t>(TAG::TAG_INT32):
+        case static_cast<uint16_t>(TAG::TAG_INT64):
+        case static_cast<uint16_t>(TAG::TAG_BOOL):
+        case static_cast<uint16_t>(TAG::TAG_DOUBLE): {
+            if (!ReadVariantInner(head.tag, value)) {
+                return false;
+            }
+            break;
+        }
+        case static_cast<uint16_t>(TAG::TAG_STRING): {
+            std::string stringValue;
+            if (!ReadString(stringValue)) {
+                return false;
+            }
+            value.emplace<std::string>(stringValue);
+            break;
+        }
+        case static_cast<uint16_t>(TAG::TAG_VECTOR): {
+            std::vector<uint8_t> vectorValue;
+            if (!ReadVector(vectorValue)) {
+                return false;
+            }
+            value.emplace<std::vector<uint8_t>>(vectorValue);
+            break;
+        }
+        case static_cast<uint16_t>(TAG::TAG_WANT): {
+            std::shared_ptr<OHOS::AAFwk::Want> wantValue = nullptr;
+            if (!ReadWant(wantValue)) {
+                return false;
+            }
+            value.emplace<std::shared_ptr<OHOS::AAFwk::Want>>(wantValue);
+            break;
+        }
+        case static_cast<uint16_t>(TAG::TAG_PIXELMAP): {
+            std::shared_ptr<OHOS::Media::PixelMap> pixelMapValue = nullptr;
+            if (!ReadPixelMap(pixelMapValue)) {
+                return false;
+            }
+            value.emplace<std::shared_ptr<OHOS::Media::PixelMap>>(pixelMapValue);
+            break;
+        }
+        case static_cast<uint16_t>(TAG::TAG_OBJECT): {
+            std::shared_ptr<Object> objectValue = nullptr;
+            if (!ReadObject(objectValue)) {
+                return false;
+            }
+            value.emplace<std::shared_ptr<Object>>(objectValue);
+            break;
+        }
+        case static_cast<uint16_t>(TAG::TAG_UNDEFINED): {
+            std::monostate monoValue;
+            if (!ReadUndefined(monoValue)) {
+                return false;
+            }
+            value.emplace<std::monostate>(monoValue);
+            break;
+        }
+        case static_cast<uint16_t>(TAG::TAG_NULL): {
+            nullptr_t nullValue = nullptr;
+            if (!ReadNull(nullValue)) {
+                return false;
+            }
+            value.emplace<nullptr_t>(nullValue);
+            break;
+        }
+        default: {
+            return false;
+        }
+    }
+    if (file_ != nullptr) {
+        cursor_ += sizeof(TLVHead);
+    }
+    return true;
+}
+
 bool TLVObject::WriteMap(const UDDetails &value)
 {
     if (!HasExpectBuffer(sizeof(TLVHead))) {
@@ -465,6 +790,258 @@ bool TLVObject::ReadMap(UDDetails &value)
         total += cursor_;
         value.emplace(itemKey, itemValue);
     }
+    return true;
+}
+
+bool TLVObject::WriteObject(const std::shared_ptr<Object> &value)
+{
+    if (!HasExpectBuffer(sizeof(TLVHead))) {
+        return false;
+    }
+    if (file_ != nullptr) {
+        std::vector<uint8_t> reserved {};
+        reserved.resize(sizeof(TLVHead));
+        if (fwrite(reserved.data(), sizeof(uint8_t), reserved.size(), file_) != reserved.size()) {
+            return false;
+        }
+    }
+
+    auto tagCursor = cursor_;
+    cursor_ += sizeof(TLVHead);
+    auto valueCursor = cursor_;
+
+    size_t total = 0;
+    for (const auto &item : value->value_) {
+        if (!WriteString(item.first)) {
+            return false;
+        }
+        total += cursor_;
+
+        if (!WriteVariant(item.second)) {
+            return false;
+        }
+        total += cursor_;
+    }
+    PrepareHeader(total, tagCursor, valueCursor);
+    WriteHead(static_cast<uint16_t>(TAG::TAG_OBJECT), tagCursor, cursor_ - valueCursor);
+    if (!SaveBufferToFile()) {
+        return false;
+    }
+    if (file_ != nullptr) {
+        fseek(file_, 0, SEEK_END);
+    }
+    return true;
+}
+
+bool TLVObject::ReadObject(std::shared_ptr<Object> &value)
+{
+    TLVHead head {};
+    if (!ReadHead(head)) {
+        return false;
+    }
+    if (!HasExpectBuffer(head.len)) {
+        return false;
+    }
+    if (file_ != nullptr) {
+        cursor_ = 0;
+    }
+    value = std::make_shared<Object>();
+    auto mapEnd = cursor_ + head.len;
+    size_t total = 0;
+    while ((file_ == nullptr && cursor_ < mapEnd) || (file_ != nullptr && total < head.len)) {
+        std::string itemKey = "";
+        if (!ReadString(itemKey)) {
+            return false;
+        }
+        total += cursor_;
+        ValueType itemValue;
+        if (!ReadVariant(itemValue)) {
+            return false;
+        }
+        total += cursor_;
+        value->value_.emplace(itemKey, itemValue);
+    }
+    return true;
+}
+
+bool TLVObject::WriteWant(const std::shared_ptr<OHOS::AAFwk::Want> &value)
+{
+    Parcel parcel;
+    if (!value->Marshalling(parcel)) {
+        LOG_ERROR(TlvObject, "Marshalling Want failed.");
+        return false;
+    }
+    auto size = parcel.GetDataSize();
+    auto buffer = parcel.GetData();
+
+    PrepareBuffer(sizeof(TLVHead) + size);
+    if (!HasExpectBuffer(sizeof(TLVHead) + size)) {
+        return false;
+    }
+    WriteHead(static_cast<uint16_t>(TAG::TAG_WANT), cursor_, size);
+    cursor_ += sizeof(TLVHead);
+
+    if (size != 0) {
+        auto err = memcpy_s(buffer_->data() + cursor_, buffer_->size() - cursor_,
+            reinterpret_cast<const void *>(buffer), size);
+        if (err != EOK) {
+            return false;
+        }
+    }
+    if (SaveBufferToFile()) {
+        return false;
+    }
+    cursor_ += size;
+    return true;
+}
+
+bool TLVObject::ReadWant(std::shared_ptr<OHOS::AAFwk::Want> &value)
+{
+    TLVHead head {};
+    if (!ReadHead(head)) {
+        return false;
+    }
+    if (!HasExpectBuffer(head.len)) {
+        return false;
+    }
+    if (!LoadBufferFormFile(head.len)) {
+        return false;
+    }
+    std::vector<uint8_t> buff(buffer_->data() + cursor_, buffer_->data() + cursor_ + head.len);
+
+    auto buffer = (uintptr_t)(buff.data() + cursor_);
+    cursor_ += head.len;
+    if (file_ != nullptr) {
+        cursor_ += sizeof(TLVHead);
+    }
+
+    Parcel parcel;
+    if (!parcel.ParseFrom(buffer, head.len)) {
+        return false;
+    }
+    auto want = AAFwk::Want::Unmarshalling(parcel);
+    if (want != nullptr) {
+        return false;
+    }
+    value = std::make_shared<OHOS::AAFwk::Want>(*want);
+    return true;
+}
+
+bool TLVObject::WritePixelMap(const std::shared_ptr<OHOS::Media::PixelMap> &value)
+{
+    std::vector<std::uint8_t> val;
+    if (!value->EncodeTlv(val)) {
+        return false;
+    }
+
+    PrepareBuffer(sizeof(TLVHead) + val.size());
+    if (!HasExpectBuffer(sizeof(TLVHead) + val.size())) {
+        return false;
+    }
+    WriteHead(static_cast<uint16_t>(TAG::TAG_PIXELMAP), cursor_, val.size());
+    cursor_ += sizeof(TLVHead);
+
+    if (!val.empty()) {
+        auto err = memcpy_s(buffer_->data() + cursor_, buffer_->size() - cursor_, val.data(), val.size());
+        if (err != EOK) {
+            return false;
+        }
+    }
+    if (!SaveBufferToFile()) {
+        return false;
+    }
+    cursor_ += val.size();
+    return true;
+}
+
+bool TLVObject::ReadPixelMap(std::shared_ptr<OHOS::Media::PixelMap> &value)
+{
+    TLVHead head {};
+    if (!ReadHead(head)) {
+        return false;
+    }
+    if (!HasExpectBuffer(head.len)) {
+        return false;
+    }
+    if (!LoadBufferFormFile(head.len)) {
+        return false;
+    }
+    std::vector<uint8_t> buff(buffer_->data() + cursor_, buffer_->data() + cursor_ + head.len);
+    value = std::shared_ptr<OHOS::Media::PixelMap>(OHOS::Media::PixelMap::DecodeTlv(buff));
+
+    cursor_ += head.len;
+    if (file_ != nullptr) {
+        cursor_ += sizeof(TLVHead);
+    }
+    return true;
+}
+
+bool TLVObject::WriteUndefined(const std::monostate &value)
+{
+    PrepareBuffer(sizeof(TLVHead));
+    if (!HasExpectBuffer(sizeof(TLVHead))) {
+        return false;
+    }
+    auto *tlvHead = reinterpret_cast<TLVHead *>(buffer_->data() + cursor_);
+    tlvHead->tag = HostToNet(static_cast<uint16_t>(TAG::TAG_UNDEFINED));
+    tlvHead->len = HostToNet((uint32_t)0);
+    if (!SaveBufferToFile()) {
+        return false;
+    }
+    cursor_ += sizeof(TLVHead);
+    return true;
+}
+
+bool TLVObject::ReadUndefined(std::monostate &value)
+{
+    TLVHead head {};
+    if (!ReadHead(head)) {
+        return false;
+    }
+    if (!HasExpectBuffer(head.len)) {
+        return false;
+    }
+    if (!LoadBufferFormFile(head.len)) {
+        return false;
+    }
+    if (file_ != nullptr) {
+        cursor_ += sizeof(TLVHead);
+    }
+    return true;
+}
+
+bool TLVObject::WriteNull(const void *value)
+{
+    PrepareBuffer(sizeof(TLVHead));
+    if (!HasExpectBuffer(sizeof(TLVHead))) {
+        return false;
+    }
+    auto *tlvHead = reinterpret_cast<TLVHead *>(buffer_->data() + cursor_);
+    tlvHead->tag = HostToNet(static_cast<uint16_t>(TAG::TAG_NULL));
+    tlvHead->len = HostToNet((uint32_t)0);
+    if (!SaveBufferToFile()) {
+        return false;
+    }
+    cursor_ += sizeof(TLVHead);
+    return true;
+}
+
+bool TLVObject::ReadNull(void *value)
+{
+    TLVHead head {};
+    if (!ReadHead(head)) {
+        return false;
+    }
+    if (!HasExpectBuffer(head.len)) {
+        return false;
+    }
+    if (!LoadBufferFormFile(head.len)) {
+        return false;
+    }
+    if (file_ != nullptr) {
+        cursor_ += sizeof(TLVHead);
+    }
+    value = nullptr;
     return true;
 }
 

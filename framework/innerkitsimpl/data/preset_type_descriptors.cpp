@@ -177,7 +177,7 @@ void PresetTypeDescriptors::InitDescriptors()
         {"general.c-header",
          {"general.source-code"},
          {".h"},
-         {"text/-chdr"},
+         {"text/x-chdr"},
          "C header file.",
          REFERENCE_URL,
          ""},

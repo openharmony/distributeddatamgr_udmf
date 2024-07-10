@@ -33,8 +33,13 @@ public:
     void SetHtmlContent(const std::string &htmlContent);
     std::string GetPlainContent() const;
     void SetPlainContent(const std::string &htmlContent);
+    ValueType GetValue() override;
 
+    static bool CheckValue(const ValueType &value);
 private:
+    void InitObject();
+    constexpr static const char *HTML_CONTENT = "htmlContent";
+    constexpr static const char *PLAINT_CONTENT = "plainContent";
     std::string htmlContent_;
     std::string plainContent_;
 };

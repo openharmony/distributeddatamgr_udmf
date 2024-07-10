@@ -99,25 +99,13 @@ static inline uint64_t NetToHost(uint64_t value)
     return le64toh(value);
 }
 
-static inline float HostToNet(float value)
-{
-    return htole32(*reinterpret_cast<uint32_t*>(&value));
-}
+float HostToNet(float value);
 
-static inline float NetToHost(float value)
-{
-    return le32toh(*reinterpret_cast<uint32_t*>(&value));
-}
+float NetToHost(float value);
 
-static inline double HostToNet(double value)
-{
-    return htole64(*reinterpret_cast<uint64_t*>(&value));
-}
+double HostToNet(double value);
 
-static inline double NetToHost(double value)
-{
-    return le64toh(*reinterpret_cast<uint64_t*>(&value));
-}
+double NetToHost(double value);
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_ENDIAN_CONVERTER_H

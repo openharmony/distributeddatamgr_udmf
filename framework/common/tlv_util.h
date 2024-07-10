@@ -105,6 +105,11 @@ template<>
 bool API_EXPORT Reading(UDVariant &output, TLVObject &data);
 
 template<>
+bool API_EXPORT Writing(const ValueType &input, TLVObject &data);
+template<>
+bool API_EXPORT Reading(ValueType &output, TLVObject &data);
+
+template<>
 bool API_EXPORT Writing(const UDDetails &input, TLVObject &data);
 template<>
 bool API_EXPORT Reading(UDDetails &output, TLVObject &data);

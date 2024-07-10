@@ -42,8 +42,11 @@ public:
     void SetAbilityName(const std::string &abilityName);
     void SetItems(UDDetails &details);
     UDDetails GetItems();
+    ValueType GetValue() override;
 
+    static bool CheckValue(const ValueType &value);
 private:
+    void InitObject();
     constexpr static const char *APPID = "appId";
     constexpr static const char *APPNAME = "appName";
     constexpr static const char *APPICONID = "appIconId";

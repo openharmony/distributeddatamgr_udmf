@@ -22,7 +22,10 @@ SystemDefinedForm::SystemDefinedForm()
     this->dataType_ = SYSTEM_DEFINED_FORM;
 }
 
-SystemDefinedForm::SystemDefinedForm(UDType type, ValueType value) : SystemDefinedRecord(type, value) {}
+SystemDefinedForm::SystemDefinedForm(UDType type, ValueType value) : SystemDefinedRecord(type, value)
+{
+    this->dataType_ = SYSTEM_DEFINED_FORM;
+}
 
 int64_t SystemDefinedForm::GetSize()
 {
