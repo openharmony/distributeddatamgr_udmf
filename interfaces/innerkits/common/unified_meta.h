@@ -510,13 +510,15 @@ namespace ObjectUtils {
     bool ConvertVariant(T &&input, std::variant<Types...> &output)
     {
         bool converted = false;
-        std::visit([&output, &converted](auto &&val) {
-            using BasicType = std::decay_t<decltype(val)>;
-            if constexpr ((std::is_same_v<BasicType, Types> || ...)) {
+        std::visit(
+            [&output, &converted](auto &&val) {
+              using BasicType = std::decay_t<decltype(val)>;
+              if constexpr ((std::is_same_v<BasicType, Types> || ...)) {
                 output = std::variant<Types...>(std::move(val));
                 converted = true;
-            }
-        }, input);
+              }
+            },
+            input);
         return converted;
     }
 } // namespace ObjectUtils

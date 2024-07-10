@@ -547,7 +547,7 @@ bool TLVObject::WriteVariantInner(TAG &tag, const ValueType &value)
         }
         tag = TAG::TAG_PIXELMAP;
     } else if (std::get_if<std::shared_ptr<Object>>(&value) != nullptr) {
-        if (!WriteObject(std::get<std::shared_ptr<Object>>(value))){
+        if (!WriteObject(std::get<std::shared_ptr<Object>>(value))) {
             return false;
         }
         tag = TAG::TAG_OBJECT;
@@ -557,7 +557,7 @@ bool TLVObject::WriteVariantInner(TAG &tag, const ValueType &value)
         }
         tag = TAG::TAG_UNDEFINED;
     } else if (std::get_if<nullptr_t>(&value) != nullptr) {
-        if (!WriteNull(nullptr)){
+        if (!WriteNull(nullptr)) {
             return false;
         }
         tag = TAG::TAG_NULL;

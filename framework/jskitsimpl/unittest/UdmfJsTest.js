@@ -1320,13 +1320,13 @@ describe('UdmfJSTest', function () {
     let plainTextDetails = {
       'key1': 'value1',
       'key2': 'value2',
-    }
+    };
     let plainText = {
       uniformDataType: UTD.UniformDataType.PLAIN_TEXT,
       textContent: 'This is plainText textContent example',
       abstract: 'this is abstract',
       details: plainTextDetails
-    }
+    };
     let record1 = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plainText);
     let unifiedData = new UDC.UnifiedData(record1);
     let records = unifiedData.getRecords();
@@ -1353,13 +1353,13 @@ describe('UdmfJSTest', function () {
     let plainTextDetails = {
       'key1': 'value1',
       'key2': 'value2',
-    }
+    };
     let plainText = {
       uniformDataType: UTD.UniformDataType.PLAIN_TEXT,
       textContent: 'This is plainText textContent example',
       abstract: 'this is abstract',
       details: plainTextDetails
-    }
+    };
     let record1 = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plainText);
     let unifiedData = new UDC.UnifiedData(record1);
     
@@ -1418,13 +1418,13 @@ describe('UdmfJSTest', function () {
     let hyperLinkDetails = {
       'key1': 'value1',
       'key2': 'value2',
-    }
+    };
     let hyperLink = {
       uniformDataType: UTD.UniformDataType.HYPERLINK,
       url: 'www.xxx',
       description: 'hyperlinkDescription',
       details: hyperLinkDetails
-    }
+    };
     let record1 = new UDC.UnifiedRecord(UTD.UniformDataType.HYPERLINK, hyperLink);
     let unifiedData = new UDC.UnifiedData(record1);
     
@@ -1483,13 +1483,13 @@ describe('UdmfJSTest', function () {
     let htmlDetails = {
       'key1': 'value1',
       'key2': 'value2',
-    }
+    };
     let html = {
       uniformDataType: UTD.UniformDataType.HTML,
       htmlContent: 'www.xxx',
       plainContent: 'htmlDescription',
       details: htmlDetails
-    }
+    };
     let record1 = new UDC.UnifiedRecord(UTD.UniformDataType.HTML, html);
     let unifiedData = new UDC.UnifiedData(record1);
     
@@ -1548,7 +1548,7 @@ describe('UdmfJSTest', function () {
     let systemDefinedDetails = {
       'key1': 'value1',
       'key2': 'value2',
-    }
+    };
     let systemDefined = {
       uniformDataType: 'openharmony.app-item',
       appId: 'app-itemAppId',
@@ -1558,7 +1558,7 @@ describe('UdmfJSTest', function () {
       bundleName: 'app-itemBundleName',
       abilityName: 'app-itemAbilityName',
       details: systemDefinedDetails
-    }
+    };
     let record1 = new UDC.UnifiedRecord('openharmony.app-item', systemDefined);
     let unifiedData = new UDC.UnifiedData(record1);
     
@@ -1627,18 +1627,18 @@ describe('UdmfJSTest', function () {
       'key2': data,
       'key3': undefined,
       'key4': null,
-    }
+    };
     let ObjectDetails2 = {
       'key1': 'value100',
       'key2': data,
       'key3': undefined,
       'key4': null,
       details: ObjectDetails1
-    }
+    };
     let systemDefined = {
       labelId: 'LabelId',
       details: ObjectDetails2
-    }
+    };
     let record1 = new UDC.UnifiedRecord('self_defined_type', systemDefined);
     let unifiedData = new UDC.UnifiedData(record1);
 
