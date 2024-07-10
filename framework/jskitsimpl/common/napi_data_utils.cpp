@@ -441,7 +441,8 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
             void *data = nullptr;
             size_t dataLen = 0;
             NAPI_CALL_BASE(env, napi_get_arraybuffer_info(env, attributeValueNapi, &data, &dataLen), napi_invalid_arg);
-            object->value_[attributeName] = std::vector<uint8_t>(reinterpret_cast<uint8_t *>(data), reinterpret_cast<uint8_t *>(data) + dataLen);
+            object->value_[attributeName] = std::vector<uint8_t>(
+                reinterpret_cast<uint8_t *>(data), reinterpret_cast<uint8_t *>(data) + dataLen);
             continue;
         }
         napi_valuetype valueType = napi_undefined;
