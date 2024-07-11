@@ -85,7 +85,6 @@ ohos_shared_library("udmf_client") {
   public_configs = [ ":udmf_client_config" ]
 
   external_deps = [
-    "ability_base:want",
     "ability_base:zuri",
     "access_token:libaccesstoken_sdk",
     "app_file_service:fileuri_native",
@@ -96,7 +95,6 @@ ohos_shared_library("udmf_client") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "hitrace:libhitracechain",
-    "image_framework:image",
     "image_framework:image_native",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
@@ -105,7 +103,11 @@ ohos_shared_library("udmf_client") {
     "samgr:samgr_proxy",
   ]
 
-  public_external_deps = [ "cJSON:cjson" ]
+  public_external_deps = [
+    "ability_base:want",
+    "cJSON:cjson"
+    "image_framework:image",
+  ]
 
   innerapi_tags = [ "platformsdk" ]
   subsystem_name = "distributeddatamgr"
