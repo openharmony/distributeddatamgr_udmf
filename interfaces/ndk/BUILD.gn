@@ -31,6 +31,7 @@ ohos_shared_library("udmf_ndk") {
   sources = [
     "${udmf_framework_path}/ndkimpl/data/uds.cpp",
     "${udmf_framework_path}/ndkimpl/data/utd.cpp",
+    "${udmf_framework_path}/ndkimpl/data/udmf.cpp"
   ]
 
   defines = [ "API_EXPORT=__attribute__((visibility (\"default\")))" ]

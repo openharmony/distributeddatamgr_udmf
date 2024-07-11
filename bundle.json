@@ -58,6 +58,7 @@
               "udmf_meta.h",
               "uds.h",
               "utd.h",
+              "udmf.h",
               "udmf_err_code.h"
             ],
             "header_base":"//foundation/distributeddatamgr/udmf/interfaces/ndk/data"
@@ -109,6 +110,15 @@
               "video.h"
             ],
             "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/data"
+          }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
+          "header": {
+            "header_files": [
+              "ndk_data_conversion.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/convert"
           }
         },
         {

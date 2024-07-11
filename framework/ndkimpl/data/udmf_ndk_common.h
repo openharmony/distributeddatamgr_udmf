@@ -69,6 +69,32 @@ struct OH_UdsAppItem : public Uds_Object_Ptr {
     OH_UdsAppItem();
 };
 
+struct OH_UdmfRecord {
+    const int64_t cid = UDMF_UNIFIED_RECORD_STRUCT_ID;
+    std::shared_ptr<OHOS::UDMF::UnifiedRecord> record_;
+    unsigned char *recordData{nullptr};
+    int recordDataLen{0};
+    char **typesArray{nullptr};
+    int typesCount{0};
+    std::mutex mutex;
+};
+
+struct OH_UdmfData {
+    const int64_t cid = UDMF_UNIFIED_DATA_STRUCT_ID;
+    std::shared_ptr<OHOS::UDMF::UnifiedData> unifiedData_;
+    char **typesArray{nullptr};
+    int typesCount{0};
+    OH_UdmfRecord **records{nullptr};
+    int recordsCount{0};
+    std::mutex mutex;
+};
+
+struct OH_UdmfProperty {
+    const int64_t cid = UDMF_UNIFIED_DATA_PROPERTIES_ID;
+    std::shared_ptr<OHOS::UDMF::UnifiedDataProperties> properties_;
+    std::string extraStr;
+};
+
 constexpr const char* UNIFORM_DATA_TYPE = "uniformDataType";
 constexpr const char* CONTENT = "content";
 constexpr const char* ABSTRACT = "abstract";
