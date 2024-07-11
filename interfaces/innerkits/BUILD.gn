@@ -105,7 +105,7 @@ ohos_shared_library("udmf_client") {
 
   public_external_deps = [
     "ability_base:want",
-    "cJSON:cjson"
+    "cJSON:cjson",
     "image_framework:image",
   ]
 
