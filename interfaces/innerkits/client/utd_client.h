@@ -38,6 +38,7 @@ public:
     Status GetUniformDataTypeByMIMEType(const std::string &mimeType, std::string &typeId,
                                         std::string belongsTo = DEFAULT_TYPE_ID);
     Status IsUtd(std::string typeId, bool &result);
+    Status GetUniformDataTypesByMIMETypePrefix(const std::string &mimeTypePrefix, std::vector<std::string> &typeIds);
 
 private:
     UtdClient();

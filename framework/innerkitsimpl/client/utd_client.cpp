@@ -189,6 +189,22 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
     return Status::E_OK;
 }
 
+Status UtdClient::GetUniformDataTypesByMIMETypePrefix(
+    const std::string &mimeTypePrefix, std::vector<std::string> &typeIds)
+{
+    std::string lowerPrefix = mimeTypePrefix;
+    std::transform(lowerPrefix.begin(), lowerPrefix.end(), lowerPrefix.begin(), ::tolower);
+    for (const auto &utdTypeCfg : descriptorCfgs_) {
+        for (const auto &mimeType : utdTypeCfg.mimeTypes) {
+            if (mimeType.rfind(lowerPrefix) == 0) {
+                typeIds = utdTypeCfg.belongingToTypes;
+                return Status::E_OK;
+            }
+        }
+    }
+    return Status::E_INVALID_PARAMETERS;
+}
+
 Status UtdClient::IsUtd(std::string typeId, bool &result)
 {
     try {
