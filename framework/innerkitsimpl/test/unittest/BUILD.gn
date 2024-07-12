@@ -21,8 +21,11 @@ config("module_private_config") {
     "${udmf_interfaces_path}/innerkits/client",
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_interfaces_path}/ndk/data",
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/innerkits/service",
+    "${udmf_framework_path}/innerkits/convert",
+    "${udmf_framework_path}/ndkimpl/data",
   ]
 }
 
@@ -87,11 +90,27 @@ ohos_unittest("UtdClientTest") {
   external_deps = common_external_deps
 }
 
+ohos_unittest("NdkDataConversionTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${udmf_framework_path}/ndkimpl/data/udmf.cpp",
+    "ndk_data_conversion_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
 
   deps = [
+    ":NdkDataConversionTest",
     ":UdmfClientSystemHapTest",
     ":UdmfClientTest",
     ":UtdClientTest",

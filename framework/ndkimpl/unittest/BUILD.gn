@@ -66,6 +66,21 @@ ohos_unittest("UdsTest") {
   external_deps = common_external_deps
 }
 
+ohos_unittest("UdmfTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${udmf_framework_path}/ndkimpl/data/udmf.cpp",
+    "udmf_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
@@ -73,6 +88,7 @@ group("unittest") {
   deps = [
     ":UdsTest",
     ":UtdTest",
+    ":UdmfTest"
   ]
 }
 ###############################################################################
