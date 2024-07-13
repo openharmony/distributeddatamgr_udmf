@@ -155,20 +155,31 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
 Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std::string &typeId,
                                                std::string belongsTo)
 {
-    std::string lowerMimeType = mimeType;
-    std::transform(lowerMimeType.begin(), lowerMimeType.end(), lowerMimeType.begin(), ::tolower);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. mimeType:%{public}s, belongsTo:%{public}s ",
                   mimeType.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
 
+    std::string lowerMimeType = mimeType;
+    std::transform(lowerMimeType.begin(), lowerMimeType.end(), lowerMimeType.begin(), ::tolower);
+    bool prefixMatch = false;
+    if (!lowerMimeType.empty() && lowerMimeType.back() == '*') {
+        lowerMimeType.pop_back();
+        prefixMatch = true;
+    }
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         std::vector<std::string> mimeTypes = utdTypeCfg.mimeTypes;
-        if (find(mimeTypes.begin(), mimeTypes.end(), lowerMimeType) != mimeTypes.end() ||
-            find(mimeTypes.begin(), mimeTypes.end(), mimeType) != mimeTypes.end()) {
-            typeId = utdTypeCfg.typeId;
-            break;
+        for (auto mime : utdTypeCfg.mimeTypes) {
+            std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
+            if (mime == lowerMimeType) {
+                typeId = utdTypeCfg.typeId;
+                break;
+            }
+            if (prefixMatch && mime.rfind(lowerMimeType, 0) == 0) {
+                typeId = utdTypeCfg.belongingToTypes[0];
+                break;
+            }
         }
     }
     // the find typeId is not belongsTo to the belongsTo.
@@ -187,22 +198,6 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
     }
 
     return Status::E_OK;
-}
-
-Status UtdClient::GetUniformDataTypesByMIMETypePrefix(
-    const std::string &mimeTypePrefix, std::vector<std::string> &typeIds)
-{
-    std::string lowerPrefix = mimeTypePrefix;
-    std::transform(lowerPrefix.begin(), lowerPrefix.end(), lowerPrefix.begin(), ::tolower);
-    for (const auto &utdTypeCfg : descriptorCfgs_) {
-        for (const auto &mimeType : utdTypeCfg.mimeTypes) {
-            if (mimeType.rfind(lowerPrefix) == 0) {
-                typeIds = utdTypeCfg.belongingToTypes;
-                return Status::E_OK;
-            }
-        }
-    }
-    return Status::E_INVALID_PARAMETERS;
 }
 
 Status UtdClient::IsUtd(std::string typeId, bool &result)
