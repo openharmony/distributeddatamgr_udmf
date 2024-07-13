@@ -51,6 +51,7 @@ private:
     bool IsValidFileExtension(const std::string &fileExtension);
     bool IsValidMimeType(const std::string &mimeType);
     Status GetFlexibleTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
+    std::string GetTypeIdFromCfg(const std::string &mimeType);
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
 };
 } // namespace UDMF

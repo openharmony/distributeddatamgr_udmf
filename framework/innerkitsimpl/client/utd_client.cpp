@@ -160,7 +160,24 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
                   mimeType.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
+    typeId = GetTypeIdFromCfg(mimeType);
+    // the find typeId is not belongsTo to the belongsTo.
+    if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
+        !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
+        typeId = "";
+    }
+    if (typeId.empty()) {
+        if (!IsValidMimeType(mimeType)) {
+            LOG_ERROR(UDMF_CLIENT, "invalid mimeType. mimeType:%{public}s, belongsTo:%{public}s ",
+                      mimeType.c_str(), belongsTo.c_str());
+            return Status::E_INVALID_PARAMETERS;
+        }
+        typeId = FlexibleType::GenFlexibleUtd(lowerMimeType, "", belongsTo);
+    }
+    return Status::E_OK;
+}
 
+std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType) {
     std::string lowerMimeType = mimeType;
     std::transform(lowerMimeType.begin(), lowerMimeType.end(), lowerMimeType.begin(), ::tolower);
     bool prefixMatch = false;
@@ -173,31 +190,14 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
         for (auto mime : utdTypeCfg.mimeTypes) {
             std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
             if (mime == lowerMimeType) {
-                typeId = utdTypeCfg.typeId;
-                break;
+                return utdTypeCfg.typeId;
             }
             if (prefixMatch && mime.rfind(prefixType, 0) == 0 && utdTypeCfg.belongingToTypes.size() > 0) {
-                typeId = utdTypeCfg.belongingToTypes[0];
-                break;
+                return utdTypeCfg.belongingToTypes[0];
             }
         }
     }
-    // the find typeId is not belongsTo to the belongsTo.
-    if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
-        !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
-        typeId = "";
-    }
-    
-    if (typeId.empty()) {
-        if (!IsValidMimeType(mimeType)) {
-            LOG_ERROR(UDMF_CLIENT, "invalid mimeType. mimeType:%{public}s, belongsTo:%{public}s ",
-                      mimeType.c_str(), belongsTo.c_str());
-            return Status::E_INVALID_PARAMETERS;
-        }
-        typeId = FlexibleType::GenFlexibleUtd(lowerMimeType, "", belongsTo);
-    }
-
-    return Status::E_OK;
+    return "";
 }
 
 Status UtdClient::IsUtd(std::string typeId, bool &result)
