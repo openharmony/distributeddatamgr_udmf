@@ -155,12 +155,14 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
 Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std::string &typeId,
                                                std::string belongsTo)
 {
+    std::string lowerMimeType = mimeType;
+    std::transform(lowerMimeType.begin(), lowerMimeType.end(), lowerMimeType.begin(), ::tolower);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. mimeType:%{public}s, belongsTo:%{public}s ",
                   mimeType.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
-    typeId = GetTypeIdFromCfg(mimeType);
+    typeId = GetTypeIdFromCfg(lowerMimeType);
     // the find typeId is not belongsTo to the belongsTo.
     if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
         !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
@@ -177,19 +179,18 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
     return Status::E_OK;
 }
 
-std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType) {
-    std::string lowerMimeType = mimeType;
-    std::transform(lowerMimeType.begin(), lowerMimeType.end(), lowerMimeType.begin(), ::tolower);
+std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
+{
     bool prefixMatch = false;
     std::string prefixType;
-    if (!lowerMimeType.empty() && lowerMimeType.back() == '*') {
-        prefixType = lowerMimeType.substr(0, lowerMimeType.length() - 1);
+    if (!mimeType.empty() && mimeType.back() == '*') {
+        prefixType = mimeType.substr(0, mimeType.length() - 1);
         prefixMatch = true;
     }
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         for (auto mime : utdTypeCfg.mimeTypes) {
             std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
-            if (mime == lowerMimeType) {
+            if (mime == mimeType) {
                 return utdTypeCfg.typeId;
             }
             if (prefixMatch && mime.rfind(prefixType, 0) == 0 && utdTypeCfg.belongingToTypes.size() > 0) {
