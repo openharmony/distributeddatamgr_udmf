@@ -164,19 +164,19 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
     std::string lowerMimeType = mimeType;
     std::transform(lowerMimeType.begin(), lowerMimeType.end(), lowerMimeType.begin(), ::tolower);
     bool prefixMatch = false;
+    std::string prefixType;
     if (!lowerMimeType.empty() && lowerMimeType.back() == '*') {
-        lowerMimeType.pop_back();
+        prefixType = lowerMimeType.substr(0, prefixType.length() - 1);
         prefixMatch = true;
     }
     for (const auto &utdTypeCfg : descriptorCfgs_) {
-        std::vector<std::string> mimeTypes = utdTypeCfg.mimeTypes;
         for (auto mime : utdTypeCfg.mimeTypes) {
             std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
             if (mime == lowerMimeType) {
                 typeId = utdTypeCfg.typeId;
                 break;
             }
-            if (prefixMatch && mime.rfind(lowerMimeType, 0) == 0) {
+            if (prefixMatch && mime.rfind(prefixType, 0) == 0 && utdTypeCfg.belongingToTypes.size() > 0) {
                 typeId = utdTypeCfg.belongingToTypes[0];
                 break;
             }
