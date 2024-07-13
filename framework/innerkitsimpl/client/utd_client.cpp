@@ -166,7 +166,7 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
     bool prefixMatch = false;
     std::string prefixType;
     if (!lowerMimeType.empty() && lowerMimeType.back() == '*') {
-        prefixType = lowerMimeType.substr(0, prefixType.length() - 1);
+        prefixType = lowerMimeType.substr(0, lowerMimeType.length() - 1);
         prefixMatch = true;
     }
     for (const auto &utdTypeCfg : descriptorCfgs_) {
