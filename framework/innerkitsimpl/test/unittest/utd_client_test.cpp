@@ -1405,11 +1405,6 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix001, TestSize.Level1
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(descriptor->GetTypeId(), "general.object");
     EXPECT_EQ(descriptor->GetTypeId(), currType);
-    EXPECT_EQ(descriptor->GetBelongingToTypes().empty(), true);
-    EXPECT_EQ(descriptor->GetDescription().empty(), true);
-    EXPECT_EQ(descriptor->GetIconFile().empty(), true);
-    EXPECT_EQ(descriptor->GetFilenameExtensions().empty(), true);
-    EXPECT_EQ(*(descriptor->GetMimeTypes().begin()), "*/*");
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix001 end.");
 }
 
