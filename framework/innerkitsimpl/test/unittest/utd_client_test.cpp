@@ -1423,7 +1423,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix002, TestSize.Level1
     std::shared_ptr<TypeDescriptor> descriptor;
     status = UtdClient::GetInstance().GetTypeDescriptor(currType, descriptor);
     EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(descriptor->GetTypeId(), "org.openxmlformats.openxml");
+    EXPECT_EQ(descriptor->GetTypeId(), "general.composite-object");
     EXPECT_EQ(descriptor->GetTypeId(), currType);
 
     std::string mimeType2 = "application/vnd.openxmlformats-officedocument.wordprocessingml.*";
@@ -1432,7 +1432,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix002, TestSize.Level1
     EXPECT_EQ(status, E_OK);
     status = UtdClient::GetInstance().GetTypeDescriptor(currType2, descriptor);
     EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(descriptor->GetTypeId(), "org.openxmlformats.openxml");
+    EXPECT_EQ(descriptor->GetTypeId(), "general.composite-object");
     EXPECT_EQ(descriptor->GetTypeId(), currType2);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix002 end.");
 }
@@ -1452,7 +1452,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix003, TestSize.Level1
     std::shared_ptr<TypeDescriptor> descriptor;
     status = UtdClient::GetInstance().GetTypeDescriptor(currType, descriptor);
     EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(descriptor->GetTypeId(), "org.openxmlformats.openxml");
+    EXPECT_EQ(descriptor->GetTypeId(), "general.composite-object");
     EXPECT_EQ(descriptor->GetTypeId(), currType);
 
     std::string mimeType2 = "application/vnd.openxmlformats-OFFICEdocument.wordprocessingml.*";
@@ -1461,7 +1461,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix003, TestSize.Level1
     EXPECT_EQ(status, E_OK);
     status = UtdClient::GetInstance().GetTypeDescriptor(currType2, descriptor);
     EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(descriptor->GetTypeId(), "org.openxmlformats.openxml");
+    EXPECT_EQ(descriptor->GetTypeId(), "general.composite-object");
     EXPECT_EQ(descriptor->GetTypeId(), currType2);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix003 end.");
 }
