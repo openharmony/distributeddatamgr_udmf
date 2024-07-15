@@ -21,7 +21,7 @@
 #include "udmf_err_code.h"
 #include "udmf_client.h"
 #include "securec.h"
-#include "udmf_ndk_common.h"
+#include "udmf_capi_common.h"
 #include "int_wrapper.h"
 #include "string_wrapper.h"
 #include "unified_meta.h"
@@ -35,7 +35,11 @@
 
 using namespace OHOS::UDMF;
 
-static void OH_Udmf_DestoryStringArray(char** &bufArray, int &count)
+static constexpr int64_t MAX_RECORDS_COUNT = 4 * 1024 * 1024;
+static constexpr int64_t MAX_RECORDS_SIZE = 4 * 1024 * 1024;
+static constexpr int64_t MAX_KEY_STRING_LEN = 1 * 1024 * 1024;
+
+static void DestoryStringArray(char**& bufArray, int& count)
 {
     if (bufArray == nullptr) {
         return;
@@ -51,7 +55,7 @@ static void OH_Udmf_DestoryStringArray(char** &bufArray, int &count)
     count = 0;
 }
 
-static void OH_Udmf_DestroyUnifiedRecordArray(OH_UdmfRecord** &records, int &count)
+static void DestroyUnifiedRecordArray(OH_UdmfRecord**& records, int& count)
 {
     if (records == nullptr) {
         return;
@@ -67,46 +71,46 @@ static void OH_Udmf_DestroyUnifiedRecordArray(OH_UdmfRecord** &records, int &cou
     count = 0;
 }
 
-static char** OH_Utd_CreateUnifiedDataTypesArray(OH_UdmfData* unifiedData, const std::vector<std::string> &strVector)
+static char** StrVectorToTypesArray(const std::vector<std::string>& strVector)
 {
-    if (unifiedData == nullptr) {
+    int vectorSize = strVector.size();
+    if (vectorSize > MAX_RECORDS_COUNT) {
         return nullptr;
     }
-    std::set<std::string> typeSet;
-    for (int i = 0; i < static_cast<int>(strVector.size()); ++i) {
-        typeSet.insert(strVector[i]);
-    }
-    int size = typeSet.size();
-    unifiedData->typesArray = new char* [size] { nullptr };
-    if (unifiedData->typesArray == nullptr) {
-        return nullptr;
-    }
-    int idx = 0;
-    for (std::set<std::string>::iterator it = typeSet.begin(); it != typeSet.end(); it++, idx++) {
-        int strlen = it->length() + 1;
-        unifiedData->typesArray[idx] = new char[strlen];
-        if (unifiedData->typesArray[idx] == nullptr ||
-            (strcpy_s(unifiedData->typesArray[idx], strlen, it->c_str())) != EOK) {
-            OH_Udmf_DestoryStringArray(unifiedData->typesArray, size);
+    char** typesArray = new (std::nothrow) char* [vectorSize] {nullptr};
+    for (int i = 0; i < vectorSize; ++i) {
+        int strLen = strVector[i].length() + 1;
+        if (strLen > MAX_KEY_STRING_LEN) {
+            LOG_INFO(UDMF_CAPI, "string exceeds maximum length, length is %{public}d", strLen);
+            DestoryStringArray(typesArray, vectorSize);
+            return nullptr;
+        }
+        typesArray[i] = new (std::nothrow) char[strLen];
+        if (typesArray[i] == nullptr ||
+            (strcpy_s(typesArray[i], strLen, strVector[i].c_str())) != EOK) {
+            LOG_ERROR(UDMF_CAPI, "string copy failed");
+            DestoryStringArray(typesArray, vectorSize);
             return nullptr;
         }
     }
-    unifiedData->typesCount = size;
-    return unifiedData->typesArray;
+    return typesArray;
 }
 
-static OH_UdmfRecord** OH_Utd_CreateUnifiedDataRecordsArray(OH_UdmfData* unifiedData,
-                                                            std::vector<std::shared_ptr<UnifiedRecord>> &records)
+static OH_UdmfRecord** CreateUnifiedDataRecordsArray(OH_UdmfData* unifiedData,
+                                                     std::vector<std::shared_ptr<UnifiedRecord>>& records)
 {
     int size = records.size();
-    if (unifiedData == nullptr || size == 0) {
+    if (unifiedData == nullptr || size == 0 || size > MAX_RECORDS_COUNT) {
         return nullptr;
     }
     OH_UdmfRecord** result = new (std::nothrow) OH_UdmfRecord* [size] { nullptr };
+    if (result == nullptr) {
+        return nullptr;
+    }
     for (int i = 0; i < size; i++) {
-        result[i] = new OH_UdmfRecord;
+        result[i] = new (std::nothrow) OH_UdmfRecord;
         if (result[i] == nullptr) {
-            OH_Udmf_DestroyUnifiedRecordArray(result, size);
+            DestroyUnifiedRecordArray(result, size);
             return nullptr;
         }
         result[i]->record_ = records[i];
@@ -118,18 +122,20 @@ static OH_UdmfRecord** OH_Utd_CreateUnifiedDataRecordsArray(OH_UdmfData* unified
 
 static bool IsUnifiedDataValid(OH_UdmfData* data)
 {
-    return data != nullptr && data->unifiedData_ != nullptr && data->cid == UDMF_UNIFIED_DATA_STRUCT_ID;
+    return data != nullptr && data->unifiedData_ != nullptr &&
+           data->cid == NdkStructId::UDMF_UNIFIED_DATA_STRUCT_ID;
 }
 
 static bool IsUnifiedRecordValid(OH_UdmfRecord* record)
 {
-    return record != nullptr && record->record_ != nullptr && record->cid == UDMF_UNIFIED_RECORD_STRUCT_ID;
+    return record != nullptr && record->record_ != nullptr &&
+           record->cid == NdkStructId::UDMF_UNIFIED_RECORD_STRUCT_ID;
 }
 
 static bool IsUnifiedPropertiesValid(OH_UdmfProperty* properties)
 {
     return properties != nullptr && properties->properties_ != nullptr &&
-           properties->cid == UDMF_UNIFIED_DATA_PROPERTIES_ID;
+           properties->cid == NdkStructId::UDMF_UNIFIED_DATA_PROPERTIES_ID;
 }
 
 OH_UdmfData* OH_UdmfData_Create()
@@ -142,14 +148,13 @@ OH_UdmfData* OH_UdmfData_Create()
     return data;
 }
 
-void OH_UdmfData_Destroy(OH_UdmfData* data) // 需要再考虑考虑
+void OH_UdmfData_Destroy(OH_UdmfData* data)
 {
-    std::lock_guard<std::mutex> lock(data->mutex);
     if (data == nullptr) {
         return;
     }
-    OH_Udmf_DestoryStringArray(data->typesArray, data->typesCount);
-    OH_Udmf_DestroyUnifiedRecordArray(data->records, data->recordsCount);
+    DestoryStringArray(data->typesArray, data->typesCount);
+    DestroyUnifiedRecordArray(data->records, data->recordsCount);
     delete data;
 }
 
@@ -174,11 +179,13 @@ char** OH_UdmfData_GetTypes(OH_UdmfData* unifiedData, unsigned int* count)
     }
     std::lock_guard<std::mutex> lock(unifiedData->mutex);
     if (unifiedData->typesArray != nullptr) {
+        LOG_DEBUG(UDMF_CAPI, "return cache value");
         *count = unifiedData->typesCount;
         return unifiedData->typesArray;
     }
     std::vector<std::string> typeLabels = unifiedData->unifiedData_->GetTypesLabels();
-    OH_Utd_CreateUnifiedDataTypesArray(unifiedData, typeLabels);
+    unifiedData->typesArray = StrVectorToTypesArray(typeLabels);
+    unifiedData->typesArray == nullptr ? unifiedData->typesCount = 0 : unifiedData->typesCount = typeLabels.size();
     *count = unifiedData->typesCount;
     return unifiedData->typesArray;
 }
@@ -190,27 +197,16 @@ char** OH_UdmfRecord_GetTypes(OH_UdmfRecord* record, unsigned int* count)
     }
     std::lock_guard<std::mutex> lock(record->mutex);
     if (record->typesArray != nullptr) {
+        LOG_DEBUG(UDMF_CAPI, "return cache value");
         *count = record->typesCount;
         return record->typesArray;
     }
     std::string type = UtdUtils::GetUtdIdFromUtdEnum(record->record_->GetType());
-    int recordLen = 1;
-    bool isSuccess = true;
-    record->typesArray = new char* [recordLen];
-    for (int i = 0; i < recordLen; ++i) {
-        int typeLen = type.length() + 1;
-        record->typesArray[i] = new char[typeLen];
-        if (strcpy_s(record->typesArray[i], typeLen, type.c_str()) != EOK) {
-            isSuccess = false;
-            break;
-        }
-    }
-    if (!isSuccess) {
-        OH_Udmf_DestoryStringArray(record->typesArray, recordLen);
-        return nullptr;
-    }
-    record->typesCount = recordLen;
-    *count = recordLen;
+    std::vector<std::string> typeLabels;
+    typeLabels.push_back(type);
+    record->typesArray = StrVectorToTypesArray(typeLabels);
+    record->typesArray == nullptr ? record->typesCount = 0 : record->typesCount = typeLabels.size();
+    *count = record->typesCount;
     return record->typesArray;
 }
 
@@ -221,11 +217,12 @@ OH_UdmfRecord** OH_UdmfData_GetRecords(OH_UdmfData* unifiedData, unsigned int* c
     }
     std::lock_guard<std::mutex> lock(unifiedData->mutex);
     if (unifiedData->records != nullptr) {
+        LOG_DEBUG(UDMF_CAPI, "return cache value");
         *count = unifiedData->recordsCount;
         return unifiedData->records;
     }
     std::vector<std::shared_ptr<UnifiedRecord>> records = unifiedData->unifiedData_->GetRecords();
-    OH_Utd_CreateUnifiedDataRecordsArray(unifiedData, records);
+    CreateUnifiedDataRecordsArray(unifiedData, records);
     *count = unifiedData->recordsCount;
     return unifiedData->records;
 }
@@ -235,10 +232,10 @@ int OH_Udmf_GetUnifiedData(const char* key, UdmfIntention intention, OH_UdmfData
     if (!IsUnifiedDataValid(data) || key == nullptr) {
         return UDMF_E_INVALID_PARAM;
     }
-    enum Intention queryOptIntent = Intention::UD_INTENTION_BUTT;
+    Intention queryOptIntent;
     switch (intention) {
         case UDMF_INTENTION_DRAG:
-            queryOptIntent = UD_INTENTION_DRAG;
+            queryOptIntent = Intention::UD_INTENTION_DRAG;
             break;
         default:
             return UDMF_E_INVALID_PARAM;
@@ -247,6 +244,7 @@ int OH_Udmf_GetUnifiedData(const char* key, UdmfIntention intention, OH_UdmfData
             .key = std::string(key),
             .intention = queryOptIntent};
     if (UdmfClient::GetInstance().GetData(query, *(data->unifiedData_)) != E_OK) {
+        LOG_ERROR(UDMF_CAPI, "get data error");
         return UDMF_ERR;
     }
     return UDMF_E_OK;
@@ -257,10 +255,10 @@ int OH_Udmf_SetUnifiedData(UdmfIntention intention, OH_UdmfData* unifiedData, ch
     if (!IsUnifiedDataValid(unifiedData) || key == nullptr || keyLen < UDMF_KEY_BUFFER_LEN) {
         return UDMF_E_INVALID_PARAM;
     }
-    enum Intention customOptIntent = Intention::UD_INTENTION_BUTT;
+    enum Intention customOptIntent;
     switch (intention) {
         case UDMF_INTENTION_DRAG:
-            customOptIntent = UD_INTENTION_DRAG;
+            customOptIntent = Intention::UD_INTENTION_DRAG;
             break;
         default:
             return UDMF_E_INVALID_PARAM;
@@ -269,9 +267,11 @@ int OH_Udmf_SetUnifiedData(UdmfIntention intention, OH_UdmfData* unifiedData, ch
             .intention = customOptIntent};
     std::string keyStr;
     if ((UdmfClient::GetInstance().SetData(option, *(unifiedData->unifiedData_), keyStr)) != E_OK) {
+        LOG_ERROR(UDMF_CAPI, "set data error");
         return UDMF_ERR;
     }
     if (strcpy_s(key, keyLen, keyStr.c_str()) != EOK) {
+        LOG_INFO(UDMF_CAPI, "string copy failed");
         return UDMF_ERR;
     }
     return UDMF_E_OK;
@@ -292,18 +292,17 @@ void OH_UdmfRecord_Destroy(OH_UdmfRecord* record)
     if (record == nullptr) {
         return;
     }
-    std::lock_guard<std::mutex> lock(record->mutex);
     if (record->recordData != nullptr) {
         delete[] record->recordData;
         record->recordData = nullptr;
     }
-
     delete record;
 }
 
 int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId, unsigned char* entry, unsigned int count)
 {
-    if (!IsUnifiedRecordValid(record) || typeId == nullptr || entry == nullptr) {
+    if (!IsUnifiedRecordValid(record) || typeId == nullptr || entry == nullptr || count == 0
+        || count > MAX_RECORDS_SIZE) {
         return UDMF_E_INVALID_PARAM;
     }
     std::vector<uint8_t> recordValue;
@@ -318,7 +317,7 @@ int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId, uns
 
 int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* record, const char* typeId, unsigned char** entry, unsigned int* count)
 {
-    if (!IsUnifiedRecordValid(record) || typeId == nullptr) {
+    if (!IsUnifiedRecordValid(record) || typeId == nullptr || entry == nullptr || count == nullptr) {
         return UDMF_E_INVALID_PARAM;
     }
     UDType type = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(typeId));
@@ -331,17 +330,23 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* record, const char* typeId, uns
     if (recordValue == nullptr) {
         return UDMF_ERR;
     }
-    if (record->recordDataLen != static_cast<int>(recordValue->size())) {
-        return UDMF_ERR;
-    }
     std::lock_guard<std::mutex> lock(record->mutex);
     *count = record->recordDataLen;
     if (record->recordData != nullptr) {
+        LOG_DEBUG(UDMF_CAPI, "return cache value");
         *entry = record->recordData;
         return UDMF_E_OK;
     }
-    record->recordData = new unsigned char[*count];
-    for (unsigned int i = 0; i < *count; ++i) {
+    if (record->recordDataLen > MAX_RECORDS_SIZE) {
+        LOG_INFO(UDMF_CAPI, "data size exceeds maximum size");
+        *count = 0;
+        return UDMF_ERR;
+    }
+    record->recordData = new (std::nothrow) unsigned char[record->recordDataLen];
+    if (record->recordData == nullptr) {
+        return UDMF_ERR;
+    }
+    for (unsigned int i = 0; i < record->recordDataLen; ++i) {
         record->recordData[i] = (*recordValue)[i];
     }
     *entry = record->recordData;
@@ -353,10 +358,10 @@ int OH_UdmfRecord_AddPlainText(OH_UdmfRecord* record, OH_UdsPlainText* plainText
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(plainText, UDS_PLAIN_TEXT_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    std::shared_ptr<PlainText> plainT = std::make_shared<PlainText>();
-    plainT->SetContent(OH_UdsPlainText_GetContent(plainText));
-    plainT->SetAbstract(OH_UdsPlainText_GetAbstract(plainText));
-    record->record_ = std::move(plainT);
+    std::shared_ptr<PlainText> text = std::make_shared<PlainText>();
+    text->SetContent(OH_UdsPlainText_GetContent(plainText));
+    text->SetAbstract(OH_UdsPlainText_GetAbstract(plainText));
+    record->record_ = std::move(text);
     record->record_->SetType(static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(OH_UdsPlainText_GetType(plainText))));
     return UDMF_E_OK;
 }
@@ -379,10 +384,10 @@ int OH_UdmfRecord_AddHtml(OH_UdmfRecord* record, OH_UdsHtml* html)
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(html, UDS_HTML_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    std::shared_ptr<Html> htmlP = std::make_shared<Html>();
-    htmlP->SetHtmlContent(OH_UdsHtml_GetContent(html));
-    htmlP->SetPlainContent(OH_UdsHtml_GetPlainContent(html));
-    record->record_ = std::move(htmlP);
+    std::shared_ptr<Html> htmlPtr = std::make_shared<Html>();
+    htmlPtr->SetHtmlContent(OH_UdsHtml_GetContent(html));
+    htmlPtr->SetPlainContent(OH_UdsHtml_GetPlainContent(html));
+    record->record_ = std::move(htmlPtr);
     record->record_->SetType(static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(OH_UdsHtml_GetType(html))));
     return UDMF_E_OK;
 }
@@ -410,6 +415,9 @@ int OH_UdmfRecord_GetPlainText(OH_UdmfRecord* record, OH_UdsPlainText* plainText
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(plainText, UDS_PLAIN_TEXT_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
+    if (record->record_->GetType() != PLAIN_TEXT) {
+        return UDMF_ERR;
+    }
     auto plain = static_cast<PlainText *>((record->record_).get());
     if (plain == nullptr) {
         return UDMF_ERR;
@@ -424,6 +432,9 @@ int OH_UdmfRecord_GetHyperlink(OH_UdmfRecord* record, OH_UdsHyperlink* hyperlink
 {
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(hyperlink, UDS_HYPERLINK_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
+    }
+    if (record->record_->GetType() != HYPERLINK) {
+        return UDMF_ERR;
     }
     auto link = static_cast<Link *>((record->record_).get());
     if (link == nullptr) {
@@ -440,12 +451,15 @@ int OH_UdmfRecord_GetHtml(OH_UdmfRecord* record, OH_UdsHtml* html)
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(html, UDS_HTML_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    auto htmlP = static_cast<Html *>((record->record_).get());
-    if (htmlP == nullptr) {
+    if (record->record_->GetType() != HTML) {
         return UDMF_ERR;
     }
-    OH_UdsHtml_SetContent(html, htmlP->GetHtmlContent().c_str());
-    OH_UdsHtml_SetPlainContent(html, htmlP->GetPlainContent().c_str());
+    auto htmlPtr = static_cast<Html *>((record->record_).get());
+    if (htmlPtr == nullptr) {
+        return UDMF_ERR;
+    }
+    OH_UdsHtml_SetContent(html, htmlPtr->GetHtmlContent().c_str());
+    OH_UdsHtml_SetPlainContent(html, htmlPtr->GetPlainContent().c_str());
     html->obj->value_[UNIFORM_DATA_TYPE] = UDMF_META_HTML;
     return UDMF_E_OK;
 }
@@ -454,6 +468,9 @@ int OH_UdmfRecord_GetAppItem(OH_UdmfRecord* record, OH_UdsAppItem* appItem)
 {
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(appItem, UDS_APP_ITEM_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
+    }
+    if (record->record_->GetType() != SYSTEM_DEFINED_APP_ITEM) {
+        return UDMF_ERR;
     }
     auto appDefRecord = static_cast<SystemDefinedAppItem *>((record->record_).get());
     if (appDefRecord == nullptr) {
@@ -522,14 +539,17 @@ UdmfShareOption OH_UdmfProperty_GetShareOption(OH_UdmfProperty* properties)
 
 int OH_UdmfProperty_GetExtrasIntParam(OH_UdmfProperty* properties, const char* key, const int defaultValue)
 {
-    return IsUnifiedPropertiesValid(properties) ?
+    return (IsUnifiedPropertiesValid(properties) && key != nullptr) ?
            properties->properties_->extras.GetIntParam(key, defaultValue) : defaultValue;
 }
 
 const char* OH_UdmfProperty_GetExtrasStringParam(OH_UdmfProperty* properties, const char* key)
 {
-    return IsUnifiedPropertiesValid(properties) ?
-           (properties->properties_->extras.GetStringParam(key)).c_str() : nullptr;
+    if (!IsUnifiedPropertiesValid(properties) || key == nullptr) {
+        return nullptr;
+    }
+    properties->extraStr = properties->properties_->extras.GetStringParam(key);
+    return properties->extraStr.c_str();
 }
 
 int OH_UdmfProperty_SetTag(OH_UdmfProperty* properties, const char* tag)
@@ -546,6 +566,7 @@ int OH_UdmfProperty_SetShareOption(OH_UdmfProperty* properties, UdmfShareOption 
     if (!IsUnifiedPropertiesValid(properties)) {
         return UDMF_E_INVALID_PARAM;
     }
+    std::lock_guard<std::mutex> lock(properties->mutex);
     switch (option) {
         case UdmfShareOption::SHARE_OPTIONS_IN_APP:
             properties->properties_->shareOptions = ShareOptions::IN_APP;
@@ -564,6 +585,7 @@ int OH_UdmfProperty_SetExtrasIntParam(OH_UdmfProperty* properties, const char* k
     if (!IsUnifiedPropertiesValid(properties) || key == nullptr) {
         return UDMF_E_INVALID_PARAM;
     }
+    std::lock_guard<std::mutex> lock(properties->mutex);
     properties->properties_->extras.SetParam(key, OHOS::AAFwk::Integer::Box(param));
     return UDMF_E_OK;
 }
@@ -573,6 +595,7 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* properties, const char
     if (!IsUnifiedPropertiesValid(properties) || key == nullptr || param == nullptr) {
         return UDMF_E_INVALID_PARAM;
     }
+    std::lock_guard<std::mutex> lock(properties->mutex);
     properties->properties_->extras.SetParam(key, OHOS::AAFwk::String::Box(param));
     return UDMF_E_OK;
 }

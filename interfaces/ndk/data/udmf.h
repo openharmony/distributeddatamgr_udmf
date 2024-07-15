@@ -76,7 +76,7 @@ typedef enum UdmfIntention {
  */
 typedef enum UdmfShareOption {
     /**
-     * @brief INVALID share option.
+     * @brief Invalid share option.
      */
     SHARE_OPTIONS_INVALID,
     /**
@@ -134,10 +134,10 @@ void OH_UdmfData_Destroy(OH_UdmfData* pThis);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfData}.
  * @param record Represents a pointer to an instance of {@link OH_UdmfRecord}.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfData Udmf_ErrCode.
+ * @see OH_UdmfData UdmfErrCode.
  * @since 12
  */
 int OH_UdmfData_AddRecord(OH_UdmfData* pThis, OH_UdmfRecord* record);
@@ -160,7 +160,7 @@ bool OH_UdmfData_HasType(OH_UdmfData* pThis, const char* type);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfData}.
  * @param count Represents the types count that is a output param.
- * @return Returns string array that in {@link OH_UdmfData} when input parameters vaild,
+ * @return Returns string array that in {@link OH_UdmfData} when input parameters valid,
  * otherwise return nullptr.
  * @see OH_UdmfData.
  * @since 12
@@ -172,7 +172,7 @@ char** OH_UdmfData_GetTypes(OH_UdmfData* pThis, unsigned int* count);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfData}.
  * @param count Represents the records count that is a output param.
- * @return Returns {@link OH_UdmfRecord} pointer array when input parameters vaild, otherwise return nullptr.
+ * @return Returns {@link OH_UdmfRecord} pointer array when input parameters valid, otherwise return nullptr.
  * @see OH_UdmfData OH_UdmfRecord.
  * @since 12
  */
@@ -204,10 +204,10 @@ void OH_UdmfRecord_Destroy(OH_UdmfRecord* pThis);
  * @param typeId Represents record type, reference udmf_meta.h.
  * @param entry Represents custom data.
  * @param count Represents the size of data param.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfRecord Udmf_ErrCode.
+ * @see OH_UdmfRecord UdmfErrCode.
  * @since 12
  */
 int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* pThis, const char* typeId, unsigned char* entry, unsigned int count);
@@ -217,10 +217,10 @@ int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* pThis, const char* typeId, unsi
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param plainText Represents a pointer to an instance of {@link OH_UdsPlainText}.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfRecord OH_UdsPlainText Udmf_ErrCode.
+ * @see OH_UdmfRecord OH_UdsPlainText UdmfErrCode.
  * @since 12
  */
 int OH_UdmfRecord_AddPlainText(OH_UdmfRecord* pThis, OH_UdsPlainText* plainText);
@@ -230,10 +230,10 @@ int OH_UdmfRecord_AddPlainText(OH_UdmfRecord* pThis, OH_UdsPlainText* plainText)
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param hyperlink Represents a pointer to an instance of {@link OH_UdsHyperlink}.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfRecord OH_UdsHyperlink Udmf_ErrCode.
+ * @see OH_UdmfRecord OH_UdsHyperlink UdmfErrCode.
  * @since 12
  */
 int OH_UdmfRecord_AddHyperlink(OH_UdmfRecord* pThis, OH_UdsHyperlink* hyperlink);
@@ -243,10 +243,10 @@ int OH_UdmfRecord_AddHyperlink(OH_UdmfRecord* pThis, OH_UdsHyperlink* hyperlink)
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param html Represents a pointer to an instance of {@link OH_UdsHtml}.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfRecord OH_UdsHtml Udmf_ErrCode.
+ * @see OH_UdmfRecord OH_UdsHtml UdmfErrCode.
  * @since 12
  */
 int OH_UdmfRecord_AddHtml(OH_UdmfRecord* pThis, OH_UdsHtml* html);
@@ -256,10 +256,10 @@ int OH_UdmfRecord_AddHtml(OH_UdmfRecord* pThis, OH_UdsHtml* html);
  *
  * @param repThisord Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param appItem Represents a pointer to an instance of {@link OH_UdsAppItem}.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfRecord OH_UdsAppItem Udmf_ErrCode.
+ * @see OH_UdmfRecord OH_UdsAppItem UdmfErrCode.
  * @since 12
  */
 int OH_UdmfRecord_AddAppItem(OH_UdmfRecord* pThis, OH_UdsAppItem* appItem);
@@ -269,7 +269,7 @@ int OH_UdmfRecord_AddAppItem(OH_UdmfRecord* pThis, OH_UdsAppItem* appItem);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param count Represents the types count that is a output param.
- * @return Returns string array that in {@link OH_UdmfRecord} when input parameters vaild,
+ * @return Returns string array that in {@link OH_UdmfRecord} when input parameters valid,
  * otherwise return nullptr.
  * @see OH_UdmfData.
  * @since 12
@@ -283,10 +283,10 @@ char** OH_UdmfRecord_GetTypes(OH_UdmfRecord* pThis, unsigned int* count);
  * @param typeId Represents record type, reference udmf_meta.h.
  * @param entry Represents a pointer to entry data that is a output param.
  * @param count Represents the entry data length that is a output param.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfRecord Udmf_ErrCode.
+ * @see OH_UdmfRecord UdmfErrCode.
  * @since 12
  */
 int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* pThis, const char* typeId,
@@ -297,10 +297,10 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* pThis, const char* typeId,
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param plainText Represents a pointer to an instance of {@link OH_UdsPlainText}.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfRecord OH_UdsPlainText Udmf_ErrCode.
+ * @see OH_UdmfRecord OH_UdsPlainText UdmfErrCode.
  * @since 12
  */
 int OH_UdmfRecord_GetPlainText(OH_UdmfRecord* pThis, OH_UdsPlainText* plainText);
@@ -310,10 +310,10 @@ int OH_UdmfRecord_GetPlainText(OH_UdmfRecord* pThis, OH_UdsPlainText* plainText)
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param hyperlink Represents a pointer to an instance of {@link OH_UdsHyperlink}.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfRecord OH_UdsHyperlink Udmf_ErrCode.
+ * @see OH_UdmfRecord OH_UdsHyperlink UdmfErrCode.
  * @since 12
  */
 int OH_UdmfRecord_GetHyperlink(OH_UdmfRecord* pThis, OH_UdsHyperlink* hyperlink);
@@ -323,10 +323,10 @@ int OH_UdmfRecord_GetHyperlink(OH_UdmfRecord* pThis, OH_UdsHyperlink* hyperlink)
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param html Represents a pointer to an instance of {@link OH_UdsHtml}.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfRecord OH_UdsHtml Udmf_ErrCode.
+ * @see OH_UdmfRecord OH_UdsHtml UdmfErrCode.
  * @since 12
  */
 int OH_UdmfRecord_GetHtml(OH_UdmfRecord* pThis, OH_UdsHtml* html);
@@ -336,10 +336,10 @@ int OH_UdmfRecord_GetHtml(OH_UdmfRecord* pThis, OH_UdsHtml* html);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param appItem Represents a pointer to an instance of {@link OH_UdsAppItem}.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfRecord OH_UdsAppItem Udmf_ErrCode.
+ * @see OH_UdmfRecord OH_UdsAppItem UdmfErrCode.
  * @since 12
  */
 int OH_UdmfRecord_GetAppItem(OH_UdmfRecord* pThis, OH_UdsAppItem* appItem);
@@ -369,7 +369,7 @@ void OH_UdmfProperty_Destroy(OH_UdmfProperty* pThis);
  * @brief Get tag value from the {@link OH_UdmfProperty}.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfProperty}.
- * @return Returns a pointer of the tag value string when input parameters vaild, otherwise return nullptr.
+ * @return Returns a pointer of the tag value string when input parameters valid, otherwise return nullptr.
  * @see OH_UdmfProperty.
  * @since 12
  */
@@ -413,7 +413,7 @@ int OH_UdmfProperty_GetExtrasIntParam(OH_UdmfProperty* pThis,
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfProperty}.
  * @param key Represents key-value pair's key.
- * @return Returns a pointer of the key value string when input parameters vaild, otherwise return nullptr.
+ * @return Returns a pointer of the key value string when input parameters valid, otherwise return nullptr.
  * @see OH_UdmfProperty
  * @since 12
  */
@@ -424,10 +424,10 @@ const char* OH_UdmfProperty_GetExtrasStringParam(OH_UdmfProperty* pThis, const c
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfProperty}.
  * @param tag Represents new tag param.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfProperty Udmf_ErrCode.
+ * @see OH_UdmfProperty UdmfErrCode.
  * @since 12
  */
 int OH_UdmfProperty_SetTag(OH_UdmfProperty* pThis, const char* tag);
@@ -437,10 +437,10 @@ int OH_UdmfProperty_SetTag(OH_UdmfProperty* pThis, const char* tag);
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfProperty}.
  * @param option Represents new {@link UdmfShareOption} param.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfProperty UdmfShareOption Udmf_ErrCode.
+ * @see OH_UdmfProperty UdmfShareOption UdmfErrCode.
  * @since 12
  */
 int OH_UdmfProperty_SetShareOption(OH_UdmfProperty* pThis, UdmfShareOption option);
@@ -451,10 +451,10 @@ int OH_UdmfProperty_SetShareOption(OH_UdmfProperty* pThis, UdmfShareOption optio
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfProperty}.
  * @param key Represents extras param's key value.
  * @param param Represents value of k-v pairs.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfProperty Udmf_ErrCode.
+ * @see OH_UdmfProperty UdmfErrCode.
  * @since 12
  */
 int OH_UdmfProperty_SetExtrasIntParam(OH_UdmfProperty* pThis, const char* key, int param);
@@ -465,10 +465,10 @@ int OH_UdmfProperty_SetExtrasIntParam(OH_UdmfProperty* pThis, const char* key, i
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfProperty}.
  * @param key Represents extras param's key value.
  * @param param Represents value of k-v pairs.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfProperty Udmf_ErrCode.
+ * @see OH_UdmfProperty UdmfErrCode.
  * @since 12
  */
 int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* pThis,
@@ -480,10 +480,10 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* pThis,
  * @param key Represents database store's key value.
  * @param intention Represents data type {@link UdmfIntention}
  * @param unifiedData Represents output params of {@link OH_UdmfData};
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfProperty UdmfIntention Udmf_ErrCode.
+ * @see OH_UdmfProperty UdmfIntention UdmfErrCode.
  * @since 12
  */
 int OH_Udmf_GetUnifiedData(const char* key, UdmfIntention intention, OH_UdmfData* unifiedData);
@@ -496,10 +496,10 @@ int OH_Udmf_GetUnifiedData(const char* key, UdmfIntention intention, OH_UdmfData
  * @param key Represents return value after set data to database successfully,
  * it's memory size not less than {@link UDMF_KEY_BUFFER_LEN}.
  * @param keyLen Represents size of key param.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ * @return Returns the status code of the execution. See {@link UdmfErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfProperty UdmfIntention Udmf_ErrCode.
+ * @see OH_UdmfProperty UdmfIntention UdmfErrCode.
  * @since 12
  */
 int OH_Udmf_SetUnifiedData(UdmfIntention intention, OH_UdmfData* unifiedData,

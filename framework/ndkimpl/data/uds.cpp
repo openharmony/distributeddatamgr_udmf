@@ -19,40 +19,40 @@
 #include "logger.h"
 #include "utd_common.h"
 #include "unified_record.h"
-#include "udmf_ndk_common.h"
+#include "udmf_capi_common.h"
 #include "udmf_meta.h"
 #include "udmf_err_code.h"
 
 using namespace OHOS::UDMF;
 
-bool IsInvalidUdsObjectPtr(const Uds_Object_Ptr* pThis, int id)
+bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid)
 {
-    return pThis == nullptr || pThis->id != id || pThis->obj == nullptr;
+    return pThis == nullptr || pThis->cid != cid || pThis->obj == nullptr;
 }
 
-Uds_Object_Ptr::Uds_Object_Ptr(const int id) : id(id) {}
+UdsObject::UdsObject(const int cid) : cid(cid) {}
 
-OH_UdsPlainText::OH_UdsPlainText() : Uds_Object_Ptr(NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID) {}
+OH_UdsPlainText::OH_UdsPlainText() : UdsObject(NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID) {}
 
-OH_UdsHyperlink::OH_UdsHyperlink() : Uds_Object_Ptr(NdkStructId::UDS_HYPERLINK_STRUCT_ID) {}
+OH_UdsHyperlink::OH_UdsHyperlink() : UdsObject(NdkStructId::UDS_HYPERLINK_STRUCT_ID) {}
 
-OH_UdsHtml::OH_UdsHtml() : Uds_Object_Ptr(NdkStructId::UDS_HTML_STRUCT_ID) {}
+OH_UdsHtml::OH_UdsHtml() : UdsObject(NdkStructId::UDS_HTML_STRUCT_ID) {}
 
-OH_UdsAppItem::OH_UdsAppItem() : Uds_Object_Ptr(NdkStructId::UDS_APP_ITEM_STRUCT_ID) {}
+OH_UdsAppItem::OH_UdsAppItem() : UdsObject(NdkStructId::UDS_APP_ITEM_STRUCT_ID) {}
 
-const char* Uds_Object_Ptr::GetUdsValue(const char* paramName)
+const char* UdsObject::GetUdsValue(const char* paramName)
 {
     if (obj->value_.find(paramName) == obj->value_.end()) {
-        LOG_ERROR(UDMF_NDK, "Don't have property %{public}s.", paramName);
+        LOG_ERROR(UDMF_CAPI, "Don't have property %{public}s.", paramName);
         return nullptr;
     }
     return (std::get_if<std::string>(&(obj->value_[paramName])))->c_str();
 }
 
-int Uds_Object_Ptr::SetUdsValue(const char* paramName, const char* pramValue)
+int UdsObject::SetUdsValue(const char* paramName, const char* pramValue)
 {
     if (obj->value_.find(paramName) == obj->value_.end()) {
-        LOG_ERROR(UDMF_NDK, "Can't set property %{public}s.", paramName);
+        LOG_ERROR(UDMF_CAPI, "Can't set property %{public}s.", paramName);
         return UdmfErrCode::UDMF_E_INVALID_PARAM;
     }
     std::lock_guard<std::mutex> lock(mutex);
@@ -64,7 +64,7 @@ OH_UdsPlainText* OH_UdsPlainText_Create()
 {
     OH_UdsPlainText* plainText = new (std::nothrow) OH_UdsPlainText();
     if (plainText == nullptr) {
-        LOG_ERROR(UDMF_NDK, "Failed to apply for memory.");
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
         return nullptr;
     }
     plainText->obj = std::make_shared<Object>();
@@ -76,7 +76,7 @@ OH_UdsPlainText* OH_UdsPlainText_Create()
 
 void OH_UdsPlainText_Destroy(OH_UdsPlainText* pThis)
 {
-    if (pThis != nullptr && pThis->id == NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID) {
+    if (pThis != nullptr && pThis->cid == NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID) {
         delete pThis;
     }
 }
@@ -125,7 +125,7 @@ OH_UdsHyperlink* OH_UdsHyperlink_Create()
 {
     OH_UdsHyperlink* hyperlink = new (std::nothrow) OH_UdsHyperlink();
     if (hyperlink == nullptr) {
-        LOG_ERROR(UDMF_NDK, "Failed to apply for memory.");
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
         return nullptr;
     }
     hyperlink->obj = std::make_shared<Object>();
@@ -137,7 +137,7 @@ OH_UdsHyperlink* OH_UdsHyperlink_Create()
 
 void OH_UdsHyperlink_Destroy(OH_UdsHyperlink* pThis)
 {
-    if (pThis != nullptr && pThis->id == NdkStructId::UDS_HYPERLINK_STRUCT_ID) {
+    if (pThis != nullptr && pThis->cid == NdkStructId::UDS_HYPERLINK_STRUCT_ID) {
         delete pThis;
     }
 }
@@ -186,7 +186,7 @@ OH_UdsHtml* OH_UdsHtml_Create()
 {
     OH_UdsHtml* html = new (std::nothrow) OH_UdsHtml();
     if (html == nullptr) {
-        LOG_ERROR(UDMF_NDK, "Failed to apply for memory.");
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
         return nullptr;
     }
     html->obj = std::make_shared<Object>();
@@ -198,7 +198,7 @@ OH_UdsHtml* OH_UdsHtml_Create()
 
 void OH_UdsHtml_Destroy(OH_UdsHtml* pThis)
 {
-    if (pThis != nullptr && pThis->id == NdkStructId::UDS_HTML_STRUCT_ID) {
+    if (pThis != nullptr && pThis->cid == NdkStructId::UDS_HTML_STRUCT_ID) {
         delete pThis;
     }
 }
@@ -247,7 +247,7 @@ OH_UdsAppItem* OH_UdsAppItem_Create()
 {
     OH_UdsAppItem* appItem = new (std::nothrow) OH_UdsAppItem();
     if (appItem == nullptr) {
-        LOG_ERROR(UDMF_NDK, "Failed to apply for memory.");
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
         return nullptr;
     }
     appItem->obj = std::make_shared<Object>();
@@ -263,7 +263,7 @@ OH_UdsAppItem* OH_UdsAppItem_Create()
 
 void OH_UdsAppItem_Destroy(OH_UdsAppItem* pThis)
 {
-    if (pThis != nullptr && pThis->id == NdkStructId::UDS_APP_ITEM_STRUCT_ID) {
+    if (pThis != nullptr && pThis->cid == NdkStructId::UDS_APP_ITEM_STRUCT_ID) {
         delete pThis;
     }
 }

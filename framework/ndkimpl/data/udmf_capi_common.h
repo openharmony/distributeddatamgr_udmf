@@ -13,19 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_NDK_COMMON_H
-#define UDMF_NDK_COMMON_H
+#ifndef UDMF_CAPI_COMMON_H
+#define UDMF_CAPI_COMMON_H
 
 #include "unified_record.h"
 #include "unified_data.h"
 #include <mutex>
 #include <cstdint>
 
-struct Uds_Object_Ptr {
-    const int64_t id;
+struct UdsObject {
+    const int64_t cid;
     std::shared_ptr<OHOS::UDMF::Object> obj;
     std::mutex mutex;
-    explicit Uds_Object_Ptr(int id);
+    explicit UdsObject(int cid);
     const char* GetUdsValue(const char* paramName);
     int SetUdsValue(const char* paramName, const char* pramValue);
 };
@@ -42,7 +42,7 @@ enum NdkStructId : std::int64_t {
 };
 
 struct OH_Utd {
-    const int64_t id = UTD_STRUCT_ID;
+    const int64_t cid = UTD_STRUCT_ID;
     std::mutex mutex;
     std::string typeId;
     const char** belongingToTypes{nullptr};
@@ -56,16 +56,16 @@ struct OH_Utd {
     std::string iconFile;
 };
 
-struct OH_UdsPlainText : public Uds_Object_Ptr {
+struct OH_UdsPlainText : public UdsObject {
     OH_UdsPlainText();
 };
-struct OH_UdsHyperlink : public Uds_Object_Ptr {
+struct OH_UdsHyperlink : public UdsObject {
     OH_UdsHyperlink();
 };
-struct OH_UdsHtml : public Uds_Object_Ptr {
+struct OH_UdsHtml : public UdsObject {
     OH_UdsHtml();
 };
-struct OH_UdsAppItem : public Uds_Object_Ptr {
+struct OH_UdsAppItem : public UdsObject {
     OH_UdsAppItem();
 };
 
@@ -92,6 +92,7 @@ struct OH_UdmfData {
 struct OH_UdmfProperty {
     const int64_t cid = UDMF_UNIFIED_DATA_PROPERTIES_ID;
     std::shared_ptr<OHOS::UDMF::UnifiedDataProperties> properties_;
+    std::mutex mutex;
     std::string extraStr;
 };
 
@@ -109,6 +110,6 @@ constexpr const char* APP_LABEL_ID = "appLabelId";
 constexpr const char* BUNDLE_NAME = "bundleName";
 constexpr const char* ABILITY_NAME = "abilityName";
 
-bool IsInvalidUdsObjectPtr(const Uds_Object_Ptr* pThis, int id);
+bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid);
 
 #endif

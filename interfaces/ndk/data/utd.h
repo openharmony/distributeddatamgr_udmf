@@ -100,7 +100,7 @@ const char* OH_Utd_GetDescription(OH_Utd* pThis);
  * @see OH_Utd.
  * @since 12
  */
-const char* OH_Utd_GetReferenceURL(OH_Utd* pThis);
+const char* OH_Utd_GetReferenceUrl(OH_Utd* pThis);
 
 /**
  * @brief Get icon file from the {@link OH_Utd}.
@@ -175,7 +175,7 @@ const char** OH_Utd_GetTypesByMimeType(const char* mimeType, unsigned int* count
  *         {@code true} Represents srcTypeId belongs to destTypeId.
  * @since 12
  */
-bool OH_Utd_IsBelongsTo(const char* srcTypeId, const char* destTypeId);
+bool OH_Utd_BelongsTo(const char* srcTypeId, const char* destTypeId);
 
 /**
  * @brief Calculate relationships of two types.
@@ -187,7 +187,7 @@ bool OH_Utd_IsBelongsTo(const char* srcTypeId, const char* destTypeId);
  *         {@code true} Represents srcTypeId lower level to destTypeId.
  * @since 12
  */
-bool OH_Utd_IsLowerLevelType(const char* srcTypeId, const char* destTypeId);
+bool OH_Utd_IsLower(const char* srcTypeId, const char* destTypeId);
 
 /**
  * @brief Calculate relationships of two types.
@@ -199,7 +199,7 @@ bool OH_Utd_IsLowerLevelType(const char* srcTypeId, const char* destTypeId);
  *         {@code true} Represents srcTypeId higher level to destTypeId.
  * @since 12
  */
-bool OH_Utd_IsHigherLevelType(const char* srcTypeId, const char* destTypeId);
+bool OH_Utd_IsHigher(const char* srcTypeId, const char* destTypeId);
 
 /**
  * @brief Calculate two {@link OH_Utd}s are equal.
@@ -211,7 +211,7 @@ bool OH_Utd_IsHigherLevelType(const char* srcTypeId, const char* destTypeId);
  *         {@code true} Represents utd1 and utd2 are equal.
  * @since 12
  */
-bool OH_Utd_IsEquals(OH_Utd* utd1, OH_Utd* utd2);
+bool OH_Utd_Equals(OH_Utd* utd1, OH_Utd* utd2);
 
 /**
  * @brief Destroy string list memory.

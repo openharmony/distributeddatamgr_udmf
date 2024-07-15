@@ -28,7 +28,7 @@ enum UdmfSubModule {
     UDMF_KITS_NAPI,     // for udmf napi kits module
     UDMF_CLIENT,        // for udmf client module
     UDMF_SERVICE,       // for udmf service module
-    UDMF_NDK,           // for udmf ndk module
+    UDMF_CAPI,           // for udmf ndk module
     UDMF_TEST,          // for udmf test module
 };
 

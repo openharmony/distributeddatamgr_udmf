@@ -15,13 +15,13 @@
 
 #include "ndk_data_conversion.h"
 #include "unified_data.h"
-#include "udmf_ndk_common.h"
+#include "udmf_capi_common.h"
 #include "error_code.h"
 
 namespace OHOS::UDMF {
     Status NdkDataConversion::GetNativeUnifiedData(std::shared_ptr<OH_UdmfData> ndkData, std::shared_ptr<UnifiedData> &data)
     {
-        if (ndkData == nullptr || data == nullptr) {
+        if (ndkData == nullptr || data == nullptr || ndkData->cid != NdkStructId::UDMF_UNIFIED_DATA_STRUCT_ID) {
             return Status::E_INVALID_PARAMETERS;
         }
         data = ndkData->unifiedData_;
@@ -30,7 +30,7 @@ namespace OHOS::UDMF {
 
     Status NdkDataConversion::GetNdkUnifiedData(std::shared_ptr<UnifiedData> data, std::shared_ptr<OH_UdmfData> &ndkData)
     {
-        if (data == nullptr || ndkData == nullptr) {
+        if (data == nullptr || ndkData == nullptr || ndkData->cid != NdkStructId::UDMF_UNIFIED_DATA_STRUCT_ID) {
             return Status::E_INVALID_PARAMETERS;
         }
         ndkData->unifiedData_ = data;

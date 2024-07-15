@@ -518,7 +518,7 @@ extern "C" {
  *
  * @since 12
  */
-#define UDMF_META_general_FILE "general.file"
+#define UDMF_META_GENERAL_FILE "general.file"
 
 /**
  * @brief A specific type of uniform data type.

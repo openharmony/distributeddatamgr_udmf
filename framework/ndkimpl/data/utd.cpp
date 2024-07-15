@@ -21,7 +21,7 @@
 #include "securec.h"
 #include "logger.h"
 #include "utd_client.h"
-#include "udmf_ndk_common.h"
+#include "udmf_capi_common.h"
 #include "udmf_err_code.h"
 
 using namespace OHOS::UDMF;
@@ -33,7 +33,7 @@ typedef Status (UtdClient::*GetUtdByConditionPtr)(const std::string&, std::strin
 static void DestroyArrayPtr(const char** &arrayPtr, unsigned int& count)
 {
     if (arrayPtr == nullptr) {
-        LOG_ERROR(UDMF_NDK, "Cannot delete arrayPtr because it's a nullptr.");
+        LOG_ERROR(UDMF_CAPI, "Cannot delete arrayPtr because it's a nullptr.");
         return;
     }
     for (unsigned int i = 0; i < count; i++) {
@@ -45,14 +45,14 @@ static void DestroyArrayPtr(const char** &arrayPtr, unsigned int& count)
     delete[] arrayPtr;
     arrayPtr = nullptr;
     count = 0;
-    LOG_INFO(UDMF_NDK, "END TO DELETE arrayPtr.");
+    LOG_INFO(UDMF_CAPI, "delete arrayPtr finish.");
 }
 
 static const char** CreateStrArrByVector(const std::vector<std::string>& paramVector, unsigned int* count)
 {
     unsigned int size = paramVector.size();
     if (size <= 0 || size > MAX_UTD_SIZE) {
-        LOG_ERROR(UDMF_NDK, "Cannot create array, because size is illegal or exceeds the max value of UTD.");
+        LOG_ERROR(UDMF_CAPI, "Cannot create array, because size is illegal or exceeds the max value of UTD.");
         *count = 0;
         return nullptr;
     }
@@ -62,10 +62,10 @@ static const char** CreateStrArrByVector(const std::vector<std::string>& paramVe
         return nullptr;
     }
     for (unsigned int i = 0; i < size; i++) {
-        charPtr[i] = new char[paramVector[i].size() + 1];
+        charPtr[i] = new (std::nothrow) char[paramVector[i].size() + 1];
         if (charPtr[i] == nullptr ||
             strcpy_s(charPtr[i], paramVector[i].size() + 1, paramVector[i].c_str()) != UDMF_E_OK) {
-            LOG_ERROR(UDMF_NDK, "obtain the memory error, or str copy error!");
+            LOG_ERROR(UDMF_CAPI, "obtain the memory error, or str copy error!");
             const char** arrayPtr = const_cast<const char**>(charPtr);
             DestroyArrayPtr(arrayPtr, size);
             *count = 0;
@@ -85,7 +85,7 @@ static std::shared_ptr<TypeDescriptor> GetTypeDescriptorByUtdClient(const char* 
 
 static bool IsUtdInvalid(OH_Utd* pThis)
 {
-    return pThis == nullptr || pThis->id != NdkStructId::UTD_STRUCT_ID;
+    return pThis == nullptr || pThis->cid != NdkStructId::UTD_STRUCT_ID;
 }
 
 static const char** GetTypesByCondition(const char* condition, unsigned int* count, GetUtdByConditionPtr funcPtr)
@@ -94,13 +94,18 @@ static const char** GetTypesByCondition(const char* condition, unsigned int* cou
         return nullptr;
     }
     std::string typeIdStr;
-    (UtdClient::GetInstance().*funcPtr)(condition, typeIdStr, DEFAULT_TYPE_ID);
-    if (typeIdStr.empty()) {
+    Status result = (UtdClient::GetInstance().*funcPtr)(condition, typeIdStr, DEFAULT_TYPE_ID);
+    if (result != Status::E_OK || typeIdStr.empty()) {
+        LOG_ERROR(UDMF_CAPI, "Failed to obtain typeId by invoking the native function.");
         return nullptr;
     }
-    auto typeId = new char[typeIdStr.size() + 1];
+    auto typeId = new (std::nothrow) char[typeIdStr.size() + 1];
+    if (typeId == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "obtain typeId's memory error!");
+        return nullptr;
+    }
     if (strcpy_s(typeId, typeIdStr.size() + 1, typeIdStr.c_str()) != UDMF_E_OK) {
-        LOG_ERROR(UDMF_NDK, "str copy error!");
+        LOG_ERROR(UDMF_CAPI, "str copy error!");
         delete[] typeId;
         return nullptr;
     }
@@ -117,10 +122,14 @@ OH_Utd* OH_Utd_Create(const char* typeId)
     }
     auto pThis = new (std::nothrow) OH_Utd();
     if (pThis == nullptr) {
-        LOG_ERROR(UDMF_NDK, "Failed to apply for memory.");
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
         return nullptr;
     }
     auto typeDescriptor = GetTypeDescriptorByUtdClient(typeId);
+    if (typeDescriptor == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Failed to create by invoking the native function.");
+        return nullptr;
+    }
     pThis->typeId = typeDescriptor->GetTypeId();
     pThis->description = typeDescriptor->GetDescription();
     pThis->referenceURL = typeDescriptor->GetReferenceURL();
@@ -136,14 +145,14 @@ OH_Utd* OH_Utd_Create(const char* typeId)
 void OH_Utd_Destroy(OH_Utd* pThis)
 {
     if (IsUtdInvalid(pThis)) {
-        LOG_ERROR(UDMF_NDK, "Failed to Destroy UTD, because pThis maybe nullptr or non-UTD struct ptr.");
+        LOG_ERROR(UDMF_CAPI, "Failed to Destroy UTD, because pThis maybe nullptr or non-UTD struct ptr.");
         return;
     }
     DestroyArrayPtr(pThis->belongingToTypes, pThis->belongingToTypesCount);
     DestroyArrayPtr(pThis->filenameExtensions, pThis->filenameExtensionsCount);
     DestroyArrayPtr(pThis->mimeTypes, pThis->mimeTypeCount);
     delete pThis;
-    LOG_INFO(UDMF_NDK, "OH_Utd ptr already be delete");
+    LOG_INFO(UDMF_CAPI, "OH_Utd ptr already be delete");
 }
 
 const char* OH_Utd_GetTypeId(OH_Utd* pThis)
@@ -156,7 +165,7 @@ const char* OH_Utd_GetDescription(OH_Utd* pThis)
     return IsUtdInvalid(pThis) ? nullptr : pThis->description.c_str();
 }
 
-const char* OH_Utd_GetReferenceURL(OH_Utd* pThis)
+const char* OH_Utd_GetReferenceUrl(OH_Utd* pThis)
 {
     return IsUtdInvalid(pThis) ? nullptr : pThis->referenceURL.c_str();
 }
@@ -203,50 +212,77 @@ const char** OH_Utd_GetTypesByMimeType(const char* mimeType, unsigned int* count
     return GetTypesByCondition(mimeType, count, &UtdClient::GetUniformDataTypeByMIMEType);
 }
 
-bool OH_Utd_IsBelongsTo(const char* srcTypeId, const char* destTypeId)
+bool OH_Utd_BelongsTo(const char* srcTypeId, const char* destTypeId)
 {
     if (srcTypeId == nullptr || destTypeId == nullptr) {
-        LOG_ERROR(UDMF_NDK, "The input parameter is nullptr");
+        LOG_ERROR(UDMF_CAPI, "The input parameter is nullptr");
         return false;
     }
     auto typeDescriptor = GetTypeDescriptorByUtdClient(srcTypeId);
+    if (typeDescriptor == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Failed to create by invoking the native function.");
+        return false;
+    }
     bool checkResult{false};
-    typeDescriptor->BelongsTo(destTypeId, checkResult);
+    if (typeDescriptor->BelongsTo(destTypeId, checkResult) != Status::E_OK) {
+        LOG_ERROR(UDMF_CAPI, "invoke the native function error.");
+    }
     return checkResult;
 }
 
-bool OH_Utd_IsLowerLevelType(const char* srcTypeId, const char* destTypeId)
+bool OH_Utd_IsLower(const char* srcTypeId, const char* destTypeId)
 {
     if (srcTypeId == nullptr || destTypeId == nullptr) {
-        LOG_ERROR(UDMF_NDK, "The input parameter is nullptr");
+        LOG_ERROR(UDMF_CAPI, "The input parameter is nullptr");
         return false;
     }
     auto typeDescriptor = GetTypeDescriptorByUtdClient(srcTypeId);
+    if (typeDescriptor == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Failed to create by invoking the native function.");
+        return false;
+    }
     bool checkResult{false};
-    typeDescriptor->IsLowerLevelType(destTypeId, checkResult);
+    if (typeDescriptor->IsLowerLevelType(destTypeId, checkResult) != Status::E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Failed to create by invoking the native function.");
+    }
     return checkResult;
 }
 
-bool OH_Utd_IsHigherLevelType(const char* srcTypeId, const char* destTypeId)
+bool OH_Utd_IsHigher(const char* srcTypeId, const char* destTypeId)
 {
     if (srcTypeId == nullptr || destTypeId == nullptr) {
-        LOG_ERROR(UDMF_NDK, "The input parameter is nullptr");
+        LOG_ERROR(UDMF_CAPI, "The input parameter is nullptr");
         return false;
     }
     auto typeDescriptor = GetTypeDescriptorByUtdClient(srcTypeId);
+    if (typeDescriptor == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Failed to create by invoking the native function.");
+        return false;
+    }
     bool checkResult{false};
-    typeDescriptor->IsHigherLevelType(destTypeId, checkResult);
+    if (typeDescriptor->IsHigherLevelType(destTypeId, checkResult) != Status::E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Failed to create by invoking the native function.");
+    }
     return checkResult;
 }
 
-bool OH_Utd_IsEquals(OH_Utd* utd1, OH_Utd* utd2)
+bool OH_Utd_Equals(OH_Utd* utd1, OH_Utd* utd2)
 {
     if (IsUtdInvalid(utd1) || IsUtdInvalid(utd2)) {
-        LOG_ERROR(UDMF_NDK, "The input parameter is invalid");
+        LOG_ERROR(UDMF_CAPI, "The input parameter is invalid");
         return false;
     }
-    return GetTypeDescriptorByUtdClient(utd1->typeId.c_str())
-        ->Equals(GetTypeDescriptorByUtdClient(utd2->typeId.c_str()));
+    auto typeDescriptor1 = GetTypeDescriptorByUtdClient(utd1->typeId.c_str());
+    if (typeDescriptor1 == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "utd1 failed to create by invoking the native function.");
+        return false;
+    }
+    auto typeDescriptor2 = GetTypeDescriptorByUtdClient(utd2->typeId.c_str());
+    if (typeDescriptor2 == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "utd2 failed to create by invoking the native function.");
+        return false;
+    }
+    return typeDescriptor1->Equals(typeDescriptor2);
 }
 
 void OH_Utd_DestroyStringList(const char** list, unsigned int count)

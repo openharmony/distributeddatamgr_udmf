@@ -18,7 +18,7 @@
 
 #include "unified_data.h"
 #include "udmf.h"
-#include "udmf_ndk_common.h"
+#include "udmf_capi_common.h"
 #include "error_code.h"
 
 namespace OHOS::UDMF {

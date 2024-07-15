@@ -26,7 +26,11 @@ config("module_private_config") {
   ]
 }
 
-common_deps = [ "${udmf_interfaces_path}/ndk:udmf_ndk" ]
+common_deps = [
+  "${udmf_interfaces_path}/innerkits:udmf_client",
+  "${udmf_interfaces_path}/innerkits:utd_client",
+  "${udmf_interfaces_path}/ndk:udmf_ndk",
+]
 
 common_external_deps = [
   "ability_base:want",
@@ -69,10 +73,7 @@ ohos_unittest("UdsTest") {
 ohos_unittest("UdmfTest") {
   module_out_path = module_output_path
 
-  sources = [
-    "${udmf_framework_path}/ndkimpl/data/udmf.cpp",
-    "udmf_test.cpp",
-  ]
+  sources = [ "udmf_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 

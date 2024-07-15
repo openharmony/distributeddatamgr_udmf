@@ -23,7 +23,7 @@
 #include "logger.h"
 #include "error_code.h"
 #include "udmf.h"
-#include "udmf_ndk_common.h"
+#include "udmf_capi_common.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;

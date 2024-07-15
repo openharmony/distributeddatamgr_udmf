@@ -24,7 +24,7 @@
 
 #include "logger.h"
 #include "uds.h"
-#include "udmf_ndk_common.h"
+#include "udmf_capi_common.h"
 #include "udmf_meta.h"
 #include "udmf_err_code.h"
 

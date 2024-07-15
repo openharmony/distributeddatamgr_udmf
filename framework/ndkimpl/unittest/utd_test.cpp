@@ -24,7 +24,7 @@
 
 #include "logger.h"
 #include "utd.h"
-#include "udmf_ndk_common.h"
+#include "udmf_capi_common.h"
 #include "udmf_meta.h"
 
 using namespace testing::ext;
@@ -119,20 +119,20 @@ HWTEST_F(UtdTest, OH_Utd_GetDescription_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OH_Utd_GetReferenceURL_001
- * @tc.desc: Normal testcase of OH_Utd_GetReferenceURL
+ * @tc.name: OH_Utd_GetReferenceUrl_001
+ * @tc.desc: Normal testcase of OH_Utd_GetReferenceUrl
  * @tc.type: FUNC
  */
-HWTEST_F(UtdTest, OH_Utd_GetReferenceURL_001, TestSize.Level1)
+HWTEST_F(UtdTest, OH_Utd_GetReferenceUrl_001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "OH_Utd_GetReferenceURL_001 begin.");
-    std::string url(OH_Utd_GetReferenceURL(utd));
+    LOG_INFO(UDMF_TEST, "OH_Utd_GetReferenceUrl_001 begin.");
+    std::string url(OH_Utd_GetReferenceUrl(utd));
     EXPECT_EQ(REFERENCE_URL, url);
 
     OH_Utd* utdNullptr = nullptr;
-    const char* urlNullptr = OH_Utd_GetReferenceURL(utdNullptr);
+    const char* urlNullptr = OH_Utd_GetReferenceUrl(utdNullptr);
     EXPECT_EQ(nullptr, urlNullptr);
-    LOG_INFO(UDMF_TEST, "OH_Utd_GetReferenceURL_001 end.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_GetReferenceUrl_001 end.");
 }
 
 /**
@@ -275,157 +275,157 @@ HWTEST_F(UtdTest, OH_Utd_GetTypesByMimeType_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OH_Utd_IsBelongsTo_001
+ * @tc.name: OH_Utd_BelongsTo_001
  * @tc.desc: test typeId1 belong to typeId2
  * @tc.type: FUNC
  */
-HWTEST_F(UtdTest, OH_Utd_IsBelongsTo_001, TestSize.Level1)
+HWTEST_F(UtdTest, OH_Utd_BelongsTo_001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsBelongsTo_001 begin.");
-    EXPECT_TRUE(OH_Utd_IsBelongsTo(UDMF_META_PLAIN_TEXT, UDMF_META_TEXT));
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsBelongsTo_001 end.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_BelongsTo_001 begin.");
+    EXPECT_TRUE(OH_Utd_BelongsTo(UDMF_META_PLAIN_TEXT, UDMF_META_TEXT));
+    LOG_INFO(UDMF_TEST, "OH_Utd_BelongsTo_001 end.");
 }
 
 /**
- * @tc.name: OH_Utd_IsBelongsTo_002
+ * @tc.name: OH_Utd_BelongsTo_002
  * @tc.desc: test typeId1 don't belong to typeId2
  * @tc.type: FUNC
  */
-HWTEST_F(UtdTest, OH_Utd_IsBelongsTo_002, TestSize.Level1)
+HWTEST_F(UtdTest, OH_Utd_BelongsTo_002, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsBelongsTo_002 begin.");
-    EXPECT_FALSE(OH_Utd_IsBelongsTo(UDMF_META_PLAIN_TEXT, UDMF_META_HTML));
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsBelongsTo_002 end.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_BelongsTo_002 begin.");
+    EXPECT_FALSE(OH_Utd_BelongsTo(UDMF_META_PLAIN_TEXT, UDMF_META_HTML));
+    LOG_INFO(UDMF_TEST, "OH_Utd_BelongsTo_002 end.");
 }
 
 /**
- * @tc.name: OH_Utd_IsBelongsTo_003
+ * @tc.name: OH_Utd_BelongsTo_003
  * @tc.desc: test param is nullptr
  * @tc.type: FUNC
  */
-HWTEST_F(UtdTest, OH_Utd_IsBelongsTo_003, TestSize.Level1)
+HWTEST_F(UtdTest, OH_Utd_BelongsTo_003, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsBelongsTo_003 begin.");
-    EXPECT_FALSE(OH_Utd_IsBelongsTo(UDMF_META_PLAIN_TEXT, nullptr));
-    EXPECT_FALSE(OH_Utd_IsBelongsTo(nullptr, UDMF_META_PLAIN_TEXT));
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsBelongsTo_003 end.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_BelongsTo_003 begin.");
+    EXPECT_FALSE(OH_Utd_BelongsTo(UDMF_META_PLAIN_TEXT, nullptr));
+    EXPECT_FALSE(OH_Utd_BelongsTo(nullptr, UDMF_META_PLAIN_TEXT));
+    LOG_INFO(UDMF_TEST, "OH_Utd_BelongsTo_003 end.");
 }
 
 /**
- * @tc.name: OH_Utd_IsLowerLevelType_001
+ * @tc.name: OH_Utd_IsLower_001
  * @tc.desc: test typeId1 is lower level of typeId2
  * @tc.type: FUNC
  */
-HWTEST_F(UtdTest, OH_Utd_IsLowerLevelType_001, TestSize.Level1)
+HWTEST_F(UtdTest, OH_Utd_IsLower_001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsLowerLevelType_001 begin.");
-    EXPECT_TRUE(OH_Utd_IsLowerLevelType(UDMF_META_PLAIN_TEXT, UDMF_META_TEXT));
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsLowerLevelType_001 end.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_IsLower_001 begin.");
+    EXPECT_TRUE(OH_Utd_IsLower(UDMF_META_PLAIN_TEXT, UDMF_META_TEXT));
+    LOG_INFO(UDMF_TEST, "OH_Utd_IsLower_001 end.");
 }
 
 /**
- * @tc.name: OH_Utd_IsLowerLevelType_002
+ * @tc.name: OH_Utd_IsLower_002
  * @tc.desc: test typeId1 isn't lower level of typeId2
  * @tc.type: FUNC
  */
-HWTEST_F(UtdTest, OH_Utd_IsLowerLevelType_002, TestSize.Level1)
+HWTEST_F(UtdTest, OH_Utd_IsLower_002, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsLowerLevelType_002 begin.");
-    EXPECT_FALSE(OH_Utd_IsLowerLevelType(UDMF_META_PLAIN_TEXT, UDMF_META_HTML));
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsLowerLevelType_002 end.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_IsLower_002 begin.");
+    EXPECT_FALSE(OH_Utd_IsLower(UDMF_META_PLAIN_TEXT, UDMF_META_HTML));
+    LOG_INFO(UDMF_TEST, "OH_Utd_IsLower_002 end.");
 }
 
 /**
- * @tc.name: OH_Utd_IsLowerLevelType_003
+ * @tc.name: OH_Utd_IsLower_003
  * @tc.desc: test param is nullptr
  * @tc.type: FUNC
  */
-HWTEST_F(UtdTest, OH_Utd_IsLowerLevelType_003, TestSize.Level1)
+HWTEST_F(UtdTest, OH_Utd_IsLower_003, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsLowerLevelType_003 begin.");
-    EXPECT_FALSE(OH_Utd_IsLowerLevelType(UDMF_META_PLAIN_TEXT, nullptr));
-    EXPECT_FALSE(OH_Utd_IsLowerLevelType(nullptr, UDMF_META_PLAIN_TEXT));
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsLowerLevelType_003 end.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_IsLower_003 begin.");
+    EXPECT_FALSE(OH_Utd_IsLower(UDMF_META_PLAIN_TEXT, nullptr));
+    EXPECT_FALSE(OH_Utd_IsLower(nullptr, UDMF_META_PLAIN_TEXT));
+    LOG_INFO(UDMF_TEST, "OH_Utd_IsLower_003 end.");
 }
 
 /**
- * @tc.name: OH_Utd_IsHigherLevelType_001
+ * @tc.name: OH_Utd_IsHigher_001
  * @tc.desc: test typeId1 is higher level of typeId2
  * @tc.type: FUNC
  */
-HWTEST_F(UtdTest, OH_Utd_IsHigherLevelType_001, TestSize.Level1)
+HWTEST_F(UtdTest, OH_Utd_IsHigher_001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsHigherLevelType_001 begin.");
-    EXPECT_TRUE(OH_Utd_IsHigherLevelType(UDMF_META_TEXT, UDMF_META_PLAIN_TEXT));
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsHigherLevelType_001 end.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_IsHigher_001 begin.");
+    EXPECT_TRUE(OH_Utd_IsHigher(UDMF_META_TEXT, UDMF_META_PLAIN_TEXT));
+    LOG_INFO(UDMF_TEST, "OH_Utd_IsHigher_001 end.");
 }
 
 /**
- * @tc.name: OH_Utd_IsHigherLevelType_002
+ * @tc.name: OH_Utd_IsHigher_002
  * @tc.desc: test typeId1 isn't higher level of typeId2
  * @tc.type: FUNC
  */
-HWTEST_F(UtdTest, OH_Utd_IsHigherLevelType_002, TestSize.Level1)
+HWTEST_F(UtdTest, OH_Utd_IsHigher_002, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsHigherLevelType_002 begin.");
-    EXPECT_FALSE(OH_Utd_IsHigherLevelType(UDMF_META_PLAIN_TEXT, UDMF_META_HTML));
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsHigherLevelType_002 end.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_IsHigher_002 begin.");
+    EXPECT_FALSE(OH_Utd_IsHigher(UDMF_META_PLAIN_TEXT, UDMF_META_HTML));
+    LOG_INFO(UDMF_TEST, "OH_Utd_IsHigher_002 end.");
 }
 
 /**
- * @tc.name: OH_Utd_IsHigherLevelType_003
+ * @tc.name: OH_Utd_IsHigher_003
  * @tc.desc: test param is nullptr
  * @tc.type: FUNC
  */
-HWTEST_F(UtdTest, OH_Utd_IsHigherLevelType_003, TestSize.Level1)
+HWTEST_F(UtdTest, OH_Utd_IsHigher_003, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsHigherLevelType_003 begin.");
-    EXPECT_FALSE(OH_Utd_IsHigherLevelType(UDMF_META_PLAIN_TEXT, nullptr));
-    EXPECT_FALSE(OH_Utd_IsHigherLevelType(nullptr, UDMF_META_PLAIN_TEXT));
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsHigherLevelType_003 end.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_IsHigher_003 begin.");
+    EXPECT_FALSE(OH_Utd_IsHigher(UDMF_META_PLAIN_TEXT, nullptr));
+    EXPECT_FALSE(OH_Utd_IsHigher(nullptr, UDMF_META_PLAIN_TEXT));
+    LOG_INFO(UDMF_TEST, "OH_Utd_IsHigher_003 end.");
 }
 
 /**
- * @tc.name: OH_Utd_IsEquals_001
+ * @tc.name: OH_Utd_Equals_001
  * @tc.desc: test case1 is equals case2
  * @tc.type: FUNC
  */
-HWTEST_F(UtdTest, OH_Utd_IsEquals_001, TestSize.Level1)
+HWTEST_F(UtdTest, OH_Utd_Equals_001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsEquals_001 begin.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_Equals_001 begin.");
     auto utd2 = OH_Utd_Create(UDMF_META_PLAIN_TEXT);
-    EXPECT_TRUE(OH_Utd_IsEquals(utd, utd2));
+    EXPECT_TRUE(OH_Utd_Equals(utd, utd2));
     OH_Utd_Destroy(utd2);
     utd2 = nullptr;
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsEquals_001 end.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_Equals_001 end.");
 }
 
 /**
- * @tc.name: OH_Utd_IsEquals_002
+ * @tc.name: OH_Utd_Equals_002
  * @tc.desc: test case1 is not equals case2
  * @tc.type: FUNC
  */
-HWTEST_F(UtdTest, OH_Utd_IsEquals_002, TestSize.Level1)
+HWTEST_F(UtdTest, OH_Utd_Equals_002, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsEquals_002 begin.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_Equals_002 begin.");
     auto utd2 = OH_Utd_Create(UDMF_META_TEXT);
-    EXPECT_FALSE(OH_Utd_IsEquals(utd, utd2));
+    EXPECT_FALSE(OH_Utd_Equals(utd, utd2));
     OH_Utd_Destroy(utd2);
     utd2 = nullptr;
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsEquals_002 end.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_Equals_002 end.");
 }
 
 /**
- * @tc.name: OH_Utd_IsEquals_003
+ * @tc.name: OH_Utd_Equals_003
  * @tc.desc: test param is nullptr
  * @tc.type: FUNC
  */
-HWTEST_F(UtdTest, OH_Utd_IsEquals_003, TestSize.Level1)
+HWTEST_F(UtdTest, OH_Utd_Equals_003, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsEquals_003 begin.");
-    EXPECT_FALSE(OH_Utd_IsEquals(utd, nullptr));
-    EXPECT_FALSE(OH_Utd_IsEquals(nullptr, utd));
-    LOG_INFO(UDMF_TEST, "OH_Utd_IsEquals_003 end.");
+    LOG_INFO(UDMF_TEST, "OH_Utd_Equals_003 begin.");
+    EXPECT_FALSE(OH_Utd_Equals(utd, nullptr));
+    EXPECT_FALSE(OH_Utd_Equals(nullptr, utd));
+    LOG_INFO(UDMF_TEST, "OH_Utd_Equals_003 end.");
 }
 
 }
