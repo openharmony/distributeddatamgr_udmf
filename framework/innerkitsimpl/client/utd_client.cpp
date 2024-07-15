@@ -162,21 +162,12 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
                   mimeType.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
-
-    for (const auto &utdTypeCfg : descriptorCfgs_) {
-        std::vector<std::string> mimeTypes = utdTypeCfg.mimeTypes;
-        if (find(mimeTypes.begin(), mimeTypes.end(), lowerMimeType) != mimeTypes.end() ||
-            find(mimeTypes.begin(), mimeTypes.end(), mimeType) != mimeTypes.end()) {
-            typeId = utdTypeCfg.typeId;
-            break;
-        }
-    }
+    typeId = GetTypeIdFromCfg(lowerMimeType);
     // the find typeId is not belongsTo to the belongsTo.
     if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
         !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
         typeId = "";
     }
-    
     if (typeId.empty()) {
         if (!IsValidMimeType(mimeType)) {
             LOG_ERROR(UDMF_CLIENT, "invalid mimeType. mimeType:%{public}s, belongsTo:%{public}s ",
@@ -185,8 +176,32 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
         }
         typeId = FlexibleType::GenFlexibleUtd(lowerMimeType, "", belongsTo);
     }
-
     return Status::E_OK;
+}
+
+std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
+{
+    for (const auto &utdTypeCfg : descriptorCfgs_) {
+        for (auto mime : utdTypeCfg.mimeTypes) {
+            std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
+            if (mime == mimeType) {
+                return utdTypeCfg.typeId;
+            }
+        }
+    }
+    if (mimeType.empty() || mimeType.back() != '*') {
+        return "";
+    }
+    std::string prefixType = mimeType.substr(0, mimeType.length() - 1);
+    for (const auto &utdTypeCfg : descriptorCfgs_) {
+        for (auto mime : utdTypeCfg.mimeTypes) {
+            std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
+            if (mime.rfind(prefixType, 0) == 0 && utdTypeCfg.belongingToTypes.size() > 0) {
+                return utdTypeCfg.belongingToTypes[0];
+            }
+        }
+    }
+    return "";
 }
 
 Status UtdClient::IsUtd(std::string typeId, bool &result)
