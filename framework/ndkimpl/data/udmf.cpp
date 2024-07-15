@@ -240,9 +240,7 @@ int OH_Udmf_GetUnifiedData(const char* key, UdmfIntention intention, OH_UdmfData
         default:
             return UDMF_E_INVALID_PARAM;
     }
-    QueryOption query = {
-            .key = std::string(key),
-            .intention = queryOptIntent};
+    QueryOption query = {.key = std::string(key), .intention = queryOptIntent};
     if (UdmfClient::GetInstance().GetData(query, *(data->unifiedData_)) != E_OK) {
         LOG_ERROR(UDMF_CAPI, "get data error");
         return UDMF_ERR;
@@ -263,8 +261,7 @@ int OH_Udmf_SetUnifiedData(UdmfIntention intention, OH_UdmfData* unifiedData, ch
         default:
             return UDMF_E_INVALID_PARAM;
     }
-    CustomOption option = {
-            .intention = customOptIntent};
+    CustomOption option = {.intention = customOptIntent};
     std::string keyStr;
     if ((UdmfClient::GetInstance().SetData(option, *(unifiedData->unifiedData_), keyStr)) != E_OK) {
         LOG_ERROR(UDMF_CAPI, "set data error");
@@ -301,8 +298,8 @@ void OH_UdmfRecord_Destroy(OH_UdmfRecord* record)
 
 int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId, unsigned char* entry, unsigned int count)
 {
-    if (!IsUnifiedRecordValid(record) || typeId == nullptr || entry == nullptr || count == 0
-        || count > MAX_RECORDS_SIZE) {
+    if (!IsUnifiedRecordValid(record) || typeId == nullptr || entry == nullptr || count == 0 ||
+        count > MAX_RECORDS_SIZE) {
         return UDMF_E_INVALID_PARAM;
     }
     std::vector<uint8_t> recordValue;
@@ -406,7 +403,7 @@ int OH_UdmfRecord_AddAppItem(OH_UdmfRecord* record, OH_UdsAppItem* appItem)
     appDefRecord->SetAbilityName(OH_UdsAppItem_GetAbilityName(appItem));
     record->record_ = std::move(appDefRecord);
     record->record_->SetType(
-            static_cast<OHOS::UDMF::UDType>(UtdUtils::GetUtdEnumFromUtdId(OH_UdsAppItem_GetType(appItem))));
+        static_cast<OHOS::UDMF::UDType>(UtdUtils::GetUtdEnumFromUtdId(OH_UdsAppItem_GetType(appItem))));
     return UDMF_E_OK;
 }
 

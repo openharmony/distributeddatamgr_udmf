@@ -87,9 +87,9 @@ group("unittest") {
   testonly = true
 
   deps = [
+    ":UdmfTest",
     ":UdsTest",
     ":UtdTest",
-    ":UdmfTest"
   ]
 }
 ###############################################################################

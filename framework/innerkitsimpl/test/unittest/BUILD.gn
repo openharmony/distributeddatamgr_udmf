@@ -95,6 +95,7 @@ ohos_unittest("NdkDataConversionTest") {
 
   sources = [
     "${udmf_framework_path}/ndkimpl/data/udmf.cpp",
+    "${udmf_framework_path}/ndkimpl/data/uds.cpp",
     "ndk_data_conversion_test.cpp",
   ]
 

@@ -17,6 +17,7 @@
 
 #include "ndk_data_conversion.h"
 #include <gtest/gtest.h>
+#include <memory>
 #include "token_setproc.h"
 #include "accesstoken_kit.h"
 #include "nativetoken_kit.h"
@@ -24,6 +25,7 @@
 #include "error_code.h"
 #include "udmf.h"
 #include "udmf_capi_common.h"
+#include "uds.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
@@ -50,11 +52,11 @@ namespace OHOS::Test {
 
     void NdkDataConversionTest::TearDown(void) {}
 
-/**
- * @tc.name: GetNativeUnifiedData_001
- * @tc.desc: Normal testcase of GetNativeUnifiedData
- * @tc.type: FUNC
- */
+    /**
+     * @tc.name: GetNativeUnifiedData_001
+     * @tc.desc: Normal testcase of GetNativeUnifiedData
+     * @tc.type: FUNC
+     */
     HWTEST_F(NdkDataConversionTest, GetNativeUnifiedData_001, TestSize.Level1) {
         LOG_INFO(UDMF_TEST, "GetNativeUnifiedData_001 begin.");
         UnifiedRecord unifiedRecord;
@@ -80,8 +82,24 @@ namespace OHOS::Test {
     }
 
     /**
+     * @tc.name: GetNativeUnifiedData_002
+     * @tc.desc: Normal testcase of GetNativeUnifiedData
+     * @tc.type: FUNC
+     */
+    HWTEST_F(NdkDataConversionTest, GetNativeUnifiedData_002, TestSize.Level1) {
+        LOG_INFO(UDMF_TEST, "GetNativeUnifiedData_002 begin.");
+        auto plainText = OH_UdsPlainText_Create();
+        OH_UdmfData* fakeNdkData = reinterpret_cast<OH_UdmfData*>(plainText);
+        std::shared_ptr<OH_UdmfData> ndkData(fakeNdkData);
+        auto data = std::make_shared<UnifiedData>();
+        Status status = NdkDataConversion::GetNativeUnifiedData(ndkData, data);
+        ASSERT_EQ(E_INVALID_PARAMETERS, status);
+        LOG_INFO(UDMF_TEST, "GetNativeUnifiedData_002 end.");
+    }
+
+    /**
      * @tc.name: GetNdkUnifiedData_001
-     * @tc.desc: Normal testcase of GetNdkUnifiedData
+     * @tc.desc: Error testcase of GetNdkUnifiedData
      * @tc.type: FUNC
      */
     HWTEST_F(NdkDataConversionTest, GetNdkUnifiedData_001, TestSize.Level1) {
@@ -92,7 +110,7 @@ namespace OHOS::Test {
         const std::shared_ptr<UnifiedRecord> recordPtr = std::make_shared<UnifiedRecord>(unifiedRecord);
         auto data= std::make_shared<UnifiedData>();
         data->AddRecord(recordPtr);
-        auto ndkData = std::make_shared<OH_UdmfData>();;
+        auto ndkData = std::make_shared<OH_UdmfData>();
         Status status = NdkDataConversion::GetNdkUnifiedData(data, ndkData);
         ASSERT_EQ(E_OK, status);
         EXPECT_EQ("typeId", ndkData->unifiedData_->GetRecordAt(0)->GetUid());
@@ -105,5 +123,21 @@ namespace OHOS::Test {
         status = NdkDataConversion::GetNdkUnifiedData(dataNull, ndkData);
         ASSERT_EQ(E_INVALID_PARAMETERS, status);
         LOG_INFO(UDMF_TEST, "GetNdkUnifiedData_001 end.");
+    }
+
+    /**
+     * @tc.name: GetNdkUnifiedData_002
+     * @tc.desc: Error testcase of GetNdkUnifiedData
+     * @tc.type: FUNC
+     */
+    HWTEST_F(NdkDataConversionTest, GetNdkUnifiedData_002, TestSize.Level1) {
+        LOG_INFO(UDMF_TEST, "GetNdkUnifiedData_002 begin.");
+        auto plainText = OH_UdsPlainText_Create();
+        OH_UdmfData* fakeNdkData = reinterpret_cast<OH_UdmfData*>(plainText);
+        std::shared_ptr<OH_UdmfData> ndkData(fakeNdkData);
+        auto data = std::make_shared<UnifiedData>();
+        Status status = NdkDataConversion::GetNdkUnifiedData(data, ndkData);
+        ASSERT_EQ(E_INVALID_PARAMETERS, status);
+        LOG_INFO(UDMF_TEST, "GetNdkUnifiedData_002 end.");
     }
 }
