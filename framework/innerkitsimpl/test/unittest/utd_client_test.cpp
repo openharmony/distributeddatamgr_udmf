@@ -1396,26 +1396,6 @@ HWTEST_F(UtdClientTest, IsUtd004, TestSize.Level1)
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix001 begin.");
-    std::string mimeType = "application/*";
-    std::string currType;
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, currType);
-    EXPECT_EQ(status, E_OK);
-    std::shared_ptr<TypeDescriptor> descriptor;
-    status = UtdClient::GetInstance().GetTypeDescriptor(currType, descriptor);
-    EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(descriptor->GetTypeId(), "general.object");
-    EXPECT_EQ(descriptor->GetTypeId(), currType);
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix001 end.");
-}
-
-/**
-* @tc.name: GetUniformDataTypeByMIMETypeByPrefix002
-* @tc.desc: normal testcase of GetUniformDataTypeByMIMEType by prefix.
-* @tc.type: FUNC
-*/
-HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix002, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix002 begin.");
     std::string mimeType = "application/vnd.openxmlformats-officedocument.*";
     std::string currType;
     auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, currType);
@@ -1434,17 +1414,17 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix002, TestSize.Level1
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(descriptor->GetTypeId(), "general.composite-object");
     EXPECT_EQ(descriptor->GetTypeId(), currType2);
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix002 end.");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix001 end.");
 }
 
 /**
-* @tc.name: GetUniformDataTypeByMIMETypeByPrefix003
+* @tc.name: GetUniformDataTypeByMIMETypeByPrefix002
 * @tc.desc: normal testcase of GetUniformDataTypeByMIMEType by prefix.
 * @tc.type: FUNC
 */
-HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix003, TestSize.Level1)
+HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix002, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix003 begin.");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix002 begin.");
     std::string mimeType = "application/vnd.openxmlformats-OFFICEdocument.*";
     std::string currType;
     auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, currType);
@@ -1463,6 +1443,6 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix003, TestSize.Level1
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(descriptor->GetTypeId(), "general.composite-object");
     EXPECT_EQ(descriptor->GetTypeId(), currType2);
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix003 end.");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix002 end.");
 }
 } // OHOS::Test

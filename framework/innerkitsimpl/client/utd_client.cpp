@@ -181,19 +181,22 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
 
 std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
 {
-    bool prefixMatch = false;
-    std::string prefixType;
-    if (!mimeType.empty() && mimeType.back() == '*') {
-        prefixType = mimeType.substr(0, mimeType.length() - 1);
-        prefixMatch = true;
-    }
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         for (auto mime : utdTypeCfg.mimeTypes) {
             std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
             if (mime == mimeType) {
                 return utdTypeCfg.typeId;
             }
-            if (prefixMatch && mime.rfind(prefixType, 0) == 0 && utdTypeCfg.belongingToTypes.size() > 0) {
+        }
+    }
+    if (mimeType.empty() || mimeType.back() != '*') {
+        return "";
+    }
+    std::string prefixType = mimeType.substr(0, mimeType.length() - 1);
+    for (const auto &utdTypeCfg : descriptorCfgs_) {
+        for (auto mime : utdTypeCfg.mimeTypes) {
+            std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
+            if (mime.rfind(prefixType, 0) == 0 && utdTypeCfg.belongingToTypes.size() > 0) {
                 return utdTypeCfg.belongingToTypes[0];
             }
         }
