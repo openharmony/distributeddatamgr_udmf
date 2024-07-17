@@ -62,7 +62,7 @@ namespace OHOS::Test {
         UnifiedRecord unifiedRecord;
         const std::string uid("typeId");
         unifiedRecord.SetUid(uid);
-        std::shared_ptr<OH_UdmfData> ndkData(OH_UdmfData_Create());
+        OH_UdmfData* ndkData = OH_UdmfData_Create();
         const std::shared_ptr<UnifiedRecord> recordPtr = std::make_shared<UnifiedRecord>(unifiedRecord);
         ndkData->unifiedData_->AddRecord(recordPtr);
         auto data = std::make_shared<UnifiedData>();
@@ -71,12 +71,13 @@ namespace OHOS::Test {
         ASSERT_EQ(E_OK, status);
         EXPECT_EQ("typeId", data->GetRecordAt(0)->GetUid());
 
-        std::shared_ptr<OH_UdmfData> ndkDataNull;
+        OH_UdmfData* ndkDataNull = nullptr;
         status = NdkDataConversion::GetNativeUnifiedData(ndkDataNull, data);
         ASSERT_EQ(E_INVALID_PARAMETERS, status);
 
         std::shared_ptr<UnifiedData> dataNull;
         status = NdkDataConversion::GetNativeUnifiedData(ndkData, dataNull);
+        OH_UdmfData_Destroy(ndkData);
         ASSERT_EQ(E_INVALID_PARAMETERS, status);
         LOG_INFO(UDMF_TEST, "GetNativeUnifiedData_001 end.");
     }
@@ -90,9 +91,9 @@ namespace OHOS::Test {
         LOG_INFO(UDMF_TEST, "GetNativeUnifiedData_002 begin.");
         auto plainText = OH_UdsPlainText_Create();
         OH_UdmfData* fakeNdkData = reinterpret_cast<OH_UdmfData*>(plainText);
-        std::shared_ptr<OH_UdmfData> ndkData(fakeNdkData);
         auto data = std::make_shared<UnifiedData>();
-        Status status = NdkDataConversion::GetNativeUnifiedData(ndkData, data);
+        Status status = NdkDataConversion::GetNativeUnifiedData(fakeNdkData, data);
+        OH_UdsPlainText_Destroy(plainText);
         ASSERT_EQ(E_INVALID_PARAMETERS, status);
         LOG_INFO(UDMF_TEST, "GetNativeUnifiedData_002 end.");
     }
@@ -110,17 +111,18 @@ namespace OHOS::Test {
         const std::shared_ptr<UnifiedRecord> recordPtr = std::make_shared<UnifiedRecord>(unifiedRecord);
         auto data= std::make_shared<UnifiedData>();
         data->AddRecord(recordPtr);
-        auto ndkData = std::make_shared<OH_UdmfData>();
+        OH_UdmfData* ndkData = OH_UdmfData_Create();
         Status status = NdkDataConversion::GetNdkUnifiedData(data, ndkData);
         ASSERT_EQ(E_OK, status);
         EXPECT_EQ("typeId", ndkData->unifiedData_->GetRecordAt(0)->GetUid());
 
-        std::shared_ptr<OH_UdmfData> ndkDataNull;
+        OH_UdmfData* ndkDataNull = nullptr;
         status = NdkDataConversion::GetNdkUnifiedData(data, ndkDataNull);
         ASSERT_EQ(E_INVALID_PARAMETERS, status);
 
         std::shared_ptr<UnifiedData> dataNull;
         status = NdkDataConversion::GetNdkUnifiedData(dataNull, ndkData);
+        OH_UdmfData_Destroy(ndkData);
         ASSERT_EQ(E_INVALID_PARAMETERS, status);
         LOG_INFO(UDMF_TEST, "GetNdkUnifiedData_001 end.");
     }
@@ -134,9 +136,9 @@ namespace OHOS::Test {
         LOG_INFO(UDMF_TEST, "GetNdkUnifiedData_002 begin.");
         auto plainText = OH_UdsPlainText_Create();
         OH_UdmfData* fakeNdkData = reinterpret_cast<OH_UdmfData*>(plainText);
-        std::shared_ptr<OH_UdmfData> ndkData(fakeNdkData);
         auto data = std::make_shared<UnifiedData>();
-        Status status = NdkDataConversion::GetNdkUnifiedData(data, ndkData);
+        Status status = NdkDataConversion::GetNdkUnifiedData(data, fakeNdkData);
+        OH_UdsPlainText_Destroy(plainText);
         ASSERT_EQ(E_INVALID_PARAMETERS, status);
         LOG_INFO(UDMF_TEST, "GetNdkUnifiedData_002 end.");
     }

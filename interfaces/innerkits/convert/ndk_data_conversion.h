@@ -24,8 +24,8 @@
 namespace OHOS::UDMF {
     class API_EXPORT NdkDataConversion {
     public:
-        static Status GetNativeUnifiedData(std::shared_ptr<OH_UdmfData> ndkData, std::shared_ptr<UnifiedData> &data);
-        static Status GetNdkUnifiedData(std::shared_ptr<UnifiedData> data, std::shared_ptr<OH_UdmfData> &ndkData);
+        static Status GetNativeUnifiedData(OH_UdmfData* ndkData, std::shared_ptr<UnifiedData>& data);
+        static Status GetNdkUnifiedData(std::shared_ptr<UnifiedData> data, OH_UdmfData* ndkData);
     };
 }
 
