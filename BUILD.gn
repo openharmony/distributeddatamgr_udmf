@@ -21,6 +21,7 @@ group("udmf_packages") {
       "interfaces/jskits:udmf_data_napi",
       "interfaces/jskits:unifieddatachannel_napi",
       "interfaces/jskits:uniformtypedescriptor_napi",
+      "interfaces/ndk:libudmf",
     ]
   }
 }
@@ -31,6 +32,7 @@ group("unittest") {
   deps = [
     "framework/innerkitsimpl/test/unittest:unittest",
     "framework/jskitsimpl/unittest:unittest",
+    "framework/ndkimpl/unittest:unittest",
   ]
 }
 

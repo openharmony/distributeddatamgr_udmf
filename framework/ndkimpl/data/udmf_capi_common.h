@@ -1,0 +1,115 @@
+/*
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef UDMF_CAPI_COMMON_H
+#define UDMF_CAPI_COMMON_H
+
+#include "unified_record.h"
+#include "unified_data.h"
+#include <mutex>
+#include <cstdint>
+
+struct UdsObject {
+    const int64_t cid;
+    std::shared_ptr<OHOS::UDMF::Object> obj;
+    std::mutex mutex;
+    explicit UdsObject(int cid);
+    const char* GetUdsValue(const char* paramName);
+    int SetUdsValue(const char* paramName, const char* pramValue);
+};
+
+enum NdkStructId : std::int64_t {
+    UTD_STRUCT_ID = 1002930,
+    UDS_PLAIN_TEXT_STRUCT_ID,
+    UDS_HYPERLINK_STRUCT_ID,
+    UDS_HTML_STRUCT_ID,
+    UDS_APP_ITEM_STRUCT_ID,
+    UDMF_UNIFIED_DATA_STRUCT_ID,
+    UDMF_UNIFIED_RECORD_STRUCT_ID,
+    UDMF_UNIFIED_DATA_PROPERTIES_ID,
+};
+
+struct OH_Utd {
+    const int64_t cid = UTD_STRUCT_ID;
+    std::mutex mutex;
+    std::string typeId;
+    const char** belongingToTypes{nullptr};
+    unsigned int belongingToTypesCount{0};
+    const char** filenameExtensions{nullptr};
+    unsigned int filenameExtensionsCount{0};
+    const char** mimeTypes{nullptr};
+    unsigned int mimeTypeCount{0};
+    std::string description;
+    std::string referenceURL;
+    std::string iconFile;
+};
+
+struct OH_UdsPlainText : public UdsObject {
+    OH_UdsPlainText();
+};
+struct OH_UdsHyperlink : public UdsObject {
+    OH_UdsHyperlink();
+};
+struct OH_UdsHtml : public UdsObject {
+    OH_UdsHtml();
+};
+struct OH_UdsAppItem : public UdsObject {
+    OH_UdsAppItem();
+};
+
+struct OH_UdmfRecord {
+    const int64_t cid = UDMF_UNIFIED_RECORD_STRUCT_ID;
+    std::shared_ptr<OHOS::UDMF::UnifiedRecord> record_;
+    unsigned char *recordData{nullptr};
+    int recordDataLen{0};
+    char **typesArray{nullptr};
+    int typesCount{0};
+    std::mutex mutex;
+};
+
+struct OH_UdmfData {
+    const int64_t cid = UDMF_UNIFIED_DATA_STRUCT_ID;
+    std::shared_ptr<OHOS::UDMF::UnifiedData> unifiedData_;
+    char **typesArray{nullptr};
+    int typesCount{0};
+    OH_UdmfRecord **records{nullptr};
+    int recordsCount{0};
+    std::mutex mutex;
+};
+
+struct OH_UdmfProperty {
+    const int64_t cid = UDMF_UNIFIED_DATA_PROPERTIES_ID;
+    std::shared_ptr<OHOS::UDMF::UnifiedDataProperties> properties_;
+    std::mutex mutex;
+    std::string extraStr;
+};
+
+constexpr const char* UNIFORM_DATA_TYPE = "uniformDataType";
+constexpr const char* CONTENT = "content";
+constexpr const char* ABSTRACT = "abstract";
+constexpr const char* URL = "url";
+constexpr const char* DESCRIPTION = "description";
+constexpr const char* HTML_CONTENT = "htmlContent";
+constexpr const char* PLAIN_CONTENT = "plainContent";
+constexpr const char* APP_ID = "appId";
+constexpr const char* APP_NAME = "appName";
+constexpr const char* APP_ICON_ID = "appIconId";
+constexpr const char* APP_LABEL_ID = "appLabelId";
+constexpr const char* BUNDLE_NAME = "bundleName";
+constexpr const char* ABILITY_NAME = "abilityName";
+
+bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid);
+
+#endif
