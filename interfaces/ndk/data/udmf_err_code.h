@@ -13,9 +13,6 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_ERR_CODE_H
-#define UDMF_ERR_CODE_H
-
 /**
  * @addtogroup UDMF
  * @{
@@ -34,11 +31,16 @@
  *
  * @brief Declaration error code information.
  *
- * @library libudmf_ndk.so
+ * @kit ArkData
+ * @library libudmf.so
  * @syscap SystemCapability.DistributedDataManager.UDMF.Core
  *
  * @since 12
  */
+
+
+#ifndef UDMF_ERR_CODE_H
+#define UDMF_ERR_CODE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,7 +51,7 @@ extern "C" {
  *
  * @since 12
  */
-typedef enum UdmfErrCode {
+typedef enum Udmf_ErrCode {
     /**
      * The error code in the correct case.
      */
@@ -70,7 +72,7 @@ typedef enum UdmfErrCode {
      * @brief The error code for common invalid args.
      */
     UDMF_E_INVALID_PARAM = (UDMF_ERR + 2),
-} UdmfErrCode;
+} Udmf_ErrCode;
 
 #ifdef __cplusplus
 };

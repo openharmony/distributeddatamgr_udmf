@@ -13,9 +13,6 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_META_H
-#define UDMF_META_H
-
 /**
  * @addtogroup UDMF
  * @{
@@ -30,15 +27,19 @@
  */
 
 /**
-* @file udmf_meta.h
-*
-* @brief Declaration the uniform data type information.
-*
-* @library libudmf_ndk.so
-* @syscap SystemCapability.DistributedDataManager.UDMF.Core
-*
-* @since 12
-*/
+ * @file udmf_meta.h
+ *
+ * @brief Declaration the uniform data type information.
+ *
+ * @kit ArkData
+ * @library libudmf.so
+ * @syscap SystemCapability.DistributedDataManager.UDMF.Core
+ *
+ * @since 12
+ */
+
+#ifndef UDMF_META_H
+#define UDMF_META_H
 
 #ifdef __cplusplus
 extern "C" {

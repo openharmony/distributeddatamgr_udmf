@@ -227,7 +227,7 @@ OH_UdmfRecord** OH_UdmfData_GetRecords(OH_UdmfData* unifiedData, unsigned int* c
     return unifiedData->records;
 }
 
-int OH_Udmf_GetUnifiedData(const char* key, UdmfIntention intention, OH_UdmfData* data)
+int OH_Udmf_GetUnifiedData(const char* key, Udmf_Intention intention, OH_UdmfData* data)
 {
     if (!IsUnifiedDataValid(data) || key == nullptr) {
         return UDMF_E_INVALID_PARAM;
@@ -248,7 +248,7 @@ int OH_Udmf_GetUnifiedData(const char* key, UdmfIntention intention, OH_UdmfData
     return UDMF_E_OK;
 }
 
-int OH_Udmf_SetUnifiedData(UdmfIntention intention, OH_UdmfData* unifiedData, char* key, unsigned int keyLen)
+int OH_Udmf_SetUnifiedData(Udmf_Intention intention, OH_UdmfData* unifiedData, char* key, unsigned int keyLen)
 {
     if (!IsUnifiedDataValid(unifiedData) || key == nullptr || keyLen < UDMF_KEY_BUFFER_LEN) {
         return UDMF_E_INVALID_PARAM;
@@ -519,18 +519,18 @@ int64_t OH_UdmfProperty_GetTimestamp(OH_UdmfProperty* properties)
     return properties->properties_->timestamp;
 }
 
-UdmfShareOption OH_UdmfProperty_GetShareOption(OH_UdmfProperty* properties)
+Udmf_ShareOption OH_UdmfProperty_GetShareOption(OH_UdmfProperty* properties)
 {
     if (!IsUnifiedPropertiesValid(properties)) {
-        return UdmfShareOption::SHARE_OPTIONS_INVALID;
+        return Udmf_ShareOption::SHARE_OPTIONS_INVALID;
     }
     switch (properties->properties_->shareOptions) {
         case ShareOptions::IN_APP:
-            return UdmfShareOption::SHARE_OPTIONS_IN_APP;
+            return Udmf_ShareOption::SHARE_OPTIONS_IN_APP;
         case ShareOptions::CROSS_APP:
-            return UdmfShareOption::SHARE_OPTIONS_CROSS_APP;
+            return Udmf_ShareOption::SHARE_OPTIONS_CROSS_APP;
         default:
-            return UdmfShareOption::SHARE_OPTIONS_INVALID;
+            return Udmf_ShareOption::SHARE_OPTIONS_INVALID;
     }
 }
 
@@ -558,17 +558,17 @@ int OH_UdmfProperty_SetTag(OH_UdmfProperty* properties, const char* tag)
     return UDMF_E_OK;
 }
 
-int OH_UdmfProperty_SetShareOption(OH_UdmfProperty* properties, UdmfShareOption option)
+int OH_UdmfProperty_SetShareOption(OH_UdmfProperty* properties, Udmf_ShareOption option)
 {
     if (!IsUnifiedPropertiesValid(properties)) {
         return UDMF_E_INVALID_PARAM;
     }
     std::lock_guard<std::mutex> lock(properties->mutex);
     switch (option) {
-        case UdmfShareOption::SHARE_OPTIONS_IN_APP:
+        case Udmf_ShareOption::SHARE_OPTIONS_IN_APP:
             properties->properties_->shareOptions = ShareOptions::IN_APP;
             break;
-        case UdmfShareOption::SHARE_OPTIONS_CROSS_APP:
+        case Udmf_ShareOption::SHARE_OPTIONS_CROSS_APP:
             properties->properties_->shareOptions = ShareOptions::CROSS_APP;
             break;
         default:

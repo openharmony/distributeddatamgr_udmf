@@ -436,7 +436,7 @@ HWTEST_F(UDMFTest, OH_Udmf_GetRecords002, TestSize.Level0)
  */
 HWTEST_F(UDMFTest, UdmfTest006, TestSize.Level0)
 {
-    UdmfIntention intention = UDMF_INTENTION_DRAG;
+    Udmf_Intention intention = UDMF_INTENTION_DRAG;
     int setRes1 = OH_Udmf_SetUnifiedData(intention, nullptr, nullptr, 0);
     EXPECT_EQ(setRes1, UDMF_E_INVALID_PARAM);
 
@@ -452,7 +452,7 @@ HWTEST_F(UDMFTest, UdmfTest006, TestSize.Level0)
     int setRes4 = OH_Udmf_SetUnifiedData(intention, unifiedData1, key, 0);
     EXPECT_EQ(setRes4, UDMF_E_INVALID_PARAM);
 
-    intention = static_cast<UdmfIntention>(10);
+    intention = static_cast<Udmf_Intention>(10);
     int setRes5 = OH_Udmf_SetUnifiedData(intention, unifiedData1, key, UDMF_KEY_BUFFER_LEN);
     EXPECT_EQ(setRes5, UDMF_E_INVALID_PARAM);
 
@@ -467,7 +467,7 @@ HWTEST_F(UDMFTest, UdmfTest006, TestSize.Level0)
  */
 HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedData001, TestSize.Level0)
 {
-    UdmfIntention intention = UDMF_INTENTION_DRAG;
+    Udmf_Intention intention = UDMF_INTENTION_DRAG;
     int getRes1 = OH_Udmf_GetUnifiedData(nullptr, intention, nullptr);
     EXPECT_EQ(getRes1, UDMF_E_INVALID_PARAM);
 
@@ -497,7 +497,7 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData001, TestSize.Level0)
     OH_UdsPlainText_SetContent(plainText, content);
     OH_UdmfRecord_AddPlainText(record, plainText);
     OH_UdmfData_AddRecord(udmfUnifiedData, record);
-    UdmfIntention intention = UDMF_INTENTION_DRAG;
+    Udmf_Intention intention = UDMF_INTENTION_DRAG;
     char key[UDMF_KEY_BUFFER_LEN];
 
     int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
@@ -1013,9 +1013,9 @@ HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesShareOption001, TestSize.Level1)
 {
     OH_UdmfData *data = OH_UdmfData_Create();
     OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
-    int result = OH_UdmfProperty_SetShareOption(properties, UdmfShareOption::SHARE_OPTIONS_IN_APP);
+    int result = OH_UdmfProperty_SetShareOption(properties, Udmf_ShareOption::SHARE_OPTIONS_IN_APP);
     EXPECT_EQ(UDMF_E_OK, result);
-    EXPECT_EQ(UdmfShareOption::SHARE_OPTIONS_IN_APP, OH_UdmfProperty_GetShareOption(properties));
+    EXPECT_EQ(Udmf_ShareOption::SHARE_OPTIONS_IN_APP, OH_UdmfProperty_GetShareOption(properties));
     OH_UdmfData_Destroy(data);
     OH_UdmfProperty_Destroy(properties);
 }
@@ -1029,9 +1029,9 @@ HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesShareOption002, TestSize.Level1)
 {
     OH_UdmfData *data = OH_UdmfData_Create();
     OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
-    int result = OH_UdmfProperty_SetShareOption(properties, UdmfShareOption::SHARE_OPTIONS_CROSS_APP);
+    int result = OH_UdmfProperty_SetShareOption(properties, Udmf_ShareOption::SHARE_OPTIONS_CROSS_APP);
     EXPECT_EQ(UDMF_E_OK, result);
-    EXPECT_EQ(UdmfShareOption::SHARE_OPTIONS_CROSS_APP, OH_UdmfProperty_GetShareOption(properties));
+    EXPECT_EQ(Udmf_ShareOption::SHARE_OPTIONS_CROSS_APP, OH_UdmfProperty_GetShareOption(properties));
     OH_UdmfData_Destroy(data);
     OH_UdmfProperty_Destroy(properties);
 }

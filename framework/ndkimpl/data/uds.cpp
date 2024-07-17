@@ -53,11 +53,11 @@ int UdsObject::SetUdsValue(const char* paramName, const char* pramValue)
 {
     if (obj->value_.find(paramName) == obj->value_.end()) {
         LOG_ERROR(UDMF_CAPI, "Can't set property %{public}s.", paramName);
-        return UdmfErrCode::UDMF_E_INVALID_PARAM;
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     std::lock_guard<std::mutex> lock(mutex);
     obj->value_[paramName] = pramValue;
-    return UdmfErrCode::UDMF_E_OK;
+    return Udmf_ErrCode::UDMF_E_OK;
 }
 
 OH_UdsPlainText* OH_UdsPlainText_Create()
@@ -108,7 +108,7 @@ const char* OH_UdsPlainText_GetAbstract(OH_UdsPlainText* pThis)
 int OH_UdsPlainText_SetContent(OH_UdsPlainText* pThis, const char* content)
 {
     if (content == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID)) {
-        return UdmfErrCode::UDMF_E_INVALID_PARAM;
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue(CONTENT, content);
 }
@@ -116,7 +116,7 @@ int OH_UdsPlainText_SetContent(OH_UdsPlainText* pThis, const char* content)
 int OH_UdsPlainText_SetAbstract(OH_UdsPlainText* pThis, const char* abstract)
 {
     if (abstract == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID)) {
-        return UdmfErrCode::UDMF_E_INVALID_PARAM;
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue(ABSTRACT, abstract);
 }
@@ -169,7 +169,7 @@ const char* OH_UdsHyperlink_GetDescription(OH_UdsHyperlink* pThis)
 int OH_UdsHyperlink_SetUrl(OH_UdsHyperlink* pThis, const char* url)
 {
     if (url == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HYPERLINK_STRUCT_ID)) {
-        return UdmfErrCode::UDMF_E_INVALID_PARAM;
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue(URL, url);
 }
@@ -177,7 +177,7 @@ int OH_UdsHyperlink_SetUrl(OH_UdsHyperlink* pThis, const char* url)
 int OH_UdsHyperlink_SetDescription(OH_UdsHyperlink* pThis, const char* description)
 {
     if (description == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HYPERLINK_STRUCT_ID)) {
-        return UdmfErrCode::UDMF_E_INVALID_PARAM;
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue(DESCRIPTION, description);
 }
@@ -230,7 +230,7 @@ const char* OH_UdsHtml_GetPlainContent(OH_UdsHtml* pThis)
 int OH_UdsHtml_SetContent(OH_UdsHtml* pThis, const char* content)
 {
     if (content == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HTML_STRUCT_ID)) {
-        return UdmfErrCode::UDMF_E_INVALID_PARAM;
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue(HTML_CONTENT, content);
 }
@@ -238,7 +238,7 @@ int OH_UdsHtml_SetContent(OH_UdsHtml* pThis, const char* content)
 int OH_UdsHtml_SetPlainContent(OH_UdsHtml* pThis, const char* plainContent)
 {
     if (plainContent == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HTML_STRUCT_ID)) {
-        return UdmfErrCode::UDMF_E_INVALID_PARAM;
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue(PLAIN_CONTENT, plainContent);
 }
@@ -327,7 +327,7 @@ const char* OH_UdsAppItem_GetAbilityName(OH_UdsAppItem* pThis)
 int OH_UdsAppItem_SetId(OH_UdsAppItem* pThis, const char* appId)
 {
     if (appId == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
-        return UdmfErrCode::UDMF_E_INVALID_PARAM;
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue(APP_ID, appId);
 }
@@ -335,7 +335,7 @@ int OH_UdsAppItem_SetId(OH_UdsAppItem* pThis, const char* appId)
 int OH_UdsAppItem_SetName(OH_UdsAppItem* pThis, const char* appName)
 {
     if (appName == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
-        return UdmfErrCode::UDMF_E_INVALID_PARAM;
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue(APP_NAME, appName);
 }
@@ -343,7 +343,7 @@ int OH_UdsAppItem_SetName(OH_UdsAppItem* pThis, const char* appName)
 int OH_UdsAppItem_SetIconId(OH_UdsAppItem* pThis, const char* appIconId)
 {
     if (appIconId == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
-        return UdmfErrCode::UDMF_E_INVALID_PARAM;
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue(APP_ICON_ID, appIconId);
 }
@@ -351,7 +351,7 @@ int OH_UdsAppItem_SetIconId(OH_UdsAppItem* pThis, const char* appIconId)
 int OH_UdsAppItem_SetLabelId(OH_UdsAppItem* pThis, const char* appLabelId)
 {
     if (appLabelId == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
-        return UdmfErrCode::UDMF_E_INVALID_PARAM;
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue(APP_LABEL_ID, appLabelId);
 }
@@ -359,7 +359,7 @@ int OH_UdsAppItem_SetLabelId(OH_UdsAppItem* pThis, const char* appLabelId)
 int OH_UdsAppItem_SetBundleName(OH_UdsAppItem* pThis, const char* bundleName)
 {
     if (bundleName == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
-        return UdmfErrCode::UDMF_E_INVALID_PARAM;
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue(BUNDLE_NAME, bundleName);
 }
@@ -367,7 +367,7 @@ int OH_UdsAppItem_SetBundleName(OH_UdsAppItem* pThis, const char* bundleName)
 int OH_UdsAppItem_SetAbilityName(OH_UdsAppItem* pThis, const char* abilityName)
 {
     if (abilityName == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
-        return UdmfErrCode::UDMF_E_INVALID_PARAM;
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue(ABILITY_NAME, abilityName);
 }

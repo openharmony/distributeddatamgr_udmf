@@ -13,11 +13,6 @@
  * limitations under the License.
  */
 
-#ifndef UTD_H
-#define UTD_H
-
-#include <stdbool.h>
-
 /**
  * @addtogroup UDMF
  * @{
@@ -31,14 +26,20 @@
  */
 
 /**
-* @file utd.h
-*
-* @brief Provides uniform type descriptor(UTD) related functions and struct.
-* @library libudmf_ndk.so
-* @syscap SystemCapability.DistributedDataManager.UDMF.Core
-* @since 12
-*/
+ * @file utd.h
+ *
+ * @brief Provides uniform type descriptor(UTD) related functions and struct.
+ *
+ * @kit ArkData
+ * @library libudmf.so
+ * @syscap SystemCapability.DistributedDataManager.UDMF.Core
+ * @since 12
+ */
 
+#ifndef UTD_H
+#define UTD_H
+
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
