@@ -52,7 +52,7 @@
       ],
       "inner_kits": [
         {
-          "name": "//foundation/distributeddatamgr/udmf/interfaces/ndk:udmf_ndk",
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/ndk:libudmf",
           "header": {
             "header_files": [
               "udmf_meta.h",
