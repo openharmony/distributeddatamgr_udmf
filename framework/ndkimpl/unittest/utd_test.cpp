@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <unistd.h>
+#include <map>
 
 #include "token_setproc.h"
 #include "accesstoken_kit.h"
@@ -426,6 +427,162 @@ HWTEST_F(UtdTest, OH_Utd_Equals_003, TestSize.Level1)
     EXPECT_FALSE(OH_Utd_Equals(utd, nullptr));
     EXPECT_FALSE(OH_Utd_Equals(nullptr, utd));
     LOG_INFO(UDMF_TEST, "OH_Utd_Equals_003 end.");
+}
+
+std::map<std::string, std::string> typeIdMap = {
+    {UDMF_META_ENTITY, "general.entity"},
+    {UDMF_META_OBJECT, "general.object"},
+    {UDMF_META_COMPOSITE_OBJECT, "general.composite-object"},
+    {UDMF_META_TEXT, "general.text"},
+    {UDMF_META_PLAIN_TEXT, "general.plain-text"},
+    {UDMF_META_HTML, "general.html"},
+    {UDMF_META_HYPERLINK, "general.hyperlink"},
+    {UDMF_META_XML, "general.xml"},
+    {UDMF_META_SOURCE_CODE, "general.source-code"},
+    {UDMF_META_SCRIPT, "general.script"},
+    {UDMF_META_SHELL_SCRIPT, "general.shell-script"},
+    {UDMF_META_CSH_SCRIPT, "general.csh-script"},
+    {UDMF_META_PERL_SCRIPT, "general.perl-script"},
+    {UDMF_META_PHP_SCRIPT, "general.php-script"},
+    {UDMF_META_PYTHON_SCRIPT, "general.python-script"},
+    {UDMF_META_RUBY_SCRIPT, "general.ruby-script"},
+    {UDMF_META_TYPE_SCRIPT, "general.type-script"},
+    {UDMF_META_JAVA_SCRIPT, "general.java-script"},
+    {UDMF_META_C_HEADER, "general.c-header"},
+    {UDMF_META_C_SOURCE, "general.c-source"},
+    {UDMF_META_C_PLUS_PLUS_HEADER, "general.c-plus-plus-header"},
+    {UDMF_META_C_PLUS_PLUS_SOURCE, "general.c-plus-plus-source"},
+    {UDMF_META_JAVA_SOURCE, "general.java-source"},
+    {UDMF_META_EBOOK, "general.ebook"},
+    {UDMF_META_EPUB, "general.epub"},
+    {UDMF_META_AZW, "com.amazon.azw"},
+    {UDMF_META_AZW3, "com.amazon.azw3"},
+    {UDMF_META_KFX, "com.amazon.kfx"},
+    {UDMF_META_MOBI, "com.amazon.mobi"},
+    {UDMF_META_MEDIA, "general.media"},
+    {UDMF_META_IMAGE, "general.image"},
+    {UDMF_META_JPEG, "general.jpeg"},
+    {UDMF_META_PNG, "general.png"},
+    {UDMF_META_RAW_IMAGE, "general.raw-image"},
+    {UDMF_META_TIFF, "general.tiff"},
+    {UDMF_META_BMP, "com.microsoft.bmp"},
+    {UDMF_META_ICO, "com.microsoft.ico"},
+    {UDMF_META_PHOTOSHOP_IMAGE, "com.adobe.photoshop-image"},
+    {UDMF_META_AI_IMAGE, "com.adobe.illustrator.ai-image"},
+    {UDMF_META_WORD_DOC, "com.microsoft.word.doc"},
+    {UDMF_META_EXCEL, "com.microsoft.excel.xls"},
+    {UDMF_META_PPT, "com.microsoft.powerpoint.ppt"},
+    {UDMF_META_PDF, "com.adobe.pdf"},
+    {UDMF_META_POSTSCRIPT, "com.adobe.postscript"},
+    {UDMF_META_ENCAPSULATED_POSTSCRIPT, "com.adobe.encapsulated-postscript"},
+    {UDMF_META_VIDEO, "general.video"},
+    {UDMF_META_AVI, "general.avi"},
+    {UDMF_META_MPEG, "general.mpeg"},
+    {UDMF_META_MPEG4, "general.mpeg-4"},
+    {UDMF_META_VIDEO_3GPP, "general.3gpp"},
+    {UDMF_META_VIDEO_3GPP2, "general.3gpp2"},
+    {UDMF_META_WINDOWS_MEDIA_WM, "com.microsoft.windows-media-wm"},
+    {UDMF_META_WINDOWS_MEDIA_WMV, "com.microsoft.windows-media-wmv"},
+    {UDMF_META_WINDOWS_MEDIA_WMP, "com.microsoft.windows-media-wmp"},
+    {UDMF_META_AUDIO, "general.audio"},
+    {UDMF_META_AAC, "general.aac"},
+    {UDMF_META_AIFF, "general.aiff"},
+    {UDMF_META_ALAC, "general.alac"},
+    {UDMF_META_FLAC, "general.flac"},
+    {UDMF_META_MP3, "general.mp3"},
+    {UDMF_META_OGG, "general.ogg"},
+    {UDMF_META_PCM, "general.pcm"},
+    {UDMF_META_WINDOWS_MEDIA_WMA, "com.microsoft.windows-media-wma"},
+    {UDMF_META_WAVEFORM_AUDIO, "com.microsoft.waveform-audio"},
+    {UDMF_META_WINDOWS_MEDIA_WMX, "com.microsoft.windows-media-wmx"},
+    {UDMF_META_WINDOWS_MEDIA_WVX, "com.microsoft.windows-media-wvx"},
+    {UDMF_META_WINDOWS_MEDIA_WAX, "com.microsoft.windows-media-wax"},
+    {UDMF_META_GENERAL_FILE, "general.file"},
+    {UDMF_META_DIRECTORY, "general.directory"},
+    {UDMF_META_FOLDER, "general.folder"},
+    {UDMF_META_SYMLINK, "general.symlink"},
+    {UDMF_META_ARCHIVE, "general.archive"},
+    {UDMF_META_BZ2_ARCHIVE, "general.bz2-archive"},
+    {UDMF_META_DISK_IMAGE, "general.disk-image"},
+    {UDMF_META_TAR_ARCHIVE, "general.tar-archive"},
+    {UDMF_META_ZIP_ARCHIVE, "general.zip-archive"},
+    {UDMF_META_JAVA_ARCHIVE, "com.sun.java-archive"},
+    {UDMF_META_GNU_TAR_ARCHIVE, "org.gnu.gnu-tar-archive"},
+    {UDMF_META_GNU_ZIP_ARCHIVE, "org.gnu.gnu-zip-archive"},
+    {UDMF_META_GNU_ZIP_TAR_ARCHIVE, "org.gnu.gnu-zip-tar-archive"},
+    {UDMF_META_CALENDAR, "general.calendar"},
+    {UDMF_META_CONTACT, "general.contact"},
+    {UDMF_META_DATABASE, "general.database"},
+    {UDMF_META_MESSAGE, "general.message"},
+    {UDMF_META_VCARD, "general.vcard"},
+    {UDMF_META_NAVIGATION, "general.navigation"},
+    {UDMF_META_LOCATION, "general.location"},
+    {UDMF_META_OPENHARMONY_FORM, "openharmony.form"},
+    {UDMF_META_OPENHARMONY_APP_ITEM, "openharmony.app-item"},
+    {UDMF_META_OPENHARMONY_PIXEL_MAP, "openharmony.pixel-map"},
+    {UDMF_META_OPENHARMONY_ATOMIC_SERVICE, "openharmony.atomic-service"},
+    {UDMF_META_OPENHARMONY_PACKAGE, "openharmony.package"},
+    {UDMF_META_OPENHARMONY_HAP, "openharmony.hap"},
+    {UDMF_META_SMIL, "com.real.smil"},
+    {UDMF_META_MARKDOWN, "general.markdown"},
+    {UDMF_META_FAX, "general.fax"},
+    {UDMF_META_JFX_FAX, "com.j2.jfx-fax"},
+    {UDMF_META_EFX_FAX, "com.js.efx-fax"},
+    {UDMF_META_XBITMAP_IMAGE, "general.xbitmap-image"},
+    {UDMF_META_TGA_IMAGE, "com.truevision.tga-image"},
+    {UDMF_META_SGI_IMAGE, "com.sgi.sgi-image"},
+    {UDMF_META_OPENEXR_IMAGE, "com.ilm.openexr-image"},
+    {UDMF_META_FLASHPIX_IMAGE, "com.kodak.flashpix.image"},
+    {UDMF_META_REALMEDIA, "com.real.realmedia"},
+    {UDMF_META_AU_AUDIO, "general.au-audio"},
+    {UDMF_META_AIFC_AUDIO, "general.aifc-audio"},
+    {UDMF_META_SD2_AUDIO, "com.digidesign.sd2-audio"},
+    {UDMF_META_REALAUDIO, "com.real.realaudio"},
+    {UDMF_META_OPENXML, "org.openxmlformats.openxml"},
+    {UDMF_META_WORDPROCESSINGML_DOCUMENT, "org.openxmlformats.wordprocessingml.document"},
+    {UDMF_META_SPREADSHEETML_SHEET, "org.openxmlformats.spreadsheetml.sheet"},
+    {UDMF_META_PRESENTATIONML_PRESENTATION, "org.openxmlformats.presentationml.presentation"},
+    {UDMF_META_OPENDOCUMENT, "org.oasis.opendocument"},
+    {UDMF_META_OPENDOCUMENT_TEXT, "org.oasis.opendocument.text"},
+    {UDMF_META_OPENDOCUMENT_SPREADSHEET, "org.oasis.opendocument.spreadsheet"},
+    {UDMF_META_OPENDOCUMENT_PRESENTATION, "org.oasis.opendocument.presentation"},
+    {UDMF_META_OPENDOCUMENT_GRAPHICS, "org.oasis.opendocument.graphics"},
+    {UDMF_META_OPENDOCUMENT_FORMULA, "org.oasis.opendocument.formula"},
+    {UDMF_META_STUFFIT_ARCHIVE, "com.allume.stuffit-archive"},
+    {UDMF_META_VCS, "general.vcs"},
+    {UDMF_META_ICS, "general.ics"},
+    {UDMF_META_EXECUTABLE, "general.executable"},
+    {UDMF_META_PORTABLE_EXECUTABLE, "com.microsoft.portable-executable"},
+    {UDMF_META_SUN_JAVA_CLASS, "com.sun.java-class"},
+    {UDMF_META_FONT, "general.font"},
+    {UDMF_META_TRUETYPE_FONT, "general.truetype-font"},
+    {UDMF_META_TRUETYPE_COLLECTION_FONT, "general.truetype-collection-font"},
+    {UDMF_META_OPENTYPE_FONT, "general.opentype-font"},
+    {UDMF_META_POSTSCRIPT_FONT, "com.adobe.postscript-font"},
+    {UDMF_META_POSTSCRIPT_PFB_FONT, "com.adobe.postscript-pfb-font"},
+    {UDMF_META_POSTSCRIPT_PFA_FONT, "com.adobe.postscript-pfa-font"},
+    {UDMF_META_OPENHARMONY_HDOC, "openharmony.hdoc"},
+    {UDMF_META_OPENHARMONY_HINOTE, "openharmony.hinote"},
+    {UDMF_META_OPENHARMONY_STYLED_STRING, "openharmony.styled-string"},
+    {UDMF_META_OPENHARMONY_WANT, "openharmony.want"}
+};
+
+/**
+ * @tc.name: OH_Utd_Create_002
+ * @tc.desc: traverse enum for UTD
+ * @tc.type: FUNC
+ */
+HWTEST_F(UtdTest, OH_Utd_Create_002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_Utd_Create_002 begin.");
+    OH_Utd* utd1;
+    for (const auto& pair : typeIdMap) {
+        utd1 = OH_Utd_Create(pair.first.c_str());
+        std::string typeId(OH_Utd_GetTypeId(utd1));
+        EXPECT_EQ(pair.second, typeId);
+        OH_Utd_Destroy(utd1);
+    }
+    LOG_INFO(UDMF_TEST, "OH_Utd_Create_002 end.");
 }
 
 }

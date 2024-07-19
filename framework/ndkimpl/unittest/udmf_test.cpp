@@ -479,6 +479,9 @@ HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedData001, TestSize.Level0)
     int getRes3 = OH_Udmf_GetUnifiedData(nullptr, intention, unifiedData1);
     EXPECT_EQ(getRes3, UDMF_E_INVALID_PARAM);
 
+    int getRes4 = OH_Udmf_GetUnifiedData("KEY", UDMF_INTENTION_PASTEBOARD, unifiedData1);
+    EXPECT_EQ(getRes4, UDMF_E_INVALID_PARAM);
+
     OH_UdmfData_Destroy(unifiedData1);
 }
 
@@ -1034,6 +1037,17 @@ HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesShareOption002, TestSize.Level1)
     EXPECT_EQ(Udmf_ShareOption::SHARE_OPTIONS_CROSS_APP, OH_UdmfProperty_GetShareOption(properties));
     OH_UdmfData_Destroy(data);
     OH_UdmfProperty_Destroy(properties);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesShareOption003
+ * @tc.desc: set invalid properties
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesShareOption003, TestSize.Level1)
+{
+    OH_UdmfProperty *property = nullptr;
+    EXPECT_EQ(Udmf_ShareOption::SHARE_OPTIONS_INVALID, OH_UdmfProperty_GetShareOption(property));
 }
 
 /**
