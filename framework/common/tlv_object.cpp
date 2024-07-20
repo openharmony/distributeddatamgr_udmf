@@ -1045,6 +1045,16 @@ bool TLVObject::ReadNull(void *value)
     return true;
 }
 
+bool TLVObject::ReadHeadTag(uint16_t &tag) const
+{
+    if (!HasExpectBuffer(sizeof(TLVHead))) {
+        return false;
+    }
+    const auto *pHead = reinterpret_cast<const TLVHead *>(buffer_->data() + cursor_);
+    tag = NetToHost(pHead->tag);
+    return true;
+}
+
 bool TLVObject::ReadHead(TLVHead &head)
 {
     if (!LoadBufferFormFile(sizeof(TLVHead))) {
