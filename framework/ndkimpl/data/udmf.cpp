@@ -35,16 +35,16 @@
 
 using namespace OHOS::UDMF;
 
-static constexpr int64_t MAX_RECORDS_COUNT = 4 * 1024 * 1024;
-static constexpr int64_t MAX_RECORDS_SIZE = 4 * 1024 * 1024;
-static constexpr int64_t MAX_KEY_STRING_LEN = 1 * 1024 * 1024;
+static constexpr uint64_t MAX_RECORDS_COUNT = 4 * 1024 * 1024;
+static constexpr uint64_t MAX_RECORDS_SIZE = 4 * 1024 * 1024;
+static constexpr uint64_t MAX_KEY_STRING_LEN = 1 * 1024 * 1024;
 
-static void DestoryStringArray(char**& bufArray, int& count)
+static void DestroyStringArray(char**& bufArray, unsigned int& count)
 {
     if (bufArray == nullptr) {
         return;
     }
-    for (int i = 0; i < count; i++) {
+    for (unsigned int i = 0; i < count; i++) {
         if (bufArray[i] != nullptr) {
             delete[] bufArray[i];
             bufArray[i] = nullptr;
@@ -55,12 +55,12 @@ static void DestoryStringArray(char**& bufArray, int& count)
     count = 0;
 }
 
-static void DestroyUnifiedRecordArray(OH_UdmfRecord**& records, int& count)
+static void DestroyUnifiedRecordArray(OH_UdmfRecord**& records, unsigned int& count)
 {
     if (records == nullptr) {
         return;
     }
-    for (int i = 0; i < count; i++) {
+    for (unsigned int i = 0; i < count; i++) {
         if (records[i] != nullptr) {
             delete records[i];
             records[i] = nullptr;
@@ -73,23 +73,23 @@ static void DestroyUnifiedRecordArray(OH_UdmfRecord**& records, int& count)
 
 static char** StrVectorToTypesArray(const std::vector<std::string>& strVector)
 {
-    int vectorSize = strVector.size();
+    unsigned int vectorSize = strVector.size();
     if (vectorSize > MAX_RECORDS_COUNT) {
         return nullptr;
     }
     char** typesArray = new (std::nothrow) char* [vectorSize] {nullptr};
-    for (int i = 0; i < vectorSize; ++i) {
-        int strLen = strVector[i].length() + 1;
+    for (unsigned int i = 0; i < vectorSize; ++i) {
+        unsigned int strLen = strVector[i].length() + 1;
         if (strLen > MAX_KEY_STRING_LEN) {
             LOG_INFO(UDMF_CAPI, "string exceeds maximum length, length is %{public}d", strLen);
-            DestoryStringArray(typesArray, vectorSize);
+            DestroyStringArray(typesArray, vectorSize);
             return nullptr;
         }
         typesArray[i] = new (std::nothrow) char[strLen];
         if (typesArray[i] == nullptr ||
             (strcpy_s(typesArray[i], strLen, strVector[i].c_str())) != EOK) {
             LOG_ERROR(UDMF_CAPI, "string copy failed");
-            DestoryStringArray(typesArray, vectorSize);
+            DestroyStringArray(typesArray, vectorSize);
             return nullptr;
         }
     }
@@ -99,7 +99,7 @@ static char** StrVectorToTypesArray(const std::vector<std::string>& strVector)
 static OH_UdmfRecord** CreateUnifiedDataRecordsArray(OH_UdmfData* unifiedData,
                                                      std::vector<std::shared_ptr<UnifiedRecord>>& records)
 {
-    int size = records.size();
+    std::size_t size = records.size();
     if (unifiedData == nullptr || size == 0 || size > MAX_RECORDS_COUNT) {
         return nullptr;
     }
@@ -107,7 +107,7 @@ static OH_UdmfRecord** CreateUnifiedDataRecordsArray(OH_UdmfData* unifiedData,
     if (result == nullptr) {
         return nullptr;
     }
-    for (int i = 0; i < size; i++) {
+    for (unsigned int i = 0; i < size; i++) {
         result[i] = new (std::nothrow) OH_UdmfRecord;
         if (result[i] == nullptr) {
             DestroyUnifiedRecordArray(result, size);
@@ -153,7 +153,7 @@ void OH_UdmfData_Destroy(OH_UdmfData* data)
     if (data == nullptr) {
         return;
     }
-    DestoryStringArray(data->typesArray, data->typesCount);
+    DestroyStringArray(data->typesArray, data->typesCount);
     DestroyUnifiedRecordArray(data->records, data->recordsCount);
     delete data;
 }

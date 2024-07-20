@@ -73,9 +73,9 @@ struct OH_UdmfRecord {
     const int64_t cid = UDMF_UNIFIED_RECORD_STRUCT_ID;
     std::shared_ptr<OHOS::UDMF::UnifiedRecord> record_;
     unsigned char *recordData{nullptr};
-    int recordDataLen{0};
+    unsigned int recordDataLen{0};
     char **typesArray{nullptr};
-    int typesCount{0};
+    unsigned int typesCount{0};
     std::mutex mutex;
 };
 
@@ -83,9 +83,9 @@ struct OH_UdmfData {
     const int64_t cid = UDMF_UNIFIED_DATA_STRUCT_ID;
     std::shared_ptr<OHOS::UDMF::UnifiedData> unifiedData_;
     char **typesArray{nullptr};
-    int typesCount{0};
+    unsigned int typesCount{0};
     OH_UdmfRecord **records{nullptr};
-    int recordsCount{0};
+    unsigned int recordsCount{0};
     std::mutex mutex;
 };
 
