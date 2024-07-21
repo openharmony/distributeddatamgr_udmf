@@ -152,6 +152,45 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
     return Status::E_OK;
 }
 
+Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &fileExtension,
+                                                        std::vector<std::string> &typeIds, std::string belongsTo)
+{
+    std::string lowerFileExtension = fileExtension;
+    std::transform(lowerFileExtension.begin(), lowerFileExtension.end(), lowerFileExtension.begin(), ::tolower);
+    if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
+        LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. fileExtension:%{public}s, belongsTo:%{public}s ",
+                  fileExtension.c_str(), belongsTo.c_str());
+        return Status::E_INVALID_PARAMETERS;
+    }
+
+    std::vector<std::string> typeIdsInCfg;
+    for (const auto &utdTypeCfg : descriptorCfgs_) {
+        std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
+        if (find(fileExtensions.begin(), fileExtensions.end(), lowerFileExtension) != fileExtensions.end()) {
+            typeIdsInCfg.push_back(utdTypeCfg.typeId);
+        }
+    }
+
+    for (const auto &typeId : typeIdsInCfg) {
+        // the find typeId is not belongsTo to the belongsTo.
+        if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
+            !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
+            continue;
+        }
+        typeIds.emplace_back(typeId);
+    }
+
+    if (typeIds.empty()) {
+        if (!IsValidFileExtension(lowerFileExtension)) {
+            LOG_ERROR(UDMF_CLIENT, "invalid fileExtension. fileExtension:%{public}s, belongsTo:%{public}s ",
+                      fileExtension.c_str(), belongsTo.c_str());
+            return Status::E_INVALID_PARAMETERS;
+        }
+        typeIds.emplace_back(FlexibleType::GenFlexibleUtd("", lowerFileExtension, belongsTo));
+    }
+    return Status::E_OK;
+}
+
 Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std::string &typeId,
                                                std::string belongsTo)
 {
@@ -202,6 +241,45 @@ std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
         }
     }
     return "";
+}
+
+Status UtdClient::GetUniformDataTypesByMIMEType(const std::string &mimeType, std::vector<std::string> &typeIds,
+                                               std::string belongsTo)
+{
+    std::string lowerMimeType = mimeType;
+    std::transform(lowerMimeType.begin(), lowerMimeType.end(), lowerMimeType.begin(), ::tolower);
+    if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
+        LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. mimeType:%{public}s, belongsTo:%{public}s ",
+                  mimeType.c_str(), belongsTo.c_str());
+        return Status::E_INVALID_PARAMETERS;
+    }
+
+    std::vector<std::string> typeIdsInCfg;
+    for (const auto &utdTypeCfg : descriptorCfgs_) {
+        for (auto mime : utdTypeCfg.mimeTypes) {
+            std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
+            if (mime == lowerMimeType) {
+                typeIdsInCfg.push_back(utdTypeCfg.typeId);
+            }
+        }
+    }
+    for (const auto &typeId : typeIdsInCfg) {
+        // the find typeId is not belongsTo to the belongsTo.
+        if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
+            !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
+            continue;
+        }
+        typeIds.emplace_back(typeId);
+    }
+    if (typeIds.empty()) {
+        if (!IsValidMimeType(mimeType)) {
+            LOG_ERROR(UDMF_CLIENT, "invalid mimeType. mimeType:%{public}s, belongsTo:%{public}s ",
+                      mimeType.c_str(), belongsTo.c_str());
+            return Status::E_INVALID_PARAMETERS;
+        }
+        typeIds.emplace_back(FlexibleType::GenFlexibleUtd(lowerMimeType, "", belongsTo));
+    }
+    return Status::E_OK;
 }
 
 Status UtdClient::IsUtd(std::string typeId, bool &result)
