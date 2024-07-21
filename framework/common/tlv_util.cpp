@@ -1117,17 +1117,6 @@ bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data)
     if (!Reading(uid, data)) {
         return false;
     }
-    ValueType value;
-    uint16_t tag = static_cast<uint16_t>(TAG::TAG_BUTT);
-    if (!data.ReadHeadTag(tag)) {
-        LOG_ERROR(UDMF_CLIENT, "Reading head empty.");
-        return false;
-    }
-    if (tag == static_cast<uint16_t>(TAG::TAG_OBJECT)) {
-        if (!Reading(value, data)) {
-            return false;
-        }
-    }   
     switch (type) {
         case UDType::TEXT: {
             std::shared_ptr<Text> text = std::make_shared<Text>();
@@ -1245,6 +1234,7 @@ bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data)
             return false;
         }
     }
+    ValueType value;
     if (!Reading(value, data)) {
         LOG_WARN(UDMF_CLIENT, "Reading value empty.");
     }

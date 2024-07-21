@@ -920,7 +920,7 @@ bool TLVObject::ReadWant(std::shared_ptr<OHOS::AAFwk::Want> &value)
         return false;
     }
     auto want = AAFwk::Want::Unmarshalling(parcel);
-    if (want != nullptr) {
+    if (want == nullptr) {
         return false;
     }
     value = std::make_shared<OHOS::AAFwk::Want>(*want);

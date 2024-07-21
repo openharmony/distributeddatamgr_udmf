@@ -100,7 +100,6 @@ public:
     bool ReadUndefined(std::monostate &value);
     bool WriteNull(const void *value);
     bool ReadNull(void *value);
-    bool ReadHeadTag(uint16_t &tag) const;
 
 private:
     bool WriteVariantInner(TAG &tag, const UDVariant &value);
