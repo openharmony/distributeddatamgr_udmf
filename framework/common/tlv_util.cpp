@@ -27,7 +27,6 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
     }
     data.Count(input->GetType());
     data.Count(input->GetUid());
-    data.Count(input->GetOriginValue());
     auto type = input->GetType();
     switch (type) {
         case UDType::TEXT: {
@@ -215,6 +214,7 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
             return false;
         }
     }
+    data.Count(input->GetOriginValue());
     return true;
 }
 
@@ -884,9 +884,6 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
     if (!Writing(input->GetUid(), data)) {
         return false;
     }
-    if (!Writing(input->GetOriginValue(), data)) {
-        return false;
-    }
     auto type = input->GetType();
     switch (type) {
         case UDType::TEXT: {
@@ -894,7 +891,10 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             if (text == nullptr) {
                 return false;
             }
-            return Writing(*text, data);
+            if (!Writing(*text, data)) {
+                return false;
+            }
+            break;
         }
         case UDType::PLAIN_TEXT: {
             auto plainText = static_cast<PlainText *>(input.get());
@@ -908,7 +908,10 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             if (text == nullptr) {
                 return false;
             }
-            return Writing(*text, data);
+            if (!Writing(*text, data)) {
+                return false;
+            }
+            break;
         }
         case UDType::HTML: {
             auto html = static_cast<Html *>(input.get());
@@ -922,7 +925,10 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             if (text == nullptr) {
                 return false;
             }
-            return Writing(*text, data);
+            if (!Writing(*text, data)) {
+                return false;
+            }
+            break;
         }
         case UDType::HYPERLINK: {
             auto link = static_cast<Link *>(input.get());
@@ -936,14 +942,20 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             if (text == nullptr) {
                 return false;
             }
-            return Writing(*text, data);
+            if (!Writing(*text, data)) {
+                return false;
+            }
+            break;
         }
         case UDType::FILE: {
             auto file = static_cast<File *>(input.get());
             if (file == nullptr) {
                 return false;
             }
-            return Writing(*file, data);
+            if (!Writing(*file, data)) {
+                return false;
+            }
+            break;
         }
         case UDType::IMAGE: {
             auto image = static_cast<Image *>(input.get());
@@ -957,7 +969,10 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             if (file == nullptr) {
                 return false;
             }
-            return Writing(*file, data);
+            if (!Writing(*file, data)) {
+                return false;
+            }
+            break;
         }
         case UDType::VIDEO: {
             auto video = static_cast<Video *>(input.get());
@@ -971,7 +986,10 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             if (file == nullptr) {
                 return false;
             }
-            return Writing(*file, data);
+            if (!Writing(*file, data)) {
+                return false;
+            }
+            break;
         }
         case UDType::AUDIO: {
             auto audio = static_cast<Audio *>(input.get());
@@ -985,7 +1003,10 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             if (file == nullptr) {
                 return false;
             }
-            return Writing(*file, data);
+            if (!Writing(*file, data)) {
+                return false;
+            }
+            break;
         }
         case UDType::FOLDER: {
             auto folder = static_cast<Folder *>(input.get());
@@ -999,14 +1020,20 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             if (file == nullptr) {
                 return false;
             }
-            return Writing(*file, data);
+            if (!Writing(*file, data)) {
+                return false;
+            }
+            break;
         }
         case UDType::SYSTEM_DEFINED_RECORD: {
             auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
             if (sdRecord == nullptr) {
                 return false;
             }
-            return Writing(*sdRecord, data);
+            if (!Writing(*sdRecord, data)) {
+                return false;
+            }
+            break;
         }
         case UDType::SYSTEM_DEFINED_FORM: {
             auto form = static_cast<SystemDefinedForm *>(input.get());
@@ -1020,7 +1047,10 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             if (sdRecord == nullptr) {
                 return false;
             }
-            return Writing(*sdRecord, data);
+            if (!Writing(*sdRecord, data)) {
+                return false;
+            }
+            break;
         }
         case UDType::SYSTEM_DEFINED_APP_ITEM: {
             auto appItem = static_cast<SystemDefinedAppItem *>(input.get());
@@ -1034,7 +1064,10 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             if (sdRecord == nullptr) {
                 return false;
             }
-            return Writing(*sdRecord, data);
+            if (!Writing(*sdRecord, data)) {
+                return false;
+            }
+            break;
         }
         case UDType::SYSTEM_DEFINED_PIXEL_MAP: {
             auto pixelMap = static_cast<SystemDefinedPixelMap *>(input.get());
@@ -1048,19 +1081,29 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             if (sdRecord == nullptr) {
                 return false;
             }
-            return Writing(*sdRecord, data);
+            if (!Writing(*sdRecord, data)) {
+                return false;
+            }
+            break;
         }
         case UDType::APPLICATION_DEFINED_RECORD: {
             auto record = static_cast<ApplicationDefinedRecord *>(input.get());
             if (record == nullptr) {
                 return false;
             }
-            return Writing(*record, data);
+            if (!Writing(*record, data)) {
+                return false;
+            }
+            break;
         }
         default: {
             return false;
         }
     }
+    if (!Writing(input->GetOriginValue(), data)) {
+        return false;
+    }
+    return true;
 }
 
 template<>
@@ -1072,10 +1115,6 @@ bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data)
     }
     std::string uid;
     if (!Reading(uid, data)) {
-        return false;
-    }
-    ValueType value;
-    if (!Reading(value, data)) {
         return false;
     }
     switch (type) {
@@ -1194,6 +1233,10 @@ bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data)
         default: {
             return false;
         }
+    }
+    ValueType value;
+    if (!Reading(value, data)) {
+        LOG_WARN(UDMF_CLIENT, "Reading value empty.");
     }
     output->SetUid(uid);
     output->SetType(type);
