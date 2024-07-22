@@ -13,7 +13,11 @@
 
 third_party_path = "//third_party"
 
-aafwk_path = "//foundation/ability/ability_runtime"
+if (is_arkui_x) {
+  aafwk_path = "//foundation/appframework/ability/ability_runtime"
+} else {
+  aafwk_path = "//foundation/ability/ability_runtime"
+}
 
 aafwk_inner_api_path = "${aafwk_path}/interfaces/inner_api"
 

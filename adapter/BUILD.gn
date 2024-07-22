@@ -1,0 +1,312 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+import("//foundation/distributeddatamgr/udmf/adapter/arkui_x_udmf.gni")
+import("//foundation/distributeddatamgr/udmf/udmf.gni")
+
+config("udmf_client_config") {
+  include_dirs = [
+    "${udmf_interfaces_path}/innerkits/client",
+    "${udmf_interfaces_path}/innerkits/common",
+    "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_framework_path}/common",
+    "${udmf_framework_path}/innerkitsimpl/data",
+    "${udmf_framework_path}/innerkitsimpl/service",
+    "${kv_store_path}/frameworks/common",
+    "${third_party_path}/libuv/include",
+    "${third_party_path}/node/src",
+    "${kv_store_path}/frameworks/innerkitsimpl/distributeddatafwk/include",
+    "${kv_store_path}/frameworks/innerkitsimpl/distributeddatafwk/src",
+    "${kv_store_path}/frameworks/innerkitsimpl/distributeddatasvc/include",
+    "${kv_store_path}/interfaces/innerkits/distributeddata/include",
+    "${file_service_path}/interfaces/common/include",
+    "${file_service_path}/interfaces/innerkits/native/file_uri/include",
+  ]
+}
+
+config("udmf_napi_config") {
+  include_dirs = [
+    "${udmf_interfaces_path}/innerkits/client",
+    "${udmf_interfaces_path}/innerkits/common",
+    "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_interfaces_path}/jskits/common",
+    "${udmf_interfaces_path}/jskits/data",
+
+    "${udmf_framework_path}/common",
+    "${udmf_framework_path}/innerkits/service",
+
+    "${third_party_path}/libuv/include",
+    "${third_party_path}/node/src",
+
+    "${aafwk_inner_api_path}/ability_manager/include",
+    "${aafwk_kits_path}/appkit/native/app/include/",
+    "${aafwk_kits_path}/ability/native/include",
+    "${aafwk_napi_path}/inner/napi_common",
+    "${aafwk_service_path}/abilitymgr/include",
+    "${aafwk_service_path}/common/include",
+  ]
+}
+
+config("arkui_x_udmf_config") {
+  include_dirs = [
+    "${arkui_x_image_framework_path}/interfaces/innerkits/include",
+    "${arkui_x_image_framework_path}/interfaces/kits/js/common/include",
+    "${arkui_x_image_framework_path}/frameworks/innerkitsimpl/receiver/include",
+    "${arkui_x_image_framework_path}/frameworks/innerkitsimpl/utils/include",
+    "${arkui_x_graphic_2d_path}/rosen/modules/platform/ipc_core",
+    "${arkui_x_graphic_2d_path}/utils/color_manager/export",
+    "${arkui_x_graphic_surface_path}/interfaces/inner_api/common",
+    "${arkui_x_graphic_surface_path}/interfaces/inner_api/surface",
+    "${arkui_x_graphic_surface_path}/interfaces/inner_api/utils",
+    "${third_party_path}/skia",
+  ]
+}
+
+arkui_x_public_source = [
+  "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
+  "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/flexible_type.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/type_descriptor.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/video.cpp",
+]
+
+ohos_source_set("arkui_x_udmf_data") {
+  sources = [
+    "${udmf_framework_path}/common/base32_utils.cpp",
+    "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
+    "${udmf_framework_path}/common/custom_utd_store.cpp",
+    "${udmf_framework_path}/common/graph.cpp",
+    "${udmf_framework_path}/common/udmf_utils.cpp",
+    "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
+    "${udmf_framework_path}/common/utd_graph.cpp",
+  ]
+
+  sources += arkui_x_public_source
+
+  include_dirs = [
+    "${arkui_x_c_utils_path}/base/include",
+    "${third_party_path}/cJSON",
+  ]
+
+  deps = [
+    "${arkui_path}/ace_engine/adapter/${target_os}/build:libarkui_${target_os}",
+    "${arkui_x_hilog_path}/interfaces/native/innerkits:libhilog_${target_os}",
+  ]
+
+  configs = [
+    ":arkui_x_udmf_config",
+    ":udmf_client_config",
+    "${ability_runtime_cross_platform_path}/interfaces/inner_api/want:want_params_config",
+  ]
+
+  subsystem_name = "distributeddatamgr"
+  part_name = "udmf"
+}
+
+ohos_source_set("arkui_x_udmf_data_inner") {
+  sources = arkui_x_public_source
+
+  include_dirs = [
+    "${arkui_x_c_utils_path}/base/include",
+    "${arkui_x_hilog_path}/interfaces/native/innerkits/include",
+    "${third_party_path}/cJSON",
+  ]
+
+  deps = [
+    "${arkui_path}/napi/:ace_napi",
+    "${arkui_x_hilog_path}/interfaces/native/innerkits:libhilog_${target_os}",
+  ]
+
+  configs = [
+    ":arkui_x_udmf_config",
+    ":udmf_client_config",
+    "${ability_runtime_cross_platform_path}/interfaces/inner_api/want:want_params_config",
+  ]
+
+  subsystem_name = "distributeddatamgr"
+  part_name = "udmf"
+}
+
+config("arkui_x_udmf_napi_config") {
+  include_dirs = [
+    "${arkui_path}/napi/interfaces/kits",
+    "${arkui_path}/napi/interfaces/inner_api",
+    "${arkui_x_c_utils_path}/base/include",
+    "${arkui_x_hilog_path}/interfaces/native/innerkits/include",
+    "${arkui_x_image_framework_path}/interfaces/kits/js/common/include",
+    "${arkui_x_image_framework_path}/frameworks/innerkitsimpl/receiver/include",
+    "${arkui_x_image_framework_path}/frameworks/innerkitsimpl/utils/include",
+    "${arkui_x_image_framework_path}/interfaces/innerkits/include",
+    "${arkui_x_graphic_surface_path}/interfaces/inner_api/common",
+    "${arkui_x_graphic_surface_path}/interfaces/inner_api/surface",
+    "${arkui_x_graphic_surface_path}/interfaces/inner_api/utils",
+    "${arkui_x_graphic_2d_path}/utils/color_manager/export",
+    "${arkui_x_graphic_2d_path}/rosen/modules/platform/ipc_core",
+    "${third_party_path}/skia",
+  ]
+}
+
+ohos_source_set("arkui_x_uniformtypedescriptor") {
+  include_dirs = [
+    "${arkui_x_c_utils_path}/base/include",
+    "${ability_runtime_cross_platform_path}/frameworks/js/napi/napi_common",
+    "${udmf_framework_path}/innerkitsimpl/data",
+    "${udmf_root_path}/adapter/framework/innerkitsimpl/client",
+  ]
+
+  sources = [
+    "${udmf_framework_path}/jskitsimpl/common/napi_data_utils.cpp",
+    "${udmf_framework_path}/jskitsimpl/common/napi_error_utils.cpp",
+    "${udmf_framework_path}/jskitsimpl/common/napi_queue.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/type_descriptor_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/uniform_type_descriptor_napi.cpp",
+    "${udmf_interfaces_path}/jskits/module/uniform_type_descriptor_napi_module.cpp",
+    "${udmf_root_path}/adapter/framework/innerkitsimpl/client/udmf_client.cpp",
+    "${udmf_root_path}/adapter/framework/innerkitsimpl/client/utd_client.cpp",
+  ]
+  deps = [
+    ":arkui_x_udmf_data",
+    "${arkui_x_hilog_path}/interfaces/native/innerkits:libhilog_${target_os}",
+    "${arkui_x_plugin_path}/libs/napi:napi_${target_os}",
+  ]
+
+  public_configs = [
+    ":udmf_napi_config",
+    ":arkui_x_udmf_napi_config",
+    "${ability_runtime_cross_platform_path}/interfaces/inner_api/jsruntime:jsruntime_config",
+    "${ability_runtime_cross_platform_path}/interfaces/inner_api/hilog:ability_cross_platform_hilog_config",
+    "${ability_runtime_cross_platform_path}/interfaces/inner_api/want:want_params_config",
+  ]
+
+  subsystem_name = "distributeddatamgr"
+  part_name = "udmf"
+}
+
+ohos_source_set("arkui_x_unifieddatachannel") {
+  include_dirs = [
+    "${arkui_x_c_utils_path}/base/include",
+    "${ability_runtime_cross_platform_path}/frameworks/js/napi/napi_common",
+    "${udmf_root_path}/adapter/framework/innerkitsimpl/client",
+    "${third_party_path}/bounds_checking_function/include",
+  ]
+
+  sources = [
+    "${udmf_framework_path}/jskitsimpl/common/napi_data_utils.cpp",
+    "${udmf_framework_path}/jskitsimpl/common/napi_error_utils.cpp",
+    "${udmf_framework_path}/jskitsimpl/common/napi_queue.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/application_defined_record_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/audio_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/file_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/folder_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/html_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/image_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/link_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/plain_text_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/summary_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/system_defined_appitem_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/system_defined_form_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/system_defined_pixelmap_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/system_defined_record_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/text_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/unified_data_channel_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/unified_data_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/unified_data_properties_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/unified_record_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/video_napi.cpp",
+    "${udmf_interfaces_path}/jskits/module/unified_data_channel_napi_module.cpp",
+    "${udmf_root_path}/adapter/framework/innerkitsimpl/client/udmf_client.cpp",
+  ]
+
+  ldflags = [ "-Wl,--exclude-libs=ALL" ]
+
+  public_configs = [
+    ":udmf_napi_config",
+    ":arkui_x_udmf_napi_config",
+    "${ability_runtime_cross_platform_path}/interfaces/inner_api/jsruntime:jsruntime_config",
+    "${ability_runtime_cross_platform_path}/interfaces/inner_api/hilog:ability_cross_platform_hilog_config",
+    "${ability_runtime_cross_platform_path}/interfaces/inner_api/want:want_params_config",
+  ]
+
+  deps = [
+    ":arkui_x_udmf_data",
+    "${ability_runtime_cross_platform_path}/interfaces/inner_api/want:cross_platform_want_params",
+    "${arkui_x_hilog_path}/interfaces/native/innerkits:libhilog_${target_os}",
+    "${arkui_x_plugin_path}/libs/napi:napi_${target_os}",
+  ]
+
+  subsystem_name = "distributeddatamgr"
+  part_name = "udmf"
+}
+
+ohos_source_set("arkui_x_udmf_data_napi") {
+  include_dirs = [
+    "${arkui_x_c_utils_path}/base/include",
+    "${ability_runtime_cross_platform_path}/frameworks/js/napi/napi_common",
+    "${ability_runtime_cross_platform_path}/interfaces/inner_api/want",
+  ]
+
+  sources = [
+    "${udmf_framework_path}/jskitsimpl/common/napi_data_utils.cpp",
+    "${udmf_framework_path}/jskitsimpl/common/napi_error_utils.cpp",
+    "${udmf_framework_path}/jskitsimpl/common/napi_queue.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/application_defined_record_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/audio_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/file_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/folder_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/html_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/image_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/link_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/plain_text_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/summary_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/system_defined_appitem_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/system_defined_form_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/system_defined_pixelmap_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/system_defined_record_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/text_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/unified_data_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/unified_data_properties_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/unified_record_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/video_napi.cpp",
+  ]
+
+  public_configs = [
+    ":udmf_napi_config",
+    ":arkui_x_udmf_napi_config",
+    "${ability_runtime_cross_platform_path}/interfaces/inner_api/want:want_params_config",
+  ]
+
+  deps = [
+    ":arkui_x_udmf_data_inner",
+    "${ability_runtime_cross_platform_path}/frameworks/js/napi/napi_common:napi_common",
+    "${ability_runtime_cross_platform_path}/interfaces/inner_api/want:cross_platform_want_params",
+  ]
+
+  subsystem_name = "distributeddatamgr"
+  part_name = "udmf"
+}
