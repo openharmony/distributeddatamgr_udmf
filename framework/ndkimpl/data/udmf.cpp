@@ -99,7 +99,7 @@ static char** StrVectorToTypesArray(const std::vector<std::string>& strVector)
 static OH_UdmfRecord** CreateUnifiedDataRecordsArray(OH_UdmfData* unifiedData,
                                                      std::vector<std::shared_ptr<UnifiedRecord>>& records)
 {
-    std::size_t size = records.size();
+    unsigned int size = static_cast<unsigned int>(records.size());
     if (unifiedData == nullptr || size == 0 || size > MAX_RECORDS_COUNT) {
         return nullptr;
     }
