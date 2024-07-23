@@ -155,14 +155,14 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
 Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &fileExtension,
                                                         std::vector<std::string> &typeIds, std::string belongsTo)
 {
-    std::string lowerFileExtension = fileExtension;
-    std::transform(lowerFileExtension.begin(), lowerFileExtension.end(), lowerFileExtension.begin(), ::tolower);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. fileExtension:%{public}s, belongsTo:%{public}s ",
                   fileExtension.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
 
+    std::string lowerFileExtension = fileExtension;
+    std::transform(lowerFileExtension.begin(), lowerFileExtension.end(), lowerFileExtension.begin(), ::tolower);
     std::vector<std::string> typeIdsInCfg;
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
@@ -170,7 +170,7 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
             typeIdsInCfg.push_back(utdTypeCfg.typeId);
         }
     }
-
+    typeIds.clear();
     for (const auto &typeId : typeIdsInCfg) {
         // the find typeId is not belongsTo to the belongsTo.
         if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
@@ -179,7 +179,6 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
         }
         typeIds.emplace_back(typeId);
     }
-
     if (typeIds.empty()) {
         if (!IsValidFileExtension(lowerFileExtension)) {
             LOG_ERROR(UDMF_CLIENT, "invalid fileExtension. fileExtension:%{public}s, belongsTo:%{public}s ",
@@ -246,14 +245,14 @@ std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
 Status UtdClient::GetUniformDataTypesByMIMEType(const std::string &mimeType, std::vector<std::string> &typeIds,
                                                std::string belongsTo)
 {
-    std::string lowerMimeType = mimeType;
-    std::transform(lowerMimeType.begin(), lowerMimeType.end(), lowerMimeType.begin(), ::tolower);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. mimeType:%{public}s, belongsTo:%{public}s ",
                   mimeType.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
 
+    std::string lowerMimeType = mimeType;
+    std::transform(lowerMimeType.begin(), lowerMimeType.end(), lowerMimeType.begin(), ::tolower);
     std::vector<std::string> typeIdsInCfg;
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         for (auto mime : utdTypeCfg.mimeTypes) {
@@ -263,6 +262,7 @@ Status UtdClient::GetUniformDataTypesByMIMEType(const std::string &mimeType, std
             }
         }
     }
+    typeIds.clear();
     for (const auto &typeId : typeIdsInCfg) {
         // the find typeId is not belongsTo to the belongsTo.
         if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
