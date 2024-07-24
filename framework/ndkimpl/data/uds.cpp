@@ -40,6 +40,10 @@ OH_UdsHtml::OH_UdsHtml() : UdsObject(NdkStructId::UDS_HTML_STRUCT_ID) {}
 
 OH_UdsAppItem::OH_UdsAppItem() : UdsObject(NdkStructId::UDS_APP_ITEM_STRUCT_ID) {}
 
+OH_UdsForm::OH_UdsForm() : UdsObject(NdkStructId::UDS_FORM_STRUCT_ID) {}
+
+OH_UdsFileUri::OH_UdsFileUri() : UdsObject(NdkStructId::UDS_FILE_URI_STRUCT_ID) {}
+
 const char* UdsObject::GetUdsValue(const char* paramName)
 {
     if (obj->value_.find(paramName) == obj->value_.end()) {
@@ -370,4 +374,109 @@ int OH_UdsAppItem_SetAbilityName(OH_UdsAppItem* pThis, const char* abilityName)
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue(ABILITY_NAME, abilityName);
+}
+
+OH_UdsForm* OH_UdsForm_Create()
+{
+    OH_UdsForm* form = new (std::nothrow) OH_UdsForm();
+    if (form == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
+        return nullptr;
+    }
+    form->obj = std::make_shared<Object>();
+    form->obj->value_[UNIFORM_DATA_TYPE] = UDMF_META_OPENHARMONY_FORM;
+    form->obj->value_[FORM_CONTENT] = "";
+    return form;
+}
+
+void OH_UdsForm_Destroy(OH_UdsForm* pThis)
+{
+    if (pThis != nullptr && pThis->cid == NdkStructId::UDS_FORM_STRUCT_ID) {
+        delete pThis;
+    }
+}
+
+const char* OH_UdsForm_GetType(OH_UdsForm* pThis)
+{
+    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_FORM_STRUCT_ID)) {
+        return nullptr;
+    }
+    return pThis->GetUdsValue(UNIFORM_DATA_TYPE);
+}
+
+const char* OH_UdsForm_GetFormContent(OH_UdsForm* pThis)
+{
+    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_FORM_STRUCT_ID)) {
+        return nullptr;
+    }
+    return pThis->GetUdsValue(FORM_CONTENT);
+}
+
+int OH_UdsForm_SetFormContent(OH_UdsForm* pThis, const char* formContent)
+{
+    if (formContent == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_FORM_STRUCT_ID)) {
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
+    }
+    return pThis->SetUdsValue(FORM_CONTENT, formContent);
+}
+
+OH_UdsFileUri* OH_UdsFileUri_Create()
+{
+    OH_UdsFileUri* fileUri = new (std::nothrow) OH_UdsFileUri();
+    if (fileUri == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
+        return nullptr;
+    }
+    fileUri->obj = std::make_shared<Object>();
+    fileUri->obj->value_[UNIFORM_DATA_TYPE] = UDMF_META_GENERAL_FILE_URI;
+    fileUri->obj->value_[FILE_URI] = "";
+    fileUri->obj->value_[FILE_TYPE] = "";
+    return fileUri;
+}
+
+void OH_UdsFileUri_Destroy(OH_UdsFileUri* pThis)
+{
+    if (pThis != nullptr && pThis->cid == NdkStructId::UDS_FILE_URI_STRUCT_ID) {
+        delete pThis;
+    }
+}
+
+const char* OH_UdsFileUri_GetType(OH_UdsFileUri* pThis)
+{
+    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_FILE_URI_STRUCT_ID)) {
+        return nullptr;
+    }
+    return pThis->GetUdsValue(UNIFORM_DATA_TYPE);
+}
+
+const char* OH_UdsFileUri_GetFileUri(OH_UdsFileUri* pThis)
+{
+    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_FILE_URI_STRUCT_ID)) {
+        return nullptr;
+    }
+    return pThis->GetUdsValue(FILE_URI);
+}
+
+const char* OH_UdsFileUri_GetFileType(OH_UdsFileUri* pThis)
+{
+    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_FILE_URI_STRUCT_ID)) {
+        return nullptr;
+    }
+    return pThis->GetUdsValue(FILE_TYPE);
+}
+
+int OH_UdsFileUri_SetFileUri(OH_UdsFileUri* pThis, const char* fileUri)
+{
+    if (fileUri == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_FILE_URI_STRUCT_ID)) {
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
+    }
+    return pThis->SetUdsValue(FILE_URI, fileUri);
+}
+
+int OH_UdsFileUri_SetFileType(OH_UdsFileUri* pThis, const char* fileType)
+{
+    if (fileType == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_FILE_URI_STRUCT_ID)) {
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
+    }
+    return pThis->SetUdsValue(FILE_URI, fileType);
 }

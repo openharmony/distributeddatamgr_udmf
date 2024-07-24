@@ -766,4 +766,200 @@ HWTEST_F(UdsTest, OH_UdsAppItem_SetAbilityName_001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "OH_UdsAppItem_SetAbilityName_001 end.");
 }
 
+/**
+ * @tc.name: OH_UdsForm_Create_001
+ * @tc.desc: Normal testcase of OH_UdsForm_Create
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsForm_Create_001, TestSize.Level1)
+{
+    auto form = OH_UdsForm_Create();
+    EXPECT_EQ(UDMF_META_OPENHARMONY_FORM, *(std::get_if<std::string>(&(form->obj)->value_[UNIFORM_DATA_TYPE])));
+    OH_UdsForm_Destroy(form);
+}
+
+/**
+ * @tc.name: OH_UdsForm_GetType_001
+ * @tc.desc: Normal testcase of OH_UdsForm_GetType
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsForm_GetType_001, TestSize.Level1)
+{
+    auto form = OH_UdsForm_Create();
+    EXPECT_EQ(UDMF_META_OPENHARMONY_APP_ITEM, std::string(OH_UdsForm_GetType(form)));
+    OH_UdsForm_Destroy(form);
+
+    OH_UdsForm* formNullptr = nullptr;
+    EXPECT_EQ(nullptr, OH_UdsForm_GetType(formNullptr));
+
+    formNullptr = new OH_UdsForm;
+    EXPECT_EQ(nullptr, OH_UdsForm_GetType(formNullptr));
+    OH_UdsForm_Destroy(formNullptr);
+}
+
+/**
+ * @tc.name: OH_UdsForm_GetFormContent_001
+ * @tc.desc: Normal testcase of OH_UdsForm_GetFormContent
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsForm_GetFormContent_001, TestSize.Level1)
+{
+    auto form = OH_UdsForm_Create();
+    form->obj->value_[FORM_CONTENT] = "content";
+    EXPECT_EQ("content", std::string(OH_UdsForm_GetFormContent(form)));
+    OH_UdsForm_Destroy(form);
+
+    OH_UdsForm* formNullptr = nullptr;
+    EXPECT_EQ(nullptr, OH_UdsForm_GetFormContent(formNullptr));
+
+    formNullptr = new OH_UdsForm;
+    EXPECT_EQ(nullptr, OH_UdsForm_GetFormContent(formNullptr));
+    OH_UdsForm_Destroy(formNullptr);
+}
+
+/**
+ * @tc.name: OH_UdsForm_SetFormContent_001
+ * @tc.desc: Normal testcase of OH_UdsForm_SetFormContent
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsForm_SetFormContent_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsAppItem_SetAbilityName_001 begin.");
+    auto form = OH_UdsForm_Create();
+    int result = OH_UdsForm_SetFormContent(form, "from content");
+    EXPECT_EQ(UDMF_E_OK, result);
+    EXPECT_EQ("from content", std::string(OH_UdsForm_GetFormContent(form)));
+
+    result = OH_UdsForm_SetFormContent(nullptr, "from content");
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    result = OH_UdsForm_SetFormContent(form, nullptr);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    form->obj = nullptr;
+    result = OH_UdsForm_SetFormContent(form, "from content");
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    OH_UdsForm_Destroy(form);
+    LOG_INFO(UDMF_TEST, "OH_UdsForm_SetFormContent_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsFileUri_Create_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_Create
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_Create_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    EXPECT_EQ(UDMF_META_GENERAL_FILE_URI, *(std::get_if<std::string>(&(fileUri->obj)->value_[UNIFORM_DATA_TYPE])));
+    OH_UdsFileUri_Destroy(fileUri);
+}
+
+/**
+ * @tc.name: OH_UdsFileUri_GetType_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_GetType
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_GetType_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    EXPECT_EQ(UDMF_META_OPENHARMONY_APP_ITEM, std::string(OH_UdsFileUri_GetType(fileUri)));
+    OH_UdsFileUri_Destroy(fileUri);
+
+    OH_UdsFileUri* fileUriNullptr = nullptr;
+    EXPECT_EQ(nullptr, OH_UdsFileUri_GetType(fileUriNullptr));
+
+    fileUriNullptr = new OH_UdsFileUri;
+    EXPECT_EQ(nullptr, OH_UdsFileUri_GetType(fileUriNullptr));
+    OH_UdsFileUri_Destroy(fileUriNullptr);
+}
+
+/**
+ * @tc.name: OH_UdsFileUri_GetFileUri_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_GetFileUri
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_GetFileUri_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    fileUri->obj->value_[FILE_URI] = "fileUri";
+    EXPECT_EQ("fileUri", std::string(OH_UdsFileUri_GetFileUri(fileUri)));
+    OH_UdsFileUri_Destroy(fileUri);
+
+    OH_UdsFileUri* fileUriNullptr = nullptr;
+    EXPECT_EQ(nullptr, OH_UdsFileUri_GetFileUri(fileUriNullptr));
+
+    fileUriNullptr = new OH_UdsFileUri;
+    EXPECT_EQ(nullptr, OH_UdsFileUri_GetFileUri(fileUriNullptr));
+    OH_UdsFileUri_Destroy(fileUriNullptr);
+}
+
+/**
+ * @tc.name: OH_UdsFileUri_GetFileType_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_GetFileType
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_GetFileType_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    fileUri->obj->value_[FILE_TYPE] = "fileType";
+    EXPECT_EQ("fileType", std::string(OH_UdsFileUri_GetFileType(fileUri)));
+    OH_UdsFileUri_Destroy(fileUri);
+
+    OH_UdsFileUri* fileUriNullptr = nullptr;
+    EXPECT_EQ(nullptr, OH_UdsFileUri_GetFileType(fileUriNullptr));
+
+    fileUriNullptr = new OH_UdsFileUri;
+    EXPECT_EQ(nullptr, OH_UdsFileUri_GetFileType(fileUriNullptr));
+    OH_UdsFileUri_Destroy(fileUriNullptr);
+}
+
+/**
+ * @tc.name: OH_UdsFileUri_SetFileUri_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_SetFileUri
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_SetFileUri_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    int result = OH_UdsFileUri_SetFileUri(fileUri, "file uri");
+    EXPECT_EQ(UDMF_E_OK, result);
+    EXPECT_EQ("file uri", std::string(OH_UdsFileUri_GetFileUri(fileUri)));
+
+    result = OH_UdsFileUri_SetFileUri(nullptr, "file uri");
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    result = OH_UdsFileUri_SetFileUri(fileUri, nullptr);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    fileUri->obj = nullptr;
+    result = OH_UdsFileUri_SetFileUri(fileUri, "file uri");
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    OH_UdsFileUri_Destroy(fileUri);
+}
+
+/**
+ * @tc.name: OH_UdsFileUri_SetFileUri_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_SetFileUri
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_SetFileType_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    int result = OH_UdsFileUri_SetFileType(fileUri, "file type");
+    EXPECT_EQ(UDMF_E_OK, result);
+    EXPECT_EQ("file type", std::string(OH_UdsFileUri_GetFileType(fileUri)));
+
+    result = OH_UdsFileUri_SetFileType(nullptr, "file type");
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    result = OH_UdsFileUri_SetFileType(fileUri, nullptr);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    fileUri->obj = nullptr;
+    result = OH_UdsFileUri_SetFileType(fileUri, "file type");
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    OH_UdsFileUri_Destroy(fileUri);
+}
+
 }
