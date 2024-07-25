@@ -173,7 +173,7 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
     typeIds.clear();
     for (const auto &typeId : typeIdsInCfg) {
         // the find typeId is not belongsTo to the belongsTo.
-        if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
+        if (belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
             !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
             continue;
         }
@@ -253,19 +253,27 @@ Status UtdClient::GetUniformDataTypesByMIMEType(const std::string &mimeType, std
 
     std::string lowerMimeType = mimeType;
     std::transform(lowerMimeType.begin(), lowerMimeType.end(), lowerMimeType.begin(), ::tolower);
+    bool prefixMatch = false;
+    std::string prefixType;
+    if (lowerMimeType.size() >= 2 && lowerMimeType.compare(lowerMimeType.size() - 2, 2, "/*") == 0) {
+        prefixType = lowerMimeType.substr(0, lowerMimeType.length() - 1);
+        prefixMatch = true;
+    }
     std::vector<std::string> typeIdsInCfg;
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         for (auto mime : utdTypeCfg.mimeTypes) {
             std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
-            if (mime == lowerMimeType) {
+            if ((mime == lowerMimeType) || (prefixMatch && mime.rfind(prefixType, 0) == 0)) {
                 typeIdsInCfg.push_back(utdTypeCfg.typeId);
+                break;
             }
         }
     }
+
     typeIds.clear();
     for (const auto &typeId : typeIdsInCfg) {
         // the find typeId is not belongsTo to the belongsTo.
-        if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
+        if (belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
             !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
             continue;
         }
