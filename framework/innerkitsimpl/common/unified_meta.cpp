@@ -422,7 +422,16 @@ static constexpr UtdType UTD_TYPES[] = {
     { KINSOFT_PRESENTATION_DPS, "KINSOFT_PRESENTATION_DPS", "com.kingsoft.office.presentation.dps" },
     { KINSOFT_PRESENTATION_TEMPLATE, "KINSOFT_PRESENTATION_TEMPLATE", "com.kingsoft.office.presentation.template" },
     { KINSOFT_SPREADSHEETS_ET, "KINSOFT_SPREADSHEETS_ET", "com.kingsoft.office.spreadsheets.et" },
-    { KINSOFT_SPREADSHEETS_TEMPLATE, "KINSOFT_SPREADSHEETS_TEMPLATE", "com.kingsoft.office.spreadsheets.template" }
+    { KINSOFT_SPREADSHEETS_TEMPLATE, "KINSOFT_SPREADSHEETS_TEMPLATE", "com.kingsoft.office.spreadsheets.template" },
+    { MICROSOFT_INI, "MICROSOFT_INI", "com.microsoft.ini" },
+    { JSON, "JSON", "general.json" },
+    { DARINGFIREBALL_MARKDOWN, "DARINGFIREBALL_MARKDOWN", "net.daringfireball.markdown" },
+    { YAML, "YAML", "general.yaml" },
+    { LOG, "LOG", "general.log" },
+    { URI, "URI", "general.uri" },
+    { FILE_URI, "FILE_URI", "general.file-uri" },
+    { TEXT_LST, "TEXT_LST", "general.text-lst" },
+    { ANDROID_APK, "ANDROID_APK", "com.android.apk" }
 };
 
 namespace UtdUtils {
