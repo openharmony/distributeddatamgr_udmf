@@ -72,7 +72,7 @@ Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<T
         }
     }
     if (typeId.find(FLEXIBLE_TYPE_FLAG) != typeId.npos) {
-        LOG_INFO(UDMF_CLIENT, "get flexible descriptor. %{public}s ", typeId.c_str());
+        LOG_DEBUG(UDMF_CLIENT, "get flexible descriptor. %{public}s ", typeId.c_str());
         return GetFlexibleTypeDescriptor(typeId, descriptor);
     }
     return Status::E_OK;

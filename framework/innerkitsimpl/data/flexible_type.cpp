@@ -40,7 +40,7 @@ bool FlexibleType::ParseFlexibleUtd(const std::string &typeId, TypeDescriptorCfg
     flexibleUtd.erase(0, flexibleFlag.size());
     std::string flexibleUtdDecode = Base32::Decode(flexibleUtd);
 
-    LOG_INFO(UDMF_CLIENT, "The typeId be parsed, flexibleUtdDecode: %{public}s", flexibleUtdDecode.c_str());
+    LOG_DEBUG(UDMF_CLIENT, "The typeId be parsed, flexibleUtdDecode: %{public}s", flexibleUtdDecode.c_str());
     if (flexibleUtdDecode.empty() || flexibleUtdDecode[0] != '?' ||
             flexibleUtdDecode.find("=") == flexibleUtdDecode.npos) {
         LOG_WARN(UDMF_CLIENT, "The typeId cannot be parsed, %{public}s ", typeId.c_str());
