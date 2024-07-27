@@ -40,7 +40,6 @@ enum NdkStructId : std::int64_t {
     UDMF_UNIFIED_DATA_STRUCT_ID,
     UDMF_UNIFIED_RECORD_STRUCT_ID,
     UDMF_UNIFIED_DATA_PROPERTIES_ID,
-    UDS_FORM_STRUCT_ID,
     UDS_FILE_URI_STRUCT_ID,
     UDS_PIXEL_MAP_STRUCT_ID
 };
@@ -71,9 +70,6 @@ struct OH_UdsHtml : public UdsObject {
 };
 struct OH_UdsAppItem : public UdsObject {
     OH_UdsAppItem();
-};
-struct OH_UdsForm : public UdsObject {
-    OH_UdsForm();
 };
 struct OH_UdsFileUri : public UdsObject {
     OH_UdsFileUri();
@@ -122,7 +118,6 @@ constexpr const char* APP_ICON_ID = "appIconId";
 constexpr const char* APP_LABEL_ID = "appLabelId";
 constexpr const char* BUNDLE_NAME = "bundleName";
 constexpr const char* ABILITY_NAME = "abilityName";
-constexpr const char* FORM_CONTENT = "formContent";
 constexpr const char* FILE_URI = "fileUri";
 constexpr const char* FILE_TYPE = "fileType";
 constexpr const char* PIXEL_MAP = "pixelMap";

@@ -75,13 +75,6 @@ typedef struct OH_UdsHtml OH_UdsHtml;
 typedef struct OH_UdsAppItem OH_UdsAppItem;
 
 /**
- * @brief Describes the unified data struct of open harmony form.
- *
- * @since 12
- */
-typedef struct OH_UdsForm OH_UdsForm;
-
-/**
  * @brief Describes the unified data struct of file uri.
  *
  * @since 12
@@ -488,58 +481,6 @@ int OH_UdsAppItem_SetBundleName(OH_UdsAppItem* pThis, const char* bundleName);
 int OH_UdsAppItem_SetAbilityName(OH_UdsAppItem* pThis, const char* abilityName);
 
 /**
- * @brief Creation a pointer to the instance of the {@link OH_UdsForm}.
- *
- * @return If the operation is successful, a pointer to the instance of the {@link OH_UdsForm}
- * structure is returned. If the operation is failed, nullptr is returned.
- * @see OH_UdsForm
- * @since 12
- */
-OH_UdsForm* OH_UdsForm_Create();
-
-/**
- * @brief Destroy a pointer that points to the {@link OH_UdsForm} instance.
- *
- * @param pThis Represents a pointer to an instance of {@link OH_UdsForm}.
- * @see OH_UdsForm
- * @since 12
- */
-void OH_UdsForm_Destroy(OH_UdsForm* pThis);
-
-/**
- * @brief Get type id from the {@link OH_UdsForm}.
- *
- * @param pThis Represents a pointer to an instance of {@link OH_UdsForm}.
- * @return Returns a pointer of the value string when input args normally, otherwise return nullptr.
- * @see OH_UdsForm
- * @since 12
- */
-const char* OH_UdsForm_GetType(OH_UdsForm* pThis);
-
-/**
- * @brief Get form content from the {@link OH_UdsForm}.
- *
- * @param pThis Represents a pointer to an instance of {@link OH_UdsForm}.
- * @return Returns a pointer of the value string when input args normally, otherwise return nullptr.
- * @see OH_UdsForm
- * @since 12
- */
-const char* OH_UdsForm_GetFormContent(OH_UdsForm* pThis);
-
-/**
- * @brief Set form content to the {@link OH_UdsForm}.
- *
- * @param pThis Represents a pointer to an instance of {@link OH_UdsForm}.
- * @param content Represents a new form content string.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
- *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdsForm Udmf_ErrCode
- * @since 12
- */
-int OH_UdsForm_SetFormContent(OH_UdsForm* pThis, const char* formContent);
-
-/**
  * @brief Creation a pointer to the instance of the {@link OH_UdsFileUri}.
  *
  * @return If the operation is successful, a pointer to the instance of the {@link OH_UdsFileUri}
@@ -655,7 +596,7 @@ const char* OH_UdsPixelMap_GetType(OH_UdsPixelMap* pThis);
 void OH_UdsPixelMap_GetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelmapNative);
 
 /**
- * @brief Set form content to the {@link OH_UdsPixelMap}.
+ * @brief Set pixel map to the {@link OH_UdsPixelMap}.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsPixelMap}.
  * @param pixelMap Represents a new pixel map.
