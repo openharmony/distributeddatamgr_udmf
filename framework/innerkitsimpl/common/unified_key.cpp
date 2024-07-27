@@ -22,10 +22,10 @@ namespace UDMF {
 static std::bitset<MAX_BIT_SIZE> g_ruleIntention;
 static std::bitset<MAX_BIT_SIZE> g_ruleBundleName;
 static std::bitset<MAX_BIT_SIZE> g_ruleGroupId;
-static const std::string UNIFIED_KEY_SCHEMA = "udmf://";
-static const std::string ALPHA_AGGREGATE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-static const std::string DIGIT_AGGREGATE = "0123456789";
-static const std::string SYMBOL_AGGREGATE = ":;<=>?@[\\]_`";
+static constexpr std::string UNIFIED_KEY_SCHEMA = "udmf://";
+static constexpr std::string ALPHA_AGGREGATE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+static constexpr std::string DIGIT_AGGREGATE = "0123456789";
+static constexpr std::string SYMBOL_AGGREGATE = ":;<=>?@[\\]_`";
 UnifiedKey::UnifiedKey(std::string key)
 {
     this->key = std::move(key);

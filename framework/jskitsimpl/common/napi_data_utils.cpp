@@ -562,7 +562,7 @@ napi_value NapiDataUtils::DefineClass(napi_env env, const std::string &name,
     const napi_property_descriptor *properties, size_t count, napi_callback newcb)
 {
     // base64("data.udmf") as rootPropName, i.e. global.<root>
-    const std::string rootPropName = "ZGF0YS51ZG1m";
+    constexpr std::string rootPropName = "ZGF0YS51ZG1m";
     napi_value root = nullptr;
     bool hasRoot = false;
     napi_value global = nullptr;

@@ -21,7 +21,7 @@ namespace OHOS {
 namespace UDMF {
 using NapiErrorCode = OHOS::UDMF::NapiErrorCode;
 
-static const NapiErrorCode JS_ERROR_CODE_MSGS[] = {
+static constexpr NapiErrorCode JS_ERROR_CODE_MSGS[] = {
     { Status::E_NO_PERMISSION, 201, "Permission denied!" },
     { Status::E_INVALID_PARAMETERS, 401, "Parameter error." },
     { Status::E_SETTINGS_EXISTED, 20400001, "Settings already exist." },

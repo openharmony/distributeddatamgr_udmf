@@ -22,7 +22,7 @@ namespace UTILS {
 static constexpr int ID_LEN = 32;
 static constexpr int MINIMUM = 48;
 static constexpr int MAXIMUM = 121;
-const char SPECIAL = '^';
+constexpr char SPECIAL = '^';
 
 std::vector<std::string> StrSplit(const std::string &str, const std::string &delimiter)
 {
