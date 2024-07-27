@@ -26,7 +26,7 @@ struct UdsObject {
     std::shared_ptr<OHOS::UDMF::Object> obj;
     std::mutex mutex;
     explicit UdsObject(int cid);
-    template<typename T> bool hasObjectKey(const char* paramName);
+    template<typename T> bool HasObjectKey(const char* paramName);
     template<typename T> T* GetUdsValue(const char* paramName);
     template<typename T> int SetUdsValue(const char* paramName, T pramValue);
 };
@@ -118,7 +118,7 @@ constexpr const char* APP_ICON_ID = "appIconId";
 constexpr const char* APP_LABEL_ID = "appLabelId";
 constexpr const char* BUNDLE_NAME = "bundleName";
 constexpr const char* ABILITY_NAME = "abilityName";
-constexpr const char* FILE_URI = "fileUri";
+constexpr const char* FILE_URI_PARAM = "fileUri";
 constexpr const char* FILE_TYPE = "fileType";
 constexpr const char* PIXEL_MAP = "pixelMap";
 

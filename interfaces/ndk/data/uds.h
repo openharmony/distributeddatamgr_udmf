@@ -533,7 +533,7 @@ const char* OH_UdsFileUri_GetFileType(OH_UdsFileUri* pThis);
  * @brief Set file uri to the {@link OH_UdsFileUri}.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsFileUri}.
- * @param content Represents a new content string.
+ * @param fileUri Represents a new file uri string.
  * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
@@ -546,7 +546,7 @@ int OH_UdsFileUri_SetFileUri(OH_UdsFileUri* pThis, const char* fileUri);
  * @brief Set file type to the {@link OH_UdsFileUri}.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsFileUri}.
- * @param content Represents a new content string.
+ * @param fileType Represents a new file type string.
  * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
@@ -588,8 +588,7 @@ const char* OH_UdsPixelMap_GetType(OH_UdsPixelMap* pThis);
  * @brief Get pixel map from the {@link OH_UdsPixelMap}.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsPixelMap}.
- * @param pixelmapNative Represents a new pixel map.
- * @return Returns a pointer of the value string when input args normally, otherwise return nullptr.
+ * @param pixelmapNative Represents output params of {@link OH_PixelmapNative}.
  * @see OH_UdsPixelMap
  * @since 12
  */
@@ -599,14 +598,14 @@ void OH_UdsPixelMap_GetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelm
  * @brief Set pixel map to the {@link OH_UdsPixelMap}.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsPixelMap}.
- * @param pixelMap Represents a new pixel map.
+ * @param pixelmapNative Represents a new {@link OH_PixelmapNative}.
  * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsPixelMap Udmf_ErrCode
  * @since 12
  */
-int OH_UdsPixelMap_SetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelMap);
+int OH_UdsPixelMap_SetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelmapNative);
 
 #ifdef __cplusplus
 };

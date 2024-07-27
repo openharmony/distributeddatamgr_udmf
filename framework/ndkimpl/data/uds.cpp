@@ -57,7 +57,7 @@ OH_UdsFileUri::OH_UdsFileUri() : UdsObject(NdkStructId::UDS_FILE_URI_STRUCT_ID) 
 OH_UdsPixelMap::OH_UdsPixelMap() : UdsObject(NdkStructId::UDS_PIXEL_MAP_STRUCT_ID) {}
 
 template<typename T>
-bool UdsObject::hasObjectKey(const char* paramName)
+bool UdsObject::HasObjectKey(const char* paramName)
 {
     auto it = obj->value_.find(paramName);
     if (it == obj->value_.end() || !std::holds_alternative<T>(it->second)) {
@@ -70,7 +70,7 @@ bool UdsObject::hasObjectKey(const char* paramName)
 template<typename T>
 T* UdsObject::GetUdsValue(const char* paramName)
 {
-    if (!hasObjectKey<T>(paramName)) {
+    if (!HasObjectKey<T>(paramName)) {
         return nullptr;
     }
     return std::get_if<T>(&(obj->value_[paramName]));
@@ -79,7 +79,7 @@ T* UdsObject::GetUdsValue(const char* paramName)
 template<typename T>
 int UdsObject::SetUdsValue(const char* paramName, const T pramValue)
 {
-    if (!hasObjectKey<T>(paramName)) {
+    if (!HasObjectKey<T>(paramName)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     std::lock_guard<std::mutex> lock(mutex);
@@ -360,7 +360,7 @@ OH_UdsFileUri* OH_UdsFileUri_Create()
     }
     fileUri->obj = std::make_shared<Object>();
     fileUri->obj->value_[UNIFORM_DATA_TYPE] = UDMF_META_GENERAL_FILE_URI;
-    fileUri->obj->value_[FILE_URI] = "";
+    fileUri->obj->value_[FILE_URI_PARAM] = "";
     fileUri->obj->value_[FILE_TYPE] = "";
     return fileUri;
 }
@@ -379,7 +379,7 @@ const char* OH_UdsFileUri_GetType(OH_UdsFileUri* pThis)
 
 const char* OH_UdsFileUri_GetFileUri(OH_UdsFileUri* pThis)
 {
-    return GetUdsStrValue(pThis, NdkStructId::UDS_FILE_URI_STRUCT_ID, FILE_URI);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_FILE_URI_STRUCT_ID, FILE_URI_PARAM);
 }
 
 const char* OH_UdsFileUri_GetFileType(OH_UdsFileUri* pThis)
@@ -392,7 +392,7 @@ int OH_UdsFileUri_SetFileUri(OH_UdsFileUri* pThis, const char* fileUri)
     if (fileUri == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_FILE_URI_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue<std::string>(FILE_URI, fileUri);
+    return pThis->SetUdsValue<std::string>(FILE_URI_PARAM, fileUri);
 }
 
 int OH_UdsFileUri_SetFileType(OH_UdsFileUri* pThis, const char* fileType)
@@ -439,10 +439,10 @@ void OH_UdsPixelMap_GetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelm
     }
 }
 
-int OH_UdsPixelMap_SetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelMap)
+int OH_UdsPixelMap_SetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelmapNative)
 {
-    if (pixelMap == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_PIXEL_MAP_STRUCT_ID)) {
+    if (pixelmapNative == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_PIXEL_MAP_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue<std::shared_ptr<OHOS::Media::PixelMap>>(PIXEL_MAP, pixelMap->GetInnerPixelmap());
+    return pThis->SetUdsValue<std::shared_ptr<OHOS::Media::PixelMap>>(PIXEL_MAP, pixelmapNative->GetInnerPixelmap());
 }

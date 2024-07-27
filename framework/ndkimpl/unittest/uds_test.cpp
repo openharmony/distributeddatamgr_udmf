@@ -805,7 +805,7 @@ HWTEST_F(UdsTest, OH_UdsFileUri_GetType_001, TestSize.Level1)
 HWTEST_F(UdsTest, OH_UdsFileUri_GetFileUri_001, TestSize.Level1)
 {
     auto fileUri = OH_UdsFileUri_Create();
-    fileUri->obj->value_[FILE_URI] = "fileUri";
+    fileUri->obj->value_[FILE_URI_PARAM] = "fileUri";
     EXPECT_EQ("fileUri", std::string(OH_UdsFileUri_GetFileUri(fileUri)));
     OH_UdsFileUri_Destroy(fileUri);
 
@@ -893,7 +893,8 @@ HWTEST_F(UdsTest, OH_UdsFileUri_SetFileType_001, TestSize.Level1)
 HWTEST_F(UdsTest, OH_UdsPixelMap_Create_001, TestSize.Level1)
 {
     auto pixelMap = OH_UdsPixelMap_Create();
-    EXPECT_EQ(UDMF_META_OPENHARMONY_PIXEL_MAP, *(std::get_if<std::string>(&(pixelMap->obj)->value_[UNIFORM_DATA_TYPE])));
+    EXPECT_EQ(UDMF_META_OPENHARMONY_PIXEL_MAP,
+        *(std::get_if<std::string>(&(pixelMap->obj)->value_[UNIFORM_DATA_TYPE])));
     OH_UdsPixelMap_Destroy(pixelMap);
 }
 
