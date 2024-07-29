@@ -29,7 +29,6 @@ ohos_shared_library("libudmf") {
     "${udmf_framework_path}/common",
   ]
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
     "${udmf_framework_path}/ndkimpl/data/udmf.cpp",
     "${udmf_framework_path}/ndkimpl/data/uds.cpp",
     "${udmf_framework_path}/ndkimpl/data/utd.cpp",
@@ -42,11 +41,8 @@ ohos_shared_library("libudmf") {
   external_deps = [
     "ability_base:base",
     "ability_base:want",
-    "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image",
-    "image_framework:image_native",
-    "image_framework:pixelmap",
   ]
 
   relative_install_dir = "ndk"
