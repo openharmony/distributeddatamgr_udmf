@@ -82,8 +82,10 @@ class RadarReporterAdapter {
 public:
     static void ReportSetDataNormal(std::string func, int32_t stage, int32_t stageRes, int32_t state);
     static void ReportSetDataFail(std::string func, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state);
+    static void ReportSetDataFail(std::string func, int32_t stage, int32_t stageRes, int32_t errorCode);
     static void ReportGetDataNormal(std::string func, int32_t stage, int32_t stageRes, int32_t state);
     static void ReportGetDataFail(std::string func, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state);
+    static void ReportGetDataFail(std::string func, int32_t stage, int32_t stageRes, int32_t errorCode);
 };
 } // namespace UDMF
 } // namespace OHOS
