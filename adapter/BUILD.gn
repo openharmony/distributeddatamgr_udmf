@@ -109,13 +109,11 @@ ohos_source_set("arkui_x_udmf_data") {
 
   sources += arkui_x_public_source
 
-  include_dirs = [
-    "${arkui_x_c_utils_path}/base/include",
-    "${third_party_path}/cJSON",
-  ]
+  include_dirs = [ "${third_party_path}/cJSON" ]
 
   deps = [
     "${arkui_path}/ace_engine/adapter/${target_os}/build:libarkui_${target_os}",
+    "${arkui_x_c_utils_path}/base:utilsbase",
     "${arkui_x_hilog_path}/interfaces/native/innerkits:libhilog_${target_os}",
   ]
 
@@ -133,13 +131,13 @@ ohos_source_set("arkui_x_udmf_data_inner") {
   sources = arkui_x_public_source
 
   include_dirs = [
-    "${arkui_x_c_utils_path}/base/include",
     "${arkui_x_hilog_path}/interfaces/native/innerkits/include",
     "${third_party_path}/cJSON",
   ]
 
   deps = [
     "${arkui_path}/napi/:ace_napi",
+    "${arkui_x_c_utils_path}/base:utilsbase",
     "${arkui_x_hilog_path}/interfaces/native/innerkits:libhilog_${target_os}",
   ]
 
@@ -157,7 +155,6 @@ config("arkui_x_udmf_napi_config") {
   include_dirs = [
     "${arkui_path}/napi/interfaces/kits",
     "${arkui_path}/napi/interfaces/inner_api",
-    "${arkui_x_c_utils_path}/base/include",
     "${arkui_x_hilog_path}/interfaces/native/innerkits/include",
     "${arkui_x_image_framework_path}/interfaces/kits/js/common/include",
     "${arkui_x_image_framework_path}/frameworks/innerkitsimpl/receiver/include",
@@ -174,7 +171,6 @@ config("arkui_x_udmf_napi_config") {
 
 ohos_source_set("arkui_x_uniformtypedescriptor") {
   include_dirs = [
-    "${arkui_x_c_utils_path}/base/include",
     "${ability_runtime_cross_platform_path}/frameworks/js/napi/napi_common",
     "${udmf_framework_path}/innerkitsimpl/data",
     "${udmf_root_path}/adapter/framework/innerkitsimpl/client",
@@ -192,6 +188,7 @@ ohos_source_set("arkui_x_uniformtypedescriptor") {
   ]
   deps = [
     ":arkui_x_udmf_data",
+    "${arkui_x_c_utils_path}/base:utilsbase",
     "${arkui_x_hilog_path}/interfaces/native/innerkits:libhilog_${target_os}",
     "${arkui_x_plugin_path}/libs/napi:napi_${target_os}",
   ]
@@ -210,7 +207,6 @@ ohos_source_set("arkui_x_uniformtypedescriptor") {
 
 ohos_source_set("arkui_x_unifieddatachannel") {
   include_dirs = [
-    "${arkui_x_c_utils_path}/base/include",
     "${ability_runtime_cross_platform_path}/frameworks/js/napi/napi_common",
     "${udmf_root_path}/adapter/framework/innerkitsimpl/client",
     "${third_party_path}/bounds_checking_function/include",
@@ -256,6 +252,7 @@ ohos_source_set("arkui_x_unifieddatachannel") {
   deps = [
     ":arkui_x_udmf_data",
     "${ability_runtime_cross_platform_path}/interfaces/inner_api/want:cross_platform_want_params",
+    "${arkui_x_c_utils_path}/base:utilsbase",
     "${arkui_x_hilog_path}/interfaces/native/innerkits:libhilog_${target_os}",
     "${arkui_x_plugin_path}/libs/napi:napi_${target_os}",
   ]
@@ -266,7 +263,6 @@ ohos_source_set("arkui_x_unifieddatachannel") {
 
 ohos_source_set("arkui_x_udmf_data_napi") {
   include_dirs = [
-    "${arkui_x_c_utils_path}/base/include",
     "${ability_runtime_cross_platform_path}/frameworks/js/napi/napi_common",
     "${ability_runtime_cross_platform_path}/interfaces/inner_api/want",
   ]
@@ -305,6 +301,7 @@ ohos_source_set("arkui_x_udmf_data_napi") {
     ":arkui_x_udmf_data_inner",
     "${ability_runtime_cross_platform_path}/frameworks/js/napi/napi_common:napi_common",
     "${ability_runtime_cross_platform_path}/interfaces/inner_api/want:cross_platform_want_params",
+    "${arkui_x_c_utils_path}/base:utilsbase",
   ]
 
   subsystem_name = "distributeddatamgr"
