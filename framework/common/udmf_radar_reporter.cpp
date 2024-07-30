@@ -56,7 +56,8 @@ void RadarReporterAdapter::ReportNormal(std::string func, int32_t scene, int32_t
     );
 }
 
-void RadarReporterAdapter::ReportFail(std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state)
+void RadarReporterAdapter::ReportFail(
+    std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state)
 {
     struct HiSysEventParam params[] = {
         { .name = { "ORG_PKG" },
@@ -97,7 +98,8 @@ void RadarReporterAdapter::ReportFail(std::string func, int32_t scene, int32_t s
     );
 }
 
-void RadarReporterAdapter::ReportFail(std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode)
+void RadarReporterAdapter::ReportFail(
+    std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode)
 {
     struct HiSysEventParam params[] = {
         { .name = { "ORG_PKG" },

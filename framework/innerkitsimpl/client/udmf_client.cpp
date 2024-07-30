@@ -42,7 +42,7 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
     DdsTrace trace(
         std::string(TAG) + std::string(__FUNCTION__), TraceSwitch::BYTRACE_ON | TraceSwitch::TRACE_CHAIN_ON);
     RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
-        BizScene::SET_DATA, SetDataStage::SET_DATA_BEGIN,StageRes::IDLE, BizState::DFX_BEGIN);
+        BizScene::SET_DATA, SetDataStage::SET_DATA_BEGIN, StageRes::IDLE, BizState::DFX_BEGIN);
     auto service = UdmfServiceClient::GetInstance();
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
