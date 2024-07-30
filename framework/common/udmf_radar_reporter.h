@@ -17,6 +17,7 @@
 #define UDMF_RADAR_REPORTER_H
 
 #include "hisysevent_c.h"
+#include "visibility.h"
 #include <string>
 
 namespace OHOS {
@@ -65,27 +66,19 @@ enum BizState : int32_t {
     DFX_NORMAL_END = 1,
     DFX_ABNORMAL_END = 2
 };
-
-const constexpr char BIZ_STATE[] = "BIZ_STATE";
-const constexpr char ERROR_CODE[] = "ERROR_CODE";
 const constexpr char DOMAIN[] = "DISTDATAMGR";
 const constexpr char EVENT_NAME[] = "DISTRIBUTED_UDMF_BEHAVIOR";
-const constexpr char ORG_PKG_KEY[] = "ORG_PKG";
-const constexpr char ORG_PKG_VALUE[] = "distributeddata";
-const constexpr char FUNC[] = "FUNC";
-const constexpr char BIZ_SCENE[] = "BIZ_SCENE";
-const constexpr char BIZ_STAGE[] = "BIZ_STAGE";
-const constexpr char STAGE_RES[] = "STAGE_RES";
+const constexpr char ORG_PKG[] = "distributeddata";
 } // namespace RadarReporter
 
-class RadarReporterAdapter {
+class API_EXPORT RadarReporterAdapter {
 public:
-    static void ReportSetDataNormal(std::string func, int32_t stage, int32_t stageRes, int32_t state);
-    static void ReportSetDataFail(std::string func, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state);
-    static void ReportSetDataFail(std::string func, int32_t stage, int32_t stageRes, int32_t errorCode);
-    static void ReportGetDataNormal(std::string func, int32_t stage, int32_t stageRes, int32_t state);
-    static void ReportGetDataFail(std::string func, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state);
-    static void ReportGetDataFail(std::string func, int32_t stage, int32_t stageRes, int32_t errorCode);
+    static  void ReportNormal(std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t state);
+    static  void ReportFail(std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state);
+    static  void ReportFail(std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode);
+    // static void ReportGetDataNormal(std::string func, int32_t stage, int32_t stageRes, int32_t state);
+    // static void ReportGetDataFail(std::string func, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state);
+    // static void ReportGetDataFail(std::string func, int32_t stage, int32_t stageRes, int32_t errorCode);
 };
 } // namespace UDMF
 } // namespace OHOS

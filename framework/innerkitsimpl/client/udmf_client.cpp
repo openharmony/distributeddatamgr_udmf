@@ -41,13 +41,13 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
 {
     DdsTrace trace(
         std::string(TAG) + std::string(__FUNCTION__), TraceSwitch::BYTRACE_ON | TraceSwitch::TRACE_CHAIN_ON);
-    RadarReporterAdapter::ReportSetDataNormal(std::string(__FUNCTION__),
-        SetDataStage::SET_DATA_BEGIN,StageRes::IDLE, BizState::DFX_BEGIN);
+    RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
+        BizScene::SET_DATA, SetDataStage::SET_DATA_BEGIN,StageRes::IDLE, BizState::DFX_BEGIN);
     auto service = UdmfServiceClient::GetInstance();
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
-        RadarReporterAdapter::ReportSetDataFail(std::string(__FUNCTION__),
-            SetDataStage::SET_DATA_BEGIN, StageRes::FAILED, E_IPC, BizState::DFX_ABNORMAL_END);
+        RadarReporterAdapter::ReportFail(std::string(__FUNCTION__),
+            BizScene::SET_DATA, SetDataStage::SET_DATA_BEGIN, StageRes::FAILED, E_IPC, BizState::DFX_ABNORMAL_END);
         return E_IPC;
     }
 
@@ -66,19 +66,19 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
             dataCache_.Clear();
             dataCache_.Insert(key, unifiedData);
             LOG_INFO(UDMF_CLIENT, "SetData in app success, bundleName:%{public}s.", bundleName.c_str());
-            RadarReporterAdapter::ReportSetDataNormal(std::string(__FUNCTION__),
-                SetDataStage::SET_DATA_END, StageRes::SUCCESS, BizState::DFX_NORMAL_END);
+            RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
+                BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::SUCCESS, BizState::DFX_NORMAL_END);
             return E_OK;
         }
     }
     int32_t ret = service->SetData(option, unifiedData, key);
     if (ret != E_OK) {
-        RadarReporterAdapter::ReportSetDataFail(std::string(__FUNCTION__),
-            SetDataStage::SET_DATA_END, StageRes::FAILED, ret, BizState::DFX_ABNORMAL_END);
+        RadarReporterAdapter::ReportFail(std::string(__FUNCTION__),
+            BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::FAILED, ret, BizState::DFX_ABNORMAL_END);
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
     }
-    RadarReporterAdapter::ReportSetDataNormal(std::string(__FUNCTION__),
-        SetDataStage::SET_DATA_END, StageRes::SUCCESS, BizState::DFX_NORMAL_END);
+    RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
+        BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::SUCCESS, BizState::DFX_NORMAL_END);
     return static_cast<Status>(ret);
 }
 
@@ -86,32 +86,32 @@ Status UdmfClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
 {
     DdsTrace trace(
         std::string(TAG) + std::string(__FUNCTION__), TraceSwitch::BYTRACE_ON | TraceSwitch::TRACE_CHAIN_ON);
-    RadarReporterAdapter::ReportGetDataNormal(std::string(__FUNCTION__),
-        GetDataStage::GET_DATA_BEGIN, StageRes::IDLE, BizState::DFX_BEGIN);
+    RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
+        BizScene::GET_DATA, GetDataStage::GET_DATA_BEGIN, StageRes::IDLE, BizState::DFX_BEGIN);
     auto service = UdmfServiceClient::GetInstance();
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
-        RadarReporterAdapter::ReportSetDataFail(std::string(__FUNCTION__),
-            GetDataStage::GET_DATA_BEGIN, StageRes::FAILED, E_IPC, BizState::DFX_ABNORMAL_END);
+        RadarReporterAdapter::ReportFail(std::string(__FUNCTION__),
+            BizScene::GET_DATA, GetDataStage::GET_DATA_BEGIN, StageRes::FAILED, E_IPC, BizState::DFX_ABNORMAL_END);
         return E_IPC;
     }
     auto it = dataCache_.Find(query.key);
     if (it.first) {
         unifiedData = it.second;
         dataCache_.Erase(query.key);
-        RadarReporterAdapter::ReportGetDataNormal(std::string(__FUNCTION__),
-            GetDataStage::GET_DATA_END, StageRes::SUCCESS, BizState::DFX_NORMAL_END);
+        RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
+            BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::SUCCESS, BizState::DFX_NORMAL_END);
         return E_OK;
     }
     LOG_WARN(UDMF_CLIENT, "query data from cache failed! key = %{public}s", query.key.c_str());
     int32_t ret = service->GetData(query, unifiedData);
     if (ret != E_OK) {
-        RadarReporterAdapter::ReportSetDataFail(std::string(__FUNCTION__),
-            GetDataStage::GET_DATA_END, StageRes::FAILED, ret, BizState::DFX_ABNORMAL_END);
+        RadarReporterAdapter::ReportFail(std::string(__FUNCTION__),
+            BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::FAILED, ret, BizState::DFX_ABNORMAL_END);
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
     }
-    RadarReporterAdapter::ReportGetDataNormal(std::string(__FUNCTION__),
-        GetDataStage::GET_DATA_END, StageRes::SUCCESS, BizState::DFX_NORMAL_END);
+    RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
+        BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::SUCCESS, BizState::DFX_NORMAL_END);
     return static_cast<Status>(ret);
 }
 
