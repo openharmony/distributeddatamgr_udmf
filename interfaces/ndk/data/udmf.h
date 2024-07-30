@@ -496,7 +496,7 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* pThis,
 int OH_Udmf_GetUnifiedData(const char* key, Udmf_Intention intention, OH_UdmfData* unifiedData);
 
 /**
- * @brief Get {@link OH_UdmfData} data from udmf database.
+ * @brief Set {@link OH_UdmfData} data to database.
  *
  * @param intention Represents data type {@link Udmf_Intention}.
  * @param unifiedData Represents a pointer to an instance of {@link OH_UdmfData}.
