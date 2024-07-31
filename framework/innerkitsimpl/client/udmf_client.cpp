@@ -18,7 +18,6 @@
 #include "dds_trace.h"
 #include "udmf_radar_reporter.h"
 
-#include "error_code.h"
 #include "logger.h"
 #include "udmf_service_client.h"
 #include "udmf_utils.h"

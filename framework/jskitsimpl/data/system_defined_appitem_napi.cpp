@@ -15,9 +15,6 @@
 #define LOG_TAG "SystemDefinedAppItemNapi"
 #include "system_defined_appitem_napi.h"
 
-#include "napi_data_utils.h"
-#include "napi_error_utils.h"
-#include "napi_queue.h"
 #include "system_defined_appitem.h"
 #include "system_defined_record_napi.h"
 #include "unified_record_napi.h"

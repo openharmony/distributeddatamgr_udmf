@@ -15,7 +15,6 @@
 #define LOG_TAG "UtdCfgsChecker"
 #include "utd_cfgs_checker.h"
 
-#include <vector>
 #include <regex>
 #include "utd_graph.h"
 #include "logger.h"
