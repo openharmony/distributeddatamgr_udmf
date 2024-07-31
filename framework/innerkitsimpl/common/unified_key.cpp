@@ -22,10 +22,10 @@ namespace UDMF {
 static std::bitset<MAX_BIT_SIZE> g_ruleIntention;
 static std::bitset<MAX_BIT_SIZE> g_ruleBundleName;
 static std::bitset<MAX_BIT_SIZE> g_ruleGroupId;
-static const std::string UNIFIED_KEY_SCHEMA = "udmf://";
-static const std::string ALPHA_AGGREGATE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-static const std::string DIGIT_AGGREGATE = "0123456789";
-static const std::string SYMBOL_AGGREGATE = ":;<=>?@[\\]_`";
+static constexpr const char *UNIFIED_KEY_SCHEMA = "udmf://";
+static constexpr const char *ALPHA_AGGREGATE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+static constexpr const char *DIGIT_AGGREGATE = "0123456789";
+static constexpr const char *SYMBOL_AGGREGATE = ":;<=>?@[\\]_`";
 UnifiedKey::UnifiedKey(std::string key)
 {
     this->key = std::move(key);
@@ -128,21 +128,21 @@ void UnifiedKey::PreliminaryWork()
 {
     // All intentions are composed of uppercase and lowercase letters and underscores.
     if (g_ruleIntention.none()) {
-        std::string intentionTmp = ALPHA_AGGREGATE + "_";
+        std::string intentionTmp = std::string(ALPHA_AGGREGATE) + "_";
         for (char i : intentionTmp) {
             g_ruleIntention.set(i);
         }
     }
     // All bundle name are composed of uppercase and lowercase letters and dots.
     if (g_ruleBundleName.none()) {
-        std::string bundleAggregate = ALPHA_AGGREGATE + DIGIT_AGGREGATE + "._";
+        std::string bundleAggregate = std::string(ALPHA_AGGREGATE) + DIGIT_AGGREGATE + "._";
         for (char i : bundleAggregate) {
             g_ruleBundleName.set(i);
         }
     }
     // Characters of groupId are taken from Ascii codes 48 to 122.
     if (g_ruleGroupId.none()) {
-        std::string idAggregate = DIGIT_AGGREGATE + ALPHA_AGGREGATE + SYMBOL_AGGREGATE;
+        std::string idAggregate = std::string(DIGIT_AGGREGATE) + ALPHA_AGGREGATE + SYMBOL_AGGREGATE;
         for (char i : idAggregate) {
             g_ruleGroupId.set(i);
         }

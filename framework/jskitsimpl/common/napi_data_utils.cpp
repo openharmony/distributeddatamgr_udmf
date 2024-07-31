@@ -562,17 +562,17 @@ napi_value NapiDataUtils::DefineClass(napi_env env, const std::string &name,
     const napi_property_descriptor *properties, size_t count, napi_callback newcb)
 {
     // base64("data.udmf") as rootPropName, i.e. global.<root>
-    const std::string rootPropName = "ZGF0YS51ZG1m";
+    constexpr const char *rootPropName = "ZGF0YS51ZG1m";
     napi_value root = nullptr;
     bool hasRoot = false;
     napi_value global = nullptr;
     napi_get_global(env, &global);
-    napi_has_named_property(env, global, rootPropName.c_str(), &hasRoot);
+    napi_has_named_property(env, global, rootPropName, &hasRoot);
     if (hasRoot) {
-        napi_get_named_property(env, global, rootPropName.c_str(), &root);
+        napi_get_named_property(env, global, rootPropName, &root);
     } else {
         napi_create_object(env, &root);
-        napi_set_named_property(env, global, rootPropName.c_str(), root);
+        napi_set_named_property(env, global, rootPropName, root);
     }
 
     std::string propName = "constructor_of_" + name;

@@ -31,13 +31,13 @@
 
 namespace OHOS {
 namespace UDMF {
-const mode_t MODE = 0700;
+constexpr mode_t MODE = 0700;
 static constexpr int64_t MAX_KV_RECORD_SIZE = 2 * 1024 * 1024;
 static constexpr int64_t MAX_KV_DATA_SIZE = 4 * 1024 * 1024;
 
-const std::string TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/udata";
-const std::string TEMP_UNIFIED_DATA_SUFFIX = ".ud";
-const std::string TEMP_UNIFIED_DATA_FLAG = "temp_udmf_file_flag";
+constexpr const char *TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/udata";
+constexpr const char *TEMP_UNIFIED_DATA_SUFFIX = ".ud";
+constexpr const char *TEMP_UNIFIED_DATA_FLAG = "temp_udmf_file_flag";
 
 std::string UnifiedDataHelper::rootPath_ = "";
 

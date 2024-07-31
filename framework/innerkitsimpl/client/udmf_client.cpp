@@ -28,7 +28,7 @@
 
 namespace OHOS {
 namespace UDMF {
-const std::string TAG = "UdmfClient::";
+constexpr const char *TAG = "UdmfClient::";
 using namespace OHOS::DistributedDataDfx;
 using namespace RadarReporter;
 UdmfClient &UdmfClient::GetInstance()
