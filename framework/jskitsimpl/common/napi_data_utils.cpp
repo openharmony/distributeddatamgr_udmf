@@ -15,8 +15,6 @@
 #define LOG_TAG "NapiDataUtils"
 #include "napi_data_utils.h"
 
-#include "napi_queue.h"
-
 namespace OHOS {
 namespace UDMF {
 constexpr int32_t STR_MAX_LENGTH = 4096;

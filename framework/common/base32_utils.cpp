@@ -15,8 +15,6 @@
 
 #include "base32_utils.h"
 
-#include <string>
-
 namespace OHOS {
 namespace UDMF {
 static char BASE32_CHARS[33] = "abcdefghijklmnopqrstuvwxyz234567";

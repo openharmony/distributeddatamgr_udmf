@@ -14,9 +14,6 @@
  */
 #define LOG_TAG "CustomUtdJsonParser"
 #include "custom_utd_json_parser.h"
-#include <fstream>
-#include <cJSON.h>
-#include "error_code.h"
 #include "logger.h"
 namespace OHOS {
 namespace UDMF {

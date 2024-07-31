@@ -16,8 +16,6 @@
 #include "summary_napi.h"
 
 #include "napi_data_utils.h"
-#include "napi_error_utils.h"
-#include "napi_queue.h"
 #include "unified_types.h"
 
 namespace OHOS {

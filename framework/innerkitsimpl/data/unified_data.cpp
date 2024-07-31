@@ -14,8 +14,6 @@
  */
 #define LOG_TAG "UnifiedData"
 #include "unified_data.h"
-#include <chrono>
-#include <cinttypes>
 #include "logger.h"
 
 namespace OHOS {

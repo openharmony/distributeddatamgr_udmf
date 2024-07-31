@@ -16,9 +16,6 @@
 #include "html_napi.h"
 
 #include "html.h"
-#include "napi_data_utils.h"
-#include "napi_error_utils.h"
-#include "napi_queue.h"
 #include "text_napi.h"
 #include "unified_record_napi.h"
 

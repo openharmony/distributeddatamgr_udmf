@@ -14,9 +14,6 @@
  */
 
 #include "ndk_data_conversion.h"
-#include "unified_data.h"
-#include "udmf_capi_common.h"
-#include "error_code.h"
 
 namespace OHOS::UDMF {
     Status NdkDataConversion::GetNativeUnifiedData(OH_UdmfData* ndkData, std::shared_ptr<UnifiedData>& data)

@@ -15,8 +15,6 @@
 #define LOG_TAG "UdmfTypesUtil"
 #include "udmf_types_util.h"
 
-#include <string>
-
 #include "logger.h"
 #include "tlv_util.h"
 

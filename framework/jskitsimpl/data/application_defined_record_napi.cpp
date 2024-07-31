@@ -16,9 +16,6 @@
 #include "application_defined_record_napi.h"
 
 #include "application_defined_record.h"
-#include "napi_data_utils.h"
-#include "napi_error_utils.h"
-#include "napi_queue.h"
 #include "unified_record_napi.h"
 
 namespace OHOS {

@@ -22,8 +22,6 @@
 #include "html_napi.h"
 #include "image_napi.h"
 #include "link_napi.h"
-#include "napi_data_utils.h"
-#include "napi_error_utils.h"
 #include "plain_text_napi.h"
 #include "system_defined_appitem_napi.h"
 #include "system_defined_form_napi.h"
