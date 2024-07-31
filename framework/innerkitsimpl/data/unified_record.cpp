@@ -15,8 +15,6 @@
 #define LOG_TAG "UnifiedRecord"
 #include "unified_record.h"
 
-#include "logger.h"
-
 namespace OHOS {
 namespace UDMF {
 UnifiedRecord::UnifiedRecord()

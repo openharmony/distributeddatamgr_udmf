@@ -14,10 +14,6 @@
  */
 #define LOG_TAG "Udmf"
 #include "udmf.h"
-#include <memory>
-#include <new>
-#include "unified_data.h"
-#include "unified_record.h"
 #include "udmf_err_code.h"
 #include "udmf_client.h"
 #include "securec.h"
@@ -25,7 +21,6 @@
 #include "int_wrapper.h"
 #include "string_wrapper.h"
 #include "unified_meta.h"
-#include "uds.h"
 #include "udmf_meta.h"
 #include "logger.h"
 #include "plain_text.h"

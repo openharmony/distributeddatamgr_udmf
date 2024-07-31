@@ -15,9 +15,6 @@
 #define LOG_TAG "PlainTextNapi"
 #include "plain_text_napi.h"
 
-#include "napi_data_utils.h"
-#include "napi_error_utils.h"
-#include "napi_queue.h"
 #include "plain_text.h"
 #include "text_napi.h"
 #include "unified_record_napi.h"
