@@ -34,11 +34,11 @@ public:
     static UtdClient &GetInstance();
     Status GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
     Status GetUniformDataTypeByFilenameExtension(const std::string &fileExtension, std::string &typeId,
-                                                const std::string &belongsTo = DEFAULT_TYPE_ID);
+                                                 std::string belongsTo = DEFAULT_TYPE_ID);
     Status GetUniformDataTypesByFilenameExtension(const std::string &fileExtension,
                     std::vector<std::string> &typeIds, const std::string &belongsTo = DEFAULT_TYPE_ID);
     Status GetUniformDataTypeByMIMEType(const std::string &mimeType, std::string &typeId,
-                                        const std::string &belongsTo = DEFAULT_TYPE_ID);
+                                        std::string belongsTo = DEFAULT_TYPE_ID);
     Status GetUniformDataTypesByMIMEType(const std::string &mimeType, std::vector<std::string> &typeIds,
                                         const std::string &belongsTo = DEFAULT_TYPE_ID);
     Status IsUtd(std::string typeId, bool &result);
