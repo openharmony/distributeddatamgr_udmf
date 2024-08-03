@@ -1448,7 +1448,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix002, TestSize.Level1
 
 /**
 * @tc.name: GetUniformDataTypesByFilenameExtension001
-* @tc.desc: Normal testcase of GetUniformDataTypesByFilenameExtension
+* @tc.desc: Normal testcase of GetUniformDataTypesByFilenameExtension, filtered by blongsToType
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension001, TestSize.Level1)
@@ -1467,7 +1467,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension001, TestSize.Leve
 
 /**
 * @tc.name: GetUniformDataTypesByFilenameExtension002
-* @tc.desc: Normal testcase of GetUniformDataTypesByFilenameExtension, filtered by blongsToType
+* @tc.desc: Normal testcase of GetUniformDataTypesByFilenameExtension
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension002, TestSize.Level1)
@@ -1527,6 +1527,12 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension004, TestSize.Leve
     ASSERT_EQ(status, E_OK);
     ASSERT_EQ(currTypes.size(), 1);
     ASSERT_EQ(currTypes[0], "general.ts");
+
+    blongsToType = "general.shell-script";
+    status =
+        UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(filenameExtension, currTypes, blongsToType);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(currTypes.size(), 0);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension004 end.");
 }
 
@@ -1641,6 +1647,11 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMEType004, TestSize.Level1)
     ASSERT_EQ(status, E_OK);
     ASSERT_EQ(currTypes.size(), 1);
     ASSERT_EQ(currTypes[0], "com.microsoft.advanced-stream-redirector");
+
+    blongsToType = "general.text";
+    status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes, blongsToType);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(currTypes.size(), 0);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMEType004 end.");
 }
 } // OHOS::Test
