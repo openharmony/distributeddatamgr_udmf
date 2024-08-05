@@ -339,7 +339,7 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor012:';
     console.info(TAG, 'start');
     let typeObj = UTD.getTypeDescriptor('general.type-script');
-    let ret = typeObj.belongsTo('general.plain-text');
+    let ret = typeObj.belongsTo('general.text');
     expect(ret === true).assertTrue();
     console.info(TAG, 'typeDescriptor, ret ' + typeObj);
     console.info(TAG, 'end');
@@ -355,7 +355,7 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor013:';
     console.info(TAG, 'start');
     let typeObj = UTD.getTypeDescriptor('general.type-script');
-    let ret = typeObj.isLowerLevelType('general.plain-text');
+    let ret = typeObj.isLowerLevelType('general.text');
     expect(ret === true).assertTrue();
     console.info(TAG, 'typeDescriptor, ret ' + ret);
     console.info(TAG, 'end');
@@ -370,7 +370,7 @@ describe('UdmfUtdJSTest', function () {
   it ('UdmfTestTypeDescriptor014', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor014:';
     console.info(TAG, 'start');
-    let typeObj = UTD.getTypeDescriptor('general.plain-text');
+    let typeObj = UTD.getTypeDescriptor('general.text');
     let ret = typeObj.isHigherLevelType('general.type-script');
     expect(ret === true).assertTrue();
     console.info(TAG, 'typeDescriptor, ret ' + typeObj);
@@ -386,7 +386,7 @@ describe('UdmfUtdJSTest', function () {
   it ('UdmfTestTypeDescriptor015', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor015:';
     console.info(TAG, 'start');
-    let typeId = UTD.getUniformDataTypeByFilenameExtension('.ts', 'general.plain-text');
+    let typeId = UTD.getUniformDataTypeByFilenameExtension('.ts', 'general.text');
     expect(typeId === 'general.type-script').assertTrue();
     console.info(TAG, 'typeDescriptor, ret ' + typeId);
     console.info(TAG, 'end');
