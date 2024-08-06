@@ -109,11 +109,109 @@ ohos_unittest("NdkDataConversionTest") {
   external_deps = common_external_deps
 }
 
+ohos_unittest("ApplicationDefineRecordTest") {
+  module_out_path = module_output_path
+
+  sources = [ "application_defined_record_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("AudioTest") {
+  module_out_path = module_output_path
+
+  sources = [ "audio_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("FileDataTest") {
+  module_out_path = module_output_path
+
+  sources = [ "file_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("FlexibleTypeTest") {
+  module_out_path = module_output_path
+
+  sources = [ "flexible_type_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("FolderTest") {
+  module_out_path = module_output_path
+
+  sources = [ "folder_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("HtmlTest") {
+  module_out_path = module_output_path
+
+  sources = [ "html_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
 
   deps = [
+    ":ApplicationDefineRecordTest",
+    ":AudioTest",
+    ":FileDataTest",
+    ":FlexibleTypeTest",
+    ":FolderTest",
+    ":HtmlTest",
     ":NdkDataConversionTest",
     ":UdmfClientSystemHapTest",
     ":UdmfClientTest",
