@@ -558,17 +558,7 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData002, TestSize.Level0)
     int getRes = OH_UdmfRecord_GetGeneralEntry(getRecords[0], typeId, &getEntry, &getCount);
     EXPECT_EQ(getRes, UDMF_E_OK);
     EXPECT_EQ(getCount, count);
-
-    bool isSame = true;
-    for (int i = 0; i < getCount; ++i)
-    {
-        if (getEntry[i] != entry[i])
-        {
-            isSame = false;
-            break;
-        }
-    }
-    EXPECT_TRUE(isSame);
+    EXPECT_EQ(std::memcmp(getEntry, entry), 0);
 
     unsigned int getCount1 = 0;
     unsigned char *getEntry1;
@@ -666,17 +656,7 @@ HWTEST_F(UDMFTest, OH_Udmf_AddAndGetGeneralEntry002, TestSize.Level0)
     int getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId, &getEntry, &getCount);
     EXPECT_EQ(getRes, UDMF_E_OK);
     EXPECT_EQ(getCount, count);
-
-    bool isSame = true;
-    for (int i = 0; i < getCount; ++i)
-    {
-        if (getEntry[i] != entry[i])
-        {
-            isSame = false;
-            break;
-        }
-    }
-    EXPECT_TRUE(isSame);
+    EXPECT_EQ(std::memcmp(getEntry, entry), 0);
 
     unsigned int getCount1 = 0;
     unsigned char *getEntry1;
