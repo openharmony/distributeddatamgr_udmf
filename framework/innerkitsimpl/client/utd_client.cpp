@@ -281,7 +281,7 @@ std::vector<std::string> UtdClient::GetTypeIdsFromCfg(const std::string &mimeTyp
     std::string prefixType;
     auto signSize = strlen(PREFIX_MATCH_SIGN);
     if (mimeType.size() >= signSize &&
-            mimeType.compare(mimeType.size() - signSize, signSize, PREFIX_MATCH_SIGN) == 0) {
+        mimeType.compare(mimeType.size() - signSize, signSize, PREFIX_MATCH_SIGN) == 0) {
         prefixType = mimeType.substr(0, mimeType.length() - 1);
         prefixMatch = true;
     }
