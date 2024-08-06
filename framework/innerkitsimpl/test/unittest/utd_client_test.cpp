@@ -1520,7 +1520,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension003, TestSize.Leve
     status =
         UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(filenameExtension, currTypes, blongsToType);
     ASSERT_EQ(status, E_OK);
-    ASSERT_EQ(currTypes.size(), 0);
+    ASSERT_EQ(currTypes.size(), 1);
+    ASSERT_EQ(currTypes[0].rfind("flex.z", 0), 0);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension003 end.");
 }
 
@@ -1640,7 +1641,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMEType003, TestSize.Level1)
     blongsToType = "general.text";
     status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes, blongsToType);
     ASSERT_EQ(status, E_OK);
-    ASSERT_EQ(currTypes.size(), 0);
+    ASSERT_EQ(currTypes.size(), 1);
+    ASSERT_EQ(currTypes[0].rfind("flex.z", 0), 0);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMEType003 end.");
 }
 
