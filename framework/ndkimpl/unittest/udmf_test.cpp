@@ -558,7 +558,7 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData002, TestSize.Level0)
     int getRes = OH_UdmfRecord_GetGeneralEntry(getRecords[0], typeId, &getEntry, &getCount);
     EXPECT_EQ(getRes, UDMF_E_OK);
     EXPECT_EQ(getCount, count);
-    EXPECT_EQ(std::memcmp(getEntry, entry), 0);
+    EXPECT_EQ(std::memcmp(getEntry, entry, getCount), 0);
 
     unsigned int getCount1 = 0;
     unsigned char *getEntry1;
@@ -656,7 +656,7 @@ HWTEST_F(UDMFTest, OH_Udmf_AddAndGetGeneralEntry002, TestSize.Level0)
     int getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId, &getEntry, &getCount);
     EXPECT_EQ(getRes, UDMF_E_OK);
     EXPECT_EQ(getCount, count);
-    EXPECT_EQ(std::memcmp(getEntry, entry), 0);
+    EXPECT_EQ(std::memcmp(getEntry, entry, getCount), 0);
 
     unsigned int getCount1 = 0;
     unsigned char *getEntry1;
