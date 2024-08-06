@@ -526,6 +526,52 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData001, TestSize.Level0)
 }
 
 /**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData002
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with valid param
+ * @tc.type: FUNC
+ * @tc.require: AROOOH5R5G
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData002, TestSize.Level0)
+{
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    char typeId[] = "general.plain-text";
+    unsigned char entry[] = "CreateGeneralRecord";
+    unsigned int count = sizeof(entry);
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_DRAG;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    int getUnifiedDataRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
+    EXPECT_EQ(getUnifiedDataRes, UDMF_E_OK);
+    unsigned int getRecordsCount = 0;
+    OH_UdmfRecord **getRecords = OH_UdmfData_GetRecords(readUnifiedData, &getRecordsCount);
+    EXPECT_EQ(getRecordsCount, 1);
+
+    unsigned char *getEntry;
+    unsigned int getCount = 0;
+    int getRes = OH_UdmfRecord_GetGeneralEntry(getRecords[0], typeId, &getEntry, &getCount);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    EXPECT_EQ(getCount, count);
+    EXPECT_EQ(std::memcmp(getEntry, entry, getCount), 0);
+
+    unsigned int getCount1 = 0;
+    unsigned char *getEntry1;
+    int getRes1 = OH_UdmfRecord_GetGeneralEntry(getRecords[0], typeId, &getEntry1, &getCount1);
+    EXPECT_EQ(getEntry1, getEntry);
+    EXPECT_EQ(getRes1, UDMF_E_OK);
+
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(readUnifiedData);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+}
+
+/**
  * @tc.name: OH_Udmf_CreateUnifiedRecord001
  * @tc.desc: OH_Udmf_CreateUnifiedRecord001
  * @tc.type: FUNC
@@ -610,17 +656,7 @@ HWTEST_F(UDMFTest, OH_Udmf_AddAndGetGeneralEntry002, TestSize.Level0)
     int getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId, &getEntry, &getCount);
     EXPECT_EQ(getRes, UDMF_E_OK);
     EXPECT_EQ(getCount, count);
-
-    bool isSame = true;
-    for (int i = 0; i < getCount; ++i)
-    {
-        if (getEntry[i] != entry[i])
-        {
-            isSame = false;
-            break;
-        }
-    }
-    EXPECT_TRUE(isSame);
+    EXPECT_EQ(std::memcmp(getEntry, entry, getCount), 0);
 
     unsigned int getCount1 = 0;
     unsigned char *getEntry1;
@@ -647,10 +683,11 @@ HWTEST_F(UDMFTest, OH_Udmf_AddAndGetGeneralEntry003, TestSize.Level0)
     EXPECT_EQ(addRes1, UDMF_E_OK);
 
     OH_UdmfRecord *getRecord = OH_UdmfRecord_Create();
-
     unsigned int getCount = 0;
     unsigned char *getEntry;
     char typeId1[] = "general.text";
+    OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
+    
     int getRes = OH_UdmfRecord_GetGeneralEntry(getRecord, typeId1, &getEntry, &getCount);
     EXPECT_EQ(getRes, UDMF_E_INVALID_PARAM);
 
