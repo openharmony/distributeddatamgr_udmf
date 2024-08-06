@@ -30,6 +30,7 @@ namespace UDMF {
 constexpr const char* CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
 constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/defaultUserId/";
 constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/utd/utd-adt.json";
+constexpr const char* PREFIX_MATCH_SIGN = "/*";
 UtdClient::UtdClient()
 {
     Init();
@@ -153,7 +154,7 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
 }
 
 Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &fileExtension,
-	std::vector<std::string> &typeIds, const std::string &belongsTo)
+    std::vector<std::string> &typeIds, const std::string &belongsTo)
 {
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. fileExtension:%{public}s, belongsTo:%{public}s ",
@@ -278,7 +279,9 @@ std::vector<std::string> UtdClient::GetTypeIdsFromCfg(const std::string &mimeTyp
 {
     bool prefixMatch = false;
     std::string prefixType;
-    if (mimeType.back() == '*') {
+    auto signSize = strlen(PREFIX_MATCH_SIGN);
+    if (mimeType.size() >= signSize &&
+            mimeType.compare(mimeType.size() - signSize, signSize, PREFIX_MATCH_SIGN) == 0) {
         prefixType = mimeType.substr(0, mimeType.length() - 1);
         prefixMatch = true;
     }
