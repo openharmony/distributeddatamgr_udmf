@@ -1448,7 +1448,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix002, TestSize.Level1
 
 /**
 * @tc.name: GetUniformDataTypesByFilenameExtension001
-* @tc.desc: Normal testcase of GetUniformDataTypesByFilenameExtension, filtered by blongsToType
+* @tc.desc: Normal testcase of GetUniformDataTypesByFilenameExtension, if filtered by blongsToType
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension001, TestSize.Level1)
@@ -1458,6 +1458,12 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension001, TestSize.Leve
     std::string blongsToType = "general.ebook";
     std::vector<std::string> currTypes;
     auto status =
+        UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(filenameExtension, currTypes);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(currTypes.size(), 1);
+    ASSERT_EQ(currTypes[0], "com.amazon.azw3");
+
+    status =
         UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(filenameExtension, currTypes, blongsToType);
     ASSERT_EQ(status, E_OK);
     ASSERT_EQ(currTypes.size(), 1);
@@ -1473,24 +1479,6 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension001, TestSize.Leve
 HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension002 begin.");
-    std::string filenameExtension = ".png";
-    std::vector<std::string> currTypes;
-    auto status =
-        UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(filenameExtension, currTypes);
-    ASSERT_EQ(status, E_OK);
-    ASSERT_EQ(currTypes.size(), 1);
-    ASSERT_EQ(currTypes[0], "general.png");
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension002 end.");
-}
-
-/**
-* @tc.name: GetUniformDataTypesByFilenameExtension003
-* @tc.desc: Normal testcase of GetUniformDataTypesByFilenameExtension
-* @tc.type: FUNC
-*/
-HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension003, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension003 begin.");
     std::string filenameExtension = ".ts";
     std::vector<std::string> currTypes;
     auto status =
@@ -1501,20 +1489,20 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension003, TestSize.Leve
     auto find2 = std::find(currTypes.begin(), currTypes.end(), "general.ts") != currTypes.end();
     ASSERT_EQ(find1, true);
     ASSERT_EQ(find2, true);
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension003 end.");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension002 end.");
 }
 
 /**
-* @tc.name: GetUniformDataTypesByFilenameExtension004
-* @tc.desc: Normal testcase of GetUniformDataTypesByFilenameExtension, filtered by blongsToType
+* @tc.name: GetUniformDataTypesByFilenameExtension003
+* @tc.desc: Normal testcase of GetUniformDataTypesByFilenameExtension, if filtered by blongsToType
 * @tc.type: FUNC
 */
-HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension004, TestSize.Level1)
+HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension003, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension004 begin.");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension003 begin.");
     std::string filenameExtension = ".ts";
     std::vector<std::string> currTypes;
-    std::string blongsToType = "general.script";
+    std::string blongsToType = "general.text";
     auto status =
         UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(filenameExtension, currTypes, blongsToType);
     ASSERT_EQ(status, E_OK);
@@ -1533,17 +1521,17 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension004, TestSize.Leve
         UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(filenameExtension, currTypes, blongsToType);
     ASSERT_EQ(status, E_OK);
     ASSERT_EQ(currTypes.size(), 0);
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension004 end.");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension003 end.");
 }
 
 /**
-* @tc.name: GetUniformDataTypesByFilenameExtension005
+* @tc.name: GetUniformDataTypesByFilenameExtension004
 * @tc.desc: Normal testcase of GetUniformDataTypesByFilenameExtension with flexibleType
 * @tc.type: FUNC
 */
-HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension005, TestSize.Level1)
+HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension004, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension005 begin.");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension004 begin.");
     std::string filenameExtension = ".mytext";
     std::string blongsToType = "general.plain-text";
     std::vector<std::string> flexTypeIds;
@@ -1552,7 +1540,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension005, TestSize.Leve
     EXPECT_EQ(status, E_OK);
     ASSERT_EQ(flexTypeIds.size(), 1);
     std::string flexTypeId = flexTypeIds[0];
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension005, flexTypeId = %{public}s.", flexTypeId.c_str());
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension004, flexTypeId = %{public}s.", flexTypeId.c_str());
     std::shared_ptr<TypeDescriptor> descriptor;
     status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId, descriptor);
     EXPECT_EQ(status, E_OK);
@@ -1567,12 +1555,12 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension005, TestSize.Leve
     status = descriptor->IsHigherLevelType("general.object", checkRet);    //  cmp with gengral type.
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(checkRet, false);
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension005 end.");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension004 end.");
 }
 
 /**
 * @tc.name: GetUniformDataTypesByMIMEType001
-* @tc.desc: Normal testcase of GetUniformDataTypesByMIMEType, filtered by blongsToType
+* @tc.desc: Normal testcase of GetUniformDataTypesByMIMEType, if filtered by blongsToType
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMEType001, TestSize.Level1)
@@ -1581,7 +1569,12 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMEType001, TestSize.Level1)
     std::string mimeType = "application/x-mobi8-ebook";
     std::string blongsToType = "general.ebook";
     std::vector<std::string> currTypes;
-    auto status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes, blongsToType);
+    auto status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(currTypes.size(), 1);
+    ASSERT_EQ(currTypes[0], "com.amazon.azw3");
+
+    status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes, blongsToType);
     ASSERT_EQ(status, E_OK);
     ASSERT_EQ(currTypes.size(), 1);
     ASSERT_EQ(currTypes[0], "com.amazon.azw3");
@@ -1590,57 +1583,53 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMEType001, TestSize.Level1)
 
 /**
 * @tc.name: GetUniformDataTypesByMIMEType002
-* @tc.desc: Normal testcase of GetUniformDataTypesByMIMEType
+* @tc.desc: Normal testcase of GetUniformDataTypesByMIMEType, if filtered by blongsToType
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMEType002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMEType002 begin.");
-    std::string mimeType = "application/vnd.ms-powerpoint";
-    std::vector<std::string> currTypes;
-    auto status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes);
-    ASSERT_EQ(status, E_OK);
-    ASSERT_EQ(currTypes.size(), 1);
-    ASSERT_EQ(currTypes[0], "com.microsoft.powerpoint.ppt");
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMEType002 end.");
-}
-
-/**
-* @tc.name: GetUniformDataTypesByMIMEType003
-* @tc.desc: Normal testcase of GetUniformDataTypesByMIMEType, filtered by blongsToType
-* @tc.type: FUNC
-*/
-HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMEType003, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMEType003 begin.");
     std::string mimeType = "application/msword";
     std::vector<std::string> currTypes;
     std::string blongsToType = "general.composite-object";
-    auto status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes, blongsToType);
+    auto status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes);
     ASSERT_EQ(status, E_OK);
     ASSERT_EQ(currTypes.size(), 2);
     auto find1 = std::find(currTypes.begin(), currTypes.end(), "com.microsoft.word.doc") != currTypes.end();
     auto find2 = std::find(currTypes.begin(), currTypes.end(), "com.microsoft.word.dot") != currTypes.end();
     ASSERT_EQ(find1, true);
     ASSERT_EQ(find2, true);
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMEType003 end.");
+
+    status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes, blongsToType);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(currTypes.size(), 2);
+    find1 = std::find(currTypes.begin(), currTypes.end(), "com.microsoft.word.doc") != currTypes.end();
+    find2 = std::find(currTypes.begin(), currTypes.end(), "com.microsoft.word.dot") != currTypes.end();
+    ASSERT_EQ(find1, true);
+    ASSERT_EQ(find2, true);
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMEType002 end.");
 }
 
 /**
-* @tc.name: GetUniformDataTypesByMIMEType004
-* @tc.desc: Normal testcase of GetUniformDataTypesByMIMEType, filtered by blongsToType
+* @tc.name: GetUniformDataTypesByMIMEType003
+* @tc.desc: Normal testcase of GetUniformDataTypesByMIMEType, if filtered by blongsToType
 * @tc.type: FUNC
 */
-HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMEType004, TestSize.Level1)
+HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMEType003, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMEType004 begin.");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMEType003 begin.");
     std::string mimeType = "video/x-ms-asf";
     std::vector<std::string> currTypes;
     std::string blongsToType = "general.media";
     auto status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes, blongsToType);
     ASSERT_EQ(status, E_OK);
-    ASSERT_EQ(currTypes.size(), 1);
-    ASSERT_EQ(currTypes[0], "com.microsoft.advanced-systems-format");
+    ASSERT_EQ(currTypes.size(), 2);
+    auto find1 = std::find(currTypes.begin(), currTypes.end(),
+                           "com.microsoft.advanced-systems-format") != currTypes.end();
+    auto find2 = std::find(currTypes.begin(), currTypes.end(),
+                           "com.microsoft.advanced-stream-redirector") != currTypes.end();
+    ASSERT_EQ(find1, true);
+    ASSERT_EQ(find2, true);
 
     blongsToType = "general.video";
     status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes, blongsToType);
@@ -1652,7 +1641,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMEType004, TestSize.Level1)
     status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes, blongsToType);
     ASSERT_EQ(status, E_OK);
     ASSERT_EQ(currTypes.size(), 0);
-    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMEType004 end.");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMEType003 end.");
 }
 
 /**
