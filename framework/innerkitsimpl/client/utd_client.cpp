@@ -30,7 +30,6 @@ namespace UDMF {
 constexpr const char* CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
 constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/defaultUserId/";
 constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/utd/utd-adt.json";
-constexpr const char* PREFIX_MATCH_SIGN = "/*";
 UtdClient::UtdClient()
 {
     Init();
@@ -154,16 +153,16 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
 }
 
 Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &fileExtension,
-									std::vector<std::string> &typeIds, const std::string &belongsTo)
+	std::vector<std::string> &typeIds, const std::string &belongsTo)
 {
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. fileExtension:%{public}s, belongsTo:%{public}s ",
-                fileExtension.c_str(), belongsTo.c_str());
+            fileExtension.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
     if (!IsValidFileExtension(fileExtension)) {
         LOG_ERROR(UDMF_CLIENT, "invalid fileExtension. fileExtension:%{public}s, belongsTo:%{public}s ",
-                fileExtension.c_str(), belongsTo.c_str());
+            fileExtension.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
 
@@ -244,16 +243,16 @@ std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
 }
 
 Status UtdClient::GetUniformDataTypesByMIMEType(const std::string &mimeType, std::vector<std::string> &typeIds,
-                                               const std::string &belongsTo)
+    const std::string &belongsTo)
 {
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. mimeType:%{public}s, belongsTo:%{public}s ",
-                mimeType.c_str(), belongsTo.c_str());
+            mimeType.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
     if (!IsValidMimeType(mimeType)) {
         LOG_ERROR(UDMF_CLIENT, "invalid mimeType. mimeType:%{public}s, belongsTo:%{public}s ",
-                mimeType.c_str(), belongsTo.c_str());
+            mimeType.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
 
@@ -279,9 +278,7 @@ std::vector<std::string> UtdClient::GetTypeIdsFromCfg(const std::string &mimeTyp
 {
     bool prefixMatch = false;
     std::string prefixType;
-    auto signSize = strlen(PREFIX_MATCH_SIGN);
-    if (mimeType.size() >= signSize &&
-            mimeType.compare(mimeType.size() - signSize, signSize, PREFIX_MATCH_SIGN) == 0) {
+    if (mimeType.back() == '*') {
         prefixType = mimeType.substr(0, mimeType.length() - 1);
         prefixMatch = true;
     }

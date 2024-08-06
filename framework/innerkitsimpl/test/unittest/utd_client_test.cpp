@@ -1654,4 +1654,26 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMEType004, TestSize.Level1)
     ASSERT_EQ(currTypes.size(), 0);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMEType004 end.");
 }
+
+/**
+* @tc.name: GetUniformDataTypesByMIMETypeByPrefix001
+* @tc.desc: normal testcase of GetUniformDatasTypeByMIMEType by prefix.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMETypeByPrefix001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMETypeByPrefix001 begin.");
+    std::string mimeType = "model/*";
+    std::vector<std::string> currTypes;
+    auto status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(currTypes.size(), 3);
+    auto find1 = std::find(currTypes.begin(), currTypes.end(), "general.iges") != currTypes.end();
+    auto find2 = std::find(currTypes.begin(), currTypes.end(), "general.mesh-model") != currTypes.end();
+    auto find3 = std::find(currTypes.begin(), currTypes.end(), "com.autodesk.dwf") != currTypes.end();
+    ASSERT_EQ(find1, true);
+    ASSERT_EQ(find2, true);
+    ASSERT_EQ(find3, true);
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMETypeByPrefix001 end.");
+}
 } // OHOS::Test
