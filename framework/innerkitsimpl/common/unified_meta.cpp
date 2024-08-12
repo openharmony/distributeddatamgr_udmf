@@ -430,7 +430,30 @@ static constexpr UtdType UTD_TYPES[] = {
     { URI, "URI", "general.uri" },
     { FILE_URI, "FILE_URI", "general.file-uri" },
     { TEXT_LST, "TEXT_LST", "general.text-lst" },
-    { ANDROID_APK, "ANDROID_APK", "com.android.apk" }
+    { ANDROID_APK, "ANDROID_APK", "com.android.apk" },
+    { BZ_ARCHIVE, "BZ_ARCHIVE", "public.bz-archive" },
+    { TBZ_ARCHIVE, "TBZ_ARCHIVE", "general.tar-bzip-archive" },
+    { TBZ2_ARCHIVE, "TBZ2_ARCHIVE", "general.tar-bzip2-archive" },
+    { XZ_ARCHIVE, "XZ_ARCHIVE", "org.tukaani.xz-archive" },
+    { TXZ_ARCHIVE, "TXZ_ARCHIVE", "org.tukaani.tar-xz-archive" },
+    { XAR_ARCHIVE, "XAR_ARCHIVE", "general.xar-archive" },
+    { CAB_ARCHIVE, "CAB_ARCHIVE", "com.microsoft.cab-archive" },
+    { RPM_ARCHIVE, "RPM_ARCHIVE", "redhat.rpm-archive" },
+    { TPZ_ARCHIVE, "TPZ_ARCHIVE", "org.godotengine.tpz-archive", },
+    { LZA_ARCHIVE, "LZA_ARCHIVE", "general.lza-archive" },
+    { ARJ_ARCHIVE, "ARJ_ARCHIVE", "general.arj-archive" },
+    { ZIPX_ARCHIVE, "ZIPX_ARCHIVE", "com.winzip.zipx" },
+    { LZMA_ARCHIVE, "LZMA_ARCHIVE", "general.lzma-archive" },
+    { LZMA86_ARCHIVE, "LZMA86_ARCHIVE", "general.lzma86-archive" },
+    { XPI_ARCHIVE, "XPI_ARCHIVE", "org.mozilla.xpinstall" },
+    { HFS_DISK_IMAGE, "HFS_DISK_IMAGE", "general.hfs-disk-image" },
+    { IMG_DISK_IMAGE, "IMG_DISK_IMAGE", "general.img-disk-image" },
+    { ISZ_DISK_IMAGE, "ISZ_DISK_IMAGE", "com.ezbsystems.zipped-iso" },
+    { WIM_DISK_IMAGE, "WIM_DISK_IMAGE", "com.microsoft.wim" },
+    { SWM_DISK_IMAGE, "SWM_DISK_IMAGE", "com.microsoft.swm" },
+    { KINSOFT_SPREADSHEETS_ETX, "KINSOFT_SPREADSHEETS_ETX", "com.kingsoft.office.spreadsheets.etx" },
+    { KINSOFT_SPREADSHEETS_ETTX, "KINSOFT_SPREADSHEETS_ETTX", "com.kingsoft.office.spreadsheets.ettx" },
+    { EXCEL_DIF, "EXCEL_DIF", "com.microsoft.excel.dif" }
 };
 
 namespace UtdUtils {
