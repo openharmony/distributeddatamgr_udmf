@@ -279,5 +279,15 @@ int32_t UdmfServiceClient::RemoveAppShareOption(const std::string &intention)
     }
     return udmfProxy_->RemoveAppShareOption(intention);
 }
+
+int32_t UdmfServiceClient::ObtainAsynProcess(AsyncProcessInfo& processInfo)
+{
+    return udmfProxy_->ObtainAsynProcess(processInfo);
+}
+
+int32_t UdmfServiceClient::ClearAsynProcess()
+{
+    return udmfProxy_->ClearAsynProcess();
+}
 } // namespace UDMF
 } // namespace OHOS

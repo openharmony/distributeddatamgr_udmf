@@ -28,6 +28,7 @@
 #include "unified_meta.h"
 #include "unified_types.h"
 #include "visibility.h"
+#include "async_obtain_data.h"
 namespace OHOS {
 namespace UDMF {
 class API_EXPORT UdmfClient {
@@ -36,6 +37,7 @@ public:
 
     Status SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key);
     Status GetData(const QueryOption &query, UnifiedData &unifiedData);
+    Status GetDataAsync(const QueryOption &query, ObtainDataCallback callback);
     Status GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet);
     Status UpdateData(const QueryOption &query, UnifiedData &unifiedData);
     Status DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet);
@@ -55,6 +57,7 @@ private:
     std::string GetSelfBundleName();
 
     ConcurrentMap<std::string, UnifiedData> dataCache_;
+    AsyncObtainData asyncObtainData_;
 };
 } // namespace UDMF
 } // namespace OHOS
