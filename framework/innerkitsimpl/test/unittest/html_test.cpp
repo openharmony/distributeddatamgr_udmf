@@ -19,6 +19,7 @@
 #include <string>
 
 #include "logger.h"
+#include "udmf_capi_common.h"
 #include "html.h"
 
 using namespace testing::ext;
@@ -53,14 +54,14 @@ void HtmlTest::TearDown()
 
 /**
 * @tc.name: Html001
-* @tc.desc: Abnormal testcase of Html, because htmlContent and plainContent are longer than MAX_TEXT_LEN
+* @tc.desc: Abnormal testcase of Html, because htmlContent and plainContent are equal to MAX_TEXT_LEN
 * @tc.type: FUNC
 */
 HWTEST_F(HtmlTest, Html001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Html001 begin.");
-    const std::string htmlContent(20 * 1024 * 1024, 'a');
-    const std::string plainContent(20 * 1024 * 1024, 'a');
+    const std::string htmlContent(MAX_TEXT_LEN, 'a');
+    const std::string plainContent(MAX_TEXT_LEN, 'a');
     Html html(htmlContent, plainContent);
     EXPECT_NE(html.dataType_, HTML);
     EXPECT_TRUE(html.htmlContent_.empty());
@@ -70,14 +71,14 @@ HWTEST_F(HtmlTest, Html001, TestSize.Level1)
 
 /**
 * @tc.name: Html002
-* @tc.desc: Abnormal testcase of Html, because plainContent are longer than MAX_TEXT_LEN
+* @tc.desc: Abnormal testcase of Html, because plainContent and MAX_TEXT_LEN are equal
 * @tc.type: FUNC
 */
 HWTEST_F(HtmlTest, Html002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Html002 begin.");
     const std::string htmlContent(20, 'a');
-    const std::string plainContent(20 * 1024 * 1024, 'a');
+    const std::string plainContent(MAX_TEXT_LEN, 'a');
     Html html(htmlContent, plainContent);
     EXPECT_NE(html.dataType_, HTML);
     EXPECT_TRUE(html.htmlContent_.empty());
@@ -87,14 +88,14 @@ HWTEST_F(HtmlTest, Html002, TestSize.Level1)
 
 /**
 * @tc.name: Html003
-* @tc.desc: Abnormal testcase of Html, because htmlContent are longer than MAX_TEXT_LEN
+* @tc.desc: Abnormal testcase of Html, because htmlContent and MAX_TEXT_LEN are equal
 * @tc.type: FUNC
 */
 HWTEST_F(HtmlTest, Html003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Html003 begin.");
     const std::string htmlContent(20, 'a');
-    const std::string plainContent(20 * 1024 * 1024, 'a');
+    const std::string plainContent(MAX_TEXT_LEN, 'a');
     Html html(htmlContent, plainContent);
     EXPECT_NE(html.dataType_, HTML);
     EXPECT_TRUE(html.htmlContent_.empty());
@@ -132,5 +133,57 @@ HWTEST_F(HtmlTest, Html005, TestSize.Level1)
     Html html(type, value);
     EXPECT_EQ(html.htmlContent_, std::get<std::string>(value));
     LOG_INFO(UDMF_TEST, "Html005 end.");
+}
+
+/**
+* @tc.name: SetHtmlContent006
+* @tc.desc: Abnormal testcase of SetHtmlContent, because htmlContent and MAX_TEXT_LEN are equal
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, SetHtmlContent006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetHtmlContent006 begin.");
+    const std::string htmlContent(20 * 1024 * 1024, 'a');
+    Html html;
+    html.SetHtmlContent(htmlContent);
+    EXPECT_NE(html.htmlContent_, htmlContent);
+    LOG_INFO(UDMF_TEST, "SetHtmlContent006 end.");
+}
+
+/**
+* @tc.name: SetPlainContent007
+* @tc.desc: Abnormal testcase of SetPlainContent, because plainContent and MAX_TEXT_LEN are equal
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, SetPlainContent007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetPlainContent007 begin.");
+    const std::string plainContent(20 * 1024 * 1024, 'a');
+    Html html;
+    html.SetPlainContent(plainContent);
+    EXPECT_NE(html.plainContent_, plainContent);
+    LOG_INFO(UDMF_TEST, "SetPlainContent007 end.");
+}
+
+/**
+* @tc.name: GetValue008
+* @tc.desc: Normal testcase of GetValue
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, GetValue008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetValue008 begin.");
+    Html html;
+    html.value_ = std::monostate{};
+    html.htmlContent_ = "htmlContent";
+    html.plainContent_ = "plainContent";
+    html.GetValue();
+    auto object = std::get<std::shared_ptr<Object>>(html.value_);
+    auto details_ = std::get<std::shared_ptr<Object>>(object->value_[Html::DETAILS]);
+    EXPECT_EQ(std::get<std::string>(object->value_[UNIFORM_DATA_TYPE]), "general.html");
+    EXPECT_EQ(std::get<std::string>(object->value_[HTML_CONTENT]), html.htmlContent_);
+    EXPECT_EQ(std::get<std::string>(object->value_[Html::PLAINT_CONTENT]), html.plainContent_);
+    EXPECT_EQ(details_->value_.size(), 0);
+    LOG_INFO(UDMF_TEST, "GetValue008 end.");
 }
 } // OHOS::Test
