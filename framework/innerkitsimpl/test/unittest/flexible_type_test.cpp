@@ -134,4 +134,79 @@ HWTEST_F(FlexibleTypeTest, EscapeStr006, TestSize.Level1)
     EXPECT_EQ(output, "string");
     LOG_INFO(UDMF_TEST, "EscapeStr006 end.");
 }
+
+/**
+* @tc.name: ParseFlexibleUtd007
+* @tc.desc: Abnormal testcase of ParseFlexibleUtd, because typeId and FLEXIBLE_TYPE_FLAG are equal
+* @tc.type: FUNC
+*/
+HWTEST_F(FlexibleTypeTest, ParseFlexibleUtd007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd007 begin.");
+    const std::string typeId = "flex.z";
+    TypeDescriptorCfg flexibleTypeDescriptorCfg;
+    flexibleTypeDescriptorCfg.typeId = "com.example.utdtest.document";
+    flexibleTypeDescriptorCfg.belongingToTypes = {"com.example.utdtest2.document"};
+    flexibleTypeDescriptorCfg.filenameExtensions = {".mydocument"};
+    flexibleTypeDescriptorCfg.mimeTypes = {"application/my-document"};
+    flexibleTypeDescriptorCfg.description = "My document.";
+    flexibleTypeDescriptorCfg.referenceURL = "http://www.mycompany.com/my-document.html";
+    flexibleTypeDescriptorCfg.iconFile = "resources/my-document.png";
+    flexibleTypeDescriptorCfg.ownerBundle = "com.example.utdtest";
+    flexibleTypeDescriptorCfg.installerBundles = {"com.example.utdtest"};
+    FlexibleType flexibleType;
+    bool ret = flexibleType.ParseFlexibleUtd(typeId, flexibleTypeDescriptorCfg);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd007 end.");
+}
+
+/**
+* @tc.name: ParseFlexibleUtd008
+* @tc.desc: Abnormal testcase of ParseFlexibleUtd, because flexibleUtdDecode[0] != '?'
+* @tc.type: FUNC
+*/
+HWTEST_F(FlexibleTypeTest, ParseFlexibleUtd008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd008 begin.");
+    const std::string typeId = "com.example.utdtest.document";
+    TypeDescriptorCfg flexibleTypeDescriptorCfg;
+    flexibleTypeDescriptorCfg.typeId = "com.example.utdtest.document";
+    flexibleTypeDescriptorCfg.belongingToTypes = {"com.example.utdtest2.document"};
+    flexibleTypeDescriptorCfg.filenameExtensions = {".mydocument"};
+    flexibleTypeDescriptorCfg.mimeTypes = {"application/my-document"};
+    flexibleTypeDescriptorCfg.description = "My document.";
+    flexibleTypeDescriptorCfg.referenceURL = "http://www.mycompany.com/my-document.html";
+    flexibleTypeDescriptorCfg.iconFile = "resources/my-document.png";
+    flexibleTypeDescriptorCfg.ownerBundle = "com.example.utdtest";
+    flexibleTypeDescriptorCfg.installerBundles = {"com.example.utdtest"};
+    FlexibleType flexibleType;
+    bool ret = flexibleType.ParseFlexibleUtd(typeId, flexibleTypeDescriptorCfg);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd008 end.");
+}
+
+/**
+* @tc.name: ParseFlexibleUtd009
+* @tc.desc: Abnormal testcase of ParseFlexibleUtd, because flexibleUtdDecode contains "="
+* @tc.type: FUNC
+*/
+HWTEST_F(FlexibleTypeTest, ParseFlexibleUtd009, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd009 begin.");
+    const std::string typeId = "flex.z=";
+    TypeDescriptorCfg flexibleTypeDescriptorCfg;
+    flexibleTypeDescriptorCfg.typeId = "com.example.utdtest.document";
+    flexibleTypeDescriptorCfg.belongingToTypes = {"com.example.utdtest2.document"};
+    flexibleTypeDescriptorCfg.filenameExtensions = {".mydocument"};
+    flexibleTypeDescriptorCfg.mimeTypes = {"application/my-document"};
+    flexibleTypeDescriptorCfg.description = "My document.";
+    flexibleTypeDescriptorCfg.referenceURL = "http://www.mycompany.com/my-document.html";
+    flexibleTypeDescriptorCfg.iconFile = "resources/my-document.png";
+    flexibleTypeDescriptorCfg.ownerBundle = "com.example.utdtest";
+    flexibleTypeDescriptorCfg.installerBundles = {"com.example.utdtest"};
+    FlexibleType flexibleType;
+    bool ret = flexibleType.ParseFlexibleUtd(typeId, flexibleTypeDescriptorCfg);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd009 end.");
+}
 } // OHOS::Test
