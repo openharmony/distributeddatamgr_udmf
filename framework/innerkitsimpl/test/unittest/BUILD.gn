@@ -198,6 +198,66 @@ ohos_unittest("HtmlTest") {
   ]
 }
 
+ohos_unittest("ImageTest") {
+  module_out_path = module_output_path
+
+  sources = [ "image_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("LinkTest") {
+  module_out_path = module_output_path
+
+  sources = [ "link_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("PlainTextTest") {
+  module_out_path = module_output_path
+
+  sources = [ "plain_text_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("SystemDefinedAppitemTest") {
+  module_out_path = module_output_path
+
+  sources = [ "system_defined_appitem_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
@@ -209,7 +269,11 @@ group("unittest") {
     ":FlexibleTypeTest",
     ":FolderTest",
     ":HtmlTest",
+    ":ImageTest",
+    ":LinkTest",
     ":NdkDataConversionTest",
+    ":PlainTextTest",
+    ":SystemDefinedAppitemTest",
     ":UdmfClientSystemHapTest",
     ":UdmfClientTest",
     ":UtdClientTest",
