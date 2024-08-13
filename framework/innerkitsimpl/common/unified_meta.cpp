@@ -453,12 +453,12 @@ static constexpr UtdType UTD_TYPES[] = {
     { SWM_DISK_IMAGE, "SWM_DISK_IMAGE", "com.microsoft.swm" },
     { KINGSOFT_SPREADSHEETS_ETX, "KINGSOFT_SPREADSHEETS_ETX", "com.kingsoft.office.spreadsheets.etx" },
     { KINGSOFT_SPREADSHEETS_ETTX, "KINGSOFT_SPREADSHEETS_ETTX", "com.kingsoft.office.spreadsheets.ettx" },
-    { EXCEL_DIF, "EXCEL_DIF", "com.microsoft.excel.dif" }
-    { SURSEN_SEP, "SURSEN_SEP", "com.sursen.sep" }
-    { SURSEN_GD, "SURSEN_GD", "com.sursen.gd" }
-    { SURSEN_S2, "SURSEN_S2", "com.sursen.s2" }
-    { SURSEN_S72, "SURSEN_S72", "com.sursen.s72" }
-    { SURSEN_S92, "SURSEN_S92", "com.sursen.s92" }
+    { EXCEL_DIF, "EXCEL_DIF", "com.microsoft.excel.dif" },
+    { SURSEN_SEP, "SURSEN_SEP", "com.sursen.sep" },
+    { SURSEN_GD, "SURSEN_GD", "com.sursen.gd" },
+    { SURSEN_S2, "SURSEN_S2", "com.sursen.s2" },
+    { SURSEN_S72, "SURSEN_S72", "com.sursen.s72" },
+    { SURSEN_S92, "SURSEN_S92", "com.sursen.s92" },
     { SURSEN_S10, "SURSEN_S10", "com.sursen.s10" }
 };
 
