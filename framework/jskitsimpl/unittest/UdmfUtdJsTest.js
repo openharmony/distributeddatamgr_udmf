@@ -797,7 +797,7 @@ describe('UdmfUtdJSTest', function () {
   it('UdmfTestTypeDescriptor036', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor036:';
     console.info(TAG, 'start');
-    let typeIds = UTD.GetUniformDataTypesByFilenameExtension('.txt');
+    let typeIds = UTD.getUniformDataTypesByFilenameExtension('.txt');
     console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
     expect(typeIds.includes('general.plain-text')).assertTrue();
     console.info(TAG, 'end');
@@ -812,7 +812,7 @@ describe('UdmfUtdJSTest', function () {
   it('UdmfTestTypeDescriptor037', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor037:';
     console.info(TAG, 'start');
-    let typeIds = UTD.GetUniformDataTypesByFilenameExtension('.txt', 'general.text');
+    let typeIds = UTD.getUniformDataTypesByFilenameExtension('.txt', 'general.text');
     console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
     expect(typeIds.includes('general.plain-text')).assertTrue();
     console.info(TAG, 'end');
@@ -828,7 +828,7 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor038:';
     console.info(TAG, 'start');
     try {
-      let flexTypeIds = UTD.GetUniformDataTypesByFilenameExtension('.txt', 'general.video');
+      let flexTypeIds = UTD.getUniformDataTypesByFilenameExtension('.txt', 'general.video');
       console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + flexTypeIds);
       let flexTypeObj = UTD.getTypeDescriptor(flexTypeIds[0]);
       console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + flexTypeObj);
@@ -857,7 +857,7 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor039:';
     console.info(TAG, 'start');
     try {
-      let typeIds = UTD.GetUniformDataTypesByFilenameExtension('.txt', 'invalid.invalid');
+      let typeIds = UTD.getUniformDataTypesByFilenameExtension('.txt', 'invalid.invalid');
       console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
       expect().assertFail();
     } catch (e) {
@@ -877,7 +877,7 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor040:';
     console.info(TAG, 'start');
     try {
-      let typeIds = UTD.GetUniformDataTypesByFilenameExtension('.invalid', '');
+      let typeIds = UTD.getUniformDataTypesByFilenameExtension('.invalid', '');
       console.error(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
       expect().assertFail();
     } catch (e) {
@@ -896,7 +896,7 @@ describe('UdmfUtdJSTest', function () {
   it('UdmfTestTypeDescriptor041', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor041:';
     console.info(TAG, 'start');
-    let typeIds = UTD.GetUniformDataTypesByMIMEType('text/plain');
+    let typeIds = UTD.getUniformDataTypesByMIMEType('text/plain');
     console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
     expect(typeIds.includes('general.plain-text')).assertTrue();
     console.info(TAG, 'end');
@@ -911,7 +911,7 @@ describe('UdmfUtdJSTest', function () {
   it('UdmfTestTypeDescriptor042', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor042:';
     console.info(TAG, 'start');
-    let typeIds = UTD.GetUniformDataTypesByMIMEType('text/plain', 'general.text');
+    let typeIds = UTD.getUniformDataTypesByMIMEType('text/plain', 'general.text');
     console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
     expect(typeIds.includes('general.plain-text')).assertTrue();
     console.info(TAG, 'end');
@@ -927,7 +927,7 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor043:';
     console.info(TAG, 'start');
     try {
-      let flexTypeIds = UTD.GetUniformDataTypesByMIMEType('text/plain', 'general.video');
+      let flexTypeIds = UTD.getUniformDataTypesByMIMEType('text/plain', 'general.video');
       console.info(TAG, 'GetUniformDataTypesByMIMEType, ret ' + flexTypeIds);
       let flexTypeObj = UTD.getTypeDescriptor(flexTypeIds[0]);
       console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + flexTypeObj);
@@ -956,7 +956,7 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor044:';
     console.info(TAG, 'start');
     try {
-      let typeIds = UTD.GetUniformDataTypesByMIMEType('text/plain', 'invalid.invalid');
+      let typeIds = UTD.getUniformDataTypesByMIMEType('text/plain', 'invalid.invalid');
       console.info(TAG, 'GetUniformDataTypesByMIMEType, ret ' + typeIds);
       expect().assertFail();
     } catch (e) {
@@ -976,7 +976,7 @@ describe('UdmfUtdJSTest', function () {
     const TAG = 'UdmfTestTypeDescriptor045:';
     console.info(TAG, 'start');
     try {
-      let typeIds = UTD.GetUniformDataTypesByMIMEType('invalid/invalid', '');
+      let typeIds = UTD.getUniformDataTypesByMIMEType('invalid/invalid', '');
       console.error(TAG, 'GetUniformDataTypesByMIMEType, ret ' + typeIds);
       expect().assertFail();
     } catch (e) {
