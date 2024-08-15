@@ -787,4 +787,202 @@ describe('UdmfUtdJSTest', function () {
     }
     console.info(TAG, 'end');
   });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor036
+  * @tc.desc Test Js Api GetUniformDataTypesByFilenameExtension
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor036', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor036:';
+    console.info(TAG, 'start');
+    let typeIds = UTD.getUniformDataTypesByFilenameExtension('.txt');
+    console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
+    expect(typeIds.includes('general.plain-text')).assertTrue();
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor037
+  * @tc.desc Test Js Api GetUniformDataTypesByFilenameExtension
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor037', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor037:';
+    console.info(TAG, 'start');
+    let typeIds = UTD.getUniformDataTypesByFilenameExtension('.txt', 'general.text');
+    console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
+    expect(typeIds.includes('general.plain-text')).assertTrue();
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor038
+  * @tc.desc Test Js Api GetUniformDataTypesByFilenameExtension invalid param
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor038', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor038:';
+    console.info(TAG, 'start');
+    try {
+      let flexTypeIds = UTD.getUniformDataTypesByFilenameExtension('.txt', 'general.video');
+      console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + flexTypeIds);
+      let flexTypeObj = UTD.getTypeDescriptor(flexTypeIds[0]);
+      console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + flexTypeObj);
+      console.info(TAG, 'UDMF,typeId:' + flexTypeObj.typeId);
+      console.info(TAG, 'belongingToTypes:' + flexTypeObj.belongingToTypes);
+      console.info(TAG, 'filenameExtension:' + flexTypeObj.filenameExtensions);
+      console.info(TAG, 'mimeTypes:' + flexTypeObj.mimeTypes);
+      expect(flexTypeObj.typeId).assertEqual(flexTypeIds[0]);
+      expect(flexTypeObj.belongingToTypes.length).assertEqual(1);
+      expect(flexTypeObj.filenameExtensions[0]).assertEqual('.txt');
+      expect(flexTypeObj.mimeTypes.length).assertEqual(0);
+    } catch (e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor039
+  * @tc.desc Test Js Api GetUniformDataTypesByFilenameExtension invalid param
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor039', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor039:';
+    console.info(TAG, 'start');
+    try {
+      let typeIds = UTD.getUniformDataTypesByFilenameExtension('.txt', 'invalid.invalid');
+      console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
+      expect().assertFail();
+    } catch (e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor040
+  * @tc.desc Test Js Api GetUniformDataTypesByFilenameExtension invalid para
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor040', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor040:';
+    console.info(TAG, 'start');
+    try {
+      let typeIds = UTD.getUniformDataTypesByFilenameExtension('.invalid', '');
+      console.error(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
+      expect().assertFail();
+    } catch (e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor041
+  * @tc.desc Test Js Api GetUniformDataTypesByMIMEType
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor041', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor041:';
+    console.info(TAG, 'start');
+    let typeIds = UTD.getUniformDataTypesByMIMEType('text/plain');
+    console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
+    expect(typeIds.includes('general.plain-text')).assertTrue();
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor042
+  * @tc.desc Test Js Api GetUniformDataTypesByMIMEType
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor042', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor042:';
+    console.info(TAG, 'start');
+    let typeIds = UTD.getUniformDataTypesByMIMEType('text/plain', 'general.text');
+    console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
+    expect(typeIds.includes('general.plain-text')).assertTrue();
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor043
+  * @tc.desc Test Js Api GetUniformDataTypesByMIMEType invalid param
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor043', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor043:';
+    console.info(TAG, 'start');
+    try {
+      let flexTypeIds = UTD.getUniformDataTypesByMIMEType('text/plain', 'general.video');
+      console.info(TAG, 'GetUniformDataTypesByMIMEType, ret ' + flexTypeIds);
+      let flexTypeObj = UTD.getTypeDescriptor(flexTypeIds[0]);
+      console.info(TAG, 'getUniformDataTypeByFilenameExtension, ret ' + flexTypeObj);
+      console.info(TAG, 'UDMF,typeId:' + flexTypeObj.typeId);
+      console.info(TAG, 'belongingToTypes:' + flexTypeObj.belongingToTypes);
+      console.info(TAG, 'filenameExtension:' + flexTypeObj.filenameExtensions);
+      console.info(TAG, 'mimeTypes:' + flexTypeObj.mimeTypes);
+      expect(flexTypeObj.typeId).assertEqual(flexTypeIds[0]);
+      expect(flexTypeObj.belongingToTypes.length).assertEqual(1);
+      expect(flexTypeObj.filenameExtensions.length).assertEqual(0);
+      expect(flexTypeObj.mimeTypes.length).assertEqual(1);
+    } catch (e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor044
+  * @tc.desc Test Js Api GetUniformDataTypesByMIMEType invalid param
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor044', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor044:';
+    console.info(TAG, 'start');
+    try {
+      let typeIds = UTD.getUniformDataTypesByMIMEType('text/plain', 'invalid.invalid');
+      console.info(TAG, 'GetUniformDataTypesByMIMEType, ret ' + typeIds);
+      expect().assertFail();
+    } catch (e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /*
+  * @tc.name UdmfTestTypeDescriptor045
+  * @tc.desc Test Js Api GetUniformDataTypesByMIMEType invalid para
+  * @tc.type: FUNC
+  * @tc.require: issueNumber
+  */
+  it('UdmfTestTypeDescriptor045', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor045:';
+    console.info(TAG, 'start');
+    try {
+      let typeIds = UTD.getUniformDataTypesByMIMEType('invalid/invalid', '');
+      console.error(TAG, 'GetUniformDataTypesByMIMEType, ret ' + typeIds);
+      expect().assertFail();
+    } catch (e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
 });
