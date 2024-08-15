@@ -167,7 +167,7 @@ napi_value UniformTypeDescriptorNapi::GetMultiUniformDataTypesByFilenameExtensio
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "GetMultiUniformDataTypesByFilenameExtension is called!");
     std::string filenameExtension;
-    std::string belongsTo = DEFAULT_TYPE_ID;
+    std::string belongsTo;
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, ctxt, &filenameExtension, &belongsTo](size_t argc, napi_value* argv) {
         LOG_DEBUG(UDMF_KITS_NAPI, "get utd types by fileExtention, argc = %{public}zu !", argc);
@@ -181,6 +181,8 @@ napi_value UniformTypeDescriptorNapi::GetMultiUniformDataTypesByFilenameExtensio
             ctxt->status = NapiDataUtils::GetValue(env, argv[1], belongsTo);
             ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !belongsTo.empty(), E_INVALID_PARAMETERS,
                 "Parameter error: parameter belongsTo type must be string");
+        } else {
+            belongsTo = DEFAULT_TYPE_ID;
         }
     };
     ctxt->GetCbInfoSync(env, info, input);
@@ -201,7 +203,7 @@ napi_value UniformTypeDescriptorNapi::GetMultiUniformDataTypesByMIMEType(napi_en
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "GetMultiUniformDataTypesByMIMEType is called!");
     std::string mimeType;
-    std::string belongsTo = DEFAULT_TYPE_ID;
+    std::string belongsTo;
     auto ctxt = std::make_shared<ContextBase>();
     auto input = [env, ctxt, &mimeType, &belongsTo](size_t argc, napi_value* argv) {
         LOG_DEBUG(UDMF_KITS_NAPI, "get utd types by MIMEType, argc = %{public}zu !", argc);
@@ -215,6 +217,8 @@ napi_value UniformTypeDescriptorNapi::GetMultiUniformDataTypesByMIMEType(napi_en
             ctxt->status = NapiDataUtils::GetValue(env, argv[1], belongsTo);
             ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !belongsTo.empty(), E_INVALID_PARAMETERS,
                 "Parameter error: parameter belongsTo type must be string");
+        } else {
+            belongsTo = DEFAULT_TYPE_ID;
         }
     };
     ctxt->GetCbInfoSync(env, info, input);
