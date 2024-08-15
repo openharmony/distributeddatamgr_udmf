@@ -29,6 +29,8 @@ napi_value UniformTypeDescriptorNapi::UniformTypeDescriptorInit(napi_env env, na
         DECLARE_NAPI_FUNCTION("getTypeDescriptor", GetTypeDescriptor),
         DECLARE_NAPI_FUNCTION("getUniformDataTypeByFilenameExtension", GetUniformDataTypeByFilenameExtension),
         DECLARE_NAPI_FUNCTION("getUniformDataTypeByMIMEType", GetUniformDataTypeByMIMEType),
+        DECLARE_NAPI_FUNCTION("getUniformDataTypesByFilenameExtension", GetMultiUniformDataTypesByFilenameExtension),
+        DECLARE_NAPI_FUNCTION("getUniformDataTypesByMIMEType", GetMultiUniformDataTypesByMIMEType),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
@@ -158,6 +160,74 @@ napi_value UniformTypeDescriptorNapi::GetUniformDataTypeByMIMEType(napi_env env,
         napi_get_null(env, &ctxt->output);
     }
 
+    return ctxt->output;
+}
+
+napi_value UniformTypeDescriptorNapi::GetMultiUniformDataTypesByFilenameExtension(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "GetMultiUniformDataTypesByFilenameExtension is called!");
+    std::string filenameExtension;
+    std::string belongsTo = DEFAULT_TYPE_ID;
+    auto ctxt = std::make_shared<ContextBase>();
+    auto input = [env, ctxt, &filenameExtension, &belongsTo](size_t argc, napi_value* argv) {
+        LOG_DEBUG(UDMF_KITS_NAPI, "get utd types by fileExtention, argc = %{public}zu !", argc);
+        // required 1 arguments : typeId
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], filenameExtension);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "Parameter error: parameter filenameExtension type must be string");
+        if (argc > 1) {
+            ctxt->status = NapiDataUtils::GetValue(env, argv[1], belongsTo);
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !belongsTo.empty(), E_INVALID_PARAMETERS,
+                "Parameter error: parameter belongsTo type must be string");
+        }
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_NULL(!ctxt->isThrowError, "GetMultiUniformDataTypesByFilenameExtension Exit");
+    std::vector<std::string> typeIds;
+    auto status = E_OK;
+    status = UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(filenameExtension, typeIds, belongsTo);
+    ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
+    if (!typeIds.empty()) {
+        NapiDataUtils::SetValue(env, typeIds, ctxt->output);
+    } else {
+        napi_get_null(env, &ctxt->output);
+    }
+    return ctxt->output;
+}
+
+napi_value UniformTypeDescriptorNapi::GetMultiUniformDataTypesByMIMEType(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "GetMultiUniformDataTypesByMIMEType is called!");
+    std::string mimeType;
+    std::string belongsTo = DEFAULT_TYPE_ID;
+    auto ctxt = std::make_shared<ContextBase>();
+    auto input = [env, ctxt, &mimeType, &belongsTo](size_t argc, napi_value* argv) {
+        LOG_DEBUG(UDMF_KITS_NAPI, "get utd types by MIMEType, argc = %{public}zu !", argc);
+        // required 1 arguments : typeId
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], mimeType);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "Parameter error: parameter mimeType type must be string");
+        if (argc > 1) {
+            ctxt->status = NapiDataUtils::GetValue(env, argv[1], belongsTo);
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !belongsTo.empty(), E_INVALID_PARAMETERS,
+                "Parameter error: parameter belongsTo type must be string");
+        }
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_NULL(!ctxt->isThrowError, "GetMultiUniformDataTypesByMIMEType Exit");
+    std::vector<std::string> typeIds;
+    auto status = E_OK;
+    status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, typeIds, belongsTo);
+    ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
+    if (!typeIds.empty()) {
+        NapiDataUtils::SetValue(env, typeIds, ctxt->output);
+    } else {
+        napi_get_null(env, &ctxt->output);
+    }
     return ctxt->output;
 }
 } // namespace UDMF
