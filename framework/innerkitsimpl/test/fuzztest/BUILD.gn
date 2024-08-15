@@ -17,5 +17,8 @@ import("//build/ohos.gni")
 group("fuzztest") {
   testonly = true
 
-  deps = [ "udmfclient_fuzzer:fuzztest" ]
+  deps = [ 
+    "udmfclient_fuzzer:fuzztest",
+    "utdclient_fuzzer:fuzztest"
+  ]
 }
