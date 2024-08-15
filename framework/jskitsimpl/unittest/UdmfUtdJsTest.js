@@ -799,7 +799,7 @@ describe('UdmfUtdJSTest', function () {
     console.info(TAG, 'start');
     let typeIds = UTD.GetUniformDataTypesByFilenameExtension('.txt');
     console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
-    expect(typeIds.includes("general.plain-text")).assertTrue();
+    expect(typeIds.includes('general.plain-text')).assertTrue();
     console.info(TAG, 'end');
   });
 
@@ -814,7 +814,7 @@ describe('UdmfUtdJSTest', function () {
     console.info(TAG, 'start');
     let typeIds = UTD.GetUniformDataTypesByFilenameExtension('.txt', 'general.text');
     console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
-    expect(typeIds.includes("general.plain-text")).assertTrue();
+    expect(typeIds.includes('general.plain-text')).assertTrue();
     console.info(TAG, 'end');
   });
 
@@ -880,7 +880,7 @@ describe('UdmfUtdJSTest', function () {
       let typeIds = UTD.GetUniformDataTypesByFilenameExtension('.invalid', '');
       console.error(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
       expect().assertFail();
-    } catch(e) {
+    } catch (e) {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
     }
@@ -898,7 +898,7 @@ describe('UdmfUtdJSTest', function () {
     console.info(TAG, 'start');
     let typeIds = UTD.GetUniformDataTypesByMIMEType('text/plain');
     console.info(TAG, 'GetUniformDataTypesByFilenameExtension, ret ' + typeIds);
-    expect(typeIds.includes("general.plain-text")).assertTrue();
+    expect(typeIds.includes('general.plain-text')).assertTrue();
     console.info(TAG, 'end');
   });
 
