@@ -229,5 +229,32 @@ int32_t UdmfServiceProxy::SendRequest(UdmfServiceInterfaceCode code, MessageParc
     LOG_DEBUG(UDMF_SERVICE, "err: %{public}d", err);
     return err;
 }
+
+int32_t UdmfServiceProxy::ObtainAsynProcess(AsyncProcessInfo &processInfo)
+{
+    MessageParcel reply;
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::OBTAIN_ASYN_PROCESS, reply);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x", status);
+        return status;
+    }
+    if (!ITypesUtil::Unmarshal(reply, processInfo)) {
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal AsyncProcessInfo failed!");
+        return E_READ_PARCEL_ERROR;
+    }
+    return E_OK;
+}
+
+int32_t UdmfServiceProxy::ClearAsynProcess()
+{
+    MessageParcel reply;
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::CLEAR_ASYN_PROCESS, reply);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x", status);
+        return status;
+    }
+    return E_OK;
+}
+
 } // namespace UDMF
 } // namespace OHOS

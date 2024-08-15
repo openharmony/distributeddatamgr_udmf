@@ -296,5 +296,29 @@ std::string UdmfClient::GetSelfBundleName()
     }
     return hapInfo.bundleName;
 }
+
+Status UdmfClient::GetDataAsync(const QueryOption &query, ObtainDataCallback callback)
+{
+    asyncObtainData_.ClearTask();
+
+    auto it = this->dataCache_.Find(query.key);
+    if (it.first) {
+        dataCache_.Erase(query.key);
+        ProgressInfo info{ "Local", ASYNC_SUCCESS, 100 };
+        callback(info, it.second);
+        return E_OK;
+    }
+
+    auto ret = asyncObtainData_.InitTask(query, callback);
+    if (ret == E_OK) {
+        ret = asyncObtainData_.RunTask();
+    }
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "InitTask or RunTask faile ret=%{public}d", ret);
+        asyncObtainData_.ClearTask();
+        return ret;
+    }
+    return E_OK;
+}
 } // namespace UDMF
 } // namespace OHOS

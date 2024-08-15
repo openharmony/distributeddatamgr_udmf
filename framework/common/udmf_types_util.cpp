@@ -193,5 +193,34 @@ bool Unmarshalling(Intention &output, MessageParcel &parcel)
     output = static_cast<Intention>(intention);
     return true;
 }
+
+template<>
+bool API_EXPORT Marshalling(const AsyncProcessInfo &input, MessageParcel &parcel)
+{
+    uint32_t syncStatus = input.syncStatus;
+    uint32_t permStatus = input.permStatus;
+    return ITypesUtil::Marshal(parcel, syncStatus, permStatus, input.srcDevName, input.syncFinished, input.syncTotal,
+        input.syncId, input.permFnished, input.permTotal);
+}
+
+template<>
+bool API_EXPORT Unmarshalling(AsyncProcessInfo &output, MessageParcel &parcel)
+{
+    uint32_t syncStatus;
+    uint32_t permStatus;
+    if (!ITypesUtil::Unmarshal(parcel, syncStatus, permStatus, output.srcDevName, output.syncFinished, output.syncTotal,
+        output.syncId, output.permFnished, output.permTotal)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal AsyncProcessInfo failed!");
+        return false;
+    }
+
+    if (syncStatus > ASYNC_FAILURE || permStatus > ASYNC_FAILURE) {
+        LOG_ERROR(UDMF_FRAMEWORK, "invalid SyncStatus!");
+        return false;
+    }
+    output.syncStatus = static_cast<AsyncTaskStatus>(syncStatus);
+    output.permStatus = static_cast<AsyncTaskStatus>(permStatus);
+    return true;
+}
 } // namespace ITypesUtil
 } // namespace OHOS

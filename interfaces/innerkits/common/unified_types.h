@@ -80,6 +80,30 @@ struct QueryOption {
     Intention intention {};
     uint32_t  tokenId {};
 };
+
+enum AsyncTaskStatus : uint32_t {
+    ASYNC_IDLE = 0,
+    ASYNC_RUNNING,
+    ASYNC_SUCCESS,
+    ASYNC_FAILURE,
+};
+
+struct AsyncProcessInfo {
+    AsyncTaskStatus syncStatus;
+    AsyncTaskStatus permStatus;
+    std::string srcDevName;
+    uint32_t syncFinished;
+    uint32_t syncTotal;
+    uint32_t syncId;
+    uint32_t permFnished;
+    uint32_t permTotal;
+};
+
+struct ProgressInfo {
+    std::string srcDevName;
+    AsyncTaskStatus status;
+    uint32_t progress;
+};
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_UNIFIED_TYPES_H
