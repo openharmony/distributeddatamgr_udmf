@@ -112,8 +112,8 @@ int32_t UdmfServiceProxy::DeleteData(const QueryOption &query, std::vector<Unifi
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::DELETE_DATA, reply, query);
     if (status != E_OK) {
-        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x,key: %{public}s, intention:%{public}s", status, query.key.c_str(),
-                  UD_INTENTION_MAP.at(query.intention).c_str());
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x,key: %{public}s, intention:%{public}d", status, query.key.c_str(),
+                  query.intention);
         return status;
     }
     if (!ITypesUtil::Unmarshal(reply, unifiedDataSet)) {
