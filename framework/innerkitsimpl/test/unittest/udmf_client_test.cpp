@@ -2488,4 +2488,61 @@ HWTEST_F(UdmfClientTest, GetDataAsync01, TestSize.Level1)
     std::this_thread::sleep_for(std::chrono::seconds(1));
     LOG_INFO(UDMF_TEST, "GetDataAsync01 end.");
 }
+
+/**
+* @tc.name: GetDataAsync02
+* @tc.desc: Set multiple record with invalid params and async get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetDataAsync02, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetDataAsync02 begin.");
+    QueryOption queryOption;
+    auto status = UdmfClient::GetInstance().GetDataAsync(queryOption, nullptr);
+    ASSERT_NE(status, E_OK);
+    LOG_INFO(UDMF_TEST, "GetDataAsync02 end.");
+}
+
+/**
+* @tc.name: GetDataAsync03
+* @tc.desc: Set multiple record with invalid params and async get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetDataAsync03, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetDataAsync03 begin.");
+
+    CustomOption customOption = {.intention = Intention::UD_INTENTION_DRAG};
+    std::string key;
+    UnifiedData inputData;
+    std::vector<std::shared_ptr<UnifiedRecord>> inputRecords = {
+        std::make_shared<Text>(),
+        std::make_shared<PlainText>(),
+        std::make_shared<File>(),
+        std::make_shared<Image>(),
+        std::make_shared<SystemDefinedRecord>(),
+        std::make_shared<SystemDefinedForm>(),
+        std::make_shared<ApplicationDefinedRecord>()
+    };
+    inputData.SetRecords(inputRecords);
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_OK);
+
+
+    auto callback = [this, inputRecords](ProgressInfo progress, UnifiedData &outputData) {
+        LOG_INFO(UDMF_TEST, "GetDataAsync03 callback begin status=%{public}u, progress=%{public}u, name=%{public}s.",
+            progress.status, progress.progress, progress.srcDevName.c_str());
+        if (progress.status == ASYNC_IDLE || progress.status == ASYNC_RUNNING) {
+            return;
+        }
+        ASSERT_EQ(progress.status, ASYNC_FAILURE);
+        LOG_INFO(UDMF_TEST, "GetDataAsync03 callback end.");
+    };
+    QueryOption queryOption = { .key = "123456" };
+    status = UdmfClient::GetInstance().GetDataAsync(queryOption, callback);
+    ASSERT_EQ(status, E_OK);
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    LOG_INFO(UDMF_TEST, "GetDataAsync03 end.");
+}
 } // OHOS::Test
