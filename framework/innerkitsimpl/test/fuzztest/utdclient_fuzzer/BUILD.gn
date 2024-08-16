@@ -22,7 +22,6 @@ ohos_fuzztest("UtdClientFuzzTest") {
 
   include_dirs = [
     "${udmf_interfaces_path}/innerkits/client",
-    "${udmf_interfaces_path}/innerkits/data",
   ]
 
   fuzz_config_file =
