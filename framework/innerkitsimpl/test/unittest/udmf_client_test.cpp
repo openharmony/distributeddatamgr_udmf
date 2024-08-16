@@ -90,6 +90,11 @@ void UdmfClientTest::SetUp()
 
 void UdmfClientTest::TearDown()
 {
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    query = { .intention = Intention::UD_INTENTION_DRAG };
+    UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
 }
 
 void UdmfClientTest::SetNativeToken(const std::string &processName)
@@ -1687,6 +1692,10 @@ HWTEST_F(UdmfClientTest, UpdateData002, TestSize.Level1)
     QueryOption queryOption = { .key = key };
     SetHapToken2();
     status = UdmfClient::GetInstance().UpdateData(queryOption, data);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    SetHapToken1();
+    status = UdmfClient::GetInstance().UpdateData(queryOption, data);
     ASSERT_EQ(status, E_OK);
 
     std::vector<UnifiedData> dataSet;
@@ -1862,6 +1871,12 @@ HWTEST_F(UdmfClientTest, DeleteData002, TestSize.Level1)
     std::vector<UnifiedData> unifiedDataSet;
     status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
     ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(0, unifiedDataSet.size());
+
+    SetHapToken1();
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(1, unifiedDataSet.size());
 
     unifiedDataSet.clear();
     status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
