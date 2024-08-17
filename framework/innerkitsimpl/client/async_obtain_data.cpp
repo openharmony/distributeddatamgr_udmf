@@ -83,6 +83,10 @@ void AsyncObtainData::ObtainDataTask()
 
     UnifiedData unifiedData;
     if (taskStatus_ != ASYNC_FAILURE) {
+        if (serviceClient_ == nullptr) {
+            LOG_ERROR(UDMF_CLIENT, "failed! serviceClient_ is nullptr");
+            return;
+        }
         int32_t ret = serviceClient_->GetData(query_, unifiedData);
         if (ret != E_OK) {
             LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
@@ -98,6 +102,10 @@ void AsyncObtainData::ObtainDataTask()
 void AsyncObtainData::ProgressTask()
 {
     LOG_DEBUG(UDMF_CLIENT, "Enter");
+    if (serviceClient_ == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "failed! serviceClient_ is nullptr");
+        return;
+    }
     AsyncProcessInfo processInfo;
     int32_t ret = serviceClient_->ObtainAsynProcess(processInfo);
     if (ret != E_OK) {
@@ -129,6 +137,10 @@ void AsyncObtainData::InvokeCallback(UnifiedData &data)
         progress.progress = lastProgress_;
     } else {
         lastProgress_ = progress.progress;
+    }
+    if (callback_ == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "failed! callback_ is nullptr");
+        return;
     }
     callback_(progress, data);
 }

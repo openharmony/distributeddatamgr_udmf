@@ -646,6 +646,7 @@ void GetDataAsyncByKeyFuzz(const uint8_t *data, size_t size)
     auto callback = [](ProgressInfo progress, UnifiedData &outputData) {
     };
     UdmfClient::GetInstance().GetDataAsync(option2, callback);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 void GetDataAsyncByIntentionFuzz(const uint8_t *data, size_t size)
@@ -665,6 +666,7 @@ void GetDataAsyncByIntentionFuzz(const uint8_t *data, size_t size)
     auto callback = [](ProgressInfo progress, UnifiedData &outputData) {
     };
     UdmfClient::GetInstance().GetDataAsync(option2, callback);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 }
 
