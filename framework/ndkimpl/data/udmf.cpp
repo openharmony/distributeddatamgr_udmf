@@ -293,7 +293,8 @@ void OH_UdmfRecord_Destroy(OH_UdmfRecord* record)
     delete record;
 }
 
-int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId, unsigned char* entry, unsigned int count)
+int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId,
+                                  const unsigned char* entry, unsigned int count)
 {
     if (!IsUnifiedRecordValid(record) || typeId == nullptr || entry == nullptr || count == 0 ||
         count > MAX_RECORDS_SIZE) {
