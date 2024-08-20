@@ -73,10 +73,10 @@ const constexpr char ORG_PKG[] = "distributeddata";
 
 class API_EXPORT RadarReporterAdapter {
 public:
-    static  void ReportNormal(std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t state);
+    static  void ReportNormal(const std::string &func, int32_t scene, int32_t stage, int32_t stageRes, int32_t state);
     static  void ReportFail(
-        std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state);
-    static  void ReportFail(std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode);
+        const std::string &func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state);
+    static  void ReportFail(const std::string &func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode);
 };
 } // namespace UDMF
 } // namespace OHOS
