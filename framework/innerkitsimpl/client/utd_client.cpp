@@ -26,7 +26,6 @@ namespace UDMF {
 constexpr const char* CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
 constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/defaultUserId/";
 constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/utd/utd-adt.json";
-constexpr const char* PREFIX_MATCH_SIGN = "/*";
 UtdClient::UtdClient()
 {
     Init();
@@ -275,9 +274,7 @@ std::vector<std::string> UtdClient::GetTypeIdsFromCfg(const std::string &mimeTyp
 {
     bool prefixMatch = false;
     std::string prefixType;
-    auto signSize = strlen(PREFIX_MATCH_SIGN);
-    if (mimeType.size() >= signSize &&
-        mimeType.compare(mimeType.size() - signSize, signSize, PREFIX_MATCH_SIGN) == 0) {
+    if (!mimeType.empty() && mimeType.back() == '*') {
         prefixType = mimeType.substr(0, mimeType.length() - 1);
         prefixMatch = true;
     }
