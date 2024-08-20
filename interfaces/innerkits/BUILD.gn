@@ -99,6 +99,7 @@ ohos_shared_library("udmf_client") {
     "bundle_framework:appexecfwk_core",
     "cJSON:cjson",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
@@ -174,6 +175,7 @@ ohos_shared_library("utd_client") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "cJSON:cjson",
+    "common_event_service:cesfwk_innerkits",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",

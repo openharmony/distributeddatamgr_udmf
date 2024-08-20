@@ -30,6 +30,7 @@ constexpr const char* PREFIX_MATCH_SIGN = "/*";
 UtdClient::UtdClient()
 {
     Init();
+    RegisterClearCacheListener();
     LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
 }
 
@@ -361,6 +362,37 @@ Status UtdClient::GetCurrentActiveUserId(int32_t& userId)
         return Status::E_ERROR;
     }
     return Status::E_OK;
+}
+
+void UtdClient::RegisterClearCacheListener()
+{
+    if (g_clearCacheListener != nullptr) {
+        return;
+    }
+    LOG_INFO(UDMF_CLIENT, "register clear cache listener");
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
+    EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
+    g_clearCacheListener = std::make_shared<ClearCacheListener>(subscribeInfo);
+    (void)EventFwk::CommonEventManager::SubscribeCommonEvent(g_clearCacheListener);
+}
+
+ClearCacheListener::ClearCacheListener(const EventFwk::CommonEventSubscribeInfo &subscribeInfo)
+    : EventFwk::CommonEventSubscriber(subscribeInfo)
+{}
+
+void ClearCacheListener::OnReceiveEvent(const EventFwk::CommonEventData &data)
+{
+    std::string action = data.GetWant().GetAction();
+    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED) {
+        LOG_INFO(UDMF_CLIENT, "COMMON_EVENT_PACKAGE_ADDED");
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
+        LOG_INFO(UDMF_CLIENT, "COMMON_EVENT_PACKAGE_REMOVED");
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
+        LOG_INFO(UDMF_CLIENT, "COMMON_EVENT_PACKAGE_CHANGED");
+    }
 }
 } // namespace UDMF
 } // namespace OHOS

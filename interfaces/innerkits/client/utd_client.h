@@ -19,6 +19,10 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "common_event_manager.h"
+#include "common_event_subscriber.h"
+#include "common_event_support.h"
+#include "mutex"
 #include "utd_common.h"
 #include "preset_type_descriptors.h"
 #include "preset_type_descriptors.h"
@@ -29,6 +33,15 @@
 namespace OHOS {
 namespace UDMF {
 class TypeDescriptor;
+class ClearCacheListener final : public EventFwk::CommonEventSubscriber {
+public:
+    explicit ClearCacheListener(const EventFwk::CommonEventSubscribeInfo &subscribeInfo);
+    virtual ~ClearCacheListener() = default;
+    void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
+
+    std::mutex mutex_;
+};
+
 class API_EXPORT UtdClient {
 public:
     static UtdClient &GetInstance();
@@ -58,6 +71,7 @@ private:
     std::string GetTypeIdFromCfg(const std::string &mimeType);
     std::vector<std::string> GetTypeIdsFromCfg(const std::string &mimeType);
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
+    std::shared_ptr<ClearCacheListener> g_clearCacheListener;
 };
 } // namespace UDMF
 } // namespace OHOS
