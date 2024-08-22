@@ -46,7 +46,7 @@ UtdClient &UtdClient::GetInstance()
 
 void UtdClient::Init()
 {
-    std::unique_lock<std::shared_mutex> lock(typeMutex_);
+    std::unique_lock<std::shared_mutex> lock(utdMutex_);
     descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
     std::string customUtdPath = GetCustomUtdPath();
     if (!customUtdPath.empty()) {
@@ -63,12 +63,14 @@ void UtdClient::Init()
 
 Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor)
 {
-    std::shared_lock<std::shared_mutex> guard(typeMutex_);
-    for (const auto &utdTypeCfg : descriptorCfgs_) {
-        if (utdTypeCfg.typeId == typeId) {
-            descriptor = std::make_shared<TypeDescriptor>(utdTypeCfg);
-            LOG_DEBUG(UDMF_CLIENT, "get descriptor success. %{public}s ", typeId.c_str());
-            return Status::E_OK;
+    {
+        std::shared_lock<std::shared_mutex> guard(utdMutex_);
+        for (const auto &utdTypeCfg : descriptorCfgs_) {
+            if (utdTypeCfg.typeId == typeId) {
+                descriptor = std::make_shared<TypeDescriptor>(utdTypeCfg);
+                LOG_DEBUG(UDMF_CLIENT, "get descriptor success. %{public}s ", typeId.c_str());
+                return Status::E_OK;
+            }
         }
     }
     if (typeId.find(FLEXIBLE_TYPE_FLAG) != typeId.npos) {
@@ -118,7 +120,6 @@ Status UtdClient::GetFlexibleTypeDescriptor(const std::string &typeId, std::shar
 Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileExtension, std::string &typeId,
                                                         std::string belongsTo)
 {
-    std::shared_lock<std::shared_mutex> guard(typeMutex_);
     std::string lowerFileExtension = fileExtension;
     std::transform(lowerFileExtension.begin(), lowerFileExtension.end(), lowerFileExtension.begin(), ::tolower);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
@@ -126,16 +127,17 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
                   fileExtension.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
-
-    for (const auto &utdTypeCfg : descriptorCfgs_) {
-        std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
-        if (find(fileExtensions.begin(), fileExtensions.end(), lowerFileExtension) != fileExtensions.end() ||
-            find(fileExtensions.begin(), fileExtensions.end(), fileExtension) != fileExtensions.end()) {
-            typeId = utdTypeCfg.typeId;
-            break;
+    {
+        std::shared_lock<std::shared_mutex> guard(utdMutex_);
+        for (const auto &utdTypeCfg : descriptorCfgs_) {
+            std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
+            if (find(fileExtensions.begin(), fileExtensions.end(), lowerFileExtension) != fileExtensions.end() ||
+                find(fileExtensions.begin(), fileExtensions.end(), fileExtension) != fileExtensions.end()) {
+                typeId = utdTypeCfg.typeId;
+                break;
+            }
         }
     }
-
     // the find typeId is not belongsTo to the belongsTo.
     if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
         !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
@@ -156,7 +158,6 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
 Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &fileExtension,
     std::vector<std::string> &typeIds, const std::string &belongsTo)
 {
-    std::shared_lock<std::shared_mutex> guard(typeMutex_);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. fileExtension:%{public}s, belongsTo:%{public}s ",
             fileExtension.c_str(), belongsTo.c_str());
@@ -171,10 +172,13 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
     std::string lowerFileExtension = fileExtension;
     std::transform(lowerFileExtension.begin(), lowerFileExtension.end(), lowerFileExtension.begin(), ::tolower);
     std::vector<std::string> typeIdsInCfg;
-    for (const auto &utdTypeCfg : descriptorCfgs_) {
-        std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
-        if (find(fileExtensions.begin(), fileExtensions.end(), lowerFileExtension) != fileExtensions.end()) {
-            typeIdsInCfg.push_back(utdTypeCfg.typeId);
+    {
+        std::shared_lock<std::shared_mutex> guard(utdMutex_);
+        for (const auto &utdTypeCfg : descriptorCfgs_) {
+            std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
+            if (find(fileExtensions.begin(), fileExtensions.end(), lowerFileExtension) != fileExtensions.end()) {
+                typeIdsInCfg.push_back(utdTypeCfg.typeId);
+            }
         }
     }
     typeIds.clear();
@@ -221,7 +225,7 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
 
 std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
 {
-    std::shared_lock<std::shared_mutex> guard(typeMutex_);
+    std::shared_lock<std::shared_mutex> guard(utdMutex_);
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         for (auto mime : utdTypeCfg.mimeTypes) {
             std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
@@ -279,7 +283,6 @@ Status UtdClient::GetUniformDataTypesByMIMEType(const std::string &mimeType, std
 
 std::vector<std::string> UtdClient::GetTypeIdsFromCfg(const std::string &mimeType)
 {
-    std::shared_lock<std::shared_mutex> guard(typeMutex_);
     bool prefixMatch = false;
     std::string prefixType;
     if (!mimeType.empty() && mimeType.back() == '*') {
@@ -287,6 +290,8 @@ std::vector<std::string> UtdClient::GetTypeIdsFromCfg(const std::string &mimeTyp
         prefixMatch = true;
     }
     std::vector<std::string> typeIdsInCfg;
+
+    std::shared_lock<std::shared_mutex> guard(utdMutex_);
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         for (auto mime : utdTypeCfg.mimeTypes) {
             std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);

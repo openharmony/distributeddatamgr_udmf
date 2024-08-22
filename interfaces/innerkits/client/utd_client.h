@@ -72,7 +72,7 @@ private:
 
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
     std::shared_ptr<UtdChangeSubscriber> subscriber_;
-    std::shared_mutex typeMutex_;
+    std::shared_mutex utdMutex_;
 };
 } // namespace UDMF
 } // namespace OHOS
