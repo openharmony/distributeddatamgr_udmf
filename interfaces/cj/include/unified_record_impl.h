@@ -18,62 +18,72 @@
 
 #include "unified_record.h"
 
-namespace OHOS {
-namespace UDMF {
-using namespace OHOS::UDMF;
-struct CArrByte {
-    u_int8_t* head;
-    int64_t size;
-};
-
-struct CJValueType {
-    int32_t integer32;
-    int64_t integer64;
-    double dou;
-    bool boolean;
-    char* string;
-    CArrByte byteArray;
-    int64_t pixelMapId;
-
-    uint8_t tag;
-};
-
-
-
-class CUnifiedRecord : public OHOS::FFI::FFIData {
-public:
-    OHOS::FFI::RuntimeType* GetRuntimeType() override
+namespace OHOS
+{
+    namespace UDMF
     {
-        return GetClassType();
+        using namespace OHOS::UDMF;
+        struct CArrByte
+        {
+            u_int8_t *head;
+            int64_t size;
+        };
+
+        struct CJValueType
+        {
+            int32_t integer32;
+            int64_t integer64;
+            double dou;
+            bool boolean;
+            char *string;
+            CArrByte byteArray;
+            int64_t pixelMapId;
+
+            uint8_t tag;
+        };
+
+        enum TypeSymbol
+        {
+            INTEGER32 = 0,
+            INTEGER64 = 1,
+            DOUBLE = 2,
+            BOOLEAN = 3,
+            STRING = 4,
+            BYTEARRAY = 5,
+            PIXELMAP = 6
+        };
+
+        class CUnifiedRecord : public OHOS::FFI::FFIData
+        {
+        public:
+            OHOS::FFI::RuntimeType *GetRuntimeType() override
+            {
+                return GetClassType();
+            }
+
+            CUnifiedRecord();
+            CUnifiedRecord(const char *type, CJValueType value);
+            CJValueType ValueType2CJValueType(ValueType value);
+            ValueType CJValueType2ValueType(CJValueType value);
+            char *GetType();
+            CJValueType GetValue();
+
+            const std::shared_ptr<UDMF::UnifiedRecord> &GetUnifiedRecord() const;
+
+        private:
+            std::shared_ptr<UDMF::UnifiedRecord> unifiedRecord_;
+            int64_t pixelMapId_;
+
+            friend class OHOS::FFI::RuntimeType;
+            friend class OHOS::FFI::TypeBase;
+            static OHOS::FFI::RuntimeType *GetClassType()
+            {
+                static OHOS::FFI::RuntimeType runtimeType = OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("CUnifiedRecord");
+                return &runtimeType;
+            }
+        };
+
     }
-
-    CUnifiedRecord() ;
-    CUnifiedRecord(const char* type,CJValueType value) ;
-    CJValueType ValueType2CJValueType(ValueType value);
-    ValueType CJValueType2ValueType(CJValueType value);
-    char * GetType();
-    CJValueType  GetValue();
-    
-    const std::shared_ptr<UDMF::UnifiedRecord> & GetUnifiedRecord() const;
-
-
-    
-private:
-     std::shared_ptr<UDMF::UnifiedRecord> unifiedRecord_;
-     int64_t pixelMapId_;
-
-
-    friend class OHOS::FFI::RuntimeType;
-    friend class OHOS::FFI::TypeBase;
-    static OHOS::FFI::RuntimeType* GetClassType()
-    {
-        static OHOS::FFI::RuntimeType runtimeType = OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("CUnifiedRecord");
-        return &runtimeType;
-    }
-};
-
-
-}
 } // namespace OHOS::UDMF
 
 #endif

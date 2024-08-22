@@ -17,32 +17,29 @@
 #define UDMF_UNIFIED_DATA_FFI_H
 
 #include <cstdint>
-// #include "napi_base_context.h"
 #include "ffi_remote_data.h"
 #include "cj_common_ffi.h"
 
 
-
-
-// #include "distributed_kv_store_log.h"
 #include "unified_data_impl.h"
 
-namespace OHOS {
-namespace UDMF {
-    
-extern "C" {
-    
-    FFI_EXPORT int64_t FfiOHOSUDMFUnifiedDataConstructor();
-    FFI_EXPORT int64_t FfiOHOSUDMFUnifiedDataConstructorwWithRecord(int64_t unifiedRecordId);
-    FFI_EXPORT void   FfiOHOSUDMFUnifiedDataAddRecord(int64_t unifiedDataId,int64_t unifiedRecordId);
-    FFI_EXPORT CArrUnifiedRecord   FfiOHOSUDMFUnifiedDataGetRecords(int64_t unifiedDataId);
-    FFI_EXPORT bool   FfiOHOSUDMFUnifiedDataHasType(int64_t unifiedDataId,const char* type);
-    FFI_EXPORT CArrString   FfiOHOSUDMFUnifiedDataGetTypes(int64_t unifiedDataId);
+namespace OHOS
+{
+    namespace UDMF
+    {
 
+        extern "C"
+        {
 
-}
+            FFI_EXPORT int64_t FfiOHOSUDMFUnifiedDataConstructor();
+            FFI_EXPORT int64_t FfiOHOSUDMFUnifiedDataConstructorwWithRecord(int64_t unifiedRecordId);
+            FFI_EXPORT void FfiOHOSUDMFUnifiedDataAddRecord(int64_t unifiedDataId, int64_t unifiedRecordId);
+            FFI_EXPORT CArrUnifiedRecord FfiOHOSUDMFUnifiedDataGetRecords(int64_t unifiedDataId);
+            FFI_EXPORT bool FfiOHOSUDMFUnifiedDataHasType(int64_t unifiedDataId, const char *type);
+            FFI_EXPORT CArrString FfiOHOSUDMFUnifiedDataGetTypes(int64_t unifiedDataId);
+        }
 
-}
+    }
 }
 
 #endif
