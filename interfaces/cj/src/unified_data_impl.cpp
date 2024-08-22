@@ -110,7 +110,6 @@ namespace UDMF {
 
     static CArrString StringVectorToArray(std::vector<std::string> vector)
     {
-
         char **head = static_cast<char **>(malloc(vector.size() * sizeof(char *)));
         if (head == nullptr) {
             return CArrString{};
