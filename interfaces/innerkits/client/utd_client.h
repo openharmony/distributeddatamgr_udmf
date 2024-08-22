@@ -33,16 +33,14 @@
 namespace OHOS {
 namespace UDMF {
 class TypeDescriptor;
-class ClearCacheListener final : public EventFwk::CommonEventSubscriber {
-public:
-    explicit ClearCacheListener(const EventFwk::CommonEventSubscribeInfo &subscribeInfo);
-    virtual ~ClearCacheListener() = default;
-    void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
-
-    std::mutex mutex_;
-};
-
 class API_EXPORT UtdClient {
+    class CommonEventSubscriber final : public EventFwk::CommonEventSubscriber {
+    public:
+        explicit CommonEventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo);
+        virtual ~CommonEventSubscriber() = default;
+        void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
+    };
+
 public:
     static UtdClient &GetInstance();
     Status GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
@@ -70,8 +68,10 @@ private:
     Status GetFlexibleTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
     std::string GetTypeIdFromCfg(const std::string &mimeType);
     std::vector<std::string> GetTypeIdsFromCfg(const std::string &mimeType);
+    void RegisterClearCacheListener();
+
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
-    std::shared_ptr<ClearCacheListener> g_clearCacheListener;
+    std::shared_ptr<CommonEventSubscriber> subscriber_;
 };
 } // namespace UDMF
 } // namespace OHOS

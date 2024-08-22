@@ -175,8 +175,8 @@ ohos_shared_library("utd_client") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "cJSON:cjson",
-    "common_event_service:cesfwk_innerkits",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "ipc:ipc_core",
     "os_account:os_account_innerkits",

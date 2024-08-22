@@ -14,6 +14,7 @@
  */
 #define LOG_TAG "UtdClient"
 #include <regex>
+#include <thread>
 #include "utd_client.h"
 #include "logger.h"
 #include "utd_graph.h"
@@ -30,7 +31,10 @@ constexpr const char* PREFIX_MATCH_SIGN = "/*";
 UtdClient::UtdClient()
 {
     Init();
-    RegisterClearCacheListener();
+    if (!IsHapTokenType()) {
+        LOG_INFO(UDMF_CLIENT, "need SubscribeDataChange callback.");
+        RegisterClearCacheListener();
+    }
     LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
 }
 
@@ -355,18 +359,19 @@ std::string UtdClient::GetCustomUtdPath()
 
 Status UtdClient::GetCurrentActiveUserId(int32_t& userId)
 {
-    int32_t localId;
-    int32_t status = OHOS::AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(localId);
-    if (status != Status::E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "GetForegroundOsAccountLocalId fail, status:%{public}d", status);
+    std::vector<int32_t> localIds;
+    int32_t status = OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(localIds);
+    if (status != Status::E_OK || localIds.empty()) {
+        LOG_ERROR(UDMF_CLIENT, "Get OsAccountId fail, status:%{public}d", status);
         return Status::E_ERROR;
     }
+    userId = localIds[0];
     return Status::E_OK;
 }
 
 void UtdClient::RegisterClearCacheListener()
 {
-    if (g_clearCacheListener != nullptr) {
+    if (subscriber_ != nullptr) {
         return;
     }
     LOG_INFO(UDMF_CLIENT, "register clear cache listener");
@@ -375,24 +380,22 @@ void UtdClient::RegisterClearCacheListener()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
-    g_clearCacheListener = std::make_shared<ClearCacheListener>(subscribeInfo);
-    (void)EventFwk::CommonEventManager::SubscribeCommonEvent(g_clearCacheListener);
+    subscriber_ = std::make_shared<CommonEventSubscriber>(subscribeInfo);
+    (void)EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber_);
 }
 
-ClearCacheListener::ClearCacheListener(const EventFwk::CommonEventSubscribeInfo &subscribeInfo)
+UtdClient::CommonEventSubscriber::CommonEventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo)
     : EventFwk::CommonEventSubscriber(subscribeInfo)
-{}
-
-void ClearCacheListener::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
-    std::string action = data.GetWant().GetAction();
-    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED) {
-        LOG_INFO(UDMF_CLIENT, "COMMON_EVENT_PACKAGE_ADDED");
-    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
-        LOG_INFO(UDMF_CLIENT, "COMMON_EVENT_PACKAGE_REMOVED");
-    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
-        LOG_INFO(UDMF_CLIENT, "COMMON_EVENT_PACKAGE_CHANGED");
-    }
+}
+
+void UtdClient::CommonEventSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
+{
+    auto updateTask = []() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+        UtdClient::GetInstance().Init();
+    };
+    std::thread(updateTask).detach();
 }
 } // namespace UDMF
 } // namespace OHOS
