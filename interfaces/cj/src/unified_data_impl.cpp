@@ -53,11 +53,13 @@ using namespace OHOS::UDMF;
 namespace OHOS {
 namespace UDMF {
 
-    CUnifiedData::CUnifiedData() {
+    CUnifiedData::CUnifiedData() 
+    {
         unifiedData_ = std::make_shared<UnifiedData>();
     }
 
-    CUnifiedData::CUnifiedData(UDMF::CUnifiedRecord *record) {
+    CUnifiedData::CUnifiedData(UDMF::CUnifiedRecord *record) 
+    {
         unifiedData_ = std::make_shared<UnifiedData>();
 
         if (record == nullptr) {
@@ -67,7 +69,8 @@ namespace UDMF {
         this->records_.push_back(record);
     }
 
-    void CUnifiedData::AddRecord(UDMF::CUnifiedRecord *record) {
+    void CUnifiedData::AddRecord(UDMF::CUnifiedRecord *record) 
+    {
         if (record == nullptr) {
             return;
         }
@@ -75,7 +78,8 @@ namespace UDMF {
         unifiedData_->AddRecord(record->GetUnifiedRecord());
     }
 
-    static CArrUnifiedRecord VectorToArray(std::vector<int64_t> vector) {
+    static CArrUnifiedRecord VectorToArray(std::vector<int64_t> vector) 
+    {
         int64_t *head = static_cast<int64_t *>(malloc(vector.size() * sizeof(int64_t)));
         if (head == nullptr) {
             return CArrUnifiedRecord{};
@@ -87,7 +91,8 @@ namespace UDMF {
         return int64Array;
     }
 
-    CArrUnifiedRecord CUnifiedData::GetRecords() {
+    CArrUnifiedRecord CUnifiedData::GetRecords() 
+    {
         std::vector<int64_t> recordIds;
         for (auto record : this->records_) {
             if (record == nullptr) {
@@ -98,11 +103,13 @@ namespace UDMF {
         return VectorToArray(recordIds);
     }
 
-    bool CUnifiedData::HasType(const char *type) {
+    bool CUnifiedData::HasType(const char *type) 
+    {
         return unifiedData_->HasType(type);
     }
 
-    static CArrString StringVectorToArray(std::vector<std::string> vector) {
+    static CArrString StringVectorToArray(std::vector<std::string> vector) 
+    {
 
         char **head = static_cast<char **>(malloc(vector.size() * sizeof(char *)));
         if (head == nullptr) {
@@ -115,7 +122,8 @@ namespace UDMF {
         return stringArray;
     }
 
-    CArrString CUnifiedData::GetTypes() {
+    CArrString CUnifiedData::GetTypes() 
+    {
         std::vector<std::string> types = unifiedData_->GetTypesLabels();
         return StringVectorToArray(types);
     }

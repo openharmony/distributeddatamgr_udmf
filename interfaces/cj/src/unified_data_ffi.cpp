@@ -25,50 +25,48 @@ namespace OHOS {
 namespace UDMF {
 extern "C" {
 
-    int64_t FfiOHOSUDMFUnifiedDataConstructor() {
+    int64_t FfiOHOSUDMFUnifiedDataConstructor() 
+    {
         auto nativeCJUnifiedData = FFIData::Create<CUnifiedData>();
-        if (nativeCJUnifiedData == nullptr)
-        {
+        if (nativeCJUnifiedData == nullptr) {
             return -1;
         }
         return nativeCJUnifiedData->GetID();
     }
 
-    int64_t FfiOHOSUDMFUnifiedDataConstructorWithRecord(int64_t unifiedRecordId) {
+    int64_t FfiOHOSUDMFUnifiedDataConstructorWithRecord(int64_t unifiedRecordId) 
+    {
         auto record = FFIData::GetData<CUnifiedRecord>(unifiedRecordId);
-        if (record == nullptr)
-        {
+        if (record == nullptr) {
             return -1;
         }
 
         auto nativeCJUnifiedData = FFIData::Create<CUnifiedData>(record);
-        if (nativeCJUnifiedData == nullptr)
-        {
+        if (nativeCJUnifiedData == nullptr) {
             return -1;
         }
         return nativeCJUnifiedData->GetID();
     }
 
-    void FfiOHOSUDMFUnifiedDataAddRecord(int64_t unifiedDataId, int64_t unifiedRecordId) {
+    void FfiOHOSUDMFUnifiedDataAddRecord(int64_t unifiedDataId, int64_t unifiedRecordId) 
+    {
         auto record = FFIData::GetData<CUnifiedRecord>(unifiedRecordId);
-        if (record == nullptr)
-        {
+        if (record == nullptr) {
             return;
         }
 
         auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
-        if (data == nullptr)
-        {
+        if (data == nullptr) {
             return;
         }
 
         data->AddRecord(record);
     }
 
-    CArrUnifiedRecord FfiOHOSUDMFUnifiedDataGetRecords(int64_t unifiedDataId) {
+    CArrUnifiedRecord FfiOHOSUDMFUnifiedDataGetRecords(int64_t unifiedDataId) 
+    {
         auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
-        if (data == nullptr)
-        {
+        if (data == nullptr) {
             CArrUnifiedRecord res;
             return res;
         }
@@ -76,7 +74,8 @@ extern "C" {
         return data->GetRecords();
     }
 
-    bool FfiOHOSUDMFUnifiedDataHasType(int64_t unifiedDataId, const char *type) {
+    bool FfiOHOSUDMFUnifiedDataHasType(int64_t unifiedDataId, const char *type)
+    {
         auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
         if (data == nullptr) {
             return false;
@@ -85,10 +84,10 @@ extern "C" {
         return data->HasType(type);
     }
 
-    CArrString FfiOHOSUDMFUnifiedDataGetTypes(int64_t unifiedDataId) {
+    CArrString FfiOHOSUDMFUnifiedDataGetTypes(int64_t unifiedDataId) 
+    {
         auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
-        if (data == nullptr)
-        {
+        if (data == nullptr) {
             CArrString res;
             return res;
         }

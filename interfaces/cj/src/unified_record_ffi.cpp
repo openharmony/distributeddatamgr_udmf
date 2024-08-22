@@ -24,7 +24,8 @@ namespace OHOS {
 namespace UDMF {
 extern "C" {
 
-    int64_t FfiOHOSUDMFUnifiedRecordConstructor() {
+    int64_t FfiOHOSUDMFUnifiedRecordConstructor() 
+    {
         auto nativeCJUnifiedRecord = FFIData::Create<CUnifiedRecord>();
         if (nativeCJUnifiedRecord == nullptr) {
             return -1;
@@ -32,7 +33,8 @@ extern "C" {
         return nativeCJUnifiedRecord->GetID();
     }
 
-    int64_t FfiOHOSUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value) {
+    int64_t FfiOHOSUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value) 
+    {
         auto nativeCJUnifiedRecord = FFIData::Create<CUnifiedRecord>(type, value);
         if (nativeCJUnifiedRecord == nullptr) {
             return -1;
@@ -40,7 +42,8 @@ extern "C" {
         return nativeCJUnifiedRecord->GetID();
     }
 
-    char *FfiOHOSUDMFUnifiedRecordGetType(int64_t unifiedId) {
+    char *FfiOHOSUDMFUnifiedRecordGetType(int64_t unifiedId) 
+    {
         auto instance = FFIData::GetData<CUnifiedRecord>(unifiedId);
         if (instance == nullptr) {
             return nullptr;
@@ -48,7 +51,8 @@ extern "C" {
         return instance->GetType();
     }
 
-    CJValueType FfiOHOSUDMFUnifiedRecordGetValue(int64_t unifiedId) {
+    CJValueType FfiOHOSUDMFUnifiedRecordGetValue(int64_t unifiedId) 
+    {
         auto instance = FFIData::GetData<CUnifiedRecord>(unifiedId);
         if (instance == nullptr) {
             CJValueType r;
