@@ -17,53 +17,56 @@
 #include "unified_record_ffi.h"
 #include "unified_record_impl.h"
 
-
 using namespace OHOS::FFI;
 using namespace OHOS::UDMF;
 
-namespace OHOS {
-namespace UDMF {
-extern "C" {
+namespace OHOS
+{
+    namespace UDMF
+    {
+        extern "C"
+        {
 
-int64_t FfiOHOSUDMFUnifiedRecordConstructor(){
-    auto nativeCJUnifiedRecord = FFIData::Create<CUnifiedRecord>();
-    if (nativeCJUnifiedRecord == nullptr) {
-        return -1;
+            int64_t FfiOHOSUDMFUnifiedRecordConstructor()
+            {
+                auto nativeCJUnifiedRecord = FFIData::Create<CUnifiedRecord>();
+                if (nativeCJUnifiedRecord == nullptr)
+                {
+                    return -1;
+                }
+                return nativeCJUnifiedRecord->GetID();
+            }
+
+            int64_t FfiOHOSUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value)
+            {
+                auto nativeCJUnifiedRecord = FFIData::Create<CUnifiedRecord>(type, value);
+                if (nativeCJUnifiedRecord == nullptr)
+                {
+                    return -1;
+                }
+                return nativeCJUnifiedRecord->GetID();
+            }
+
+            char *FfiOHOSUDMFUnifiedRecordGetType(int64_t unifiedId)
+            {
+                auto instance = FFIData::GetData<CUnifiedRecord>(unifiedId);
+                if (instance == nullptr)
+                {
+                    return nullptr;
+                }
+                return instance->GetType();
+            }
+
+            CJValueType FfiOHOSUDMFUnifiedRecordGetValue(int64_t unifiedId)
+            {
+                auto instance = FFIData::GetData<CUnifiedRecord>(unifiedId);
+                if (instance == nullptr)
+                {
+                    CJValueType r;
+                    return r;
+                }
+                return instance->GetValue();
+            }
+        }
     }
-    return nativeCJUnifiedRecord->GetID();
 }
-
-
-int64_t FfiOHOSUDMFUnifiedRecordConstructorwithType(const char* type,CJValueType value){
-    auto nativeCJUnifiedRecord = FFIData::Create<CUnifiedRecord>(type,value);
-    if (nativeCJUnifiedRecord == nullptr) {
-        return -1;
-    }
-    return nativeCJUnifiedRecord->GetID();
-}
-
-char*   FfiOHOSUDMFUnifiedRecordGetType(int64_t unifiedId){
-    auto instance = FFIData::GetData<CUnifiedRecord>(unifiedId);
-    if (instance == nullptr) {
-        return nullptr;
-    }
-    return instance->GetType();
-    
-}
-
-CJValueType   FfiOHOSUDMFUnifiedRecordGetValue(int64_t unifiedId){
-    auto instance = FFIData::GetData<CUnifiedRecord>(unifiedId);
-    if (instance == nullptr) {
-        CJValueType r;
-        return r;
-    }
-    return instance->GetValue();
-}
-
-
-
-
-}
-}
-}
-

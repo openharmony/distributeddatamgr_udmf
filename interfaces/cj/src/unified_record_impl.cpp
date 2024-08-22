@@ -169,7 +169,7 @@ namespace OHOS
             }
 
             ValueType value = CJValueType2ValueType(cjvalue);
-            if (cjvalue.tag == 6)
+            if (cjvalue.tag == PIXELMAP)
             {
                 this->pixelMapId_ = cjvalue.pixelMapId;
             }

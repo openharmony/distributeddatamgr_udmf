@@ -18,92 +18,93 @@
 #include "unified_data_impl.h"
 #include "unified_record_impl.h"
 
-
 using namespace OHOS::FFI;
 using namespace OHOS::UDMF;
 
-namespace OHOS {
-namespace UDMF {
-extern "C" {
+namespace OHOS
+{
+    namespace UDMF
+    {
+        extern "C"
+        {
 
-int64_t FfiOHOSUDMFUnifiedDataConstructor(){
-    auto nativeCJUnifiedData = FFIData::Create<CUnifiedData>();
-    if (nativeCJUnifiedData == nullptr) {
-        return -1;
+            int64_t FfiOHOSUDMFUnifiedDataConstructor()
+            {
+                auto nativeCJUnifiedData = FFIData::Create<CUnifiedData>();
+                if (nativeCJUnifiedData == nullptr)
+                {
+                    return -1;
+                }
+                return nativeCJUnifiedData->GetID();
+            }
+
+            int64_t FfiOHOSUDMFUnifiedDataConstructorWithRecord(int64_t unifiedRecordId)
+            {
+                auto record = FFIData::GetData<CUnifiedRecord>(unifiedRecordId);
+                if (record == nullptr)
+                {
+                    return -1;
+                }
+
+                auto nativeCJUnifiedData = FFIData::Create<CUnifiedData>(record);
+                if (nativeCJUnifiedData == nullptr)
+                {
+                    return -1;
+                }
+                return nativeCJUnifiedData->GetID();
+            }
+
+            void FfiOHOSUDMFUnifiedDataAddRecord(int64_t unifiedDataId, int64_t unifiedRecordId)
+            {
+                auto record = FFIData::GetData<CUnifiedRecord>(unifiedRecordId);
+                if (record == nullptr)
+                {
+                    return;
+                }
+
+                auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
+                if (data == nullptr)
+                {
+                    return;
+                }
+
+                data->AddRecord(record);
+            }
+
+            CArrUnifiedRecord FfiOHOSUDMFUnifiedDataGetRecords(int64_t unifiedDataId)
+            {
+                auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
+                if (data == nullptr)
+                {
+                    CArrUnifiedRecord res;
+                    return res;
+                }
+
+                return data->GetRecords();
+            }
+
+            bool FfiOHOSUDMFUnifiedDataHasType(int64_t unifiedDataId, const char *type)
+            {
+                auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
+                if (data == nullptr)
+                {
+                    return false;
+                }
+
+                return data->HasType(type);
+            }
+
+            CArrString FfiOHOSUDMFUnifiedDataGetTypes(int64_t unifiedDataId)
+            {
+                auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
+                if (data == nullptr)
+                {
+                    CArrString res;
+                    return res;
+                }
+
+                return data->GetTypes();
+            }
+        }
     }
-    return nativeCJUnifiedData->GetID();
 }
-
-
-int64_t FfiOHOSUDMFUnifiedDataConstructorWithRecord(int64_t unifiedRecordId){
-    auto record = FFIData::GetData<CUnifiedRecord>(unifiedRecordId);
-    if (record == nullptr) {
-        return -1;
-    }
-
-    auto nativeCJUnifiedData = FFIData::Create<CUnifiedData>(record);
-    if (nativeCJUnifiedData == nullptr) {
-        return -1;
-    }
-    return nativeCJUnifiedData->GetID();
-}
-
-
-
-void  FfiOHOSUDMFUnifiedDataAddRecord(int64_t unifiedDataId,int64_t unifiedRecordId){
-    auto record = FFIData::GetData<CUnifiedRecord>(unifiedRecordId);
-    if (record == nullptr) {
-        return ;
-    }
-
-    auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
-    if (data == nullptr) {
-        return ;
-    }
-
-    data->AddRecord(record);
-}
-
-CArrUnifiedRecord   FfiOHOSUDMFUnifiedDataGetRecords(int64_t unifiedDataId){
-    auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
-    if (data == nullptr) {
-        CArrUnifiedRecord res;
-        return res;
-    }
-
-    return data->GetRecords();
-
-   
-
-}
-
-
-
-bool   FfiOHOSUDMFUnifiedDataHasType(int64_t unifiedDataId,const char* type){
-    auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
-    if (data == nullptr) {
-        return false;
-    }
-
-    return data->HasType(type);
-}
-
-
-CArrString   FfiOHOSUDMFUnifiedDataGetTypes(int64_t unifiedDataId){
-    auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
-    if (data == nullptr) {
-        CArrString res;
-        return res;
-    }
-
-    return data->GetTypes();
-}
-
-
-
-
-
-}
-}
-}
-
