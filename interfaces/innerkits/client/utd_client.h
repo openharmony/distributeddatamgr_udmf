@@ -33,10 +33,10 @@ namespace OHOS {
 namespace UDMF {
 class TypeDescriptor;
 class API_EXPORT UtdClient {
-    class CommonEventSubscriber final : public EventFwk::CommonEventSubscriber {
+    class UtdChangeSubscriber final : public EventFwk::CommonEventSubscriber {
     public:
-        explicit CommonEventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo);
-        virtual ~CommonEventSubscriber() = default;
+        explicit UtdChangeSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo);
+        virtual ~UtdChangeSubscriber() = default;
         void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     };
 
@@ -67,10 +67,10 @@ private:
     Status GetFlexibleTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
     std::string GetTypeIdFromCfg(const std::string &mimeType);
     std::vector<std::string> GetTypeIdsFromCfg(const std::string &mimeType);
-    void SubscribeCommonEvent();
+    void SubscribeUtdChange();
 
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
-    std::shared_ptr<CommonEventSubscriber> subscriber_;
+    std::shared_ptr<UtdChangeSubscriber> subscriber_;
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -31,10 +31,7 @@ constexpr const char* PREFIX_MATCH_SIGN = "/*";
 UtdClient::UtdClient()
 {
     Init();
-    if (!IsHapTokenType()) {
-        LOG_INFO(UDMF_CLIENT, "subscribe utd change callback.");
-        SubscribeCommonEvent();
-    }
+    SubscribeUtdChange();
     LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
 }
 
@@ -369,27 +366,27 @@ Status UtdClient::GetCurrentActiveUserId(int32_t& userId)
     return Status::E_OK;
 }
 
-void UtdClient::SubscribeCommonEvent()
+void UtdClient::SubscribeUtdChange()
 {
-    if (subscriber_ != nullptr) {
+    if (IsHapTokenType()) {
         return;
     }
-    LOG_INFO(UDMF_CLIENT, "register clear cache listener");
+    LOG_INFO(UDMF_CLIENT, "subscribe utd change callback.");
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
-    subscriber_ = std::make_shared<CommonEventSubscriber>(subscribeInfo);
+    subscriber_ = std::make_shared<UtdChangeSubscriber>(subscribeInfo);
     (void)EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber_);
 }
 
-UtdClient::CommonEventSubscriber::CommonEventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo)
+UtdClient::UtdChangeSubscriber::UtdChangeSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo)
     : EventFwk::CommonEventSubscriber(subscribeInfo)
 {
 }
 
-void UtdClient::CommonEventSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
+void UtdClient::UtdChangeSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
     auto updateTask = []() {
         std::this_thread::sleep_for(std::chrono::milliseconds(3000));
