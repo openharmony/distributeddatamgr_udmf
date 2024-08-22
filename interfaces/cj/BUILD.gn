@@ -50,7 +50,6 @@ ohos_shared_library("cj_unified_data_channel_ffi") {
   public_configs = [ ":udmf_cj_config" ]
 
   deps = [
-    "${third_party_path}/bounds_checking_function:libsec_shared",
     "../innerkits:udmf_client",
   ]
 

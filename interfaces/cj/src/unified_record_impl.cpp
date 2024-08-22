@@ -113,7 +113,7 @@ namespace UDMF {
             case STRING:
                 value = cjvalue.string;
                 break;
-            case BYTEARRAY: 
+            case BYTEARRAY:
                 std::vector<uint8_t> bytes = std::vector<uint8_t>();
                 for (int64_t i = 0; i < cjvalue.byteArray.size; i++) {
                     bytes.push_back(cjvalue.byteArray.head[i]);
