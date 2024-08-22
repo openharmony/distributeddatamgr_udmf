@@ -1,0 +1,170 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+import("//build/ohos/ace/ace.gni")
+import("//foundation/distributeddatamgr/udmf/udmf.gni")
+
+config("udmf_cj_config") {
+  include_dirs = [
+    "${udmf_interfaces_path}/innerkits/client",
+    "${udmf_interfaces_path}/innerkits/common",
+    "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_interfaces_path}/jskits/common",
+    "${udmf_interfaces_path}/jskits/data",
+    "${udmf_interfaces_path}/cj/include",
+
+    "${udmf_framework_path}/common",
+    "${udmf_framework_path}/innerkits/service",
+
+    "//third_party/libuv/include",
+    "//third_party/node/src",
+
+    "${aafwk_inner_api_path}/ability_manager/include",
+    "${aafwk_kits_path}/appkit/native/app/include/",
+    "${aafwk_kits_path}/ability/native/include",
+# "${aafwk_napi_path}/inner/napi_common",
+    "${aafwk_service_path}/abilitymgr/include",
+    "${aafwk_service_path}/common/include",
+  ]
+}
+
+ohos_shared_library("cj_unified_data_channel_ffi") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  sources = [
+    "${udmf_interfaces_path}/cj/src/unified_record_ffi.cpp",
+    "${udmf_interfaces_path}/cj/src/unified_record_impl.cpp",
+    "${udmf_interfaces_path}/cj/src/unified_data_impl.cpp",
+    "${udmf_interfaces_path}/cj/src/unified_data_ffi.cpp",
+    "${udmf_interfaces_path}/cj/src/utils.cpp",
+  ]
+
+#  ldflags = [ "-Wl,--exclude-libs=ALL" ]
+
+  public_configs = [ ":udmf_cj_config" ]
+
+  deps = [
+    "${third_party_path}/bounds_checking_function:libsec_shared",
+    "../innerkits:udmf_client",
+    
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:napi_common",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
+    "napi:ace_napi",
+    "napi:cj_bind_ffi",
+    "napi:cj_bind_native",
+    "image_framework:cj_image_ffi"
+  ]
+
+  public_external_deps = [ "image_framework:image" ]
+# cflags = [ "-fvisibility=hidden" ]
+  innerapi_tags = ["platformsdk"]
+  subsystem_name = "distributeddatamgr"
+  part_name = "udmf"
+}
+
+ohos_shared_library("cj_uniform_typedescriptor_ffi") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  sources = [
+    "${udmf_interfaces_path}/cj/src/xxx.cpp",
+  ]
+
+  ldflags = [ "-Wl,--exclude-libs=ALL" ]
+
+  public_configs = [ ":udmf_cj_config" ]
+
+  deps = [
+    "${third_party_path}/bounds_checking_function:libsec_shared",
+    "../innerkits:udmf_client",
+    
+  ]
+
+  external_deps = [
+    "ability_runtime:abilitykit_native",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "napi:ace_napi",
+    "napi:cj_bind_ffi",
+    "napi:cj_bind_native",
+  ]
+
+  public_external_deps = [ "image_framework:image" ]
+  cflags = [ "-fvisibility=hidden" ]
+  relative_install_dir = "module/data"
+  subsystem_name = "distributeddatamgr"
+  part_name = "udmf"
+}
+
+ohos_shared_library("cj_udmf_data_napi") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  sources = [
+    
+  ]
+
+  ldflags = [ "-Wl,--exclude-libs=ALL" ]
+
+  public_configs = [ ":udmf_cj_config" ]
+
+  deps = [
+    "${third_party_path}/bounds_checking_function:libsec_shared",
+    "../innerkits:udmf_client",
+   
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:napi_common",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
+    "napi:ace_napi",
+    "napi:cj_bind_ffi",
+    "napi:cj_bind_native",
+  ]
+
+  public_external_deps = [ "image_framework:image" ]
+  cflags = [ "-fvisibility=hidden" ]
+  subsystem_name = "distributeddatamgr"
+  part_name = "udmf"
+}
+
+

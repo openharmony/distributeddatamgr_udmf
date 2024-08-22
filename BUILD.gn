@@ -22,6 +22,7 @@ group("udmf_packages") {
       "interfaces/jskits:unifieddatachannel_napi",
       "interfaces/jskits:uniformtypedescriptor_napi",
       "interfaces/ndk:libudmf",
+      "interfaces/cj:cj_unified_data_channel_ffi",
     ]
   }
 }
