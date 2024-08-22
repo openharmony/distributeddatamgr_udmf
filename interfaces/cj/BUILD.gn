@@ -16,12 +16,12 @@ import("//foundation/distributeddatamgr/udmf/udmf.gni")
 
 config("udmf_cj_config") {
   include_dirs = [
+    "${udmf_interfaces_path}/cj/include",
     "${udmf_interfaces_path}/innerkits/client",
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_interfaces_path}/innerkits/data",
     "${udmf_interfaces_path}/jskits/common",
     "${udmf_interfaces_path}/jskits/data",
-    "${udmf_interfaces_path}/cj/include",
 
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/innerkits/service",
