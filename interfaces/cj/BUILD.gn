@@ -26,9 +26,6 @@ config("udmf_cj_config") {
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/innerkits/service",
 
-    "//third_party/libuv/include",
-    "//third_party/node/src",
-
     "${aafwk_inner_api_path}/ability_manager/include",
     "${aafwk_kits_path}/appkit/native/app/include/",
     "${aafwk_kits_path}/ability/native/include",
