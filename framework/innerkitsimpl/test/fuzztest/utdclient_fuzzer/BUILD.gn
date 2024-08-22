@@ -37,7 +37,7 @@ ohos_fuzztest("UtdClientFuzzTest") {
 
   sources = [ "utd_client_fuzzer.cpp" ]
 
-  deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
+  deps = [ "${udmf_interfaces_path}/innerkits:utd_client" ]
 
   external_deps = []
 }
