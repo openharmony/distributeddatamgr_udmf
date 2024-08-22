@@ -33,7 +33,7 @@ UtdClient::UtdClient()
     Init();
     if (!IsHapTokenType()) {
         LOG_INFO(UDMF_CLIENT, "subscribe utd change callback.");
-        RegisterClearCacheListener();
+        SubscribeCommonEvent();
     }
     LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
 }
