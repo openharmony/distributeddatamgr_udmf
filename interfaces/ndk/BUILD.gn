@@ -36,7 +36,10 @@ ohos_shared_library("libudmf") {
 
   defines = [ "API_EXPORT=__attribute__((visibility (\"default\")))" ]
 
-  deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
+  deps = [
+    "${udmf_interfaces_path}/innerkits:udmf_client",
+    "${udmf_interfaces_path}/innerkits:utd_client",
+  ]
 
   external_deps = [
     "ability_base:base",
