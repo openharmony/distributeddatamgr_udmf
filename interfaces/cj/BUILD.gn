@@ -56,7 +56,7 @@ ohos_shared_library("cj_unified_data_channel_ffi") {
     "${udmf_interfaces_path}/cj/src/utils.cpp",
   ]
 
-  #  ldflags = [ "-Wl,--exclude-libs=ALL" ]
+  ldflags = [ "-Wl,--exclude-libs=ALL" ]
 
   public_configs = [ ":udmf_cj_config" ]
 

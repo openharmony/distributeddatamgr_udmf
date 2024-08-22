@@ -46,7 +46,7 @@ using namespace OHOS::UDMF;
 
 namespace OHOS {
 namespace UDMF {
-    static CArrByte VectorToByteArray(std::vector<uint8_t> bytes) 
+    static CArrByte VectorToByteArray(std::vector<uint8_t> bytes)
     {
         uint8_t *head = static_cast<uint8_t *>(malloc(bytes.size() * sizeof(uint8_t)));
         if (head == nullptr) {
@@ -59,7 +59,7 @@ namespace UDMF {
         return byteArray;
     }
 
-    CJValueType CUnifiedRecord::ValueType2CJValueType(ValueType value) 
+    CJValueType CUnifiedRecord::ValueType2CJValueType(ValueType value)
     {
         CJValueType cjvalue;
         if (auto p = std::get_if<int32_t>(&value)) {
@@ -95,7 +95,7 @@ namespace UDMF {
         return cjvalue;
     }
 
-    ValueType CUnifiedRecord::CJValueType2ValueType(CJValueType cjvalue) 
+    ValueType CUnifiedRecord::CJValueType2ValueType(CJValueType cjvalue)
     {
         ValueType value;
         switch (cjvalue.tag) {
@@ -140,12 +140,12 @@ namespace UDMF {
         return value;
     }
 
-    CUnifiedRecord::CUnifiedRecord() 
+    CUnifiedRecord::CUnifiedRecord()
     {
         unifiedRecord_ = std::make_shared<UnifiedRecord>();
     }
 
-    CUnifiedRecord::CUnifiedRecord(const char *type, CJValueType cjvalue) 
+    CUnifiedRecord::CUnifiedRecord(const char *type, CJValueType cjvalue)
     {
         UDType utdType = APPLICATION_DEFINED_RECORD;
         if (UtdUtils::IsValidUtdId(type)) {
@@ -165,15 +165,15 @@ namespace UDMF {
             {VIDEO, [](UDType type, ValueType value) { return std::make_shared<Video>(type, value); }},
             {AUDIO, [](UDType type, ValueType value) { return std::make_shared<Audio>(type, value); }},
             {FOLDER, [](UDType type, ValueType value) { return std::make_shared<Folder>(type, value); }},
-            {SYSTEM_DEFINED_RECORD, [](UDType type, ValueType value) 
+            {SYSTEM_DEFINED_RECORD, [](UDType type, ValueType value)
                 { return std::make_shared<SystemDefinedRecord>(type, value); }},
-            {SYSTEM_DEFINED_APP_ITEM, [](UDType type, ValueType value) 
+            {SYSTEM_DEFINED_APP_ITEM, [](UDType type, ValueType value)
                 { return std::make_shared<SystemDefinedAppItem>(type, value); }},
-            {SYSTEM_DEFINED_FORM, [](UDType type, ValueType value) 
+            {SYSTEM_DEFINED_FORM, [](UDType type, ValueType value)
                 { return std::make_shared<SystemDefinedForm>(type, value); }},
-            {SYSTEM_DEFINED_PIXEL_MAP, [](UDType type, ValueType value) 
+            {SYSTEM_DEFINED_PIXEL_MAP, [](UDType type, ValueType value)
                 { return std::make_shared<SystemDefinedPixelMap>(type, value); }},
-            {APPLICATION_DEFINED_RECORD, [](UDType type, ValueType value) 
+            {APPLICATION_DEFINED_RECORD, [](UDType type, ValueType value)
                 { return std::make_shared<ApplicationDefinedRecord>(type, value); }},
         };
         auto constructor = constructors.find(utdType);
@@ -184,13 +184,13 @@ namespace UDMF {
         unifiedRecord_ = constructor->second(utdType, value);
     }
 
-    char *CUnifiedRecord::GetType() 
+    char *CUnifiedRecord::GetType()
     {
         std::string ret = UtdUtils::GetUtdIdFromUtdEnum(this->unifiedRecord_->GetType());
         return Utils::MallocCString(ret);
     }
 
-    CJValueType CUnifiedRecord::GetValue() 
+    CJValueType CUnifiedRecord::GetValue()
     {
         ValueType value = this->unifiedRecord_->GetValue();
         CJValueType cjvalue = ValueType2CJValueType(value);

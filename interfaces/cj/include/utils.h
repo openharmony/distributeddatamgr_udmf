@@ -22,8 +22,9 @@
 
 #define FFI_EXPORT __attribute__((visibility("default")))
 
-class FFI_EXPORT Utils {
-public:
-    static char* MallocCString(const std::string& origin);
+class FFI_EXPORT Utils
+{
+    public:
+        static char *MallocCString(const std::string &origin);
 };
 #endif // OHOS_UDMF_UTILS_H

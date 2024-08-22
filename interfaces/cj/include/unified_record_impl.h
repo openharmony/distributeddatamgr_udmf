@@ -50,7 +50,8 @@ namespace UDMF {
 
     class CUnifiedRecord : public OHOS::FFI::FFIData {
         public:
-            OHOS::FFI::RuntimeType *GetRuntimeType() override {
+            OHOS::FFI::RuntimeType *GetRuntimeType() override
+            {
                 return GetClassType();
             }
 
@@ -69,7 +70,8 @@ namespace UDMF {
 
             friend class OHOS::FFI::RuntimeType;
             friend class OHOS::FFI::TypeBase;
-            static OHOS::FFI::RuntimeType *GetClassType() {
+            static OHOS::FFI::RuntimeType *GetClassType()
+            {
                 static OHOS::FFI::RuntimeType runtimeType = OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("CUnifiedRecord");
                 return &runtimeType;
             }
