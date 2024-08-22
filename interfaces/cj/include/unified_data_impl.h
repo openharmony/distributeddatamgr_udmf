@@ -19,29 +19,23 @@
 #include "unified_data.h"
 #include "unified_record_impl.h"
 
-namespace OHOS
-{
-    namespace UDMF
-    {
-        using namespace OHOS::UDMF;
+namespace OHOS {
+namespace UDMF {
+    using namespace OHOS::UDMF;
 
-        struct CArrUnifiedRecord
-        {
-            int64_t *head;
-            int64_t size;
-        };
+    struct CArrUnifiedRecord {
+        int64_t *head;
+        int64_t size;
+    };
 
-        struct CArrString
-        {
-            char **head;
-            int64_t size;
-        };
+    struct CArrString {
+        char **head;
+        int64_t size;
+    };
 
-        class CUnifiedData : public OHOS::FFI::FFIData
-        {
+    class CUnifiedData : public OHOS::FFI::FFIData {
         public:
-            OHOS::FFI::RuntimeType *GetRuntimeType() override
-            {
+            OHOS::FFI::RuntimeType *GetRuntimeType() override {
                 return GetClassType();
             }
 
@@ -59,14 +53,13 @@ namespace OHOS
 
             friend class OHOS::FFI::RuntimeType;
             friend class OHOS::FFI::TypeBase;
-            static OHOS::FFI::RuntimeType *GetClassType()
-            {
+            static OHOS::FFI::RuntimeType *GetClassType() {
                 static OHOS::FFI::RuntimeType runtimeType = OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("CUnifiedData");
                 return &runtimeType;
             }
-        };
+    };
 
-    }
+}
 } // namespace OHOS::UDMF
 
 #endif

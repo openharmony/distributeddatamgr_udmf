@@ -50,101 +50,75 @@
 using namespace OHOS::FFI;
 using namespace OHOS::UDMF;
 
-namespace OHOS
-{
-    namespace UDMF
-    {
+namespace OHOS {
+namespace UDMF {
 
-        CUnifiedData::CUnifiedData()
-        {
-
-            unifiedData_ = std::make_shared<UnifiedData>();
-        }
-
-        CUnifiedData::CUnifiedData(UDMF::CUnifiedRecord *record)
-        {
-
-            unifiedData_ = std::make_shared<UnifiedData>();
-
-            if (record == nullptr)
-            {
-                return;
-            }
-            unifiedData_->AddRecord(record->GetUnifiedRecord());
-            this->records_.push_back(record);
-        }
-
-        void CUnifiedData::AddRecord(UDMF::CUnifiedRecord *record)
-        {
-
-            if (record == nullptr)
-            {
-                return;
-            }
-            this->records_.push_back(record);
-
-            unifiedData_->AddRecord(record->GetUnifiedRecord());
-        }
-
-        static CArrUnifiedRecord VectorToArray(std::vector<int64_t> vector)
-        {
-            int64_t *head = static_cast<int64_t *>(malloc(vector.size() * sizeof(int64_t)));
-            if (head == nullptr)
-            {
-                return CArrUnifiedRecord{};
-            }
-            for (unsigned long i = 0; i < vector.size(); i++)
-            {
-                head[i] = vector[i];
-            }
-            CArrUnifiedRecord int64Array = {head, vector.size()};
-            return int64Array;
-        }
-
-        CArrUnifiedRecord CUnifiedData::GetRecords()
-        {
-
-            std::vector<int64_t> recordIds;
-
-            for (auto record : this->records_)
-            {
-                if (record == nullptr)
-                {
-                    break;
-                }
-                recordIds.push_back(record->GetID());
-            }
-
-            return VectorToArray(recordIds);
-        }
-
-        bool CUnifiedData::HasType(const char *type)
-        {
-            return unifiedData_->HasType(type);
-        }
-
-        static CArrString StringVectorToArray(std::vector<std::string> vector)
-        {
-
-            char **head = static_cast<char **>(malloc(vector.size() * sizeof(char *)));
-            if (head == nullptr)
-            {
-                return CArrString{};
-            }
-            for (unsigned long i = 0; i < vector.size(); i++)
-            {
-                head[i] = Utils::MallocCString(vector[i]);
-            }
-            CArrString stringArray = {head, vector.size()};
-            return stringArray;
-        }
-
-        CArrString CUnifiedData::GetTypes()
-        {
-            std::vector<std::string> types = unifiedData_->GetTypesLabels();
-
-            return StringVectorToArray(types);
-        }
-
+    CUnifiedData::CUnifiedData() {
+        unifiedData_ = std::make_shared<UnifiedData>();
     }
+
+    CUnifiedData::CUnifiedData(UDMF::CUnifiedRecord *record) {
+        unifiedData_ = std::make_shared<UnifiedData>();
+
+        if (record == nullptr) {
+            return;
+        }
+        unifiedData_->AddRecord(record->GetUnifiedRecord());
+        this->records_.push_back(record);
+    }
+
+    void CUnifiedData::AddRecord(UDMF::CUnifiedRecord *record) {
+        if (record == nullptr) {
+            return;
+        }
+        this->records_.push_back(record);
+        unifiedData_->AddRecord(record->GetUnifiedRecord());
+    }
+
+    static CArrUnifiedRecord VectorToArray(std::vector<int64_t> vector) {
+        int64_t *head = static_cast<int64_t *>(malloc(vector.size() * sizeof(int64_t)));
+        if (head == nullptr) {
+            return CArrUnifiedRecord{};
+        }
+        for (unsigned long i = 0; i < vector.size(); i++) {
+            head[i] = vector[i];
+        }
+        CArrUnifiedRecord int64Array = {head, vector.size()};
+        return int64Array;
+    }
+
+    CArrUnifiedRecord CUnifiedData::GetRecords() {
+        std::vector<int64_t> recordIds;
+        for (auto record : this->records_) {
+            if (record == nullptr) {
+                break;
+            }
+            recordIds.push_back(record->GetID());
+        }
+        return VectorToArray(recordIds);
+    }
+
+    bool CUnifiedData::HasType(const char *type) {
+        return unifiedData_->HasType(type);
+    }
+
+    static CArrString StringVectorToArray(std::vector<std::string> vector) {
+
+        char **head = static_cast<char **>(malloc(vector.size() * sizeof(char *)));
+        if (head == nullptr) {
+            return CArrString{};
+        }
+        for (unsigned long i = 0; i < vector.size(); i++) {
+            head[i] = Utils::MallocCString(vector[i]);
+        }
+        CArrString stringArray = {head, vector.size()};
+        return stringArray;
+    }
+
+    CArrString CUnifiedData::GetTypes() {
+        std::vector<std::string> types = unifiedData_->GetTypesLabels();
+        return StringVectorToArray(types);
+    }
+
+}
 }

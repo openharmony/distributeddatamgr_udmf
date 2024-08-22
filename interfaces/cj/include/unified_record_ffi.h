@@ -23,21 +23,15 @@
 
 #include "unified_record_impl.h"
 
-namespace OHOS
-{
-    namespace UDMF
-    {
-
-        extern "C"
-        {
-
-            FFI_EXPORT int64_t FfiOHOSUDMFUnifiedRecordConstructor();
-            FFI_EXPORT int64_t FfiOHOSUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value);
-            FFI_EXPORT char *FfiOHOSUDMFUnifiedRecordGetType(int64_t unifiedId);
-            FFI_EXPORT CJValueType FfiOHOSUDMFUnifiedRecordGetValue(int64_t unifiedId);
-        }
-
-    }
+namespace OHOS {
+namespace UDMF {
+extern "C" {
+    FFI_EXPORT int64_t FfiOHOSUDMFUnifiedRecordConstructor();
+    FFI_EXPORT int64_t FfiOHOSUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value);
+    FFI_EXPORT char *FfiOHOSUDMFUnifiedRecordGetType(int64_t unifiedId);
+    FFI_EXPORT CJValueType FfiOHOSUDMFUnifiedRecordGetValue(int64_t unifiedId);
+}
+}
 }
 
 #endif
