@@ -32,6 +32,7 @@ config("udmf_cj_config") {
     "${aafwk_inner_api_path}/ability_manager/include",
     "${aafwk_kits_path}/appkit/native/app/include/",
     "${aafwk_kits_path}/ability/native/include",
+
     # "${aafwk_napi_path}/inner/napi_common",
     "${aafwk_service_path}/abilitymgr/include",
     "${aafwk_service_path}/common/include",
@@ -48,21 +49,20 @@ ohos_shared_library("cj_unified_data_channel_ffi") {
     debug = false
   }
   sources = [
+    "${udmf_interfaces_path}/cj/src/unified_data_ffi.cpp",
+    "${udmf_interfaces_path}/cj/src/unified_data_impl.cpp",
     "${udmf_interfaces_path}/cj/src/unified_record_ffi.cpp",
     "${udmf_interfaces_path}/cj/src/unified_record_impl.cpp",
-    "${udmf_interfaces_path}/cj/src/unified_data_impl.cpp",
-    "${udmf_interfaces_path}/cj/src/unified_data_ffi.cpp",
     "${udmf_interfaces_path}/cj/src/utils.cpp",
   ]
 
-#  ldflags = [ "-Wl,--exclude-libs=ALL" ]
+  #  ldflags = [ "-Wl,--exclude-libs=ALL" ]
 
   public_configs = [ ":udmf_cj_config" ]
 
   deps = [
     "${third_party_path}/bounds_checking_function:libsec_shared",
     "../innerkits:udmf_client",
-    
   ]
 
   external_deps = [
@@ -71,17 +71,18 @@ ohos_shared_library("cj_unified_data_channel_ffi") {
     "ability_runtime:napi_common",
     "c_utils:utils",
     "hilog:libhilog",
+    "image_framework:cj_image_ffi",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
     "napi:cj_bind_ffi",
     "napi:cj_bind_native",
-    "image_framework:cj_image_ffi"
   ]
 
   public_external_deps = [ "image_framework:image" ]
-# cflags = [ "-fvisibility=hidden" ]
-  innerapi_tags = ["platformsdk"]
+
+  # cflags = [ "-fvisibility=hidden" ]
+  innerapi_tags = [ "platformsdk" ]
   subsystem_name = "distributeddatamgr"
   part_name = "udmf"
 }
@@ -95,9 +96,7 @@ ohos_shared_library("cj_uniform_typedescriptor_ffi") {
     cfi_cross_dso = true
     debug = false
   }
-  sources = [
-    "${udmf_interfaces_path}/cj/src/xxx.cpp",
-  ]
+  sources = [ "${udmf_interfaces_path}/cj/src/xxx.cpp" ]
 
   ldflags = [ "-Wl,--exclude-libs=ALL" ]
 
@@ -106,7 +105,6 @@ ohos_shared_library("cj_uniform_typedescriptor_ffi") {
   deps = [
     "${third_party_path}/bounds_checking_function:libsec_shared",
     "../innerkits:udmf_client",
-    
   ]
 
   external_deps = [
@@ -134,9 +132,7 @@ ohos_shared_library("cj_udmf_data_napi") {
     cfi_cross_dso = true
     debug = false
   }
-  sources = [
-    
-  ]
+  sources = []
 
   ldflags = [ "-Wl,--exclude-libs=ALL" ]
 
@@ -145,7 +141,6 @@ ohos_shared_library("cj_udmf_data_napi") {
   deps = [
     "${third_party_path}/bounds_checking_function:libsec_shared",
     "../innerkits:udmf_client",
-   
   ]
 
   external_deps = [
@@ -166,5 +161,3 @@ ohos_shared_library("cj_udmf_data_napi") {
   subsystem_name = "distributeddatamgr"
   part_name = "udmf"
 }
-
-
