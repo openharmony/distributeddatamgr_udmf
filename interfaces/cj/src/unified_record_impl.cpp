@@ -113,15 +113,13 @@ namespace UDMF {
             case STRING:
                 value = cjvalue.string;
                 break;
-            case BYTEARRAY: {
+            case BYTEARRAY: 
                 std::vector<uint8_t> bytes = std::vector<uint8_t>();
                 for (int64_t i = 0; i < cjvalue.byteArray.size; i++) {
                     bytes.push_back(cjvalue.byteArray.head[i]);
                 }
                 value = bytes;
                 break;
-            }
-
             case PIXELMAP:
                 auto instance = FFIData::GetData<OHOS::Media::PixelMapImpl>(cjvalue.pixelMapId);
                 if (instance == nullptr) {
@@ -129,10 +127,6 @@ namespace UDMF {
                     break;
                 }
                 value = instance->GetRealPixelMap();
-                break;
-
-            default:
-                value = -1;
                 break;
         }
 
