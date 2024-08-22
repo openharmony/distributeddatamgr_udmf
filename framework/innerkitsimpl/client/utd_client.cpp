@@ -25,8 +25,8 @@
 namespace OHOS {
 namespace UDMF {
 constexpr const char* CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
-constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/defaultUserId/";
-constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/utd/utd-adt.json";
+constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/";
+constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/distributeddata/utd/utd-adt.json";
 constexpr const char* PREFIX_MATCH_SIGN = "/*";
 UtdClient::UtdClient()
 {
@@ -47,6 +47,7 @@ UtdClient &UtdClient::GetInstance()
 
 void UtdClient::Init()
 {
+    std::unique_lock<std::shared_mutex> lock(typeMutex_);
     descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
     std::string customUtdPath = GetCustomUtdPath();
     if (!customUtdPath.empty()) {
@@ -63,6 +64,7 @@ void UtdClient::Init()
 
 Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor)
 {
+    std::shared_lock<std::shared_mutex> guard(typeMutex_);
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         if (utdTypeCfg.typeId == typeId) {
             descriptor = std::make_shared<TypeDescriptor>(utdTypeCfg);
@@ -117,6 +119,7 @@ Status UtdClient::GetFlexibleTypeDescriptor(const std::string &typeId, std::shar
 Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileExtension, std::string &typeId,
                                                         std::string belongsTo)
 {
+    std::shared_lock<std::shared_mutex> guard(typeMutex_);
     std::string lowerFileExtension = fileExtension;
     std::transform(lowerFileExtension.begin(), lowerFileExtension.end(), lowerFileExtension.begin(), ::tolower);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
@@ -154,6 +157,7 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
 Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &fileExtension,
     std::vector<std::string> &typeIds, const std::string &belongsTo)
 {
+    std::shared_lock<std::shared_mutex> guard(typeMutex_);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. fileExtension:%{public}s, belongsTo:%{public}s ",
             fileExtension.c_str(), belongsTo.c_str());
@@ -218,6 +222,7 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
 
 std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
 {
+    std::shared_lock<std::shared_mutex> guard(typeMutex_);
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         for (auto mime : utdTypeCfg.mimeTypes) {
             std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
@@ -275,6 +280,7 @@ Status UtdClient::GetUniformDataTypesByMIMEType(const std::string &mimeType, std
 
 std::vector<std::string> UtdClient::GetTypeIdsFromCfg(const std::string &mimeType)
 {
+    std::shared_lock<std::shared_mutex> guard(typeMutex_);
     bool prefixMatch = false;
     std::string prefixType;
     auto signSize = strlen(PREFIX_MATCH_SIGN);
@@ -388,6 +394,7 @@ UtdClient::UtdChangeSubscriber::UtdChangeSubscriber(const EventFwk::CommonEventS
 
 void UtdClient::UtdChangeSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
+    LOG_INFO(UDMF_CLIENT, "start.");
     auto updateTask = []() {
         std::this_thread::sleep_for(std::chrono::milliseconds(3000));
         UtdClient::GetInstance().Init();

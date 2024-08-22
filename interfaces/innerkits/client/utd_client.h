@@ -16,6 +16,7 @@
 #ifndef UTD_CLIENT_H
 #define UTD_CLIENT_H
 
+#include <shared_mutex>
 #include <string>
 #include <vector>
 #include <map>
@@ -71,6 +72,7 @@ private:
 
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
     std::shared_ptr<UtdChangeSubscriber> subscriber_;
+    std::shared_mutex typeMutex_;
 };
 } // namespace UDMF
 } // namespace OHOS
