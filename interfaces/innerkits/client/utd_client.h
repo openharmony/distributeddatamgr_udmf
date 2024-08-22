@@ -22,7 +22,6 @@
 #include "common_event_manager.h"
 #include "common_event_subscriber.h"
 #include "common_event_support.h"
-#include "mutex"
 #include "utd_common.h"
 #include "preset_type_descriptors.h"
 #include "preset_type_descriptors.h"
@@ -68,7 +67,7 @@ private:
     Status GetFlexibleTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
     std::string GetTypeIdFromCfg(const std::string &mimeType);
     std::vector<std::string> GetTypeIdsFromCfg(const std::string &mimeType);
-    void RegisterClearCacheListener();
+    void SubscribeCommonEvent();
 
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
     std::shared_ptr<CommonEventSubscriber> subscriber_;

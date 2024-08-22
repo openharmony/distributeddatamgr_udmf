@@ -32,7 +32,7 @@ UtdClient::UtdClient()
 {
     Init();
     if (!IsHapTokenType()) {
-        LOG_INFO(UDMF_CLIENT, "need SubscribeDataChange callback.");
+        LOG_INFO(UDMF_CLIENT, "subscribe utd change callback.");
         RegisterClearCacheListener();
     }
     LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
@@ -369,7 +369,7 @@ Status UtdClient::GetCurrentActiveUserId(int32_t& userId)
     return Status::E_OK;
 }
 
-void UtdClient::RegisterClearCacheListener()
+void UtdClient::SubscribeCommonEvent()
 {
     if (subscriber_ != nullptr) {
         return;
