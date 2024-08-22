@@ -72,7 +72,8 @@ namespace UDMF {
             friend class OHOS::FFI::TypeBase;
             static OHOS::FFI::RuntimeType *GetClassType()
             {
-                static OHOS::FFI::RuntimeType runtimeType = OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("CUnifiedRecord");
+                static OHOS::FFI::RuntimeType runtimeType =
+                    OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("CUnifiedRecord");
                 return &runtimeType;
             }
     };

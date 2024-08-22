@@ -86,8 +86,7 @@ namespace UDMF {
             cjvalue.byteArray = VectorToByteArray(*p);
             cjvalue.tag = BYTEARRAY;
         }
-        if (auto p = std::get_if<std::shared_ptr<OHOS::Media::PixelMap>>(&value)) 
-        {
+        if (auto p = std::get_if<std::shared_ptr<OHOS::Media::PixelMap>>(&value)) {
             cjvalue.pixelMapId = this->pixelMapId_;
             cjvalue.tag = PIXELMAP;
         }
