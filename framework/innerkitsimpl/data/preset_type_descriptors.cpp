@@ -2960,6 +2960,13 @@ void PresetTypeDescriptors::InitDescriptors()
          "Data interchange format",
          REFERENCE_URL,
          ""},
+        {"openharmony.app",
+         {"openharmony.package"},
+         {".app"},
+         {},
+         "OpenHarmony system defined application package",
+         REFERENCE_URL,
+         ""},
     };
 }
 } // namespace UDMF

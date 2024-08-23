@@ -453,7 +453,8 @@ static constexpr UtdType UTD_TYPES[] = {
     { SWM_DISK_IMAGE, "SWM_DISK_IMAGE", "com.microsoft.swm" },
     { KINGSOFT_SPREADSHEETS_ETX, "KINGSOFT_SPREADSHEETS_ETX", "com.kingsoft.office.spreadsheets.etx" },
     { KINGSOFT_SPREADSHEETS_ETTX, "KINGSOFT_SPREADSHEETS_ETTX", "com.kingsoft.office.spreadsheets.ettx" },
-    { EXCEL_DIF, "EXCEL_DIF", "com.microsoft.excel.dif" }
+    { EXCEL_DIF, "EXCEL_DIF", "com.microsoft.excel.dif" },
+    { OPENHARMONY_APP, "OPENHARMONY_APP", "openharmony.app" }
 };
 
 namespace UtdUtils {
