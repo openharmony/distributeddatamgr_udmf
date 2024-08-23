@@ -16,7 +16,6 @@ import("//build/ohos.gni")
 group("udmf_packages") {
   if (is_standard_system) {
     deps = [
-      "interfaces/cj:cj_unified_data_channel_ffi",
       "interfaces/innerkits:udmf_client",
       "interfaces/innerkits:utd_client",
       "interfaces/jskits:udmf_data_napi",

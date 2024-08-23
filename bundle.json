@@ -49,7 +49,8 @@
     },
     "build": {
       "sub_component": [
-        "//foundation/distributeddatamgr/udmf:udmf_packages"
+        "//foundation/distributeddatamgr/udmf:udmf_packages",
+        "//foundation/distributeddatamgr/udmf/interfaces/cj:cj_unified_data_channel_ffi"
       ],
       "inner_kits": [
         {
