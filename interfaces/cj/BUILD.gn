@@ -14,7 +14,14 @@ import("//build/ohos.gni")
 import("//build/ohos/ace/ace.gni")
 import("//foundation/distributeddatamgr/udmf/udmf.gni")
 
-config("udmf_cj_config") {
+ohos_shared_library("cj_unified_data_channel_ffi") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "${udmf_interfaces_path}/cj/include",
     "${udmf_interfaces_path}/innerkits/client",
@@ -26,48 +33,36 @@ config("udmf_cj_config") {
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/innerkits/service",
   ]
-}
 
-ohos_shared_library("cj_unified_data_channel_ffi") {
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    ubsan = true
-    boundary_sanitize = true
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
+  if (product_name != "ohos-sdk") {
+    sources = [
+      "${udmf_interfaces_path}/cj/src/unified_data_ffi.cpp",
+      "${udmf_interfaces_path}/cj/src/unified_data_impl.cpp",
+      "${udmf_interfaces_path}/cj/src/unified_record_ffi.cpp",
+      "${udmf_interfaces_path}/cj/src/unified_record_impl.cpp",
+      "${udmf_interfaces_path}/cj/src/utils.cpp",
+    ]
+
+    deps = [ "../innerkits:udmf_client" ]
+
+    external_deps = [
+      "ability_base:base",
+      "ability_base:want",
+      "ability_runtime:abilitykit_native",
+      "ability_runtime:napi_common",
+      "c_utils:utils",
+      "common_event_service:cesfwk_innerkits",
+      "hilog:libhilog",
+      "image_framework:cj_image_ffi",
+      "ipc:ipc_core",
+      "kv_store:distributeddata_inner",
+      "napi:ace_napi",
+      "napi:cj_bind_ffi",
+      "napi:cj_bind_native",
+    ]
+
+    public_external_deps = [ "image_framework:image" ]
   }
-  sources = [
-    "${udmf_interfaces_path}/cj/src/unified_data_ffi.cpp",
-    "${udmf_interfaces_path}/cj/src/unified_data_impl.cpp",
-    "${udmf_interfaces_path}/cj/src/unified_record_ffi.cpp",
-    "${udmf_interfaces_path}/cj/src/unified_record_impl.cpp",
-    "${udmf_interfaces_path}/cj/src/utils.cpp",
-  ]
-
-  ldflags = [ "-Wl,--exclude-libs=ALL" ]
-
-  public_configs = [ ":udmf_cj_config" ]
-
-  deps = [ "../innerkits:udmf_client" ]
-
-  external_deps = [
-    "ability_base:base",
-    "ability_base:want",
-    "ability_runtime:abilitykit_native",
-    "ability_runtime:napi_common",
-    "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
-    "hilog:libhilog",
-    "image_framework:cj_image_ffi",
-    "ipc:ipc_core",
-    "kv_store:distributeddata_inner",
-    "napi:ace_napi",
-    "napi:cj_bind_ffi",
-    "napi:cj_bind_native",
-  ]
-
-  public_external_deps = [ "image_framework:image" ]
 
   # cflags = [ "-fvisibility=hidden" ]
   innerapi_tags = [ "platformsdk" ]
