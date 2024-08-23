@@ -16,6 +16,7 @@
 #ifndef UTD_CLIENT_H
 #define UTD_CLIENT_H
 
+#include <shared_mutex>
 #include <string>
 #include <vector>
 #include <map>
@@ -29,6 +30,7 @@
 namespace OHOS {
 namespace UDMF {
 class TypeDescriptor;
+class UtdChangeSubscriber;
 class API_EXPORT UtdClient {
 public:
     static UtdClient &GetInstance();
@@ -54,7 +56,11 @@ private:
     Status GetFlexibleTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
     std::string GetTypeIdFromCfg(const std::string &mimeType);
     std::vector<std::string> GetTypeIdsFromCfg(const std::string &mimeType);
+    void SubscribeUtdChange();
+
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
+    std::shared_ptr<UtdChangeSubscriber> subscriber_;
+    std::shared_mutex utdMutex_;
 };
 } // namespace UDMF
 } // namespace OHOS

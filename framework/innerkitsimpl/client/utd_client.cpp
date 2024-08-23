@@ -16,7 +16,7 @@
 #include <regex>
 #include <thread>
 #include "common_event_manager.h"
-#include "common_event_subacriber.h"
+#include "common_event_subscriber.h"
 #include "common_event_support.h"
 #include "utd_client.h"
 #include "logger.h"
@@ -27,10 +27,24 @@
 #include "os_account_manager.h"
 namespace OHOS {
 namespace UDMF {
-constexpr const char* CUSTOM_TYPE_CFG_PATH = "/data/utd/utd-adt.json";
+constexpr const char* CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
+constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/";
+constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/distributeddata/utd/utd-adt.json";
+
+class UtdChangeSubscriber final : public EventFwk::CommonEventSubscriber {
+public:
+    explicit UtdChangeSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo,
+                                const std::function<void()> &callback);
+    virtual ~UtdChangeSubscriber() = default;
+    void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
+private:
+    std::function<void()> callback_;
+};
+
 UtdClient::UtdClient()
 {
     Init();
+    SubscribeUtdChange();
     LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
 }
 
@@ -46,6 +60,7 @@ UtdClient &UtdClient::GetInstance()
 
 void UtdClient::Init()
 {
+    std::unique_lock<std::shared_mutex> lock(utdMutex_);
     descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
     std::vector<TypeDescriptorCfg> customTypes =
         CustomUtdStore::GetInstance().GetTypeCfgs(CUSTOM_TYPE_CFG_PATH);
@@ -57,11 +72,14 @@ void UtdClient::Init()
 
 Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor)
 {
-    for (const auto &utdTypeCfg : descriptorCfgs_) {
-        if (utdTypeCfg.typeId == typeId) {
-            descriptor = std::make_shared<TypeDescriptor>(utdTypeCfg);
-            LOG_DEBUG(UDMF_CLIENT, "get descriptor success. %{public}s ", typeId.c_str());
-            return Status::E_OK;
+    {
+        std::shared_lock<std::shared_mutex> guard(utdMutex_);
+        for (const auto &utdTypeCfg : descriptorCfgs_) {
+            if (utdTypeCfg.typeId == typeId) {
+                descriptor = std::make_shared<TypeDescriptor>(utdTypeCfg);
+                LOG_DEBUG(UDMF_CLIENT, "get descriptor success. %{public}s ", typeId.c_str());
+                return Status::E_OK;
+            }
         }
     }
     if (typeId.find(FLEXIBLE_TYPE_FLAG) != typeId.npos) {
@@ -118,16 +136,17 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
                   fileExtension.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
-
-    for (const auto &utdTypeCfg : descriptorCfgs_) {
-        std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
-        if (find(fileExtensions.begin(), fileExtensions.end(), lowerFileExtension) != fileExtensions.end() ||
-            find(fileExtensions.begin(), fileExtensions.end(), fileExtension) != fileExtensions.end()) {
-            typeId = utdTypeCfg.typeId;
-            break;
+    {
+        std::shared_lock<std::shared_mutex> guard(utdMutex_);
+        for (const auto &utdTypeCfg : descriptorCfgs_) {
+            std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
+            if (find(fileExtensions.begin(), fileExtensions.end(), lowerFileExtension) != fileExtensions.end() ||
+                find(fileExtensions.begin(), fileExtensions.end(), fileExtension) != fileExtensions.end()) {
+                typeId = utdTypeCfg.typeId;
+                break;
+            }
         }
     }
-
     // the find typeId is not belongsTo to the belongsTo.
     if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
         !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
@@ -162,10 +181,13 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
     std::string lowerFileExtension = fileExtension;
     std::transform(lowerFileExtension.begin(), lowerFileExtension.end(), lowerFileExtension.begin(), ::tolower);
     std::vector<std::string> typeIdsInCfg;
-    for (const auto &utdTypeCfg : descriptorCfgs_) {
-        std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
-        if (find(fileExtensions.begin(), fileExtensions.end(), lowerFileExtension) != fileExtensions.end()) {
-            typeIdsInCfg.push_back(utdTypeCfg.typeId);
+    {
+        std::shared_lock<std::shared_mutex> guard(utdMutex_);
+        for (const auto &utdTypeCfg : descriptorCfgs_) {
+            std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
+            if (find(fileExtensions.begin(), fileExtensions.end(), lowerFileExtension) != fileExtensions.end()) {
+                typeIdsInCfg.push_back(utdTypeCfg.typeId);
+            }
         }
     }
     typeIds.clear();
@@ -212,6 +234,7 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
 
 std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
 {
+    std::shared_lock<std::shared_mutex> guard(utdMutex_);
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         for (auto mime : utdTypeCfg.mimeTypes) {
             std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
@@ -276,6 +299,8 @@ std::vector<std::string> UtdClient::GetTypeIdsFromCfg(const std::string &mimeTyp
         prefixMatch = true;
     }
     std::vector<std::string> typeIdsInCfg;
+
+    std::shared_lock<std::shared_mutex> guard(utdMutex_);
     for (const auto &utdTypeCfg : descriptorCfgs_) {
         for (auto mime : utdTypeCfg.mimeTypes) {
             std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
@@ -318,6 +343,74 @@ Status UtdClient::IsUtd(std::string typeId, bool &result)
     }
     LOG_ERROR(UDMF_CLIENT, "is not utd, typeId:%{public}s", typeId.c_str());
     return Status::E_OK;
+}
+
+bool UtdClient::IsHapTokenType()
+{
+    uint32_t tokenId = IPCSkeleton::GetSelfTokenID();
+    auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    LOG_DEBUG(UDMF_CLIENT, "GetTokenTypeFlag, tokenType = %{public}d.", tokenType);
+    if (tokenType == Security::AccessToken::TypeATokenTypeEnum::TOKEN_HAP) {
+        return true;
+    }
+    return false;
+}
+
+std::string UtdClient::GetCustomUtdPath()
+{
+    if (IsHapTokenType()) {
+        return std::string(CUSTOM_UTD_HAP_DIR);
+    }
+    int32_t userId = DEFAULT_USER_ID;
+    if (GetCurrentActiveUserId(userId) != Status::E_OK) {
+        return "";
+    }
+    std::string customUtdSaPath = std::string(CUSTOM_UTD_SA_DIR) +
+                                  std::to_string(userId) + std::string(CUSTOM_UTD_SA_SUB_DIR);
+    return customUtdSaPath;
+}
+
+Status UtdClient::GetCurrentActiveUserId(int32_t& userId)
+{
+    std::vector<int32_t> localIds;
+    int32_t status = OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(localIds);
+    if (status != Status::E_OK || localIds.empty()) {
+        LOG_ERROR(UDMF_CLIENT, "Get OsAccountId fail, status:%{public}d", status);
+        return Status::E_ERROR;
+    }
+    userId = localIds[0];
+    return Status::E_OK;
+}
+
+void UtdClient::SubscribeUtdChange()
+{
+    if (IsHapTokenType()) {
+        return;
+    }
+    LOG_INFO(UDMF_CLIENT, "subscribe utd change callback.");
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
+    EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
+    auto updateTask = []() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+        UtdClient::GetInstance().Init();
+    };
+    subscriber_ = std::make_shared<UtdChangeSubscriber>(subscribeInfo, updateTask);
+    (void)EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber_);
+}
+
+UtdChangeSubscriber::UtdChangeSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo,
+    const std::function<void()> &callback)
+    : EventFwk::CommonEventSubscriber(subscribeInfo), callback_(callback)
+{
+}
+
+void UtdChangeSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
+{
+    LOG_INFO(UDMF_CLIENT, "start.");
+    std::thread(callback_).detach();
 }
 } // namespace UDMF
 } // namespace OHOS
