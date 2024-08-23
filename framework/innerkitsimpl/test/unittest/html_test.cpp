@@ -136,43 +136,43 @@ HWTEST_F(HtmlTest, Html005, TestSize.Level1)
 }
 
 /**
-* @tc.name: SetHtmlContent001
+* @tc.name: SetHtmlContent006
 * @tc.desc: Abnormal testcase of SetHtmlContent, because htmlContent and MAX_TEXT_LEN are equal
 * @tc.type: FUNC
 */
-HWTEST_F(HtmlTest, SetHtmlContent001, TestSize.Level1)
+HWTEST_F(HtmlTest, SetHtmlContent006, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetHtmlContent001 begin.");
+    LOG_INFO(UDMF_TEST, "SetHtmlContent006 begin.");
     const std::string htmlContent(20 * 1024 * 1024, 'a');
     Html html;
     html.SetHtmlContent(htmlContent);
     EXPECT_NE(html.htmlContent_, htmlContent);
-    LOG_INFO(UDMF_TEST, "SetHtmlContent001 end.");
+    LOG_INFO(UDMF_TEST, "SetHtmlContent006 end.");
 }
 
 /**
-* @tc.name: SetPlainContent002
+* @tc.name: SetPlainContent007
 * @tc.desc: Abnormal testcase of SetPlainContent, because plainContent and MAX_TEXT_LEN are equal
 * @tc.type: FUNC
 */
-HWTEST_F(HtmlTest, SetPlainContent002, TestSize.Level1)
+HWTEST_F(HtmlTest, SetPlainContent007, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetPlainContent002 begin.");
+    LOG_INFO(UDMF_TEST, "SetPlainContent007 begin.");
     const std::string plainContent(20 * 1024 * 1024, 'a');
     Html html;
     html.SetPlainContent(plainContent);
     EXPECT_NE(html.plainContent_, plainContent);
-    LOG_INFO(UDMF_TEST, "SetPlainContent002 end.");
+    LOG_INFO(UDMF_TEST, "SetPlainContent007 end.");
 }
 
 /**
-* @tc.name: GetValue001
+* @tc.name: GetValue008
 * @tc.desc: Normal testcase of GetValue
 * @tc.type: FUNC
 */
-HWTEST_F(HtmlTest, GetValue001, TestSize.Level1)
+HWTEST_F(HtmlTest, GetValue008, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "GetValue001 begin.");
+    LOG_INFO(UDMF_TEST, "GetValue008 begin.");
     Html html;
     html.value_ = std::monostate{};
     html.htmlContent_ = "htmlContent";
@@ -184,6 +184,6 @@ HWTEST_F(HtmlTest, GetValue001, TestSize.Level1)
     EXPECT_EQ(std::get<std::string>(object->value_[HTML_CONTENT]), html.htmlContent_);
     EXPECT_EQ(std::get<std::string>(object->value_[Html::PLAINT_CONTENT]), html.plainContent_);
     EXPECT_EQ(details_->value_.size(), 0);
-    LOG_INFO(UDMF_TEST, "GetValue001 end.");
+    LOG_INFO(UDMF_TEST, "GetValue008 end.");
 }
 } // OHOS::Test

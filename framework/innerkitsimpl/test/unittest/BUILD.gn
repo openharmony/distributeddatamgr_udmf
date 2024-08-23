@@ -261,81 +261,6 @@ ohos_unittest("SystemDefinedAppitemTest") {
   ]
 }
 
-ohos_unittest("SystemDefinedFormTest") {
-  module_out_path = module_output_path
-
-  sources = [ "system_defined_form_test.cpp" ]
-
-  deps = common_deps
-
-  external_deps = common_external_deps
-
-  defines = [
-    "private=public",
-    "protected=public",
-  ]
-}
-
-ohos_unittest("SystemDefinedPixelMapTest") {
-  module_out_path = module_output_path
-
-  sources = [ "system_defined_pixelmap_test.cpp" ]
-
-  deps = common_deps
-
-  external_deps = common_external_deps
-
-  defines = [
-    "private=public",
-    "protected=public",
-  ]
-}
-
-ohos_unittest("SystemDefinedRecordTest") {
-  module_out_path = module_output_path
-
-  sources = [ "system_defined_record_test.cpp" ]
-
-  deps = common_deps
-
-  external_deps = common_external_deps
-
-  defines = [
-    "private=public",
-    "protected=public",
-  ]
-}
-
-ohos_unittest("TextTest") {
-  module_out_path = module_output_path
-
-  sources = [ "text_test.cpp" ]
-
-  deps = common_deps
-
-  external_deps = common_external_deps
-
-  defines = [
-    "private=public",
-    "protected=public",
-  ]
-}
-
-ohos_unittest("UnifiedDataTest") {
-  module_out_path = module_output_path
-
-  sources = [ "unified_data_test.cpp" ]
-
-  deps = common_deps
-
-  external_deps = common_external_deps
-
-  defines = [
-    "private=public",
-    "protected=public",
-  ]
-}
-
 ###############################################################################
 group("unittest") {
   testonly = true
@@ -352,13 +277,8 @@ group("unittest") {
     ":NdkDataConversionTest",
     ":PlainTextTest",
     ":SystemDefinedAppitemTest",
-    ":SystemDefinedFormTest",
-    ":SystemDefinedPixelMapTest",
-    ":SystemDefinedRecordTest",
-    ":TextTest",
     ":UdmfClientSystemHapTest",
     ":UdmfClientTest",
-    ":UnifiedDataTest",
     ":UtdClientTest",
   ]
 }

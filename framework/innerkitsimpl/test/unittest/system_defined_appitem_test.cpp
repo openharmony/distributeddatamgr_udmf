@@ -167,13 +167,13 @@ HWTEST_F(SystemDefinedAppitemTest, SetItems007, TestSize.Level1)
 }
 
 /**
-* @tc.name: GetItems001
+* @tc.name: GetItems008
 * @tc.desc: Normal testcase of GetItems
 * @tc.type: FUNC
 */
-HWTEST_F(SystemDefinedAppitemTest, GetItems001, TestSize.Level1)
+HWTEST_F(SystemDefinedAppitemTest, SetItems008, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "GetItems001 begin.");
+    LOG_INFO(UDMF_TEST, "GetItems008 begin.");
     SystemDefinedAppItem valueType;
     valueType.appId_ = "appId";
     valueType.appName_ = "appName_";
@@ -188,17 +188,17 @@ HWTEST_F(SystemDefinedAppitemTest, GetItems001, TestSize.Level1)
     EXPECT_EQ(std::get<std::string>(items[SystemDefinedAppItem::APPLABELID]), valueType.appLabelId_);
     EXPECT_EQ(std::get<std::string>(items[SystemDefinedAppItem::BUNDLENAME]), valueType.bundleName_);
     EXPECT_EQ(std::get<std::string>(items[SystemDefinedAppItem::ABILITYNAME]), valueType.abilityName_);
-    LOG_INFO(UDMF_TEST, "GetItems001 end.");
+    LOG_INFO(UDMF_TEST, "GetItems008 end.");
 }
 
 /**
-* @tc.name: GetValue001
+* @tc.name: GetValue009
 * @tc.desc: Normal testcase of GetValue
 * @tc.type: FUNC
 */
-HWTEST_F(SystemDefinedAppitemTest, GetValue001, TestSize.Level1)
+HWTEST_F(SystemDefinedAppitemTest, GetValue009, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "GetValue001 begin.");
+    LOG_INFO(UDMF_TEST, "GetValue009 begin.");
     SystemDefinedAppItem valueType;
     valueType.value_ = std::monostate{};
     valueType.appId_ = "appId";
@@ -218,6 +218,6 @@ HWTEST_F(SystemDefinedAppitemTest, GetValue001, TestSize.Level1)
     EXPECT_EQ(std::get<std::string>(object->value_[SystemDefinedAppItem::BUNDLENAME]), valueType.bundleName_);
     EXPECT_EQ(std::get<std::string>(object->value_[SystemDefinedAppItem::ABILITYNAME]), valueType.abilityName_);
     EXPECT_EQ(details->value_.size(), 0);
-    LOG_INFO(UDMF_TEST, "GetValue001 end.");
+    LOG_INFO(UDMF_TEST, "GetValue009 end.");
 }
 } // OHOS::Test

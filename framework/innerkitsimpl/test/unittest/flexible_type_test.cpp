@@ -136,13 +136,13 @@ HWTEST_F(FlexibleTypeTest, EscapeStr006, TestSize.Level1)
 }
 
 /**
-* @tc.name: ParseFlexibleUtd001
+* @tc.name: ParseFlexibleUtd007
 * @tc.desc: Abnormal testcase of ParseFlexibleUtd, because typeId and FLEXIBLE_TYPE_FLAG are equal
 * @tc.type: FUNC
 */
-HWTEST_F(FlexibleTypeTest, ParseFlexibleUtd001, TestSize.Level1)
+HWTEST_F(FlexibleTypeTest, ParseFlexibleUtd007, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd001 begin.");
+    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd007 begin.");
     const std::string typeId = "flex.z";
     TypeDescriptorCfg flexibleTypeDescriptorCfg;
     flexibleTypeDescriptorCfg.typeId = "com.example.utdtest.document";
@@ -157,17 +157,17 @@ HWTEST_F(FlexibleTypeTest, ParseFlexibleUtd001, TestSize.Level1)
     FlexibleType flexibleType;
     bool ret = flexibleType.ParseFlexibleUtd(typeId, flexibleTypeDescriptorCfg);
     EXPECT_FALSE(ret);
-    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd001 end.");
+    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd007 end.");
 }
 
 /**
-* @tc.name: ParseFlexibleUtd002
+* @tc.name: ParseFlexibleUtd008
 * @tc.desc: Abnormal testcase of ParseFlexibleUtd, because flexibleUtdDecode[0] != '?'
 * @tc.type: FUNC
 */
-HWTEST_F(FlexibleTypeTest, ParseFlexibleUtd002, TestSize.Level1)
+HWTEST_F(FlexibleTypeTest, ParseFlexibleUtd008, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd002 begin.");
+    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd008 begin.");
     const std::string typeId = "com.example.utdtest.document";
     TypeDescriptorCfg flexibleTypeDescriptorCfg;
     flexibleTypeDescriptorCfg.typeId = "com.example.utdtest.document";
@@ -182,17 +182,17 @@ HWTEST_F(FlexibleTypeTest, ParseFlexibleUtd002, TestSize.Level1)
     FlexibleType flexibleType;
     bool ret = flexibleType.ParseFlexibleUtd(typeId, flexibleTypeDescriptorCfg);
     EXPECT_FALSE(ret);
-    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd002 end.");
+    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd008 end.");
 }
 
 /**
-* @tc.name: ParseFlexibleUtd003
+* @tc.name: ParseFlexibleUtd009
 * @tc.desc: Abnormal testcase of ParseFlexibleUtd, because flexibleUtdDecode contains "="
 * @tc.type: FUNC
 */
-HWTEST_F(FlexibleTypeTest, ParseFlexibleUtd003, TestSize.Level1)
+HWTEST_F(FlexibleTypeTest, ParseFlexibleUtd009, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd003 begin.");
+    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd009 begin.");
     const std::string typeId = "flex.z=";
     TypeDescriptorCfg flexibleTypeDescriptorCfg;
     flexibleTypeDescriptorCfg.typeId = "com.example.utdtest.document";
@@ -207,6 +207,6 @@ HWTEST_F(FlexibleTypeTest, ParseFlexibleUtd003, TestSize.Level1)
     FlexibleType flexibleType;
     bool ret = flexibleType.ParseFlexibleUtd(typeId, flexibleTypeDescriptorCfg);
     EXPECT_FALSE(ret);
-    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd003 end.");
+    LOG_INFO(UDMF_TEST, "ParseFlexibleUtd009 end.");
 }
 } // OHOS::Test

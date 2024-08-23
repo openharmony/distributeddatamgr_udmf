@@ -119,58 +119,58 @@ HWTEST_F(LinkTest, LinkTest004, TestSize.Level1)
 }
 
 /**
-* @tc.name: SetUrlTest001
+* @tc.name: SetUrlTest005
 * @tc.desc: Abnormal testcase of SetUrl,because url and MAX_TEXT_LEN are equal
 * @tc.type: FUNC
 */
-HWTEST_F(LinkTest, SetUrlTest001, TestSize.Level1)
+HWTEST_F(LinkTest, SetUrlTest005, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetUrlTest001 begin.");
+    LOG_INFO(UDMF_TEST, "SetUrlTest005 begin.");
     const std::string url(MAX_TEXT_LEN, 'a');
     Link link;
     link.SetUrl(url);
     EXPECT_NE(link.url_, url);
-    LOG_INFO(UDMF_TEST, "SetUrlTest001 end.");
+    LOG_INFO(UDMF_TEST, "SetUrlTest005 end.");
 }
 
 /**
-* @tc.name: SetDescription001
+* @tc.name: SetDescription006
 * @tc.desc: Abnormal testcase of SetDescription,because url and MAX_TEXT_LEN are equal
 * @tc.type: FUNC
 */
-HWTEST_F(LinkTest, SetDescription001, TestSize.Level1)
+HWTEST_F(LinkTest, SetDescription006, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetDescription001 begin.");
+    LOG_INFO(UDMF_TEST, "SetDescription006 begin.");
     const std::string description(MAX_TEXT_LEN, 'a');
     Link link;
     link.SetDescription(description);
     EXPECT_NE(link.description_, description);
-    LOG_INFO(UDMF_TEST, "SetDescription001 end.");
+    LOG_INFO(UDMF_TEST, "SetDescription006 end.");
 }
 
 /**
-* @tc.name: SetDescription002
+* @tc.name: SetDescription007
 * @tc.desc: Abnormal testcase of SetDescription,because description and MAX_TEXT_LEN are equal
 * @tc.type: FUNC
 */
-HWTEST_F(LinkTest, SetDescription002, TestSize.Level1)
+HWTEST_F(LinkTest, SetDescription007, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetDescription002 begin.");
+    LOG_INFO(UDMF_TEST, "SetDescription007 begin.");
     const std::string description(MAX_TEXT_LEN, 'a');
     Link link;
     link.SetDescription(description);
     EXPECT_NE(link.description_, description);
-    LOG_INFO(UDMF_TEST, "SetDescription002 end.");
+    LOG_INFO(UDMF_TEST, "SetDescription007 end.");
 }
 
 /**
-* @tc.name: GetValue001
+* @tc.name: GetValue008
 * @tc.desc: Abnormal testcase of GetValue,because description and MAX_TEXT_LEN are equal
 * @tc.type: FUNC
 */
-HWTEST_F(LinkTest, GetValue001, TestSize.Level1)
+HWTEST_F(LinkTest, GetValue008, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "GetValue001 begin.");
+    LOG_INFO(UDMF_TEST, "GetValue008 begin.");
     Link link;
     link.value_ = std::monostate{};
     link.url_ = "url_";
@@ -182,6 +182,6 @@ HWTEST_F(LinkTest, GetValue001, TestSize.Level1)
     EXPECT_EQ(std::get<std::string>(object->value_[Link::URL]), link.url_);
     EXPECT_EQ(std::get<std::string>(object->value_[Link::DESCRIPTION]), link.description_);
     EXPECT_EQ(details_->value_.size(), 0);
-    LOG_INFO(UDMF_TEST, "GetValue001 end.");
+    LOG_INFO(UDMF_TEST, "GetValue008 end.");
 }
 } // OHOS::Test
