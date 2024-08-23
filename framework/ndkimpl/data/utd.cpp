@@ -126,6 +126,7 @@ OH_Utd* OH_Utd_Create(const char* typeId)
     auto typeDescriptor = GetTypeDescriptorByUtdClient(typeId);
     if (typeDescriptor == nullptr) {
         LOG_ERROR(UDMF_CAPI, "Failed to create by invoking the native function.");
+        delete pThis;
         return nullptr;
     }
     pThis->typeId = typeDescriptor->GetTypeId();
