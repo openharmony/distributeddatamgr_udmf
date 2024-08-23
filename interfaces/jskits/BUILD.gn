@@ -118,7 +118,6 @@ ohos_shared_library("uniformtypedescriptor_napi") {
   deps = [
     "${third_party_path}/bounds_checking_function:libsec_shared",
     "../innerkits:udmf_client",
-    "../innerkits:utd_client",
     "../jskits:udmf_js_common",
   ]
 
