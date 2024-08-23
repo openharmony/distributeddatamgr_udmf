@@ -16,13 +16,9 @@
 #ifndef UTD_CLIENT_H
 #define UTD_CLIENT_H
 
-#include <shared_mutex>
 #include <string>
 #include <vector>
 #include <map>
-#include "common_event_manager.h"
-#include "common_event_subscriber.h"
-#include "common_event_support.h"
 #include "utd_common.h"
 #include "preset_type_descriptors.h"
 #include "preset_type_descriptors.h"
@@ -34,13 +30,6 @@ namespace OHOS {
 namespace UDMF {
 class TypeDescriptor;
 class API_EXPORT UtdClient {
-    class UtdChangeSubscriber final : public EventFwk::CommonEventSubscriber {
-    public:
-        explicit UtdChangeSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo);
-        virtual ~UtdChangeSubscriber() = default;
-        void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
-    };
-
 public:
     static UtdClient &GetInstance();
     Status GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
@@ -68,11 +57,7 @@ private:
     Status GetFlexibleTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
     std::string GetTypeIdFromCfg(const std::string &mimeType);
     std::vector<std::string> GetTypeIdsFromCfg(const std::string &mimeType);
-    void SubscribeUtdChange();
-
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
-    std::shared_ptr<UtdChangeSubscriber> subscriber_;
-    std::shared_mutex utdMutex_;
 };
 } // namespace UDMF
 } // namespace OHOS
