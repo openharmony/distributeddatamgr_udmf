@@ -25,12 +25,12 @@
 namespace OHOS {
 namespace UDMF {
 extern "C" {
-    FFI_EXPORT int64_t FfiOHOSUDMFUnifiedDataConstructor();
-    FFI_EXPORT int64_t FfiOHOSUDMFUnifiedDataConstructorwWithRecord(int64_t unifiedRecordId);
-    FFI_EXPORT void FfiOHOSUDMFUnifiedDataAddRecord(int64_t unifiedDataId, int64_t unifiedRecordId);
-    FFI_EXPORT CArrUnifiedRecord FfiOHOSUDMFUnifiedDataGetRecords(int64_t unifiedDataId);
-    FFI_EXPORT bool FfiOHOSUDMFUnifiedDataHasType(int64_t unifiedDataId, const char *type);
-    FFI_EXPORT CArrString FfiOHOSUDMFUnifiedDataGetTypes(int64_t unifiedDataId);
+    FFI_EXPORT int64_t FfiUDMFUnifiedDataConstructor();
+    FFI_EXPORT int64_t FfiUDMFUnifiedDataConstructorwWithRecord(int64_t unifiedRecordId);
+    FFI_EXPORT void FfiUDMFUnifiedDataAddRecord(int64_t unifiedDataId, int64_t unifiedRecordId);
+    FFI_EXPORT CArrUnifiedRecord FfiUDMFUnifiedDataGetRecords(int64_t unifiedDataId);
+    FFI_EXPORT bool FfiUDMFUnifiedDataHasType(int64_t unifiedDataId, const char *type);
+    FFI_EXPORT CArrString FfiUDMFUnifiedDataGetTypes(int64_t unifiedDataId);
 }
 }
 }

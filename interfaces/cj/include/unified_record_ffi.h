@@ -26,10 +26,10 @@
 namespace OHOS {
 namespace UDMF {
 extern "C" {
-    FFI_EXPORT int64_t FfiOHOSUDMFUnifiedRecordConstructor();
-    FFI_EXPORT int64_t FfiOHOSUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value);
-    FFI_EXPORT char *FfiOHOSUDMFUnifiedRecordGetType(int64_t unifiedId);
-    FFI_EXPORT CJValueType FfiOHOSUDMFUnifiedRecordGetValue(int64_t unifiedId);
+    FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructor();
+    FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value);
+    FFI_EXPORT char *FfiUDMFUnifiedRecordGetType(int64_t unifiedId);
+    FFI_EXPORT CJValueType FfiUDMFUnifiedRecordGetValue(int64_t unifiedId);
 }
 }
 }
