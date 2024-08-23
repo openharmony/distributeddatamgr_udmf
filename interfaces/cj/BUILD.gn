@@ -49,9 +49,7 @@ ohos_shared_library("cj_unified_data_channel_ffi") {
 
   public_configs = [ ":udmf_cj_config" ]
 
-  deps = [
-    "../innerkits:udmf_client",
-  ]
+  deps = [ "../innerkits:udmf_client" ]
 
   external_deps = [
     "ability_base:want",
