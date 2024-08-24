@@ -1092,9 +1092,11 @@ bool TLVObject::PrepareHeader(size_t size, size_t &tagCursor, size_t &valueCurso
 {
     if (file_ != nullptr) {
         cursor_ = size;
-        if (sizeof(TLVHead) > static_cast<size_t>(std::numeric_limits<long>::max()) ||
+        if (cursor_ > static_cast<size_t>(std::numeric_limits<long>::max()) ||
+            sizeof(TLVHead) > static_cast<size_t>(std::numeric_limits<long>::max()) ||
             cursor_ > static_cast<size_t>(std::numeric_limits<long>::max()) - sizeof(TLVHead)) {
-            LOG_ERROR(TlvObject, "Values are out of range for type long.");
+            LOG_ERROR(TlvObject, "Values are out of range, cursor_:%{public}zu, TLVHead:%{public}zu",
+                cursor_, sizeof(TLVHead));
             return false;
         }
         if (fseek(file_, -static_cast<long>(cursor_) - static_cast<long>(sizeof(TLVHead)), SEEK_CUR) != 0) {
