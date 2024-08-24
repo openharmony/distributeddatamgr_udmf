@@ -425,7 +425,6 @@ static constexpr UtdType UTD_TYPES[] = {
     { KINGSOFT_SPREADSHEETS_TEMPLATE, "KINGSOFT_SPREADSHEETS_TEMPLATE", "com.kingsoft.office.spreadsheets.template" },
     { MICROSOFT_INI, "MICROSOFT_INI", "com.microsoft.ini" },
     { JSON, "JSON", "general.json" },
-    { DARINGFIREBALL_MARKDOWN, "DARINGFIREBALL_MARKDOWN", "net.daringfireball.markdown" },
     { YAML, "YAML", "general.yaml" },
     { LOG, "LOG", "general.log" },
     { URI, "URI", "general.uri" },
