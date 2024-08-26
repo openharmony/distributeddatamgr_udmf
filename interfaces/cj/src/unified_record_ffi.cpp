@@ -55,8 +55,7 @@ extern "C" {
     {
         auto instance = FFIData::GetData<CUnifiedRecord>(unifiedId);
         if (instance == nullptr) {
-            CJValueType r;
-            return r;
+            return CJValueType{};
         }
         return instance->GetValue();
     }

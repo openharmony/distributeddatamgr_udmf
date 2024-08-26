@@ -68,8 +68,7 @@ extern "C" {
     {
         auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
         if (data == nullptr) {
-            CArrUnifiedRecord res;
-            return res;
+            return CArrUnifiedRecord{};
         }
 
         return data->GetRecords();
@@ -89,8 +88,7 @@ extern "C" {
     {
         auto data = FFIData::GetData<CUnifiedData>(unifiedDataId);
         if (data == nullptr) {
-            CArrString res;
-            return res;
+            return CArrString{};
         }
 
         return data->GetTypes();

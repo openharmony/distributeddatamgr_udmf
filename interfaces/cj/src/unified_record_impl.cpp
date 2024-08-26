@@ -48,6 +48,9 @@ namespace OHOS {
 namespace UDMF {
     static CArrUI8 VectorToByteArray(std::vector<uint8_t> bytes)
     {
+        if (bytes.size() == 0) {
+            return CArrUI8{};
+        }
         uint8_t *head = static_cast<uint8_t *>(malloc(bytes.size() * sizeof(uint8_t)));
         if (head == nullptr) {
             return CArrUI8{};

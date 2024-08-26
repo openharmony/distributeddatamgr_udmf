@@ -81,6 +81,9 @@ namespace UDMF {
 
     static CArrUnifiedRecord VectorToArray(std::vector<int64_t> vector)
     {
+        if (vector.size() == 0) {
+            return CArrUnifiedRecord{};
+        }
         int64_t *head = static_cast<int64_t *>(malloc(vector.size() * sizeof(int64_t)));
         if (head == nullptr) {
             return CArrUnifiedRecord{};
@@ -111,6 +114,9 @@ namespace UDMF {
 
     static CArrString StringVectorToArray(std::vector<std::string> vector)
     {
+        if (vector.size() == 0) {
+            return CArrString{};
+        }
         char **head = static_cast<char **>(malloc(vector.size() * sizeof(char *)));
         if (head == nullptr) {
             return CArrString{};

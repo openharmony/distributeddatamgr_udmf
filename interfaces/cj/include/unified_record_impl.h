@@ -46,12 +46,8 @@ namespace UDMF {
     };
 
     class CUnifiedRecord : public OHOS::FFI::FFIData {
+        DECL_TYPE(CUnifiedRecord, OHOS::FFI::FFIData)
         public:
-            OHOS::FFI::RuntimeType *GetRuntimeType() override
-            {
-                return GetClassType();
-            }
-
             CUnifiedRecord();
             CUnifiedRecord(const char *type, CJValueType value);
             CJValueType ValueType2CJValueType(ValueType value);

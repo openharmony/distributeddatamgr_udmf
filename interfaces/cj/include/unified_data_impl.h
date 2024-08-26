@@ -27,12 +27,8 @@ namespace UDMF {
     typedef CArrI64 CArrUnifiedRecord;
 
     class CUnifiedData : public OHOS::FFI::FFIData {
+        DECL_TYPE(CUnifiedData, OHOS::FFI::FFIData)
         public:
-            OHOS::FFI::RuntimeType *GetRuntimeType() override
-            {
-                return GetClassType();
-            }
-
             CUnifiedData();
             CUnifiedData(UDMF::CUnifiedRecord *record);
 
