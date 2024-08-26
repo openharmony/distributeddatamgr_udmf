@@ -18,20 +18,13 @@
 
 #include "unified_data.h"
 #include "unified_record_impl.h"
+#include "cj_common_ffi.h"
 
 namespace OHOS {
 namespace UDMF {
     using namespace OHOS::UDMF;
 
-    struct CArrUnifiedRecord {
-        int64_t *head;
-        int64_t size;
-    };
-
-    struct CArrString {
-        char **head;
-        int64_t size;
-    };
+    typedef CArrI64 CArrUnifiedRecord;
 
     class CUnifiedData : public OHOS::FFI::FFIData {
         public:

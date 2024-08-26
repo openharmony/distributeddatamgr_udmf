@@ -17,15 +17,12 @@
 #define UDMF_UNIFIED_RECORD_IMPL_H
 
 #include "unified_record.h"
+#include "cj_common_ffi.h"
 
 namespace OHOS {
 namespace UDMF {
     using namespace OHOS::UDMF;
-    struct CArrByte {
-        u_int8_t *head;
-        int64_t size;
-    };
-
+ 
     struct CJValueType {
         int32_t integer32;
         int64_t integer64;

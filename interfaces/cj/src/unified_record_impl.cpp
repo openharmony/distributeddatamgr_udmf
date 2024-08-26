@@ -46,16 +46,16 @@ using namespace OHOS::UDMF;
 
 namespace OHOS {
 namespace UDMF {
-    static CArrByte VectorToByteArray(std::vector<uint8_t> bytes)
+    static CArrUI8 VectorToByteArray(std::vector<uint8_t> bytes)
     {
         uint8_t *head = static_cast<uint8_t *>(malloc(bytes.size() * sizeof(uint8_t)));
         if (head == nullptr) {
-            return CArrByte{};
+            return CArrUI8{};
         }
         for (unsigned long i = 0; i < bytes.size(); i++) {
             head[i] = bytes[i];
         }
-        CArrByte byteArray = {head, bytes.size()};
+        CArrUI8 byteArray = {head, bytes.size()};
         return byteArray;
     }
 
