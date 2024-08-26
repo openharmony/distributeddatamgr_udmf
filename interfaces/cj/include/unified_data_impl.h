@@ -40,15 +40,6 @@ namespace UDMF {
         private:
             std::shared_ptr<UDMF::UnifiedData> unifiedData_;
             std::vector<UDMF::CUnifiedRecord *> records_;
-
-            friend class OHOS::FFI::RuntimeType;
-            friend class OHOS::FFI::TypeBase;
-            static OHOS::FFI::RuntimeType *GetClassType()
-            {
-                static OHOS::FFI::RuntimeType runtimeType =
-                    OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("CUnifiedData");
-                return &runtimeType;
-            }
     };
 
 }

@@ -60,15 +60,6 @@ namespace UDMF {
         private:
             std::shared_ptr<UDMF::UnifiedRecord> unifiedRecord_;
             int64_t pixelMapId_;
-
-            friend class OHOS::FFI::RuntimeType;
-            friend class OHOS::FFI::TypeBase;
-            static OHOS::FFI::RuntimeType *GetClassType()
-            {
-                static OHOS::FFI::RuntimeType runtimeType =
-                    OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("CUnifiedRecord");
-                return &runtimeType;
-            }
     };
 
 }
