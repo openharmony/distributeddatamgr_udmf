@@ -29,7 +29,7 @@ namespace UDMF {
         double dou;
         bool boolean;
         char *string;
-        CArrByte byteArray;
+        CArrUI8 byteArray;
         int64_t pixelMapId;
 
         uint8_t tag;

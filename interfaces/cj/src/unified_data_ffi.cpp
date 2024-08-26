@@ -17,6 +17,7 @@
 #include "unified_data_ffi.h"
 #include "unified_data_impl.h"
 #include "unified_record_impl.h"
+#include "cj_common_ffi.h"
 
 using namespace OHOS::FFI;
 using namespace OHOS::UDMF;
