@@ -47,39 +47,29 @@ ohos_shared_library("udmf_client") {
     debug = false
   }
   sources = [
-    "${udmf_framework_path}/common/base32_utils.cpp",
-    "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
-    "${udmf_framework_path}/common/custom_utd_store.cpp",
     "${udmf_framework_path}/common/endian_converter.cpp",
-    "${udmf_framework_path}/common/graph.cpp",
     "${udmf_framework_path}/common/tlv_object.cpp",
     "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/common/udmf_radar_reporter.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
     "${udmf_framework_path}/common/udmf_utils.cpp",
-    "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
-    "${udmf_framework_path}/common/utd_graph.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
-    "${udmf_framework_path}/innerkitsimpl/client/utd_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
     "${udmf_framework_path}/innerkitsimpl/convert/ndk_data_conversion.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/flexible_type.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/type_descriptor.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data_helper.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
@@ -105,7 +95,6 @@ ohos_shared_library("udmf_client") {
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "kv_store:distributeddata_mgr",
-    "os_account:os_account_innerkits",
     "samgr:samgr_proxy",
   ]
 
@@ -121,10 +110,6 @@ ohos_shared_library("udmf_client") {
   part_name = "udmf"
   use_exceptions = true
   cflags_cc = [ "-fvisibility=hidden" ]
-  if (build_selinux) {
-    cflags = [ "-DWITH_SELINUX" ]
-    external_deps += [ "selinux_adapter:librestorecon" ]
-  }
 }
 
 config("utd_client_config") {
@@ -145,13 +130,6 @@ ohos_shared_library("utd_client") {
     cfi_cross_dso = true
     debug = false
   }
-  include_dirs = [
-    "${udmf_interfaces_path}/innerkits/client",
-    "${udmf_interfaces_path}/innerkits/common",
-    "${udmf_interfaces_path}/innerkits/data",
-    "${udmf_framework_path}/common",
-    "${udmf_framework_path}/innerkitsimpl/data",
-  ]
 
   sources = [
     "${udmf_framework_path}/common/base32_utils.cpp",
@@ -185,4 +163,8 @@ ohos_shared_library("utd_client") {
 
   part_name = "udmf"
   cflags_cc = [ "-fvisibility=hidden" ]
+  if (build_selinux) {
+    cflags = [ "-DWITH_SELINUX" ]
+    external_deps += [ "selinux_adapter:librestorecon" ]
+  }
 }
