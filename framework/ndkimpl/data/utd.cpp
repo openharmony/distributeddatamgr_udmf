@@ -49,7 +49,7 @@ static void DestroyArrayPtr(const char** &arrayPtr, unsigned int& count)
 static const char** CreateStrArrByVector(const std::vector<std::string>& paramVector, unsigned int* count)
 {
     unsigned int size = paramVector.size();
-    if (size <= 0 || size > MAX_UTD_SIZE) {
+    if (size == 0 || size > MAX_UTD_SIZE) {
         LOG_ERROR(UDMF_CAPI, "Cannot create array, because size is illegal or exceeds the max value of UTD.");
         *count = 0;
         return nullptr;

@@ -211,7 +211,8 @@ void OH_UdmfRecord_Destroy(OH_UdmfRecord* pThis);
  * @see OH_UdmfRecord Udmf_ErrCode.
  * @since 12
  */
-int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* pThis, const char* typeId, unsigned char* entry, unsigned int count);
+int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId,
+                                  const unsigned char* entry, unsigned int count);
 
 /**
  * @brief Add one {OH_UdsPlainText} data to the {@link OH_UdmfRecord} record.
