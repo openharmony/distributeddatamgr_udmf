@@ -264,7 +264,7 @@ Status UdmfClient::GetAppShareOption(const std::string &intention, enum ShareOpt
         shareOption = static_cast<ShareOptions>(shareOptionRet);
     }
     if (ret != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
+        LOG_INFO(UDMF_CLIENT, "No share option was obtained, ret = %{public}d", ret);
     }
     return static_cast<Status>(ret);
 }
