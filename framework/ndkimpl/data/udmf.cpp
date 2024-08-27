@@ -166,7 +166,7 @@ int OH_UdmfData_AddRecord(OH_UdmfData* unifiedData, OH_UdmfRecord* record)
 
 bool OH_UdmfData_HasType(OH_UdmfData* unifiedData, const char* type)
 {
-    return IsUnifiedDataValid(unifiedData) && type != nullptr && unifiedData->unifiedData_->HasType(type);
+    return IsUnifiedDataValid(unifiedData) && type != nullptr && unifiedData->unifiedData_->HasTypeInEntries(type);
 }
 
 char** OH_UdmfData_GetTypes(OH_UdmfData* unifiedData, unsigned int* count)
@@ -180,7 +180,7 @@ char** OH_UdmfData_GetTypes(OH_UdmfData* unifiedData, unsigned int* count)
         *count = unifiedData->typesCount;
         return unifiedData->typesArray;
     }
-    std::vector<std::string> typeLabels = unifiedData->unifiedData_->GetTypesLabels();
+    std::vector<std::string> typeLabels = unifiedData->unifiedData_->GetEntriesTypes();
     unifiedData->typesArray = StrVectorToTypesArray(typeLabels);
     unifiedData->typesArray == nullptr ? unifiedData->typesCount = 0 : unifiedData->typesCount = typeLabels.size();
     *count = unifiedData->typesCount;
@@ -198,9 +198,8 @@ char** OH_UdmfRecord_GetTypes(OH_UdmfRecord* record, unsigned int* count)
         *count = record->typesCount;
         return record->typesArray;
     }
-    std::string type = UtdUtils::GetUtdIdFromUtdEnum(record->record_->GetType());
-    std::vector<std::string> typeLabels;
-    typeLabels.push_back(type);
+    auto types = record->record_->GetUtdIds();
+    std::vector<std::string> typeLabels {types.begin(), types.end()};
     record->typesArray = StrVectorToTypesArray(typeLabels);
     record->typesArray == nullptr ? record->typesCount = 0 : record->typesCount = typeLabels.size();
     *count = record->typesCount;
@@ -300,12 +299,19 @@ int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId,
         count > MAX_RECORDS_SIZE) {
         return UDMF_E_INVALID_PARAM;
     }
-    std::vector<uint8_t> recordValue(count);
-    for (unsigned int i = 0; i < count; ++i) {
-        recordValue[i] = entry[i];
+    std::string utdId(typeId);
+    std::string prefix(APPLICATION_DEFINED_TYPE);
+    if (utdId.compare(0, prefix.length(), prefix) != 0) {
+        LOG_ERROR(UDMF_CAPI, "not appdefined type:%{public}s", utdId.c_str());
+        return UDMF_E_INVALID_PARAM;
     }
-    std::shared_ptr<ApplicationDefinedRecord> appDef = std::make_shared<ApplicationDefinedRecord>(typeId, recordValue);
-    record->record_ = std::move(appDef);
+    std::vector<uint8_t> recordValue(entry, entry + count);
+    if (record->record_->GetType() == UD_BUTT) {
+        record->record_ = std::make_shared<ApplicationDefinedRecord>(APPLICATION_DEFINED_RECORD, recordValue);
+        record->record_->SetUtdId(typeId);
+    } else {
+        record->record_->AddEntry(utdId, std::move(recordValue));
+    }
     record->recordDataLen = count;
     return UDMF_E_OK;
 }
@@ -315,42 +321,53 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* record, const char* typeId, uns
     if (!IsUnifiedRecordValid(record) || typeId == nullptr || entry == nullptr || count == nullptr) {
         return UDMF_E_INVALID_PARAM;
     }
-    if (record->record_->GetType() != APPLICATION_DEFINED_RECORD) {
-        LOG_ERROR(UDMF_CAPI, "record's type not ApplicationDefinedType");
+    if (!record->record_->HasType(typeId)) {
+        LOG_ERROR(UDMF_CAPI, "no type:%{public}s", typeId);
         return UDMF_E_INVALID_PARAM;
     }
-    auto appDef = static_cast<ApplicationDefinedRecord *>((record->record_).get());
-    if (appDef == nullptr) {
-        LOG_ERROR(UDMF_CAPI, "cast failed");
-        return UDMF_ERR;
-    }
-    if (appDef->GetApplicationDefinedType() != std::string(typeId)) {
-        LOG_ERROR(UDMF_CAPI, "query typeId not equals to data type");
-        return UDMF_E_INVALID_PARAM;
-    }
-    std::lock_guard<std::mutex> lock(record->mutex);
-    std::vector<uint8_t> recordValue = appDef->GetRawData();
-    *count = recordValue.size();
-    if (record->recordData != nullptr) {
+    if (record->lastType == typeId && record->recordData != nullptr) {
         LOG_DEBUG(UDMF_CAPI, "return cache value");
         *entry = record->recordData;
         return UDMF_E_OK;
     }
-    if (*count > MAX_RECORDS_SIZE) {
-        LOG_ERROR(UDMF_CAPI, "data size exceeds maximum size");
+    auto value = record->record_->GetEntry(typeId);
+    auto recordValue = std::get_if<std::vector<uint8_t>>(&value);
+    if (recordValue == nullptr) {
+        return UDMF_ERR;
+    }
+    std::lock_guard<std::mutex> lock(record->mutex);
+    *count = recordValue->size();
+    record->recordDataLen = recordValue->size();
+    if (record->recordDataLen > MAX_RECORDS_SIZE) {
+        LOG_INFO(UDMF_CAPI, "data size exceeds maximum size");
         *count = 0;
         return UDMF_ERR;
     }
-    record->recordData = new (std::nothrow) unsigned char[*count];
+    if (record->recordData != nullptr) {
+        delete[] record->recordData;
+        record->recordData = nullptr;
+    }
+    record->recordData = new (std::nothrow) unsigned char[record->recordDataLen];
     if (record->recordData == nullptr) {
-        LOG_ERROR(UDMF_CAPI, "allocate memory failed");
         return UDMF_ERR;
     }
-    for (unsigned int i = 0; i < *count; ++i) {
-        (record->recordData)[i] = recordValue[i];
+    auto err = memcpy_s(record->recordData, record->recordDataLen, recordValue->data(), record->recordDataLen);
+    if (err != EOK) {
+        LOG_ERROR(UDMF_CAPI, "memcpy error! type:%{public}s", typeId);
     }
+    record->lastType = const_cast<char*>(typeId);
     *entry = record->recordData;
     return UDMF_E_OK;
+}
+
+template<typename T>
+void AddUds(OH_UdmfRecord* record, UdsObject* udsObject, UDType type)
+{
+    if (record->record_->GetType() == UD_BUTT) {
+        record->record_ = std::make_shared<T>(type, udsObject->obj);
+    } else {
+        record->record_->AddEntry(UtdUtils::GetUtdIdFromUtdEnum(type), udsObject->obj);
+    }
 }
 
 int OH_UdmfRecord_AddPlainText(OH_UdmfRecord* record, OH_UdsPlainText* plainText)
@@ -358,11 +375,7 @@ int OH_UdmfRecord_AddPlainText(OH_UdmfRecord* record, OH_UdsPlainText* plainText
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(plainText, UDS_PLAIN_TEXT_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    std::shared_ptr<PlainText> text = std::make_shared<PlainText>();
-    text->SetContent(OH_UdsPlainText_GetContent(plainText));
-    text->SetAbstract(OH_UdsPlainText_GetAbstract(plainText));
-    record->record_ = std::move(text);
-    record->record_->SetType(static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(OH_UdsPlainText_GetType(plainText))));
+    AddUds<PlainText>(record, plainText, PLAIN_TEXT);
     return UDMF_E_OK;
 }
 
@@ -371,11 +384,7 @@ int OH_UdmfRecord_AddHyperlink(OH_UdmfRecord* record, OH_UdsHyperlink* hyperlink
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(hyperlink, UDS_HYPERLINK_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    std::shared_ptr<Link> link = std::make_shared<Link>();
-    link->SetUrl(OH_UdsHyperlink_GetUrl(hyperlink));
-    link->SetDescription(OH_UdsHyperlink_GetDescription(hyperlink));
-    record->record_ = std::move(link);
-    record->record_->SetType(static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(OH_UdsHyperlink_GetType(hyperlink))));
+    AddUds<Link>(record, hyperlink, HYPERLINK);
     return UDMF_E_OK;
 }
 
@@ -384,11 +393,7 @@ int OH_UdmfRecord_AddHtml(OH_UdmfRecord* record, OH_UdsHtml* html)
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(html, UDS_HTML_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    std::shared_ptr<Html> htmlPtr = std::make_shared<Html>();
-    htmlPtr->SetHtmlContent(OH_UdsHtml_GetContent(html));
-    htmlPtr->SetPlainContent(OH_UdsHtml_GetPlainContent(html));
-    record->record_ = std::move(htmlPtr);
-    record->record_->SetType(static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(OH_UdsHtml_GetType(html))));
+    AddUds<Html>(record, html, HTML);
     return UDMF_E_OK;
 }
 
@@ -397,16 +402,17 @@ int OH_UdmfRecord_AddAppItem(OH_UdmfRecord* record, OH_UdsAppItem* appItem)
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(appItem, UDS_APP_ITEM_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    std::shared_ptr<SystemDefinedAppItem> appDefRecord = std::make_shared<SystemDefinedAppItem>();
-    appDefRecord->SetAppId(OH_UdsAppItem_GetId(appItem));
-    appDefRecord->SetAppName(OH_UdsAppItem_GetName(appItem));
-    appDefRecord->SetAppIconId(OH_UdsAppItem_GetIconId(appItem));
-    appDefRecord->SetAppLabelId(OH_UdsAppItem_GetLabelId(appItem));
-    appDefRecord->SetBundleName(OH_UdsAppItem_GetBundleName(appItem));
-    appDefRecord->SetAbilityName(OH_UdsAppItem_GetAbilityName(appItem));
-    record->record_ = std::move(appDefRecord);
-    record->record_->SetType(
-        static_cast<OHOS::UDMF::UDType>(UtdUtils::GetUtdEnumFromUtdId(OH_UdsAppItem_GetType(appItem))));
+    AddUds<SystemDefinedAppItem>(record, appItem, SYSTEM_DEFINED_APP_ITEM);
+    return UDMF_E_OK;
+}
+
+int GetUds(OH_UdmfRecord* record, UdsObject* udsObject, UDType type)
+{
+    auto value = record->record_->GetEntry(UtdUtils::GetUtdIdFromUtdEnum(type));
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        return UDMF_ERR;
+    }
+    udsObject->obj = std::get<std::shared_ptr<Object>>(value);
     return UDMF_E_OK;
 }
 
@@ -415,17 +421,7 @@ int OH_UdmfRecord_GetPlainText(OH_UdmfRecord* record, OH_UdsPlainText* plainText
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(plainText, UDS_PLAIN_TEXT_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    if (record->record_->GetType() != PLAIN_TEXT) {
-        return UDMF_ERR;
-    }
-    auto plain = static_cast<PlainText *>((record->record_).get());
-    if (plain == nullptr) {
-        return UDMF_ERR;
-    }
-    OH_UdsPlainText_SetContent(plainText, plain->GetContent().c_str());
-    OH_UdsPlainText_SetAbstract(plainText, plain->GetAbstract().c_str());
-    plainText->obj->value_[UNIFORM_DATA_TYPE] = UDMF_META_PLAIN_TEXT;
-    return UDMF_E_OK;
+    return GetUds(record, plainText, PLAIN_TEXT);
 }
 
 int OH_UdmfRecord_GetHyperlink(OH_UdmfRecord* record, OH_UdsHyperlink* hyperlink)
@@ -433,17 +429,7 @@ int OH_UdmfRecord_GetHyperlink(OH_UdmfRecord* record, OH_UdsHyperlink* hyperlink
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(hyperlink, UDS_HYPERLINK_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    if (record->record_->GetType() != HYPERLINK) {
-        return UDMF_ERR;
-    }
-    auto link = static_cast<Link *>((record->record_).get());
-    if (link == nullptr) {
-        return UDMF_ERR;
-    }
-    OH_UdsHyperlink_SetUrl(hyperlink, link->GetUrl().c_str());
-    OH_UdsHyperlink_SetDescription(hyperlink, link->GetDescription().c_str());
-    hyperlink->obj->value_[UNIFORM_DATA_TYPE] = UDMF_META_HYPERLINK;
-    return UDMF_E_OK;
+    return GetUds(record, hyperlink, HYPERLINK);
 }
 
 int OH_UdmfRecord_GetHtml(OH_UdmfRecord* record, OH_UdsHtml* html)
@@ -451,17 +437,7 @@ int OH_UdmfRecord_GetHtml(OH_UdmfRecord* record, OH_UdsHtml* html)
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(html, UDS_HTML_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    if (record->record_->GetType() != HTML) {
-        return UDMF_ERR;
-    }
-    auto htmlPtr = static_cast<Html *>((record->record_).get());
-    if (htmlPtr == nullptr) {
-        return UDMF_ERR;
-    }
-    OH_UdsHtml_SetContent(html, htmlPtr->GetHtmlContent().c_str());
-    OH_UdsHtml_SetPlainContent(html, htmlPtr->GetPlainContent().c_str());
-    html->obj->value_[UNIFORM_DATA_TYPE] = UDMF_META_HTML;
-    return UDMF_E_OK;
+    return GetUds(record, html, HTML);
 }
 
 int OH_UdmfRecord_GetAppItem(OH_UdmfRecord* record, OH_UdsAppItem* appItem)
@@ -469,21 +445,7 @@ int OH_UdmfRecord_GetAppItem(OH_UdmfRecord* record, OH_UdsAppItem* appItem)
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(appItem, UDS_APP_ITEM_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    if (record->record_->GetType() != SYSTEM_DEFINED_APP_ITEM) {
-        return UDMF_ERR;
-    }
-    auto appDefRecord = static_cast<SystemDefinedAppItem *>((record->record_).get());
-    if (appDefRecord == nullptr) {
-        return UDMF_ERR;
-    }
-    OH_UdsAppItem_SetId(appItem, appDefRecord->GetAppId().c_str());
-    OH_UdsAppItem_SetName(appItem, appDefRecord->GetAppName().c_str());
-    OH_UdsAppItem_SetIconId(appItem, appDefRecord->GetAppIconId().c_str());
-    OH_UdsAppItem_SetLabelId(appItem, appDefRecord->GetAppLabelId().c_str());
-    OH_UdsAppItem_SetBundleName(appItem, appDefRecord->GetBundleName().c_str());
-    OH_UdsAppItem_SetAbilityName(appItem, appDefRecord->GetAbilityName().c_str());
-    appItem->obj->value_[UNIFORM_DATA_TYPE] = UDMF_META_OPENHARMONY_APP_ITEM;
-    return UDMF_E_OK;
+    return GetUds(record, appItem, SYSTEM_DEFINED_APP_ITEM);
 }
 
 OH_UdmfProperty* OH_UdmfProperty_Create(OH_UdmfData* data)

@@ -19,18 +19,18 @@ namespace OHOS {
 namespace UDMF {
 SystemDefinedPixelMap::SystemDefinedPixelMap()
 {
-    this->dataType_ = SYSTEM_DEFINED_PIXEL_MAP;
+    SetType(SYSTEM_DEFINED_PIXEL_MAP);
 }
 
 SystemDefinedPixelMap::SystemDefinedPixelMap(std::vector<uint8_t> &data)
 {
-    this->dataType_ = SYSTEM_DEFINED_PIXEL_MAP;
+    SetType(SYSTEM_DEFINED_PIXEL_MAP);
     this->rawData_ = std::move(data);
 }
 
 SystemDefinedPixelMap::SystemDefinedPixelMap(UDType type, ValueType value) : SystemDefinedRecord(type, value)
 {
-    this->dataType_ = SYSTEM_DEFINED_PIXEL_MAP;
+    SetType(SYSTEM_DEFINED_PIXEL_MAP);
     if (std::holds_alternative<std::vector<uint8_t>>(value)) {
         rawData_ = std::get<std::vector<uint8_t>>(value);
     }

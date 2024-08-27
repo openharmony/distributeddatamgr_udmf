@@ -31,6 +31,24 @@
 
 namespace OHOS {
 namespace UDMF {
+constexpr const char* UNIFORM_DATA_TYPE = "uniformDataType";
+constexpr const char* CONTENT = "content";
+constexpr const char* ABSTRACT = "abstract";
+constexpr const char* URL = "url";
+constexpr const char* DESCRIPTION = "description";
+constexpr const char* HTML_CONTENT = "htmlContent";
+constexpr const char* PLAIN_CONTENT = "plainContent";
+constexpr const char* APP_ID = "appId";
+constexpr const char* APP_NAME = "appName";
+constexpr const char* APP_ICON_ID = "appIconId";
+constexpr const char* APP_LABEL_ID = "appLabelId";
+constexpr const char* BUNDLE_NAME = "bundleName";
+constexpr const char* ABILITY_NAME = "abilityName";
+constexpr const char* FILE_URI_PARAM = "fileUri";
+constexpr const char* FILE_TYPE = "fileType";
+constexpr const char* PIXEL_MAP = "pixelMap";
+constexpr const char* APPLICATION_DEFINED_TYPE = "ApplicationDefined";
+
 enum UDType : int32_t {
     ENTITY = 0,
     OBJECT,
@@ -527,7 +545,7 @@ struct Object;
 using ValueType = std::variant<std::monostate, int32_t, int64_t, double, bool, std::string, std::vector<uint8_t>,
     std::shared_ptr<OHOS::AAFwk::Want>, std::shared_ptr<OHOS::Media::PixelMap>, std::shared_ptr<Object>, nullptr_t>;
 
-struct Object {
+struct API_EXPORT Object {
     bool GetValue(const std::string &key, std::string &value);
     bool GetValue(const std::string &key, std::shared_ptr<Object> &value);
 

@@ -26,14 +26,14 @@ PlainText::PlainText(const std::string &content, const std::string &abstract)
     if (content.length() >= MAX_TEXT_LEN) {
         return;
     }
-    this->dataType_ = PLAIN_TEXT;
+    SetType(PLAIN_TEXT);
     this->content_ = content;
     this->abstract_ = abstract;
 }
 
 PlainText::PlainText(UDType type, ValueType value) : Text(type, value)
 {
-    this->dataType_ = PLAIN_TEXT;
+    SetType(PLAIN_TEXT);
     if (std::holds_alternative<std::string>(value)) {
         content_ = std::get<std::string>(value);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
