@@ -29,6 +29,7 @@
 #include "html.h"
 #include "system_defined_appitem.h"
 #include "application_defined_record.h"
+#include "system_defined_pixelmap.h"
 
 using namespace OHOS::UDMF;
 
@@ -406,6 +407,24 @@ int OH_UdmfRecord_AddAppItem(OH_UdmfRecord* record, OH_UdsAppItem* appItem)
     return UDMF_E_OK;
 }
 
+int OH_UdmfRecord_AddFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
+{
+    if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(fileUri, UDS_FILE_URI_STRUCT_ID)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    AddUds<UnifiedRecord>(record, fileUri, UDType::FILE_URI);
+    return UDMF_E_OK;
+}
+
+int OH_UdmfRecord_AddPixelMap(OH_UdmfRecord* record, OH_UdsPixelMap* pixelMap)
+{
+    if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(pixelMap, UDS_PIXEL_MAP_STRUCT_ID)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    AddUds<SystemDefinedPixelMap>(record, pixelMap, UDType::SYSTEM_DEFINED_PIXEL_MAP);
+    return UDMF_E_OK;
+}
+
 int GetUds(OH_UdmfRecord* record, UdsObject* udsObject, UDType type)
 {
     auto value = record->record_->GetEntry(UtdUtils::GetUtdIdFromUtdEnum(type));
@@ -446,6 +465,22 @@ int OH_UdmfRecord_GetAppItem(OH_UdmfRecord* record, OH_UdsAppItem* appItem)
         return UDMF_E_INVALID_PARAM;
     }
     return GetUds(record, appItem, SYSTEM_DEFINED_APP_ITEM);
+}
+
+int OH_UdmfRecord_GetFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
+{
+    if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(fileUri, UDS_FILE_URI_STRUCT_ID)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    return GetUds(record, fileUri, UDType::FILE_URI);
+}
+
+int OH_UdmfRecord_GetPixelMap(OH_UdmfRecord* record, OH_UdsPixelMap* pixelMap)
+{
+    if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(pixelMap, UDS_PIXEL_MAP_STRUCT_ID)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    return GetUds(record, pixelMap, UDType::SYSTEM_DEFINED_PIXEL_MAP);
 }
 
 OH_UdmfProperty* OH_UdmfProperty_Create(OH_UdmfData* data)

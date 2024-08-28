@@ -30,8 +30,12 @@ public:
 
     std::vector<uint8_t> GetRawData() const;
     void SetRawData(const std::vector<uint8_t> &rawData);
+
+    ValueType GetValue() override;
 private:
+    void InitObject();
     std::vector<uint8_t> rawData_;
+    bool updateObjectFlag_ = true;
 };
 } // namespace UDMF
 } // namespace OHOS

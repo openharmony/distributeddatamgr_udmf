@@ -990,6 +990,13 @@ extern "C" {
  */
 #define UDMF_META_OPENHARMONY_WANT "openharmony.want"
 
+/**
+ * @brief A specific type of uniform data type.
+ *
+ * @since 13
+ */
+#define UDMF_META_GENERAL_FILE_URI "general.file-uri"
+
 #ifdef __cplusplus
 };
 #endif
