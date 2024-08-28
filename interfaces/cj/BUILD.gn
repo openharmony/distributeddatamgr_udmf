@@ -94,6 +94,9 @@ ohos_shared_library("cj_uniform_type_descriptor_ffi") {
     sources = [
       "${udmf_interfaces_path}/cj/src/type_descriptor_ffi.cpp",
       "${udmf_interfaces_path}/cj/src/type_descriptor_impl.cpp",
+      "${udmf_interfaces_path}/cj/src/uniform_type_descriptor_ffi.cpp",
+      "${udmf_interfaces_path}/cj/src/uniform_type_descriptor_impl.cpp",
+      "${udmf_interfaces_path}/cj/src/utils.cpp",
     ]
 
     deps = [ "../innerkits:udmf_client" ]
