@@ -27,3 +27,19 @@ char* Utils::MallocCString(const std::string& origin)
     }
     return std::char_traits<char>::copy(res, origin.c_str(), len);
 }
+
+CArrString Utils::StringVectorToArray(std::vector<std::string> vector)
+{
+    if (vector.size() == 0) {
+        return CArrString{};
+    }
+    char **head = static_cast<char **>(malloc(vector.size() * sizeof(char *)));
+    if (head == nullptr) {
+        return CArrString{};
+    }
+    for (unsigned long i = 0; i < vector.size(); i++) {
+        head[i] = Utils::MallocCString(vector[i]);
+    }
+    CArrString stringArray = {head, vector.size()};
+    return stringArray;
+}

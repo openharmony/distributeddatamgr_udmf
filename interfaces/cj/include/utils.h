@@ -19,11 +19,15 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
+#include "cj_common_ffi.h"
 
 #define FFI_EXPORT __attribute__((visibility("default")))
 
 class FFI_EXPORT Utils {
     public:
         static char *MallocCString(const std::string &origin);
+        static CArrString StringVectorToArray(std::vector<std::string> vector);
+ 
 };
 #endif // OHOS_UDMF_UTILS_H

@@ -68,3 +68,56 @@ ohos_shared_library("cj_unified_data_channel_ffi") {
   subsystem_name = "distributeddatamgr"
   part_name = "udmf"
 }
+
+
+ohos_shared_library("cj_uniform_type_descriptor_ffi") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  include_dirs = [
+    "${udmf_interfaces_path}/cj/include",
+    "${udmf_interfaces_path}/innerkits/client",
+    "${udmf_interfaces_path}/innerkits/common",
+    "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_interfaces_path}/jskits/common",
+    "${udmf_interfaces_path}/jskits/data",
+
+    "${udmf_framework_path}/common",
+    "${udmf_framework_path}/innerkits/service",
+  ]
+
+  if (product_name != "ohos-sdk") {
+    sources = [
+      "${udmf_interfaces_path}/cj/src/type_descriptor_ffi.cpp",
+      "${udmf_interfaces_path}/cj/src/type_descriptor_impl.cpp",
+    ]
+
+    deps = [ "../innerkits:udmf_client" ]
+
+    external_deps = [
+      "ability_base:base",
+      "ability_base:want",
+      "ability_runtime:abilitykit_native",
+      "ability_runtime:napi_common",
+      "c_utils:utils",
+      "hilog:libhilog",
+      "image_framework:cj_image_ffi",
+      "ipc:ipc_core",
+      "kv_store:distributeddata_inner",
+      "napi:ace_napi",
+      "napi:cj_bind_ffi",
+      "napi:cj_bind_native",
+    ]
+
+    public_external_deps = [ "image_framework:image" ]
+  }
+
+  # cflags = [ "-fvisibility=hidden" ]
+  innerapi_tags = [ "platformsdk" ]
+  subsystem_name = "distributeddatamgr"
+  part_name = "udmf"
+}

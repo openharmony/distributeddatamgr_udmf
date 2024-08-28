@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,25 +14,33 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_UNIFIED_RECORD_FFI_H
-#define UDMF_UNIFIED_RECORD_FFI_H
 
-#include <cstdint>
-
-#include "ffi_remote_data.h"
+#include "uniform_type_descriptor_impl.h"
 #include "cj_common_ffi.h"
 
-#include "unified_record_impl.h"
+#include <string>
+#include <vector>
+#include "utd_client.h"
+#include "type_descriptor_impl.h"
+
+#include "ffi_remote_data.h"
+
+#include "utils.h"
+
+using namespace OHOS::FFI;
+using namespace OHOS::UDMF;
 
 namespace OHOS {
 namespace UDMF {
-extern "C" {
-    FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructor();
-    FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value);
-    FFI_EXPORT char * FfiUDMFUnifiedRecordGetType(int64_t unifiedId);
-    FFI_EXPORT CJValueType FfiUDMFUnifiedRecordGetValue(int64_t unifiedId);
-}
-}
-}
+    static int64_t GetTypeDescriptor(const char *typeId){
+        std::shared_ptr<TypeDescriptor> descriptor;
+        UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+        auto nativeCJTypeDescriptor = FFIData::Create<CTypeDescriptor>(descriptor);
+        if (nativeCJTypeDescriptor == nullptr) {
+            return -1;
+        }
+        return nativeCJTypeDescriptor->GetID();
+    }
 
-#endif
+}
+}

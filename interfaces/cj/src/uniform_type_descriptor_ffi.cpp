@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,25 +14,20 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_UNIFIED_RECORD_FFI_H
-#define UDMF_UNIFIED_RECORD_FFI_H
+#include "uniform_type_descriptor_ffi.h"
+#include "uniform_type_descriptor_impl.h"
 
-#include <cstdint>
-
-#include "ffi_remote_data.h"
-#include "cj_common_ffi.h"
-
-#include "unified_record_impl.h"
+using namespace OHOS::FFI;
+using namespace OHOS::UDMF;
 
 namespace OHOS {
 namespace UDMF {
 extern "C" {
-    FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructor();
-    FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value);
-    FFI_EXPORT char * FfiUDMFUnifiedRecordGetType(int64_t unifiedId);
-    FFI_EXPORT CJValueType FfiUDMFUnifiedRecordGetValue(int64_t unifiedId);
-}
-}
-}
 
-#endif
+    int64_t FfiUDMFUniformTypeDescriptorGetTypeDescriptor(const char *typeId){
+        return UDMF::GetTypeDescriptor(typeId);
+    }
+
+}
+}
+}

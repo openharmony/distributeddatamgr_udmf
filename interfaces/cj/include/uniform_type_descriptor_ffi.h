@@ -13,23 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_UNIFIED_RECORD_FFI_H
-#define UDMF_UNIFIED_RECORD_FFI_H
+#ifndef UDMF_UNIFORM_TYPE_DESCRIPTOR_FFI_H
+#define UDMF_UNIFORM_TYPE_DESCRIPTOR_FFI_H
 
 #include <cstdint>
-
 #include "ffi_remote_data.h"
 #include "cj_common_ffi.h"
 
-#include "unified_record_impl.h"
+#include "uniform_type_descriptor_impl.h"
 
 namespace OHOS {
 namespace UDMF {
 extern "C" {
-    FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructor();
-    FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value);
-    FFI_EXPORT char * FfiUDMFUnifiedRecordGetType(int64_t unifiedId);
-    FFI_EXPORT CJValueType FfiUDMFUnifiedRecordGetValue(int64_t unifiedId);
+    FFI_EXPORT int64_t FfiUDMFUniformTypeDescriptorGetTypeDescriptor(const char *typeId);
 }
 }
 }
