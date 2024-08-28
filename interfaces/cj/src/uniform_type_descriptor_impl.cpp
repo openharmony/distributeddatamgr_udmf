@@ -32,7 +32,7 @@ using namespace OHOS::UDMF;
 
 namespace OHOS {
 namespace UDMF {
-    static int64_t GetTypeDescriptor(const char *typeId){
+    int64_t GetTypeDescriptor(const char *typeId){
         std::shared_ptr<TypeDescriptor> descriptor;
         UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
         auto nativeCJTypeDescriptor = FFIData::Create<CTypeDescriptor>(descriptor);

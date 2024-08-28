@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace UDMF {
     using namespace OHOS::UDMF;
-    static int64_t GetTypeDescriptor(const char *typeId);
+    int64_t GetTypeDescriptor(const char *typeId);
 }
 } // namespace OHOS::UDMF
 

@@ -16,6 +16,8 @@
 #ifndef UDMF_UNIFIED_DATA_IMPL_H
 #define UDMF_UNIFIED_DATA_IMPL_H
 
+#include <memory>
+
 #include "unified_data.h"
 #include "unified_record_impl.h"
 #include "cj_common_ffi.h"
