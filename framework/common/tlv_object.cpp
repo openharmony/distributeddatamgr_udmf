@@ -402,7 +402,9 @@ bool TLVObject::WriteVariant(const UDVariant &value)
     if (!WriteVariantInner(tag, value)) {
         return false;
     }
-    PrepareHeader(cursor_, tagCursor, valueCursor);
+    if (!PrepareHeader(cursor_, tagCursor, valueCursor)) {
+        return false;
+    }
     WriteHead(static_cast<uint16_t>(tag), tagCursor, cursor_ - valueCursor);
     if (!SaveBufferToFile()) {
         return false;
@@ -582,7 +584,9 @@ bool TLVObject::WriteVariant(const ValueType &value)
     if (!WriteVariantInner(tag, value)) {
         return false;
     }
-    PrepareHeader(cursor_, tagCursor, valueCursor);
+    if (!PrepareHeader(cursor_, tagCursor, valueCursor)) {
+        return false;
+    }
     WriteHead(static_cast<uint16_t>(tag), tagCursor, cursor_ - valueCursor);
     if (!SaveBufferToFile()) {
         return false;
@@ -750,7 +754,9 @@ bool TLVObject::WriteMap(const UDDetails &value)
         }
         total += cursor_;
     }
-    PrepareHeader(total, tagCursor, valueCursor);
+    if (!PrepareHeader(total, tagCursor, valueCursor)) {
+        return false;
+    }
     WriteHead(static_cast<uint16_t>(TAG::TAG_MAP), tagCursor, cursor_ - valueCursor);
     if (!SaveBufferToFile()) {
         return false;
@@ -820,7 +826,9 @@ bool TLVObject::WriteObject(const std::shared_ptr<Object> &value)
         }
         total += cursor_;
     }
-    PrepareHeader(total, tagCursor, valueCursor);
+    if (!PrepareHeader(total, tagCursor, valueCursor)) {
+        return false;
+    }
     WriteHead(static_cast<uint16_t>(TAG::TAG_OBJECT), tagCursor, cursor_ - valueCursor);
     if (!SaveBufferToFile()) {
         return false;
@@ -1080,15 +1088,26 @@ bool TLVObject::HasExpectBuffer(const uint32_t expectLen) const
     return buffer_->size() >= cursor_ && buffer_->size() - cursor_ >= expectLen;
 }
 
-void TLVObject::PrepareHeader(size_t size, size_t &tagCursor, size_t &valueCursor)
+bool TLVObject::PrepareHeader(size_t size, size_t &tagCursor, size_t &valueCursor)
 {
     if (file_ != nullptr) {
         cursor_ = size;
-        fseek(file_, -static_cast<long long>(cursor_) - sizeof(TLVHead), SEEK_CUR);
+        if (cursor_ > static_cast<size_t>(std::numeric_limits<long>::max()) ||
+            sizeof(TLVHead) > static_cast<size_t>(std::numeric_limits<long>::max()) ||
+            cursor_ > static_cast<size_t>(std::numeric_limits<long>::max()) - sizeof(TLVHead)) {
+            LOG_ERROR(TlvObject, "Values are out of range, cursor_:%{public}zu, TLVHead:%{public}zu",
+                cursor_, sizeof(TLVHead));
+            return false;
+        }
+        if (fseek(file_, -static_cast<long>(cursor_) - static_cast<long>(sizeof(TLVHead)), SEEK_CUR) != 0) {
+            LOG_ERROR(TlvObject, "fseek failed, error: %{public}d", errno);
+            return false;
+        }
         buffer_->resize(sizeof(TLVHead));
         tagCursor  = 0;
         valueCursor = 0;
     }
+    return true;
 }
 
 void TLVObject::PrepareBuffer(size_t size)

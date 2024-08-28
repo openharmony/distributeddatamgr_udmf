@@ -165,7 +165,7 @@ bool UnifiedDataHelper::SaveUDataToFile(const std::string &dataFile, UnifiedData
 
     std::FILE *file = fopen(dataFile.c_str(), "w+");
     if (file == nullptr) {
-        LOG_ERROR(UDMF_FRAMEWORK, "failed to open file");
+        LOG_ERROR(UDMF_FRAMEWORK, "failed to open file: %{public}s, errno is %{public}d", dataFile.c_str(), errno);
         return false;
     }
     recordTlv.SetFile(file);
