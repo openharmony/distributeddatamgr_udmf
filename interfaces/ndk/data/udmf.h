@@ -105,6 +105,13 @@ typedef struct OH_UdmfData OH_UdmfData;
 typedef struct OH_UdmfRecord OH_UdmfRecord;
 
 /**
+ * @brief Defines the data provider.
+ *
+ * @since 13
+ */
+typedef struct OH_UdmfRecordProvider OH_UdmfRecordProvider;
+
+/**
  * @brief Describes some property parameters of unified data.
  *
  * @since 12
@@ -178,6 +185,62 @@ char** OH_UdmfData_GetTypes(OH_UdmfData* pThis, unsigned int* count);
  * @since 12
  */
 OH_UdmfRecord** OH_UdmfData_GetRecords(OH_UdmfData* pThis, unsigned int* count);
+
+/**
+ * @brief Defines the callback function used free the context.
+ * @param context Pointer to the context which is to be free.
+ * @since 13
+ */
+typedef void (*UdmfData_Finalize)(void* context);
+
+/**
+ * @brief Creates an {@link OH_UdmfRecordProvider} instance.
+ *
+ * @return Returns the pointer to the {@link OH_UdmfRecordProvider} instance created if the operation is successful.
+ * Returns nullptr otherwise.
+ * @see OH_UdmfRecordProvider.
+ * @since 13
+ */
+OH_UdmfRecordProvider* OH_UdmfRecordProvider_Create();
+
+/**
+ * @brief Destroy an {@link OH_UdmfRecordProvider} instance.
+ *
+ * @param subscriber Pointer to the {@link OH_UdmfRecordProvider} instance to destroy.
+ * @return Returns the status code of the execution. For details, see {@link Udmf_ErrCode}.
+ *         Returns {@link UDMF_E_OK} if the operation is successful.
+ *         Returns {@link UDMF_E_INVALID_PARAM} if invalid args are detected.
+ * @see OH_UdmfRecordProvider Udmf_ErrCode.
+ * @since 13
+ */
+int OH_UdmfRecordProvider_Destroy(OH_UdmfRecordProvider* provider);
+
+/**
+ * @brief Defines a callback function used to obtain data by type.
+ *
+ * @param context Pointer to the context set by {@link OH_UdmfRecordProvider_SetData}.
+ * @param type Pointer to the type of data to obtain. For details, see {@link udmf_meta.h}.
+ * @return Returns the data content.
+ * @since 13
+ */
+typedef void* (*OH_UdmfRecordProvider_GetData)(void* context, const char* type);
+
+/**
+ * @brief Sets a callback function to obtain data.
+ *
+ * @param provider Pointer to the {@link OH_UdmfRecordProvider} instance.
+ * @param context Pointer to the context set, which is the first parameter in OH_UdmfRecordProvider_GetData.
+ * @param callback Callback to set. For details, see {@link OH_UdmfRecordProvider_GetData}.
+ * @param finalize Optional callback that can free context when destroy provider.
+ *         For details, see {@link UdmfData_Finalize}.
+ * @return Returns the status code of the execution. For details, see {@link Udmf_ErrCode}.
+ *         Returns {@link UDMF_E_OK} if the operation is successful.
+ *         Returns {@link UDMF_E_INVALID_PARAM} if invalid args are detected.
+ * @see OH_UdmfRecordProvider OH_UdmfRecordProvider_GetData UdmfData_Finalize Udmf_ErrCode.
+ * @since 13
+ */
+int OH_UdmfRecordProvider_SetData(OH_UdmfRecordProvider* provider, void* context,
+    const OH_UdmfRecordProvider_GetData callback, const UdmfData_Finalize finalize);
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdmfRecord}, it's relate with UDS data.
@@ -288,12 +351,11 @@ char** OH_UdmfRecord_GetTypes(OH_UdmfRecord* pThis, unsigned int* count);
  * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- *         {@link UDMF_ERR} Internal data error.
  * @see OH_UdmfRecord Udmf_ErrCode.
  * @since 12
  */
 int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* pThis, const char* typeId,
-                                  unsigned char** entry, unsigned int* count);
+    unsigned char** entry, unsigned int* count);
 
 /**
  * @brief Get one {OH_UdsPlainText} data from the {@link OH_UdmfRecord} record.
@@ -303,7 +365,6 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* pThis, const char* typeId,
  * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- *         {@link UDMF_ERR} Internal data error.
  * @see OH_UdmfRecord OH_UdsPlainText Udmf_ErrCode.
  * @since 12
  */
@@ -317,7 +378,6 @@ int OH_UdmfRecord_GetPlainText(OH_UdmfRecord* pThis, OH_UdsPlainText* plainText)
  * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- *         {@link UDMF_ERR} Internal data error.
  * @see OH_UdmfRecord OH_UdsHyperlink Udmf_ErrCode.
  * @since 12
  */
@@ -331,7 +391,6 @@ int OH_UdmfRecord_GetHyperlink(OH_UdmfRecord* pThis, OH_UdsHyperlink* hyperlink)
  * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- *         {@link UDMF_ERR} Internal data error.
  * @see OH_UdmfRecord OH_UdsHtml Udmf_ErrCode.
  * @since 12
  */
@@ -345,11 +404,26 @@ int OH_UdmfRecord_GetHtml(OH_UdmfRecord* pThis, OH_UdsHtml* html);
  * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- *         {@link UDMF_ERR} Internal data error.
  * @see OH_UdmfRecord OH_UdsAppItem Udmf_ErrCode.
  * @since 12
  */
 int OH_UdmfRecord_GetAppItem(OH_UdmfRecord* pThis, OH_UdsAppItem* appItem);
+
+/**
+ * @brief Set the data provider of the types.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
+ * @param types Represents a pointer to a group of data types;
+ * @param count Represents the number of data types;
+ * @param provider Represents a pointer an instance of {@link OH_UdmfRecordProvider}.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdmfRecord OH_UdmfRecordProvider Udmf_ErrCode.
+ * @since 12
+ */
+int OH_UdmfRecord_SetProvider(OH_UdmfRecord* pThis, const char* const* types, unsigned int count,
+    OH_UdmfRecordProvider* provider);
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdmfProperty}
@@ -413,7 +487,7 @@ Udmf_ShareOption OH_UdmfProperty_GetShareOption(OH_UdmfProperty* pThis);
  * @since 12
  */
 int OH_UdmfProperty_GetExtrasIntParam(OH_UdmfProperty* pThis,
-                                      const char* key, int defaultValue);
+    const char* key, int defaultValue);
 
 /**
  * @brief Get tag value from the {@link OH_UdmfProperty}.
@@ -479,7 +553,7 @@ int OH_UdmfProperty_SetExtrasIntParam(OH_UdmfProperty* pThis, const char* key, i
  * @since 12
  */
 int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* pThis,
-                                         const char* key, const char* param);
+    const char* key, const char* param);
 
 /**
  * @brief Get {@link OH_UdmfData} data from udmf database.
@@ -490,7 +564,6 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* pThis,
  * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- *         {@link UDMF_ERR} Internal data error.
  * @see OH_UdmfProperty Udmf_Intention Udmf_ErrCode.
  * @since 12
  */
@@ -507,12 +580,11 @@ int OH_Udmf_GetUnifiedData(const char* key, Udmf_Intention intention, OH_UdmfDat
  * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- *         {@link UDMF_ERR} Internal data error.
  * @see OH_UdmfProperty Udmf_Intention Udmf_ErrCode.
  * @since 12
  */
 int OH_Udmf_SetUnifiedData(Udmf_Intention intention, OH_UdmfData* unifiedData,
-                           char* key, unsigned int keyLen);
+    char* key, unsigned int keyLen);
 
 #ifdef __cplusplus
 };

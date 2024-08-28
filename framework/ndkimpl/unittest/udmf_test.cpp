@@ -28,6 +28,7 @@
 #include "udmf_client.h"
 #include "plain_text.h"
 #include "udmf_meta.h"
+#include "data_provider_impl.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
@@ -44,6 +45,8 @@ public:
     static void AllocHapToken2();
     void SetHapToken1();
     bool CheckUnsignedChar(unsigned char* dst, unsigned char* src, int size);
+    static void FinalizeFunc(void* context);
+    static void* GetDataCallbackFunc(void* context, const char* type);
     static constexpr int USER_ID = 100;
     static constexpr int INST_INDEX = 0;
 };
@@ -163,6 +166,16 @@ bool UDMFTest::CheckUnsignedChar(unsigned char* dst, unsigned char* src, int siz
         }
     }
     return true;
+}
+
+void UDMFTest::FinalizeFunc(void* context) {}
+
+void* UDMFTest::GetDataCallbackFunc(void* context, const char* type)
+{
+    auto plainText = OH_UdsPlainText_Create();
+    OH_UdsPlainText_SetAbstract(plainText, "doing something");
+    OH_UdsPlainText_SetContent(plainText, "doing something");
+    return plainText;
 }
 
 /**
@@ -1235,4 +1248,140 @@ HWTEST_F(UDMFTest, OH_Udmf_MultiStyleRecord001, TestSize.Level1)
     OH_UdsAppItem_Destroy(getAppItem);
     OH_UdmfRecord_Destroy(record);
     OH_UdmfData_Destroy(data);
+}
+
+/**
+ * @tc.name: OH_UdmfRecordProvider_Create001
+ * @tc.desc: Normal testcase of OH_UdmfRecordProvider_Create
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecordProvider_Create001, TestSize.Level1)
+{
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    OH_UdmfRecordProvider_Destroy(provider);
+}
+
+/**
+ * @tc.name: OH_UdmfRecordProvider_Destroy001
+ * @tc.desc: Normal testcase of OH_UdmfRecordProvider_Destroy
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecordProvider_Destroy001, TestSize.Level1)
+{
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    int num = 1;
+    void* context = &num;
+    OH_UdmfRecordProvider_SetData(provider, context, GetDataCallbackFunc, FinalizeFunc);
+    int res1 = OH_UdmfRecordProvider_Destroy(provider);
+    EXPECT_EQ(res1, UDMF_E_OK);
+}
+
+/**
+ * @tc.name: OH_UdmfRecordProvider_Destroy002
+ * @tc.desc: invalid parameters testcase of OH_UdmfRecordProvider_Destroy
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecordProvider_Destroy002, TestSize.Level1)
+{
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    int num = 1;
+    void* context = &num;
+    OH_UdmfRecordProvider_SetData(provider, context, GetDataCallbackFunc, nullptr);
+    int res1 = OH_UdmfRecordProvider_Destroy(provider);
+    EXPECT_EQ(res1, UDMF_E_OK);
+}
+
+/**
+ * @tc.name: OH_UdmfRecordProvider_SetData001
+ * @tc.desc: Normal testcase of OH_UdmfRecordProvider_SetData
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecordProvider_SetData001, TestSize.Level1)
+{
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    int num = 1;
+    void* context = &num;
+    int res = OH_UdmfRecordProvider_SetData(provider, context, GetDataCallbackFunc, FinalizeFunc);
+    EXPECT_NE(provider->context, nullptr);
+    EXPECT_NE(provider->callback, nullptr);
+    EXPECT_NE(provider->finalize, nullptr);
+    EXPECT_EQ(res, UDMF_E_OK);
+    OH_UdmfRecordProvider_Destroy(provider);
+}
+
+/**
+ * @tc.name: OH_UdmfRecordProvider_SetData002
+ * @tc.desc: invalid parameters testcase of OH_UdmfRecordProvider_SetData
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecordProvider_SetData002, TestSize.Level1)
+{
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    int num = 1;
+    void* context = &num;
+    int res1 = OH_UdmfRecordProvider_SetData(provider, context, GetDataCallbackFunc, nullptr);
+    EXPECT_EQ(provider->context, nullptr);
+    EXPECT_EQ(provider->finalize, nullptr);
+    EXPECT_EQ(res1, UDMF_E_INVALID_PARAM);
+
+    int res2 = OH_UdmfRecordProvider_SetData(nullptr, context, GetDataCallbackFunc, nullptr);
+    EXPECT_EQ(res2, UDMF_E_INVALID_PARAM);
+
+    int res3 = OH_UdmfRecordProvider_SetData(provider, context, nullptr, nullptr);
+    EXPECT_EQ(res3, UDMF_E_INVALID_PARAM);
+    OH_UdmfRecordProvider_Destroy(provider);
+}
+
+/**
+ * @tc.name: OH_UdmfRecord_SetProvider001
+ * @tc.desc: Normal testcase of OH_UdmfRecord_SetProvider
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider001, TestSize.Level1)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
+    char content[] = "hello world";
+    OH_UdsPlainText_SetContent(plainText, content);
+    OH_UdmfRecord_AddPlainText(record, plainText);
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    int num = 1;
+    void* context = &num;
+    OH_UdmfRecordProvider_SetData(provider, context, GetDataCallbackFunc, FinalizeFunc);
+    const char* types[3] = { "general.plain-text", "general.hyperlink", "general.html" };
+    
+    int res = OH_UdmfRecord_SetProvider(record, types, 3, provider);
+    EXPECT_EQ(res, UDMF_E_OK);
+    OH_UdmfRecordProvider_Destroy(provider);
+}
+
+/**
+ * @tc.name: OH_UdmfRecord_SetProvider002
+ * @tc.desc: invalid parameters testcase of OH_UdmfRecord_SetProvider
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider002, TestSize.Level1)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
+    char content[] = "hello world";
+    OH_UdsPlainText_SetContent(plainText, content);
+    OH_UdmfRecord_AddPlainText(record, plainText);
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    int num = 1;
+    void* context = &num;
+    OH_UdmfRecordProvider_SetData(provider, context, GetDataCallbackFunc, FinalizeFunc);
+    const char* types[3] = { "general.plain-text", "general.hyperlink", "general.html" };
+    
+    int res = OH_UdmfRecord_SetProvider(record, types, 3, provider);
+    EXPECT_EQ(res, UDMF_E_OK);
+    OH_UdmfRecordProvider_Destroy(provider);
+}
 }

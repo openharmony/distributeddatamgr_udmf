@@ -27,6 +27,22 @@ bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid)
     return pThis == nullptr || pThis->cid != cid || pThis->obj == nullptr;
 }
 
+bool IsInvalidUdsObjectByType(const UdsObject* pThis, const UDType& type)
+{
+    switch(type) {
+        case PLAIN_TEXT:
+            return IsInvalidUdsObjectPtr(pThis, UDS_PLAIN_TEXT_STRUCT_ID);
+        case HYPERLINK:
+            return IsInvalidUdsObjectPtr(pThis, UDS_HYPERLINK_STRUCT_ID);
+        case HTML:
+            return IsInvalidUdsObjectPtr(pThis, UDS_HTML_STRUCT_ID);
+        case SYSTEM_DEFINED_APP_ITEM:
+            return IsInvalidUdsObjectPtr(pThis, UDS_APP_ITEM_STRUCT_ID);
+        default:
+            return false;
+    }
+}
+
 UdsObject::UdsObject(const int cid) : cid(cid) {}
 
 OH_UdsPlainText::OH_UdsPlainText() : UdsObject(NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID) {}

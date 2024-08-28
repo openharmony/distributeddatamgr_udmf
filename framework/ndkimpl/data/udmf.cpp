@@ -14,8 +14,8 @@
  */
 #define LOG_TAG "Udmf"
 #include "udmf.h"
-#include <cstring>
 #include "udmf_err_code.h"
+#include "data_provider_impl.h"
 #include "udmf_client.h"
 #include "securec.h"
 #include "udmf_capi_common.h"
@@ -559,5 +559,63 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* properties, const char
     }
     std::lock_guard<std::mutex> lock(properties->mutex);
     properties->properties_->extras.SetParam(key, OHOS::AAFwk::String::Box(param));
+    return UDMF_E_OK;
+}
+
+OH_UdmfRecordProvider* OH_UdmfRecordProvider_Create()
+{
+    OH_UdmfRecordProvider* provider = new (std::nothrow) OH_UdmfRecordProvider();
+    if (provider == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "allocate OH_UdmfRecordProvider memory fail");
+    }
+    return provider;
+}
+
+int OH_UdmfRecordProvider_Destroy(OH_UdmfRecordProvider* provider)
+{
+    if (provider == nullptr) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    if (provider->context != nullptr && provider->finalize != nullptr) {
+        (provider->finalize)(provider->context);
+        LOG_INFO(UDMF_CAPI, "free context finished");
+    }
+    delete provider;
+    return UDMF_E_OK;
+}
+
+int OH_UdmfRecordProvider_SetData(OH_UdmfRecordProvider* provider, void* context,
+    const OH_UdmfRecordProvider_GetData callback, const UdmfData_Finalize finalize)
+{
+    if (provider == nullptr || callback == nullptr) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    provider->callback = callback;
+    if (context != nullptr && finalize == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "finalize function is null when context not null");
+        return UDMF_E_INVALID_PARAM;
+    }
+    provider->context = context;
+    provider->finalize = finalize;
+    return UDMF_E_OK;
+}
+
+int OH_UdmfRecord_SetProvider(OH_UdmfRecord* record, const char* const* types, unsigned int count,
+    OH_UdmfRecordProvider* provider)
+{
+    if (!IsUnifiedRecordValid(record) || types == nullptr || count == 0 || provider == nullptr) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    std::shared_ptr<DataProviderImpl> providerBox = std::make_shared<DataProviderImpl>();
+    providerBox->SetInnerProvider(provider);
+    std::set<std::string> udTypes;
+    for (unsigned int i = 0; i < count; ++i) {
+        if (types[i] == nullptr) {
+            LOG_ERROR(UDMF_CAPI, "The type with index %{public}d is empty", i);
+            continue;
+        }
+        udTypes.emplace(types[i]);
+    }
+    record->record_->SetEntryGetter(udTypes, providerBox);
     return UDMF_E_OK;
 }

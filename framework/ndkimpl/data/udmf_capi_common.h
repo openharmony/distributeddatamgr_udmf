@@ -99,4 +99,6 @@ struct OH_UdmfProperty {
 
 bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid);
 
+bool IsInvalidUdsObjectByType(const UdsObject* pThis, const OHOS::UDMF::UDType& type);
+
 #endif
