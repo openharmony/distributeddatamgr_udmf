@@ -40,8 +40,6 @@
 #ifndef UDS_H
 #define UDS_H
 
-#include "pixelmap_native_impl.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -87,6 +85,13 @@ typedef struct OH_UdsFileUri OH_UdsFileUri;
  * @since 13
  */
 typedef struct OH_UdsPixelMap OH_UdsPixelMap;
+
+/**
+ * @brief Describes the of pixel map native.
+ *
+ * @since 13
+ */
+struct OH_PixelmapNative;
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdsPlainText}.
