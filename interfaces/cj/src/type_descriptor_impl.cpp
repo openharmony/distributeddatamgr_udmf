@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-
+#include "type_descriptor_ffi.h"
 #include "type_descriptor_impl.h"
 #include "cj_common_ffi.h"
 
