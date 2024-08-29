@@ -55,7 +55,7 @@ void UtdGraph::InitUtdGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs
     typeIdIndex_.clear();
     uint32_t descriptorsNum = static_cast<uint32_t>(descriptorCfgs.size());
     std::unique_lock<std::mutex> lock(graphMutex_);
-    graph_ = new Graph(descriptorsNum);
+    graph_ = std::make_unique<Graph>(descriptorsNum);
     for (uint32_t i = 0; i < descriptorsNum; i++) {
         typeIdIndex_.insert(std::make_pair(descriptorCfgs[i].typeId, i));
     }
