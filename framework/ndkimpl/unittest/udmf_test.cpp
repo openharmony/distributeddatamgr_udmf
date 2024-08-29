@@ -504,11 +504,11 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData001, TestSize.Level0)
     char key[UDMF_KEY_BUFFER_LEN];
 
     int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
-    EXPECT_EQ(setRes, UDMF_E_OK);
+    ASSERT_EQ(setRes, UDMF_E_OK);
     EXPECT_NE(key[0], '\0');
     OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
     int getRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
-    EXPECT_EQ(getRes, UDMF_E_OK);
+    ASSERT_EQ(getRes, UDMF_E_OK);
     unsigned int count = 0;
     OH_UdmfRecord **getRecords = OH_UdmfData_GetRecords(readUnifiedData, &count);
     EXPECT_EQ(count, 1);
@@ -544,7 +544,7 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData002, TestSize.Level0)
     char key[UDMF_KEY_BUFFER_LEN];
 
     int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
-    EXPECT_EQ(setRes, UDMF_E_OK);
+    ASSERT_EQ(setRes, UDMF_E_OK);
     EXPECT_NE(key[0], '\0');
     OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
     int getUnifiedDataRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
@@ -556,7 +556,7 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData002, TestSize.Level0)
     unsigned char *getEntry;
     unsigned int getCount = 0;
     int getRes = OH_UdmfRecord_GetGeneralEntry(getRecords[0], typeId, &getEntry, &getCount);
-    EXPECT_EQ(getRes, UDMF_E_OK);
+    ASSERT_EQ(getRes, UDMF_E_OK);
     EXPECT_EQ(getCount, count);
     EXPECT_EQ(std::memcmp(getEntry, entry, getCount), 0);
 
@@ -649,7 +649,7 @@ HWTEST_F(UDMFTest, OH_Udmf_AddAndGetGeneralEntry002, TestSize.Level0)
     unsigned int count = sizeof(entry);
     OH_UdmfRecord *record = OH_UdmfRecord_Create();
     int addRes1 = OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
-    EXPECT_EQ(addRes1, UDMF_E_OK);
+    ASSERT_EQ(addRes1, UDMF_E_OK);
 
     unsigned int getCount = 0;
     unsigned char *getEntry;
@@ -1119,5 +1119,403 @@ HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesExtrasStringParam001, TestSize.Level1)
     EXPECT_EQ(str, actualStr);
     OH_UdmfData_Destroy(data);
     OH_UdmfProperty_Destroy(properties);
+}
+
+/**
+ * @tc.name: OH_UdmfData_GetPrimaryPlainText001
+ * @tc.desc: Normal testcase of OH_UdmfData_GetPrimaryPlainText
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryPlainText001, TestSize.Level1)
+{
+    int result = OH_UdmfData_GetPrimaryPlainText(nullptr, nullptr);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfData data;
+    int result2 = OH_UdmfData_GetPrimaryPlainText(&data, nullptr);
+    EXPECT_EQ(result2, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfData *data2 = OH_UdmfData_Create();
+    int result3 = OH_UdmfData_GetPrimaryPlainText(data2, nullptr);
+    EXPECT_EQ(result3, UDMF_E_INVALID_PARAM);
+
+    OH_UdsPlainText plainText;
+    int result4 = OH_UdmfData_GetPrimaryPlainText(data2, &plainText);
+    EXPECT_EQ(result4, UDMF_E_INVALID_PARAM);
+
+    OH_UdsPlainText *plainText2 = OH_UdsPlainText_Create();
+    int result5 = OH_UdmfData_GetPrimaryPlainText(data2, plainText2);
+    EXPECT_EQ(result5, UDMF_ERR);
+
+    OH_UdsPlainText_Destroy(plainText2);
+    OH_UdmfData_Destroy(data2);
+}
+
+/**
+ * @tc.name: OH_UdmfData_GetPrimaryPlainText002
+ * @tc.desc: Normal testcase of OH_UdmfData_GetPrimaryPlainText
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryPlainText002, TestSize.Level1)
+{
+    const char *HELLOWORLD = "Hello world";
+
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdsPlainText *plainTextOutput = OH_UdsPlainText_Create();
+    int result = OH_UdmfData_GetPrimaryPlainText(data, plainTextOutput);
+    EXPECT_EQ(result, UDMF_ERR);
+
+    OH_UdmfData *data2 = OH_UdmfData_Create();
+    OH_UdsHtml *html = OH_UdsHtml_Create();
+    OH_UdsHtml_SetContent(html, "<p>Hello world</p>");
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddHtml(record, html);
+    OH_UdmfData_AddRecord(data2, record);
+    int result2 = OH_UdmfData_GetPrimaryPlainText(data2, plainTextOutput);
+    EXPECT_EQ(result2, UDMF_ERR);
+
+    OH_UdmfData *data3 = OH_UdmfData_Create();
+    OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
+    OH_UdsPlainText_SetContent(plainText, HELLOWORLD);
+    OH_UdmfRecord *record2 = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddPlainText(record2, plainText);
+    OH_UdmfData_AddRecord(data3, record);
+    OH_UdmfData_AddRecord(data3, record2);
+    int result3 = OH_UdmfData_GetPrimaryPlainText(data3, plainTextOutput);
+    ASSERT_EQ(result3, UDMF_E_OK);
+    auto *content = OH_UdsPlainText_GetContent(plainTextOutput);
+    EXPECT_EQ(strcmp(content, HELLOWORLD), 0);
+
+    OH_UdsHtml_Destroy(html);
+    OH_UdsPlainText_Destroy(plainTextOutput);
+    OH_UdsPlainText_Destroy(plainText);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfRecord_Destroy(record2);
+    OH_UdmfData_Destroy(data);
+    OH_UdmfData_Destroy(data2);
+    OH_UdmfData_Destroy(data3);
+}
+
+/**
+ * @tc.name: OH_UdmfData_GetPrimaryPlainText003
+ * @tc.desc: Normal testcase of OH_UdmfData_GetPrimaryPlainText
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryPlainText003, TestSize.Level1)
+{
+    const char *HELLOWORLD = "Hello world";
+    const char *HELLOWORLD2 = "Hello world2";
+
+    OH_UdsHtml *html = OH_UdsHtml_Create();
+    OH_UdsHtml_SetContent(html, "<p>Hello world</p>");
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddHtml(record, html);
+
+    OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
+    OH_UdsPlainText_SetContent(plainText, HELLOWORLD);
+    OH_UdmfRecord *record2 = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddPlainText(record2, plainText);
+
+
+    OH_UdsPlainText *plainText2 = OH_UdsPlainText_Create();
+    OH_UdsPlainText_SetContent(plainText2, HELLOWORLD2);
+    OH_UdmfRecord* record3 = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddPlainText(record3, plainText2);
+
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfData_AddRecord(data, record3);
+    OH_UdmfData_AddRecord(data, record2);
+    OH_UdmfData_AddRecord(data, record);
+    OH_UdsPlainText *plainTextOutput = OH_UdsPlainText_Create();
+    int result4 = OH_UdmfData_GetPrimaryPlainText(data, plainTextOutput);
+    ASSERT_EQ(result4, UDMF_E_OK);
+    auto *content2 = OH_UdsPlainText_GetContent(plainTextOutput);
+    EXPECT_EQ(strcmp(content2, HELLOWORLD2), 0);
+
+    OH_UdsHtml_Destroy(html);
+    OH_UdsPlainText_Destroy(plainTextOutput);
+    OH_UdsPlainText_Destroy(plainText);
+    OH_UdsPlainText_Destroy(plainText2);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfRecord_Destroy(record2);
+    OH_UdmfRecord_Destroy(record3);
+    OH_UdmfData_Destroy(data);
+}
+
+/**
+ * @tc.name: OH_UdmfData_GetPrimaryHtml001
+ * @tc.desc: Normal testcase of OH_UdmfData_GetPrimaryHtml
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryHtml001, TestSize.Level1)
+{
+    int result1 = OH_UdmfData_GetPrimaryHtml(nullptr, nullptr);
+    EXPECT_EQ(result1, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfData data;
+    int result2 = OH_UdmfData_GetPrimaryHtml(&data, nullptr);
+    EXPECT_EQ(result2, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfData *data2 = OH_UdmfData_Create();
+    int result3 = OH_UdmfData_GetPrimaryHtml(data2, nullptr);
+    EXPECT_EQ(result3, UDMF_E_INVALID_PARAM);
+
+    OH_UdsHtml html;
+    int result4 = OH_UdmfData_GetPrimaryHtml(data2, &html);
+    EXPECT_EQ(result4, UDMF_E_INVALID_PARAM);
+
+    OH_UdsHtml *html2 = OH_UdsHtml_Create();
+    int result5 = OH_UdmfData_GetPrimaryHtml(data2, html2);
+    EXPECT_EQ(result5, UDMF_ERR);
+
+    OH_UdsHtml_Destroy(html2);
+    OH_UdmfData_Destroy(data2);
+}
+
+/**
+ * @tc.name: OH_UdmfData_GetPrimaryHtml002
+ * @tc.desc: Normal testcase of OH_UdmfData_GetPrimaryHtml
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryHtml002, TestSize.Level1)
+{
+    const char *HELLOWORLD = "<p>Hello world</p>";
+
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdsHtml *htmlOutput = OH_UdsHtml_Create();
+    int result = OH_UdmfData_GetPrimaryHtml(data, htmlOutput);
+    EXPECT_EQ(result, UDMF_ERR);
+
+    OH_UdmfData *data2 = OH_UdmfData_Create();
+    OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
+    OH_UdsPlainText_SetContent(plainText, "Hello world");
+    OH_UdmfRecord* record = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddPlainText(record, plainText);
+    OH_UdmfData_AddRecord(data2, record);
+    int result2 = OH_UdmfData_GetPrimaryHtml(data2, htmlOutput);
+    EXPECT_EQ(result2, UDMF_ERR);
+
+    OH_UdmfData *data3 = OH_UdmfData_Create();
+    OH_UdsHtml *html = OH_UdsHtml_Create();
+    OH_UdsHtml_SetContent(html, HELLOWORLD);
+    OH_UdmfRecord* record2 = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddHtml(record2, html);
+    OH_UdmfData_AddRecord(data3, record);
+    OH_UdmfData_AddRecord(data3, record2);
+    int result3 = OH_UdmfData_GetPrimaryHtml(data3, htmlOutput);
+    ASSERT_EQ(result3, UDMF_E_OK);
+    auto content = OH_UdsHtml_GetContent(htmlOutput);
+    EXPECT_EQ(strcmp(content, HELLOWORLD), 0);
+
+    OH_UdsHtml_Destroy(html);
+    OH_UdsHtml_Destroy(htmlOutput);
+    OH_UdsPlainText_Destroy(plainText);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfRecord_Destroy(record2);
+    OH_UdmfData_Destroy(data);
+    OH_UdmfData_Destroy(data2);
+    OH_UdmfData_Destroy(data3);
+}
+
+/**
+ * @tc.name: OH_UdmfData_GetPrimaryHtml003
+ * @tc.desc: Normal testcase of OH_UdmfData_GetPrimaryHtml
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryHtml003, TestSize.Level1)
+{
+    const char *HELLOWORLD = "<p>Hello world</p>";
+    const char *HELLOWORLD2 = "<p>Hello world2</p>";
+
+    OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
+    OH_UdsPlainText_SetContent(plainText, "Hello world");
+    OH_UdmfRecord* record = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddPlainText(record, plainText);
+
+    OH_UdsHtml *html = OH_UdsHtml_Create();
+    OH_UdsHtml_SetContent(html, HELLOWORLD);
+    OH_UdmfRecord* record2 = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddHtml(record2, html);
+
+    OH_UdsHtml *html2 = OH_UdsHtml_Create();
+    OH_UdsHtml_SetContent(html2, HELLOWORLD2);
+    OH_UdmfRecord* record3 = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddHtml(record3, html2);
+
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfData_AddRecord(data, record3);
+    OH_UdmfData_AddRecord(data, record2);
+    OH_UdmfData_AddRecord(data, record);
+    OH_UdsHtml *htmlOutput = OH_UdsHtml_Create();
+    int result4 = OH_UdmfData_GetPrimaryHtml(data, htmlOutput);
+    ASSERT_EQ(result4, UDMF_E_OK);
+    auto content2 = OH_UdsHtml_GetContent(htmlOutput);
+    EXPECT_EQ(strcmp(content2, HELLOWORLD2), 0);
+
+    OH_UdsHtml_Destroy(html);
+    OH_UdsHtml_Destroy(html2);
+    OH_UdsHtml_Destroy(htmlOutput);
+    OH_UdsPlainText_Destroy(plainText);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfRecord_Destroy(record2);
+    OH_UdmfRecord_Destroy(record3);
+    OH_UdmfData_Destroy(data);
+}
+
+/**
+ * @tc.name: OH_UdmfData_GetRecordCount001
+ * @tc.desc: Normal testcase of OH_UdmfData_GetRecordCount
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfData_GetRecordCount001, TestSize.Level1)
+{
+    int result = OH_UdmfData_GetRecordCount(nullptr);
+    EXPECT_EQ(result, 0);
+
+    OH_UdmfData data;
+    int result2 = OH_UdmfData_GetRecordCount(&data);
+    EXPECT_EQ(result2, 0);
+
+    OH_UdmfData *data2 = OH_UdmfData_Create();
+    int result3 = OH_UdmfData_GetRecordCount(data2);
+    EXPECT_EQ(result3, 0);
+
+    OH_UdmfData *data3 = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdmfData_AddRecord(data3, record);
+    int result4 = OH_UdmfData_GetRecordCount(data3);
+    EXPECT_EQ(result4, 1);
+
+    OH_UdmfData *data4 = OH_UdmfData_Create();
+    OH_UdmfRecord *record2 = OH_UdmfRecord_Create();
+    OH_UdmfData_AddRecord(data4, record);
+    OH_UdmfData_AddRecord(data4, record2);
+    int result5 = OH_UdmfData_GetRecordCount(data4);
+    EXPECT_EQ(result5, 2);
+
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfRecord_Destroy(record2);
+    OH_UdmfData_Destroy(data2);
+    OH_UdmfData_Destroy(data3);
+    OH_UdmfData_Destroy(data4);
+}
+
+/**
+ * @tc.name: OH_UdmfData_GetRecord001
+ * @tc.desc: Normal testcase of OH_UdmfData_GetRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfData_GetRecord001, TestSize.Level1)
+{
+    OH_UdmfRecord *result = OH_UdmfData_GetRecord(nullptr, -1);
+    EXPECT_EQ(result, nullptr);
+
+    OH_UdmfData data;
+    OH_UdmfRecord *result2 = OH_UdmfData_GetRecord(&data, -1);
+    EXPECT_EQ(result2, nullptr);
+
+    OH_UdmfRecord *result3 = OH_UdmfData_GetRecord(&data, 0);
+    EXPECT_EQ(result3, nullptr);
+
+    OH_UdmfData *data2 = OH_UdmfData_Create();
+    OH_UdmfRecord *result4 = OH_UdmfData_GetRecord(data2, -1);
+    EXPECT_EQ(result4, nullptr);
+
+    OH_UdmfRecord *result5 = OH_UdmfData_GetRecord(data2, 0);
+    EXPECT_EQ(result5, nullptr);
+
+    OH_UdmfRecord *result6 = OH_UdmfData_GetRecord(data2, 1);
+    EXPECT_EQ(result6, nullptr);
+
+    OH_UdmfData *data3 = OH_UdmfData_Create();
+    OH_UdmfRecord* record = OH_UdmfRecord_Create();
+    OH_UdmfData_AddRecord(data3, record);
+    EXPECT_EQ(OH_UdmfData_GetRecordCount(data3), 1);
+    OH_UdmfRecord *result7 = OH_UdmfData_GetRecord(data3, -1);
+    EXPECT_EQ(result7, nullptr);
+    OH_UdmfRecord *result8 = OH_UdmfData_GetRecord(data3, 1);
+    EXPECT_EQ(result8, nullptr);
+    OH_UdmfRecord *result9 = OH_UdmfData_GetRecord(data3, 0);
+    EXPECT_NE(result9, nullptr);
+
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(data2);
+    OH_UdmfData_Destroy(data3);
+}
+
+/**
+ * @tc.name: OH_UdmfData_GetRecord002
+ * @tc.desc: Normal testcase of OH_UdmfData_GetRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfData_GetRecord002, TestSize.Level1)
+{
+    const char *HELLOWORLD = "Hello world";
+    const char *HELLOWORLD2 = "Hello world2";
+
+    OH_UdmfData *data3 = OH_UdmfData_Create();
+    OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
+    OH_UdsPlainText_SetContent(plainText, HELLOWORLD);
+    OH_UdmfRecord* record = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddPlainText(record, plainText);
+    OH_UdmfData_AddRecord(data3, record);
+    OH_UdmfRecord *result9 = OH_UdmfData_GetRecord(data3, 0);
+    EXPECT_NE(result9, nullptr);
+    OH_UdsPlainText *plainText2 = OH_UdsPlainText_Create();
+    OH_UdmfRecord_GetPlainText(result9, plainText2);
+    auto content = OH_UdsPlainText_GetContent(plainText2);
+    EXPECT_EQ(strcmp(content, HELLOWORLD), 0);
+
+    OH_UdmfData *data4 = OH_UdmfData_Create();
+    OH_UdsPlainText *plainText3 = OH_UdsPlainText_Create();
+    OH_UdsPlainText_SetContent(plainText3, HELLOWORLD2);
+    OH_UdmfRecord* record2 = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddPlainText(record2, plainText3);
+    OH_UdmfData_AddRecord(data4, record);
+    OH_UdmfData_AddRecord(data4, record2);
+    OH_UdmfRecord *result10 = OH_UdmfData_GetRecord(data4, -1);
+    EXPECT_EQ(result10, nullptr);
+    OH_UdmfRecord *result11 = OH_UdmfData_GetRecord(data4, 2);
+    EXPECT_EQ(result11, nullptr);
+    OH_UdmfRecord *result12 = OH_UdmfData_GetRecord(data4, 0);
+    ASSERT_NE(result12, nullptr);
+    OH_UdsPlainText *plainText4 = OH_UdsPlainText_Create();
+    OH_UdmfRecord_GetPlainText(result12, plainText4);
+    auto content2 = OH_UdsPlainText_GetContent(plainText4);
+    EXPECT_EQ(strcmp(content2, HELLOWORLD), 0);
+    OH_UdmfRecord *result13 = OH_UdmfData_GetRecord(data4, 1);
+    ASSERT_NE(result13, nullptr);
+    OH_UdsPlainText *plainText5 = OH_UdsPlainText_Create();
+    OH_UdmfRecord_GetPlainText(result13, plainText5);
+    auto content3 = OH_UdsPlainText_GetContent(plainText5);
+    EXPECT_EQ(strcmp(content3, HELLOWORLD2), 0);
+
+    OH_UdsPlainText_Destroy(plainText);
+    OH_UdsPlainText_Destroy(plainText2);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfRecord_Destroy(record2);
+    OH_UdmfData_Destroy(data3);
+    OH_UdmfData_Destroy(data4);
+}
+
+/**
+ * @tc.name: OH_UdmfData_IsLocal001
+ * @tc.desc: Normal testcase of OH_UdmfData_IsLocal
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfData_IsLocal001, TestSize.Level1)
+{
+    bool result = OH_UdmfData_IsLocal(nullptr);
+    EXPECT_EQ(result, true);
+
+    OH_UdmfData data;
+    bool result2 = OH_UdmfData_IsLocal(&data);
+    EXPECT_EQ(result2, true);
+
+    OH_UdmfData *data2 = OH_UdmfData_Create();
+    bool result3 = OH_UdmfData_IsLocal(data2);
+    EXPECT_EQ(result3, true);
+
+    OH_UdmfData_Destroy(data2);
 }
 }
