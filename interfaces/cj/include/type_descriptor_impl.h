@@ -28,6 +28,7 @@ namespace UDMF {
     class CTypeDescriptor : public OHOS::FFI::FFIData {
         DECL_TYPE(CTypeDescriptor, OHOS::FFI::FFIData)
         public:
+            CTypeDescriptor();
             CTypeDescriptor(std::shared_ptr<UDMF::TypeDescriptor> typeDescriptor);
 
             char * GetTypeId();

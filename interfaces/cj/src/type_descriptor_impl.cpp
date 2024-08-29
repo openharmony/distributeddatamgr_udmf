@@ -30,6 +30,9 @@ using namespace OHOS::UDMF;
 
 namespace OHOS {
 namespace UDMF {
+    CTypeDescriptor::CTypeDescriptor(){
+        typeDescriptor_=nullptr;
+    }
 
     CTypeDescriptor::CTypeDescriptor(std::shared_ptr<UDMF::TypeDescriptor> typeDescriptor)
     {
