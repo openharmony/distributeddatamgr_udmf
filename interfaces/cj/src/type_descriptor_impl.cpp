@@ -39,7 +39,7 @@ namespace UDMF {
         typeDescriptor_ = typeDescriptor;
     }
 
-    char * CTypeDescriptor::GetTypeId(const char *type)
+    char * CTypeDescriptor::GetTypeId()
     {
         std::string ret = typeDescriptor_->GetTypeId();
         return Utils::MallocCString(ret);
@@ -51,19 +51,19 @@ namespace UDMF {
         return Utils::StringVectorToArray(types);
     }
 
-    char * CTypeDescriptor::GetDescription(const char *type)
+    char * CTypeDescriptor::GetDescription()
     {
         std::string ret = typeDescriptor_->GetDescription();
         return Utils::MallocCString(ret);
     }
 
-    char * CTypeDescriptor::GetIconFile(const char *type)
+    char * CTypeDescriptor::GetIconFile()
     {
         std::string ret = typeDescriptor_->GetIconFile();
         return Utils::MallocCString(ret);
     }
 
-    char * CTypeDescriptor::GetReferenceURL(const char *type)
+    char * CTypeDescriptor::GetReferenceURL()
     {
         std::string ret = typeDescriptor_->GetReferenceURL();
         return Utils::MallocCString(ret);
