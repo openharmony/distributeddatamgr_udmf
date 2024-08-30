@@ -21,11 +21,14 @@
 #include "uniform_type_descriptor_ffi.h"
 #include "type_descriptor.h"
 #include "cj_common_ffi.h"
+#include "udmf_log.h"
 
 namespace OHOS {
 namespace UDMF {
     using namespace OHOS::UDMF;
     int64_t GetTypeDescriptor(const char *typeId);
+    char * GetUniformDataTypeByFilenameExtension(const char *cFilenameExtension, const char *cBelongsTo);
+    char * GetUniformDataTypeByMIMEType(const char *cMimeType, const char *cBelongsTo);
 }
 } // namespace OHOS::UDMF
 

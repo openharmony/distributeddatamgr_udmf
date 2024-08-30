@@ -32,7 +32,8 @@ using namespace OHOS::UDMF;
 
 namespace OHOS {
 namespace UDMF {
-    int64_t GetTypeDescriptor(const char *typeId){
+    int64_t GetTypeDescriptor(const char *typeId)
+    {
         std::shared_ptr<TypeDescriptor> descriptor;
         UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
         if (descriptor == nullptr) {
@@ -43,6 +44,52 @@ namespace UDMF {
             return -1;
         }
         return nativeCJTypeDescriptor->GetID();
+    }
+
+    
+    char * GetUniformDataTypeByFilenameExtension(const char *cFilenameExtension, const char *cBelongsTo)
+    {
+        std::string typeId;
+        auto status = E_OK;
+        if (cBelongsTo == nullptr) {
+            LOGD("call GetUniformDataTypeByFilenameExtension with cBelongsTo")
+            status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(cFilenameExtension, typeId);
+        } else {
+            LOGD("call GetUniformDataTypeByFilenameExtension with not cBelongsTo")
+            status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(cFilenameExtension, typeId, cBelongsTo);
+        }
+        if(status != E_OK){
+            LOGE("invalid arguments!")
+            return "";
+        }
+        if (!typeId.empty()) {
+            retturn Utils::MallocCString(typeId);
+        } else {
+            return "";
+        }
+
+    }
+
+    char * GetUniformDataTypeByMIMEType(const char *cMimeType, const char *cBelongsTo)
+    {
+        std::string typeId;
+        auto status = E_OK;
+        if (cBelongsTo == nullptr) {
+            LOGD("call GetUniformDataTypeByMIMEType with cBelongsTo")
+            status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(cMimeType, typeId);
+        } else {
+            LOGD("call GetUniformDataTypeByMIMEType with not cBelongsTo")
+            status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(cMimeType, typeId, cBelongsTo);
+        }
+        if(status != E_OK){
+            LOGE("invalid arguments!")
+            return "";
+        }
+        if (!typeId.empty()) {
+            retturn Utils::MallocCString(typeId);
+        } else {
+            return "";
+        }
     }
 
 }

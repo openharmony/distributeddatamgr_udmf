@@ -26,6 +26,8 @@ namespace OHOS {
 namespace UDMF {
 extern "C" {
     FFI_EXPORT int64_t FfiUDMFUniformTypeDescriptorGetTypeDescriptor(const char *typeId);
+    FFI_EXPORT char * FfiUDMFUniformTypeDescriptorGetUniformDataTypeByFilenameExtension(const char *cFilenameExtension, const char *cBelongsTo);
+    FFI_EXPORT char * FfiUDMFUniformTypeDescriptorGetUniformDataTypeByMIMEType(const char *cMimeType, const char *cBelongsTo);
 }
 }
 }

@@ -28,6 +28,11 @@ if (HiLogIsLoggable(LOG_DOMAIN, LOG_TAG, LOG_INFO)) {       \
     HILOG_INFO(LOG_CORE, ##__VA_ARGS__);                    \
 }
 
+#define LOGD(...)                                           \
+if (HiLogIsLoggable(LOG_DOMAIN, LOG_TAG, LOG_DEBUG)) {      \
+    HILOG_INFO(LOG_CORE, ##__VA_ARGS__);                    \
+}
+
 #define LOGE(...)                                           \
 if (HiLogIsLoggable(LOG_DOMAIN, LOG_TAG, LOG_ERROR)) {      \
     HILOG_ERROR(LOG_CORE, __VA_ARGS__);                     \
