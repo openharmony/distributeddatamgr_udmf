@@ -39,4 +39,4 @@ private:
 } // namespace UDMF
 } // namespace OHOS
 
-#endif
+#endif /* DATA_PROVIDER_IMPL_H */
