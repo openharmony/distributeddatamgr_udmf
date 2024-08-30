@@ -49,14 +49,15 @@ namespace UDMF {
     
     char * GetUniformDataTypeByFilenameExtension(const char *cFilenameExtension, const char *cBelongsTo)
     {
+        std::string belongsTo = cBelongsTo
         std::string typeId;
         auto status = E_OK;
-        if (cBelongsTo == "") {
-            LOGI("call GetUniformDataTypeByFilenameExtension with cBelongsTo")
+        if (belongsTo.empty()) {
+            LOGI("call GetUniformDataTypeByFilenameExtension with not cBelongsTo")
             status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(cFilenameExtension, typeId);
         } else {
-            LOGI("call GetUniformDataTypeByFilenameExtension with not cBelongsTo")
-            status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(cFilenameExtension, typeId, cBelongsTo);
+            LOGI("call GetUniformDataTypeByFilenameExtension with cBelongsTo")
+            status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(cFilenameExtension, typeId, belongsTo);
         }
         if(status != E_OK){
             LOGE("invalid arguments!")
@@ -72,14 +73,15 @@ namespace UDMF {
 
     char * GetUniformDataTypeByMIMEType(const char *cMimeType, const char *cBelongsTo)
     {
+        std::string belongsTo = cBelongsTo
         std::string typeId;
         auto status = E_OK;
-        if (cBelongsTo == "") {
-            LOGI("call GetUniformDataTypeByMIMEType with cBelongsTo")
+        if (belongsTo.empty()) {
+            LOGI("call GetUniformDataTypeByMIMEType with not cBelongsTo")
             status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(cMimeType, typeId);
         } else {
-            LOGI("call GetUniformDataTypeByMIMEType with not cBelongsTo")
-            status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(cMimeType, typeId, cBelongsTo);
+            LOGI("call GetUniformDataTypeByMIMEType with cBelongsTo")
+            status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(cMimeType, typeId, belongsTo);
         }
         if(status != E_OK){
             LOGE("invalid arguments!")
