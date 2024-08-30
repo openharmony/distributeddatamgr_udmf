@@ -109,7 +109,7 @@ private:
     bool ReadHead(TLVHead &head);
     void WriteHead(uint16_t type, size_t tagCursor, uint32_t len);
     bool HasExpectBuffer(const uint32_t expectLen) const;
-    void PrepareHeader(size_t size, size_t &tagCursor, size_t &valueCursor);
+    bool PrepareHeader(size_t size, size_t &tagCursor, size_t &valueCursor);
     void PrepareBuffer(size_t size);
     bool SaveBufferToFile();
     bool LoadBufferFormFile(size_t size);
