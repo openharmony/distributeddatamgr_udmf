@@ -52,10 +52,10 @@ namespace UDMF {
         std::string typeId;
         auto status = E_OK;
         if (cBelongsTo == nullptr) {
-            LOGD("call GetUniformDataTypeByFilenameExtension with cBelongsTo")
+            LOGI("call GetUniformDataTypeByFilenameExtension with cBelongsTo")
             status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(cFilenameExtension, typeId);
         } else {
-            LOGD("call GetUniformDataTypeByFilenameExtension with not cBelongsTo")
+            LOGI("call GetUniformDataTypeByFilenameExtension with not cBelongsTo")
             status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(cFilenameExtension, typeId, cBelongsTo);
         }
         if(status != E_OK){
@@ -75,10 +75,10 @@ namespace UDMF {
         std::string typeId;
         auto status = E_OK;
         if (cBelongsTo == nullptr) {
-            LOGD("call GetUniformDataTypeByMIMEType with cBelongsTo")
+            LOGI("call GetUniformDataTypeByMIMEType with cBelongsTo")
             status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(cMimeType, typeId);
         } else {
-            LOGD("call GetUniformDataTypeByMIMEType with not cBelongsTo")
+            LOGI("call GetUniformDataTypeByMIMEType with not cBelongsTo")
             status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(cMimeType, typeId, cBelongsTo);
         }
         if(status != E_OK){
