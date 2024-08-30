@@ -12,21 +12,75 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #define LOG_TAG "UnifiedRecordTest"
 
+#include <unistd.h>
 #include <gtest/gtest.h>
+#include <string>
 
+#include "logger.h"
+#include "udmf_capi_common.h"
 #include "unified_record.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
+using namespace OHOS;
+namespace OHOS::Test {
+using namespace std;
 
 class UnifiedRecordTest : public testing::Test {
 public:
-    void SetUp(){};
-    void TearDown(){};
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    void SetUp() override;
+    void TearDown() override;
 };
+
+void UnifiedRecordTest::SetUpTestCase()
+{
+}
+
+void UnifiedRecordTest::TearDownTestCase()
+{
+}
+
+void UnifiedRecordTest::SetUp()
+{
+}
+
+void UnifiedRecordTest::TearDown()
+{
+}
+
+/**
+* @tc.name: GetSize001
+* @tc.desc: Normal testcase of GetSize
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedRecordTest, GetSize001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSize001 begin.");
+    UnifiedRecord unifiedRecord;
+    int64_t ret = unifiedRecord.GetSize();
+    EXPECT_EQ(ret, 0);
+    LOG_INFO(UDMF_TEST, "GetSize001 end.");
+}
+
+/**
+* @tc.name: GetValue001
+* @tc.desc: Normal testcase of GetValue
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedRecordTest, GetValue001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetValue001 begin.");
+    UnifiedRecord unifiedRecord;
+    unifiedRecord.value_ = "value";
+    ValueType ret = unifiedRecord.GetValue();
+    EXPECT_EQ(ret, unifiedRecord.value_);
+    LOG_INFO(UDMF_TEST, "GetValue001 end.");
+}
+
 
 /**
  * @tc.name: Constructor_001
@@ -112,3 +166,4 @@ HWTEST_F(UnifiedRecordTest, Constructor_003, TestSize.Level0)
     auto entryStr2 = std::get_if<std::string>(&entry2);
     EXPECT_EQ(*entryStr2, "123456");
 }
+} // OHOS::Test
