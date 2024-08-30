@@ -49,7 +49,7 @@ namespace UDMF {
     
     char * GetUniformDataTypeByFilenameExtension(const char *cFilenameExtension, const char *cBelongsTo)
     {
-        std::string belongsTo = cBelongsTo
+        std::string belongsTo = cBelongsTo;
         std::string typeId;
         auto status = E_OK;
         if (belongsTo.empty()) {
@@ -73,7 +73,7 @@ namespace UDMF {
 
     char * GetUniformDataTypeByMIMEType(const char *cMimeType, const char *cBelongsTo)
     {
-        std::string belongsTo = cBelongsTo
+        std::string belongsTo = cBelongsTo;
         std::string typeId;
         auto status = E_OK;
         if (belongsTo.empty()) {
