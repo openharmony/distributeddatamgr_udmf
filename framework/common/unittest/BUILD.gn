@@ -21,14 +21,19 @@ config("module_private_config") {
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_framework_path}/innerkitsimpl/data",
     "${udmf_framework_path}/common",
+    "${kv_store_path}/frameworks/common",
+    "${udmf_interfaces_path}/innerkits/data",
   ]
 }
 
-common_deps = []
+common_deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
 
 common_external_deps = [
+  "ability_base:want",
   "c_utils:utils",
   "hilog:libhilog",
+  "image_framework:image",
+  "ipc:ipc_core",
 ]
 
 ohos_unittest("UtdCfgsCheckerTest") {
@@ -48,10 +53,30 @@ ohos_unittest("UtdCfgsCheckerTest") {
   external_deps = common_external_deps
 }
 
+ohos_unittest("UdmfTypesUtilTest") {
+  module_out_path = module_output_path
+
+  sources = [ "udmf_types_util_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
 
-  deps = [ ":UtdCfgsCheckerTest" ]
+  deps = [
+    ":UdmfTypesUtilTest",
+    ":UtdCfgsCheckerTest",
+  ]
 }
 ###############################################################################

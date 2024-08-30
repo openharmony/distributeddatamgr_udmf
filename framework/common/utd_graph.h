@@ -42,7 +42,7 @@ private:
     int32_t GetIndex(const std::string &node);
     void AddEdge(const std::string &startNode, const std::string &endNode);
     std::mutex graphMutex_;
-    Graph *graph_ = nullptr;
+    std::unique_ptr<Graph> graph_;
     std::map<std::string, uint32_t> typeIdIndex_;
 };
 } // namespace UDMF
