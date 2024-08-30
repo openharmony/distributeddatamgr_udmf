@@ -38,3 +38,5 @@ private:
 
 } // namespace UDMF
 } // namespace OHOS
+
+#endif
