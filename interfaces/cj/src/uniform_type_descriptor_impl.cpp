@@ -60,12 +60,12 @@ namespace UDMF {
         }
         if(status != E_OK){
             LOGE("invalid arguments!")
-            return "";
+            return nullptr;
         }
         if (!typeId.empty()) {
-            retturn Utils::MallocCString(typeId);
+            return Utils::MallocCString(typeId);
         } else {
-            return "";
+            return nullptr;
         }
 
     }
@@ -83,12 +83,12 @@ namespace UDMF {
         }
         if(status != E_OK){
             LOGE("invalid arguments!")
-            return "";
+            return nullptr;
         }
         if (!typeId.empty()) {
-            retturn Utils::MallocCString(typeId);
+            return Utils::MallocCString(typeId);
         } else {
-            return "";
+            return nullptr;
         }
     }
 
