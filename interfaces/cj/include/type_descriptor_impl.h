@@ -20,6 +20,7 @@
 
 #include "type_descriptor.h"
 #include "cj_common_ffi.h"
+#include "udmf_log.h"
 
 namespace OHOS {
 namespace UDMF {

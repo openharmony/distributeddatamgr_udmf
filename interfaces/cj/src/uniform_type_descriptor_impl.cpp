@@ -35,6 +35,9 @@ namespace UDMF {
     int64_t GetTypeDescriptor(const char *typeId){
         std::shared_ptr<TypeDescriptor> descriptor;
         UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+        if (descriptor == nullptr) {
+            return -1;
+        }
         auto nativeCJTypeDescriptor = FFIData::Create<CTypeDescriptor>(descriptor);
         if (nativeCJTypeDescriptor == nullptr) {
             return -1;
