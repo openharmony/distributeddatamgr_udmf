@@ -21,8 +21,8 @@
 #include "token_setproc.h"
 #include "accesstoken_kit.h"
 #include "nativetoken_kit.h"
-
 #include "logger.h"
+#include "pixelmap_native_impl.h"
 #include "uds.h"
 #include "udmf_capi_common.h"
 #include "udmf_meta.h"
