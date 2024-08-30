@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef DATA_PROVIDER_IMPL_H
+#define DATA_PROVIDER_IMPL_H
+
 #include "entry_getter.h"
 #include "udmf.h"
 
