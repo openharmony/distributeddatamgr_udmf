@@ -560,7 +560,7 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData001, TestSize.Level0)
 HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData002, TestSize.Level0)
 {
     OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
-    char typeId[] = "general.plain-text";
+    char typeId[] = "ApplicationDefined-myType";
     unsigned char entry[] = "CreateGeneralRecord";
     unsigned int count = sizeof(entry);
     OH_UdmfRecord *record = OH_UdmfRecord_Create();
