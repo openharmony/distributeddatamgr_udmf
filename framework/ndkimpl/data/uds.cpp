@@ -41,7 +41,7 @@ bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid)
 
 bool IsInvalidUdsObjectByType(const UdsObject* pThis, const UDType& type)
 {
-    switch(type) {
+    switch (type) {
         case PLAIN_TEXT:
             return IsInvalidUdsObjectPtr(pThis, UDS_PLAIN_TEXT_STRUCT_ID);
         case HYPERLINK:
