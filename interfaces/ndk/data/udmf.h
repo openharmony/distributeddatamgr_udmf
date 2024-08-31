@@ -197,7 +197,7 @@ typedef void (*UdmfData_Finalize)(void* context);
  * @brief Creates an {@link OH_UdmfRecordProvider} instance.
  *
  * @return Returns the pointer to the {@link OH_UdmfRecordProvider} instance created if the operation is successful.
- * Returns nullptr otherwise.
+ * Returns nullptr if the memory is not enough.
  * @see OH_UdmfRecordProvider.
  * @since 13
  */
@@ -472,7 +472,7 @@ int OH_UdmfRecord_GetPixelMap(OH_UdmfRecord* pThis, OH_UdsPixelMap* pixelMap);
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdmfRecord OH_UdmfRecordProvider Udmf_ErrCode.
- * @since 12
+ * @since 13
  */
 int OH_UdmfRecord_SetProvider(OH_UdmfRecord* pThis, const char* const* types, unsigned int count,
     OH_UdmfRecordProvider* provider);
