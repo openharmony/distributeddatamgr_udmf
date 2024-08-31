@@ -387,6 +387,21 @@ ohos_unittest("VideoTest") {
   ]
 }
 
+ohos_unittest("UnifiedMetaTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unified_meta_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
@@ -411,6 +426,7 @@ group("unittest") {
     ":UdmfClientTest",
     ":UnifiedDataHelperTest",
     ":UnifiedDataTest",
+    ":UnifiedMetaTest",
     ":UnifiedRecordTest",
     ":UtdClientTest",
     ":VideoTest",

@@ -141,4 +141,64 @@ HWTEST_F(UdmfTypesUtilTest, Unmarshalling005, TestSize.Level1)
     EXPECT_EQ(ret, ITypesUtil::Unmarshal(parcel, output.key, output.intention));
     LOG_INFO(UDMF_TEST, "Unmarshalling005 end.");
 }
+
+/**
+* @tc.name: Marshalling002
+* @tc.desc: Normal testcase of Marshalling
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Marshalling002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Marshalling002 begin.");
+    const UDType input{};
+    MessageParcel parcel;
+    bool ret = ITypesUtil::Marshalling(input, parcel);
+    EXPECT_EQ(ret, ITypesUtil::Marshal(parcel, input));
+    LOG_INFO(UDMF_TEST, "Marshalling002 end.");
+}
+
+/**
+* @tc.name: Unmarshalling006
+* @tc.desc: Normal testcase of Unmarshalling
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Unmarshalling006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Unmarshalling006 begin.");
+    UDType output{};
+    MessageParcel parcel;
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "Unmarshalling006 end.");
+}
+
+/**
+* @tc.name: Unmarshalling007
+* @tc.desc: Normal testcase of Unmarshalling
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Unmarshalling007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Unmarshalling007 begin.");
+    Intention output;
+    MessageParcel parcel;
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "Unmarshalling007 end.");
+}
+
+/**
+* @tc.name: Marshalling003
+* @tc.desc: Normal testcase of Marshalling
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Marshalling003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Marshalling003 begin.");
+    const AsyncProcessInfo input{};
+    MessageParcel parcel;
+    bool ret = ITypesUtil::Marshalling(input, parcel);
+    EXPECT_NE(ret, false);
+    LOG_INFO(UDMF_TEST, "Marshalling003 end.");
+}
 } // OHOS::Test
