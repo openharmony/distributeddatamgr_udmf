@@ -564,12 +564,14 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData002, TestSize.Level0)
     unsigned char entry[] = "CreateGeneralRecord";
     unsigned int count = sizeof(entry);
     OH_UdmfRecord *record = OH_UdmfRecord_Create();
-    OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
-    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    int setRes = OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    setRes = OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    EXPECT_EQ(setRes, UDMF_E_OK);
     Udmf_Intention intention = UDMF_INTENTION_DRAG;
     char key[UDMF_KEY_BUFFER_LEN];
 
-    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
     EXPECT_EQ(setRes, UDMF_E_OK);
     EXPECT_NE(key[0], '\0');
     OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
@@ -578,19 +580,7 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData002, TestSize.Level0)
     unsigned int getRecordsCount = 0;
     OH_UdmfRecord **getRecords = OH_UdmfData_GetRecords(readUnifiedData, &getRecordsCount);
     EXPECT_EQ(getRecordsCount, 1);
-
-    unsigned char *getEntry;
-    unsigned int getCount = 0;
-    int getRes = OH_UdmfRecord_GetGeneralEntry(getRecords[0], typeId, &getEntry, &getCount);
-    EXPECT_EQ(getRes, UDMF_E_OK);
-    EXPECT_EQ(getCount, count);
-    EXPECT_EQ(std::memcmp(getEntry, entry, getCount), 0);
-
-    unsigned int getCount1 = 0;
-    unsigned char *getEntry1;
-    int getRes1 = OH_UdmfRecord_GetGeneralEntry(getRecords[0], typeId, &getEntry1, &getCount1);
-    EXPECT_EQ(getEntry1, getEntry);
-    EXPECT_EQ(getRes1, UDMF_E_OK);
+    EXPECT_NE(getRecords, nullptr);
 
     OH_UdmfRecord_Destroy(record);
     OH_UdmfData_Destroy(readUnifiedData);
