@@ -135,7 +135,7 @@ std::set<std::string> UnifiedRecord::GetUtdIds() const
     if (!utdId_.empty()) {
         utdIds.emplace(utdId_);
     }
-    for (const auto& [key, value] : *entries_ ) {
+    for (const auto& [key, value] : *entries_) {
         utdIds.emplace(key);
     }
     return utdIds;
