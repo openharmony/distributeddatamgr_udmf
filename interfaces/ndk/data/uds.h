@@ -73,6 +73,13 @@ typedef struct OH_UdsHtml OH_UdsHtml;
 typedef struct OH_UdsAppItem OH_UdsAppItem;
 
 /**
+ * @brief Describes the unified data struct of array buffer.
+ *
+ * @since 13
+ */
+typedef struct OH_UdsArrayBuffer OH_UdsArrayBuffer;
+
+/**
  * @brief Creation a pointer to the instance of the {@link OH_UdsPlainText}.
  *
  * @return If the operation is successful, a pointer to the instance of the {@link OH_UdsPlainText}
@@ -463,6 +470,56 @@ int OH_UdsAppItem_SetBundleName(OH_UdsAppItem* pThis, const char* bundleName);
  * @since 12
  */
 int OH_UdsAppItem_SetAbilityName(OH_UdsAppItem* pThis, const char* abilityName);
+
+/**
+ * @brief Creation a pointer to the instance of the {@link OH_UdsArrayBuffer}.
+ *
+ * @return If the operation is successful, a pointer to the instance of the {@link OH_UdsArrayBuffer}
+ * structure is returned. If the memory is not enough, nullptr is returned.
+ * @see OH_UdsArrayBuffer
+ * @since 13
+ */
+OH_UdsArrayBuffer* OH_UdsArrayBuffer_Create();
+
+/**
+ * @brief Destroy a pointer that points to the {@link OH_UdsArrayBuffer} instance.
+ *
+ * @param buffer Represents a pointer to an instance of {@link OH_UdsArrayBuffer}.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsArrayBuffer Udmf_ErrCode
+ * @since 13
+ */
+int OH_UdsArrayBuffer_Destroy(OH_UdsArrayBuffer* buffer);
+
+/**
+ * @brief Set array buffer data to the {@link OH_UdsArrayBuffer}.
+ *
+ * @param buffer Represents a pointer to an instance of {@link OH_UdsArrayBuffer}.
+ * @param data Represents the array buffer data.
+ * @param len Represents the length of data param.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsArrayBuffer Udmf_ErrCode
+ * @since 13
+ */
+int OH_UdsArrayBuffer_SetData(OH_UdsArrayBuffer* buffer, unsigned char* data, unsigned int len);
+
+/**
+ * @brief Get array buffer data from the {@link OH_UdsArrayBuffer}.
+ *
+ * @param buffer Represents a pointer to an instance of {@link OH_UdsArrayBuffer}.
+ * @param data Represents a pointer to array buffer data that is a output param.
+ * @param len Represents the array buffer data length that is a output param.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsArrayBuffer Udmf_ErrCode
+ * @since 13
+ */
+int OH_UdsArrayBuffer_GetData(OH_UdsArrayBuffer* buffer, unsigned char** data, unsigned int* len);
 
 #ifdef __cplusplus
 };

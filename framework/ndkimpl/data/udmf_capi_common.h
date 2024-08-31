@@ -39,6 +39,7 @@ enum NdkStructId : std::int64_t {
     UDMF_UNIFIED_DATA_STRUCT_ID,
     UDMF_UNIFIED_RECORD_STRUCT_ID,
     UDMF_UNIFIED_DATA_PROPERTIES_ID,
+    UDS_ARRAY_BUFFER_STRUCT_ID,
 };
 
 struct OH_Utd {
@@ -67,6 +68,9 @@ struct OH_UdsHtml : public UdsObject {
 };
 struct OH_UdsAppItem : public UdsObject {
     OH_UdsAppItem();
+};
+struct OH_UdsArrayBuffer : public UdsObject {
+    OH_UdsArrayBuffer();
 };
 
 struct OH_UdmfRecord {
@@ -109,6 +113,8 @@ constexpr const char* APP_ICON_ID = "appIconId";
 constexpr const char* APP_LABEL_ID = "appLabelId";
 constexpr const char* BUNDLE_NAME = "bundleName";
 constexpr const char* ABILITY_NAME = "abilityName";
+constexpr const char* ARRAY_BUFFER = "arrayBuffer";
+constexpr const char* ARRAY_BUFFER_LENGTH = "arrayBufferLen";
 
 bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid);
 

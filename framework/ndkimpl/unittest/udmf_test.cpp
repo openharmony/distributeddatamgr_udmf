@@ -504,11 +504,11 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData001, TestSize.Level0)
     char key[UDMF_KEY_BUFFER_LEN];
 
     int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
-    EXPECT_EQ(setRes, UDMF_E_OK);
+    ASSERT_EQ(setRes, UDMF_E_OK);
     EXPECT_NE(key[0], '\0');
     OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
     int getRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
-    EXPECT_EQ(getRes, UDMF_E_OK);
+    ASSERT_EQ(getRes, UDMF_E_OK);
     unsigned int count = 0;
     OH_UdmfRecord **getRecords = OH_UdmfData_GetRecords(readUnifiedData, &count);
     EXPECT_EQ(count, 1);
@@ -1119,5 +1119,122 @@ HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesExtrasStringParam001, TestSize.Level1)
     EXPECT_EQ(str, actualStr);
     OH_UdmfData_Destroy(data);
     OH_UdmfProperty_Destroy(properties);
+}
+
+/**
+ * @tc.name: OH_Udmf_BuildRecordByOpenHarmonyArrayBuffer001
+ * @tc.desc: test OH_UdmfRecord_AddArrayBuffer with invalid param
+ * @tc.type: FUNC
+ * @tc.require: AROOOH5R5G
+ */
+HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByOpenHarmonyArrayBuffer001, TestSize.Level0)
+{
+    int buildRes1 = OH_UdmfRecord_AddArrayBuffer(nullptr, nullptr, nullptr);
+    EXPECT_EQ(buildRes1, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfRecord record1;
+    int buildRes2 = OH_UdmfRecord_AddArrayBuffer(&record1, nullptr, nullptr);
+    EXPECT_EQ(buildRes2, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfRecord *record2 = OH_UdmfRecord_Create();
+    int buildRes3 = OH_UdmfRecord_AddArrayBuffer(record2, nullptr, nullptr);
+    EXPECT_EQ(buildRes3, UDMF_E_INVALID_PARAM);
+
+    OH_UdsArrayBuffer buffer;
+    int buildRes4 = OH_UdmfRecord_AddArrayBuffer(record2, nullptr, &buffer);
+    EXPECT_EQ(buildRes4, UDMF_E_INVALID_PARAM);
+
+    OH_UdsArrayBuffer *buffer2 = OH_UdsArrayBuffer_Create();
+    int buildRes5 = OH_UdmfRecord_AddArrayBuffer(record2, nullptr, buffer2);
+    EXPECT_EQ(buildRes5, UDMF_E_INVALID_PARAM);
+
+    char type[] = "general.plain-text";
+    int buildRes6 = OH_UdmfRecord_AddArrayBuffer(record2, type, buffer2);
+    EXPECT_EQ(buildRes6, UDMF_E_INVALID_PARAM);
+
+    char type2[] = "ApplicationDefined-myType1";
+    int buildRes7 = OH_UdmfRecord_AddArrayBuffer(record2, type2, buffer2);
+    EXPECT_EQ(buildRes7, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfRecord_Destroy(record2);
+    OH_UdsArrayBuffer_Destroy(buffer2);
+}
+
+/**
+ * @tc.name: OH_Udmf_BuildRecordByOpenHarmonyArrayBuffer002
+ * @tc.desc: test OH_UdmfRecord_AddArrayBuffer with invalid param
+ * @tc.type: FUNC
+ * @tc.require: AROOOH5R5G
+ */
+HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByOpenHarmonyArrayBuffer002, TestSize.Level0)
+{
+    int buildRes1 = OH_UdmfRecord_GetArrayBuffer(nullptr, nullptr, nullptr);
+    EXPECT_EQ(buildRes1, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfRecord record1;
+    int buildRes2 = OH_UdmfRecord_GetArrayBuffer(&record1, nullptr, nullptr);
+    EXPECT_EQ(buildRes2, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfRecord *record2 = OH_UdmfRecord_Create();
+    int buildRes3 = OH_UdmfRecord_GetArrayBuffer(record2, nullptr, nullptr);
+    EXPECT_EQ(buildRes3, UDMF_E_INVALID_PARAM);
+
+    OH_UdsArrayBuffer buffer;
+    int buildRes4 = OH_UdmfRecord_GetArrayBuffer(record2, nullptr, &buffer);
+    EXPECT_EQ(buildRes4, UDMF_E_INVALID_PARAM);
+
+    OH_UdsArrayBuffer *buffer2 = OH_UdsArrayBuffer_Create();
+    int buildRes5 = OH_UdmfRecord_GetArrayBuffer(record2, nullptr, buffer2);
+    EXPECT_EQ(buildRes5, UDMF_E_INVALID_PARAM);
+
+    char type[] = "general.plain-text";
+    int buildRes6 = OH_UdmfRecord_GetArrayBuffer(record2, type, buffer2);
+    EXPECT_EQ(buildRes6, UDMF_E_INVALID_PARAM);
+
+    char type2[] = "ApplicationDefined-myType1";
+    int buildRes7 = OH_UdmfRecord_GetArrayBuffer(record2, type2, buffer2);
+    EXPECT_EQ(buildRes7, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfRecord_Destroy(record2);
+    OH_UdsArrayBuffer_Destroy(buffer2);
+}
+
+/**
+ * @tc.name: OH_Udmf_BuildAndGetArrayBufferFromRecord001
+ * @tc.desc: test OH_UdmfRecord_AddArrayBuffer with invalid param
+ * @tc.type: FUNC
+ * @tc.require: AROOOH5R5G
+ */
+HWTEST_F(UDMFTest, OH_Udmf_BuildAndGetArrayBufferFromRecord001, TestSize.Level0)
+{
+
+    unsigned char data1[] = "Hello world";
+    unsigned int len1 = sizeof(data1);
+    OH_UdsArrayBuffer *buffer1 = OH_UdsArrayBuffer_Create();
+    OH_UdsArrayBuffer_SetData(buffer1, data1, len1);
+
+    char type1[] = "ApplicationDefined-myType1";
+    OH_UdmfRecord *record1 = OH_UdmfRecord_Create();
+    int buildRes = OH_UdmfRecord_AddArrayBuffer(record1, type1, buffer1);
+    ASSERT_EQ(buildRes, UDMF_E_OK);
+
+    char type2[] = "ApplicationDefined-myType2";
+    OH_UdsArrayBuffer *buffer2 = OH_UdsArrayBuffer_Create();
+    int getRes = OH_UdmfRecord_GetArrayBuffer(record1, type2, buffer2);
+    EXPECT_EQ(getRes, UDMF_E_INVALID_PARAM);
+
+    int getRes2 = OH_UdmfRecord_GetArrayBuffer(record1, type1, buffer2);
+    ASSERT_EQ(getRes2, UDMF_E_OK);
+
+    unsigned int getLen = 0;
+    unsigned char *getData;
+    int getRes3 = OH_UdsArrayBuffer_GetData(buffer2, &getData, &getLen);
+    ASSERT_EQ(getRes3, UDMF_E_OK);
+    ASSERT_EQ(len1, getLen);
+    ASSERT_TRUE(CheckUnsignedChar(data1, getData, getLen));
+
+    OH_UdmfRecord_Destroy(record1);
+    OH_UdsArrayBuffer_Destroy(buffer1);
+    OH_UdsArrayBuffer_Destroy(buffer2);
 }
 }

@@ -410,6 +410,22 @@ int OH_UdmfRecord_AddAppItem(OH_UdmfRecord* record, OH_UdsAppItem* appItem)
     return UDMF_E_OK;
 }
 
+int OH_UdmfRecord_AddArrayBuffer(OH_UdmfRecord* record, const char* type, OH_UdsArrayBuffer* buffer)
+{
+    if (!IsUnifiedRecordValid(record) || type == nullptr ||
+        IsInvalidUdsObjectPtr(buffer, UDS_ARRAY_BUFFER_STRUCT_ID)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    unsigned char *entry;
+    unsigned int size;
+    int ret = OH_UdsArrayBuffer_GetData(buffer, &entry, &size);
+    if (ret != UDMF_E_OK) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    buffer->obj->value_[UNIFORM_DATA_TYPE] = type;
+    return OH_UdmfRecord_AddGeneralEntry(record, type, entry, size);
+}
+
 int OH_UdmfRecord_GetPlainText(OH_UdmfRecord* record, OH_UdsPlainText* plainText)
 {
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(plainText, UDS_PLAIN_TEXT_STRUCT_ID)) {
@@ -484,6 +500,18 @@ int OH_UdmfRecord_GetAppItem(OH_UdmfRecord* record, OH_UdsAppItem* appItem)
     OH_UdsAppItem_SetAbilityName(appItem, appDefRecord->GetAbilityName().c_str());
     appItem->obj->value_[UNIFORM_DATA_TYPE] = UDMF_META_OPENHARMONY_APP_ITEM;
     return UDMF_E_OK;
+}
+
+int OH_UdmfRecord_GetArrayBuffer(OH_UdmfRecord* record, const char* type, OH_UdsArrayBuffer* buffer)
+{
+    unsigned int size = 0;
+    unsigned char *entry;
+    int ret = OH_UdmfRecord_GetGeneralEntry(record, type, &entry, &size);
+    if (ret != UDMF_E_OK) {
+        LOG_ERROR(UDMF_CAPI, "OH_UdmfRecord_GetGeneralEntry ret: %{public}d.", ret);
+        return ret;
+    }
+    return OH_UdsArrayBuffer_SetData(buffer, entry, size);
 }
 
 OH_UdmfProperty* OH_UdmfProperty_Create(OH_UdmfData* data)
