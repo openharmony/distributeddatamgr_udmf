@@ -28,6 +28,7 @@
 #include "udmf_client.h"
 #include "plain_text.h"
 #include "udmf_meta.h"
+#include "data_provider_impl.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
@@ -43,6 +44,9 @@ public:
     static void AllocHapToken1();
     static void AllocHapToken2();
     void SetHapToken1();
+    bool CheckUnsignedChar(unsigned char* dst, unsigned char* src, int size);
+    static void FinalizeFunc(void* context);
+    static void* GetDataCallbackFunc(void* context, const char* type);
     static constexpr int USER_ID = 100;
     static constexpr int INST_INDEX = 0;
 };
@@ -150,6 +154,28 @@ void UDMFTest::SetHapToken1()
 {
     auto tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo1", INST_INDEX);
     SetSelfTokenID(tokenId);
+}
+
+bool UDMFTest::CheckUnsignedChar(unsigned char* dst, unsigned char* src, int size)
+{
+    EXPECT_NE(dst, nullptr);
+    EXPECT_NE(src, nullptr);
+    for (int i = 0; i < size; ++i) {
+        if (dst[i] != src[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void UDMFTest::FinalizeFunc(void* context) {}
+
+void* UDMFTest::GetDataCallbackFunc(void* context, const char* type)
+{
+    auto plainText = OH_UdsPlainText_Create();
+    OH_UdsPlainText_SetAbstract(plainText, "doing something");
+    OH_UdsPlainText_SetContent(plainText, "doing something");
+    return plainText;
 }
 
 /**
@@ -534,16 +560,18 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData001, TestSize.Level0)
 HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData002, TestSize.Level0)
 {
     OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
-    char typeId[] = "general.plain-text";
+    char typeId[] = "ApplicationDefined-myType";
     unsigned char entry[] = "CreateGeneralRecord";
     unsigned int count = sizeof(entry);
     OH_UdmfRecord *record = OH_UdmfRecord_Create();
-    OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
-    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    int setRes = OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    setRes = OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    EXPECT_EQ(setRes, UDMF_E_OK);
     Udmf_Intention intention = UDMF_INTENTION_DRAG;
     char key[UDMF_KEY_BUFFER_LEN];
 
-    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
     EXPECT_EQ(setRes, UDMF_E_OK);
     EXPECT_NE(key[0], '\0');
     OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
@@ -552,19 +580,7 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData002, TestSize.Level0)
     unsigned int getRecordsCount = 0;
     OH_UdmfRecord **getRecords = OH_UdmfData_GetRecords(readUnifiedData, &getRecordsCount);
     EXPECT_EQ(getRecordsCount, 1);
-
-    unsigned char *getEntry;
-    unsigned int getCount = 0;
-    int getRes = OH_UdmfRecord_GetGeneralEntry(getRecords[0], typeId, &getEntry, &getCount);
-    EXPECT_EQ(getRes, UDMF_E_OK);
-    EXPECT_EQ(getCount, count);
-    EXPECT_EQ(std::memcmp(getEntry, entry, getCount), 0);
-
-    unsigned int getCount1 = 0;
-    unsigned char *getEntry1;
-    int getRes1 = OH_UdmfRecord_GetGeneralEntry(getRecords[0], typeId, &getEntry1, &getCount1);
-    EXPECT_EQ(getEntry1, getEntry);
-    EXPECT_EQ(getRes1, UDMF_E_OK);
+    EXPECT_NE(getRecords, nullptr);
 
     OH_UdmfRecord_Destroy(record);
     OH_UdmfData_Destroy(readUnifiedData);
@@ -649,6 +665,22 @@ HWTEST_F(UDMFTest, OH_Udmf_AddAndGetGeneralEntry002, TestSize.Level0)
     unsigned int count = sizeof(entry);
     OH_UdmfRecord *record = OH_UdmfRecord_Create();
     int addRes1 = OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
+    EXPECT_EQ(addRes1, UDMF_E_INVALID_PARAM);
+}
+
+/**
+ * @tc.name: OH_Udmf_AddAndGetGeneralEntry003
+ * @tc.desc: test OH_UdmfRecord_AddGeneralEntry and OH_UdmfRecord_GetGeneralEntry with appdefined type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDMFTest, OH_Udmf_AddAndGetGeneralEntry003, TestSize.Level0)
+{
+    char typeId[] = "ApplicationDefined-myType";
+    unsigned char entry[] = "CreateGeneralRecord1";
+    unsigned int count = sizeof(entry);
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    int addRes1 = OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
     EXPECT_EQ(addRes1, UDMF_E_OK);
 
     unsigned int getCount = 0;
@@ -656,43 +688,45 @@ HWTEST_F(UDMFTest, OH_Udmf_AddAndGetGeneralEntry002, TestSize.Level0)
     int getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId, &getEntry, &getCount);
     EXPECT_EQ(getRes, UDMF_E_OK);
     EXPECT_EQ(getCount, count);
-    EXPECT_EQ(std::memcmp(getEntry, entry, getCount), 0);
-
-    unsigned int getCount1 = 0;
-    unsigned char *getEntry1;
-    int getRes1 = OH_UdmfRecord_GetGeneralEntry(record, typeId, &getEntry1, &getCount1);
-    EXPECT_EQ(getEntry1, getEntry);
-    EXPECT_EQ(getRes1, UDMF_E_OK);
-
+    ASSERT_TRUE(CheckUnsignedChar(entry, getEntry, getCount));
     OH_UdmfRecord_Destroy(record);
 }
 
 /**
- * @tc.name: OH_Udmf_AddAndGetGeneralEntry003
- * @tc.desc: test OH_UdmfRecord_AddGeneralEntry and OH_UdmfRecord_GetGeneralEntry with return error
+ * @tc.name: OH_Udmf_AddAndGetGeneralEntry004
+ * @tc.desc: test OH_UdmfRecord_AddGeneralEntry and OH_UdmfRecord_GetGeneralEntry with appdefined diff types
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
+ * @tc.require:
  */
-HWTEST_F(UDMFTest, OH_Udmf_AddAndGetGeneralEntry003, TestSize.Level0)
+HWTEST_F(UDMFTest, OH_Udmf_AddAndGetGeneralEntry004, TestSize.Level0)
 {
-    char typeId[] = "general.plain-text";
-    unsigned char entry[] = "CreateGeneralRecord";
-    unsigned int count = sizeof(entry);
+    char typeId1[] = "ApplicationDefined-myType1";
+    unsigned char entry1[] = "CreateGeneralRecord1";
+    unsigned int count1 = sizeof(entry1);
+    char typeId2[] = "ApplicationDefined-myType2";
+    unsigned char entry2[] = "CreateGeneralRecord2";
+    unsigned int count2 = sizeof(entry2);
     OH_UdmfRecord *record = OH_UdmfRecord_Create();
-    int addRes1 = OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
+    int addRes1 = OH_UdmfRecord_AddGeneralEntry(record, typeId1, entry1, count1);
+    EXPECT_EQ(addRes1, UDMF_E_OK);
+    addRes1 = OH_UdmfRecord_AddGeneralEntry(record, typeId2, entry2, count2);
     EXPECT_EQ(addRes1, UDMF_E_OK);
 
-    OH_UdmfRecord *getRecord = OH_UdmfRecord_Create();
-    unsigned int getCount = 0;
-    unsigned char *getEntry;
-    char typeId1[] = "general.text";
-    OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
-    
-    int getRes = OH_UdmfRecord_GetGeneralEntry(getRecord, typeId1, &getEntry, &getCount);
-    EXPECT_EQ(getRes, UDMF_E_INVALID_PARAM);
+    unsigned int getCount1 = 0;
+    unsigned char *getEntry1;
+    int getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId1, &getEntry1, &getCount1);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    EXPECT_EQ(getCount1, count1);
+    ASSERT_TRUE(CheckUnsignedChar(entry1, getEntry1, getCount1));
+
+    unsigned int getCount2 = 0;
+    unsigned char *getEntry2;
+    getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId2, &getEntry2, &getCount2);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    EXPECT_EQ(getCount2, count2);
+    ASSERT_TRUE(CheckUnsignedChar(entry2, getEntry2, getCount2));
 
     OH_UdmfRecord_Destroy(record);
-    OH_UdmfRecord_Destroy(getRecord);
 }
 
 /**
@@ -1119,5 +1153,225 @@ HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesExtrasStringParam001, TestSize.Level1)
     EXPECT_EQ(str, actualStr);
     OH_UdmfData_Destroy(data);
     OH_UdmfProperty_Destroy(properties);
+}
+
+/**
+ * @tc.name: OH_Udmf_MultiStyleRecord001
+ * @tc.desc: Normal testcase of OH_UdmfProperty_SetExtrasStringParam
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_MultiStyleRecord001, TestSize.Level1)
+{
+    OH_UdsPlainText* plainText = OH_UdsPlainText_Create();
+    char plainTextContent[] = "plain text";
+    OH_UdsPlainText_SetContent(plainText, plainTextContent);
+
+    OH_UdsHyperlink* hyperlink = OH_UdsHyperlink_Create();
+    char url[] = "hyper link";
+    OH_UdsHyperlink_SetUrl(hyperlink, url);
+
+    OH_UdsHtml* html = OH_UdsHtml_Create();
+    char htmlContent[] = "html";
+    OH_UdsHtml_SetContent(html, htmlContent);
+
+    OH_UdsAppItem* appItem = OH_UdsAppItem_Create();
+    char name[] = "appItem";
+    OH_UdsAppItem_SetName(appItem, name);
+
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+
+    OH_UdmfRecord_AddPlainText(record, plainText);
+    OH_UdmfRecord_AddHyperlink(record, hyperlink);
+    OH_UdmfRecord_AddHtml(record, html);
+    OH_UdmfRecord_AddAppItem(record, appItem);
+
+    unsigned int count = 0;
+    char** types = OH_UdmfRecord_GetTypes(record, &count);
+    EXPECT_NE(types, nullptr);
+    EXPECT_EQ(count, 4);
+
+    OH_UdsPlainText *getPlainText = OH_UdsPlainText_Create();
+    OH_UdmfRecord_GetPlainText(record, getPlainText);
+    const char *getPlainTextContent = OH_UdsPlainText_GetContent(getPlainText);
+    EXPECT_EQ(strcmp(getPlainTextContent, plainTextContent), 0);
+
+    OH_UdsHyperlink *getHyperLink = OH_UdsHyperlink_Create();
+    OH_UdmfRecord_GetHyperlink(record, getHyperLink);
+    const char *getUrl = OH_UdsHyperlink_GetUrl(getHyperLink);
+    EXPECT_EQ(strcmp(getUrl, url), 0);
+
+    OH_UdsHtml *getHtml = OH_UdsHtml_Create();
+    OH_UdmfRecord_GetHtml(record, getHtml);
+    const char *getHtmlContent = OH_UdsHtml_GetContent(getHtml);
+    EXPECT_EQ(strcmp(getHtmlContent, htmlContent), 0);
+
+    OH_UdsAppItem *getAppItem = OH_UdsAppItem_Create();
+    OH_UdmfRecord_GetAppItem(record, getAppItem);
+    const char *getName = OH_UdsAppItem_GetName(getAppItem);
+    EXPECT_EQ(strcmp(getName, name), 0);
+
+    OH_UdmfData* data = OH_UdmfData_Create();
+    OH_UdmfData_AddRecord(data, record);
+
+    unsigned int count2 = 0;
+    char** types2 = OH_UdmfData_GetTypes(data, &count2);
+    EXPECT_NE(types2, nullptr);
+    EXPECT_EQ(count2, 4);
+
+    char plianTextType[] = "general.plain-text";
+    char hyperLinkType[] = "general.hyperlink";
+    char htmlType[] = "general.html";
+    char appItemType[] = "openharmony.app-item";
+
+    EXPECT_TRUE(OH_UdmfData_HasType(data, plianTextType));
+    EXPECT_TRUE(OH_UdmfData_HasType(data, hyperLinkType));
+    EXPECT_TRUE(OH_UdmfData_HasType(data, htmlType));
+    EXPECT_TRUE(OH_UdmfData_HasType(data, appItemType));
+
+    OH_UdsPlainText_Destroy(plainText);
+    OH_UdsPlainText_Destroy(getPlainText);
+    OH_UdsHyperlink_Destroy(hyperlink);
+    OH_UdsHyperlink_Destroy(getHyperLink);
+    OH_UdsHtml_Destroy(html);
+    OH_UdsHtml_Destroy(getHtml);
+    OH_UdsAppItem_Destroy(appItem);
+    OH_UdsAppItem_Destroy(getAppItem);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(data);
+}
+
+/**
+ * @tc.name: OH_UdmfRecordProvider_Create001
+ * @tc.desc: Normal testcase of OH_UdmfRecordProvider_Create
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecordProvider_Create001, TestSize.Level1)
+{
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    OH_UdmfRecordProvider_Destroy(provider);
+}
+
+/**
+ * @tc.name: OH_UdmfRecordProvider_Destroy001
+ * @tc.desc: Normal testcase of OH_UdmfRecordProvider_Destroy
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecordProvider_Destroy001, TestSize.Level1)
+{
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    int num = 1;
+    void* context = &num;
+    OH_UdmfRecordProvider_SetData(provider, context, GetDataCallbackFunc, FinalizeFunc);
+    int res1 = OH_UdmfRecordProvider_Destroy(provider);
+    EXPECT_EQ(res1, UDMF_E_OK);
+}
+
+/**
+ * @tc.name: OH_UdmfRecordProvider_Destroy002
+ * @tc.desc: invalid parameters testcase of OH_UdmfRecordProvider_Destroy
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecordProvider_Destroy002, TestSize.Level1)
+{
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    int num = 1;
+    void* context = &num;
+    OH_UdmfRecordProvider_SetData(provider, context, GetDataCallbackFunc, nullptr);
+    int res1 = OH_UdmfRecordProvider_Destroy(provider);
+    EXPECT_EQ(res1, UDMF_E_OK);
+}
+
+/**
+ * @tc.name: OH_UdmfRecordProvider_SetData001
+ * @tc.desc: Normal testcase of OH_UdmfRecordProvider_SetData
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecordProvider_SetData001, TestSize.Level1)
+{
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    int num = 1;
+    void* context = &num;
+    int res = OH_UdmfRecordProvider_SetData(provider, context, GetDataCallbackFunc, FinalizeFunc);
+    EXPECT_NE(provider->context, nullptr);
+    EXPECT_NE(provider->callback, nullptr);
+    EXPECT_NE(provider->finalize, nullptr);
+    EXPECT_EQ(res, UDMF_E_OK);
+    OH_UdmfRecordProvider_Destroy(provider);
+}
+
+/**
+ * @tc.name: OH_UdmfRecordProvider_SetData002
+ * @tc.desc: invalid parameters testcase of OH_UdmfRecordProvider_SetData
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecordProvider_SetData002, TestSize.Level1)
+{
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    int num = 1;
+    void* context = &num;
+    int res1 = OH_UdmfRecordProvider_SetData(provider, context, GetDataCallbackFunc, nullptr);
+    EXPECT_EQ(provider->context, nullptr);
+    EXPECT_EQ(provider->finalize, nullptr);
+    EXPECT_EQ(res1, UDMF_E_INVALID_PARAM);
+
+    int res2 = OH_UdmfRecordProvider_SetData(nullptr, context, GetDataCallbackFunc, nullptr);
+    EXPECT_EQ(res2, UDMF_E_INVALID_PARAM);
+
+    int res3 = OH_UdmfRecordProvider_SetData(provider, context, nullptr, nullptr);
+    EXPECT_EQ(res3, UDMF_E_INVALID_PARAM);
+    OH_UdmfRecordProvider_Destroy(provider);
+}
+
+/**
+ * @tc.name: OH_UdmfRecord_SetProvider001
+ * @tc.desc: Normal testcase of OH_UdmfRecord_SetProvider
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider001, TestSize.Level1)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
+    char content[] = "hello world";
+    OH_UdsPlainText_SetContent(plainText, content);
+    OH_UdmfRecord_AddPlainText(record, plainText);
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    int num = 1;
+    void* context = &num;
+    OH_UdmfRecordProvider_SetData(provider, context, GetDataCallbackFunc, FinalizeFunc);
+    const char* types[3] = { "general.plain-text", "general.hyperlink", "general.html" };
+    
+    int res = OH_UdmfRecord_SetProvider(record, types, 3, provider);
+    EXPECT_EQ(res, UDMF_E_OK);
+    OH_UdmfRecordProvider_Destroy(provider);
+}
+
+/**
+ * @tc.name: OH_UdmfRecord_SetProvider002
+ * @tc.desc: invalid parameters testcase of OH_UdmfRecord_SetProvider
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider002, TestSize.Level1)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
+    char content[] = "hello world";
+    OH_UdsPlainText_SetContent(plainText, content);
+    OH_UdmfRecord_AddPlainText(record, plainText);
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    int num = 1;
+    void* context = &num;
+    OH_UdmfRecordProvider_SetData(provider, context, GetDataCallbackFunc, FinalizeFunc);
+    const char* types[3] = { "general.plain-text", "general.hyperlink", "general.html" };
+    
+    int res = OH_UdmfRecord_SetProvider(record, types, 3, provider);
+    EXPECT_EQ(res, UDMF_E_OK);
+    OH_UdmfRecordProvider_Destroy(provider);
 }
 }

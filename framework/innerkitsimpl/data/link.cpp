@@ -27,7 +27,7 @@ Link::Link(const std::string &url) : Link(url, "")
 
 Link::Link(UDType type, ValueType value) : Text(type, value)
 {
-    this->dataType_ = HYPERLINK;
+    SetType(HYPERLINK);
     if (std::holds_alternative<std::string>(value)) {
         url_ = std::get<std::string>(value);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
@@ -46,7 +46,7 @@ Link::Link(const std::string &url, const std::string &description)
     if (url.length() >= MAX_TEXT_LEN || description.length() >= MAX_TEXT_LEN) {
         return;
     }
-    this->dataType_ = HYPERLINK;
+    SetType(HYPERLINK);
     this->url_ = url;
     this->description_ = description;
 }

@@ -12,27 +12,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#define LOG_TAG "SystemDefinedPixelMap"
 
 #include "system_defined_pixelmap.h"
+#include "logger.h"
 
 namespace OHOS {
 namespace UDMF {
+
 SystemDefinedPixelMap::SystemDefinedPixelMap()
 {
-    this->dataType_ = SYSTEM_DEFINED_PIXEL_MAP;
+    SetType(SYSTEM_DEFINED_PIXEL_MAP);
 }
 
 SystemDefinedPixelMap::SystemDefinedPixelMap(std::vector<uint8_t> &data)
 {
-    this->dataType_ = SYSTEM_DEFINED_PIXEL_MAP;
+    SetType(SYSTEM_DEFINED_PIXEL_MAP);
     this->rawData_ = std::move(data);
 }
 
 SystemDefinedPixelMap::SystemDefinedPixelMap(UDType type, ValueType value) : SystemDefinedRecord(type, value)
 {
-    this->dataType_ = SYSTEM_DEFINED_PIXEL_MAP;
+    SetType(SYSTEM_DEFINED_PIXEL_MAP);
     if (std::holds_alternative<std::vector<uint8_t>>(value)) {
         rawData_ = std::get<std::vector<uint8_t>>(value);
+        return;
+    }
+    if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        auto object = std::get<std::shared_ptr<Object>>(value);
+        auto it = object->value_.find(PIXEL_MAP);
+        if (it != object->value_.end() && std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(it->second)) {
+            auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(it->second);
+            if (!pixelMap->EncodeTlv(rawData_)) {
+                LOG_ERROR(UDMF_KITS_INNER, "pixelMap encode fail!");
+            }
+        }
     }
 }
 
@@ -49,6 +63,32 @@ std::vector<uint8_t> SystemDefinedPixelMap::GetRawData() const
 void SystemDefinedPixelMap::SetRawData(const std::vector<uint8_t> &rawData)
 {
     this->rawData_ = rawData;
+    this->updateObjectFlag_ = true;
 }
+
+ValueType SystemDefinedPixelMap::GetValue()
+{
+    if (std::holds_alternative<std::monostate>(value_)) {
+        value_ = std::make_shared<Object>();
+    }
+    if (this->updateObjectFlag_) {
+        InitObject();
+        this->updateObjectFlag_ = false;
+    }
+    return value_;
+}
+
+void SystemDefinedPixelMap::InitObject()
+{
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        auto pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(OHOS::Media::PixelMap::DecodeTlv(rawData_));
+        if (pixelMap == nullptr) {
+            LOG_ERROR(UDMF_KITS_INNER, "pixelMap encode fail!");
+        }
+        object->value_[PIXEL_MAP] = pixelMap;
+    }
+}
+
 } // namespace UDMF
 } // namespace OHOS

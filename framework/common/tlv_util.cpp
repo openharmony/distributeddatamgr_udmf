@@ -210,6 +210,13 @@ bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &dat
             data.Count(record->GetRawData());
             break;
         }
+        case UDType::FILE_URI: {
+            if (input == nullptr) {
+                return false;
+            }
+            data.Count(input->GetValue());
+            break;
+        }
         default: {
             return false;
         }
@@ -1096,6 +1103,15 @@ bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
             }
             break;
         }
+        case UDType::FILE_URI: {
+            if (input == nullptr) {
+                return false;
+            }
+            if (!Writing(input->GetValue(), data)) {
+                return false;
+            }
+            break;
+        }
         default: {
             return false;
         }
@@ -1228,6 +1244,10 @@ bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data)
                 return false;
             }
             output = record;
+            break;
+        }
+        case UDType::FILE_URI: {
+            output = std::make_shared<UnifiedRecord>();
             break;
         }
         default: {

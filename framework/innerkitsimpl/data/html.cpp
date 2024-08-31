@@ -19,7 +19,7 @@ namespace OHOS {
 namespace UDMF {
 Html::Html()
 {
-    this->dataType_ = HTML;
+    SetType(HTML);
 }
 
 Html::Html(const std::string &htmlContent, const std::string &plainContent)
@@ -27,14 +27,14 @@ Html::Html(const std::string &htmlContent, const std::string &plainContent)
     if (plainContent.length() >= MAX_TEXT_LEN || htmlContent.length() >= MAX_TEXT_LEN) {
         return;
     }
-    this->dataType_ = HTML;
+    SetType(HTML);
     this->htmlContent_ = htmlContent;
     this->plainContent_ = plainContent;
 }
 
 Html::Html(UDType type, ValueType value) : Text(type, value)
 {
-    this->dataType_ = HTML;
+    SetType(HTML);
     if (std::holds_alternative<std::string>(value)) {
         htmlContent_ = std::get<std::string>(value);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {

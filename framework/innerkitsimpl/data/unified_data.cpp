@@ -61,6 +61,7 @@ void UnifiedData::AddRecord(const std::shared_ptr<UnifiedRecord> &record)
     if (record == nullptr) {
         return;
     }
+    record->SetRecordId(++recordId_);
     this->records_.push_back(record);
 }
 
@@ -70,6 +71,7 @@ void UnifiedData::AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>> &
         if (record == nullptr) {
             return;
         }
+        record->SetRecordId(++recordId_);
         this->records_.push_back(record);
     }
 }
@@ -92,20 +94,13 @@ std::vector<std::shared_ptr<UnifiedRecord>> UnifiedData::GetRecords() const
     return this->records_;
 }
 
-std::vector<UDType> UnifiedData::GetUDTypes() const
-{
-    std::vector<UDType> typeSet;
-    for (const std::shared_ptr<UnifiedRecord> &record : records_) {
-        typeSet.push_back(record->GetType());
-    }
-    return typeSet;
-}
-
 std::string UnifiedData::GetTypes()
 {
     std::string types;
-    for (const std::shared_ptr<UnifiedRecord> &record : records_) {
-        types.append("-").append(UtdUtils::GetUtdIdFromUtdEnum(record->GetType()));
+    for (const auto &record : records_) {
+        for (const auto &type : record->GetUtdIds()) {
+            types.append("-").append(type);
+        }
     }
     return types;
 }
@@ -123,6 +118,27 @@ bool UnifiedData::HasType(const std::string &type) const
 {
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
         if (UtdUtils::GetUtdIdFromUtdEnum(record->GetType()) == type) {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::vector<std::string> UnifiedData::GetEntriesTypes() const
+{
+    std::set<std::string> labels;
+    for (const auto &record : records_) {
+        auto types = record->GetUtdIds();
+        labels.insert(types.begin(), types.end());
+    }
+    return std::vector<std::string>(labels.begin(), labels.end());
+}
+
+bool UnifiedData::HasTypeInEntries(const std::string &type) const
+{
+    for (const auto &record : records_) {
+        auto types = record->GetUtdIds();
+        if (types.find(type) != types.end()) {
             return true;
         }
     }
@@ -164,6 +180,10 @@ bool UnifiedData::IsComplete()
 
 void UnifiedData::SetProperties(std::shared_ptr<UnifiedDataProperties> properties)
 {
+    if (!properties) {
+        LOG_ERROR(UDMF_FRAMEWORK, "properties is null!");
+        return;
+    }
     properties->timestamp = properties_->timestamp;
     properties_ = properties;
 }
@@ -171,6 +191,21 @@ void UnifiedData::SetProperties(std::shared_ptr<UnifiedDataProperties> propertie
 std::shared_ptr<UnifiedDataProperties> UnifiedData::GetProperties() const
 {
     return properties_;
+}
+
+void UnifiedData::SetDataId(uint32_t dataId)
+{
+    dataId_ = dataId;
+}
+
+uint32_t UnifiedData::GetDataId() const
+{
+    return dataId_;
+}
+
+void UnifiedData::SetChannelName(const std::string &name)
+{
+    channelName_ = std::move(name);
 }
 } // namespace UDMF
 } // namespace OHOS
