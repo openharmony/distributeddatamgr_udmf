@@ -26,6 +26,7 @@ public:
     AAFwk::WantParams extras;
     ShareOptions shareOptions = CROSS_APP;
     std::int64_t timestamp;
+    bool isRemote;
 };
 } // namespace UDMF
 } // namespace OHOS
