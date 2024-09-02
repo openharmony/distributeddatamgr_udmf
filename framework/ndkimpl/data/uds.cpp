@@ -521,7 +521,7 @@ int OH_UdsArrayBuffer_GetData(OH_UdsArrayBuffer* buffer, unsigned char** data, u
         return UDMF_ERR;
     }
     const auto length = buffer->GetUdsValue<int>(ARRAY_BUFFER_LENGTH);
-    if (length == nullptr) {
+    if (length == nullptr || *length == 0) {
         return UDMF_ERR;
     }
 
@@ -532,6 +532,7 @@ int OH_UdsArrayBuffer_GetData(OH_UdsArrayBuffer* buffer, unsigned char** data, u
     }
     if (memcpy_s(chData, *length, (*arrayBuffer).data(), *length) != EOK) {
         LOG_ERROR(UDMF_CAPI, "memcpy failed.");
+        delete chData;
         return UDMF_ERR;
     }
     *data = chData;
