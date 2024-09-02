@@ -262,65 +262,65 @@ static int GetFirstHtml(OH_UdmfRecord **records, unsigned int recordCount, OH_Ud
     return ret;
 }
 
-int OH_UdmfData_GetPrimaryPlainText(OH_UdmfData* unifiedData, OH_UdsPlainText* plainText)
+int OH_UdmfData_GetPrimaryPlainText(OH_UdmfData* data, OH_UdsPlainText* plainText)
 {
-    if (!IsUnifiedDataValid(unifiedData) || IsInvalidUdsObjectPtr(plainText, UDS_PLAIN_TEXT_STRUCT_ID)) {
+    if (!IsUnifiedDataValid(data) || IsInvalidUdsObjectPtr(plainText, UDS_PLAIN_TEXT_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    std::lock_guard<std::mutex> lock(unifiedData->mutex);
-    if (unifiedData->records == nullptr) {
+    std::lock_guard<std::mutex> lock(data->mutex);
+    if (data->records == nullptr) {
         LOG_DEBUG(UDMF_CAPI, "no cache value");
-        std::vector<std::shared_ptr<UnifiedRecord>> records = unifiedData->unifiedData_->GetRecords();
-        CreateUnifiedDataRecordsArray(unifiedData, records);
+        std::vector<std::shared_ptr<UnifiedRecord>> records = data->unifiedData_->GetRecords();
+        CreateUnifiedDataRecordsArray(data, records);
     }
 
-    return GetFirstPlainText(unifiedData->records, unifiedData->recordsCount, plainText);
+    return GetFirstPlainText(data->records, data->recordsCount, plainText);
 }
 
-int OH_UdmfData_GetPrimaryHtml(OH_UdmfData* unifiedData, OH_UdsHtml* html)
+int OH_UdmfData_GetPrimaryHtml(OH_UdmfData* data, OH_UdsHtml* html)
 {
-    if (!IsUnifiedDataValid(unifiedData) || IsInvalidUdsObjectPtr(html, UDS_HTML_STRUCT_ID)) {
+    if (!IsUnifiedDataValid(data) || IsInvalidUdsObjectPtr(html, UDS_HTML_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    std::lock_guard<std::mutex> lock(unifiedData->mutex);
-    if (unifiedData->records == nullptr) {
+    std::lock_guard<std::mutex> lock(data->mutex);
+    if (data->records == nullptr) {
         LOG_DEBUG(UDMF_CAPI, "no cache value");
-        std::vector<std::shared_ptr<UnifiedRecord>> records = unifiedData->unifiedData_->GetRecords();
-        CreateUnifiedDataRecordsArray(unifiedData, records);
+        std::vector<std::shared_ptr<UnifiedRecord>> records = data->unifiedData_->GetRecords();
+        CreateUnifiedDataRecordsArray(data, records);
     }
 
-    return GetFirstHtml(unifiedData->records, unifiedData->recordsCount, html);
+    return GetFirstHtml(data->records, data->recordsCount, html);
 }
 
-int OH_UdmfData_GetRecordCount(OH_UdmfData *unifiedData)
+int OH_UdmfData_GetRecordCount(OH_UdmfData *data)
 {
-    if (!IsUnifiedDataValid(unifiedData)) {
+    if (!IsUnifiedDataValid(data)) {
         return 0;
     }
-    std::lock_guard<std::mutex> lock(unifiedData->mutex);
-    if (unifiedData->records == nullptr) {
+    std::lock_guard<std::mutex> lock(data->mutex);
+    if (data->records == nullptr) {
         LOG_DEBUG(UDMF_CAPI, "no cache value");
-        std::vector<std::shared_ptr<UnifiedRecord>> records = unifiedData->unifiedData_->GetRecords();
-        CreateUnifiedDataRecordsArray(unifiedData, records);
+        std::vector<std::shared_ptr<UnifiedRecord>> records = data->unifiedData_->GetRecords();
+        CreateUnifiedDataRecordsArray(data, records);
     }
-    return static_cast<int>(unifiedData->recordsCount);
+    return static_cast<int>(data->recordsCount);
 }
 
-OH_UdmfRecord* OH_UdmfData_GetRecord(OH_UdmfData* unifiedData, unsigned int index)
+OH_UdmfRecord* OH_UdmfData_GetRecord(OH_UdmfData* data, unsigned int index)
 {
-    if (!IsUnifiedDataValid(unifiedData) || index < 0) {
+    if (!IsUnifiedDataValid(data) || index < 0) {
         return nullptr;
     }
-    std::lock_guard<std::mutex> lock(unifiedData->mutex);
-    if (unifiedData->records == nullptr) {
+    std::lock_guard<std::mutex> lock(data->mutex);
+    if (data->records == nullptr) {
         LOG_DEBUG(UDMF_CAPI, "no cache value");
-        std::vector<std::shared_ptr<UnifiedRecord>> records = unifiedData->unifiedData_->GetRecords();
-        CreateUnifiedDataRecordsArray(unifiedData, records);
+        std::vector<std::shared_ptr<UnifiedRecord>> records = data->unifiedData_->GetRecords();
+        CreateUnifiedDataRecordsArray(data, records);
     }
-    if (index >= unifiedData->recordsCount) {
+    if (index >= data->recordsCount || data->records == nullptr) {
         return nullptr;
     }
-    return unifiedData->records[index];
+    return data->records[index];
 }
 
 bool OH_UdmfData_IsLocal(OH_UdmfData* data)
