@@ -485,7 +485,8 @@ OH_UdsArrayBuffer* OH_UdsArrayBuffer_Create()
 
 int OH_UdsArrayBuffer_Destroy(OH_UdsArrayBuffer* buffer)
 {
-    if (buffer != nullptr && buffer->cid != NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID) {
+    if (IsInvalidUdsObjectPtr(buffer, NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID)) {
+        LOG_ERROR(UDMF_CAPI, "Param is invalid.");
         return UDMF_E_INVALID_PARAM;
     }
     delete buffer;
@@ -494,8 +495,9 @@ int OH_UdsArrayBuffer_Destroy(OH_UdsArrayBuffer* buffer)
 
 int OH_UdsArrayBuffer_SetData(OH_UdsArrayBuffer* buffer, unsigned char* data, unsigned int len)
 {
-    if (data == nullptr || len <= 0 || IsInvalidUdsObjectPtr(buffer, NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID) ||
+    if (data == nullptr || len == 0 || IsInvalidUdsObjectPtr(buffer, NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID) ||
         len > MAX_RECORDS_SIZE) {
+        LOG_ERROR(UDMF_CAPI, "Param is invalid.");
         return UDMF_E_INVALID_PARAM;
     }
     std::vector<uint8_t> arrayBuffer(data, data + len);
@@ -511,6 +513,7 @@ int OH_UdsArrayBuffer_SetData(OH_UdsArrayBuffer* buffer, unsigned char* data, un
 int OH_UdsArrayBuffer_GetData(OH_UdsArrayBuffer* buffer, unsigned char** data, unsigned int* len)
 {
     if (buffer == nullptr || IsInvalidUdsObjectPtr(buffer, NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID)) {
+        LOG_ERROR(UDMF_CAPI, "Param is invalid.");
         return UDMF_E_INVALID_PARAM;
     }
     const auto arrayBuffer = buffer->GetUdsValue<std::vector<uint8_t>>(ARRAY_BUFFER);
@@ -528,7 +531,7 @@ int OH_UdsArrayBuffer_GetData(OH_UdsArrayBuffer* buffer, unsigned char** data, u
         return UDMF_ERR;
     }
     if (memcpy_s(chData, *length, (*arrayBuffer).data(), *length) != EOK) {
-        LOG_ERROR(UDMF_CAPI, "memcpy error!");
+        LOG_ERROR(UDMF_CAPI, "memcpy failed.");
         return UDMF_ERR;
     }
     *data = chData;
