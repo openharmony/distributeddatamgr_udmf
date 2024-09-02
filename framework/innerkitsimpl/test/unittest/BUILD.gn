@@ -80,6 +80,7 @@ ohos_unittest("UtdClientTest") {
 
   sources = [
     "${udmf_framework_path}/common/graph.cpp",
+    "${udmf_framework_path}/common/utd_graph.cpp",
     "custom_utd_json_parser_test.cpp",
     "custom_utd_store_test.cpp",
     "graph_test.cpp",
@@ -91,6 +92,11 @@ ohos_unittest("UtdClientTest") {
   deps = [ "${udmf_interfaces_path}/innerkits:utd_client" ]
 
   external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
 }
 
 ohos_unittest("NdkDataConversionTest") {
@@ -336,6 +342,66 @@ ohos_unittest("UnifiedDataTest") {
   ]
 }
 
+ohos_unittest("UnifiedDataHelperTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unified_data_helper_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("UnifiedRecordTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unified_record_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("VideoTest") {
+  module_out_path = module_output_path
+
+  sources = [ "video_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("UnifiedMetaTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unified_meta_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
@@ -358,8 +424,12 @@ group("unittest") {
     ":TextTest",
     ":UdmfClientSystemHapTest",
     ":UdmfClientTest",
+    ":UnifiedDataHelperTest",
     ":UnifiedDataTest",
+    ":UnifiedMetaTest",
+    ":UnifiedRecordTest",
     ":UtdClientTest",
+    ":VideoTest",
   ]
 }
 ###############################################################################

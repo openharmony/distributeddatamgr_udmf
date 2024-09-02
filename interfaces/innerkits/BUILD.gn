@@ -55,6 +55,7 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/common/udmf_types_util.cpp",
     "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/async_obtain_data.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/getter_system.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",

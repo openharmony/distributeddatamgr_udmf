@@ -21,8 +21,8 @@
 #include "token_setproc.h"
 #include "accesstoken_kit.h"
 #include "nativetoken_kit.h"
-
 #include "logger.h"
+#include "pixelmap_native_impl.h"
 #include "uds.h"
 #include "udmf_capi_common.h"
 #include "udmf_meta.h"
@@ -766,4 +766,219 @@ HWTEST_F(UdsTest, OH_UdsAppItem_SetAbilityName_001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "OH_UdsAppItem_SetAbilityName_001 end.");
 }
 
+/**
+ * @tc.name: OH_UdsFileUri_Create_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_Create
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_Create_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    EXPECT_EQ(UDMF_META_GENERAL_FILE_URI, *(std::get_if<std::string>(&(fileUri->obj)->value_[UNIFORM_DATA_TYPE])));
+    OH_UdsFileUri_Destroy(fileUri);
+}
+
+/**
+ * @tc.name: OH_UdsFileUri_GetType_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_GetType
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_GetType_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    EXPECT_EQ(UDMF_META_GENERAL_FILE_URI, std::string(OH_UdsFileUri_GetType(fileUri)));
+    OH_UdsFileUri_Destroy(fileUri);
+
+    OH_UdsFileUri* fileUriNullptr = nullptr;
+    EXPECT_EQ(nullptr, OH_UdsFileUri_GetType(fileUriNullptr));
+
+    fileUriNullptr = new OH_UdsFileUri;
+    EXPECT_EQ(nullptr, OH_UdsFileUri_GetType(fileUriNullptr));
+    OH_UdsFileUri_Destroy(fileUriNullptr);
+}
+
+/**
+ * @tc.name: OH_UdsFileUri_GetFileUri_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_GetFileUri
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_GetFileUri_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    fileUri->obj->value_[FILE_URI_PARAM] = "fileUri";
+    EXPECT_EQ("fileUri", std::string(OH_UdsFileUri_GetFileUri(fileUri)));
+    OH_UdsFileUri_Destroy(fileUri);
+
+    OH_UdsFileUri* fileUriNullptr = nullptr;
+    EXPECT_EQ(nullptr, OH_UdsFileUri_GetFileUri(fileUriNullptr));
+
+    fileUriNullptr = new OH_UdsFileUri;
+    EXPECT_EQ(nullptr, OH_UdsFileUri_GetFileUri(fileUriNullptr));
+    OH_UdsFileUri_Destroy(fileUriNullptr);
+}
+
+/**
+ * @tc.name: OH_UdsFileUri_GetFileType_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_GetFileType
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_GetFileType_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    fileUri->obj->value_[FILE_TYPE] = "fileType";
+    EXPECT_EQ("fileType", std::string(OH_UdsFileUri_GetFileType(fileUri)));
+    OH_UdsFileUri_Destroy(fileUri);
+
+    OH_UdsFileUri* fileUriNullptr = nullptr;
+    EXPECT_EQ(nullptr, OH_UdsFileUri_GetFileType(fileUriNullptr));
+
+    fileUriNullptr = new OH_UdsFileUri;
+    EXPECT_EQ(nullptr, OH_UdsFileUri_GetFileType(fileUriNullptr));
+    OH_UdsFileUri_Destroy(fileUriNullptr);
+}
+
+/**
+ * @tc.name: OH_UdsFileUri_SetFileUri_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_SetFileUri
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_SetFileUri_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    int result = OH_UdsFileUri_SetFileUri(fileUri, "file uri");
+    EXPECT_EQ(UDMF_E_OK, result);
+    EXPECT_EQ("file uri", std::string(OH_UdsFileUri_GetFileUri(fileUri)));
+
+    result = OH_UdsFileUri_SetFileUri(nullptr, "file uri");
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    result = OH_UdsFileUri_SetFileUri(fileUri, nullptr);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    fileUri->obj = nullptr;
+    result = OH_UdsFileUri_SetFileUri(fileUri, "file uri");
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    OH_UdsFileUri_Destroy(fileUri);
+}
+
+/**
+ * @tc.name: OH_UdsFileUri_SetFileUri_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_SetFileUri
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_SetFileType_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    int result = OH_UdsFileUri_SetFileType(fileUri, "file type");
+    EXPECT_EQ(UDMF_E_OK, result);
+    EXPECT_EQ("file type", std::string(OH_UdsFileUri_GetFileType(fileUri)));
+
+    result = OH_UdsFileUri_SetFileType(nullptr, "file type");
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    result = OH_UdsFileUri_SetFileType(fileUri, nullptr);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    fileUri->obj = nullptr;
+    result = OH_UdsFileUri_SetFileType(fileUri, "file type");
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    OH_UdsFileUri_Destroy(fileUri);
+}
+
+/**
+ * @tc.name: OH_UdsPixelMap_Create_001
+ * @tc.desc: Normal testcase of OH_UdsPixelMap_Create
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsPixelMap_Create_001, TestSize.Level1)
+{
+    auto pixelMap = OH_UdsPixelMap_Create();
+    EXPECT_EQ(UDMF_META_OPENHARMONY_PIXEL_MAP,
+        *(std::get_if<std::string>(&(pixelMap->obj)->value_[UNIFORM_DATA_TYPE])));
+    OH_UdsPixelMap_Destroy(pixelMap);
+}
+
+/**
+ * @tc.name: OH_UdsPixelMap_GetType_001
+ * @tc.desc: Normal testcase of OH_UdsPixelMap_GetType
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsPixelMap_GetType_001, TestSize.Level1)
+{
+    auto pixelMap = OH_UdsPixelMap_Create();
+    EXPECT_EQ(UDMF_META_OPENHARMONY_PIXEL_MAP, std::string(OH_UdsPixelMap_GetType(pixelMap)));
+    OH_UdsPixelMap_Destroy(pixelMap);
+
+    OH_UdsPixelMap* pixelMapNullptr = nullptr;
+    EXPECT_EQ(nullptr, OH_UdsPixelMap_GetType(pixelMapNullptr));
+
+    pixelMapNullptr = new OH_UdsPixelMap;
+    EXPECT_EQ(nullptr, OH_UdsPixelMap_GetType(pixelMapNullptr));
+    OH_UdsPixelMap_Destroy(pixelMapNullptr);
+}
+
+/**
+ * @tc.name: OH_UdsPixelMap_GetPixelMap_001
+ * @tc.desc: Normal testcase of OH_UdsPixelMap_GetPixelMap
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsPixelMap_GetPixelMap_001, TestSize.Level1)
+{
+    auto pixelMap = OH_UdsPixelMap_Create();
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMapPtr = std::make_shared<OHOS::Media::PixelMap>();
+    pixelMapPtr->SetTransformered(true);
+    pixelMap->obj->value_[PIXEL_MAP] = pixelMapPtr;
+    OH_PixelmapNative* pixelMapResult = new OH_PixelmapNative(nullptr);
+    OH_UdsPixelMap_GetPixelMap(pixelMap, pixelMapResult);
+    auto innerPixelMap = pixelMapResult->GetInnerPixelmap();
+    EXPECT_NE(nullptr, innerPixelMap);
+    EXPECT_TRUE(innerPixelMap->IsTransformered());
+    OH_UdsPixelMap_Destroy(pixelMap);
+    delete pixelMapResult;
+
+    OH_PixelmapNative* ohPixelMapNull = new OH_PixelmapNative(nullptr);
+    OH_UdsPixelMap* pixelMapNullptr = nullptr;
+    OH_UdsPixelMap_GetPixelMap(pixelMapNullptr, ohPixelMapNull);
+    EXPECT_EQ(nullptr, ohPixelMapNull->GetInnerPixelmap());
+    delete pixelMapNullptr;
+
+    pixelMapNullptr = new OH_UdsPixelMap;
+    OH_UdsPixelMap_GetPixelMap(pixelMapNullptr, ohPixelMapNull);
+    EXPECT_EQ(nullptr, ohPixelMapNull->GetInnerPixelmap());
+    delete ohPixelMapNull;
+    OH_UdsPixelMap_Destroy(pixelMapNullptr);
+}
+
+/**
+ * @tc.name: OH_UdsPixelMap_SetPixelMap_001
+ * @tc.desc: Normal testcase of OH_UdsPixelMap_SetPixelMap
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsPixelMap_SetPixelMap_001, TestSize.Level1)
+{
+    auto pixelMap = OH_UdsPixelMap_Create();
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMapPtr = std::make_shared<OHOS::Media::PixelMap>();
+    pixelMapPtr->SetTransformered(true);
+    OH_PixelmapNative* ohPixelmapNative = new OH_PixelmapNative(pixelMapPtr);
+    int result = OH_UdsPixelMap_SetPixelMap(pixelMap, ohPixelmapNative);
+    EXPECT_EQ(UDMF_E_OK, result);
+    OH_PixelmapNative* pixelMapResult = new OH_PixelmapNative(nullptr);
+    OH_UdsPixelMap_GetPixelMap(pixelMap, pixelMapResult);
+    auto innerPixelMap = pixelMapResult->GetInnerPixelmap();
+    EXPECT_NE(nullptr, innerPixelMap);
+    EXPECT_TRUE(innerPixelMap->IsTransformered());
+
+    result = OH_UdsPixelMap_SetPixelMap(nullptr, ohPixelmapNative);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    result = OH_UdsPixelMap_SetPixelMap(pixelMap, nullptr);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    pixelMap->obj = nullptr;
+    result = OH_UdsPixelMap_SetPixelMap(pixelMap, ohPixelmapNative);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    delete pixelMapResult;
+    delete ohPixelmapNative;
+    OH_UdsPixelMap_Destroy(pixelMap);
+}
 }

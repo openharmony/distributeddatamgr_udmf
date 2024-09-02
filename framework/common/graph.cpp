@@ -24,6 +24,18 @@ Graph::Graph(uint32_t vertexNum):vertexNum_(vertexNum)
     fill(visited_.begin(), visited_.end(), 0);
 }
 
+Graph::~Graph()
+{
+    for (auto &vertexNode : adjList_) {
+        EdgeNode *edge = vertexNode.firstEdge;
+        while (edge != nullptr) {
+            EdgeNode *nextEdge = edge->next;
+            delete edge;
+            edge = nextEdge;
+        }
+    }
+}
+
 void Graph::AddEdge(uint32_t start, uint32_t end)
 {
     EdgeNode *edge = new EdgeNode;  // add new edge

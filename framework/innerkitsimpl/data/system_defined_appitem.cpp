@@ -19,12 +19,12 @@ namespace OHOS {
 namespace UDMF {
 SystemDefinedAppItem::SystemDefinedAppItem()
 {
-    this->dataType_ = SYSTEM_DEFINED_APP_ITEM;
+    SetType(SYSTEM_DEFINED_APP_ITEM);
 }
 
 SystemDefinedAppItem::SystemDefinedAppItem(UDType type, ValueType value) : SystemDefinedRecord(type, value)
 {
-    this->dataType_ = SYSTEM_DEFINED_APP_ITEM;
+    SetType(SYSTEM_DEFINED_APP_ITEM);
     if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
         object->GetValue(APPID, appId_);

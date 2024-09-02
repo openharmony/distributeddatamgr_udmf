@@ -38,10 +38,11 @@ public:
     void SetRecords(std::vector<std::shared_ptr<UnifiedRecord>> records);
     std::vector<std::shared_ptr<UnifiedRecord>> GetRecords() const;
 
-    std::vector<UDType> GetUDTypes() const;
     std::string GetTypes();
     std::vector<std::string> GetTypesLabels() const;
     bool HasType(const std::string &type) const;
+    std::vector<std::string> GetEntriesTypes() const;
+    bool HasTypeInEntries(const std::string &type) const;
 
     bool IsEmpty() const;
     bool IsValid();
@@ -50,9 +51,16 @@ public:
     void SetProperties(std::shared_ptr<UnifiedDataProperties> properties);
     std::shared_ptr<UnifiedDataProperties> GetProperties() const;
 
+    void SetDataId(uint32_t dataId);
+    uint32_t GetDataId() const;
+    void SetChannelName(const std::string &name);
+
     static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;
 
 private:
+    uint32_t dataId_ = 0;
+    uint32_t recordId_ = 0;
+    std::string channelName_;
     std::shared_ptr<Runtime> runtime_;
     std::vector<std::shared_ptr<UnifiedRecord>> records_;
     std::shared_ptr<UnifiedDataProperties> properties_;

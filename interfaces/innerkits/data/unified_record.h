@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "entry_getter.h"
 #include "visibility.h"
 #include "unified_types.h"
 
@@ -41,6 +42,22 @@ public:
     void SetValue(const ValueType &value);
     ValueType GetOriginValue();
 
+    void SetUtdId(const std::string &utdId);
+    std::set<std::string> GetUtdIds() const;
+    std::string GetUtdId() const;
+
+    bool HasType(const std::string &utdId) const;
+    void AddEntry(const std::string &utdId, ValueType &&value);
+    ValueType GetEntry(const std::string &utdId);
+    std::shared_ptr<std::map<std::string, ValueType>> GetEntries() const;
+	
+    void SetEntryGetter(const std::set<std::string> &utdIds, const std::shared_ptr<EntryGetter> entryGetter);
+    std::shared_ptr<EntryGetter> GetEntryGetter();
+    void SetDataId(uint32_t dataId);
+    uint32_t GetDataId() const;
+    void SetRecordId(uint32_t recordId);
+    uint32_t GetRecordId() const;
+    void SetChannelName(const std::string &channelName);
 protected:
     static constexpr const char *UNIFORM_DATA_TYPE = "uniformDataType";
     static constexpr const char *DETAILS = "details";
@@ -48,6 +65,12 @@ protected:
     ValueType value_;
 private:
     std::string uid_; // unique identifier
+    std::string utdId_;
+    std::shared_ptr<std::map<std::string, ValueType>> entries_ = std::make_shared<std::map<std::string, ValueType>>();
+    uint32_t dataId_ = 0;
+    uint32_t recordId_ = 0;
+    std::string channelName_;
+    std::shared_ptr<EntryGetter> entryGetter_;
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -28,7 +28,7 @@ Text::Text(UDDetails &variantMap) : UnifiedRecord(TEXT)
 
 Text::Text(UDType type, ValueType value) : UnifiedRecord(type, value)
 {
-    this->dataType_ = TEXT;
+    SetType(TEXT);
 }
 
 int64_t Text::GetSize()

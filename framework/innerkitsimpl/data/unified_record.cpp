@@ -15,6 +15,8 @@
 #define LOG_TAG "UnifiedRecord"
 #include "unified_record.h"
 
+#include "getter_system.h"
+
 namespace OHOS {
 namespace UDMF {
 UnifiedRecord::UnifiedRecord()
@@ -25,11 +27,13 @@ UnifiedRecord::UnifiedRecord()
 UnifiedRecord::UnifiedRecord(UDType type)
 {
     dataType_ = type;
+    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(type);
 }
 
 UnifiedRecord::UnifiedRecord(UDType type, ValueType value)
 {
     dataType_ = type;
+    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(type);
     value_ = value;
 }
 
@@ -40,7 +44,8 @@ UDType UnifiedRecord::GetType() const
 
 void UnifiedRecord::SetType(const UDType &type)
 {
-    this->dataType_ = type;
+    dataType_ = type;
+    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(type);
 }
 
 int64_t UnifiedRecord::GetSize()
@@ -71,6 +76,117 @@ void UnifiedRecord::SetValue(const ValueType &value)
 ValueType UnifiedRecord::GetOriginValue()
 {
     return value_;
+}
+
+bool UnifiedRecord::HasType(const std::string &utdId) const
+{
+    if (entries_->find(utdId) != entries_->end()) {
+        return true;
+    }
+    return utdId == utdId_;
+}
+
+void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
+{
+    if (utdId == utdId_ || utdId_.empty()) {
+        utdId_ = utdId;
+        value_ = std::move(value);
+        auto udType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(utdId_));
+        if (udType != UD_BUTT) {
+            dataType_ = udType;
+        } else {
+            dataType_ = APPLICATION_DEFINED_RECORD;
+        }
+    } else {
+        entries_->insert_or_assign(utdId, std::move(value));
+    }
+}
+
+ValueType UnifiedRecord::GetEntry(const std::string &utdId)
+{
+    if (utdId_ == utdId && !(std::holds_alternative<std::monostate>(value_))) {
+        return value_;
+    }
+    auto it = entries_->find(utdId);
+    if (it != entries_->end() && !(std::holds_alternative<std::monostate>(it->second))) {
+        return it->second;
+    }
+    auto getter = GetterSystem::GetInstance().GetGetter(channelName_);
+    if (getter != nullptr && (utdId_ == utdId || it != entries_->end())) {
+        auto value = getter->GetValueByType(dataId_, recordId_, utdId);
+        AddEntry(utdId, ValueType(value));
+        return value;
+    }
+    return std::monostate();
+}
+
+std::shared_ptr<std::map<std::string, ValueType>> UnifiedRecord::GetEntries() const
+{
+    auto res = std::make_shared<std::map<std::string, ValueType>>(*entries_);
+    if (!utdId_.empty()) {
+        res->insert_or_assign(utdId_, value_);
+    }
+    return res;
+}
+
+std::set<std::string> UnifiedRecord::GetUtdIds() const
+{
+    std::set<std::string> utdIds;
+    if (!utdId_.empty()) {
+        utdIds.emplace(utdId_);
+    }
+    for (const auto& [key, value] : *entries_) {
+        utdIds.emplace(key);
+    }
+    return utdIds;
+}
+
+void UnifiedRecord::SetUtdId(const std::string& utdId)
+{
+    utdId_ = utdId;
+}
+
+std::string UnifiedRecord::GetUtdId() const
+{
+    return utdId_;
+}
+
+void UnifiedRecord::SetDataId(uint32_t dataId)
+{
+    dataId_ = dataId;
+}
+
+uint32_t UnifiedRecord::GetDataId() const
+{
+    return dataId_;
+}
+
+void UnifiedRecord::SetRecordId(uint32_t recordId)
+{
+    recordId_ = recordId;
+}
+
+uint32_t UnifiedRecord::GetRecordId() const
+{
+    return recordId_;
+}
+
+void UnifiedRecord::SetEntryGetter(const std::set<std::string> &utdIds, const std::shared_ptr<EntryGetter> entryGetter)
+{
+    for (auto utdId : utdIds) {
+        AddEntry(utdId, ValueType());
+    }
+    entryGetter_ = std::move(entryGetter);
+}
+
+std::shared_ptr<EntryGetter> UnifiedRecord::GetEntryGetter()
+{
+    return entryGetter_;
+}
+
+void UnifiedRecord::SetChannelName(const std::string &channelName)
+{
+    channelName_ = channelName;
 }
 } // namespace UDMF
 } // namespace OHOS
