@@ -26,8 +26,6 @@
 
 using namespace OHOS::UDMF;
 
-static constexpr uint64_t MAX_RECORDS_SIZE = 4 * 1024 * 1024;
-
 static const char* GetUdsStrValue(UdsObject* pThis, NdkStructId ndkStructId, const char* pramName)
 {
     if (IsInvalidUdsObjectPtr(pThis, ndkStructId)) {
@@ -496,7 +494,7 @@ int OH_UdsArrayBuffer_Destroy(OH_UdsArrayBuffer* buffer)
 int OH_UdsArrayBuffer_SetData(OH_UdsArrayBuffer* buffer, unsigned char* data, unsigned int len)
 {
     if (data == nullptr || len == 0 || IsInvalidUdsObjectPtr(buffer, NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID) ||
-        len > MAX_RECORDS_SIZE) {
+        len > MAX_GENERAL_ENTRY_SIZE) {
         LOG_ERROR(UDMF_CAPI, "Param is invalid.");
         return UDMF_E_INVALID_PARAM;
     }
@@ -506,7 +504,7 @@ int OH_UdsArrayBuffer_SetData(OH_UdsArrayBuffer* buffer, unsigned char* data, un
         LOG_ERROR(UDMF_CAPI, "Failed to apply for memory. ret: %{public}d", ret);
         return ret;
     }
-    ret = buffer->SetUdsValue<int>(ARRAY_BUFFER_LENGTH, (int)len);
+    ret = buffer->SetUdsValue<int>(ARRAY_BUFFER_LENGTH, static_cast<int>(len));
     return ret;
 }
 
@@ -517,25 +515,15 @@ int OH_UdsArrayBuffer_GetData(OH_UdsArrayBuffer* buffer, unsigned char** data, u
         return UDMF_E_INVALID_PARAM;
     }
     const auto arrayBuffer = buffer->GetUdsValue<std::vector<uint8_t>>(ARRAY_BUFFER);
-    if (arrayBuffer == nullptr) {
+    if (arrayBuffer == nullptr || arrayBuffer->empty()) {
         return UDMF_ERR;
     }
     const auto length = buffer->GetUdsValue<int>(ARRAY_BUFFER_LENGTH);
-    if (length == nullptr || *length == 0) {
+    if (length == nullptr || *length <= 0 || *length > MAX_GENERAL_ENTRY_SIZE) {
         return UDMF_ERR;
     }
 
-    auto *chData = new (std::nothrow) unsigned char[*length];
-    if (chData == nullptr) {
-        LOG_ERROR(UDMF_CAPI, "create failed.");
-        return UDMF_ERR;
-    }
-    if (memcpy_s(chData, *length, (*arrayBuffer).data(), *length) != EOK) {
-        LOG_ERROR(UDMF_CAPI, "memcpy failed.");
-        delete chData;
-        return UDMF_ERR;
-    }
-    *data = chData;
+    *data = arrayBuffer->data();
     *len = *length;
     return UDMF_E_OK;
 }

@@ -21,6 +21,8 @@
 #include <mutex>
 #include <cstdint>
 
+# define MAX_GENERAL_ENTRY_SIZE (128 * 1024 * 1024)
+
 struct UdsObject {
     const int64_t cid;
     std::shared_ptr<OHOS::UDMF::Object> obj;

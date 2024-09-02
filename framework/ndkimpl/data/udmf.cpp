@@ -33,8 +33,8 @@
 
 using namespace OHOS::UDMF;
 
-static constexpr uint64_t MAX_RECORDS_COUNT = 128 * 1024 * 1024;
-static constexpr uint64_t MAX_RECORDS_SIZE = 128 * 1024 * 1024;
+static constexpr uint64_t MAX_RECORDS_COUNT = 4 * 1024 * 1024;
+static constexpr uint64_t MAX_RECORDS_SIZE = 4 * 1024 * 1024;
 static constexpr uint64_t MAX_KEY_STRING_LEN = 1 * 1024 * 1024;
 
 static void DestroyStringArray(char**& bufArray, unsigned int& count)
@@ -297,7 +297,7 @@ int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId,
                                   const unsigned char* entry, unsigned int count)
 {
     if (!IsUnifiedRecordValid(record) || typeId == nullptr || entry == nullptr || count == 0 ||
-        count > MAX_RECORDS_SIZE || strlen(typeId) > MAX_KEY_STRING_LEN) {
+        count > MAX_GENERAL_ENTRY_SIZE || strlen(typeId) > MAX_KEY_STRING_LEN) {
         return UDMF_E_INVALID_PARAM;
     }
     std::string utdId(typeId);
@@ -328,7 +328,6 @@ static int GetValueFromUdsArrayBuffer(OH_UdmfRecord *record, const char *typeId,
         return ret;
     }
     record->lastType = const_cast<char*>(typeId);
-    OH_UdsArrayBuffer_Destroy(buffer);
     return UDMF_E_OK;
 }
 
@@ -385,10 +384,10 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* record, const char* typeId, uns
     } else if (std::holds_alternative<std::vector<uint8_t>>(value)) {
         result = GetValueFromUint8Array(record, typeId, value);
     } else {
-        LOG_ERROR(UDMF_CAPI, "Not contains right data type. typeId: %{public}s", typeId);
+        LOG_ERROR(UDMF_CAPI, "Not contains right data type.");
     }
     if (result != UDMF_E_OK) {
-        LOG_ERROR(UDMF_CAPI, "Get value from valueType failed. result: %{public}d", result);
+        LOG_ERROR(UDMF_CAPI, "Get value from valueType failed. typeId: %{public}s, result: %{public}d", typeId, result);
         return result;
     }
     *count = record->recordDataLen;

@@ -1379,7 +1379,6 @@ HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider002, TestSize.Level1)
  * @tc.name: OH_Udmf_BuildRecordByOpenHarmonyArrayBuffer001
  * @tc.desc: test OH_UdmfRecord_AddArrayBuffer with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByOpenHarmonyArrayBuffer001, TestSize.Level0)
 {
@@ -1418,7 +1417,6 @@ HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByOpenHarmonyArrayBuffer001, TestSize.Leve
  * @tc.name: OH_Udmf_BuildRecordByOpenHarmonyArrayBuffer002
  * @tc.desc: test OH_UdmfRecord_AddArrayBuffer with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByOpenHarmonyArrayBuffer002, TestSize.Level0)
 {
@@ -1454,12 +1452,11 @@ HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByOpenHarmonyArrayBuffer002, TestSize.Leve
 }
 
 /**
- * @tc.name: OH_Udmf_BuildAndGetArrayBufferFromRecord001
+ * @tc.name: OH_Udmf_GetArrayBufferFromRecord001
  * @tc.desc: test OH_UdmfRecord_AddArrayBuffer with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
-HWTEST_F(UDMFTest, OH_Udmf_BuildAndGetArrayBufferFromRecord001, TestSize.Level0)
+HWTEST_F(UDMFTest, OH_Udmf_GetArrayBufferFromRecord001, TestSize.Level0)
 {
     unsigned char data1[] = "Hello world";
     unsigned int len1 = sizeof(data1);
