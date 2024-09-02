@@ -405,7 +405,7 @@ int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId,
                                   const unsigned char* entry, unsigned int count)
 {
     if (!IsUnifiedRecordValid(record) || typeId == nullptr || entry == nullptr || count == 0 ||
-        count > MAX_RECORDS_SIZE) {
+        count > MAX_GENERAL_ENTRY_SIZE || strlen(typeId) > MAX_KEY_STRING_LEN) {
         return UDMF_E_INVALID_PARAM;
     }
     std::string utdId(typeId);
@@ -425,36 +425,30 @@ int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId,
     return UDMF_E_OK;
 }
 
-int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* record, const char* typeId, unsigned char** entry, unsigned int* count)
+static int GetValueFromUdsArrayBuffer(OH_UdmfRecord *record, const char *typeId, ValueType value)
 {
-    if (!IsUnifiedRecordValid(record) || typeId == nullptr || entry == nullptr || count == nullptr) {
-        return UDMF_E_INVALID_PARAM;
+    OH_UdsArrayBuffer *buffer = OH_UdsArrayBuffer_Create();
+    buffer->obj = std::get<std::shared_ptr<Object>>(value);
+
+    int ret = OH_UdsArrayBuffer_GetData(buffer, &record->recordData, &record->recordDataLen);
+    if (ret != UDMF_E_OK) {
+        LOG_ERROR(UDMF_CAPI, "get data from buffer failed. ret: %{public}d", ret);
+        return ret;
     }
-    if (!record->record_->HasType(typeId)) {
-        LOG_ERROR(UDMF_CAPI, "no type:%{public}s", typeId);
-        return UDMF_E_INVALID_PARAM;
-    }
-    if (record->lastType == typeId && record->recordData != nullptr) {
-        LOG_DEBUG(UDMF_CAPI, "return cache value");
-        *entry = record->recordData;
-        return UDMF_E_OK;
-    }
-    auto value = record->record_->GetEntry(typeId);
+    record->lastType = const_cast<char*>(typeId);
+    return UDMF_E_OK;
+}
+
+static int GetValueFromUint8Array(OH_UdmfRecord *record, const char *typeId, ValueType value)
+{
     auto recordValue = std::get_if<std::vector<uint8_t>>(&value);
     if (recordValue == nullptr) {
         return UDMF_ERR;
     }
-    std::lock_guard<std::mutex> lock(record->mutex);
-    *count = recordValue->size();
     record->recordDataLen = recordValue->size();
     if (record->recordDataLen > MAX_RECORDS_SIZE) {
         LOG_INFO(UDMF_CAPI, "data size exceeds maximum size");
-        *count = 0;
         return UDMF_ERR;
-    }
-    if (record->recordData != nullptr) {
-        delete[] record->recordData;
-        record->recordData = nullptr;
     }
     record->recordData = new (std::nothrow) unsigned char[record->recordDataLen];
     if (record->recordData == nullptr) {
@@ -463,8 +457,48 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* record, const char* typeId, uns
     auto err = memcpy_s(record->recordData, record->recordDataLen, recordValue->data(), record->recordDataLen);
     if (err != EOK) {
         LOG_ERROR(UDMF_CAPI, "memcpy error! type:%{public}s", typeId);
+        return UDMF_ERR;
     }
     record->lastType = const_cast<char*>(typeId);
+    return UDMF_E_OK;
+}
+
+int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* record, const char* typeId, unsigned char** entry, unsigned int* count)
+{
+    if (!IsUnifiedRecordValid(record) || typeId == nullptr || entry == nullptr || count == nullptr) {
+        return UDMF_E_INVALID_PARAM;
+    }
+
+    std::lock_guard<std::mutex> lock(record->mutex);
+    if (!record->record_->HasType(typeId)) {
+        LOG_ERROR(UDMF_CAPI, "no type:%{public}s", typeId);
+        return UDMF_E_INVALID_PARAM;
+    }
+    if (record->lastType == typeId && record->recordData != nullptr) {
+        LOG_DEBUG(UDMF_CAPI, "return cache value");
+        *entry = record->recordData;
+        *count = record->recordDataLen;
+        return UDMF_E_OK;
+    }
+    if (record->recordData != nullptr) {
+        delete[] record->recordData;
+        record->recordData = nullptr;
+    }
+    auto value = record->record_->GetEntry(typeId);
+
+    int result = UDMF_ERR;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        result = GetValueFromUdsArrayBuffer(record, typeId, value);
+    } else if (std::holds_alternative<std::vector<uint8_t>>(value)) {
+        result = GetValueFromUint8Array(record, typeId, value);
+    } else {
+        LOG_ERROR(UDMF_CAPI, "Not contains right data type.");
+    }
+    if (result != UDMF_E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Get value from valueType failed. typeId: %{public}s, result: %{public}d", typeId, result);
+        return result;
+    }
+    *count = record->recordDataLen;
     *entry = record->recordData;
     return UDMF_E_OK;
 }
@@ -543,6 +577,22 @@ int GetUds(OH_UdmfRecord* record, UdsObject* udsObject, UDType type)
     return UDMF_E_OK;
 }
 
+int OH_UdmfRecord_AddArrayBuffer(OH_UdmfRecord* record, const char* type, OH_UdsArrayBuffer* buffer)
+{
+    if (!IsUnifiedRecordValid(record) || type == nullptr || strlen(type) > MAX_KEY_STRING_LEN ||
+        IsInvalidUdsObjectPtr(buffer, UDS_ARRAY_BUFFER_STRUCT_ID)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    unsigned char *entry;
+    unsigned int size;
+    int ret = OH_UdsArrayBuffer_GetData(buffer, &entry, &size);
+    if (ret != UDMF_E_OK) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    buffer->obj->value_[UNIFORM_DATA_TYPE] = type;
+    return OH_UdmfRecord_AddGeneralEntry(record, type, entry, size);
+}
+
 int OH_UdmfRecord_GetPlainText(OH_UdmfRecord* record, OH_UdsPlainText* plainText)
 {
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(plainText, UDS_PLAIN_TEXT_STRUCT_ID)) {
@@ -589,6 +639,18 @@ int OH_UdmfRecord_GetPixelMap(OH_UdmfRecord* record, OH_UdsPixelMap* pixelMap)
         return UDMF_E_INVALID_PARAM;
     }
     return GetUds(record, pixelMap, UDType::SYSTEM_DEFINED_PIXEL_MAP);
+}
+
+int OH_UdmfRecord_GetArrayBuffer(OH_UdmfRecord* record, const char* type, OH_UdsArrayBuffer* buffer)
+{
+    unsigned int size = 0;
+    unsigned char *entry;
+    int ret = OH_UdmfRecord_GetGeneralEntry(record, type, &entry, &size);
+    if (ret != UDMF_E_OK) {
+        LOG_ERROR(UDMF_CAPI, "OH_UdmfRecord_GetGeneralEntry ret: %{public}d.", ret);
+        return ret;
+    }
+    return OH_UdsArrayBuffer_SetData(buffer, entry, size);
 }
 
 OH_UdmfProperty* OH_UdmfProperty_Create(OH_UdmfData* data)

@@ -48,6 +48,9 @@ constexpr const char* FILE_URI_PARAM = "fileUri";
 constexpr const char* FILE_TYPE = "fileType";
 constexpr const char* PIXEL_MAP = "pixelMap";
 constexpr const char* APPLICATION_DEFINED_TYPE = "ApplicationDefined";
+constexpr const char* ARRAY_BUFFER = "arrayBuffer";
+constexpr const char* ARRAY_BUFFER_LENGTH = "arrayBufferLen";
+
 
 enum UDType : int32_t {
     ENTITY = 0,

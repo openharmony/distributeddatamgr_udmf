@@ -40,6 +40,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+    static bool CheckUnsignedChar(unsigned char* dst, unsigned char* src, int size);
 };
 
 void UdsTest::SetUpTestCase(void) {}
@@ -49,6 +50,18 @@ void UdsTest::TearDownTestCase(void) {}
 void UdsTest::SetUp(void) {}
 
 void UdsTest::TearDown(void) {}
+
+bool UdsTest::CheckUnsignedChar(unsigned char* dst, unsigned char* src, int size)
+{
+    EXPECT_NE(dst, nullptr);
+    EXPECT_NE(src, nullptr);
+    for (int i = 0; i < size; ++i) {
+        if (dst[i] != src[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 
 /**
  * @tc.name: OH_UdsPlainText_Create_001
@@ -981,4 +994,91 @@ HWTEST_F(UdsTest, OH_UdsPixelMap_SetPixelMap_001, TestSize.Level1)
     delete ohPixelmapNative;
     OH_UdsPixelMap_Destroy(pixelMap);
 }
+/**
+ * @tc.name: OH_UdsArrayBuffer_Create_001
+ * @tc.desc: Normal testcase of OH_UdsArrayBuffer_Create
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsArrayBuffer_Create_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsArrayBuffer_Create_001 begin.");
+    auto buffer = OH_UdsArrayBuffer_Create();
+    EXPECT_NE(buffer, nullptr);
+    int ret = OH_UdsArrayBuffer_Destroy(buffer);
+    EXPECT_EQ(UDMF_E_OK, ret);
+    LOG_INFO(UDMF_TEST, "OH_UdsArrayBuffer_Create_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsArrayBuffer_GetData_001
+ * @tc.desc: Normal testcase of OH_UdsArrayBuffer_GetData
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsArrayBuffer_GetData_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsArrayBuffer_GetData_001 begin.");
+    auto buffer = OH_UdsArrayBuffer_Create();
+
+    unsigned char data[] = "doing something";
+    int len = sizeof(data);
+
+    std::vector<uint8_t> bufferData(data, data + len);
+    buffer->obj->value_[ARRAY_BUFFER] = bufferData;
+    buffer->obj->value_[ARRAY_BUFFER_LENGTH] = len;
+
+    unsigned char *getData;
+    unsigned int getLen;
+    int ret = OH_UdsArrayBuffer_GetData(buffer, &getData, &getLen);
+    ASSERT_EQ(UDMF_E_OK, ret);
+    ASSERT_EQ(len, getLen);
+    ASSERT_TRUE(CheckUnsignedChar(data, getData, getLen));
+    OH_UdsArrayBuffer_Destroy(buffer);
+
+    OH_UdsArrayBuffer* bufferNullptr = nullptr;
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, OH_UdsArrayBuffer_GetData(bufferNullptr, &getData, &getLen));
+    delete bufferNullptr;
+
+    bufferNullptr = new OH_UdsArrayBuffer;
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, OH_UdsArrayBuffer_GetData(bufferNullptr, &getData, &getLen));
+    OH_UdsArrayBuffer_Destroy(bufferNullptr);
+    LOG_INFO(UDMF_TEST, "OH_UdsArrayBuffer_GetContent_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsArrayBuffer_SetData_001
+ * @tc.desc: Normal testcase of OH_UdsArrayBuffer_SetData
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsArrayBuffer_SetData_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsArrayBuffer_SetData_001 begin.");
+    int result = OH_UdsArrayBuffer_SetData(nullptr, nullptr, 0);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    auto buffer = OH_UdsArrayBuffer_Create();
+    result = OH_UdsArrayBuffer_SetData(buffer, nullptr, 0);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    unsigned char data[] = "doing something";
+    unsigned int len = sizeof(data);
+    result = OH_UdsArrayBuffer_SetData(buffer, data, 0);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    result = OH_UdsArrayBuffer_SetData(buffer, data, 4 * 1024 * 1024 + 1);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    result = OH_UdsArrayBuffer_SetData(buffer, data, len);
+    EXPECT_EQ(UDMF_E_OK, result);
+
+    unsigned char *getData;
+    unsigned int getLen;
+    int ret = OH_UdsArrayBuffer_GetData(buffer, &getData, &getLen);
+    ASSERT_EQ(UDMF_E_OK, ret);
+    ASSERT_EQ(len, getLen);
+    ASSERT_TRUE(CheckUnsignedChar(data, getData, getLen));
+
+    OH_UdsArrayBuffer_Destroy(buffer);
+    LOG_INFO(UDMF_TEST, "OH_UdsArrayBuffer_SetData_001 end.");
+}
+
 }

@@ -16,6 +16,7 @@
 
 #include "uds.h"
 #include "logger.h"
+#include "securec.h"
 #include "unified_meta.h"
 #include "udmf_capi_common.h"
 #include "udmf_meta.h"
@@ -72,6 +73,8 @@ OH_UdsAppItem::OH_UdsAppItem() : UdsObject(NdkStructId::UDS_APP_ITEM_STRUCT_ID) 
 OH_UdsFileUri::OH_UdsFileUri() : UdsObject(NdkStructId::UDS_FILE_URI_STRUCT_ID) {}
 
 OH_UdsPixelMap::OH_UdsPixelMap() : UdsObject(NdkStructId::UDS_PIXEL_MAP_STRUCT_ID) {}
+
+OH_UdsArrayBuffer::OH_UdsArrayBuffer() : UdsObject(NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID) {}
 
 template<typename T>
 bool UdsObject::HasObjectKey(const char* paramName)
@@ -462,4 +465,65 @@ int OH_UdsPixelMap_SetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelma
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     return pThis->SetUdsValue<std::shared_ptr<OHOS::Media::PixelMap>>(PIXEL_MAP, pixelmapNative->GetInnerPixelmap());
+}
+
+OH_UdsArrayBuffer* OH_UdsArrayBuffer_Create()
+{
+    auto *buffer = new (std::nothrow) OH_UdsArrayBuffer();
+    if (buffer == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
+        return nullptr;
+    }
+    buffer->obj = std::make_shared<Object>();
+    buffer->obj->value_[UNIFORM_DATA_TYPE] = "";
+    buffer->obj->value_[ARRAY_BUFFER] = std::vector<uint8_t>();
+    buffer->obj->value_[ARRAY_BUFFER_LENGTH] = 0;
+    return buffer;
+}
+
+int OH_UdsArrayBuffer_Destroy(OH_UdsArrayBuffer* buffer)
+{
+    if (IsInvalidUdsObjectPtr(buffer, NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID)) {
+        LOG_ERROR(UDMF_CAPI, "Param is invalid.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    delete buffer;
+    return UDMF_E_OK;
+}
+
+int OH_UdsArrayBuffer_SetData(OH_UdsArrayBuffer* buffer, unsigned char* data, unsigned int len)
+{
+    if (data == nullptr || len == 0 || IsInvalidUdsObjectPtr(buffer, NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID) ||
+        len > MAX_GENERAL_ENTRY_SIZE) {
+        LOG_ERROR(UDMF_CAPI, "Param is invalid.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    std::vector<uint8_t> arrayBuffer(data, data + len);
+    int ret = buffer->SetUdsValue<std::vector<uint8_t>>(ARRAY_BUFFER, arrayBuffer);
+    if (ret != UDMF_E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory. ret: %{public}d", ret);
+        return ret;
+    }
+    ret = buffer->SetUdsValue<int>(ARRAY_BUFFER_LENGTH, static_cast<int>(len));
+    return ret;
+}
+
+int OH_UdsArrayBuffer_GetData(OH_UdsArrayBuffer* buffer, unsigned char** data, unsigned int* len)
+{
+    if (buffer == nullptr || IsInvalidUdsObjectPtr(buffer, NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID)) {
+        LOG_ERROR(UDMF_CAPI, "Param is invalid.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    const auto arrayBuffer = buffer->GetUdsValue<std::vector<uint8_t>>(ARRAY_BUFFER);
+    if (arrayBuffer == nullptr || arrayBuffer->empty()) {
+        return UDMF_ERR;
+    }
+    const auto length = buffer->GetUdsValue<int>(ARRAY_BUFFER_LENGTH);
+    if (length == nullptr || *length <= 0 || *length > MAX_GENERAL_ENTRY_SIZE) {
+        return UDMF_ERR;
+    }
+
+    *data = arrayBuffer->data();
+    *len = *length;
+    return UDMF_E_OK;
 }
