@@ -227,10 +227,14 @@ OH_UdmfRecord** OH_UdmfData_GetRecords(OH_UdmfData* unifiedData, unsigned int* c
 static int GetFirstPlainText(OH_UdmfRecord **records, unsigned int recordCount, OH_UdsPlainText* plainText)
 {
     int ret = UDMF_ERR;
-    if (records == nullptr || recordCount <= 0) {
+    if (records == nullptr || recordCount == 0) {
         return ret;
     }
     for (unsigned int i = 0; i < recordCount; i++) {
+        const char *type = OH_UdsPlainText_GetType(plainText);
+        if (type == nullptr || !records[i]->record_->HasType(type)) {
+            continue;
+        }
         ret = OH_UdmfRecord_GetPlainText(records[i], plainText);
         if (ret == UDMF_E_OK) {
             return ret;
@@ -242,10 +246,14 @@ static int GetFirstPlainText(OH_UdmfRecord **records, unsigned int recordCount, 
 static int GetFirstHtml(OH_UdmfRecord **records, unsigned int recordCount, OH_UdsHtml* html)
 {
     int ret = UDMF_ERR;
-    if (records == nullptr || recordCount <= 0) {
+    if (records == nullptr || recordCount == 0) {
         return ret;
     }
     for (unsigned int i = 0; i < recordCount; i++) {
+        const char *type = OH_UdsHtml_GetType(html);
+        if (type == nullptr || !records[i]->record_->HasType(type)) {
+            continue;
+        }
         ret = OH_UdmfRecord_GetHtml(records[i], html);
         if (ret == UDMF_E_OK) {
             return ret;
@@ -317,7 +325,7 @@ OH_UdmfRecord* OH_UdmfData_GetRecord(OH_UdmfData* unifiedData, unsigned int inde
 
 bool OH_UdmfData_IsLocal(OH_UdmfData* data)
 {
-    if (!IsUnifiedDataValid(data)) {
+    if (!IsUnifiedDataValid(data) || data->unifiedData_->GetProperties() == nullptr) {
         return true;
     }
     bool isRemote = data->unifiedData_->GetProperties()->isRemote;
