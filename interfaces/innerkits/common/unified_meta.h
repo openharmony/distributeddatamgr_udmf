@@ -470,6 +470,8 @@ enum UDType : int32_t {
     KINGSOFT_SPREADSHEETS_ETTX,
     EXCEL_DIF,
     OPENHARMONY_APP,
+    HMOS_WIFI,
+    TEL,
     UD_BUTT
 };
 
