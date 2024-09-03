@@ -1525,7 +1525,7 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryPlainText001, TestSize.Level1)
  */
 HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryPlainText002, TestSize.Level1)
 {
-    const char *HELLOWORLD = "Hello world";
+    const char *helloWorld = "Hello world";
 
     OH_UdmfData *data = OH_UdmfData_Create();
     OH_UdsPlainText *plainTextOutput = OH_UdsPlainText_Create();
@@ -1543,7 +1543,7 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryPlainText002, TestSize.Level1)
 
     OH_UdmfData *data3 = OH_UdmfData_Create();
     OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
-    OH_UdsPlainText_SetContent(plainText, HELLOWORLD);
+    OH_UdsPlainText_SetContent(plainText, helloWorld);
     OH_UdmfRecord *record2 = OH_UdmfRecord_Create();
     OH_UdmfRecord_AddPlainText(record2, plainText);
     OH_UdmfData_AddRecord(data3, record);
@@ -1551,7 +1551,7 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryPlainText002, TestSize.Level1)
     int result3 = OH_UdmfData_GetPrimaryPlainText(data3, plainTextOutput);
     ASSERT_EQ(result3, UDMF_E_OK);
     auto *content = OH_UdsPlainText_GetContent(plainTextOutput);
-    EXPECT_EQ(strcmp(content, HELLOWORLD), 0);
+    EXPECT_EQ(strcmp(content, helloWorld), 0);
 
     OH_UdsHtml_Destroy(html);
     OH_UdsPlainText_Destroy(plainTextOutput);
@@ -1570,8 +1570,8 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryPlainText002, TestSize.Level1)
  */
 HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryPlainText003, TestSize.Level1)
 {
-    const char *HELLOWORLD = "Hello world";
-    const char *HELLOWORLD2 = "Hello world2";
+    const char *helloWorld = "Hello world";
+    const char *helloWorld2 = "Hello world2";
 
     OH_UdsHtml *html = OH_UdsHtml_Create();
     OH_UdsHtml_SetContent(html, "<p>Hello world</p>");
@@ -1579,13 +1579,13 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryPlainText003, TestSize.Level1)
     OH_UdmfRecord_AddHtml(record, html);
 
     OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
-    OH_UdsPlainText_SetContent(plainText, HELLOWORLD);
+    OH_UdsPlainText_SetContent(plainText, helloWorld);
     OH_UdmfRecord *record2 = OH_UdmfRecord_Create();
     OH_UdmfRecord_AddPlainText(record2, plainText);
 
 
     OH_UdsPlainText *plainText2 = OH_UdsPlainText_Create();
-    OH_UdsPlainText_SetContent(plainText2, HELLOWORLD2);
+    OH_UdsPlainText_SetContent(plainText2, helloWorld2);
     OH_UdmfRecord* record3 = OH_UdmfRecord_Create();
     OH_UdmfRecord_AddPlainText(record3, plainText2);
 
@@ -1597,7 +1597,7 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryPlainText003, TestSize.Level1)
     int result4 = OH_UdmfData_GetPrimaryPlainText(data, plainTextOutput);
     ASSERT_EQ(result4, UDMF_E_OK);
     auto *content2 = OH_UdsPlainText_GetContent(plainTextOutput);
-    EXPECT_EQ(strcmp(content2, HELLOWORLD2), 0);
+    EXPECT_EQ(strcmp(content2, helloWorld2), 0);
 
     OH_UdsHtml_Destroy(html);
     OH_UdsPlainText_Destroy(plainTextOutput);
@@ -1646,7 +1646,7 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryHtml001, TestSize.Level1)
  */
 HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryHtml002, TestSize.Level1)
 {
-    const char *HELLOWORLD = "<p>Hello world</p>";
+    const char *helloWorld = "<p>Hello world</p>";
 
     OH_UdmfData *data = OH_UdmfData_Create();
     OH_UdsHtml *htmlOutput = OH_UdsHtml_Create();
@@ -1664,7 +1664,7 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryHtml002, TestSize.Level1)
 
     OH_UdmfData *data3 = OH_UdmfData_Create();
     OH_UdsHtml *html = OH_UdsHtml_Create();
-    OH_UdsHtml_SetContent(html, HELLOWORLD);
+    OH_UdsHtml_SetContent(html, helloWorld);
     OH_UdmfRecord* record2 = OH_UdmfRecord_Create();
     OH_UdmfRecord_AddHtml(record2, html);
     OH_UdmfData_AddRecord(data3, record);
@@ -1672,7 +1672,7 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryHtml002, TestSize.Level1)
     int result3 = OH_UdmfData_GetPrimaryHtml(data3, htmlOutput);
     ASSERT_EQ(result3, UDMF_E_OK);
     auto content = OH_UdsHtml_GetContent(htmlOutput);
-    EXPECT_EQ(strcmp(content, HELLOWORLD), 0);
+    EXPECT_EQ(strcmp(content, helloWorld), 0);
 
     OH_UdsHtml_Destroy(html);
     OH_UdsHtml_Destroy(htmlOutput);
@@ -1691,8 +1691,8 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryHtml002, TestSize.Level1)
  */
 HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryHtml003, TestSize.Level1)
 {
-    const char *HELLOWORLD = "<p>Hello world</p>";
-    const char *HELLOWORLD2 = "<p>Hello world2</p>";
+    const char *helloWorld = "<p>Hello world</p>";
+    const char *helloWorld2 = "<p>Hello world2</p>";
 
     OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
     OH_UdsPlainText_SetContent(plainText, "Hello world");
@@ -1700,12 +1700,12 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryHtml003, TestSize.Level1)
     OH_UdmfRecord_AddPlainText(record, plainText);
 
     OH_UdsHtml *html = OH_UdsHtml_Create();
-    OH_UdsHtml_SetContent(html, HELLOWORLD);
+    OH_UdsHtml_SetContent(html, helloWorld);
     OH_UdmfRecord* record2 = OH_UdmfRecord_Create();
     OH_UdmfRecord_AddHtml(record2, html);
 
     OH_UdsHtml *html2 = OH_UdsHtml_Create();
-    OH_UdsHtml_SetContent(html2, HELLOWORLD2);
+    OH_UdsHtml_SetContent(html2, helloWorld2);
     OH_UdmfRecord* record3 = OH_UdmfRecord_Create();
     OH_UdmfRecord_AddHtml(record3, html2);
 
@@ -1717,7 +1717,7 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryHtml003, TestSize.Level1)
     int result4 = OH_UdmfData_GetPrimaryHtml(data, htmlOutput);
     ASSERT_EQ(result4, UDMF_E_OK);
     auto content2 = OH_UdsHtml_GetContent(htmlOutput);
-    EXPECT_EQ(strcmp(content2, HELLOWORLD2), 0);
+    EXPECT_EQ(strcmp(content2, helloWorld2), 0);
 
     OH_UdsHtml_Destroy(html);
     OH_UdsHtml_Destroy(html2);
@@ -1817,12 +1817,12 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetRecord001, TestSize.Level1)
  */
 HWTEST_F(UDMFTest, OH_UdmfData_GetRecord002, TestSize.Level1)
 {
-    const char *HELLOWORLD = "Hello world";
-    const char *HELLOWORLD2 = "Hello world2";
+    const char *helloWorld = "Hello world";
+    const char *helloWorld2 = "Hello world2";
 
     OH_UdmfData *data3 = OH_UdmfData_Create();
     OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
-    OH_UdsPlainText_SetContent(plainText, HELLOWORLD);
+    OH_UdsPlainText_SetContent(plainText, helloWorld);
     OH_UdmfRecord* record = OH_UdmfRecord_Create();
     OH_UdmfRecord_AddPlainText(record, plainText);
     OH_UdmfData_AddRecord(data3, record);
@@ -1831,11 +1831,11 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetRecord002, TestSize.Level1)
     OH_UdsPlainText *plainText2 = OH_UdsPlainText_Create();
     OH_UdmfRecord_GetPlainText(result9, plainText2);
     auto content = OH_UdsPlainText_GetContent(plainText2);
-    EXPECT_EQ(strcmp(content, HELLOWORLD), 0);
+    EXPECT_EQ(strcmp(content, helloWorld), 0);
 
     OH_UdmfData *data4 = OH_UdmfData_Create();
     OH_UdsPlainText *plainText3 = OH_UdsPlainText_Create();
-    OH_UdsPlainText_SetContent(plainText3, HELLOWORLD2);
+    OH_UdsPlainText_SetContent(plainText3, helloWorld2);
     OH_UdmfRecord* record2 = OH_UdmfRecord_Create();
     OH_UdmfRecord_AddPlainText(record2, plainText3);
     OH_UdmfData_AddRecord(data4, record);
@@ -1849,13 +1849,13 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetRecord002, TestSize.Level1)
     OH_UdsPlainText *plainText4 = OH_UdsPlainText_Create();
     OH_UdmfRecord_GetPlainText(result12, plainText4);
     auto content2 = OH_UdsPlainText_GetContent(plainText4);
-    EXPECT_EQ(strcmp(content2, HELLOWORLD), 0);
+    EXPECT_EQ(strcmp(content2, helloWorld), 0);
     OH_UdmfRecord *result13 = OH_UdmfData_GetRecord(data4, 1);
     ASSERT_NE(result13, nullptr);
     OH_UdsPlainText *plainText5 = OH_UdsPlainText_Create();
     OH_UdmfRecord_GetPlainText(result13, plainText5);
     auto content3 = OH_UdsPlainText_GetContent(plainText5);
-    EXPECT_EQ(strcmp(content3, HELLOWORLD2), 0);
+    EXPECT_EQ(strcmp(content3, helloWorld2), 0);
 
     OH_UdsPlainText_Destroy(plainText);
     OH_UdsPlainText_Destroy(plainText2);
