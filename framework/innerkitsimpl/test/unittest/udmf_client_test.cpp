@@ -2545,4 +2545,18 @@ HWTEST_F(UdmfClientTest, GetDataAsync03, TestSize.Level1)
     std::this_thread::sleep_for(std::chrono::seconds(1));
     LOG_INFO(UDMF_TEST, "GetDataAsync03 end.");
 }
+
+/**
+* @tc.name: GetSelfBundleName001
+* @tc.desc: Nrmal testcase of GetSelfBundleName
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetSelfBundleName001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSelfBundleName001 begin.");
+    UdmfClient udmfClient;
+    std::string ret = udmfClient.GetSelfBundleName();
+    EXPECT_NE(ret, "");
+    LOG_INFO(UDMF_TEST, "GetSelfBundleName001 end.");
+}
 } // OHOS::Test

@@ -25,7 +25,10 @@ config("module_private_config") {
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/innerkits/service",
     "${udmf_framework_path}/innerkits/convert",
+    "${udmf_framework_path}/innerkitsimpl/client/",
+    "${udmf_framework_path}/innerkitsimpl/test/unittest/mock/include",
     "${udmf_framework_path}/ndkimpl/data",
+    "${kv_store_path}/frameworks/common",
   ]
 }
 
@@ -41,10 +44,16 @@ common_external_deps = [
   "access_token:libtoken_setproc",
   "bundle_framework:appexecfwk_core",
   "c_utils:utils",
+  "ffmpeg:libohosffmpeg",
   "hilog:libhilog",
+  "hisysevent:libhisysevent",
+  "hitrace:hitrace_meter",
+  "hitrace:libhitracechain",
   "image_framework:image",
   "ipc:ipc_core",
   "kv_store:distributeddata_inner",
+  "kv_store:distributeddata_mgr",
+  "libexif:libexif",
   "samgr:samgr_proxy",
 ]
 
@@ -53,6 +62,8 @@ ohos_unittest("UdmfClientTest") {
 
   sources = [
     "${udmf_framework_path}/common/graph.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/async_obtain_data.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
     "udmf_client_test.cpp",
   ]
 
@@ -61,6 +72,11 @@ ohos_unittest("UdmfClientTest") {
   deps = common_deps
 
   external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
 }
 
 ohos_unittest("UdmfClientSystemHapTest") {
@@ -402,6 +418,57 @@ ohos_unittest("UnifiedMetaTest") {
   ]
 }
 
+ohos_unittest("UdmfClientAbnormalTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${udmf_framework_path}/common/endian_converter.cpp",
+    "${udmf_framework_path}/common/tlv_util.cpp",
+    "${udmf_framework_path}/common/udmf_radar_reporter.cpp",
+    "${udmf_framework_path}/common/udmf_types_util.cpp",
+    "${udmf_framework_path}/common/udmf_utils.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/async_obtain_data.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
+    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/video.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
+    "${udmf_framework_path}/innerkitsimpl/test/unittest/mock/system_defined_pixelmap_mock.cpp",
+    "${udmf_framework_path}/innerkitsimpl/test/unittest/mock/tlv_object_mock.cpp",
+    "${udmf_framework_path}/innerkitsimpl/test/unittest/mock/udmf_service_client_mock.cpp",
+    "udmf_client_abnormal_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${udmf_interfaces_path}/innerkits:utd_client",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
@@ -422,6 +489,7 @@ group("unittest") {
     ":SystemDefinedPixelMapTest",
     ":SystemDefinedRecordTest",
     ":TextTest",
+    ":UdmfClientAbnormalTest",
     ":UdmfClientSystemHapTest",
     ":UdmfClientTest",
     ":UnifiedDataHelperTest",
