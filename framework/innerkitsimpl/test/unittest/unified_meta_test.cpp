@@ -428,8 +428,8 @@ HWTEST_F(UnifiedMetaTest, GetIntentionByString001, TestSize.Level1)
 */
 HWTEST_F(UnifiedMetaTest, IsValidOptions001, TestSize.Level1)
 {
-    std::string keyDataHub = "udmf://DataHub/com.huawei.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
-    std::string keyDrag = "udmf://DataHub/com.huawei.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    std::string keyDataHub = "udmf://DataHub/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    std::string keyDrag = "udmf://drag/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
     std::string intentionDataHub = "DataHub";
     std::string intentionDrag = "drag";
     std::string intentionEmpty = "";
