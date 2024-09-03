@@ -1064,7 +1064,7 @@ HWTEST_F(UdsTest, OH_UdsArrayBuffer_SetData_001, TestSize.Level1)
     result = OH_UdsArrayBuffer_SetData(buffer, data, 0);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
-    result = OH_UdsArrayBuffer_SetData(buffer, data, 4 * 1024 * 1024 + 1);
+    result = OH_UdsArrayBuffer_SetData(buffer, data, 128 * 1024 * 1024 + 1);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     result = OH_UdsArrayBuffer_SetData(buffer, data, len);
