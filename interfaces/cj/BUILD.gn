@@ -69,7 +69,6 @@ ohos_shared_library("cj_unified_data_channel_ffi") {
   part_name = "udmf"
 }
 
-
 ohos_shared_library("cj_uniform_type_descriptor_ffi") {
   branch_protector_ret = "pac_ret"
   sanitize = {
