@@ -29,8 +29,8 @@ extern "C" {
         return UDMF::GetTypeDescriptor(typeId);
     }
 
-    char *FfiUDMFUniformTypeDescriptorGetUniformDataTypeByFilenameExtension
-        (const char *cFilenameExtension, const char *cBelongsTo)
+    char *FfiUDMFUniformTypeDescriptorGetUniformDataTypeByFilenameExtension(
+        const char *cFilenameExtension, const char *cBelongsTo)
     {
         return UDMF::GetUniformDataTypeByFilenameExtension(cFilenameExtension, cBelongsTo);
     }
