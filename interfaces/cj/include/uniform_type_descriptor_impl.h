@@ -27,8 +27,8 @@ namespace OHOS {
 namespace UDMF {
     using namespace OHOS::UDMF;
     int64_t GetTypeDescriptor(const char *typeId);
-    char * GetUniformDataTypeByFilenameExtension(const char *cFilenameExtension, const char *cBelongsTo);
-    char * GetUniformDataTypeByMIMEType(const char *cMimeType, const char *cBelongsTo);
+    char *GetUniformDataTypeByFilenameExtension(const char *cFilenameExtension, const char *cBelongsTo);
+    char *GetUniformDataTypeByMIMEType(const char *cMimeType, const char *cBelongsTo);
 }
 } // namespace OHOS::UDMF
 

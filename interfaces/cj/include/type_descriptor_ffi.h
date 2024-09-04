@@ -25,18 +25,17 @@
 namespace OHOS {
 namespace UDMF {
 extern "C" {
-    FFI_EXPORT char * FfiUDMFUniformTypeDescriptorGetTypeId(int64_t typeDescriptorID);
+    FFI_EXPORT char *FfiUDMFUniformTypeDescriptorGetTypeId(int64_t typeDescriptorID);
     FFI_EXPORT CArrString FfiUDMFUniformTypeDescriptorGetBelongingToTypes(int64_t typeDescriptorID);
-    FFI_EXPORT char * FfiUDMFUniformTypeDescriptorGetDescription(int64_t typeDescriptorID);
-    FFI_EXPORT char * FfiUDMFUniformTypeDescriptorGetReferenceURL(int64_t typeDescriptorID);
-    FFI_EXPORT char * FfiUDMFUniformTypeDescriptorGetIconFile(int64_t typeDescriptorID);
+    FFI_EXPORT char *FfiUDMFUniformTypeDescriptorGetDescription(int64_t typeDescriptorID);
+    FFI_EXPORT char *FfiUDMFUniformTypeDescriptorGetReferenceURL(int64_t typeDescriptorID);
+    FFI_EXPORT char *FfiUDMFUniformTypeDescriptorGetIconFile(int64_t typeDescriptorID);
     FFI_EXPORT CArrString FfiUDMFUniformTypeDescriptorGetFilenameExtensions(int64_t typeDescriptorID);
     FFI_EXPORT CArrString FfiUDMFUniformTypeDescriptorGetMimeTypes(int64_t typeDescriptorID);
     FFI_EXPORT bool FfiUDMFUniformTypeDescriptorBelongsTo(int64_t typeDescriptorID, const char *type);
     FFI_EXPORT bool FfiUDMFUniformTypeDescriptorIsLowerLevelType(int64_t typeDescriptorID, const char *type);
     FFI_EXPORT bool FfiUDMFUniformTypeDescriptorIsHigherLevelType(int64_t typeDescriptorID, const char *type);
     FFI_EXPORT bool FfiUDMFUniformTypeDescriptorEquals(int64_t thisTypeDescriptorID, int64_t thatTypeDescriptorID);
-    
 }
 }
 }

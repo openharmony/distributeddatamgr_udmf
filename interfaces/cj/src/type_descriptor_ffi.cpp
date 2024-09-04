@@ -25,7 +25,7 @@ namespace OHOS {
 namespace UDMF {
 extern "C" {
 
-    char * FfiUDMFUniformTypeDescriptorGetTypeId(int64_t typeDescriptorID)
+    char *FfiUDMFUniformTypeDescriptorGetTypeId(int64_t typeDescriptorID)
     {
         auto data = FFIData::GetData<CTypeDescriptor>(typeDescriptorID);
         if (data == nullptr) {
@@ -45,7 +45,7 @@ extern "C" {
         return data->GetBelongingToTypes();
     }
 
-    char * FfiUDMFUniformTypeDescriptorGetDescription(int64_t typeDescriptorID)
+    char *FfiUDMFUniformTypeDescriptorGetDescription(int64_t typeDescriptorID)
     {
         auto data = FFIData::GetData<CTypeDescriptor>(typeDescriptorID);
         if (data == nullptr) {
@@ -55,7 +55,7 @@ extern "C" {
         return data->GetDescription();
     }
 
-    char * FfiUDMFUniformTypeDescriptorGetReferenceURL(int64_t typeDescriptorID)
+    char *FfiUDMFUniformTypeDescriptorGetReferenceURL(int64_t typeDescriptorID)
     {
         auto data = FFIData::GetData<CTypeDescriptor>(typeDescriptorID);
         if (data == nullptr) {
@@ -65,7 +65,7 @@ extern "C" {
         return data->GetReferenceURL();
     }
 
-    char * FfiUDMFUniformTypeDescriptorGetIconFile(int64_t typeDescriptorID)
+    char *FfiUDMFUniformTypeDescriptorGetIconFile(int64_t typeDescriptorID)
     {
         auto data = FFIData::GetData<CTypeDescriptor>(typeDescriptorID);
         if (data == nullptr) {

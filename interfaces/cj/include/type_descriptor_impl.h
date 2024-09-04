@@ -31,11 +31,11 @@ namespace UDMF {
         public:
             CTypeDescriptor(std::shared_ptr<UDMF::TypeDescriptor> typeDescriptor);
 
-            char * GetTypeId();
+            char *GetTypeId();
             CArrString GetBelongingToTypes();
-            char * GetDescription();
-            char * GetIconFile();
-            char * GetReferenceURL();
+            char *GetDescription();
+            char *GetIconFile();
+            char *GetReferenceURL();
             CArrString GetFilenameExtensions();
             CArrString GetMimeTypes();
 
@@ -46,7 +46,6 @@ namespace UDMF {
 
             const std::shared_ptr<UDMF::TypeDescriptor> &GetTypeDescriptor() const;
     
-
         private:
             std::shared_ptr<UDMF::TypeDescriptor> typeDescriptor_;
     };

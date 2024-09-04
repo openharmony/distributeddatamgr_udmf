@@ -28,6 +28,5 @@ class FFI_EXPORT Utils {
     public:
         static char *MallocCString(const std::string &origin);
         static CArrString StringVectorToArray(std::vector<std::string> vector);
- 
 };
 #endif // OHOS_UDMF_UTILS_H

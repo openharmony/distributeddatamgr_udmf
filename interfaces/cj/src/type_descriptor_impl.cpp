@@ -48,19 +48,19 @@ namespace UDMF {
         return Utils::StringVectorToArray(types);
     }
 
-    char * CTypeDescriptor::GetDescription()
+    char *CTypeDescriptor::GetDescription()
     {
         std::string ret = typeDescriptor_->GetDescription();
         return Utils::MallocCString(ret);
     }
 
-    char * CTypeDescriptor::GetIconFile()
+    char *CTypeDescriptor::GetIconFile()
     {
         std::string ret = typeDescriptor_->GetIconFile();
         return Utils::MallocCString(ret);
     }
 
-    char * CTypeDescriptor::GetReferenceURL()
+    char *CTypeDescriptor::GetReferenceURL()
     {
         std::string ret = typeDescriptor_->GetReferenceURL();
         return Utils::MallocCString(ret);

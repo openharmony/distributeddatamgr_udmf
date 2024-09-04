@@ -28,7 +28,7 @@ namespace UDMF {
 extern "C" {
     FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructor();
     FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value);
-    FFI_EXPORT char * FfiUDMFUnifiedRecordGetType(int64_t unifiedId);
+    FFI_EXPORT char *FfiUDMFUnifiedRecordGetType(int64_t unifiedId);
     FFI_EXPORT CJValueType FfiUDMFUnifiedRecordGetValue(int64_t unifiedId);
 }
 }

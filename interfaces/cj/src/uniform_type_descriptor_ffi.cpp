@@ -29,17 +29,15 @@ extern "C" {
         return UDMF::GetTypeDescriptor(typeId);
     }
 
-    char * FfiUDMFUniformTypeDescriptorGetUniformDataTypeByFilenameExtension(const char *cFilenameExtension, const char *cBelongsTo)
+    char *FfiUDMFUniformTypeDescriptorGetUniformDataTypeByFilenameExtension(const char *cFilenameExtension, const char *cBelongsTo)
     {
-        return UDMF::GetUniformDataTypeByFilenameExtension(cFilenameExtension,cBelongsTo);
+        return UDMF::GetUniformDataTypeByFilenameExtension(cFilenameExtension, cBelongsTo);
     }
 
-    char * FfiUDMFUniformTypeDescriptorGetUniformDataTypeByMIMEType(const char *cMimeType, const char *cBelongsTo)
+    char *FfiUDMFUniformTypeDescriptorGetUniformDataTypeByMIMEType(const char *cMimeType, const char *cBelongsTo)
     {
-        return UDMF::GetUniformDataTypeByMIMEType(cMimeType,cBelongsTo);
+        return UDMF::GetUniformDataTypeByMIMEType(cMimeType, cBelongsTo);
     }
-
-
 }
 }
 }
