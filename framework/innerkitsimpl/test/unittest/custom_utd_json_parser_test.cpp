@@ -102,4 +102,71 @@ HWTEST_F(CustomUtdJsonParserTest, ParseJsonData001, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "ParseJsonData001 end.");
 }
+
+/**
+* @tc.name: ParseJsonData002
+* @tc.desc: ParseJson, empty JsonData
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdJsonParserTest, ParseJsonData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseJsonData002 begin.");
+    std::vector<TypeDescriptorCfg> typesCfg1;
+    std::vector<TypeDescriptorCfg> typesCfg2;
+    std::string emptyJson = "";
+    CustomUtdJsonParser parser;
+    bool result = parser.ParseUserCustomUtdJson(emptyJson, typesCfg1, typesCfg2);
+    EXPECT_EQ(result, false);
+    LOG_INFO(UDMF_TEST, "ParseJsonData002 end.");
+}
+
+/**
+* @tc.name: ParseJsonData003
+* @tc.desc: ParseJson, invalid JsonData
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdJsonParserTest, ParseJsonData003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseJsonData003 begin.");
+    std::vector<TypeDescriptorCfg> typesCfg1;
+    std::vector<TypeDescriptorCfg> typesCfg2;
+    std::string invalidJson = "{ invalid json }\0";
+    CustomUtdJsonParser parser;
+    bool result = parser.ParseUserCustomUtdJson(invalidJson, typesCfg1, typesCfg2);
+    EXPECT_EQ(result, true);
+    EXPECT_EQ(typesCfg1.empty(), true);
+    EXPECT_EQ(typesCfg2.empty(), true);
+
+    invalidJson = R"({ ["item1", "item2", "item3"] })";
+    result = parser.ParseUserCustomUtdJson(invalidJson, typesCfg1, typesCfg2);
+    EXPECT_EQ(result, true);
+    EXPECT_EQ(typesCfg1.empty(), true);
+    EXPECT_EQ(typesCfg2.empty(), true);
+    LOG_INFO(UDMF_TEST, "ParseJsonData003 end.");
+}
+
+/**
+* @tc.name: ParseJsonData004
+* @tc.desc: ParseJson, JsonData is valid but no data is needed
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdJsonParserTest, ParseJsonData004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseJsonData004 begin.");
+    std::vector<TypeDescriptorCfg> typesCfg1;
+    std::vector<TypeDescriptorCfg> typesCfg2;
+    std::string validJsonData = R"({"key": "value"})";
+    CustomUtdJsonParser parser;
+    bool result = parser.ParseUserCustomUtdJson(validJsonData, typesCfg1, typesCfg2);
+    EXPECT_EQ(result, true);
+    EXPECT_EQ(typesCfg1.empty(), true);
+    EXPECT_EQ(typesCfg2.empty(), true);
+
+    validJsonData = R"({"CustomUTDs": [{}]})";
+    result = parser.ParseUserCustomUtdJson(validJsonData, typesCfg1, typesCfg2);
+    EXPECT_EQ(result, true);
+    EXPECT_EQ(typesCfg1.empty(), true);
+    EXPECT_EQ(typesCfg2.empty(), true);
+    LOG_INFO(UDMF_TEST, "ParseJsonData004 end.");
+}
 } // OHOS::Test
