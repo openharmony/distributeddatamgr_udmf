@@ -109,12 +109,11 @@ ohos_source_set("arkui_x_udmf_data") {
 
   sources += arkui_x_public_source
 
-  include_dirs = [ "${third_party_path}/cJSON" ]
-
   deps = [
     "${arkui_path}/ace_engine/adapter/${target_os}/build:libarkui_${target_os}",
     "${arkui_x_c_utils_path}/base:utilsbase",
     "${arkui_x_hilog_path}/interfaces/native/innerkits:libhilog_${target_os}",
+    "${third_party_path}/cJSON:cjson_static",
   ]
 
   configs = [
@@ -130,10 +129,7 @@ ohos_source_set("arkui_x_udmf_data") {
 ohos_source_set("arkui_x_udmf_data_inner") {
   sources = arkui_x_public_source
 
-  include_dirs = [
-    "${arkui_x_hilog_path}/interfaces/native/innerkits/include",
-    "${third_party_path}/cJSON",
-  ]
+  include_dirs = [ "${arkui_x_hilog_path}/interfaces/native/innerkits/include" ]
 
   deps = [
     "${arkui_path}/napi/:ace_napi",
