@@ -105,6 +105,22 @@ HWTEST_F(UdmfTypesUtilAbnormalTest, Marshalling002, TestSize.Level1)
 }
 
 /**
+* @tc.name: Marshalling003
+* @tc.desc: Abnrmal testcase of Marshalling, the return value of Reading() is nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilAbnormalTest, Marshalling003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Marshalling003 begin.");
+    UnifiedData unifiedData;
+    std::vector<UnifiedData> input = {unifiedData};
+    MessageParcel parcel;
+    bool ret = ITypesUtil::Marshalling(input, parcel);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "Marshalling003 end.");
+}
+
+/**
 * @tc.name: Unmarshalling001
 * @tc.desc: Abnrmal testcase of Unmarshalling, the return value of Reading() is nullptr
 * @tc.type: FUNC
@@ -115,7 +131,7 @@ HWTEST_F(UdmfTypesUtilAbnormalTest, Unmarshalling001, TestSize.Level1)
     UnifiedData unifiedData;
     std::vector<UnifiedData> output = {unifiedData};
     MessageParcel parcel;
-    bool ret = ITypesUtil::Marshalling(output, parcel);
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
     EXPECT_FALSE(ret);
     LOG_INFO(UDMF_TEST, "Unmarshalling001 end.");
 }
