@@ -21,6 +21,15 @@
 #include "logger.h"
 #include "udmf_types_util.h"
 #include "unified_meta.h"
+#include "text.h"
+#include "plain_text.h"
+#include "file.h"
+#include "image.h"
+#include "system_defined_record.h"
+#include "system_defined_form.h"
+#include "application_defined_record.h"
+#include "unified_types.h"
+#include "udmf_client.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
@@ -60,7 +69,18 @@ void UdmfTypesUtilTest::TearDown()
 HWTEST_F(UdmfTypesUtilTest, Unmarshalling001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Unmarshalling001 begin.");
+
     UnifiedData input;
+    std::vector<std::shared_ptr<UnifiedRecord>> inputRecords = {
+        std::make_shared<Text>(),
+        std::make_shared<PlainText>(),
+        std::make_shared<File>(),
+        std::make_shared<Image>(),
+        std::make_shared<SystemDefinedRecord>(),
+        std::make_shared<SystemDefinedForm>(),
+        std::make_shared<ApplicationDefinedRecord>()
+    };
+    input.SetRecords(inputRecords);
     MessageParcel parcel;
     bool ret = ITypesUtil::Unmarshalling(input, parcel);
     EXPECT_FALSE(ret);
@@ -75,7 +95,8 @@ HWTEST_F(UdmfTypesUtilTest, Unmarshalling001, TestSize.Level1)
 HWTEST_F(UdmfTypesUtilTest, Unmarshalling002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Unmarshalling002 begin.");
-    std::vector<UnifiedData> output = std::vector<UnifiedData>();
+    UnifiedData unifiedData;
+    std::vector<UnifiedData> output = {unifiedData};
     MessageParcel parcel;
     bool ret = ITypesUtil::Unmarshalling(output, parcel);
     EXPECT_FALSE(ret);
@@ -90,7 +111,9 @@ HWTEST_F(UdmfTypesUtilTest, Unmarshalling002, TestSize.Level1)
 HWTEST_F(UdmfTypesUtilTest, Marshalling001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Marshalling001 begin.");
-    const Summary input{};
+    Summary input;
+    input.summary.insert({"summary", 10});
+    input.totalSize = 20;
     MessageParcel parcel;
     bool ret = ITypesUtil::Marshalling(input, parcel);
     EXPECT_EQ(ret, ITypesUtil::Marshal(parcel, input.summary, input.totalSize));
@@ -105,10 +128,13 @@ HWTEST_F(UdmfTypesUtilTest, Marshalling001, TestSize.Level1)
 HWTEST_F(UdmfTypesUtilTest, Unmarshalling003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Unmarshalling003 begin.");
-    const Privilege input{};
+    Privilege output;
+    output.tokenId = 5;
+    output.readPermission = "readPermission";
+    output.writePermission = "writePermission";
     MessageParcel parcel;
-    bool ret = ITypesUtil::Marshalling(input, parcel);
-    EXPECT_EQ(ret, ITypesUtil::Marshal(parcel, input.tokenId, input.readPermission, input.writePermission));
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_EQ(ret, ITypesUtil::Unmarshal(parcel, output.tokenId, output.readPermission, output.writePermission));
     LOG_INFO(UDMF_TEST, "Unmarshalling003 end.");
 }
 
@@ -122,7 +148,7 @@ HWTEST_F(UdmfTypesUtilTest, Unmarshalling004, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "Unmarshalling004 begin.");
     CustomOption output;
     MessageParcel parcel;
-    bool ret = ITypesUtil::Marshalling(output, parcel);
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
     EXPECT_EQ(ret, ITypesUtil::Unmarshal(parcel, output.intention));
     LOG_INFO(UDMF_TEST, "Unmarshalling004 end.");
 }
@@ -137,7 +163,7 @@ HWTEST_F(UdmfTypesUtilTest, Unmarshalling005, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "Unmarshalling005 begin.");
     QueryOption output;
     MessageParcel parcel;
-    bool ret = ITypesUtil::Marshalling(output, parcel);
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
     EXPECT_EQ(ret, ITypesUtil::Unmarshal(parcel, output.key, output.intention));
     LOG_INFO(UDMF_TEST, "Unmarshalling005 end.");
 }
@@ -150,7 +176,7 @@ HWTEST_F(UdmfTypesUtilTest, Unmarshalling005, TestSize.Level1)
 HWTEST_F(UdmfTypesUtilTest, Marshalling002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Marshalling002 begin.");
-    const UDType input{};
+    const UDType input = UDType::ENTITY;
     MessageParcel parcel;
     bool ret = ITypesUtil::Marshalling(input, parcel);
     EXPECT_EQ(ret, ITypesUtil::Marshal(parcel, input));
@@ -165,7 +191,7 @@ HWTEST_F(UdmfTypesUtilTest, Marshalling002, TestSize.Level1)
 HWTEST_F(UdmfTypesUtilTest, Unmarshalling006, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Unmarshalling006 begin.");
-    UDType output{};
+    UDType output = UDType::ENTITY;
     MessageParcel parcel;
     bool ret = ITypesUtil::Unmarshalling(output, parcel);
     EXPECT_FALSE(ret);
@@ -180,7 +206,7 @@ HWTEST_F(UdmfTypesUtilTest, Unmarshalling006, TestSize.Level1)
 HWTEST_F(UdmfTypesUtilTest, Unmarshalling007, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Unmarshalling007 begin.");
-    Intention output;
+    Intention output = Intention::UD_INTENTION_DRAG;
     MessageParcel parcel;
     bool ret = ITypesUtil::Unmarshalling(output, parcel);
     EXPECT_FALSE(ret);
@@ -195,10 +221,47 @@ HWTEST_F(UdmfTypesUtilTest, Unmarshalling007, TestSize.Level1)
 HWTEST_F(UdmfTypesUtilTest, Marshalling003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Marshalling003 begin.");
-    const AsyncProcessInfo input{};
+    AsyncProcessInfo input;
+    input.srcDevName = "srcDevName";
+    input.syncFinished = 0;
+    input.syncTotal = 1;
+    input.syncId = 2;
+    input.permFnished = 3;
+    input.permTotal = 4;
     MessageParcel parcel;
     bool ret = ITypesUtil::Marshalling(input, parcel);
-    EXPECT_NE(ret, false);
+    EXPECT_TRUE(ret);
     LOG_INFO(UDMF_TEST, "Marshalling003 end.");
+}
+
+/**
+* @tc.name: Marshalling004
+* @tc.desc: Normal testcase of Marshalling
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Marshalling004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Marshalling004 begin.");
+    UnifiedData unifiedData;
+    std::vector<UnifiedData> input = {unifiedData};
+    MessageParcel parcel;
+    bool ret = ITypesUtil::Marshalling(input, parcel);
+    EXPECT_TRUE(ret);
+    LOG_INFO(UDMF_TEST, "Marshalling004 end.");
+}
+
+/**
+* @tc.name: Marshalling005
+* @tc.desc: Normal testcase of Marshalling
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Marshalling005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Marshalling005 begin.");
+    UDType input = UDType::ENTITY;
+    MessageParcel parcel;
+    bool ret = ITypesUtil::Marshalling(input, parcel);
+    EXPECT_TRUE(ret);
+    LOG_INFO(UDMF_TEST, "Marshalling005 end.");
 }
 } // OHOS::Test
