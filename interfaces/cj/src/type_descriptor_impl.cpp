@@ -36,7 +36,7 @@ namespace UDMF {
         typeDescriptor_ = typeDescriptor;
     }
 
-    char * CTypeDescriptor::GetTypeId()
+    char *CTypeDescriptor::GetTypeId()
     {
         std::string ret = typeDescriptor_->GetTypeId();
         return Utils::MallocCString(ret);

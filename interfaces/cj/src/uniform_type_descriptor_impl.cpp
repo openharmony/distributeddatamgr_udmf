@@ -60,7 +60,7 @@ namespace UDMF {
             status = UtdClient::GetInstance()
                 .GetUniformDataTypeByFilenameExtension(cFilenameExtension, typeId, belongsTo);
         }
-        if(status != E_OK) {
+        if (status != E_OK) {
             LOGE("invalid arguments!")
             return nullptr;
         }
@@ -83,7 +83,7 @@ namespace UDMF {
             LOGI("call GetUniformDataTypeByMIMEType with cBelongsTo")
             status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(cMimeType, typeId, belongsTo);
         }
-        if(status != E_OK) {
+        if (status != E_OK) {
             LOGE("invalid arguments!")
             return nullptr;
         }

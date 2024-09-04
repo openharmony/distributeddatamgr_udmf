@@ -139,7 +139,6 @@ extern "C" {
 
         return thisTypeDescriptor->Equals(thatTypeDescriptor);
     }
-    
 }
 }
 }
