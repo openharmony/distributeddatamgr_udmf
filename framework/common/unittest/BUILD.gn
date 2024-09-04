@@ -23,6 +23,8 @@ config("module_private_config") {
     "${udmf_framework_path}/common",
     "${kv_store_path}/frameworks/common",
     "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_framework_path}/common/unittest/mock/include",
+    "${udmf_framework_path}/innerkitsimpl/client/",
   ]
 }
 
@@ -30,10 +32,22 @@ common_deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
 
 common_external_deps = [
   "ability_base:want",
+  "access_token:libaccesstoken_sdk",
+  "access_token:libnativetoken",
+  "access_token:libtoken_setproc",
+  "bundle_framework:appexecfwk_core",
   "c_utils:utils",
+  "ffmpeg:libohosffmpeg",
   "hilog:libhilog",
+  "hisysevent:libhisysevent",
+  "hitrace:hitrace_meter",
+  "hitrace:libhitracechain",
   "image_framework:image",
   "ipc:ipc_core",
+  "kv_store:distributeddata_inner",
+  "kv_store:distributeddata_mgr",
+  "libexif:libexif",
+  "samgr:samgr_proxy",
 ]
 
 ohos_unittest("UtdCfgsCheckerTest") {
@@ -70,11 +84,48 @@ ohos_unittest("UdmfTypesUtilTest") {
   ]
 }
 
+ohos_unittest("UdmfTypesUtilAbnormalTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${udmf_framework_path}/common/tlv_object.cpp",
+    "${udmf_framework_path}/common/udmf_types_util.cpp",
+    "${udmf_framework_path}/common/unittest/mock/tlv_util_mock.cpp",
+    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "udmf_types_util_abnormal_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${udmf_interfaces_path}/innerkits:utd_client",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
 
   deps = [
+    ":UdmfTypesUtilAbnormalTest",
     ":UdmfTypesUtilTest",
     ":UtdCfgsCheckerTest",
   ]
