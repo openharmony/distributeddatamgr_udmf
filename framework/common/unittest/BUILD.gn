@@ -73,7 +73,7 @@ ohos_unittest("UdmfTypesUtilTest") {
 ohos_unittest("TlvUtilTest") {
   module_out_path = module_output_path
 
-  sources = [ "tlv_util.cpp" ]
+  sources = [ "tlv_util_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
@@ -92,9 +92,9 @@ group("unittest") {
   testonly = true
 
   deps = [
+    ":TlvUtilTest",
     ":UdmfTypesUtilTest",
     ":UtdCfgsCheckerTest",
-    ":TlvUtilTest",
   ]
 }
 ###############################################################################
