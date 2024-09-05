@@ -20,7 +20,6 @@
 
 #include "logger.h"
 #include "tlv_util.h"
-#include "udmf_utils.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
@@ -360,7 +359,7 @@ HWTEST_F(TlvUtilTest, Writing009, TestSize.Level1)
     std::vector<uint8_t> dataBytes;
     TLVObject data(dataBytes);
 
-    UnifiedKey key("drag", bundleName, UTILS::GenerateId());
+    UnifiedKey key("drag", bundleName, "GenerateId");
     data.Count(key);
     data.UpdateSize();
     bool res = TLVUtil::Writing(key, data);
