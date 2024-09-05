@@ -264,4 +264,36 @@ HWTEST_F(UdmfTypesUtilTest, Marshalling005, TestSize.Level1)
     EXPECT_TRUE(ret);
     LOG_INFO(UDMF_TEST, "Marshalling005 end.");
 }
+
+/**
+* @tc.name: Unmarshalling008
+* @tc.desc: Normal testcase of Unmarshalling
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Unmarshalling008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Unmarshalling008 begin.");
+    UDType output = UDType::ENTITY;
+    MessageParcel parcel;
+    ITypesUtil::Marshalling(output, parcel);
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_TRUE(ret);
+    LOG_INFO(UDMF_TEST, "Unmarshalling008 end.");
+}
+
+/**
+* @tc.name: Unmarshalling009
+* @tc.desc: Normal testcase of Unmarshalling
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Unmarshalling009, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Unmarshalling009 begin.");
+    Intention output = Intention::UD_INTENTION_DRAG;
+    MessageParcel parcel;
+    ITypesUtil::Marshalling(output, parcel);
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_TRUE(ret);
+    LOG_INFO(UDMF_TEST, "Unmarshalling009 end.");
+}
 } // OHOS::Test
