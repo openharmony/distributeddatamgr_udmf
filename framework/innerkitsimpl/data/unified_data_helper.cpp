@@ -15,12 +15,19 @@
 #define LOG_TAG "UnifiedDataHelper"
 #include "unified_data_helper.h"
 
+#include <cstdio>
+#include <string>
+#include <sys/stat.h>
+#include <cinttypes>
 #include "common_func.h"
 #include "directory_ex.h"
 #include "file_ex.h"
 #include "file_uri.h"
+#include "file.h"
 #include "logger.h"
+#include "tlv_object.h"
 #include "tlv_util.h"
+#include "unified_meta.h"
 
 namespace OHOS {
 namespace UDMF {

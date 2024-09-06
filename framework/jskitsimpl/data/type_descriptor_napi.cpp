@@ -14,7 +14,9 @@
  */
 #define LOG_TAG "TypeDescriptorNapi"
 #include "type_descriptor_napi.h"
+#include "utd_client.h"
 #include "napi_data_utils.h"
+#include "napi_error_utils.h"
 
 namespace OHOS {
 namespace UDMF {

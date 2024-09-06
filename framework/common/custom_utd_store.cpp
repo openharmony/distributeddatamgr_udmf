@@ -17,6 +17,7 @@
 #include <fstream>
 #include <sys/stat.h>
 #include "unistd.h"
+#include "error_code.h"
 #include "logger.h"
 #ifdef WITH_SELINUX
 #include <policycoreutils.h>

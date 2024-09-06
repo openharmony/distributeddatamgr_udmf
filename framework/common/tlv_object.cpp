@@ -15,6 +15,8 @@
 
 #define LOG_TAG "TlvObject"
 #include "tlv_object.h"
+#include <string>
+#include <map>
 #include "logger.h"
 
 namespace OHOS {

@@ -16,6 +16,8 @@
 #define LOG_TAG "Utd"
 #include "utd.h"
 
+#include <cstring>
+#include <vector>
 #include "securec.h"
 #include "logger.h"
 #include "utd_client.h"

@@ -15,7 +15,10 @@
 #define LOG_TAG "UdmfServiceProxy"
 #include "udmf_service_proxy.h"
 
+#include "ipc_types.h"
+
 #include "logger.h"
+#include "tlv_util.h"
 #include "udmf_types_util.h"
 
 namespace OHOS {

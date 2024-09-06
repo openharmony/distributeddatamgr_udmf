@@ -14,6 +14,11 @@
  */
 #define LOG_TAG "Udmf"
 #include "udmf.h"
+#include <cstring>
+#include <memory>
+#include <new>
+#include "unified_data.h"
+#include "unified_record.h"
 #include "udmf_err_code.h"
 #include "udmf_client.h"
 #include "securec.h"
@@ -21,12 +26,14 @@
 #include "int_wrapper.h"
 #include "string_wrapper.h"
 #include "unified_meta.h"
+#include "uds.h"
 #include "udmf_meta.h"
 #include "logger.h"
 #include "plain_text.h"
 #include "link.h"
 #include "html.h"
 #include "system_defined_appitem.h"
+#include "application_defined_record.h"
 
 using namespace OHOS::UDMF;
 
@@ -297,13 +304,13 @@ int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId, uns
         count > MAX_RECORDS_SIZE) {
         return UDMF_E_INVALID_PARAM;
     }
-    std::vector<uint8_t> recordValue;
+    std::vector<uint8_t> recordValue(count);
     for (unsigned int i = 0; i < count; ++i) {
-        recordValue.push_back(entry[i]);
+        recordValue[i] = entry[i];
     }
-    record->record_->SetValue(recordValue);
+    std::shared_ptr<ApplicationDefinedRecord> appDef = std::make_shared<ApplicationDefinedRecord>(typeId, recordValue);
+    record->record_ = std::move(appDef);
     record->recordDataLen = count;
-    record->record_->SetType(static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(typeId)));
     return UDMF_E_OK;
 }
 
@@ -312,34 +319,39 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* record, const char* typeId, uns
     if (!IsUnifiedRecordValid(record) || typeId == nullptr || entry == nullptr || count == nullptr) {
         return UDMF_E_INVALID_PARAM;
     }
-    UDType type = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(typeId));
-    UDType recordType = record->record_->GetType();
-    if (type != recordType) {
+    if (record->record_->GetType() != APPLICATION_DEFINED_RECORD) {
+        LOG_ERROR(UDMF_CAPI, "record's type not ApplicationDefinedType");
         return UDMF_E_INVALID_PARAM;
     }
-    auto value = record->record_->GetValue();
-    auto recordValue = std::get_if<std::vector<uint8_t>>(&value);
-    if (recordValue == nullptr) {
+    auto appDef = static_cast<ApplicationDefinedRecord *>((record->record_).get());
+    if (appDef == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "cast failed");
         return UDMF_ERR;
     }
+    if (appDef->GetApplicationDefinedType() != std::string(typeId)) {
+        LOG_ERROR(UDMF_CAPI, "query typeId not equals to data type");
+        return UDMF_E_INVALID_PARAM;
+    }
     std::lock_guard<std::mutex> lock(record->mutex);
-    *count = record->recordDataLen;
+    std::vector<uint8_t> recordValue = appDef->GetRawData();
+    *count = recordValue.size();
     if (record->recordData != nullptr) {
         LOG_DEBUG(UDMF_CAPI, "return cache value");
         *entry = record->recordData;
         return UDMF_E_OK;
     }
-    if (record->recordDataLen > MAX_RECORDS_SIZE) {
-        LOG_INFO(UDMF_CAPI, "data size exceeds maximum size");
+    if (*count > MAX_RECORDS_SIZE) {
+        LOG_ERROR(UDMF_CAPI, "data size exceeds maximum size");
         *count = 0;
         return UDMF_ERR;
     }
-    record->recordData = new (std::nothrow) unsigned char[record->recordDataLen];
+    record->recordData = new (std::nothrow) unsigned char[*count];
     if (record->recordData == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "allocate memory failed");
         return UDMF_ERR;
     }
-    for (unsigned int i = 0; i < record->recordDataLen; ++i) {
-        record->recordData[i] = (*recordValue)[i];
+    for (unsigned int i = 0; i < *count; ++i) {
+        (record->recordData)[i] = recordValue[i];
     }
     *entry = record->recordData;
     return UDMF_E_OK;

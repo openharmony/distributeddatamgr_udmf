@@ -15,6 +15,8 @@
 #define LOG_TAG "NapiQueue"
 #include "napi_queue.h"
 
+#include "logger.h"
+
 namespace OHOS {
 namespace UDMF {
 ContextBase::~ContextBase()

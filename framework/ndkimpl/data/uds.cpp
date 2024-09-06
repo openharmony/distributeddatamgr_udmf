@@ -15,7 +15,10 @@
 #define LOG_TAG "Uds"
 
 #include "uds.h"
+#include <string>
 #include "logger.h"
+#include "utd_common.h"
+#include "unified_record.h"
 #include "udmf_capi_common.h"
 #include "udmf_meta.h"
 #include "udmf_err_code.h"

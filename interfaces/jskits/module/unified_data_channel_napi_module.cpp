@@ -20,6 +20,7 @@
 #include "html_napi.h"
 #include "image_napi.h"
 #include "link_napi.h"
+#include "logger.h"
 #include "plain_text_napi.h"
 #include "unified_data_channel_napi.h"
 #include "summary_napi.h"
