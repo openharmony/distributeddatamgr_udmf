@@ -660,12 +660,12 @@ HWTEST_F(UDMFTest, OH_Udmf_GetGeneralEntry001, TestSize.Level0)
  */
 HWTEST_F(UDMFTest, OH_Udmf_AddAndGetGeneralEntry002, TestSize.Level0)
 {
-    char typeId[] = "general.plain-text";
+    char typeId[] = "general.plain-text-1";
     unsigned char entry[] = "CreateGeneralRecord";
     unsigned int count = sizeof(entry);
     OH_UdmfRecord *record = OH_UdmfRecord_Create();
     int addRes1 = OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
-    EXPECT_EQ(addRes1, UDMF_E_INVALID_PARAM);
+    EXPECT_EQ(addRes1, UDMF_E_OK);
 }
 
 /**
