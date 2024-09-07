@@ -472,6 +472,8 @@ enum UDType : int32_t {
     OPENHARMONY_APP,
     HMOS_WIFI,
     TEL,
+    ETS,
+    JSON5,
     UD_BUTT
 };
 
