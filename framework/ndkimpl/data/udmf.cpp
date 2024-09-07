@@ -408,18 +408,12 @@ int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId,
         count > MAX_GENERAL_ENTRY_SIZE || strlen(typeId) > MAX_KEY_STRING_LEN) {
         return UDMF_E_INVALID_PARAM;
     }
-    std::string utdId(typeId);
-    std::string prefix(APPLICATION_DEFINED_TYPE);
-    if (utdId.compare(0, prefix.length(), prefix) != 0) {
-        LOG_ERROR(UDMF_CAPI, "not appdefined type:%{public}s", utdId.c_str());
-        return UDMF_E_INVALID_PARAM;
-    }
     std::vector<uint8_t> recordValue(entry, entry + count);
     if (record->record_->GetType() == UD_BUTT) {
         record->record_ = std::make_shared<ApplicationDefinedRecord>(APPLICATION_DEFINED_RECORD, recordValue);
         record->record_->SetUtdId(typeId);
     } else {
-        record->record_->AddEntry(utdId, std::move(recordValue));
+        record->record_->AddEntry(typeId, std::move(recordValue));
     }
     record->recordDataLen = count;
     return UDMF_E_OK;
