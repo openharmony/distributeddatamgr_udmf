@@ -32,7 +32,7 @@
 namespace OHOS {
 namespace UDMF {
 constexpr const char* UNIFORM_DATA_TYPE = "uniformDataType";
-constexpr const char* CONTENT = "content";
+constexpr const char* CONTENT = "textContent";
 constexpr const char* ABSTRACT = "abstract";
 constexpr const char* URL = "url";
 constexpr const char* DESCRIPTION = "description";
