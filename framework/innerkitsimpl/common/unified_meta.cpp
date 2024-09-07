@@ -456,7 +456,9 @@ static constexpr UtdType UTD_TYPES[] = {
     { EXCEL_DIF, "EXCEL_DIF", "com.microsoft.excel.dif" },
     { OPENHARMONY_APP, "OPENHARMONY_APP", "openharmony.app" },
     { HMOS_WIFI, "HMOS_WIFI", "com.huawei.hmos.settings.wifi" },
-    { TEL, "TEL", "general.tel" }
+    { TEL, "TEL", "general.tel" },
+    { ETS, "ETS", "general.ets" },
+    { JSON5, "JSON5", "general.json5" }
 };
 
 namespace UtdUtils {

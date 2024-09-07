@@ -2981,6 +2981,20 @@ void PresetTypeDescriptors::InitDescriptors()
          "TEL schematic diagram file format",
          REFERENCE_URL,
          ""},
+        {"general.ets",
+         {"general.script"},
+         {".ets"},
+         {},
+         "Extended TypeScript source code",
+         REFERENCE_URL,
+         ""},
+        {"general.json5",
+         {"general.script"},
+         {".json5"},
+         {},
+         "JSON5 data interchange format",
+         REFERENCE_URL,
+         ""},
     };
 }
 } // namespace UDMF
