@@ -32,7 +32,6 @@ public:
     void SetContent(const std::string &content);
     std::string GetAbstract() const;
     void SetAbstract(const std::string &abstract);
-    ValueType GetValue() override;
     void InitObject() override;
 
     static bool CheckValue(const ValueType &value);

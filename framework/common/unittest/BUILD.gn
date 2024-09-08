@@ -22,26 +22,22 @@ config("module_private_config") {
     "${udmf_interfaces_path}/innerkits/convert",
     "${udmf_framework_path}/innerkitsimpl/data",
     "${udmf_framework_path}/common",
+    "${kv_store_path}/frameworks/common",
+    "${udmf_interfaces_path}/innerkits/data",
   ]
 }
 
-common_deps = []
+common_deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
 
 common_external_deps = [
+  "ability_base:want",
   "c_utils:utils",
   "hilog:libhilog",
-  "hisysevent:libhisysevent",
-  "hitrace:hitrace_meter",
-  "hitrace:libhitracechain",
   "image_framework:image",
   "image_framework:image",
   "image_framework:image_native",
   "image_framework:pixelmap",
   "ipc:ipc_core",
-  "kv_store:distributeddata_inner",
-  "kv_store:distributeddata_mgr",
-  "libexif:libexif",
-  "samgr:samgr_proxy",
 ]
 
 ohos_unittest("UtdCfgsCheckerTest") {
@@ -59,61 +55,6 @@ ohos_unittest("UtdCfgsCheckerTest") {
   deps = common_deps
 
   external_deps = common_external_deps
-}
-
-ohos_unittest("UdmfTypesUtilTest") {
-  module_out_path = module_output_path
-
-  sources = [ "udmf_types_util_test.cpp" ]
-
-  configs = [ ":module_private_config" ]
-
-  deps = common_deps
-
-  external_deps = common_external_deps
-
-  defines = [
-    "private=public",
-    "protected=public",
-  ]
-}
-
-ohos_unittest("UdmfTypesUtilAbnormalTest") {
-  module_out_path = module_output_path
-
-  sources = [
-    "${udmf_framework_path}/common/tlv_object.cpp",
-    "${udmf_framework_path}/common/udmf_types_util.cpp",
-    "${udmf_framework_path}/common/unittest/mock/tlv_util_mock.cpp",
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
-    "udmf_types_util_abnormal_test.cpp",
-  ]
-
-  configs = [ ":module_private_config" ]
-
-  deps = [
-    "${udmf_interfaces_path}/innerkits:udmf_client",
-    "${udmf_interfaces_path}/innerkits:utd_client",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = common_external_deps
-
-  defines = [
-    "private=public",
-    "protected=public",
-  ]
 }
 
 ohos_unittest("TlvUtilTest") {
@@ -144,6 +85,9 @@ ohos_unittest("TlvUtilTest") {
 group("unittest") {
   testonly = true
 
-  deps = [ ":UtdCfgsCheckerTest" ]
+  deps = [
+    ":TlvUtilTest",
+    ":UtdCfgsCheckerTest",
+  ]
 }
 ###############################################################################

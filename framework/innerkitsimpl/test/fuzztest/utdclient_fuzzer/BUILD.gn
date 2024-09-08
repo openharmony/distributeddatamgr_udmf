@@ -20,10 +20,7 @@ import("//foundation/distributeddatamgr/udmf/udmf.gni")
 ohos_fuzztest("UtdClientFuzzTest") {
   module_out_path = "udmf/udmf"
 
-  include_dirs = [
-    "${udmf_interfaces_path}/innerkits/client",
-    "${udmf_interfaces_path}/innerkits/data",
-  ]
+  include_dirs = [ "${udmf_interfaces_path}/innerkits/client" ]
 
   fuzz_config_file =
       "${udmf_framework_path}/innerkitsimpl/test/fuzztest/utdclient_fuzzer"

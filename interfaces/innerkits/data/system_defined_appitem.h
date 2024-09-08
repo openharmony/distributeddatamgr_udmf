@@ -42,7 +42,6 @@ public:
     void SetAbilityName(const std::string &abilityName);
     void SetItems(UDDetails &details);
     UDDetails GetItems();
-    ValueType GetValue() override;
     void InitObject() override;
 
     static bool CheckValue(const ValueType &value);

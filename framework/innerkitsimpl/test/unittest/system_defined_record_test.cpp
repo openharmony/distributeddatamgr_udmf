@@ -66,6 +66,7 @@ HWTEST_F(SystemDefinedRecordTest, AddProperty001, TestSize.Level1)
     systemDefinedRecord.AddProperty(property, value);
     auto object = std::get<std::shared_ptr<Object>>(systemDefinedRecord.value_);
     auto details = std::get<std::shared_ptr<Object>>(object->value_[SystemDefinedRecord::DETAILS]);
+    systemDefinedRecord.InitObject();
     EXPECT_EQ(systemDefinedRecord.details_.size(), 1);
     EXPECT_NE(details->value_.size(), 0);
     LOG_INFO(UDMF_TEST, "AddProperty001 end.");
@@ -118,7 +119,6 @@ HWTEST_F(SystemDefinedRecordTest, InitObject001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "InitObject001 begin.");
     SystemDefinedRecord systemDefinedRecord;
     systemDefinedRecord.details_.insert({ "first", "second" });
-    systemDefinedRecord.value_ = std::make_shared<Object>();
     systemDefinedRecord.InitObject();
     auto object = std::get<std::shared_ptr<Object>>(systemDefinedRecord.value_);
     auto details = std::get<std::shared_ptr<Object>>(object->value_[SystemDefinedRecord::DETAILS]);

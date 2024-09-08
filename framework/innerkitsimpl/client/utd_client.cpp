@@ -62,10 +62,15 @@ void UtdClient::Init()
 {
     std::unique_lock<std::shared_mutex> lock(utdMutex_);
     descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
-    std::vector<TypeDescriptorCfg> customTypes =
-        CustomUtdStore::GetInstance().GetTypeCfgs(CUSTOM_TYPE_CFG_PATH);
-    if (!customTypes.empty()) {
-        descriptorCfgs_.insert(descriptorCfgs_.end(), customTypes.begin(), customTypes.end());
+    std::string customUtdPath = GetCustomUtdPath();
+    if (!customUtdPath.empty()) {
+        std::vector<TypeDescriptorCfg> customTypes =
+            CustomUtdStore::GetInstance().GetTypeCfgs(customUtdPath);
+        LOG_INFO(UDMF_CLIENT, "get customUtd. path:%{public}s, size:%{public}zu",
+                 customUtdPath.c_str(), customTypes.size());
+        if (!customTypes.empty()) {
+            descriptorCfgs_.insert(descriptorCfgs_.end(), customTypes.begin(), customTypes.end());
+        }
     }
     UtdGraph::GetInstance().InitUtdGraph(descriptorCfgs_);
 }

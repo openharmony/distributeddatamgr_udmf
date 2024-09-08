@@ -164,26 +164,4 @@ HWTEST_F(HtmlTest, SetPlainContent002, TestSize.Level1)
     EXPECT_NE(html.plainContent_, plainContent);
     LOG_INFO(UDMF_TEST, "SetPlainContent002 end.");
 }
-
-/**
-* @tc.name: GetValue001
-* @tc.desc: Normal testcase of GetValue
-* @tc.type: FUNC
-*/
-HWTEST_F(HtmlTest, GetValue001, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "GetValue001 begin.");
-    Html html;
-    html.value_ = std::monostate{};
-    html.htmlContent_ = "htmlContent";
-    html.plainContent_ = "plainContent";
-    html.GetValue();
-    auto object = std::get<std::shared_ptr<Object>>(html.value_);
-    auto details_ = std::get<std::shared_ptr<Object>>(object->value_[Html::DETAILS]);
-    EXPECT_EQ(std::get<std::string>(object->value_[UNIFORM_DATA_TYPE]), "general.html");
-    EXPECT_EQ(std::get<std::string>(object->value_[HTML_CONTENT]), html.htmlContent_);
-    EXPECT_EQ(std::get<std::string>(object->value_[Html::PLAINT_CONTENT]), html.plainContent_);
-    EXPECT_EQ(details_->value_.size(), 0);
-    LOG_INFO(UDMF_TEST, "GetValue001 end.");
-}
 } // OHOS::Test

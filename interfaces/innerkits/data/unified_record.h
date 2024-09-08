@@ -38,7 +38,7 @@ public:
 
     std::string GetUid() const;
     void SetUid(const std::string &id);
-    virtual ValueType GetValue();
+    ValueType GetValue();
     void SetValue(const ValueType &value);
     ValueType GetOriginValue() const;
 

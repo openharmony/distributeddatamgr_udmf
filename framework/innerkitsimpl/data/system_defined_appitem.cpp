@@ -165,15 +165,6 @@ UDDetails SystemDefinedAppItem::GetItems()
     return items;
 }
 
-ValueType SystemDefinedAppItem::GetValue()
-{
-    if (std::holds_alternative<std::monostate>(value_)) {
-        value_ = std::make_shared<Object>();
-    }
-    InitObject();
-    return value_;
-}
-
 void SystemDefinedAppItem::InitObject()
 {
     if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
