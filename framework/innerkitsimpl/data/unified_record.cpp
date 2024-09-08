@@ -33,6 +33,9 @@ UnifiedRecord::UnifiedRecord(UDType type, ValueType value)
 {
     dataType_ = type;
     value_ = value;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        hasObject_ = true;
+    }
 }
 
 UDType UnifiedRecord::GetType() const
@@ -70,9 +73,24 @@ void UnifiedRecord::SetValue(const ValueType &value)
     value_ = value;
 }
 
-ValueType UnifiedRecord::GetOriginValue()
+ValueType UnifiedRecord::GetOriginValue() const
 {
     return value_;
+}
+
+void UnifiedRecord::InitObject()
+{
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = value_;
+        value_ = std::make_shared<Object>();
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_["VALUE_TYPE"] = value;
+    }
+}
+
+bool UnifiedRecord::HasObject()
+{
+    return hasObject_;
 }
 } // namespace UDMF
 } // namespace OHOS

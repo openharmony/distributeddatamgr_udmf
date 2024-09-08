@@ -1,0 +1,64 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/test.gni")
+import("//foundation/distributeddatamgr/udmf/udmf.gni")
+
+module_output_path = "udmf/common"
+
+###############################################################################
+config("module_private_config") {
+  include_dirs = [
+    "${udmf_interfaces_path}/innerkits/common",
+    "${udmf_interfaces_path}/innerkits/convert",
+    "${udmf_framework_path}/innerkitsimpl/data",
+    "${udmf_framework_path}/common",
+    "${kv_store_path}/frameworks/common",
+    "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_framework_path}/common/unittest/mock/include",
+    "${udmf_framework_path}/innerkitsimpl/client/",
+  ]
+}
+
+common_deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
+
+ohos_unittest("TlvUtilTest") {
+  module_out_path = module_output_path
+
+  sources = [ "tlv_util_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = [
+    "ability_base:want",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "image_framework:image",
+    "image_framework:image_native",
+    "image_framework:pixelmap",
+  ]
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+###############################################################################
+group("unittest") {
+  testonly = true
+
+  deps = [ ":TlvUtilTest" ]
+}
+###############################################################################

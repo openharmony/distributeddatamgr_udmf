@@ -842,7 +842,17 @@ HWTEST_F(UdmfClientTest, SetData014, TestSize.Level1)
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
     systemDefinedPixelMap1.SetDetails(details1);
-    std::vector<uint8_t> rawData1 = { 1, 2, 3, 4, 5 };
+    std::vector<uint8_t> rawData1;
+
+    uint32_t color[100] = { 3, 7, 9, 9, 7, 6 };
+    OHOS::Media::InitializationOptions opts = { { 5, 7 },
+        Media::PixelFormat::ARGB_8888,
+        Media::PixelFormat::ARGB_8888 };
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap =
+        OHOS::Media::PixelMap::Create(color, sizeof(color) / sizeof(color[0]), opts);
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMapIn = move(pixelMap);
+    pixelMapIn->EncodeTlv(rawData1);
+
     systemDefinedPixelMap1.SetRawData(rawData1);
     std::shared_ptr<UnifiedRecord> record1 = std::make_shared<SystemDefinedPixelMap>(systemDefinedPixelMap1);
     data1.AddRecord(record1);
@@ -1994,6 +2004,115 @@ HWTEST_F(UdmfClientTest, SetData024, TestSize.Level1)
     UnifiedDataHelper::SetRootPath("");
 
     LOG_INFO(UDMF_TEST, "SetData024 end.");
+}
+
+/**
+* @tc.name: SetData025
+* @tc.desc: Set PixelMap record with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData025, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData025 begin.");
+    
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data1;
+    std::string key;
+    SystemDefinedPixelMap systemDefinedPixelMap1;
+    UDDetails details1;
+    details1.insert({ "udmf_key", "udmf_value" });
+    systemDefinedPixelMap1.SetDetails(details1);
+    std::vector<uint8_t> rawData1 = { 1, 2, 3, 4, 5 };
+
+    systemDefinedPixelMap1.SetRawData(rawData1);
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<SystemDefinedPixelMap>(systemDefinedPixelMap1);
+    data1.AddRecord(record1);
+    auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege(option2);
+    SetHapToken2();
+    UnifiedData data2;
+    status = UdmfClient::GetInstance().GetData(option2, data2);
+    ASSERT_EQ(status, E_OK);
+
+    std::shared_ptr<UnifiedRecord> record2 = data2.GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    auto type = record2->GetType();
+    ASSERT_EQ(type, UDType::SYSTEM_DEFINED_PIXEL_MAP);
+
+    auto systemDefinedRecord2 = static_cast<SystemDefinedRecord *>(record2.get());
+    ASSERT_NE(systemDefinedRecord2, nullptr);
+    CompareDetails(systemDefinedRecord2->GetDetails());
+
+    auto systemDefinedPixelMap2 = static_cast<SystemDefinedPixelMap *>(record2.get());
+    ASSERT_NE(systemDefinedPixelMap2, nullptr);
+    auto rawData2 = systemDefinedPixelMap2->GetRawData();
+    EXPECT_EQ(rawData1.size(), rawData2.size());
+    for (uint32_t i = 0; i < rawData1.size(); ++i) {
+        EXPECT_EQ(rawData1[i], rawData2[i]);
+    }
+
+    LOG_INFO(UDMF_TEST, "SetData025 end.");
+}
+
+/**
+* @tc.name: SetData026
+* @tc.desc: Set more record with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData026, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData026 begin.");
+    
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data1;
+    std::string key;
+    SystemDefinedPixelMap systemDefinedPixelMap1;
+    UDDetails details1;
+    details1.insert({ "udmf_key", "udmf_value" });
+    systemDefinedPixelMap1.SetDetails(details1);
+    std::vector<uint8_t> rawData1 = { 1, 2, 3, 4, 5 };
+
+    systemDefinedPixelMap1.SetRawData(rawData1);
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<SystemDefinedPixelMap>(systemDefinedPixelMap1);
+    std::shared_ptr<UnifiedRecord> record2 = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "this is a content");
+    data1.AddRecord(record1);
+    data1.AddRecord(record2);
+    auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege(option2);
+    SetHapToken2();
+    UnifiedData data2;
+    status = UdmfClient::GetInstance().GetData(option2, data2);
+    ASSERT_EQ(status, E_OK);
+
+    std::shared_ptr<UnifiedRecord> record3 = data2.GetRecordAt(0);
+    ASSERT_NE(record3, nullptr);
+    auto type = record3->GetType();
+    ASSERT_EQ(type, UDType::SYSTEM_DEFINED_PIXEL_MAP);
+
+    auto systemDefinedRecord2 = static_cast<SystemDefinedRecord *>(record3.get());
+    ASSERT_NE(systemDefinedRecord2, nullptr);
+    CompareDetails(systemDefinedRecord2->GetDetails());
+
+    auto systemDefinedPixelMap2 = static_cast<SystemDefinedPixelMap *>(record3.get());
+    ASSERT_NE(systemDefinedPixelMap2, nullptr);
+    auto rawData2 = systemDefinedPixelMap2->GetRawData();
+    EXPECT_EQ(rawData1.size(), rawData2.size());
+    for (uint32_t i = 0; i < rawData1.size(); ++i) {
+        EXPECT_EQ(rawData1[i], rawData2[i]);
+    }
+
+    std::shared_ptr<UnifiedRecord> record4 = data2.GetRecordAt(1);
+    auto plainText = static_cast<PlainText *>(record4.get());
+    ASSERT_EQ(UDType::PLAIN_TEXT, plainText->GetType());
+    ASSERT_EQ("this is a content", plainText->GetContent());
+
+    LOG_INFO(UDMF_TEST, "SetData026 end.");
 }
 
 /**

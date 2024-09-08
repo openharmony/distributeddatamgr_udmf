@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,398 +12,97 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define LOG_TAG "TlvUtil"
-#include "tlv_util.h"
 
+#define LOG_TAG "TlvUtil"
+
+#include "tlv_util.h"
+#include "udmf_utils.h"
 #include "logger.h"
+#include "tlv_object.h"
 
 namespace OHOS {
 namespace TLVUtil {
-template<>
-bool CountBufferSize(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
+template <> size_t CountBufferSize(const std::nullptr_t &input, TLVObject &data)
 {
-    if (input == nullptr) {
-        return false;
-    }
-    data.Count(input->GetType());
-    data.Count(input->GetUid());
-    auto type = input->GetType();
-    switch (type) {
-        case UDType::TEXT: {
-            auto text = static_cast<Text *>(input.get());
-            if (text == nullptr) {
-                return false;
-            }
-            data.Count(text->GetDetails());
-            break;
-        }
-        case UDType::PLAIN_TEXT: {
-            auto plainText = static_cast<PlainText *>(input.get());
-            if (plainText == nullptr) {
-                return false;
-            }
-            data.Count(plainText->GetContent());
-            data.Count(plainText->GetAbstract());
-            auto text = static_cast<Text *>(input.get());
-            if (text == nullptr) {
-                return false;
-            }
-            data.Count(text->GetDetails());
-            break;
-        }
-        case UDType::HTML: {
-            auto html = static_cast<Html *>(input.get());
-            if (html == nullptr) {
-                return false;
-            }
-            data.Count(html->GetHtmlContent());
-            data.Count(html->GetPlainContent());
-            auto text = static_cast<Text *>(input.get());
-            if (text == nullptr) {
-                return false;
-            }
-            data.Count(text->GetDetails());
-            break;
-        }
-        case UDType::HYPERLINK: {
-            auto link = static_cast<Link *>(input.get());
-            if (link == nullptr) {
-                return false;
-            }
-            data.Count(link->GetUrl());
-            data.Count(link->GetDescription());
-            auto text = static_cast<Text *>(input.get());
-            if (text == nullptr) {
-                return false;
-            }
-            data.Count(text->GetDetails());
-            break;
-        }
-        case UDType::FILE: {
-            auto file = static_cast<File *>(input.get());
-            if (file == nullptr) {
-                return false;
-            }
-            data.Count(file->GetUri());
-            data.Count(file->GetRemoteUri());
-            data.Count(file->GetDetails());
-            break;
-        }
-        case UDType::IMAGE: {
-            auto image = static_cast<Image *>(input.get());
-            if (image == nullptr) {
-                return false;
-            }
-            data.Count(image->GetUri());
-            data.Count(image->GetRemoteUri());
-            auto file = static_cast<File *>(input.get());
-            if (file == nullptr) {
-                return false;
-            }
-            data.Count(file->GetDetails());
-            break;
-        }
-        case UDType::VIDEO: {
-            auto video = static_cast<Video *>(input.get());
-            if (video == nullptr) {
-                return false;
-            }
-            data.Count(video->GetUri());
-            data.Count(video->GetRemoteUri());
-            auto file = static_cast<File *>(input.get());
-            if (file == nullptr) {
-                return false;
-            }
-            data.Count(file->GetDetails());
-            break;
-        }
-        case UDType::AUDIO: {
-            auto audio = static_cast<Audio *>(input.get());
-            if (audio == nullptr) {
-                return false;
-            }
-            data.Count(audio->GetUri());
-            data.Count(audio->GetRemoteUri());
-            auto file = static_cast<File *>(input.get());
-            if (file == nullptr) {
-                return false;
-            }
-            data.Count(file->GetDetails());
-            break;
-        }
-        case UDType::FOLDER: {
-            auto folder = static_cast<Folder *>(input.get());
-            if (folder == nullptr) {
-                return false;
-            }
-            data.Count(folder->GetUri());
-            data.Count(folder->GetRemoteUri());
-            auto file = static_cast<File *>(input.get());
-            if (file == nullptr) {
-                return false;
-            }
-            data.Count(file->GetDetails());
-            break;
-        }
-        case UDType::SYSTEM_DEFINED_RECORD: {
-            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
-            if (sdRecord == nullptr) {
-                return false;
-            }
-            data.Count(sdRecord->GetDetails());
-            break;
-        }
-        case UDType::SYSTEM_DEFINED_FORM: {
-            auto form = static_cast<SystemDefinedForm *>(input.get());
-            if (form == nullptr) {
-                return false;
-            }
-            data.Count(form->GetFormId());
-            data.Count(form->GetFormName());
-            data.Count(form->GetBundleName());
-            data.Count(form->GetAbilityName());
-            data.Count(form->GetModule());
-            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
-            if (sdRecord == nullptr) {
-                return false;
-            }
-            data.Count(sdRecord->GetDetails());
-            break;
-        }
-        case UDType::SYSTEM_DEFINED_APP_ITEM: {
-            auto appItem = static_cast<SystemDefinedAppItem *>(input.get());
-            if (appItem == nullptr) {
-                return false;
-            }
-            data.Count(appItem->GetAppId());
-            data.Count(appItem->GetAppName());
-            data.Count(appItem->GetAppIconId());
-            data.Count(appItem->GetAppLabelId());
-            data.Count(appItem->GetBundleName());
-            data.Count(appItem->GetAbilityName());
-            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
-            if (sdRecord == nullptr) {
-                return false;
-            }
-            data.Count(sdRecord->GetDetails());
-            break;
-        }
-        case UDType::SYSTEM_DEFINED_PIXEL_MAP: {
-            auto pixelMap = static_cast<SystemDefinedPixelMap *>(input.get());
-            if (pixelMap == nullptr) {
-                return false;
-            }
-            data.Count(pixelMap->GetRawData());
-            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
-            if (sdRecord == nullptr) {
-                return false;
-            }
-            data.Count(sdRecord->GetDetails());
-            break;
-        }
-        case UDType::APPLICATION_DEFINED_RECORD: {
-            auto record = static_cast<ApplicationDefinedRecord *>(input.get());
-            if (record == nullptr) {
-                return false;
-            }
-            data.Count(record->GetApplicationDefinedType());
-            data.Count(record->GetRawData());
-            break;
-        }
-        default: {
-            return false;
-        }
-    }
-    data.Count(input->GetOriginValue());
-    return true;
+    return data.CountHead();
 }
 
-template<>
-bool CountBufferSize(const Runtime &input, TLVObject &data)
+template <> bool Writing(const std::nullptr_t &input, TLVObject &data, TAG tag)
 {
-    data.Count(input.key);
-    data.Count(input.isPrivate);
-    uint32_t size = static_cast<uint32_t>(input.privileges.size());
-    data.Count(size);
-    for (uint32_t i = 0; i < size; ++i) {
-        data.Count(input.privileges[i]);
-    }
-    data.Count(static_cast<int64_t>(input.createTime));
-    data.Count(static_cast<int64_t>(input.lastModifiedTime));
-    data.Count(input.sourcePackage);
-    data.Count(static_cast<int32_t>(input.dataStatus));
-    data.Count(input.dataVersion);
-    data.Count(input.createPackage);
-    data.Count(input.deviceId);
-    data.Count(input.recordTotalNum);
-    data.Count(input.tokenId);
-    return true;
+    InitWhenFirst(input, data);
+    return data.WriteHead(static_cast<uint16_t>(tag), 0);
 }
 
-template<>
-bool CountBufferSize(const UnifiedData &input, TLVObject &data)
+template <> bool Reading(std::nullptr_t &output, TLVObject &data, const TLVHead &head)
 {
-    int32_t size = static_cast<int32_t>(input.GetRecords().size());
-    data.Count(size);
-    for (auto record : input.GetRecords()) {
-        if (!CountBufferSize(record, data)) {
-            return false;
-        }
-    }
-    return true;
+    return data.Read(output, head);
 }
 
-template<>
-bool CountBufferSize(const std::vector<UnifiedData> &input, TLVObject &data)
+template <> size_t CountBufferSize(const std::monostate &input, TLVObject &data)
 {
-    int32_t size = static_cast<int32_t>(input.size());
-    data.Count(size);
-    for (auto unifiedData : input) {
-        if (!CountBufferSize(unifiedData, data)) {
-            return false;
-        }
-    }
-    return true;
+    return data.Count(input);
 }
 
-template<typename T>
-bool Writing(const T &input, TLVObject &data);
-
-template<typename T>
-bool Reading(T &output, TLVObject &data);
-
-template<>
-bool Writing(const int32_t &input, TLVObject &data)
+template <> bool Writing(const std::monostate &input, TLVObject &data, TAG tag)
 {
-    return data.WriteBasic(TAG::TAG_INT32, input);
+    InitWhenFirst(input, data);
+    return data.Write(tag, input);
 }
 
-template<>
-bool Reading(int32_t &output, TLVObject &data)
+template <> bool Reading(std::monostate &output, TLVObject &data, const TLVHead &head)
 {
-    return data.ReadBasic(output);
+    return data.Read(output, head);
 }
 
-template<>
-bool Writing(const int64_t &input, TLVObject &data)
+template <> size_t CountBufferSize(const std::string &input, TLVObject &data)
 {
-    return data.WriteBasic(TAG::TAG_INT64, input);
+    return data.Count(input);
 }
 
-template<>
-bool Reading(int64_t &output, TLVObject &data)
+template <> bool Writing(const std::string &input, TLVObject &data, TAG tag)
 {
-    return data.ReadBasic(output);
+    InitWhenFirst(input, data);
+    return data.Write(tag, input);
 }
 
-template<>
-bool Reading(uint32_t &output, TLVObject &data)
+template <> bool Reading(std::string &output, TLVObject &data, const TLVHead &head)
 {
-    return data.ReadBasic(output);
+    return data.Read(output, head);
 }
 
-template<>
-bool Writing(const uint32_t &input, TLVObject &data)
+template <> size_t CountBufferSize(const std::vector<uint8_t> &input, TLVObject &data)
 {
-    return data.WriteBasic(TAG::TAG_UINT32, input);
+    return data.Count(input);
 }
 
-template<>
-bool Reading(uint64_t &output, TLVObject &data)
+template <> bool Writing(const std::vector<uint8_t> &input, TLVObject &data, TAG tag)
 {
-    return data.ReadBasic(output);
+    InitWhenFirst(input, data);
+    return data.Write(tag, input);
 }
 
-template<>
-bool Writing(const uint64_t &input, TLVObject &data)
+template <> bool Reading(std::vector<uint8_t> &output, TLVObject &data, const TLVHead &head)
 {
-    return data.WriteBasic(TAG::TAG_UINT64, input);
+    return data.Read(output, head);
 }
 
-template<>
-bool Writing(const bool &input, TLVObject &data)
-{
-    return data.WriteBasic(TAG::TAG_BOOL, input);
-}
-
-template<>
-bool Reading(bool &output, TLVObject &data)
-{
-    return data.ReadBasic(output);
-}
-
-template<>
-bool Writing(const std::string &input, TLVObject &data)
-{
-    return data.WriteString(input);
-}
-
-template<>
-bool Reading(std::string &output, TLVObject &data)
-{
-    return data.ReadString(output);
-}
-
-template<>
-bool Writing(const std::vector<uint8_t> &input, TLVObject &data)
-{
-    return data.WriteVector(input);
-}
-
-template<>
-bool Reading(std::vector<uint8_t> &output, TLVObject &data)
-{
-    return data.ReadVector(output);
-}
-
-template<>
-bool Writing(const UDVariant &input, TLVObject &data)
-{
-    return data.WriteVariant(input);
-}
-
-template<>
-bool Reading(UDVariant &output, TLVObject &data)
-{
-    return data.ReadVariant(output);
-}
-
-template<>
-bool Writing(const ValueType &input, TLVObject &data)
-{
-    return data.WriteVariant(input);
-}
-
-template<>
-bool Reading(ValueType &output, TLVObject &data)
-{
-    return data.ReadVariant(output);
-}
-
-template<>
-bool Writing(const UDDetails &input, TLVObject &data)
-{
-    return data.WriteMap(input);
-}
-
-template<>
-bool Reading(UDDetails &output, TLVObject &data)
-{
-    return data.ReadMap(output);
-}
-
-template<>
-bool Writing(const UDType &input, TLVObject &data)
+template <> size_t CountBufferSize(const UDType &input, TLVObject &data)
 {
     int32_t type = input;
-    return Writing(type, data);
+    return data.CountBasic(type);
 }
 
-template<>
-bool Reading(UDType &output, TLVObject &data)
+template <> bool Writing(const UDType &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    int32_t type = input;
+    return data.WriteBasic(tag, type);
+}
+
+template <> bool Reading(UDType &output, TLVObject &data, const TLVHead &head)
 {
     int32_t type;
-    if (!Reading(type, data)) {
+    if (!Reading(type, data, head)) {
         return false;
     }
     if (type < UDType::ENTITY || type >= UDType::UD_BUTT) {
@@ -413,1007 +112,23 @@ bool Reading(UDType &output, TLVObject &data)
     return true;
 }
 
-template<>
-bool Writing(const Text &input, TLVObject &data)
-{
-    return Writing(input.GetDetails(), data);
-}
-
-template<>
-bool Reading(Text &output, TLVObject &data)
-{
-    UDDetails details;
-    if (!Reading(details, data)) {
-        return false;
-    }
-    output.SetDetails(details);
-    return true;
-}
-
-template<>
-bool Writing(const PlainText &input, TLVObject &data)
-{
-    if (!Writing(input.GetContent(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetAbstract(), data)) {
-        return false;
-    }
-    return true;
-}
-
-template<>
-bool Reading(PlainText &output, TLVObject &data)
-{
-    std::string content;
-    std::string abstract;
-    UDDetails details;
-    if (!Reading(content, data)) {
-        return false;
-    }
-    if (!Reading(abstract, data)) {
-        return false;
-    }
-    if (!Reading(details, data)) {
-        return false;
-    }
-    output.SetContent(content);
-    output.SetAbstract(abstract);
-    output.SetDetails(details);
-    return true;
-}
-
-template<>
-bool Writing(const Html &input, TLVObject &data)
-{
-    if (!Writing(input.GetHtmlContent(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetPlainContent(), data)) {
-        return false;
-    }
-    return true;
-}
-
-template<>
-bool Reading(Html &output, TLVObject &data)
-{
-    std::string htmlContent;
-    std::string plainContent;
-    UDDetails details;
-    if (!Reading(htmlContent, data)) {
-        return false;
-    }
-    if (!Reading(plainContent, data)) {
-        return false;
-    }
-    if (!Reading(details, data)) {
-        return false;
-    }
-    output.SetHtmlContent(htmlContent);
-    output.SetPlainContent(plainContent);
-    output.SetDetails(details);
-    return true;
-}
-
-template<>
-bool Writing(const Link &input, TLVObject &data)
-{
-    if (!Writing(input.GetUrl(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetDescription(), data)) {
-        return false;
-    }
-    return true;
-}
-
-template<>
-bool Reading(Link &output, TLVObject &data)
-{
-    std::string url;
-    std::string description;
-    UDDetails details;
-    if (!Reading(url, data)) {
-        return false;
-    }
-    if (!Reading(description, data)) {
-        return false;
-    }
-    if (!Reading(details, data)) {
-        return false;
-    }
-    output.SetUrl(url);
-    output.SetDescription(description);
-    output.SetDetails(details);
-    return true;
-}
-
-template<>
-bool Writing(const File &input, TLVObject &data)
-{
-    if (!Writing(input.GetUri(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetRemoteUri(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetDetails(), data)) {
-        return false;
-    }
-    return true;
-}
-
-template<>
-bool Reading(File &output, TLVObject &data)
-{
-    std::string uri;
-    std::string remoteUri;
-    UDDetails details;
-    if (!Reading(uri, data)) {
-        return false;
-    }
-    if (!Reading(remoteUri, data)) {
-        return false;
-    }
-    if (!Reading(details, data)) {
-        return false;
-    }
-    output.SetUri(uri);
-    output.SetRemoteUri(remoteUri);
-    output.SetDetails(details);
-    return true;
-}
-
-template<>
-bool Writing(const Image &input, TLVObject &data)
-{
-    return true;
-}
-
-template<>
-bool Reading(Image &output, TLVObject &data)
-{
-    std::string uri;
-    std::string remoteUri;
-    UDDetails details;
-    if (!Reading(uri, data)) {
-        return false;
-    }
-    if (!Reading(remoteUri, data)) {
-        return false;
-    }
-    if (!Reading(details, data)) {
-        return false;
-    }
-    output.SetUri(uri);
-    output.SetRemoteUri(remoteUri);
-    output.SetDetails(details);
-    return true;
-}
-
-template<>
-bool Writing(const Video &input, TLVObject &data)
-{
-    return true;
-}
-
-template<>
-bool Reading(Video &output, TLVObject &data)
-{
-    std::string uri;
-    std::string remoteUri;
-    UDDetails details;
-    if (!Reading(uri, data)) {
-        return false;
-    }
-    if (!Reading(remoteUri, data)) {
-        return false;
-    }
-    if (!Reading(details, data)) {
-        return false;
-    }
-    output.SetUri(uri);
-    output.SetRemoteUri(remoteUri);
-    output.SetDetails(details);
-    return true;
-}
-
-template<>
-bool Writing(const Audio &input, TLVObject &data)
-{
-    return true;
-}
-
-template<>
-bool Reading(Audio &output, TLVObject &data)
-{
-    std::string uri;
-    std::string remoteUri;
-    UDDetails details;
-    if (!Reading(uri, data)) {
-        return false;
-    }
-    if (!Reading(remoteUri, data)) {
-        return false;
-    }
-    if (!Reading(details, data)) {
-        return false;
-    }
-    output.SetUri(uri);
-    output.SetRemoteUri(remoteUri);
-    output.SetDetails(details);
-    return true;
-}
-
-template<>
-bool Writing(const Folder &input, TLVObject &data)
-{
-    return true;
-}
-
-template<>
-bool Reading(Folder &output, TLVObject &data)
-{
-    std::string uri;
-    std::string remoteUri;
-    UDDetails details;
-    if (!Reading(uri, data)) {
-        return false;
-    }
-    if (!Reading(remoteUri, data)) {
-        return false;
-    }
-    if (!Reading(details, data)) {
-        return false;
-    }
-    output.SetUri(uri);
-    output.SetRemoteUri(remoteUri);
-    output.SetDetails(details);
-    return true;
-}
-
-template<>
-bool Writing(const SystemDefinedRecord &input, TLVObject &data)
-{
-    if (!Writing(input.GetDetails(), data)) {
-        return false;
-    }
-    return true;
-}
-
-template<>
-bool Reading(SystemDefinedRecord &output, TLVObject &data)
-{
-    UDDetails details;
-    if (!Reading(details, data)) {
-        return false;
-    }
-    output.SetDetails(details);
-    return true;
-}
-
-template<>
-bool Writing(const SystemDefinedForm &input, TLVObject &data)
-{
-    if (!Writing(input.GetFormId(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetFormName(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetBundleName(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetAbilityName(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetModule(), data)) {
-        return false;
-    }
-    return true;
-}
-
-template<>
-bool Reading(SystemDefinedForm &output, TLVObject &data)
-{
-    int32_t formId;
-    std::string formName;
-    std::string bundleName;
-    std::string abilityName;
-    std::string module;
-    UDDetails details;
-    if (!Reading(formId, data)) {
-        return false;
-    }
-    if (!Reading(formName, data)) {
-        return false;
-    }
-    if (!Reading(bundleName, data)) {
-        return false;
-    }
-    if (!Reading(abilityName, data)) {
-        return false;
-    }
-    if (!Reading(module, data)) {
-        return false;
-    }
-    if (!Reading(details, data)) {
-        return false;
-    }
-    output.SetFormId(formId);
-    output.SetFormName(formName);
-    output.SetBundleName(bundleName);
-    output.SetAbilityName(abilityName);
-    output.SetModule(module);
-    output.SetDetails(details);
-    return true;
-}
-
-template<>
-bool Writing(const SystemDefinedAppItem &input, TLVObject &data)
-{
-    if (!Writing(input.GetAppId(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetAppName(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetAppIconId(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetAppLabelId(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetBundleName(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetAbilityName(), data)) {
-        return false;
-    }
-    return true;
-}
-
-template<>
-bool Reading(SystemDefinedAppItem &output, TLVObject &data)
-{
-    std::string appId;
-    std::string appName;
-    std::string appIconId;
-    std::string appLabelId;
-    std::string bundleName;
-    std::string abilityName;
-    UDDetails details;
-    if (!Reading(appId, data)) {
-        return false;
-    }
-    if (!Reading(appName, data)) {
-        return false;
-    }
-    if (!Reading(appIconId, data)) {
-        return false;
-    }
-    if (!Reading(appLabelId, data)) {
-        return false;
-    }
-    if (!Reading(bundleName, data)) {
-        return false;
-    }
-    if (!Reading(abilityName, data)) {
-        return false;
-    }
-    if (!Reading(details, data)) {
-        return false;
-    }
-    output.SetAppId(appId);
-    output.SetAppName(appName);
-    output.SetAppIconId(appIconId);
-    output.SetAppLabelId(appLabelId);
-    output.SetBundleName(bundleName);
-    output.SetAbilityName(abilityName);
-    output.SetDetails(details);
-    return true;
-}
-
-template<>
-bool Writing(const SystemDefinedPixelMap &input, TLVObject &data)
-{
-    if (!Writing(input.GetRawData(), data)) {
-        return false;
-    }
-    return true;
-}
-
-template<>
-bool Reading(SystemDefinedPixelMap &output, TLVObject &data)
-{
-    std::vector<uint8_t> rawData;
-    UDDetails details;
-    if (!Reading(rawData, data)) {
-        return false;
-    }
-    if (!Reading(details, data)) {
-        return false;
-    }
-    output.SetRawData(rawData);
-    output.SetDetails(details);
-    return true;
-}
-
-template<>
-bool Writing(const ApplicationDefinedRecord &input, TLVObject &data)
-{
-    if (!Writing(input.GetApplicationDefinedType(), data)) {
-        return false;
-    }
-    if (!Writing(input.GetRawData(), data)) {
-        return false;
-    }
-    return true;
-}
-
-template<>
-bool Reading(ApplicationDefinedRecord &output, TLVObject &data)
-{
-    std::string type;
-    std::vector<uint8_t> rawData;
-    if (!Reading(type, data)) {
-        return false;
-    }
-    if (!Reading(rawData, data)) {
-        return false;
-    }
-    output.SetApplicationDefinedType(type);
-    output.SetRawData(rawData);
-    return true;
-}
-
-template<>
-bool Writing(const std::shared_ptr<UnifiedRecord> &input, TLVObject &data)
-{
-    if (data.GetBuffer().size() == 0) {
-        if (!CountBufferSize(input, data)) {
-            return false;
-        }
-        data.UpdateSize();
-    }
-
-    if (!Writing(input->GetType(), data)) {
-        return false;
-    }
-    if (!Writing(input->GetUid(), data)) {
-        return false;
-    }
-    auto type = input->GetType();
-    switch (type) {
-        case UDType::TEXT: {
-            auto text = static_cast<Text *>(input.get());
-            if (text == nullptr) {
-                return false;
-            }
-            if (!Writing(*text, data)) {
-                return false;
-            }
-            break;
-        }
-        case UDType::PLAIN_TEXT: {
-            auto plainText = static_cast<PlainText *>(input.get());
-            if (plainText == nullptr) {
-                return false;
-            }
-            if (!Writing(*plainText, data)) {
-                return false;
-            }
-            auto text = static_cast<Text *>(input.get());
-            if (text == nullptr) {
-                return false;
-            }
-            if (!Writing(*text, data)) {
-                return false;
-            }
-            break;
-        }
-        case UDType::HTML: {
-            auto html = static_cast<Html *>(input.get());
-            if (html == nullptr) {
-                return false;
-            }
-            if (!Writing(*html, data)) {
-                return false;
-            }
-            auto text = static_cast<Text *>(input.get());
-            if (text == nullptr) {
-                return false;
-            }
-            if (!Writing(*text, data)) {
-                return false;
-            }
-            break;
-        }
-        case UDType::HYPERLINK: {
-            auto link = static_cast<Link *>(input.get());
-            if (link == nullptr) {
-                return false;
-            }
-            if (!Writing(*link, data)) {
-                return false;
-            }
-            auto text = static_cast<Text *>(input.get());
-            if (text == nullptr) {
-                return false;
-            }
-            if (!Writing(*text, data)) {
-                return false;
-            }
-            break;
-        }
-        case UDType::FILE: {
-            auto file = static_cast<File *>(input.get());
-            if (file == nullptr) {
-                return false;
-            }
-            if (!Writing(*file, data)) {
-                return false;
-            }
-            break;
-        }
-        case UDType::IMAGE: {
-            auto image = static_cast<Image *>(input.get());
-            if (image == nullptr) {
-                return false;
-            }
-            if (!Writing(*image, data)) {
-                return false;
-            }
-            auto file = static_cast<File *>(input.get());
-            if (file == nullptr) {
-                return false;
-            }
-            if (!Writing(*file, data)) {
-                return false;
-            }
-            break;
-        }
-        case UDType::VIDEO: {
-            auto video = static_cast<Video *>(input.get());
-            if (video == nullptr) {
-                return false;
-            }
-            if (!Writing(*video, data)) {
-                return false;
-            }
-            auto file = static_cast<File *>(input.get());
-            if (file == nullptr) {
-                return false;
-            }
-            if (!Writing(*file, data)) {
-                return false;
-            }
-            break;
-        }
-        case UDType::AUDIO: {
-            auto audio = static_cast<Audio *>(input.get());
-            if (audio == nullptr) {
-                return false;
-            }
-            if (!Writing(*audio, data)) {
-                return false;
-            }
-            auto file = static_cast<File *>(input.get());
-            if (file == nullptr) {
-                return false;
-            }
-            if (!Writing(*file, data)) {
-                return false;
-            }
-            break;
-        }
-        case UDType::FOLDER: {
-            auto folder = static_cast<Folder *>(input.get());
-            if (folder == nullptr) {
-                return false;
-            }
-            if (!Writing(*folder, data)) {
-                return false;
-            }
-            auto file = static_cast<File *>(input.get());
-            if (file == nullptr) {
-                return false;
-            }
-            if (!Writing(*file, data)) {
-                return false;
-            }
-            break;
-        }
-        case UDType::SYSTEM_DEFINED_RECORD: {
-            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
-            if (sdRecord == nullptr) {
-                return false;
-            }
-            if (!Writing(*sdRecord, data)) {
-                return false;
-            }
-            break;
-        }
-        case UDType::SYSTEM_DEFINED_FORM: {
-            auto form = static_cast<SystemDefinedForm *>(input.get());
-            if (form == nullptr) {
-                return false;
-            }
-            if (!Writing(*form, data)) {
-                return false;
-            }
-            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
-            if (sdRecord == nullptr) {
-                return false;
-            }
-            if (!Writing(*sdRecord, data)) {
-                return false;
-            }
-            break;
-        }
-        case UDType::SYSTEM_DEFINED_APP_ITEM: {
-            auto appItem = static_cast<SystemDefinedAppItem *>(input.get());
-            if (appItem == nullptr) {
-                return false;
-            }
-            if (!Writing(*appItem, data)) {
-                return false;
-            }
-            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
-            if (sdRecord == nullptr) {
-                return false;
-            }
-            if (!Writing(*sdRecord, data)) {
-                return false;
-            }
-            break;
-        }
-        case UDType::SYSTEM_DEFINED_PIXEL_MAP: {
-            auto pixelMap = static_cast<SystemDefinedPixelMap *>(input.get());
-            if (pixelMap == nullptr) {
-                return false;
-            }
-            if (!Writing(*pixelMap, data)) {
-                return false;
-            }
-            auto sdRecord = static_cast<SystemDefinedRecord *>(input.get());
-            if (sdRecord == nullptr) {
-                return false;
-            }
-            if (!Writing(*sdRecord, data)) {
-                return false;
-            }
-            break;
-        }
-        case UDType::APPLICATION_DEFINED_RECORD: {
-            auto record = static_cast<ApplicationDefinedRecord *>(input.get());
-            if (record == nullptr) {
-                return false;
-            }
-            if (!Writing(*record, data)) {
-                return false;
-            }
-            break;
-        }
-        default: {
-            return false;
-        }
-    }
-    if (!Writing(input->GetOriginValue(), data)) {
-        return false;
-    }
-    return true;
-}
-
-template<>
-bool Reading(std::shared_ptr<UnifiedRecord> &output, TLVObject &data)
-{
-    UDType type ;
-    if (!Reading(type, data)) {
-        return false;
-    }
-    std::string uid;
-    if (!Reading(uid, data)) {
-        return false;
-    }
-    switch (type) {
-        case UDType::TEXT: {
-            std::shared_ptr<Text> text = std::make_shared<Text>();
-            if (!Reading(*text, data)) {
-                return false;
-            }
-            output = text;
-            break;
-        }
-        case UDType::PLAIN_TEXT: {
-            std::shared_ptr<PlainText> plainText = std::make_shared<PlainText>();
-            if (!Reading(*plainText, data)) {
-                return false;
-            }
-            output = plainText;
-            break;
-        }
-        case UDType::HTML: {
-            std::shared_ptr<Html> html = std::make_shared<Html>();
-            if (!Reading(*html, data)) {
-                return false;
-            }
-            output = html;
-            break;
-        }
-        case UDType::HYPERLINK: {
-            std::shared_ptr<Link> link = std::make_shared<Link>();
-            if (!Reading(*link, data)) {
-                return false;
-            }
-            output = link;
-            break;
-        }
-        case UDType::FILE: {
-            std::shared_ptr<File> file = std::make_shared<File>();
-            if (!Reading(*file, data)) {
-                return false;
-            }
-            output = file;
-            break;
-        }
-        case UDType::IMAGE: {
-            std::shared_ptr<Image> image = std::make_shared<Image>();
-            if (!Reading(*image, data)) {
-                return false;
-            }
-            output = image;
-            break;
-        }
-        case UDType::VIDEO: {
-            std::shared_ptr<Video> video = std::make_shared<Video>();
-            if (!Reading(*video, data)) {
-                return false;
-            }
-            output = video;
-            break;
-        }
-        case UDType::AUDIO: {
-            std::shared_ptr<Audio> audio = std::make_shared<Audio>();
-            if (!Reading(*audio, data)) {
-                return false;
-            }
-            output = audio;
-            break;
-        }
-        case UDType::FOLDER: {
-            std::shared_ptr<Folder> folder = std::make_shared<Folder>();
-            if (!Reading(*folder, data)) {
-                return false;
-            }
-            output = folder;
-            break;
-        }
-        case UDType::SYSTEM_DEFINED_RECORD: {
-            std::shared_ptr<SystemDefinedRecord> sdRecord = std::make_shared<SystemDefinedRecord>();
-            if (!Reading(*sdRecord, data)) {
-                return false;
-            }
-            output = sdRecord;
-            break;
-        }
-        case UDType::SYSTEM_DEFINED_FORM: {
-            std::shared_ptr<SystemDefinedForm> form = std::make_shared<SystemDefinedForm>();
-            if (!Reading(*form, data)) {
-                return false;
-            }
-            output = form;
-            break;
-        }
-        case UDType::SYSTEM_DEFINED_APP_ITEM: {
-            std::shared_ptr<SystemDefinedAppItem> appItem = std::make_shared<SystemDefinedAppItem>();
-            if (!Reading(*appItem, data)) {
-                return false;
-            }
-            output = appItem;
-            break;
-        }
-        case UDType::SYSTEM_DEFINED_PIXEL_MAP: {
-            std::shared_ptr<SystemDefinedPixelMap> pixelMap = std::make_shared<SystemDefinedPixelMap>();
-            if (!Reading(*pixelMap, data)) {
-                return false;
-            }
-            output = pixelMap;
-            break;
-        }
-        case UDType::APPLICATION_DEFINED_RECORD: {
-            std::shared_ptr<ApplicationDefinedRecord> record = std::make_shared<ApplicationDefinedRecord>();
-            if (!Reading(*record, data)) {
-                return false;
-            }
-            output = record;
-            break;
-        }
-        default: {
-            return false;
-        }
-    }
-    ValueType value;
-    if (!Reading(value, data)) {
-        LOG_WARN(UDMF_CLIENT, "Reading value empty.");
-    }
-    output->SetUid(uid);
-    output->SetType(type);
-    output->SetValue(value);
-    return true;
-}
-
-template<>
-bool Writing(const UnifiedData &input, TLVObject &data)
-{
-    if (data.GetBuffer().size() == 0) {
-        if (!CountBufferSize(input, data)) {
-            return false;
-        }
-        data.UpdateSize();
-    }
-
-    int32_t size = static_cast<int32_t>(input.GetRecords().size());
-    if (!Writing(size, data)) {
-        return false;
-    }
-
-    for (auto record : input.GetRecords()) {
-        if (!Writing(record, data)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-template<>
-bool Reading(UnifiedData &output, TLVObject &data)
-{
-    int32_t size;
-    if (!Reading(size, data)) {
-        return false;
-    }
-    while (size-- > 0) {
-        std::shared_ptr<UnifiedRecord> record;
-        if (!Reading(record, data)) {
-            return false;
-        }
-        output.AddRecord(record);
-    }
-    return true;
-}
-
-template<>
-bool Writing(const std::vector<UnifiedData> &input, TLVObject &data)
-{
-    if (!CountBufferSize(input, data)) {
-        return false;
-    }
-    data.UpdateSize();
-
-    int32_t size = static_cast<int32_t>(input.size());
-    if (!Writing(size, data)) {
-        return false;
-    }
-
-    for (auto unifiedData : input) {
-        if (!Writing(unifiedData, data)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-template<>
-bool Reading(std::vector<UnifiedData> &output, TLVObject &data)
-{
-    int32_t size;
-    if (!Reading(size, data)) {
-        return false;
-    }
-    while (size-- > 0) {
-        UnifiedData unifiedData;
-        if (!Reading(unifiedData, data)) {
-            return false;
-        }
-        output.push_back(unifiedData);
-    }
-    return true;
-}
-
-template<>
-bool Writing(const UnifiedKey &input, TLVObject &data)
-{
-    if (!Writing(input.key, data)) {
-        return false;
-    }
-    if (!Writing(input.intention, data)) {
-        return false;
-    }
-    if (!Writing(input.bundleName, data)) {
-        return false;
-    }
-    if (!Writing(input.groupId, data)) {
-        return false;
-    }
-    return true;
-}
-
-template<>
-bool Reading(UnifiedKey &output, TLVObject &data)
-{
-    std::string key;
-    std::string intention;
-    std::string bundleName;
-    std::string groupId;
-    if (!Reading(key, data)) {
-        return false;
-    }
-    if (!Reading(intention, data)) {
-        return false;
-    }
-    if (!Reading(bundleName, data)) {
-        return false;
-    }
-    if (!Reading(groupId, data)) {
-        return false;
-    }
-    output.key = key;
-    output.intention = intention;
-    output.bundleName = bundleName;
-    output.groupId = groupId;
-    return true;
-}
-
-template<>
-bool Writing(const Privilege &input, TLVObject &data)
-{
-    if (!Writing(input.tokenId, data)) {
-        return false;
-    }
-    if (!Writing(input.readPermission, data)) {
-        return false;
-    }
-    if (!Writing(input.writePermission, data)) {
-        return false;
-    }
-    return true;
-}
-
-template<>
-bool Reading(Privilege &output, TLVObject &data)
-{
-    uint32_t tokenId;
-    std::string readPermission;
-    std::string writePermission;
-    if (!Reading(tokenId, data)) {
-        return false;
-    }
-    if (!Reading(readPermission, data)) {
-        return false;
-    }
-    if (!Reading(writePermission, data)) {
-        return false;
-    }
-    output.tokenId = tokenId;
-    output.readPermission = readPermission;
-    output.writePermission = writePermission;
-    return true;
-}
-
-template<>
-bool Writing(const DataStatus &input, TLVObject &data)
+template <> size_t CountBufferSize(const DataStatus &input, TLVObject &data)
 {
     int32_t status = input;
-    return Writing(status, data);
+    return data.CountBasic(status);
 }
 
-template<>
-bool Reading(DataStatus &output, TLVObject &data)
+template <> bool Writing(const DataStatus &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    int32_t status = input;
+    return data.WriteBasic(tag, status);
+}
+
+template <> bool Reading(DataStatus &output, TLVObject &data, const TLVHead &head)
 {
     int32_t status;
-    if (!Reading(status, data)) {
+    if (!data.ReadBasic(status, head)) {
         return false;
     }
     if (status < DataStatus::WORKING || status >= DataStatus::FADE) {
@@ -1423,127 +138,479 @@ bool Reading(DataStatus &output, TLVObject &data)
     return true;
 }
 
-template<>
-bool Writing(const Runtime &input, TLVObject &data)
+template <> size_t CountBufferSize(const Object &input, TLVObject &data)
 {
-    (void)CountBufferSize(input, data);
-    data.UpdateSize();
-    if (!Writing(input.key, data)) {
+    return data.CountHead() + CountBufferSize(input.value_, data);
+}
+
+template <> bool Writing(const Object &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    auto tagCursor = data.GetCursor();
+    data.OffsetHead();
+    if (!Writing(input.value_, data, TAG::TAG_OBJECT_VALUE)) {
         return false;
     }
-    if (!Writing(input.isPrivate, data)) {
+    return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
+}
+template <> bool Reading(Object &output, TLVObject &data, const TLVHead &head)
+{
+    TLVHead headValue{};
+    if (!data.ReadHead(headValue)) {
         return false;
     }
-    uint32_t size = static_cast<uint32_t>(input.privileges.size());
-    if (!Writing(size, data)) {
+    if (headValue.tag != static_cast<uint16_t>(TAG::TAG_OBJECT_VALUE)) {
         return false;
     }
-    for (uint32_t i = 0; i < size; ++i) {
-        if (!Writing(input.privileges[i], data)) {
-            return false;
-        }
-    }
-    if (!Writing(static_cast<int64_t>(input.createTime), data)) {
-        return false;
-    }
-    if (!Writing(input.sourcePackage, data)) {
-        return false;
-    }
-    if (!Writing(input.dataStatus, data)) {
-        return false;
-    }
-    if (!Writing(input.dataVersion, data)) {
-        return false;
-    }
-    if (!Writing(static_cast<int64_t>(input.lastModifiedTime), data)) {
-        return false;
-    }
-    if (!Writing(input.createPackage, data)) {
-        return false;
-    }
-    if (!Writing(input.deviceId, data)) {
-        return false;
-    }
-    if (!Writing(input.recordTotalNum, data)) {
-        return false;
-    }
-    if (!Writing(input.tokenId, data)) {
+    if (!Reading(output.value_, data, headValue)) {
         return false;
     }
     return true;
 }
 
-template<>
-bool Reading(Runtime &output, TLVObject &data)
+template <> size_t CountBufferSize(const UnifiedKey &input, TLVObject &data)
 {
-    UnifiedKey key;
-    bool isPrivate;
-    uint32_t size;
-    std::vector<Privilege> privileges;
-    int64_t createTime;
-    std::string sourcePackage;
-    DataStatus dataStatus;
-    int32_t dataVersion;
-    int64_t lastModifiedTime;
-    std::string createPackage;
-    std::string deviceId;
-    uint32_t recordTotalNum;
-    uint32_t tokenId = 0;
-    if (!Reading(key, data)) {
+    return data.CountHead() + data.Count(input.key) + data.Count(input.intention) + data.Count(input.bundleName) +
+        data.Count(input.groupId);
+}
+template <> bool Writing(const UnifiedKey &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    auto tagCursor = data.GetCursor();
+    data.OffsetHead();
+    if (!data.Write(TAG::TAG_KEY, input.key)) {
         return false;
     }
-    if (!Reading(isPrivate, data)) {
+    if (!data.Write(TAG::TAG_INTENTION, input.intention)) {
         return false;
     }
-    if (!Reading(size, data)) {
+    if (!data.Write(TAG::TAG_BUNDLE_NAME, input.bundleName)) {
         return false;
     }
-    for (uint32_t i = 0; i < size; ++i) {
-        Privilege privilege;
-        if (!Reading(privilege, data)) {
+    if (!data.Write(TAG::TAG_GROUP_ID, input.groupId)) {
+        return false;
+    }
+    return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
+}
+
+template <> bool Reading(UnifiedKey &output, TLVObject &data, const TLVHead &head)
+{
+    auto endCursor = data.GetCursor() + head.len;
+    while (data.GetCursor() < endCursor) {
+        TLVHead headItem{};
+        if (!data.ReadHead(headItem)) {
             return false;
         }
-        privileges.emplace_back(privilege);
+        switch (headItem.tag) {
+            case static_cast<uint16_t>(TAG::TAG_KEY):
+                if (!data.Read(output.key, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_INTENTION):
+                if (!data.Read(output.intention, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_BUNDLE_NAME):
+                if (!data.Read(output.bundleName, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_GROUP_ID):
+                if (!data.Read(output.groupId, headItem)) {
+                    return false;
+                }
+                break;
+            default:
+                data.Skip(headItem);
+        }
     }
-    if (!Reading(createTime, data)) {
+    return true;
+}
+
+template <> size_t CountBufferSize(const UnifiedData &input, TLVObject &data)
+{
+    std::string version = UTILS::GetCurrentSdkVersion();
+    return data.CountHead() + data.Count(version) + TLVUtil::CountBufferSize(input.GetRecords(), data);
+}
+
+template <> bool Writing(const UnifiedData &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    auto tagCursor = data.GetCursor();
+    data.OffsetHead();
+    std::string version = UTILS::GetCurrentSdkVersion();
+    if (!data.Write(TAG::TAG_VERSION, version)) {
         return false;
     }
-    if (!Reading(sourcePackage, data)) {
+    if (!TLVUtil::Writing(input.GetRecords(), data, TAG::TAG_UNIFIED_RECORD)) {
         return false;
     }
-    if (!Reading(dataStatus, data)) {
+    return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
+}
+
+template <> bool Reading(UnifiedData &output, TLVObject &data, const TLVHead &head)
+{
+    auto endCursor = data.GetCursor() + head.len;
+    while (data.GetCursor() < endCursor) {
+        TLVHead headItem{};
+        if (!data.ReadHead(headItem)) {
+            return false;
+        }
+        if (headItem.tag == static_cast<uint16_t>(TAG::TAG_VERSION)) {
+            data.Skip(headItem);
+            continue;
+        }
+        if (headItem.tag == static_cast<uint16_t>(TAG::TAG_UNIFIED_RECORD)) {
+            auto records = output.GetRecords();
+            if (!Reading(records, data, headItem)) {
+                return false;
+            }
+            output.SetRecords(records);
+            continue;
+        }
+        data.Skip(headItem);
+    }
+    return true;
+}
+
+template <> size_t CountBufferSize(const UnifiedRecord &input, TLVObject &data)
+{
+    std::string version = UTILS::GetCurrentSdkVersion();
+    return data.CountHead() + data.Count(version) + data.CountBasic(static_cast<int32_t>(input.GetType())) +
+        data.Count(input.GetUid()) + CountBufferSize(input.GetOriginValue(), data);
+}
+
+template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    auto tagCursor = data.GetCursor();
+    data.OffsetHead();
+    std::string version = UTILS::GetCurrentSdkVersion();
+    if (!data.Write(TAG::TAG_VERSION, version)) {
         return false;
     }
-    if (!Reading(dataVersion, data)) {
+    if (!data.WriteBasic(TAG::TAG_UD_TYPE, static_cast<int32_t>(input.GetType()))) {
         return false;
     }
-    if (!Reading(lastModifiedTime, data)) {
+    if (!data.Write(TAG::TAG_UID, input.GetUid())) {
         return false;
     }
-    if (!Reading(createPackage, data)) {
+    if (!TLVUtil::Writing(input.GetOriginValue(), data, TAG::TAG_RECORD_VALUE)) {
         return false;
     }
-    if (!Reading(deviceId, data)) {
+    return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
+}
+
+template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &head)
+{
+    auto endCursor = data.GetCursor() + head.len;
+    UDType dataType;
+    std::string uid;
+    ValueType value;
+    while (data.GetCursor() < endCursor) {
+        TLVHead headItem{};
+        if (!data.ReadHead(headItem)) {
+            return false;
+        }
+        switch (headItem.tag) {
+            case static_cast<uint16_t>(TAG::TAG_VERSION):
+                data.Skip(headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_UD_TYPE):
+                if (!TLVUtil::Reading(dataType, data, headItem)) {
+                    return false;
+                }
+                output.SetType(dataType);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_UID):
+                if (!data.Read(uid, headItem)) {
+                    return false;
+                }
+                output.SetUid(uid);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_RECORD_VALUE):
+                if (!TLVUtil::Reading(value, data, headItem)) {
+                    return false;
+                }
+                output.SetValue(value);
+                break;
+            default:
+                data.Skip(headItem);
+        }
+    }
+    return true;
+}
+
+template <> size_t CountBufferSize(const Runtime &input, TLVObject &data)
+{
+    std::string version = UTILS::GetCurrentSdkVersion();
+    return data.CountHead() + data.CountBasic(input.isPrivate) + data.CountBasic(input.dataVersion) +
+        data.CountBasic(input.recordTotalNum) + data.CountBasic(input.tokenId) +
+        data.CountBasic(static_cast<int64_t>(input.createTime)) +
+        data.CountBasic(static_cast<int64_t>(input.lastModifiedTime)) +
+        data.CountBasic(static_cast<int32_t>(input.dataStatus)) + data.Count(input.sourcePackage) +
+        data.Count(input.createPackage) + data.Count(input.deviceId) + TLVUtil::CountBufferSize(input.key, data) +
+        data.Count(version) + TLVUtil::CountBufferSize(input.privileges, data);
+}
+
+template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    auto tagCursor = data.GetCursor();
+    data.OffsetHead();
+    std::string version = UTILS::GetCurrentSdkVersion();
+    if (!TLVUtil::Writing(version, data, TAG::TAG_VERSION)) {
         return false;
     }
-    if (!Reading(recordTotalNum, data)) {
+    if (!TLVUtil::Writing(input.key, data, TAG::TAG_KEY)) {
         return false;
     }
-    if (!Reading(tokenId, data)) {
-        LOG_WARN(UDMF_CLIENT, "Reading tokenId empty.");
+    if (!data.WriteBasic(TAG::TAG_IS_PRIVATE, input.isPrivate)) {
+        return false;
     }
-    output.key = key;
-    output.isPrivate = isPrivate;
-    output.privileges = privileges;
-    output.createTime = createTime;
-    output.sourcePackage = sourcePackage;
-    output.dataStatus = dataStatus;
-    output.dataVersion = dataVersion;
-    output.lastModifiedTime = lastModifiedTime;
-    output.createPackage = createPackage;
-    output.deviceId = deviceId;
-    output.recordTotalNum = recordTotalNum;
-    output.tokenId = tokenId;
+    if (!TLVUtil::Writing(input.privileges, data, TAG::TAG_PRIVILEGE)) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_CREATE_TIME, static_cast<int64_t>(input.createTime))) {
+        return false;
+    }
+    if (!data.Write(TAG::TAG_SOURCE_PACKAGE, input.sourcePackage)) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_DATA_STATUS, static_cast<int32_t>(input.dataStatus))) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_DATA_VERSION, input.dataVersion)) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_LAST_MODIFIED_TIME, static_cast<int64_t>(input.lastModifiedTime))) {
+        return false;
+    }
+    if (!data.Write(TAG::TAG_CREATE_PACKAGE, input.createPackage)) {
+        return false;
+    }
+    if (!data.Write(TAG::TAG_DEVICE_ID, input.deviceId)) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_RECORD_TOTAL_NUM, input.recordTotalNum)) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_TOKEN_ID, input.tokenId)) {
+        return false;
+    }
+    return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
+}
+
+template <> bool Reading(Runtime &output, TLVObject &data, const TLVHead &head)
+{
+    auto endCursor = data.GetCursor() + head.len;
+    while (data.GetCursor() < endCursor) {
+        TLVHead headItem{};
+        if (!data.ReadHead(headItem)) {
+            return false;
+        }
+        bool result = true;
+        int64_t createTime = 0;
+        int64_t lastModifiedTime = 0;
+        switch (headItem.tag) {
+            case static_cast<uint16_t>(TAG::TAG_KEY):
+                result = TLVUtil::Reading(output.key, data, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_IS_PRIVATE):
+                result = data.ReadBasic(output.isPrivate, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_PRIVILEGE):
+                result = TLVUtil::Reading(output.privileges, data, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_CREATE_TIME):
+                result = data.ReadBasic(createTime, headItem);
+                output.createTime = static_cast<time_t>(createTime);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_SOURCE_PACKAGE):
+                result = data.Read(output.sourcePackage, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_DATA_STATUS):
+                result = TLVUtil::Reading(output.dataStatus, data, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_DATA_VERSION):
+                result = data.ReadBasic(output.dataVersion, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_LAST_MODIFIED_TIME):
+                result = data.ReadBasic(lastModifiedTime, headItem);
+                output.lastModifiedTime = static_cast<time_t>(lastModifiedTime);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_CREATE_PACKAGE):
+                result = data.Read(output.createPackage, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_DEVICE_ID):
+                result = data.Read(output.deviceId, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_RECORD_TOTAL_NUM):
+                result = data.ReadBasic(output.recordTotalNum, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_TOKEN_ID):
+                result = data.ReadBasic(output.tokenId, headItem);
+                break;
+            default:
+                result = data.Skip(headItem);
+        }
+        if (!result) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <> size_t CountBufferSize(const Privilege &input, TLVObject &data)
+{
+    return data.CountHead() + data.CountBasic(input.tokenId) + data.Count(input.readPermission) +
+        data.Count(input.writePermission);
+}
+
+template <> bool Writing(const Privilege &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    auto tagCursor = data.GetCursor();
+    data.OffsetHead();
+    if (!data.WriteBasic(TAG::TAG_TOKEN_ID, input.tokenId)) {
+        return false;
+    }
+    if (!data.Write(TAG::TAG_READPERMISSION, input.readPermission)) {
+        return false;
+    }
+    if (!data.Write(TAG::TAG_WRITEPERMISSION, input.writePermission)) {
+        return false;
+    }
+    return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
+}
+
+template <> bool Reading(Privilege &output, TLVObject &data, const TLVHead &head)
+{
+    auto endCursor = data.GetCursor() + head.len;
+    while (data.GetCursor() < endCursor) {
+        TLVHead headItem{};
+        if (!data.ReadHead(headItem)) {
+            return false;
+        }
+        switch (headItem.tag) {
+            case static_cast<uint16_t>(TAG::TAG_TOKEN_ID):
+                if (!data.ReadBasic(output.tokenId, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_READPERMISSION):
+                if (!data.Read(output.readPermission, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_WRITEPERMISSION):
+                if (!data.Read(output.writePermission, headItem)) {
+                    return false;
+                }
+                break;
+            default:
+                data.Skip(headItem);
+        }
+    }
+    return true;
+}
+
+template <> size_t CountBufferSize(const std::shared_ptr<OHOS::Media::PixelMap> &input, TLVObject &data)
+{
+    std::vector<std::uint8_t> val;
+    if (!input->EncodeTlv(val)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Encode pixelMap error when CountBufferSize");
+        return 0;
+    }
+    return CountBufferSize(val, data);
+}
+
+template <> bool Writing(const std::shared_ptr<OHOS::Media::PixelMap> &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    std::vector<std::uint8_t> val;
+    if (!input->EncodeTlv(val)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Encode pixelMap error when Writing");
+        return false;
+    }
+    return data.Write(tag, val);
+}
+
+template <> bool Reading(std::shared_ptr<OHOS::Media::PixelMap> &output, TLVObject &data, const TLVHead &head)
+{
+    std::vector<std::uint8_t> val;
+    if (!data.Read(val, head)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Reading u8 vector error.");
+        return false;
+    }
+    output = std::shared_ptr<OHOS::Media::PixelMap>(OHOS::Media::PixelMap::DecodeTlv(val));
+    if (output == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "DecodeTlv pixelMap error when Reading.");
+        return false;
+    }
+    return true;
+}
+
+template <> size_t CountBufferSize(const std::shared_ptr<OHOS::AAFwk::Want> &input, TLVObject &data)
+{
+    Parcel parcel;
+    if (!input->Marshalling(parcel)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Marshalling want error when Count");
+        return 0;
+    }
+    auto size = parcel.GetDataSize();
+    std::vector<std::uint8_t> val(size);
+    return CountBufferSize(val, data);
+}
+
+template <> bool Writing(const std::shared_ptr<OHOS::AAFwk::Want> &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    Parcel parcel;
+    if (!input->Marshalling(parcel)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Marshalling want error in tlv write. tag=%{public}hu", tag);
+        return false;
+    }
+    auto size = parcel.GetDataSize();
+    auto buffer = parcel.GetData();
+    std::vector<std::uint8_t> val(size);
+    if (size != 0) {
+        auto err = memcpy_s(val.data(), size, reinterpret_cast<const void *>(buffer), size);
+        if (err != EOK) {
+            LOG_ERROR(UDMF_FRAMEWORK, "memcpy error in tlv write want. tag=%{public}hu", tag);
+            return false;
+        }
+    }
+    return data.Write(tag, val);
+}
+
+template <> bool Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &data, const TLVHead &head)
+{
+    std::vector<std::uint8_t> val;
+    if (!data.Read(val, head)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Reading u8 vector error.");
+        return false;
+    }
+
+    std::shared_ptr<Parcel> parcel = std::make_shared<Parcel>();
+    auto buffer = malloc(val.size());
+    auto err = memcpy_s(buffer, val.size(), val.data(), val.size());
+    if (err != EOK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "memcpy_s error in tlv read want. tag=%{public}hu", head.tag);
+        return false;
+    }
+    if (!parcel->ParseFrom((uintptr_t)buffer, head.len)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "ParseFrom error in tlv read want. tag=%{public}hu", head.tag);
+        return false;
+    }
+    auto want = AAFwk::Want::Unmarshalling(*parcel);
+    if (want == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshalling want error in tlv read. tag=%{public}hu", head.tag);
+        return false;
+    }
+    output = std::shared_ptr<OHOS::AAFwk::Want>(want);
     return true;
 }
 } // namespace TLVUtil

@@ -96,20 +96,6 @@ struct OH_UdmfProperty {
     std::string extraStr;
 };
 
-constexpr const char* UNIFORM_DATA_TYPE = "uniformDataType";
-constexpr const char* CONTENT = "content";
-constexpr const char* ABSTRACT = "abstract";
-constexpr const char* URL = "url";
-constexpr const char* DESCRIPTION = "description";
-constexpr const char* HTML_CONTENT = "htmlContent";
-constexpr const char* PLAIN_CONTENT = "plainContent";
-constexpr const char* APP_ID = "appId";
-constexpr const char* APP_NAME = "appName";
-constexpr const char* APP_ICON_ID = "appIconId";
-constexpr const char* APP_LABEL_ID = "appLabelId";
-constexpr const char* BUNDLE_NAME = "bundleName";
-constexpr const char* ABILITY_NAME = "abilityName";
-
 bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid);
 
 #endif
