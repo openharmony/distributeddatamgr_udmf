@@ -38,9 +38,9 @@ public:
 
     std::string GetUid() const;
     void SetUid(const std::string &id);
-    virtual ValueType GetValue();
+    ValueType GetValue();
     void SetValue(const ValueType &value);
-    ValueType GetOriginValue();
+    ValueType GetOriginValue() const;
 
     void SetUtdId(const std::string &utdId);
     std::set<std::string> GetUtdIds() const;
@@ -58,11 +58,15 @@ public:
     void SetRecordId(uint32_t recordId);
     uint32_t GetRecordId() const;
     void SetChannelName(const std::string &channelName);
+
+    virtual void InitObject();
+    bool HasObject();
 protected:
     static constexpr const char *UNIFORM_DATA_TYPE = "uniformDataType";
     static constexpr const char *DETAILS = "details";
     UDType dataType_;
     ValueType value_;
+    bool hasObject_ = false;
 private:
     std::string uid_; // unique identifier
     std::string utdId_;

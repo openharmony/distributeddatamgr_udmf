@@ -38,6 +38,7 @@ Link::Link(UDType type, ValueType value) : Text(type, value)
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
         }
+        hasObject_ = true;
     }
 }
 
@@ -67,7 +68,9 @@ void Link::SetUrl(const std::string &url)
         return;
     }
     this->url_ = url;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[URL] = url_;
+    }
 }
 
 std::string Link::GetDescription() const
@@ -81,26 +84,22 @@ void Link::SetDescription(const std::string &description)
         return;
     }
     this->description_ = description;
-    InitObject();
-}
-
-ValueType Link::GetValue()
-{
-    if (std::holds_alternative<std::monostate>(value_)) {
-        value_ = std::make_shared<Object>();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[DESCRIPTION] = description_;
     }
-    InitObject();
-    return value_;
 }
 
 void Link::InitObject()
 {
-    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = value_;
+        value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[URL] = url_;
         object->value_[DESCRIPTION] = description_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        object->value_["VALUE_TYPE"] = value;
     }
 }
 } // namespace UDMF

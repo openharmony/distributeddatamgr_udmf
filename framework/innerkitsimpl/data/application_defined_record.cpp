@@ -39,6 +39,11 @@ ApplicationDefinedRecord::ApplicationDefinedRecord(UDType type, ValueType value)
     this->dataType_ = APPLICATION_DEFINED_RECORD;
     if (std::holds_alternative<std::vector<uint8_t>>(value)) {
         rawData_ = std::get<std::vector<uint8_t>>(value);
+    } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        auto object = std::get<std::shared_ptr<Object>>(value);
+        object->GetValue(APPLICATION_DEFINED_TYPE, applicationDefinedType);
+        object->GetValue(RAW_DATA, rawData_);
+        hasObject_ = true;
     }
 }
 
@@ -55,6 +60,10 @@ std::string ApplicationDefinedRecord::GetApplicationDefinedType() const
 void ApplicationDefinedRecord::SetApplicationDefinedType(const std::string &type)
 {
     this->applicationDefinedType = type;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[APPLICATION_DEFINED_TYPE] = applicationDefinedType;
+    }
 }
 
 std::vector<uint8_t> ApplicationDefinedRecord::GetRawData() const
@@ -65,6 +74,24 @@ std::vector<uint8_t> ApplicationDefinedRecord::GetRawData() const
 void ApplicationDefinedRecord::SetRawData(const std::vector<uint8_t> &rawData)
 {
     this->rawData_ = rawData;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[RAW_DATA] = rawData_;
+    }
 }
+
+void ApplicationDefinedRecord::InitObject()
+{
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = value_;
+        value_ = std::make_shared<Object>();
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
+        object->value_[APPLICATION_DEFINED_TYPE] = applicationDefinedType;
+        object->value_[RAW_DATA] = rawData_;
+        object->value_["VALUE_TYPE"] = value;
+    }
+}
+
 } // namespace UDMF
 } // namespace OHOS

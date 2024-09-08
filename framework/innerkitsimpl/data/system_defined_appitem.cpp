@@ -37,6 +37,7 @@ SystemDefinedAppItem::SystemDefinedAppItem(UDType type, ValueType value) : Syste
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
         }
+        hasObject_ = true;
     }
 }
 
@@ -54,7 +55,9 @@ std::string SystemDefinedAppItem::GetAppId() const
 void SystemDefinedAppItem::SetAppId(const std::string &appId)
 {
     this->appId_ = appId;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[APPID] = appId_;
+    }
 }
 
 std::string SystemDefinedAppItem::GetAppName() const
@@ -65,7 +68,9 @@ std::string SystemDefinedAppItem::GetAppName() const
 void SystemDefinedAppItem::SetAppName(const std::string &appName)
 {
     this->appName_ = appName;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[APPNAME] = appName_;
+    }
 }
 
 std::string SystemDefinedAppItem::GetAppIconId() const
@@ -76,7 +81,9 @@ std::string SystemDefinedAppItem::GetAppIconId() const
 void SystemDefinedAppItem::SetAppIconId(const std::string &appIconId)
 {
     this->appIconId_ = appIconId;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[APPICONID] = appIconId_;
+    }
 }
 
 std::string SystemDefinedAppItem::GetAppLabelId() const
@@ -87,7 +94,9 @@ std::string SystemDefinedAppItem::GetAppLabelId() const
 void SystemDefinedAppItem::SetAppLabelId(const std::string &appLabelId)
 {
     this->appLabelId_ = appLabelId;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[APPLABELID] = appLabelId_;
+    }
 }
 
 std::string SystemDefinedAppItem::GetBundleName() const
@@ -98,7 +107,9 @@ std::string SystemDefinedAppItem::GetBundleName() const
 void SystemDefinedAppItem::SetBundleName(const std::string &bundleName)
 {
     this->bundleName_ = bundleName;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[BUNDLENAME] = bundleName_;
+    }
 }
 
 std::string SystemDefinedAppItem::GetAbilityName() const
@@ -109,7 +120,9 @@ std::string SystemDefinedAppItem::GetAbilityName() const
 void SystemDefinedAppItem::SetAbilityName(const std::string &abilityName)
 {
     this->abilityName_ = abilityName;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[ABILITYNAME] = abilityName_;
+    }
 }
 
 void SystemDefinedAppItem::SetItems(UDDetails &details)
@@ -138,7 +151,6 @@ void SystemDefinedAppItem::SetItems(UDDetails &details)
             SetAbilityName(*value);
         }
     }
-    InitObject();
 }
 
 UDDetails SystemDefinedAppItem::GetItems()
@@ -153,18 +165,11 @@ UDDetails SystemDefinedAppItem::GetItems()
     return items;
 }
 
-ValueType SystemDefinedAppItem::GetValue()
-{
-    if (std::holds_alternative<std::monostate>(value_)) {
-        value_ = std::make_shared<Object>();
-    }
-    InitObject();
-    return value_;
-}
-
 void SystemDefinedAppItem::InitObject()
 {
-    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = value_;
+        value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[APPID] = appId_;
@@ -174,6 +179,7 @@ void SystemDefinedAppItem::InitObject()
         object->value_[BUNDLENAME] = bundleName_;
         object->value_[ABILITYNAME] = abilityName_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        object->value_["VALUE_TYPE"] = value;
     }
 }
 } // namespace UDMF

@@ -15,6 +15,8 @@
 #include "udmf_utils.h"
 #include <random>
 #include <sstream>
+#include "accesstoken_kit.h"
+#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -59,6 +61,25 @@ std::string GenerateId()
         idStr << static_cast<uint8_t>(asc);
     }
     return idStr.str();
+}
+
+std::string GetSdkVersionByToken(uint32_t tokenId)
+{
+    if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId) !=
+        Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
+        return "";
+    }
+    Security::AccessToken::HapTokenInfo hapTokenInfo;
+    auto ret = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapTokenInfo);
+    if (ret != 0) {
+        return "";
+    }
+    return std::to_string(hapTokenInfo.apiVersion);
+}
+
+std::string GetCurrentSdkVersion()
+{
+    return GetSdkVersionByToken(IPCSkeleton::GetSelfTokenID());
 }
 } // namespace UTILS
 } // namespace UDMF

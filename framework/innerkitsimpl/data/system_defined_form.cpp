@@ -25,6 +25,19 @@ SystemDefinedForm::SystemDefinedForm()
 SystemDefinedForm::SystemDefinedForm(UDType type, ValueType value) : SystemDefinedRecord(type, value)
 {
     this->dataType_ = SYSTEM_DEFINED_FORM;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        auto object = std::get<std::shared_ptr<Object>>(value);
+        object->GetValue(FORMID, formId_);
+        object->GetValue(FORMNAME, formName_);
+        object->GetValue(BUNDLENAME, bundleName_);
+        object->GetValue(ABILITYNAME, abilityName_);
+        object->GetValue(MODULE, module_);
+        std::shared_ptr<Object> detailObj = nullptr;
+        if (object->GetValue(DETAILS, detailObj)) {
+            details_ = ObjectUtils::ConvertToUDDetails(detailObj);
+        }
+        hasObject_ = true;
+    }
 }
 
 int64_t SystemDefinedForm::GetSize()
@@ -41,6 +54,9 @@ int32_t SystemDefinedForm::GetFormId() const
 void SystemDefinedForm::SetFormId(const int32_t &formId)
 {
     this->formId_ = formId;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[FORMID] = formId_;
+    }
 }
 
 std::string SystemDefinedForm::GetFormName() const
@@ -51,6 +67,9 @@ std::string SystemDefinedForm::GetFormName() const
 void SystemDefinedForm::SetFormName(const std::string &formName)
 {
     this->formName_ = formName;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[FORMNAME] = formName_;
+    }
 }
 
 std::string SystemDefinedForm::GetBundleName() const
@@ -61,6 +80,9 @@ std::string SystemDefinedForm::GetBundleName() const
 void SystemDefinedForm::SetBundleName(const std::string &bundleName)
 {
     this->bundleName_ = bundleName;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[BUNDLENAME] = bundleName_;
+    }
 }
 
 std::string SystemDefinedForm::GetAbilityName() const
@@ -71,6 +93,9 @@ std::string SystemDefinedForm::GetAbilityName() const
 void SystemDefinedForm::SetAbilityName(const std::string &abilityName)
 {
     this->abilityName_ = abilityName;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[ABILITYNAME] = abilityName_;
+    }
 }
 
 std::string SystemDefinedForm::GetModule() const
@@ -81,6 +106,9 @@ std::string SystemDefinedForm::GetModule() const
 void SystemDefinedForm::SetModule(const std::string &module)
 {
     this->module_ = module;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[MODULE] = module_;
+    }
 }
 
 void SystemDefinedForm::SetItems(UDDetails& details)
@@ -123,5 +151,23 @@ UDDetails SystemDefinedForm::GetItems()
     items[ABILITYNAME] = GetAbilityName();
     return items;
 }
+
+void SystemDefinedForm::InitObject()
+{
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = value_;
+        value_ = std::make_shared<Object>();
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
+        object->value_[FORMID] = formId_;
+        object->value_[FORMNAME] = formName_;
+        object->value_[BUNDLENAME] = bundleName_;
+        object->value_[ABILITYNAME] = abilityName_;
+        object->value_[MODULE] = module_;
+        object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        object->value_["VALUE_TYPE"] = value;
+    }
+}
+
 } // namespace UDMF
 } // namespace OHOS

@@ -29,6 +29,14 @@ Text::Text(UDDetails &variantMap) : UnifiedRecord(TEXT)
 Text::Text(UDType type, ValueType value) : UnifiedRecord(type, value)
 {
     SetType(TEXT);
+    if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        auto object = std::get<std::shared_ptr<Object>>(value);
+        std::shared_ptr<Object> detailObj = nullptr;
+        if (object->GetValue(DETAILS, detailObj)) {
+            details_ = ObjectUtils::ConvertToUDDetails(detailObj);
+        }
+        hasObject_ = true;
+    }
 }
 
 int64_t Text::GetSize()
@@ -39,7 +47,9 @@ int64_t Text::GetSize()
 void Text::SetDetails(UDDetails &variantMap)
 {
     this->details_ = variantMap;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+    }
 }
 
 UDDetails Text::GetDetails() const
@@ -49,9 +59,12 @@ UDDetails Text::GetDetails() const
 
 void Text::InitObject()
 {
-    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = value_;
+        value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        object->value_["VALUE_TYPE"] = value;
     }
 }
 } // namespace UDMF

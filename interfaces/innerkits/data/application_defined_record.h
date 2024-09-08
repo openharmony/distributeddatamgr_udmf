@@ -34,6 +34,8 @@ public:
 
     std::vector<uint8_t> GetRawData() const;
     void SetRawData(const std::vector<uint8_t> &rawData);
+
+    void InitObject() override;
 protected:
     std::string applicationDefinedType;
     std::vector<uint8_t> rawData_;

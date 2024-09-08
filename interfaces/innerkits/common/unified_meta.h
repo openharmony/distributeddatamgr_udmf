@@ -47,10 +47,17 @@ constexpr const char* ABILITY_NAME = "abilityName";
 constexpr const char* FILE_URI_PARAM = "fileUri";
 constexpr const char* FILE_TYPE = "fileType";
 constexpr const char* PIXEL_MAP = "pixelMap";
-constexpr const char* APPLICATION_DEFINED_TYPE = "ApplicationDefined";
 constexpr const char* ARRAY_BUFFER = "arrayBuffer";
 constexpr const char* ARRAY_BUFFER_LENGTH = "arrayBufferLen";
-
+constexpr static const char *FORMID = "formId";
+constexpr static const char *FORMNAME = "formName";
+constexpr static const char *MODULE = "module";
+constexpr static const char *BUNDLENAME = "bundleName";
+constexpr static const char *ABILITYNAME = "abilityName";
+constexpr static const char *ORI_URI = "oriUri";
+constexpr static const char *REMOTE_URI = "remoteUri";
+constexpr static const char *APPLICATION_DEFINED_TYPE = "applicationDefinedType";
+constexpr static const char *RAW_DATA = "rawData";
 
 enum UDType : int32_t {
     ENTITY = 0,
@@ -553,8 +560,16 @@ using ValueType = std::variant<std::monostate, int32_t, int64_t, double, bool, s
     std::shared_ptr<OHOS::AAFwk::Want>, std::shared_ptr<OHOS::Media::PixelMap>, std::shared_ptr<Object>, nullptr_t>;
 
 struct API_EXPORT Object {
-    bool GetValue(const std::string &key, std::string &value);
-    bool GetValue(const std::string &key, std::shared_ptr<Object> &value);
+    template<typename T>
+    bool GetValue(const std::string &key, T &value)
+    {
+        auto it = value_.find(key);
+        if (it != value_.end() && std::holds_alternative<T>(it->second)) {
+            value = std::get<T>(it->second);
+            return true;
+        }
+        return false;
+    }
 
     std::map<std::string, ValueType> value_;
 };

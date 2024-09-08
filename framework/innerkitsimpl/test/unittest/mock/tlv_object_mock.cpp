@@ -18,15 +18,23 @@ namespace OHOS {
 namespace UDMF {
 TLVObject::TLVObject(std::vector<std::uint8_t> &buffer)
 {
+    total_ += buffer.size();
     buffer_ = &buffer;
+    cursor_ = 0;
+    file_ = nullptr;
 }
 
 void TLVObject::SetFile(std::FILE *file)
 {
+    file_ = file;
 }
 
 void TLVObject::UpdateSize()
 {
+    if (file_ != nullptr) {
+        return;
+    }
+    buffer_->resize(total_);
 }
 
 std::vector<std::uint8_t> TLVObject::GetBuffer()
@@ -34,194 +42,121 @@ std::vector<std::uint8_t> TLVObject::GetBuffer()
     return *buffer_;
 }
 
-void TLVObject::Count(const uint32_t value)
+size_t TLVObject::GetTotal()
 {
+    return total_;
 }
 
-void TLVObject::Count(const uint64_t value)
+size_t TLVObject::GetCursor()
 {
+    return cursor_;
 }
 
-void TLVObject::Count(const int32_t value)
+size_t TLVObject::OffsetHead()
 {
+    if (file_ != nullptr) {
+        fseek(file_, sizeof(TLVHead), SEEK_CUR);
+    }
+    cursor_ += sizeof(TLVHead);
+    return cursor_;
 }
 
-void TLVObject::Count(const int64_t value)
+void TLVObject::ResetCursor()
 {
+    cursor_ = 0;
+    if (file_ != nullptr) {
+        fseek(file_, 0, SEEK_SET);
+    }
 }
 
-void TLVObject::Count(const float value)
+size_t TLVObject::Count(const std::string &value)
 {
+    return sizeof(TLVHead);
 }
 
-void TLVObject::Count(const double value)
+size_t TLVObject::Count(const std::vector<uint8_t> &value)
 {
+    return sizeof(TLVHead);
 }
 
-void TLVObject::Count(const std::string &value)
+size_t TLVObject::Count(const OHOS::AAFwk::Want &value)
 {
+    return sizeof(TLVHead);
 }
 
-void TLVObject::Count(const std::vector<uint8_t> &value)
+size_t TLVObject::Count(const std::monostate &value)
 {
+    return sizeof(TLVHead);
 }
 
-void TLVObject::Count(const UDVariant &value)
+size_t TLVObject::Count(const void *value)
 {
+    return sizeof(TLVHead);
 }
 
-void TLVObject::Count(const ValueType &value)
-{
-}
-
-void TLVObject::Count(const UDDetails &value)
-{
-}
-
-void TLVObject::Count(const UnifiedKey &value)
-{
-}
-
-void TLVObject::Count(const Privilege &value)
-{
-}
-
-void TLVObject::Count(const std::shared_ptr<OHOS::AAFwk::Want> &value)
-{
-}
-
-void TLVObject::Count(const std::shared_ptr<OHOS::Media::PixelMap> &value)
-{
-}
-
-void TLVObject::Count(const std::shared_ptr<Object> &value)
-{
-}
-
-void TLVObject::Count(const std::monostate &value)
-{
-}
-
-void TLVObject::Count(const void *value)
-{
-}
-
-bool TLVObject::WriteString(const std::string &value)
+bool TLVObject::Write(TAG tag, const std::string &value)
 {
     return true;
 }
 
-bool TLVObject::ReadString(std::string &value)
+bool TLVObject::Read(std::string &value, const TLVHead &head)
 {
     return true;
 }
 
-bool TLVObject::WriteVector(const std::vector<uint8_t> &value)
+bool TLVObject::Write(TAG tag, const std::vector<uint8_t> &value)
 {
     return true;
 }
 
-bool TLVObject::ReadVector(std::vector<uint8_t> &value)
+
+bool TLVObject::Read(std::vector<uint8_t> &value, const TLVHead &head)
 {
     return true;
 }
 
-bool TLVObject::WriteVariantInner(TAG &tag, const UDVariant &value)
+bool TLVObject::Write(TAG tag, const OHOS::AAFwk::Want &value)
 {
     return true;
 }
 
-bool TLVObject::WriteVariant(const UDVariant &value)
+bool TLVObject::Read(OHOS::AAFwk::Want &value, const TLVHead &head)
 {
     return true;
 }
 
-bool TLVObject::ReadVariantInner(uint16_t tag, UDVariant &value)
+bool TLVObject::Write(TAG tag, const std::monostate &value)
 {
     return true;
 }
 
-bool TLVObject::ReadVariant(UDVariant &value)
+bool TLVObject::Read(std::monostate &value, const TLVHead &head)
 {
     return true;
 }
 
-bool TLVObject::WriteVariantInner(TAG &tag, const ValueType &value)
+bool TLVObject::Write(TAG tag, const void *value)
 {
     return true;
 }
 
-bool TLVObject::WriteVariant(const ValueType &value)
+
+bool TLVObject::Read(void *value, const TLVHead &head)
 {
     return true;
 }
 
-bool TLVObject::ReadVariantInner(uint16_t tag, ValueType &value)
+size_t TLVObject::CountHead()
 {
     return true;
 }
 
-bool TLVObject::ReadVariant(ValueType &value)
+bool TLVObject::WriteHead(uint16_t type, uint32_t len)
 {
     return true;
 }
 
-bool TLVObject::WriteMap(const UDDetails &value)
-{
-    return true;
-}
-
-bool TLVObject::ReadMap(UDDetails &value)
-{
-    return true;
-}
-
-bool TLVObject::WriteObject(const std::shared_ptr<Object> &value)
-{
-    return true;
-}
-
-bool TLVObject::ReadObject(std::shared_ptr<Object> &value)
-{
-    return true;
-}
-
-bool TLVObject::WriteWant(const std::shared_ptr<OHOS::AAFwk::Want> &value)
-{
-    return true;
-}
-
-bool TLVObject::ReadWant(std::shared_ptr<OHOS::AAFwk::Want> &value)
-{
-    return true;
-}
-
-bool TLVObject::WritePixelMap(const std::shared_ptr<OHOS::Media::PixelMap> &value)
-{
-    return true;
-}
-
-bool TLVObject::ReadPixelMap(std::shared_ptr<OHOS::Media::PixelMap> &value)
-{
-    return false;
-}
-
-bool TLVObject::WriteUndefined(const std::monostate &value)
-{
-    return true;
-}
-
-bool TLVObject::ReadUndefined(std::monostate &value)
-{
-    return true;
-}
-
-bool TLVObject::WriteNull(const void *value)
-{
-    return true;
-}
-
-bool TLVObject::ReadNull(void *value)
+bool TLVObject::WriteBackHead(uint16_t tag, size_t tagCursor, uint32_t len)
 {
     return true;
 }
@@ -231,8 +166,9 @@ bool TLVObject::ReadHead(TLVHead &head)
     return true;
 }
 
-void TLVObject::WriteHead(uint16_t type, size_t tagCursor, uint32_t len)
+bool TLVObject::Skip(TLVHead &head)
 {
+    return true;
 }
 
 bool TLVObject::HasExpectBuffer(const uint32_t expectLen) const
@@ -240,16 +176,19 @@ bool TLVObject::HasExpectBuffer(const uint32_t expectLen) const
     return true;
 }
 
-bool TLVObject::PrepareHeader(size_t size, size_t &tagCursor, size_t &valueCursor)
+void TLVObject::PrepareBufferForFile(size_t size) { }
+
+std::uint8_t *TLVObject::GetStartCursor()
+{
+    return 0;
+}
+
+bool TLVObject::SaveBufferToFile()
 {
     return true;
 }
 
-void TLVObject::PrepareBuffer(size_t size)
-{
-}
-
-bool TLVObject::SaveBufferToFile()
+bool TLVObject::SaveBufferToFileFront(size_t tagCursor, uint32_t len)
 {
     return true;
 }

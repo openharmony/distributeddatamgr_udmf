@@ -61,10 +61,10 @@ HWTEST_F(SystemDefinedAppitemTest, SetItems001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "SetItems001 begin.");
     SystemDefinedAppItem systemDefinedAppItem;
-    systemDefinedAppItem.value_ = std::make_shared<Object>();
     UDDetails details;
     details.insert({ "string", "" });
     systemDefinedAppItem.SetItems(details);
+    systemDefinedAppItem.InitObject();
     auto object = std::get<std::shared_ptr<Object>>(systemDefinedAppItem.value_);
     EXPECT_EQ(std::get<std::string>(object->value_[UNIFORM_DATA_TYPE]), "openharmony.app-item");
     LOG_INFO(UDMF_TEST, "SetItems001 end.");
@@ -207,7 +207,7 @@ HWTEST_F(SystemDefinedAppitemTest, GetValue001, TestSize.Level1)
     valueType.appLabelId_ = "appLabelId";
     valueType.bundleName_ = "bundleName";
     valueType.abilityName_ = "abilityName";
-    valueType.GetValue();
+    valueType.InitObject();
     auto object = std::get<std::shared_ptr<Object>>(valueType.value_);
     auto details = std::get<std::shared_ptr<Object>>(object->value_[SystemDefinedAppItem::DETAILS]);
     EXPECT_EQ(std::get<std::string>(object->value_[UNIFORM_DATA_TYPE]), "openharmony.app-item");

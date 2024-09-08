@@ -17,6 +17,7 @@
 
 #include "logger.h"
 #include "udmf_types_util.h"
+#include "udmf_conversion.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -52,6 +53,7 @@ UdmfServiceProxy::UdmfServiceProxy(const sptr<IRemoteObject> &object) : IRemoteP
 
 int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
 {
+    UdmfConversion::InitValueObject(unifiedData);
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_DATA, reply, option, unifiedData);
     if (status != E_OK) {
@@ -98,6 +100,7 @@ int32_t UdmfServiceProxy::GetBatchData(const QueryOption &query, std::vector<Uni
 
 int32_t UdmfServiceProxy::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
 {
+    UdmfConversion::InitValueObject(unifiedData);
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::UPDATE_DATA, reply, query, unifiedData);
     if (status != E_OK) {

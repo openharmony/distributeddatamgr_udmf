@@ -21,6 +21,8 @@
 #include "file_uri.h"
 #include "logger.h"
 #include "tlv_util.h"
+#include "udmf_conversion.h"
+#include "file.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -169,8 +171,8 @@ bool UnifiedDataHelper::SaveUDataToFile(const std::string &dataFile, UnifiedData
         return false;
     }
     recordTlv.SetFile(file);
-
-    if (!TLVUtil::Writing(data, recordTlv)) {
+    UdmfConversion::InitValueObject(data);
+    if (!TLVUtil::Writing(data, recordTlv, TAG::TAG_UNIFIED_DATA)) {
         LOG_ERROR(UDMF_FRAMEWORK, "TLV Writing failed!");
         (void)fclose(file);
         return false;
@@ -194,12 +196,13 @@ bool UnifiedDataHelper::LoadUDataFromFile(const std::string &dataFile, UnifiedDa
         return false;
     }
     recordTlv.SetFile(file);
-
-    if (!TLVUtil::Reading(data, recordTlv)) {
+	
+    if (!TLVUtil::ReadTlv(data, recordTlv, TAG::TAG_UNIFIED_DATA)) {
         LOG_ERROR(UDMF_FRAMEWORK, "TLV Reading failed!");
         (void)fclose(file);
         return false;
     }
+    UdmfConversion::ConvertRecordToSubclass(data);
     (void)fclose(file);
     return true;
 }

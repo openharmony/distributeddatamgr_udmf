@@ -41,11 +41,17 @@ SystemDefinedPixelMap::SystemDefinedPixelMap(UDType type, ValueType value) : Sys
     if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
         auto it = object->value_.find(PIXEL_MAP);
-        if (it != object->value_.end() && std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(it->second)) {
+        hasObject_ = true;
+        if (it == object->value_.end()) {
+            return;
+        }
+        if (std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(it->second)) {
             auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(it->second);
             if (!pixelMap->EncodeTlv(rawData_)) {
                 LOG_ERROR(UDMF_KITS_INNER, "pixelMap encode fail!");
             }
+        } else if (std::holds_alternative<std::vector<uint8_t>>(it->second)) {
+            rawData_ = std::get<std::vector<uint8_t>>(it->second);
         }
     }
 }
@@ -63,30 +69,33 @@ std::vector<uint8_t> SystemDefinedPixelMap::GetRawData() const
 void SystemDefinedPixelMap::SetRawData(const std::vector<uint8_t> &rawData)
 {
     this->rawData_ = rawData;
-    this->updateObjectFlag_ = true;
-}
-
-ValueType SystemDefinedPixelMap::GetValue()
-{
-    if (std::holds_alternative<std::monostate>(value_)) {
-        value_ = std::make_shared<Object>();
-    }
-    if (this->updateObjectFlag_) {
-        InitObject();
-        this->updateObjectFlag_ = false;
-    }
-    return value_;
-}
-
-void SystemDefinedPixelMap::InitObject()
-{
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
         auto pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(OHOS::Media::PixelMap::DecodeTlv(rawData_));
         if (pixelMap == nullptr) {
-            LOG_ERROR(UDMF_KITS_INNER, "pixelMap encode fail!");
+            LOG_ERROR(UDMF_KITS_INNER, "pixelMap decode fail!");
+            object->value_[PIXEL_MAP] = rawData;
+            return;
         }
         object->value_[PIXEL_MAP] = pixelMap;
+    }
+}
+
+void SystemDefinedPixelMap::InitObject()
+{
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = value_;
+        value_ = std::make_shared<Object>();
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        auto pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(OHOS::Media::PixelMap::DecodeTlv(rawData_));
+        if (pixelMap == nullptr) {
+            LOG_ERROR(UDMF_KITS_INNER, "pixelMap decode fail!");
+            object->value_[PIXEL_MAP] = rawData_;
+        } else {
+            object->value_[PIXEL_MAP] = pixelMap;
+        }
+        object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        object->value_["VALUE_TYPE"] = value;
     }
 }
 

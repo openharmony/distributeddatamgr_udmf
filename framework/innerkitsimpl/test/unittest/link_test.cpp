@@ -162,26 +162,4 @@ HWTEST_F(LinkTest, SetDescription002, TestSize.Level1)
     EXPECT_NE(link.description_, description);
     LOG_INFO(UDMF_TEST, "SetDescription002 end.");
 }
-
-/**
-* @tc.name: GetValue001
-* @tc.desc: Abnormal testcase of GetValue,because description and MAX_TEXT_LEN are equal
-* @tc.type: FUNC
-*/
-HWTEST_F(LinkTest, GetValue001, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "GetValue001 begin.");
-    Link link;
-    link.value_ = std::monostate{};
-    link.url_ = "url_";
-    link.description_ = "description_";
-    link.GetValue();
-    auto object = std::get<std::shared_ptr<Object>>(link.value_);
-    auto details_ = std::get<std::shared_ptr<Object>>(object->value_[Link::DETAILS]);
-    EXPECT_EQ(std::get<std::string>(object->value_[Link::UNIFORM_DATA_TYPE]), "general.hyperlink");
-    EXPECT_EQ(std::get<std::string>(object->value_[Link::URL]), link.url_);
-    EXPECT_EQ(std::get<std::string>(object->value_[Link::DESCRIPTION]), link.description_);
-    EXPECT_EQ(details_->value_.size(), 0);
-    LOG_INFO(UDMF_TEST, "GetValue001 end.");
-}
 } // OHOS::Test
