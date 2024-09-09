@@ -15,6 +15,8 @@
 #define LOG_TAG "NapiErrorCode"
 #include "napi_error_utils.h"
 
+#include <algorithm>
+
 namespace OHOS {
 namespace UDMF {
 using NapiErrorCode = OHOS::UDMF::NapiErrorCode;
