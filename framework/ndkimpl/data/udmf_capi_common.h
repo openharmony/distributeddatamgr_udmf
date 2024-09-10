@@ -30,7 +30,7 @@ struct UdsObject {
     explicit UdsObject(int cid);
     template<typename T> bool HasObjectKey(const char* paramName);
     template<typename T> T* GetUdsValue(const char* paramName);
-    template<typename T> int SetUdsValue(const char* paramName, T pramValue);
+    template<typename T> int SetUdsValue(const char* paramName, const T pramValue);
 };
 
 enum NdkStructId : std::int64_t {
