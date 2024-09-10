@@ -21,7 +21,7 @@
 #include <mutex>
 #include <cstdint>
 
-# define MAX_GENERAL_ENTRY_SIZE (128 * 1024 * 1024)
+# define MAX_GENERAL_ENTRY_SIZE (100 * 1024 * 1024)
 
 struct UdsObject {
     const int64_t cid;
