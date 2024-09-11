@@ -43,12 +43,6 @@ void SystemDefinedPixelMap::SetRawData(const std::vector<uint8_t> &rawData)
 {
 }
 
-ValueType SystemDefinedPixelMap::GetValue()
-{
-    value_ = std::make_shared<Object>();
-    return value_;
-}
-
 void SystemDefinedPixelMap::InitObject()
 {
 }

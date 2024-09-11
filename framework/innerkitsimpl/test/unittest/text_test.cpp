@@ -76,7 +76,6 @@ HWTEST_F(TextTest, InitObject001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InitObject001 begin.");
     Text text;
-    text.value_ = std::make_shared<Object>();
     text.details_.insert({ "first", "second" });
     text.InitObject();
     auto object = std::get<std::shared_ptr<Object>>(text.value_);

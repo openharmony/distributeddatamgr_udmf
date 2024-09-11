@@ -29,6 +29,14 @@ int64_t SystemDefinedRecord::GetSize()
 SystemDefinedRecord::SystemDefinedRecord(UDType type, ValueType value) : UnifiedRecord(type, value)
 {
     this->dataType_ = SYSTEM_DEFINED_RECORD;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        auto object = std::get<std::shared_ptr<Object>>(value);
+        std::shared_ptr<Object> detailObj = nullptr;
+        if (object->GetValue(DETAILS, detailObj)) {
+            details_ = ObjectUtils::ConvertToUDDetails(detailObj);
+        }
+        hasObject_ = true;
+    }
 }
 
 void SystemDefinedRecord::AddProperty(const std::string &property, UDVariant &value)
@@ -39,7 +47,9 @@ void SystemDefinedRecord::AddProperty(const std::string &property, UDVariant &va
     } else {
         details_[property] = value;
     }
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+    }
 }
 
 UDVariant SystemDefinedRecord::GetPropertyByName(const std::string &property) const
@@ -54,7 +64,9 @@ UDVariant SystemDefinedRecord::GetPropertyByName(const std::string &property) co
 void SystemDefinedRecord::SetDetails(UDDetails &details)
 {
     this->details_ = details;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+    }
 }
 
 UDDetails SystemDefinedRecord::GetDetails() const
@@ -64,9 +76,12 @@ UDDetails SystemDefinedRecord::GetDetails() const
 
 void SystemDefinedRecord::InitObject()
 {
-    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = value_;
+        value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        object->value_["VALUE_TYPE"] = value;
     }
 }
 } // namespace UDMF
