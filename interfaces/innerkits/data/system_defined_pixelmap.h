@@ -30,6 +30,8 @@ public:
 
     std::vector<uint8_t> GetRawData() const;
     void SetRawData(const std::vector<uint8_t> &rawData);
+
+    void InitObject() override;
 private:
     std::vector<uint8_t> rawData_;
 };

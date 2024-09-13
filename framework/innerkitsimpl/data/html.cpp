@@ -45,6 +45,7 @@ Html::Html(UDType type, ValueType value) : Text(type, value)
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
         }
+        hasObject_ = true;
     }
 }
 
@@ -64,7 +65,9 @@ void Html::SetHtmlContent(const std::string &htmlContent)
         return;
     }
     this->htmlContent_ = htmlContent;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[HTML_CONTENT] = htmlContent_;
+    }
 }
 
 std::string Html::GetPlainContent() const
@@ -78,26 +81,23 @@ void Html::SetPlainContent(const std::string &plainContent)
         return;
     }
     this->plainContent_ = plainContent;
-    InitObject();
-}
-
-ValueType Html::GetValue()
-{
-    if (std::holds_alternative<std::monostate>(value_)) {
-        value_ = std::make_shared<Object>();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[PLAINT_CONTENT] = plainContent_;
     }
-    InitObject();
-    return value_;
 }
 
 void Html::InitObject()
 {
-    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = value_;
+        value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[HTML_CONTENT] = htmlContent_;
         object->value_[PLAINT_CONTENT] = plainContent_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        object->value_["VALUE_TYPE"] = value;
     }
 }
 } // namespace UDMF

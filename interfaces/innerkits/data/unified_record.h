@@ -37,15 +37,19 @@ public:
 
     std::string GetUid() const;
     void SetUid(const std::string &id);
-    virtual ValueType GetValue();
+    ValueType GetValue();
     void SetValue(const ValueType &value);
-    ValueType GetOriginValue();
+    ValueType GetOriginValue() const;
 
+
+    virtual void InitObject();
+    bool HasObject();
 protected:
     static constexpr const char *UNIFORM_DATA_TYPE = "uniformDataType";
     static constexpr const char *DETAILS = "details";
     UDType dataType_;
     ValueType value_;
+    bool hasObject_ = false;
 private:
     std::string uid_; // unique identifier
 };

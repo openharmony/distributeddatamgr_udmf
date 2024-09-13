@@ -32,10 +32,10 @@ public:
     void SetDetails(UDDetails &variantMap);
     UDDetails GetDetails() const;
 
+    void InitObject() override;
+
 protected:
     UDDetails details_;
-private:
-    void InitObject();
 };
 } // namespace UDMF
 } // namespace OHOS
