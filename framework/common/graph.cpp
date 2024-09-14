@@ -26,7 +26,7 @@ Graph::Graph(uint32_t vertexNum):vertexNum_(vertexNum)
 
 Graph::~Graph()
 {
-    for (auto &vertexNode : adjList_) {
+    for (const auto &vertexNode : adjList_) {
         EdgeNode *edge = vertexNode.firstEdge;
         while (edge != nullptr) {
             EdgeNode *nextEdge = edge->next;
