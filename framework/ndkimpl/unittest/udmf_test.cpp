@@ -1889,7 +1889,7 @@ HWTEST_F(UDMFTest, OH_UdmfData_IsLocal001, TestSize.Level1)
 
 /**
  * @tc.name: FileUriTest001
- * @tc.desc: test fileUri between js and ndk
+ * @tc.desc: test fileUri between js and capi
  * @tc.type: FUNC
  */
 HWTEST_F(UDMFTest, FileUriTest001, TestSize.Level1)
