@@ -33,7 +33,13 @@ void TLVObject::SetFile(std::FILE *file)
     if (fseek(file_, 0, SEEK_END) != 0) {
         LOG_ERROR(UDMF_SERVICE, "fseek to end error!");
     }
-    total_ = ftell(file_);
+
+    auto total = ftell(file_);
+    if (total < 0) {
+        LOG_ERROR(UDMF_SERVICE, "Values are out of range, total:%{public}ld", total);
+        return;
+    }
+    total_ = static_cast<size_t>(total);
     ResetCursor();
 }
 
