@@ -30,12 +30,24 @@
 #include "system_defined_appitem.h"
 #include "application_defined_record.h"
 #include "system_defined_pixelmap.h"
+#include "file.h"
+#include "audio.h"
+#include "folder.h"
+#include "image.h"
+#include "video.h"
 
 using namespace OHOS::UDMF;
 
 static constexpr uint64_t MAX_RECORDS_COUNT = 4 * 1024 * 1024;
 static constexpr uint64_t MAX_RECORDS_SIZE = 4 * 1024 * 1024;
 static constexpr uint64_t MAX_KEY_STRING_LEN = 1 * 1024 * 1024;
+static const std::map<std::string, UDType> FILE_TYPES = {
+    { UDMF_META_GENERAL_FILE, UDType::FILE },
+    { UDMF_META_AUDIO, UDType::AUDIO },
+    { UDMF_META_FOLDER, UDType::FOLDER },
+    { UDMF_META_IMAGE, UDType::IMAGE },
+    { UDMF_META_VIDEO, UDType::VIDEO }
+};
 
 static void DestroyStringArray(char**& bufArray, unsigned int& count)
 {
@@ -136,6 +148,17 @@ static bool IsUnifiedPropertiesValid(OH_UdmfProperty* properties)
            properties->cid == NdkStructId::UDMF_UNIFIED_DATA_PROPERTIES_ID;
 }
 
+static void AddFileUriTypeIfContains(std::vector<std::string>& types)
+{
+    for (auto type : types) {
+        if (FILE_TYPES.find(type) != FILE_TYPES.end()) {
+            types.push_back(UDMF_META_GENERAL_FILE_URI);
+            break;
+        }
+    }
+    return;
+}
+
 OH_UdmfData* OH_UdmfData_Create()
 {
     OH_UdmfData* data = new (std::nothrow) OH_UdmfData;
@@ -182,6 +205,7 @@ char** OH_UdmfData_GetTypes(OH_UdmfData* unifiedData, unsigned int* count)
         return unifiedData->typesArray;
     }
     std::vector<std::string> typeLabels = unifiedData->unifiedData_->GetEntriesTypes();
+    AddFileUriTypeIfContains(typeLabels);
     unifiedData->typesArray = StrVectorToTypesArray(typeLabels);
     unifiedData->typesArray == nullptr ? unifiedData->typesCount = 0 : unifiedData->typesCount = typeLabels.size();
     *count = unifiedData->typesCount;
@@ -201,6 +225,7 @@ char** OH_UdmfRecord_GetTypes(OH_UdmfRecord* record, unsigned int* count)
     }
     auto types = record->record_->GetUtdIds();
     std::vector<std::string> typeLabels {types.begin(), types.end()};
+    AddFileUriTypeIfContains(typeLabels);
     record->typesArray = StrVectorToTypesArray(typeLabels);
     record->typesArray == nullptr ? record->typesCount = 0 : record->typesCount = typeLabels.size();
     *count = record->typesCount;
@@ -548,7 +573,30 @@ int OH_UdmfRecord_AddFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(fileUri, UDS_FILE_URI_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    AddUds<UnifiedRecord>(record, fileUri, UDType::FILE_URI);
+    std::string* fileType = std::get_if<std::string>(&(fileUri->obj->value_[FILE_TYPE]));
+    if (fileType == nullptr) {
+        return UDMF_ERR;
+    }
+    int32_t utdId = UtdUtils::GetUtdEnumFromUtdId(*fileType);
+    switch (utdId) {
+        case UDType::FILE:
+            AddUds<File>(record, fileUri, UDType::FILE);
+            break;
+        case UDType::AUDIO:
+            AddUds<Audio>(record, fileUri, UDType::AUDIO);
+            break;
+        case UDType::FOLDER:
+            AddUds<Audio>(record, fileUri, UDType::FOLDER);
+            break;
+        case UDType::IMAGE:
+            AddUds<Image>(record, fileUri, UDType::IMAGE);
+            break;
+        case UDType::VIDEO:
+            AddUds<Video>(record, fileUri, UDType::VIDEO);
+            break;
+        default:
+            AddUds<UnifiedRecord>(record, fileUri, UDType::FILE_URI);
+    }
     return UDMF_E_OK;
 }
 
@@ -563,6 +611,7 @@ int OH_UdmfRecord_AddPixelMap(OH_UdmfRecord* record, OH_UdsPixelMap* pixelMap)
 
 int GetUds(OH_UdmfRecord* record, UdsObject* udsObject, UDType type)
 {
+    record->record_->InitObject();
     auto value = record->record_->GetEntry(UtdUtils::GetUtdIdFromUtdEnum(type));
     if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
         return UDMF_ERR;
@@ -624,7 +673,16 @@ int OH_UdmfRecord_GetFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(fileUri, UDS_FILE_URI_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
-    return GetUds(record, fileUri, UDType::FILE_URI);
+    for (auto fileType : FILE_TYPES) {
+        int ret = GetUds(record, fileUri, fileType.second);
+        if (ret == UDMF_E_OK) {
+            fileUri->obj->value_[UNIFORM_DATA_TYPE] = UDMF_META_GENERAL_FILE_URI;
+            fileUri->obj->value_[FILE_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(fileType.second);
+            return UDMF_E_OK;
+        }
+    }
+    LOG_ERROR(UDMF_CAPI, "could't find file uri");
+    return UDMF_ERR;
 }
 
 int OH_UdmfRecord_GetPixelMap(OH_UdmfRecord* record, OH_UdsPixelMap* pixelMap)

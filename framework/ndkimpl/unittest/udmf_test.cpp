@@ -29,6 +29,7 @@
 #include "plain_text.h"
 #include "udmf_meta.h"
 #include "data_provider_impl.h"
+#include "image.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
@@ -1884,5 +1885,58 @@ HWTEST_F(UDMFTest, OH_UdmfData_IsLocal001, TestSize.Level1)
     EXPECT_EQ(result3, true);
 
     OH_UdmfData_Destroy(data2);
+}
+
+/**
+ * @tc.name: FileUriTest001
+ * @tc.desc: test fileUri between js and capi
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, FileUriTest001, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    std::shared_ptr<Image> image = std::make_shared<Image>();
+    image->SetUri(uri);
+    std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
+    unifiedData->AddRecord(image);
+    std::string key;
+    CustomOption option = {
+        .intention = UD_INTENTION_DRAG
+    };
+    int setRet = UdmfClient::GetInstance().SetData(option, *unifiedData, key);
+    EXPECT_EQ(setRet, E_OK);
+
+    OH_UdmfData* udmfData = OH_UdmfData_Create();
+    OH_Udmf_GetUnifiedData(key.c_str(), UDMF_INTENTION_DRAG, udmfData);
+
+    unsigned int dataTypeCount;
+    char** dataTypes = OH_UdmfData_GetTypes(udmfData, &dataTypeCount);
+    EXPECT_EQ(dataTypeCount, 2);
+    EXPECT_NE(dataTypes, nullptr);
+    EXPECT_EQ(strcmp(dataTypes[0], UDMF_META_IMAGE), 0);
+    EXPECT_EQ(strcmp(dataTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+
+    unsigned int recordCount;
+    OH_UdmfRecord** records = OH_UdmfData_GetRecords(udmfData, &recordCount);
+    EXPECT_EQ(recordCount, 1);
+    EXPECT_NE(records, nullptr);
+
+    for (unsigned int idx = 0; idx < recordCount; ++idx) {
+        unsigned int recordTypeCount;
+        char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount);
+        EXPECT_EQ(recordTypeCount, 2);
+        EXPECT_NE(recordTypes, nullptr);
+        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_IMAGE), 0);
+        EXPECT_EQ(strcmp(recordTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+        for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
+            if (strcmp(recordTypes[recordIdx], UDMF_META_GENERAL_FILE_URI) == 0) {
+                OH_UdsFileUri* fileUri = OH_UdsFileUri_Create();
+                int getFileUriRet = OH_UdmfRecord_GetFileUri(records[idx], fileUri);
+                EXPECT_EQ(getFileUriRet, UDMF_E_OK);
+                const char* getFileUri = OH_UdsFileUri_GetFileUri(fileUri);
+                EXPECT_EQ(strcmp(getFileUri, uri.c_str()), 0);
+            }
+        }
+    }
 }
 }
