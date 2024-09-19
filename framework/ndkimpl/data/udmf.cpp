@@ -333,7 +333,7 @@ int OH_UdmfData_GetRecordCount(OH_UdmfData *data)
 
 OH_UdmfRecord* OH_UdmfData_GetRecord(OH_UdmfData* data, unsigned int index)
 {
-    if (!IsUnifiedDataValid(data) || index < 0) {
+    if (!IsUnifiedDataValid(data)) {
         return nullptr;
     }
     std::lock_guard<std::mutex> lock(data->mutex);
