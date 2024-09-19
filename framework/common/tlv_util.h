@@ -308,7 +308,10 @@ size_t CountVariant(TLVObject &data, uint32_t step, const _InTp &input)
 
 template <typename... _Types> size_t CountBufferSize(const std::variant<_Types...> &input, TLVObject &data)
 {
-    uint32_t index = input.index();
+    if (input.index() > size_t(std::numeric_limits<uint32_t>::max())) {
+        return 0;
+    }
+    uint32_t index = static_cast<uint32_t>(input.index());
     return data.CountHead() + data.CountBasic(index) + CountVariant<decltype(input), _Types...>(data, 0, input);
 }
 

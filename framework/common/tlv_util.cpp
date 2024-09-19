@@ -596,6 +596,10 @@ template <> bool Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &
 
     std::shared_ptr<Parcel> parcel = std::make_shared<Parcel>();
     auto buffer = malloc(val.size());
+    if (buffer == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "malloc error in tlv read. tag=%{public}hu", head.tag);
+        return false;
+    }
     auto err = memcpy_s(buffer, val.size(), val.data(), val.size());
     if (err != EOK) {
         LOG_ERROR(UDMF_FRAMEWORK, "memcpy_s error in tlv read want. tag=%{public}hu", head.tag);
