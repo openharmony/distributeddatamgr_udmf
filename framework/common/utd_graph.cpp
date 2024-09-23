@@ -34,57 +34,32 @@ UtdGraph &UtdGraph::GetInstance()
 
 bool UtdGraph::IsValidType(const std::string &node)
 {
-    if (typeIdIndex_.find(node) == typeIdIndex_.end()) {
-        LOG_ERROR(UDMF_CLIENT, "invalid typeId. typeId:%{public}s ", node.c_str());
-        return false;
-    }
-    return true;
-}
-
-int32_t UtdGraph::GetIndex(const std::string &node)
-{
-    auto idx = typeIdIndex_.find(node);
-    if (idx == typeIdIndex_.end()) {
-        return -1;
-    }
-    return idx->second;
+    return graph_->IsValidType(node);
 }
 
 void UtdGraph::InitUtdGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs)
 {
-    typeIdIndex_.clear();
+    std::map<std::string, uint32_t> typeIdIndex;
     uint32_t descriptorsNum = static_cast<uint32_t>(descriptorCfgs.size());
-    std::unique_lock<std::mutex> lock(graphMutex_);
-    graph_ = std::make_unique<Graph>(descriptorsNum);
     for (uint32_t i = 0; i < descriptorsNum; i++) {
-        typeIdIndex_.insert(std::make_pair(descriptorCfgs[i].typeId, i));
+        typeIdIndex.insert(std::make_pair(descriptorCfgs[i].typeId, i));
     }
+    std::unique_lock<std::mutex> lock(graphMutex_);
+    graph_ = std::make_unique<Graph>(descriptorsNum, typeIdIndex);
     for (const auto &descriptorCfg : descriptorCfgs) {
         std::vector<std::string> belongsTo = descriptorCfg.belongingToTypes;
         for (auto belongsToType : belongsTo) {
-            AddEdge(belongsToType, descriptorCfg.typeId);
+            graph_->AddEdge(belongsToType, descriptorCfg.typeId);
         }
     }
     LOG_INFO(UDMF_CLIENT, "InitUtdGraph success, descriptorsNum:%{public}u. ", descriptorsNum);
 }
 
-void UtdGraph::AddEdge(const std::string &startNode, const std::string &endNode)
-{
-    int32_t start = GetIndex(startNode);
-    int32_t end = GetIndex(endNode);
-    if (start < 0 || end < 0) {
-        LOG_WARN(UDMF_CLIENT, "abnormal edge, startNode:%{public}s, endNode:%{public}s. ",
-                 startNode.c_str(), endNode.c_str());
-        return;
-    }
-    graph_->AddEdge(start, end);
-}
-
 bool UtdGraph::IsLowerLevelType(const std::string &lowerLevelType, const std::string &heigitLevelType)
 {
     bool isFind = false;
-    int32_t start = GetIndex(lowerLevelType);
-    int32_t end = GetIndex(heigitLevelType);
+    int32_t start = graph_->GetIndex(lowerLevelType);
+    int32_t end = graph_->GetIndex(heigitLevelType);
     if (start < 0 || end < 0) {
         return false;
     }
@@ -101,10 +76,28 @@ bool UtdGraph::IsLowerLevelType(const std::string &lowerLevelType, const std::st
     return isFind;
 }
 
-bool UtdGraph::IsDAG()
+std::unique_ptr<Graph> UtdGraph::ConstructNewGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs)
+{
+    std::map<std::string, uint32_t> typeIdIndex;
+    uint32_t descriptorsNum = static_cast<uint32_t>(descriptorCfgs.size());
+    for (uint32_t i = 0; i < descriptorsNum; i++) {
+        typeIdIndex.insert(std::make_pair(descriptorCfgs[i].typeId, i));
+    }
+    auto graph = std::make_unique<Graph>(descriptorsNum, typeIdIndex);
+    
+    for (const auto &descriptorCfg : descriptorCfgs) {
+        std::vector<std::string> belongsTo = descriptorCfg.belongingToTypes;
+        for (auto belongsToType : belongsTo) {
+            graph->AddEdge(belongsToType, descriptorCfg.typeId);
+        }
+    }
+    return graph;
+}
+
+void UtdGraph::UpdateGraph(std::unique_ptr<Graph> graph)
 {
     std::unique_lock<std::mutex> lock(graphMutex_);
-    return graph_->DfsUnconnectedGraph([&](uint32_t currNode) -> bool {return false; });
+    graph_ = std::move(graph);
 }
 } // namespace UDMF
 } // namespace OHOS

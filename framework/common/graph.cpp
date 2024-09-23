@@ -15,13 +15,13 @@
 #include "graph.h"
 namespace OHOS {
 namespace UDMF {
-Graph::Graph(uint32_t vertexNum):vertexNum_(vertexNum)
-{
-    for (uint32_t node = 0; node < vertexNum_; node++) {
-        adjList_.push_back({node, nullptr});
-    }
-    visited_.resize(vertexNum_);
-    fill(visited_.begin(), visited_.end(), 0);
+Graph::Graph(uint32_t vertexNum, const std::map<std::string, uint32_t> &typeIdIndex)
+    : vertexNum_(vertexNum), typeIdIndex_(typeIdIndex) {
+  for (uint32_t node = 0; node < vertexNum_; node++) {
+    adjList_.push_back({node, nullptr});
+  }
+  visited_.resize(vertexNum_);
+  fill(visited_.begin(), visited_.end(), 0);
 }
 
 Graph::~Graph()
@@ -34,6 +34,18 @@ Graph::~Graph()
             edge = nextEdge;
         }
     }
+}
+
+void Graph::AddEdge(const std::string &startNode, const std::string &endNode)
+{
+    int32_t start = GetIndex(startNode);
+    int32_t end = GetIndex(endNode);
+    if (start < 0 || end < 0) {
+        // LOG_WARN(UDMF_CLIENT, "abnormal edge, startNode:%{public}s, endNode:%{public}s. ",
+        //          startNode.c_str(), endNode.c_str());
+        return;
+    }
+    AddEdge(start, end);
 }
 
 void Graph::AddEdge(uint32_t start, uint32_t end)
@@ -91,6 +103,29 @@ bool Graph::DfsUnconnectedGraph(Action action)
         }
     }
     return true;
+}
+
+bool Graph::IsValidType(const std::string &node)
+{
+    if (typeIdIndex_.find(node) == typeIdIndex_.end()) {
+        // LOG_ERROR(UDMF_CLIENT, "invalid typeId. typeId:%{public}s ", node.c_str());
+        return false;
+    }
+    return true;
+}
+
+int32_t Graph::GetIndex(const std::string &node)
+{
+    auto idx = typeIdIndex_.find(node);
+    if (idx == typeIdIndex_.end()) {
+        return -1;
+    }
+    return idx->second;
+}
+
+bool Graph::IsDAG()
+{
+    return DfsUnconnectedGraph([&](uint32_t currNode) -> bool {return false; });
 }
 } // namespace UDMF
 } // namespace OHOS

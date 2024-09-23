@@ -16,8 +16,11 @@
 #include "custom_utd_store.h"
 #include <fstream>
 #include <sys/stat.h>
-#include "unistd.h"
 #include "logger.h"
+#include "preset_type_descriptors.h"
+#include "unistd.h"
+#include "utd_cfgs_checker.h"
+#include "utd_graph.h"
 #ifdef WITH_SELINUX
 #include <policycoreutils.h>
 #endif
@@ -113,6 +116,116 @@ bool CustomUtdStore::CreateDirectory(const std::string &path) const
     }
 
     return false;
+}
+
+bool CustomUtdStore::InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user)
+{
+    // new utd
+    CustomUtdCfgs typeCfgs;
+    if (!utdJsonParser_.ParseUserCustomUtdJson(jsonStr, typeCfgs.first, typeCfgs.second)) {
+        LOG_ERROR(UDMF_CLIENT, "Parse json failed. bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+        return false;
+    }
+    // preset utd
+    std::vector<TypeDescriptorCfg> presetTypes = PresetTypeDescriptors::GetInstance().GetPresetTypes();
+    // file utd
+    std::string path = CUSTOM_UTD_PATH + std::to_string(user) + CUSTOM_UTD_FILE;
+    std::vector<TypeDescriptorCfg> customTyepCfgs = GetTypeCfgs(path);
+    // check
+    if (!UtdCfgsChecker::GetInstance().CheckTypeDescriptors(
+            typeCfgs, presetTypes, customTyepCfgs, bundleName)) {
+        LOG_ERROR(UDMF_CLIENT, "check type descriptors failed, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+        return false;
+    }
+    // update
+    UpdateGraph(presetTypes, customTyepCfgs);
+    // save  
+    if (SaveCustomUtds(typeCfgs, customTyepCfgs, bundleName, path) != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Install save custom utds failed, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+        return false;
+    }
+    return true;
+}
+
+bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, int32_t user)
+{
+    // file utd
+    std::string path = CUSTOM_UTD_PATH + std::to_string(user) + CUSTOM_UTD_FILE;
+    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetTypeCfgs(path);
+
+    for (auto iter = customTyepCfgs.begin(); iter != customTyepCfgs.end();) {
+        auto it = find (iter->installerBundles.begin(), iter->installerBundles.end(), bundleName);
+        if (it != iter->installerBundles.end()) {
+            iter->installerBundles.erase(it);
+        }
+        if (iter->installerBundles.empty()) {
+            iter = customTyepCfgs.erase(iter);
+        } else {
+            iter++;
+        }
+    }
+    std::vector<TypeDescriptorCfg> presetTypes = PresetTypeDescriptors::GetInstance().GetPresetTypes();
+    if (!UtdCfgsChecker::GetInstance().CheckBelongingToTypes(customTyepCfgs, presetTypes)) {
+        LOG_ERROR(UDMF_CLIENT, "Uninstall error, belongingToTypes check failed.\
+            bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+        return false;
+    }
+    // update
+    UpdateGraph(presetTypes, customTyepCfgs);
+    // save
+    if (CustomUtdStore::GetInstance().SaveTypeCfgs(customTyepCfgs, path) != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s, user:%{public}d",
+            bundleName.c_str(), user);
+        return false;
+    }
+    return true;
+}
+
+int32_t CustomUtdStore::SaveCustomUtds(const CustomUtdCfgs &utdTypes, std::vector<TypeDescriptorCfg> customTyepCfgs,
+    const std::string &bundleName, const std::string &path)
+{
+    for (TypeDescriptorCfg declarationType : utdTypes.first) {
+        for (auto iter = customTyepCfgs.begin(); iter != customTyepCfgs.end();) {
+            if (iter->typeId == declarationType.typeId) {
+                declarationType.installerBundles = iter->installerBundles;
+                iter = customTyepCfgs.erase(iter);
+            } else {
+                iter ++;
+            }
+        }
+        declarationType.installerBundles.emplace(bundleName);
+        declarationType.ownerBundle = bundleName;
+        customTyepCfgs.push_back(declarationType);
+    }
+    for (TypeDescriptorCfg referenceType : utdTypes.second) {
+        bool found = false;
+        for (auto &typeCfg : customTyepCfgs) {
+            if (typeCfg.typeId == referenceType.typeId) {
+                typeCfg.installerBundles.emplace(bundleName);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            referenceType.installerBundles.emplace(bundleName);
+            customTyepCfgs.push_back(referenceType);
+        }
+    }
+    
+    if (SaveTypeCfgs(customTyepCfgs, path) != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s.", bundleName.c_str());
+        return E_ERROR;
+    }
+    return E_OK;
+}
+
+void CustomUtdStore::UpdateGraph(const std::vector<TypeDescriptorCfg> &presetTypes,
+    const std::vector<TypeDescriptorCfg> &customTyepCfgs)
+{
+    std::vector<TypeDescriptorCfg> allTypeCfgs = presetTypes;
+    allTypeCfgs.insert(allTypeCfgs.end(), customTyepCfgs.begin(), customTyepCfgs.end());
+    auto graph = UtdGraph::GetInstance().ConstructNewGraph(allTypeCfgs);
+    UtdGraph::GetInstance().UpdateGraph(std::move(graph));
 }
 } // namespace UDMF
 } // namespace OHOS

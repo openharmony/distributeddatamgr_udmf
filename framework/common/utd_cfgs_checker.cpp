@@ -77,10 +77,10 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
         inputTypeCfgs.insert(inputTypeCfgs.end(), typeCfgs.second.begin(), typeCfgs.second.end());
     }
     for (TypeDescriptorCfg &typeCfg : inputTypeCfgs) {
-        for (std::string filenames : typeCfg.filenameExtensions) {
-            if (!(filenames[0] == FILE_EXTENSION_PREFIX)) {
+        for (std::string filename : typeCfg.filenameExtensions) {
+            if (filename.empty() || filename[0] != FILE_EXTENSION_PREFIX) {
                 LOG_ERROR(UDMF_CLIENT, "Extension not valid, extension: %{public}s, bundleName: %{public}s.",
-                    filenames.c_str(), bundleName.c_str());
+                    filename.c_str(), bundleName.c_str());
                 return false;
             }
         }
@@ -200,8 +200,8 @@ bool UtdCfgsChecker::CanConstructDAG(CustomUtdCfgs &typeCfgs, const std::vector<
         allTypeCfgs.insert(allTypeCfgs.end(), presetCfgs.begin(), presetCfgs.end());
     }
     if (!allTypeCfgs.empty()) {
-        UtdGraph::GetInstance().InitUtdGraph(allTypeCfgs);
-        if (UtdGraph::GetInstance().IsDAG()) {
+        auto graph = UtdGraph::GetInstance().ConstructNewGraph(allTypeCfgs);
+        if (graph->IsDAG()) {
             return true;
         }
     }

@@ -31,20 +31,9 @@ constexpr const char* CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
 constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/";
 constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/distributeddata/utd/utd-adt.json";
 
-class UtdChangeSubscriber final : public EventFwk::CommonEventSubscriber {
-public:
-    explicit UtdChangeSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo,
-                                const std::function<void()> &callback);
-    virtual ~UtdChangeSubscriber() = default;
-    void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
-private:
-    std::function<void()> callback_;
-};
-
 UtdClient::UtdClient()
 {
     Init();
-    SubscribeUtdChange();
     LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
 }
 
@@ -388,35 +377,24 @@ Status UtdClient::GetCurrentActiveUserId(int32_t& userId)
     return Status::E_OK;
 }
 
-void UtdClient::SubscribeUtdChange()
-{
-    if (IsHapTokenType()) {
-        return;
+void UtdClient::InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user) {
+    LOG_DEBUG(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user)) {
+        LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
+            bundleName.c_str(), user);
     }
-    LOG_INFO(UDMF_CLIENT, "subscribe utd change callback.");
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED);
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED);
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
-    EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
-    auto updateTask = []() {
-        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-        UtdClient::GetInstance().Init();
-    };
-    subscriber_ = std::make_shared<UtdChangeSubscriber>(subscribeInfo, updateTask);
-    (void)EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber_);
+    if (!CustomUtdStore::GetInstance().InstallCustomUtds(bundleName, jsonStr, user)) {
+        LOG_ERROR(UDMF_CLIENT, "no custom utd installed. bundleName:%{public}s, user:%{public}d",
+            bundleName.c_str(), user);
+    }
 }
 
-UtdChangeSubscriber::UtdChangeSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo,
-    const std::function<void()> &callback)
-    : EventFwk::CommonEventSubscriber(subscribeInfo), callback_(callback)
-{
-}
-
-void UtdChangeSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
-{
-    LOG_INFO(UDMF_CLIENT, "start.");
-    std::thread(callback_).detach();
+void UtdClient::UninstallCustomUtds(const std::string &bundleName, int32_t user) {
+    LOG_DEBUG(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user)) {
+        LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
+            bundleName.c_str(), user);
+    }
 }
 } // namespace UDMF
 } // namespace OHOS
