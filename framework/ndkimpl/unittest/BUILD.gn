@@ -80,11 +80,29 @@ ohos_unittest("UdmfTest") {
   external_deps = common_external_deps
 }
 
+ohos_unittest("DataProviderImplTest") {
+  module_out_path = module_output_path
+
+  sources = [ "data_provider_impl_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
 
   deps = [
+    ":DataProviderImplTest",
     ":UdmfTest",
     ":UdsTest",
     ":UtdTest",
