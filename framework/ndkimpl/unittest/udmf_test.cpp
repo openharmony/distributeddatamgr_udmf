@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#define LOG_TAG "UDMFTEST"
 #include <gtest/gtest.h>
 #include "token_setproc.h"
 #include "accesstoken_kit.h"
@@ -30,6 +32,11 @@
 #include "udmf_meta.h"
 #include "data_provider_impl.h"
 #include "image.h"
+#include "audio.h"
+#include "file.h"
+#include "folder.h"
+#include "video.h"
+#include "logger.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
@@ -1938,5 +1945,408 @@ HWTEST_F(UDMFTest, FileUriTest001, TestSize.Level1)
             }
         }
     }
+}
+
+/**
+ * @tc.name: FileUriTest002
+ * @tc.desc: test fileUri between js and capi
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, FileUriTest002, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    std::string content = "content";
+    std::shared_ptr<Image> image = std::make_shared<Image>();
+    image->SetUri(uri);
+    std::shared_ptr<PlainText> plaintext = std::make_shared<PlainText>();
+    plaintext->SetContent(content);
+    std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
+    unifiedData->AddRecord(image);
+    unifiedData->AddRecord(plaintext);
+    std::string key;
+    CustomOption option = {
+        .intention = UD_INTENTION_DRAG
+    };
+    int setRet = UdmfClient::GetInstance().SetData(option, *unifiedData, key);
+    EXPECT_EQ(setRet, E_OK);
+
+    OH_UdmfData* udmfData = OH_UdmfData_Create();
+    OH_Udmf_GetUnifiedData(key.c_str(), UDMF_INTENTION_DRAG, udmfData);
+
+    unsigned int dataTypeCount;
+    char** dataTypes = OH_UdmfData_GetTypes(udmfData, &dataTypeCount);
+    EXPECT_EQ(dataTypeCount, 3);
+    EXPECT_NE(dataTypes, nullptr);
+    EXPECT_EQ(strcmp(dataTypes[0], UDMF_META_IMAGE), 0);
+    EXPECT_EQ(strcmp(dataTypes[1], UDMF_META_PLAIN_TEXT), 0);
+    EXPECT_EQ(strcmp(dataTypes[2], UDMF_META_GENERAL_FILE_URI), 0);
+
+    unsigned int recordCount;
+    OH_UdmfRecord** records = OH_UdmfData_GetRecords(udmfData, &recordCount);
+    EXPECT_EQ(recordCount, 2);
+    EXPECT_NE(records, nullptr);
+
+    for (unsigned int idx = 0; idx < recordCount; idx++) {
+        unsigned int recordTypeCount;
+        char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount);
+        EXPECT_NE(recordTypes, nullptr);
+        if (recordTypeCount == 1) {
+            EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_PLAIN_TEXT), 0);
+            for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
+                OH_UdsPlainText* text = OH_UdsPlainText_Create();
+                int getPlaintextRet = OH_UdmfRecord_GetPlainText(records[idx], text);
+                EXPECT_EQ(getPlaintextRet, UDMF_E_OK);
+                const char* getContent = OH_UdsPlainText_GetContent(text);
+                EXPECT_EQ(strcmp(getContent, content.c_str()), 0);
+            }
+        }
+        if (recordTypeCount == 2) {
+            EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_IMAGE), 0);
+            EXPECT_EQ(strcmp(recordTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+            for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
+                if (strcmp(recordTypes[recordIdx], UDMF_META_GENERAL_FILE_URI) == 0) {
+                    OH_UdsFileUri* fileUri = OH_UdsFileUri_Create();
+                    int getFileUriRet = OH_UdmfRecord_GetFileUri(records[idx], fileUri);
+                    EXPECT_EQ(getFileUriRet, UDMF_E_OK);
+                    const char* getFileUri = OH_UdsFileUri_GetFileUri(fileUri);
+                    EXPECT_EQ(strcmp(getFileUri, uri.c_str()), 0);
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @tc.name: FileUriTest003
+ * @tc.desc: test fileUri between js and capi
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, FileUriTest003, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    std::shared_ptr<Audio> audio = std::make_shared<Audio>();
+    audio->SetUri(uri);
+    std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
+    unifiedData->AddRecord(audio);
+    std::string key;
+    CustomOption option = {
+        .intention = UD_INTENTION_DRAG
+    };
+    int setRet = UdmfClient::GetInstance().SetData(option, *unifiedData, key);
+    EXPECT_EQ(setRet, E_OK);
+
+    OH_UdmfData* udmfData = OH_UdmfData_Create();
+    OH_Udmf_GetUnifiedData(key.c_str(), UDMF_INTENTION_DRAG, udmfData);
+
+    unsigned int dataTypeCount;
+    char** dataTypes = OH_UdmfData_GetTypes(udmfData, &dataTypeCount);
+    EXPECT_EQ(dataTypeCount, 2);
+    EXPECT_NE(dataTypes, nullptr);
+    EXPECT_EQ(strcmp(dataTypes[0], UDMF_META_AUDIO), 0);
+    EXPECT_EQ(strcmp(dataTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+
+    unsigned int recordCount;
+    OH_UdmfRecord** records = OH_UdmfData_GetRecords(udmfData, &recordCount);
+    EXPECT_EQ(recordCount, 1);
+    EXPECT_NE(records, nullptr);
+
+    for (unsigned int idx = 0; idx < recordCount; ++idx) {
+        unsigned int recordTypeCount;
+        char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount);
+        EXPECT_EQ(recordTypeCount, 2);
+        EXPECT_NE(recordTypes, nullptr);
+        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_AUDIO), 0);
+        EXPECT_EQ(strcmp(recordTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+        for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
+            if (strcmp(recordTypes[recordIdx], UDMF_META_GENERAL_FILE_URI) == 0) {
+                OH_UdsFileUri* fileUri = OH_UdsFileUri_Create();
+                int getFileUriRet = OH_UdmfRecord_GetFileUri(records[idx], fileUri);
+                EXPECT_EQ(getFileUriRet, UDMF_E_OK);
+                const char* getFileUri = OH_UdsFileUri_GetFileUri(fileUri);
+                EXPECT_EQ(strcmp(getFileUri, uri.c_str()), 0);
+            }
+        }
+    }
+}
+
+/**
+ * @tc.name: FileUriTest004
+ * @tc.desc: test fileUri between js and capi
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, FileUriTest004, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    std::shared_ptr<File> file = std::make_shared<File>();
+    file->SetUri(uri);
+    std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
+    unifiedData->AddRecord(file);
+    std::string key;
+    CustomOption option = {
+        .intention = UD_INTENTION_DRAG
+    };
+    int setRet = UdmfClient::GetInstance().SetData(option, *unifiedData, key);
+    EXPECT_EQ(setRet, E_OK);
+
+    OH_UdmfData* udmfData = OH_UdmfData_Create();
+    OH_Udmf_GetUnifiedData(key.c_str(), UDMF_INTENTION_DRAG, udmfData);
+
+    unsigned int dataTypeCount;
+    char** dataTypes = OH_UdmfData_GetTypes(udmfData, &dataTypeCount);
+    EXPECT_EQ(dataTypeCount, 2);
+    EXPECT_NE(dataTypes, nullptr);
+    EXPECT_EQ(strcmp(dataTypes[0], UDMF_META_GENERAL_FILE), 0);
+    EXPECT_EQ(strcmp(dataTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+
+    unsigned int recordCount;
+    OH_UdmfRecord** records = OH_UdmfData_GetRecords(udmfData, &recordCount);
+    EXPECT_EQ(recordCount, 1);
+    EXPECT_NE(records, nullptr);
+
+    for (unsigned int idx = 0; idx < recordCount; ++idx) {
+        unsigned int recordTypeCount;
+        char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount);
+        EXPECT_EQ(recordTypeCount, 2);
+        EXPECT_NE(recordTypes, nullptr);
+        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_GENERAL_FILE), 0);
+        EXPECT_EQ(strcmp(recordTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+        for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
+            if (strcmp(recordTypes[recordIdx], UDMF_META_GENERAL_FILE_URI) == 0) {
+                OH_UdsFileUri* fileUri = OH_UdsFileUri_Create();
+                int getFileUriRet = OH_UdmfRecord_GetFileUri(records[idx], fileUri);
+                EXPECT_EQ(getFileUriRet, UDMF_E_OK);
+                const char* getFileUri = OH_UdsFileUri_GetFileUri(fileUri);
+                EXPECT_EQ(strcmp(getFileUri, uri.c_str()), 0);
+            }
+        }
+    }
+}
+
+/**
+ * @tc.name: FileUriTest005
+ * @tc.desc: test fileUri between js and capi
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, FileUriTest005, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    std::shared_ptr<Folder> folder = std::make_shared<Folder>();
+    folder->SetUri(uri);
+    std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
+    unifiedData->AddRecord(folder);
+    std::string key;
+    CustomOption option = {
+        .intention = UD_INTENTION_DRAG
+    };
+    int setRet = UdmfClient::GetInstance().SetData(option, *unifiedData, key);
+    EXPECT_EQ(setRet, E_OK);
+
+    OH_UdmfData* udmfData = OH_UdmfData_Create();
+    OH_Udmf_GetUnifiedData(key.c_str(), UDMF_INTENTION_DRAG, udmfData);
+
+    unsigned int dataTypeCount;
+    char** dataTypes = OH_UdmfData_GetTypes(udmfData, &dataTypeCount);
+    EXPECT_EQ(dataTypeCount, 2);
+    EXPECT_NE(dataTypes, nullptr);
+    EXPECT_EQ(strcmp(dataTypes[0], UDMF_META_FOLDER), 0);
+    EXPECT_EQ(strcmp(dataTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+
+    unsigned int recordCount;
+    OH_UdmfRecord** records = OH_UdmfData_GetRecords(udmfData, &recordCount);
+    EXPECT_EQ(recordCount, 1);
+    EXPECT_NE(records, nullptr);
+
+    for (unsigned int idx = 0; idx < recordCount; ++idx) {
+        unsigned int recordTypeCount;
+        char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount);
+        EXPECT_EQ(recordTypeCount, 2);
+        EXPECT_NE(recordTypes, nullptr);
+        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_FOLDER), 0);
+        EXPECT_EQ(strcmp(recordTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+        for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
+            if (strcmp(recordTypes[recordIdx], UDMF_META_GENERAL_FILE_URI) == 0) {
+                OH_UdsFileUri* fileUri = OH_UdsFileUri_Create();
+                int getFileUriRet = OH_UdmfRecord_GetFileUri(records[idx], fileUri);
+                EXPECT_EQ(getFileUriRet, UDMF_E_OK);
+                const char* getFileUri = OH_UdsFileUri_GetFileUri(fileUri);
+                EXPECT_EQ(strcmp(getFileUri, uri.c_str()), 0);
+            }
+        }
+    }
+}
+
+/**
+ * @tc.name: FileUriTest006
+ * @tc.desc: test fileUri between js and capi
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, FileUriTest006, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    std::shared_ptr<Video> video = std::make_shared<Video>();
+    video->SetUri(uri);
+    std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
+    unifiedData->AddRecord(video);
+    std::string key;
+    CustomOption option = {
+        .intention = UD_INTENTION_DRAG
+    };
+    int setRet = UdmfClient::GetInstance().SetData(option, *unifiedData, key);
+    EXPECT_EQ(setRet, E_OK);
+
+    OH_UdmfData* udmfData = OH_UdmfData_Create();
+    OH_Udmf_GetUnifiedData(key.c_str(), UDMF_INTENTION_DRAG, udmfData);
+
+    unsigned int dataTypeCount;
+    char** dataTypes = OH_UdmfData_GetTypes(udmfData, &dataTypeCount);
+    EXPECT_EQ(dataTypeCount, 2);
+    EXPECT_NE(dataTypes, nullptr);
+    EXPECT_EQ(strcmp(dataTypes[0], UDMF_META_VIDEO), 0);
+    EXPECT_EQ(strcmp(dataTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+
+    unsigned int recordCount;
+    OH_UdmfRecord** records = OH_UdmfData_GetRecords(udmfData, &recordCount);
+    EXPECT_EQ(recordCount, 1);
+    EXPECT_NE(records, nullptr);
+
+    for (unsigned int idx = 0; idx < recordCount; ++idx) {
+        unsigned int recordTypeCount;
+        char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount);
+        EXPECT_EQ(recordTypeCount, 2);
+        EXPECT_NE(recordTypes, nullptr);
+        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_VIDEO), 0);
+        EXPECT_EQ(strcmp(recordTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+        for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
+            if (strcmp(recordTypes[recordIdx], UDMF_META_GENERAL_FILE_URI) == 0) {
+                OH_UdsFileUri* fileUri = OH_UdsFileUri_Create();
+                int getFileUriRet = OH_UdmfRecord_GetFileUri(records[idx], fileUri);
+                EXPECT_EQ(getFileUriRet, UDMF_E_OK);
+                const char* getFileUri = OH_UdsFileUri_GetFileUri(fileUri);
+                EXPECT_EQ(strcmp(getFileUri, uri.c_str()), 0);
+            }
+        }
+    }
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData003
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with file uri
+ * @tc.type: FUNC
+ * @tc.require: AROOOH5R5G
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData003, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_DRAG;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    int getRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    unsigned int count = 0;
+    OH_UdmfRecord **getRecords = OH_UdmfData_GetRecords(readUnifiedData, &count);
+    EXPECT_EQ(count, 1);
+    OH_UdsFileUri *getFileUri = OH_UdsFileUri_Create();
+    OH_UdmfRecord_GetFileUri(getRecords[0], getFileUri);
+    const char *getUri = OH_UdsFileUri_GetFileUri(getFileUri);
+    EXPECT_EQ(strcmp(getUri, uri.c_str()), 0);
+
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+
+    OH_UdsFileUri_Destroy(getFileUri);
+    OH_UdmfData_Destroy(readUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData004
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with file uri
+ * @tc.type: FUNC
+ * @tc.require: AROOOH5R5G
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData004, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_DRAG;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    int getRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    unsigned int count = 0;
+    OH_UdmfRecord **getRecords = OH_UdmfData_GetRecords(readUnifiedData, &count);
+    EXPECT_EQ(count, 1);
+    OH_UdsFileUri *getFileUri = OH_UdsFileUri_Create();
+    OH_UdmfRecord_GetFileUri(getRecords[0], getFileUri);
+    const char *getUri = OH_UdsFileUri_GetFileUri(getFileUri);
+    EXPECT_EQ(strcmp(getUri, uri.c_str()), 0);
+
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+
+    OH_UdsFileUri_Destroy(getFileUri);
+    OH_UdmfData_Destroy(readUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData005
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with file uri
+ * @tc.type: FUNC
+ * @tc.require: AROOOH5R5G
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData005, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_FOLDER);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_DRAG;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    int getRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    unsigned int count = 0;
+    OH_UdmfRecord **getRecords = OH_UdmfData_GetRecords(readUnifiedData, &count);
+    EXPECT_EQ(count, 1);
+    OH_UdsFileUri *getFileUri = OH_UdsFileUri_Create();
+    OH_UdmfRecord_GetFileUri(getRecords[0], getFileUri);
+    const char *getUri = OH_UdsFileUri_GetFileUri(getFileUri);
+    EXPECT_EQ(strcmp(getUri, uri.c_str()), 0);
+
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+
+    OH_UdsFileUri_Destroy(getFileUri);
+    OH_UdmfData_Destroy(readUnifiedData);
 }
 }

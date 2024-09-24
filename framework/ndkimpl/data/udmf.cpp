@@ -586,7 +586,7 @@ int OH_UdmfRecord_AddFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
             AddUds<Audio>(record, fileUri, UDType::AUDIO);
             break;
         case UDType::FOLDER:
-            AddUds<Audio>(record, fileUri, UDType::FOLDER);
+            AddUds<Folder>(record, fileUri, UDType::FOLDER);
             break;
         case UDType::IMAGE:
             AddUds<Image>(record, fileUri, UDType::IMAGE);
@@ -673,6 +673,9 @@ int OH_UdmfRecord_GetFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(fileUri, UDS_FILE_URI_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
+    if (GetUds(record, fileUri, UDType::FILE_URI) == UDMF_E_OK) {
+        return UDMF_E_OK;
+    }
     for (auto fileType : FILE_TYPES) {
         int ret = GetUds(record, fileUri, fileType.second);
         if (ret == UDMF_E_OK) {
@@ -682,7 +685,7 @@ int OH_UdmfRecord_GetFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
         }
     }
     LOG_ERROR(UDMF_CAPI, "could't find file uri");
-    return UDMF_ERR;
+    return UDMF_E_INVALID_PARAM;
 }
 
 int OH_UdmfRecord_GetPixelMap(OH_UdmfRecord* record, OH_UdsPixelMap* pixelMap)
