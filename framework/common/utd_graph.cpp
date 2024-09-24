@@ -94,7 +94,7 @@ std::unique_ptr<Graph> UtdGraph::ConstructNewGraph(const std::vector<TypeDescrip
     return graph;
 }
 
-void UtdGraph::UpdateGraph(std::unique_ptr<Graph> graph)
+void UtdGraph::Update(std::unique_ptr<Graph> graph)
 {
     std::unique_lock<std::mutex> lock(graphMutex_);
     graph_ = std::move(graph);

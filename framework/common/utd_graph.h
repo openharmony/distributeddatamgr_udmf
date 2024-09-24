@@ -34,7 +34,7 @@ public:
     void InitUtdGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs);
     bool IsLowerLevelType(const std::string &lowerLevelType, const std::string &heigitLevelType);
     std::unique_ptr<Graph> ConstructNewGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs);
-    void UpdateGraph(std::unique_ptr<Graph> graph);
+    void Update(std::unique_ptr<Graph> graph);
 private:
     UtdGraph();
     ~UtdGraph();

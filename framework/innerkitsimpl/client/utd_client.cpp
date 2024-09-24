@@ -15,9 +15,6 @@
 #define LOG_TAG "UtdClient"
 #include <regex>
 #include <thread>
-#include "common_event_manager.h"
-#include "common_event_subscriber.h"
-#include "common_event_support.h"
 #include "utd_client.h"
 #include "logger.h"
 #include "utd_graph.h"
@@ -378,23 +375,39 @@ Status UtdClient::GetCurrentActiveUserId(int32_t& userId)
 }
 
 void UtdClient::InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user) {
-    LOG_DEBUG(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
-    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user)) {
+    LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+    std::vector<TypeDescriptorCfg> customTyepCfgs;
+    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user, customTyepCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
             bundleName.c_str(), user);
     }
-    if (!CustomUtdStore::GetInstance().InstallCustomUtds(bundleName, jsonStr, user)) {
+
+    if (!CustomUtdStore::GetInstance().InstallCustomUtds(bundleName, jsonStr, user, customTyepCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "no custom utd installed. bundleName:%{public}s, user:%{public}d",
             bundleName.c_str(), user);
     }
+    UpdateGraph(customTyepCfgs);
 }
 
 void UtdClient::UninstallCustomUtds(const std::string &bundleName, int32_t user) {
-    LOG_DEBUG(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
-    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user)) {
+    LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+    std::vector<TypeDescriptorCfg> customTyepCfgs;
+    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user, customTyepCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
             bundleName.c_str(), user);
     }
+    UpdateGraph(customTyepCfgs);
+}
+
+void UtdClient::UpdateGraph(const std::vector<TypeDescriptorCfg> &customTyepCfgs)
+{
+    std::vector<TypeDescriptorCfg> allTypeCfgs = PresetTypeDescriptors::GetInstance().GetPresetTypes();
+    allTypeCfgs.insert(allTypeCfgs.end(), customTyepCfgs.begin(), customTyepCfgs.end());
+    auto graph = UtdGraph::GetInstance().ConstructNewGraph(allTypeCfgs);
+
+    std::unique_lock<std::shared_mutex> lock(utdMutex_);
+    UtdGraph::GetInstance().Update(std::move(graph));
+    descriptorCfgs_ = allTypeCfgs;
 }
 } // namespace UDMF
 } // namespace OHOS

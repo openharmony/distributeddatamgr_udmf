@@ -63,9 +63,9 @@ private:
     Status GetFlexibleTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
     std::string GetTypeIdFromCfg(const std::string &mimeType);
     std::vector<std::string> GetTypeIdsFromCfg(const std::string &mimeType);
+    void UpdateGraph(const std::vector<TypeDescriptorCfg> &customTyepCfgs);
 
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
-    std::shared_ptr<UtdChangeSubscriber> subscriber_;
     std::shared_mutex utdMutex_;
 };
 } // namespace UDMF

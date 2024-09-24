@@ -61,6 +61,7 @@ std::vector<TypeDescriptorCfg> CustomUtdStore::GetTypeCfgs(const std::string &cf
 int32_t CustomUtdStore::SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes,
                                      const std::string &cfgFilePath)
 {
+    LOG_DEBUG(UDMF_CLIENT, "customUtdTypes total:%{public}zu.", customUtdTypes.size());
     std::string jsonData;
     std::string cfgFileName = UTD_CFG_FILE;
     std::string cfgFileDir = cfgFilePath.substr(0, cfgFilePath.length() - cfgFileName.length());
@@ -118,7 +119,7 @@ bool CustomUtdStore::CreateDirectory(const std::string &path) const
     return false;
 }
 
-bool CustomUtdStore::InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user)
+bool CustomUtdStore::InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user, std::vector<TypeDescriptorCfg> &customTyepCfgs)
 {
     // new utd
     CustomUtdCfgs typeCfgs;
@@ -130,28 +131,31 @@ bool CustomUtdStore::InstallCustomUtds(const std::string &bundleName, const std:
     std::vector<TypeDescriptorCfg> presetTypes = PresetTypeDescriptors::GetInstance().GetPresetTypes();
     // file utd
     std::string path = CUSTOM_UTD_PATH + std::to_string(user) + CUSTOM_UTD_FILE;
-    std::vector<TypeDescriptorCfg> customTyepCfgs = GetTypeCfgs(path);
+    if (customTyepCfgs.empty()) {
+        customTyepCfgs = GetTypeCfgs(path);
+    }
     // check
     if (!UtdCfgsChecker::GetInstance().CheckTypeDescriptors(
             typeCfgs, presetTypes, customTyepCfgs, bundleName)) {
         LOG_ERROR(UDMF_CLIENT, "check type descriptors failed, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
         return false;
     }
-    // update
-    UpdateGraph(presetTypes, customTyepCfgs);
-    // save  
-    if (SaveCustomUtds(typeCfgs, customTyepCfgs, bundleName, path) != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "Install save custom utds failed, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+    ProcessUtdForSave(typeCfgs, customTyepCfgs, bundleName);
+    // save
+    if (CustomUtdStore::GetInstance().SaveTypeCfgs(customTyepCfgs, path) != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s, user:%{public}d",
+            bundleName.c_str(), user);
         return false;
     }
     return true;
 }
 
-bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, int32_t user)
+bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, int32_t user, std::vector<TypeDescriptorCfg> &customTyepCfgs)
 {
     // file utd
     std::string path = CUSTOM_UTD_PATH + std::to_string(user) + CUSTOM_UTD_FILE;
-    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetTypeCfgs(path);
+    customTyepCfgs = CustomUtdStore::GetInstance().GetTypeCfgs(path);
+    const auto customUtdSize = customTyepCfgs.size();
 
     for (auto iter = customTyepCfgs.begin(); iter != customTyepCfgs.end();) {
         auto it = find (iter->installerBundles.begin(), iter->installerBundles.end(), bundleName);
@@ -166,13 +170,14 @@ bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, int32_t 
     }
     std::vector<TypeDescriptorCfg> presetTypes = PresetTypeDescriptors::GetInstance().GetPresetTypes();
     if (!UtdCfgsChecker::GetInstance().CheckBelongingToTypes(customTyepCfgs, presetTypes)) {
-        LOG_ERROR(UDMF_CLIENT, "Uninstall error, belongingToTypes check failed.\
-            bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+        LOG_ERROR(UDMF_CLIENT, "belongingToTypes check failed. bundleName:%{public}s, user:%{public}d",
+            bundleName.c_str(), user);
         return false;
     }
-    // update
-    UpdateGraph(presetTypes, customTyepCfgs);
     // save
+    if (customTyepCfgs.size() == customUtdSize) {
+        return true;
+    }
     if (CustomUtdStore::GetInstance().SaveTypeCfgs(customTyepCfgs, path) != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s, user:%{public}d",
             bundleName.c_str(), user);
@@ -181,8 +186,8 @@ bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, int32_t 
     return true;
 }
 
-int32_t CustomUtdStore::SaveCustomUtds(const CustomUtdCfgs &utdTypes, std::vector<TypeDescriptorCfg> customTyepCfgs,
-    const std::string &bundleName, const std::string &path)
+void CustomUtdStore::ProcessUtdForSave(const CustomUtdCfgs &utdTypes, std::vector<TypeDescriptorCfg> &customTyepCfgs,
+    const std::string &bundleName)
 {
     for (TypeDescriptorCfg declarationType : utdTypes.first) {
         for (auto iter = customTyepCfgs.begin(); iter != customTyepCfgs.end();) {
@@ -190,7 +195,7 @@ int32_t CustomUtdStore::SaveCustomUtds(const CustomUtdCfgs &utdTypes, std::vecto
                 declarationType.installerBundles = iter->installerBundles;
                 iter = customTyepCfgs.erase(iter);
             } else {
-                iter ++;
+                iter++;
             }
         }
         declarationType.installerBundles.emplace(bundleName);
@@ -211,21 +216,6 @@ int32_t CustomUtdStore::SaveCustomUtds(const CustomUtdCfgs &utdTypes, std::vecto
             customTyepCfgs.push_back(referenceType);
         }
     }
-    
-    if (SaveTypeCfgs(customTyepCfgs, path) != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s.", bundleName.c_str());
-        return E_ERROR;
-    }
-    return E_OK;
-}
-
-void CustomUtdStore::UpdateGraph(const std::vector<TypeDescriptorCfg> &presetTypes,
-    const std::vector<TypeDescriptorCfg> &customTyepCfgs)
-{
-    std::vector<TypeDescriptorCfg> allTypeCfgs = presetTypes;
-    allTypeCfgs.insert(allTypeCfgs.end(), customTyepCfgs.begin(), customTyepCfgs.end());
-    auto graph = UtdGraph::GetInstance().ConstructNewGraph(allTypeCfgs);
-    UtdGraph::GetInstance().UpdateGraph(std::move(graph));
 }
 } // namespace UDMF
 } // namespace OHOS
