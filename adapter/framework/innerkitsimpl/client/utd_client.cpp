@@ -70,5 +70,32 @@ Status UtdClient::IsUtd(std::string typeId, bool &result)
 {
     return Status::E_OK;
 }
+
+Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &fileExtension,
+    std::vector<std::string> &typeIds, const std::string &belongsTo)
+{
+    return Status::E_OK;
+}
+
+std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
+{
+    return "";
+}
+
+std::vector<std::string> UtdClient::GetTypeIdsFromCfg(const std::string &mimeType)
+{
+    std::vector<std::string> typeIdsInCfg;
+    return typeIdsInCfg;
+}
+
+void UtdClient::SubscribeUtdChange()
+{
+}
+
+Status UtdClient::GetUniformDataTypesByMIMEType(const std::string &mimeType, std::vector<std::string> &typeIds,
+    const std::string &belongsTo)
+{
+    return Status::E_OK;
+}
 } // namespace UDMF
 } // namespace OHOS
