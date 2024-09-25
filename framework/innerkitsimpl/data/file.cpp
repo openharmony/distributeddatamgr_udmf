@@ -100,7 +100,7 @@ void File::InitObject()
         object->value_[ORI_URI] = oriUri_;
         object->value_[REMOTE_URI] = remoteUri_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_["VALUE_TYPE"] = value;
+        object->value_[VALUE_TYPE] = value;
     }
 }
 

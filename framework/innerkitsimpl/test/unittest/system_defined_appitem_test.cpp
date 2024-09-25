@@ -79,7 +79,7 @@ HWTEST_F(SystemDefinedAppitemTest, SetItems002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "SetItems002 begin.");
     UDDetails details;
-    details.insert({ SystemDefinedAppItem::APPID, "SetItems002" });
+    details.insert({ APP_ID, "SetItems002" });
     SystemDefinedAppItem systemDefinedAppItem;
     systemDefinedAppItem.SetItems(details);
     EXPECT_EQ(systemDefinedAppItem.appId_, "SetItems002");
@@ -95,7 +95,7 @@ HWTEST_F(SystemDefinedAppitemTest, SetItems003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "SetItems003 begin.");
     UDDetails details;
-    details.insert({ SystemDefinedAppItem::APPNAME, "SetItems003" });
+    details.insert({ APP_NAME, "SetItems003" });
     SystemDefinedAppItem systemDefinedAppItem;
     systemDefinedAppItem.SetItems(details);
     EXPECT_EQ(systemDefinedAppItem.appName_, "SetItems003");
@@ -111,7 +111,7 @@ HWTEST_F(SystemDefinedAppitemTest, SetItems004, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "SetItems004 begin.");
     UDDetails details;
-    details.insert({ SystemDefinedAppItem::APPICONID, "SetItems004" });
+    details.insert({ APP_ICON_ID, "SetItems004" });
     SystemDefinedAppItem systemDefinedAppItem;
     systemDefinedAppItem.SetItems(details);
     EXPECT_EQ(systemDefinedAppItem.appIconId_, "SetItems004");
@@ -127,7 +127,7 @@ HWTEST_F(SystemDefinedAppitemTest, SetItems005, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "SetItems005 begin.");
     UDDetails details;
-    details.insert({ SystemDefinedAppItem::APPLABELID, "SetItems005" });
+    details.insert({APP_LABEL_ID, "SetItems005" });
     SystemDefinedAppItem systemDefinedAppItem;
     systemDefinedAppItem.SetItems(details);
     EXPECT_EQ(systemDefinedAppItem.appLabelId_, "SetItems005");
@@ -143,7 +143,7 @@ HWTEST_F(SystemDefinedAppitemTest, SetItems006, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "SetItems006 begin.");
     UDDetails details;
-    details.insert({ SystemDefinedAppItem::BUNDLENAME, "SetItems006" });
+    details.insert({ BUNDLE_NAME, "SetItems006" });
     SystemDefinedAppItem systemDefinedAppItem;
     systemDefinedAppItem.SetItems(details);
     EXPECT_EQ(systemDefinedAppItem.bundleName_, "SetItems006");
@@ -159,7 +159,7 @@ HWTEST_F(SystemDefinedAppitemTest, SetItems007, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "SetItems007 begin.");
     UDDetails details;
-    details.insert({ SystemDefinedAppItem::ABILITYNAME, "SetItems007" });
+    details.insert({ ABILITY_NAME, "SetItems007" });
     SystemDefinedAppItem systemDefinedAppItem;
     systemDefinedAppItem.SetItems(details);
     EXPECT_EQ(systemDefinedAppItem.abilityName_, "SetItems007");
@@ -182,12 +182,12 @@ HWTEST_F(SystemDefinedAppitemTest, GetItems001, TestSize.Level1)
     valueType.bundleName_ = "bundleName";
     valueType.abilityName_ = "abilityName";
     UDDetails items = valueType.GetItems();
-    EXPECT_EQ(std::get<std::string>(items[SystemDefinedAppItem::APPID]), valueType.appId_);
-    EXPECT_EQ(std::get<std::string>(items[SystemDefinedAppItem::APPNAME]), valueType.appName_);
-    EXPECT_EQ(std::get<std::string>(items[SystemDefinedAppItem::APPICONID]), valueType.appIconId_);
-    EXPECT_EQ(std::get<std::string>(items[SystemDefinedAppItem::APPLABELID]), valueType.appLabelId_);
-    EXPECT_EQ(std::get<std::string>(items[SystemDefinedAppItem::BUNDLENAME]), valueType.bundleName_);
-    EXPECT_EQ(std::get<std::string>(items[SystemDefinedAppItem::ABILITYNAME]), valueType.abilityName_);
+    EXPECT_EQ(std::get<std::string>(items[APP_ID]), valueType.appId_);
+    EXPECT_EQ(std::get<std::string>(items[APP_NAME]), valueType.appName_);
+    EXPECT_EQ(std::get<std::string>(items[APP_ICON_ID]), valueType.appIconId_);
+    EXPECT_EQ(std::get<std::string>(items[APP_LABEL_ID]), valueType.appLabelId_);
+    EXPECT_EQ(std::get<std::string>(items[BUNDLE_NAME]), valueType.bundleName_);
+    EXPECT_EQ(std::get<std::string>(items[ABILITY_NAME]), valueType.abilityName_);
     LOG_INFO(UDMF_TEST, "GetItems001 end.");
 }
 
@@ -209,14 +209,14 @@ HWTEST_F(SystemDefinedAppitemTest, GetValue001, TestSize.Level1)
     valueType.abilityName_ = "abilityName";
     valueType.InitObject();
     auto object = std::get<std::shared_ptr<Object>>(valueType.value_);
-    auto details = std::get<std::shared_ptr<Object>>(object->value_[SystemDefinedAppItem::DETAILS]);
+    auto details = std::get<std::shared_ptr<Object>>(object->value_[DETAILS]);
     EXPECT_EQ(std::get<std::string>(object->value_[UNIFORM_DATA_TYPE]), "openharmony.app-item");
-    EXPECT_EQ(std::get<std::string>(object->value_[SystemDefinedAppItem::APPID]), valueType.appId_);
-    EXPECT_EQ(std::get<std::string>(object->value_[SystemDefinedAppItem::APPNAME]), valueType.appName_);
-    EXPECT_EQ(std::get<std::string>(object->value_[SystemDefinedAppItem::APPICONID]), valueType.appIconId_);
-    EXPECT_EQ(std::get<std::string>(object->value_[SystemDefinedAppItem::APPLABELID]), valueType.appLabelId_);
-    EXPECT_EQ(std::get<std::string>(object->value_[SystemDefinedAppItem::BUNDLENAME]), valueType.bundleName_);
-    EXPECT_EQ(std::get<std::string>(object->value_[SystemDefinedAppItem::ABILITYNAME]), valueType.abilityName_);
+    EXPECT_EQ(std::get<std::string>(object->value_[APP_ID]), valueType.appId_);
+    EXPECT_EQ(std::get<std::string>(object->value_[APP_NAME]), valueType.appName_);
+    EXPECT_EQ(std::get<std::string>(object->value_[APP_ICON_ID]), valueType.appIconId_);
+    EXPECT_EQ(std::get<std::string>(object->value_[APP_LABEL_ID]), valueType.appLabelId_);
+    EXPECT_EQ(std::get<std::string>(object->value_[BUNDLE_NAME]), valueType.bundleName_);
+    EXPECT_EQ(std::get<std::string>(object->value_[ABILITY_NAME]), valueType.abilityName_);
     EXPECT_EQ(details->value_.size(), 0);
     LOG_INFO(UDMF_TEST, "GetValue001 end.");
 }

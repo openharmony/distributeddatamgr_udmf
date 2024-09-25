@@ -14,6 +14,7 @@
  */
 
 #include "html.h"
+#include "udmf_meta.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -40,7 +41,7 @@ Html::Html(UDType type, ValueType value) : Text(type, value)
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
         object->GetValue(HTML_CONTENT, htmlContent_);
-        object->GetValue(PLAINT_CONTENT, plainContent_);
+        object->GetValue(PLAIN_CONTENT, plainContent_);
         std::shared_ptr<Object> detailObj = nullptr;
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
@@ -83,7 +84,7 @@ void Html::SetPlainContent(const std::string &plainContent)
     this->plainContent_ = plainContent;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[PLAINT_CONTENT] = plainContent_;
+        object->value_[PLAIN_CONTENT] = plainContent_;
     }
 }
 
@@ -93,11 +94,11 @@ void Html::InitObject()
         auto value = value_;
         value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
+        object->value_[UNIFORM_DATA_TYPE] = UDMF_META_HTML;
         object->value_[HTML_CONTENT] = htmlContent_;
-        object->value_[PLAINT_CONTENT] = plainContent_;
+        object->value_[PLAIN_CONTENT] = plainContent_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_["VALUE_TYPE"] = value;
+        object->value_[VALUE_TYPE] = value;
     }
 }
 } // namespace UDMF

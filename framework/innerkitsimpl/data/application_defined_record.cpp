@@ -24,6 +24,7 @@ ApplicationDefinedRecord::ApplicationDefinedRecord() : UnifiedRecord(APPLICATION
 ApplicationDefinedRecord::ApplicationDefinedRecord(std::string type) : UnifiedRecord(APPLICATION_DEFINED_RECORD)
 {
     this->applicationDefinedType = std::move(type);
+    SetUtdId(this->applicationDefinedType);
 }
 
 ApplicationDefinedRecord::ApplicationDefinedRecord(std::string type, std::vector<uint8_t> &data)
@@ -31,6 +32,7 @@ ApplicationDefinedRecord::ApplicationDefinedRecord(std::string type, std::vector
 {
     this->applicationDefinedType = std::move(type);
     this->rawData_ = std::move(data);
+    SetUtdId(this->applicationDefinedType);
 }
 
 ApplicationDefinedRecord::ApplicationDefinedRecord(UDType type, ValueType value)
@@ -41,10 +43,14 @@ ApplicationDefinedRecord::ApplicationDefinedRecord(UDType type, ValueType value)
         rawData_ = std::get<std::vector<uint8_t>>(value);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
-        object->GetValue(APPLICATION_DEFINED_TYPE, applicationDefinedType);
-        object->GetValue(RAW_DATA, rawData_);
+        object->GetValue(UNIFORM_DATA_TYPE, applicationDefinedType);
+        object->GetValue(ARRAY_BUFFER, rawData_);
         hasObject_ = true;
     }
+    if (applicationDefinedType.empty()) {
+        applicationDefinedType = UtdUtils::GetUtdIdFromUtdEnum(type);
+    }
+    SetUtdId(this->applicationDefinedType);
 }
 
 int64_t ApplicationDefinedRecord::GetSize()
@@ -60,9 +66,10 @@ std::string ApplicationDefinedRecord::GetApplicationDefinedType() const
 void ApplicationDefinedRecord::SetApplicationDefinedType(const std::string &type)
 {
     this->applicationDefinedType = type;
+    SetUtdId(this->applicationDefinedType);
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[APPLICATION_DEFINED_TYPE] = applicationDefinedType;
+        object->value_[UNIFORM_DATA_TYPE] = applicationDefinedType;
     }
 }
 
@@ -76,7 +83,8 @@ void ApplicationDefinedRecord::SetRawData(const std::vector<uint8_t> &rawData)
     this->rawData_ = rawData;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[RAW_DATA] = rawData_;
+        object->value_[ARRAY_BUFFER] = rawData_;
+        object->value_[ARRAY_BUFFER_LENGTH] = static_cast<int>(rawData_.size());
     }
 }
 
@@ -86,10 +94,10 @@ void ApplicationDefinedRecord::InitObject()
         auto value = value_;
         value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
-        object->value_[APPLICATION_DEFINED_TYPE] = applicationDefinedType;
-        object->value_[RAW_DATA] = rawData_;
-        object->value_["VALUE_TYPE"] = value;
+        object->value_[UNIFORM_DATA_TYPE] = applicationDefinedType;
+        object->value_[ARRAY_BUFFER] = rawData_;
+        object->value_[ARRAY_BUFFER_LENGTH] = static_cast<int>(rawData_.size());
+        object->value_[VALUE_TYPE] = value;
     }
 }
 

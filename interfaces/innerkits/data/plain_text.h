@@ -36,8 +36,6 @@ public:
 
     static bool CheckValue(const ValueType &value);
 private:
-    constexpr static const char *TEXT_CONTENT = "textContent";
-    constexpr static const char *ABSTRACT = "abstract";
     std::string content_;
     std::string abstract_;
 };

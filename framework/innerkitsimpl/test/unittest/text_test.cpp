@@ -79,7 +79,7 @@ HWTEST_F(TextTest, InitObject001, TestSize.Level1)
     text.details_.insert({ "first", "second" });
     text.InitObject();
     auto object = std::get<std::shared_ptr<Object>>(text.value_);
-    auto details = std::get<std::shared_ptr<Object>>(object->value_[Text::DETAILS]);
+    auto details = std::get<std::shared_ptr<Object>>(object->value_[DETAILS]);
     EXPECT_NE(details->value_.size(), 0);
     LOG_INFO(UDMF_TEST, "InitObject001 end.");
 }
