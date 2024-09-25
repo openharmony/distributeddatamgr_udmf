@@ -198,7 +198,7 @@ void UnifiedRecord::InitObject()
         auto value = value_;
         value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_["VALUE_TYPE"] = value;
+        object->value_[VALUE_TYPE] = value;
     }
 }
 

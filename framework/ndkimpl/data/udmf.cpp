@@ -398,7 +398,7 @@ int OH_Udmf_SetUnifiedData(Udmf_Intention intention, OH_UdmfData* unifiedData, c
         return UDMF_ERR;
     }
     if (strcpy_s(key, keyLen, keyStr.c_str()) != EOK) {
-        LOG_INFO(UDMF_CAPI, "string copy failed");
+        LOG_ERROR(UDMF_CAPI, "string copy failed");
         return UDMF_ERR;
     }
     return UDMF_E_OK;
@@ -423,6 +423,7 @@ void OH_UdmfRecord_Destroy(OH_UdmfRecord* record)
         delete[] record->recordData;
         record->recordData = nullptr;
     }
+    DestroyStringArray(record->typesArray, record->typesCount);
     delete record;
 }
 
@@ -434,37 +435,36 @@ int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId,
         return UDMF_E_INVALID_PARAM;
     }
     std::vector<uint8_t> recordValue(entry, entry + count);
+    auto obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = typeId;
+    obj->value_[ARRAY_BUFFER] = recordValue;
+    obj->value_[ARRAY_BUFFER_LENGTH] = static_cast<int>(recordValue.size());
     if (record->record_->GetType() == UD_BUTT) {
-        record->record_ = std::make_shared<ApplicationDefinedRecord>(APPLICATION_DEFINED_RECORD, recordValue);
+        record->record_ = std::make_shared<ApplicationDefinedRecord>(APPLICATION_DEFINED_RECORD, obj);
         record->record_->SetUtdId(typeId);
     } else {
-        record->record_->AddEntry(typeId, std::move(recordValue));
+        record->record_->AddEntry(typeId, obj);
     }
     record->recordDataLen = count;
     return UDMF_E_OK;
 }
 
-static int GetValueFromUdsArrayBuffer(OH_UdmfRecord *record, const char *typeId, ValueType value)
-{
-    OH_UdsArrayBuffer *buffer = OH_UdsArrayBuffer_Create();
-    buffer->obj = std::get<std::shared_ptr<Object>>(value);
-
-    int ret = OH_UdsArrayBuffer_GetData(buffer, &record->recordData, &record->recordDataLen);
-    if (ret != UDMF_E_OK) {
-        LOG_ERROR(UDMF_CAPI, "get data from buffer failed. ret: %{public}d", ret);
-        return ret;
-    }
-    record->lastType = const_cast<char*>(typeId);
-    return UDMF_E_OK;
-}
-
 static int GetValueFromUint8Array(OH_UdmfRecord *record, const char *typeId, ValueType value)
 {
-    auto recordValue = std::get_if<std::vector<uint8_t>>(&value);
-    if (recordValue == nullptr) {
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        LOG_ERROR(UDMF_CAPI, "valueType is not object sptr!");
         return UDMF_ERR;
     }
-    record->recordDataLen = recordValue->size();
+    auto obj = std::get<std::shared_ptr<Object>>(value);
+    if (obj == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "object is nullptr!");
+        return UDMF_ERR;
+    }
+    std::vector<uint8_t> recordValue;
+    int recordDataLen;
+    obj->GetValue(ARRAY_BUFFER, recordValue);
+    obj->GetValue(ARRAY_BUFFER_LENGTH, recordDataLen);
+    record->recordDataLen = recordValue.size();
     if (record->recordDataLen > MAX_RECORDS_SIZE) {
         LOG_INFO(UDMF_CAPI, "data size exceeds maximum size");
         return UDMF_ERR;
@@ -473,7 +473,7 @@ static int GetValueFromUint8Array(OH_UdmfRecord *record, const char *typeId, Val
     if (record->recordData == nullptr) {
         return UDMF_ERR;
     }
-    auto err = memcpy_s(record->recordData, record->recordDataLen, recordValue->data(), record->recordDataLen);
+    auto err = memcpy_s(record->recordData, record->recordDataLen, recordValue.data(), record->recordDataLen);
     if (err != EOK) {
         LOG_ERROR(UDMF_CAPI, "memcpy error! type:%{public}s", typeId);
         return UDMF_ERR;
@@ -487,7 +487,6 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* record, const char* typeId, uns
     if (!IsUnifiedRecordValid(record) || typeId == nullptr || entry == nullptr || count == nullptr) {
         return UDMF_E_INVALID_PARAM;
     }
-
     std::lock_guard<std::mutex> lock(record->mutex);
     if (!record->record_->HasType(typeId)) {
         LOG_ERROR(UDMF_CAPI, "no type:%{public}s", typeId);
@@ -499,20 +498,13 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* record, const char* typeId, uns
         *count = record->recordDataLen;
         return UDMF_E_OK;
     }
-    if (record->recordData != nullptr) {
-        delete[] record->recordData;
-        record->recordData = nullptr;
-    }
+    record->record_->InitObject();
     auto value = record->record_->GetEntry(typeId);
-
-    int result = UDMF_ERR;
-    if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
-        result = GetValueFromUdsArrayBuffer(record, typeId, value);
-    } else if (std::holds_alternative<std::vector<uint8_t>>(value)) {
-        result = GetValueFromUint8Array(record, typeId, value);
-    } else {
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
         LOG_ERROR(UDMF_CAPI, "Not contains right data type.");
+        return UDMF_ERR;
     }
+    auto result = GetValueFromUint8Array(record, typeId, value);
     if (result != UDMF_E_OK) {
         LOG_ERROR(UDMF_CAPI, "Get value from valueType failed. typeId: %{public}s, result: %{public}d", typeId, result);
         return result;

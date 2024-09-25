@@ -16,10 +16,10 @@
 
 #include "system_defined_pixelmap.h"
 #include "logger.h"
+#include "udmf_meta.h"
 
 namespace OHOS {
 namespace UDMF {
-
 SystemDefinedPixelMap::SystemDefinedPixelMap()
 {
     SetType(SYSTEM_DEFINED_PIXEL_MAP);
@@ -37,8 +37,12 @@ SystemDefinedPixelMap::SystemDefinedPixelMap(UDType type, ValueType value) : Sys
     if (std::holds_alternative<std::vector<uint8_t>>(value)) {
         rawData_ = std::get<std::vector<uint8_t>>(value);
         return;
-    }
-    if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+    } else if (std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(value)) {
+        auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value);
+        if (!pixelMap->EncodeTlv(rawData_)) {
+            LOG_ERROR(UDMF_KITS_INNER, "pixelMap encode fail!");
+        }
+    } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
         auto it = object->value_.find(PIXEL_MAP);
         hasObject_ = true;
@@ -94,10 +98,10 @@ void SystemDefinedPixelMap::InitObject()
         } else {
             object->value_[PIXEL_MAP] = pixelMap;
         }
+        object->value_[UNIFORM_DATA_TYPE] = UDMF_META_OPENHARMONY_PIXEL_MAP;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_["VALUE_TYPE"] = value;
+        object->value_[VALUE_TYPE] = value;
     }
 }
-
 } // namespace UDMF
 } // namespace OHOS

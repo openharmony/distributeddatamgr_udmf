@@ -37,8 +37,6 @@ public:
 
     static bool CheckValue(const ValueType &value);
 private:
-    constexpr static const char *HTML_CONTENT = "htmlContent";
-    constexpr static const char *PLAINT_CONTENT = "plainContent";
     std::string htmlContent_;
     std::string plainContent_;
 };

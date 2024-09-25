@@ -41,7 +41,7 @@ void UdmfConversion::SetValueWhenNotUds(std::shared_ptr<UnifiedRecord> record)
         return;
     }
     auto object = std::get<std::shared_ptr<Object>>(record->GetValue());
-    auto it = object->value_.find("VALUE_TYPE");
+    auto it = object->value_.find(VALUE_TYPE);
     if (it == object->value_.end()) {
         return;
     }

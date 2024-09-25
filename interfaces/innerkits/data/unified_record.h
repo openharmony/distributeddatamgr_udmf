@@ -62,8 +62,6 @@ public:
     virtual void InitObject();
     bool HasObject();
 protected:
-    static constexpr const char *UNIFORM_DATA_TYPE = "uniformDataType";
-    static constexpr const char *DETAILS = "details";
     UDType dataType_;
     ValueType value_;
     bool hasObject_ = false;

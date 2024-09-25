@@ -454,9 +454,11 @@ void OH_UdsPixelMap_GetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelm
         return;
     }
     auto pixelMap = pThis->GetUdsValue<std::shared_ptr<OHOS::Media::PixelMap>>(PIXEL_MAP);
-    if (pixelMap != nullptr) {
-        *pixelmapNative = OH_PixelmapNative(*pixelMap);
+    if (pixelMap == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Get pixelMap value is null.");
+        return;
     }
+    *pixelmapNative = OH_PixelmapNative(*pixelMap);
 }
 
 int OH_UdsPixelMap_SetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelmapNative)
