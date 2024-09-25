@@ -42,7 +42,9 @@ namespace UDMF {
         BOOLEAN = 3,
         STRING = 4,
         BYTEARRAY = 5,
-        PIXELMAP = 6
+        PIXELMAP = 6,
+        NULLTAG = 7,
+        UNDEFINED = 8
     };
 
     class CUnifiedRecord : public OHOS::FFI::FFIData {
