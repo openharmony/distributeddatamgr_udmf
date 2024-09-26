@@ -132,7 +132,7 @@ bool CustomUtdStore::InstallCustomUtds(const std::string &bundleName, const std:
     std::vector<TypeDescriptorCfg> presetTypes = PresetTypeDescriptors::GetInstance().GetPresetTypes();
 
     if (!UtdCfgsChecker::GetInstance().CheckTypeDescriptors(
-            typeCfgs, presetTypes, customTyepCfgs, bundleName)) {
+        typeCfgs, presetTypes, customTyepCfgs, bundleName)) {
         LOG_ERROR(UDMF_CLIENT, "check type descriptors failed, bundleName:%{public}s", bundleName.c_str());
         return false;
     }

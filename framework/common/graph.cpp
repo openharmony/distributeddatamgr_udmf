@@ -18,7 +18,8 @@
 namespace OHOS {
 namespace UDMF {
 Graph::Graph(uint32_t vertexNum, const std::map<std::string, uint32_t> &typeIdIndex)
-    : vertexNum_(vertexNum), typeIdIndex_(typeIdIndex) {
+    : vertexNum_(vertexNum), typeIdIndex_(typeIdIndex)
+{
     for (uint32_t node = 0; node < vertexNum_; node++) {
         adjList_.push_back({node, nullptr});
     }

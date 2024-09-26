@@ -30,8 +30,10 @@ public:
     static CustomUtdStore &GetInstance();
     std::vector<TypeDescriptorCfg> GetTypeCfgs(const std::string &cfgFilePath);
     int32_t SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes, const std::string &cfgFilePath);
-    bool InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, const std::string &path, std::vector<TypeDescriptorCfg> &customTyepCfgs);
-    bool UninstallCustomUtds(const std::string &bundleName, const std::string &path, std::vector<TypeDescriptorCfg> &customTyepCfgs);
+    bool InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, const std::string &path,
+        std::vector<TypeDescriptorCfg> &customTyepCfgs);
+    bool UninstallCustomUtds(const std::string &bundleName, const std::string &path,
+        std::vector<TypeDescriptorCfg> &customTyepCfgs);
 private:
     CustomUtdStore();
     ~CustomUtdStore();

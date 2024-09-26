@@ -129,13 +129,18 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
     }
     {
         std::shared_lock<std::shared_mutex> guard(utdMutex_);
+        bool found = false;
         for (const auto &utdTypeCfg : descriptorCfgs_) {
             for (auto fileEx : utdTypeCfg.filenameExtensions) {
                 std::transform(fileEx.begin(), fileEx.end(), fileEx.begin(), ::tolower);
                 if (fileEx == fileExtension) {
                     typeId = utdTypeCfg.typeId;
+                    found = true;
                     break;
                 }
+            }
+            if (found) {
+                break;
             }
         }
     }
@@ -179,7 +184,7 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
             for (auto fileEx : utdTypeCfg.filenameExtensions) {
                 std::transform(fileEx.begin(), fileEx.end(), fileEx.begin(), ::tolower);
                 if (fileEx == fileExtension) {
-                    typeIds.push_back(utdTypeCfg.typeId);
+                    typeIdsInCfg.push_back(utdTypeCfg.typeId);
                     break;
                 }
             }
