@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace UDMF {
-constexpr const char *TYPE_ID_REGEX = "[a-zA-Z0-9/.-]+$";
+constexpr const char *TYPE_ID_REGEX = R"((\.[A-Za-z\d-]+)+)";
 constexpr const char FILE_EXTENSION_PREFIX = '.';
 constexpr const int32_t MAX_UTD_SIZE = 50;
 
