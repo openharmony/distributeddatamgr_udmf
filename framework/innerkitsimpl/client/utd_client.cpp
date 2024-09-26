@@ -134,7 +134,7 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
         for (const auto &utdTypeCfg : descriptorCfgs_) {
             for (auto fileEx : utdTypeCfg.filenameExtensions) {
                 std::transform(fileEx.begin(), fileEx.end(), fileEx.begin(), ::tolower);
-                if (fileEx == fileExtension) {
+                if (fileEx == lowerFileExtension) {
                     typeId = utdTypeCfg.typeId;
                     found = true;
                     break;
@@ -184,7 +184,7 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
         for (const auto &utdTypeCfg : descriptorCfgs_) {
             for (auto fileEx : utdTypeCfg.filenameExtensions) {
                 std::transform(fileEx.begin(), fileEx.end(), fileEx.begin(), ::tolower);
-                if (fileEx == fileExtension) {
+                if (fileEx == lowerFileExtension) {
                     typeIdsInCfg.push_back(utdTypeCfg.typeId);
                     break;
                 }
@@ -396,15 +396,15 @@ void UtdClient::InstallCustomUtds(const std::string &bundleName, const std::stri
             bundleName.c_str(), user);
         return;
     }
-    if (jsonStr.empty()) {
-        return;
-    }
-    if (!CustomUtdStore::GetInstance().InstallCustomUtds(bundleName, jsonStr, path, customTyepCfgs)) {
-        LOG_ERROR(UDMF_CLIENT, "no custom utd installed. bundleName:%{public}s, user:%{public}d",
-            bundleName.c_str(), user);
-        return;
-    }
     UpdateGraph(customTyepCfgs);
+    if (!jsonStr.empty()) {
+        if (!CustomUtdStore::GetInstance().InstallCustomUtds(bundleName, jsonStr, path, customTyepCfgs)) {
+            LOG_ERROR(UDMF_CLIENT, "no custom utd installed. bundleName:%{public}s, user:%{public}d",
+                bundleName.c_str(), user);
+            return;
+        }
+        UpdateGraph(customTyepCfgs);
+    }
 }
 
 void UtdClient::UninstallCustomUtds(const std::string &bundleName, int32_t user)
@@ -415,15 +415,12 @@ void UtdClient::UninstallCustomUtds(const std::string &bundleName, int32_t user)
     LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
     std::string path = CUSTOM_UTD_SA_DIR + std::to_string(user) + CUSTOM_UTD_SA_SUB_DIR;
     std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetTypeCfgs(path);
-    const auto customUtdSize = customTyepCfgs.size();
     if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, path, customTyepCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
             bundleName.c_str(), user);
         return;
     }
-    if (customTyepCfgs.size() != customUtdSize) {
-        UpdateGraph(customTyepCfgs);
-    }
+    UpdateGraph(customTyepCfgs);
 }
 
 void UtdClient::UpdateGraph(const std::vector<TypeDescriptorCfg> &customTyepCfgs)
