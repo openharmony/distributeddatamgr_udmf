@@ -77,10 +77,10 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
         inputTypeCfgs.insert(inputTypeCfgs.end(), typeCfgs.second.begin(), typeCfgs.second.end());
     }
     for (TypeDescriptorCfg &typeCfg : inputTypeCfgs) {
-        for (std::string filename : typeCfg.filenameExtensions) {
-            if (filename.empty() || filename[0] != FILE_EXTENSION_PREFIX) {
+        for (std::string filenames : typeCfg.filenameExtensions) {
+            if (filenames.empty() || filenames[0] != FILE_EXTENSION_PREFIX) {
                 LOG_ERROR(UDMF_CLIENT, "Extension not valid, extension: %{public}s, bundleName: %{public}s.",
-                    filename.c_str(), bundleName.c_str());
+                    filenames.c_str(), bundleName.c_str());
                 return false;
             }
         }

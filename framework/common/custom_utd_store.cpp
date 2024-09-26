@@ -76,7 +76,9 @@ int32_t CustomUtdStore::SavaCfgFile(const std::string &jsonData, const std::stri
     std::ofstream ofs;
     LOG_DEBUG(UDMF_CLIENT, "set cfg start, path:%{public}s ", cfgFilePath.c_str());
     ofs.open(cfgFilePath, 0x02);
-    LOG_DEBUG(UDMF_CLIENT, "set cfg, is_open= %{public}d", ofs.is_open());
+    if (!ofs.is_open()) {
+        LOG_ERROR(UDMF_CLIENT, "open cfg failed, path:%{public}s", cfgFilePath.c_str());
+    }
     ofs << jsonData << std::endl;
     ofs.close();
     LOG_DEBUG(UDMF_CLIENT, "set cfg end.");
@@ -119,44 +121,34 @@ bool CustomUtdStore::CreateDirectory(const std::string &path) const
     return false;
 }
 
-bool CustomUtdStore::InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user, std::vector<TypeDescriptorCfg> &customTyepCfgs)
+bool CustomUtdStore::InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr,
+    const std::string &path, std::vector<TypeDescriptorCfg> &customTyepCfgs)
 {
-    // new utd
     CustomUtdCfgs typeCfgs;
     if (!utdJsonParser_.ParseUserCustomUtdJson(jsonStr, typeCfgs.first, typeCfgs.second)) {
-        LOG_ERROR(UDMF_CLIENT, "Parse json failed. bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+        LOG_ERROR(UDMF_CLIENT, "Parse json failed. bundleName:%{public}s", bundleName.c_str());
         return false;
     }
-    // preset utd
     std::vector<TypeDescriptorCfg> presetTypes = PresetTypeDescriptors::GetInstance().GetPresetTypes();
-    // file utd
-    std::string path = CUSTOM_UTD_PATH + std::to_string(user) + CUSTOM_UTD_FILE;
-    if (customTyepCfgs.empty()) {
-        customTyepCfgs = GetTypeCfgs(path);
-    }
-    // check
+
     if (!UtdCfgsChecker::GetInstance().CheckTypeDescriptors(
             typeCfgs, presetTypes, customTyepCfgs, bundleName)) {
-        LOG_ERROR(UDMF_CLIENT, "check type descriptors failed, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+        LOG_ERROR(UDMF_CLIENT, "check type descriptors failed, bundleName:%{public}s", bundleName.c_str());
         return false;
     }
+
     ProcessUtdForSave(typeCfgs, customTyepCfgs, bundleName);
-    // save
     if (CustomUtdStore::GetInstance().SaveTypeCfgs(customTyepCfgs, path) != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s, user:%{public}d",
-            bundleName.c_str(), user);
+        LOG_ERROR(UDMF_CLIENT, "Save failed, bundleName: %{public}s", bundleName.c_str());
         return false;
     }
     return true;
 }
 
-bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, int32_t user, std::vector<TypeDescriptorCfg> &customTyepCfgs)
+bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, const std::string &path,
+    std::vector<TypeDescriptorCfg> &customTyepCfgs)
 {
-    // file utd
-    std::string path = CUSTOM_UTD_PATH + std::to_string(user) + CUSTOM_UTD_FILE;
-    customTyepCfgs = CustomUtdStore::GetInstance().GetTypeCfgs(path);
     const auto customUtdSize = customTyepCfgs.size();
-
     for (auto iter = customTyepCfgs.begin(); iter != customTyepCfgs.end();) {
         auto it = find (iter->installerBundles.begin(), iter->installerBundles.end(), bundleName);
         if (it != iter->installerBundles.end()) {
@@ -170,8 +162,7 @@ bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, int32_t 
     }
     std::vector<TypeDescriptorCfg> presetTypes = PresetTypeDescriptors::GetInstance().GetPresetTypes();
     if (!UtdCfgsChecker::GetInstance().CheckBelongingToTypes(customTyepCfgs, presetTypes)) {
-        LOG_ERROR(UDMF_CLIENT, "belongingToTypes check failed. bundleName:%{public}s, user:%{public}d",
-            bundleName.c_str(), user);
+        LOG_ERROR(UDMF_CLIENT, "belongingToTypes check failed. bundleName:%{public}s", bundleName.c_str());
         return false;
     }
     // save
@@ -179,8 +170,7 @@ bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, int32_t 
         return true;
     }
     if (CustomUtdStore::GetInstance().SaveTypeCfgs(customTyepCfgs, path) != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s, user:%{public}d",
-            bundleName.c_str(), user);
+        LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s", bundleName.c_str());
         return false;
     }
     return true;

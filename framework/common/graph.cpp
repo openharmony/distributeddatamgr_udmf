@@ -12,16 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#define LOG_TAG "Graph"
 #include "graph.h"
+#include "logger.h"
 namespace OHOS {
 namespace UDMF {
 Graph::Graph(uint32_t vertexNum, const std::map<std::string, uint32_t> &typeIdIndex)
     : vertexNum_(vertexNum), typeIdIndex_(typeIdIndex) {
-  for (uint32_t node = 0; node < vertexNum_; node++) {
-    adjList_.push_back({node, nullptr});
-  }
-  visited_.resize(vertexNum_);
-  fill(visited_.begin(), visited_.end(), 0);
+    for (uint32_t node = 0; node < vertexNum_; node++) {
+        adjList_.push_back({node, nullptr});
+    }
+    visited_.resize(vertexNum_);
+    fill(visited_.begin(), visited_.end(), 0);
 }
 
 Graph::~Graph()
@@ -41,8 +43,8 @@ void Graph::AddEdge(const std::string &startNode, const std::string &endNode)
     int32_t start = GetIndex(startNode);
     int32_t end = GetIndex(endNode);
     if (start < 0 || end < 0) {
-        // LOG_WARN(UDMF_CLIENT, "abnormal edge, startNode:%{public}s, endNode:%{public}s. ",
-        //          startNode.c_str(), endNode.c_str());
+        LOG_WARN(UDMF_CLIENT, "abnormal edge, startNode:%{public}s, endNode:%{public}s. ",
+                 startNode.c_str(), endNode.c_str());
         return;
     }
     AddEdge(start, end);
@@ -108,7 +110,7 @@ bool Graph::DfsUnconnectedGraph(Action action)
 bool Graph::IsValidType(const std::string &node)
 {
     if (typeIdIndex_.find(node) == typeIdIndex_.end()) {
-        // LOG_ERROR(UDMF_CLIENT, "invalid typeId. typeId:%{public}s ", node.c_str());
+        LOG_ERROR(UDMF_CLIENT, "invalid typeId. typeId:%{public}s ", node.c_str());
         return false;
     }
     return true;
@@ -125,7 +127,7 @@ int32_t Graph::GetIndex(const std::string &node)
 
 bool Graph::IsDAG()
 {
-    return DfsUnconnectedGraph([&](uint32_t currNode) -> bool {return false; });
+    return DfsUnconnectedGraph([&](uint32_t currNode) -> bool { return false; });
 }
 } // namespace UDMF
 } // namespace OHOS

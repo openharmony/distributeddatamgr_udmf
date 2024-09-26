@@ -34,6 +34,7 @@ UtdGraph &UtdGraph::GetInstance()
 
 bool UtdGraph::IsValidType(const std::string &node)
 {
+    std::unique_lock<std::mutex> lock(graphMutex_);
     return graph_->IsValidType(node);
 }
 
@@ -57,6 +58,7 @@ void UtdGraph::InitUtdGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs
 
 bool UtdGraph::IsLowerLevelType(const std::string &lowerLevelType, const std::string &heigitLevelType)
 {
+    std::unique_lock<std::mutex> lock(graphMutex_);
     bool isFind = false;
     int32_t start = graph_->GetIndex(lowerLevelType);
     int32_t end = graph_->GetIndex(heigitLevelType);
@@ -65,7 +67,6 @@ bool UtdGraph::IsLowerLevelType(const std::string &lowerLevelType, const std::st
     }
     uint32_t uStart = static_cast<uint32_t>(start);
     uint32_t uEnd = static_cast<uint32_t>(end);
-    std::unique_lock<std::mutex> lock(graphMutex_);
     graph_->Dfs(uStart, [&isFind, &uEnd](uint32_t currNode)-> bool {
         if (uEnd == currNode) {
             isFind = true;

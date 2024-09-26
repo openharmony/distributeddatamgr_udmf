@@ -44,9 +44,7 @@ public:
     Status GetUniformDataTypesByMIMEType(const std::string &mimeType, std::vector<std::string> &typeIds,
                                         const std::string &belongsTo = DEFAULT_TYPE_ID);
     Status IsUtd(std::string typeId, bool &result);
-
     void InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user);
-
     void UninstallCustomUtds(const std::string &bundleName, int32_t user);
 
 private:

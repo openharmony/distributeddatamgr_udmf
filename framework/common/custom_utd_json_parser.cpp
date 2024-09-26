@@ -64,7 +64,8 @@ bool CustomUtdJsonParser::ParseUserCustomUtdJson(const std::string &jsonData,
         GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_REFERENCE, typesReference);
     }
     cJSON_Delete(jsonRoot);
-    LOG_DEBUG(UDMF_CLIENT, "DeclarationsSize: %{public}zu, ReferenceSize: %{public}zu", typesDeclarations.size(), typesReference.size());
+    LOG_DEBUG(UDMF_CLIENT, "DeclarationsSize:%{public}zu, ReferenceSize:%{public}zu",
+        typesDeclarations.size(), typesReference.size());
     return true;
 }
 
