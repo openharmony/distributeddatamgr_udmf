@@ -27,6 +27,7 @@ namespace UDMF {
 constexpr const char* CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
 constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/";
 constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/distributeddata/utd/utd-adt.json";
+constexpr const int MAX_UTD_LENGTH = 256;
 
 UtdClient::UtdClient()
 {
@@ -316,7 +317,7 @@ std::vector<std::string> UtdClient::GetTypeIdsFromCfg(const std::string &mimeTyp
 Status UtdClient::IsUtd(std::string typeId, bool &result)
 {
     try {
-        if (typeId.empty()) {
+        if (typeId.empty() || typeId.size() > MAX_UTD_LENGTH) {
             result = false;
             return Status::E_INVALID_PARAMETERS;
         }
@@ -330,8 +331,7 @@ Status UtdClient::IsUtd(std::string typeId, bool &result)
             result = true;
             return Status::E_OK;
         }
-        constexpr const char *customUtdRegexRule =
-            R"(^([A-Za-z][\w]*[A-Za-z\d])(\.([A-Za-z\d]+_?)+[A-Za-z\d]+){2,}(\.[A-Za-z\d]+[-|\.]?[A-Za-z\d]+)+)";
+        constexpr const char *customUtdRegexRule = R"(^([A-Za-z]\w*)(\.\w+)+(\.[A-Za-z\d-]+)+)";
         if (std::regex_match(typeId, std::regex(customUtdRegexRule))) {
             result = true;
             return Status::E_OK;
