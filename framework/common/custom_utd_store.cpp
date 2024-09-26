@@ -148,9 +148,8 @@ bool CustomUtdStore::InstallCustomUtds(const std::string &bundleName, const std:
 bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, const std::string &path,
     std::vector<TypeDescriptorCfg> &customTyepCfgs)
 {
-    const auto customUtdSize = customTyepCfgs.size();
     for (auto iter = customTyepCfgs.begin(); iter != customTyepCfgs.end();) {
-        auto it = find (iter->installerBundles.begin(), iter->installerBundles.end(), bundleName);
+        auto it = find(iter->installerBundles.begin(), iter->installerBundles.end(), bundleName);
         if (it != iter->installerBundles.end()) {
             iter->installerBundles.erase(it);
         }
@@ -164,10 +163,6 @@ bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, const st
     if (!UtdCfgsChecker::GetInstance().CheckBelongingToTypes(customTyepCfgs, presetTypes)) {
         LOG_ERROR(UDMF_CLIENT, "belongingToTypes check failed. bundleName:%{public}s", bundleName.c_str());
         return false;
-    }
-    // save
-    if (customTyepCfgs.size() == customUtdSize) {
-        return true;
     }
     if (CustomUtdStore::GetInstance().SaveTypeCfgs(customTyepCfgs, path) != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s", bundleName.c_str());
