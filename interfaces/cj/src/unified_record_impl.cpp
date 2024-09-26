@@ -65,31 +65,29 @@ namespace UDMF {
     CJValueType CUnifiedRecord::ValueType2CJValueType(ValueType value)
     {
         CJValueType cjvalue;
-        if (auto p = std::get_if<int32_t>(&value)) {
+        if (std::holds_alternative<std::monostate>(value)) {
+            cjvalue.tag = UNDEFINED;
+        } else if (std::holds_alternative<nullptr_t>(value)) {
+            cjvalue.tag = NULLTAG;
+        } else if (auto p = std::get_if<int32_t>(&value)) {
             cjvalue.integer32 = *p;
             cjvalue.tag = INTEGER32;
-        }
-        if (auto p = std::get_if<int64_t>(&value)) {
+        } else if (auto p = std::get_if<int64_t>(&value)) {
             cjvalue.integer64 = *p;
             cjvalue.tag = INTEGER64;
-        }
-        if (auto p = std::get_if<double>(&value)) {
+        } else if (auto p = std::get_if<double>(&value)) {
             cjvalue.dou = *p;
             cjvalue.tag = DOUBLE;
-        }
-        if (auto p = std::get_if<bool>(&value)) {
+        } else if (auto p = std::get_if<bool>(&value)) {
             cjvalue.boolean = *p;
             cjvalue.tag = BOOLEAN;
-        }
-        if (auto p = std::get_if<std::string>(&value)) {
+        } else if (auto p = std::get_if<std::string>(&value)) {
             cjvalue.string = Utils::MallocCString(*p);
             cjvalue.tag = STRING;
-        }
-        if (auto p = std::get_if<std::vector<uint8_t>>(&value)) {
+        } else if (auto p = std::get_if<std::vector<uint8_t>>(&value)) {
             cjvalue.byteArray = VectorToByteArray(*p);
             cjvalue.tag = BYTEARRAY;
-        }
-        if (auto p = std::get_if<std::shared_ptr<OHOS::Media::PixelMap>>(&value)) {
+        } else if (auto p = std::get_if<std::shared_ptr<OHOS::Media::PixelMap>>(&value)) {
             cjvalue.pixelMapId = this->pixelMapId_;
             cjvalue.tag = PIXELMAP;
         }
@@ -132,6 +130,16 @@ namespace UDMF {
                     break;
                 }
                 value = instance->GetRealPixelMap();
+                break;
+            }
+
+            case NULLTAG: {
+                value = nullptr;
+                break;
+            }
+
+            case UNDEFINED: {
+                value = std::monostate();
                 break;
             }
             
