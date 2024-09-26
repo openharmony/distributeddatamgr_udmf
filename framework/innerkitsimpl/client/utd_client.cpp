@@ -15,9 +15,6 @@
 #define LOG_TAG "UtdClient"
 #include <regex>
 #include <thread>
-#include "common_event_manager.h"
-#include "common_event_subscriber.h"
-#include "common_event_support.h"
 #include "utd_client.h"
 #include "logger.h"
 #include "utd_graph.h"
@@ -31,20 +28,9 @@ constexpr const char* CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
 constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/";
 constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/distributeddata/utd/utd-adt.json";
 
-class UtdChangeSubscriber final : public EventFwk::CommonEventSubscriber {
-public:
-    explicit UtdChangeSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo,
-                                const std::function<void()> &callback);
-    virtual ~UtdChangeSubscriber() = default;
-    void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
-private:
-    std::function<void()> callback_;
-};
-
 UtdClient::UtdClient()
 {
     Init();
-    SubscribeUtdChange();
     LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
 }
 
@@ -143,11 +129,17 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
     }
     {
         std::shared_lock<std::shared_mutex> guard(utdMutex_);
+        bool found = false;
         for (const auto &utdTypeCfg : descriptorCfgs_) {
-            std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
-            if (find(fileExtensions.begin(), fileExtensions.end(), lowerFileExtension) != fileExtensions.end() ||
-                find(fileExtensions.begin(), fileExtensions.end(), fileExtension) != fileExtensions.end()) {
-                typeId = utdTypeCfg.typeId;
+            for (auto fileEx : utdTypeCfg.filenameExtensions) {
+                std::transform(fileEx.begin(), fileEx.end(), fileEx.begin(), ::tolower);
+                if (fileEx == fileExtension) {
+                    typeId = utdTypeCfg.typeId;
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
                 break;
             }
         }
@@ -189,9 +181,12 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
     {
         std::shared_lock<std::shared_mutex> guard(utdMutex_);
         for (const auto &utdTypeCfg : descriptorCfgs_) {
-            std::vector<std::string> fileExtensions = utdTypeCfg.filenameExtensions;
-            if (find(fileExtensions.begin(), fileExtensions.end(), lowerFileExtension) != fileExtensions.end()) {
-                typeIdsInCfg.push_back(utdTypeCfg.typeId);
+            for (auto fileEx : utdTypeCfg.filenameExtensions) {
+                std::transform(fileEx.begin(), fileEx.end(), fileEx.begin(), ::tolower);
+                if (fileEx == fileExtension) {
+                    typeIdsInCfg.push_back(utdTypeCfg.typeId);
+                    break;
+                }
             }
         }
     }
@@ -369,7 +364,7 @@ std::string UtdClient::GetCustomUtdPath()
     }
     int32_t userId = DEFAULT_USER_ID;
     if (GetCurrentActiveUserId(userId) != Status::E_OK) {
-        return "";
+        userId = DEFAULT_USER_ID;
     }
     std::string customUtdSaPath = std::string(CUSTOM_UTD_SA_DIR) +
                                   std::to_string(userId) + std::string(CUSTOM_UTD_SA_SUB_DIR);
@@ -388,35 +383,59 @@ Status UtdClient::GetCurrentActiveUserId(int32_t& userId)
     return Status::E_OK;
 }
 
-void UtdClient::SubscribeUtdChange()
+void UtdClient::InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user)
 {
     if (IsHapTokenType()) {
         return;
     }
-    LOG_INFO(UDMF_CLIENT, "subscribe utd change callback.");
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED);
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED);
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
-    EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
-    auto updateTask = []() {
-        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-        UtdClient::GetInstance().Init();
-    };
-    subscriber_ = std::make_shared<UtdChangeSubscriber>(subscribeInfo, updateTask);
-    (void)EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber_);
+    LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+    std::string path = CUSTOM_UTD_SA_DIR + std::to_string(user) + CUSTOM_UTD_SA_SUB_DIR;
+    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetTypeCfgs(path);
+    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, path, customTyepCfgs)) {
+        LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
+            bundleName.c_str(), user);
+        return;
+    }
+    if (jsonStr.empty()) {
+        return;
+    }
+    if (!CustomUtdStore::GetInstance().InstallCustomUtds(bundleName, jsonStr, path, customTyepCfgs)) {
+        LOG_ERROR(UDMF_CLIENT, "no custom utd installed. bundleName:%{public}s, user:%{public}d",
+            bundleName.c_str(), user);
+        return;
+    }
+    UpdateGraph(customTyepCfgs);
 }
 
-UtdChangeSubscriber::UtdChangeSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo,
-    const std::function<void()> &callback)
-    : EventFwk::CommonEventSubscriber(subscribeInfo), callback_(callback)
+void UtdClient::UninstallCustomUtds(const std::string &bundleName, int32_t user)
 {
+    if (IsHapTokenType()) {
+        return;
+    }
+    LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+    std::string path = CUSTOM_UTD_SA_DIR + std::to_string(user) + CUSTOM_UTD_SA_SUB_DIR;
+    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetTypeCfgs(path);
+    const auto customUtdSize = customTyepCfgs.size();
+    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, path, customTyepCfgs)) {
+        LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
+            bundleName.c_str(), user);
+        return;
+    }
+    if (customTyepCfgs.size() != customUtdSize) {
+        UpdateGraph(customTyepCfgs);
+    }
 }
 
-void UtdChangeSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
+void UtdClient::UpdateGraph(const std::vector<TypeDescriptorCfg> &customTyepCfgs)
 {
-    LOG_INFO(UDMF_CLIENT, "start.");
-    std::thread(callback_).detach();
+    std::vector<TypeDescriptorCfg> allTypeCfgs = PresetTypeDescriptors::GetInstance().GetPresetTypes();
+    allTypeCfgs.insert(allTypeCfgs.end(), customTyepCfgs.begin(), customTyepCfgs.end());
+    LOG_INFO(UDMF_CLIENT, "customTyepSize:%{public}zu, allTypeSize:%{public}zu",
+        customTyepCfgs.size(), allTypeCfgs.size());
+    auto graph = UtdGraph::GetInstance().ConstructNewGraph(allTypeCfgs);
+    std::unique_lock<std::shared_mutex> lock(utdMutex_);
+    UtdGraph::GetInstance().Update(std::move(graph));
+    descriptorCfgs_ = allTypeCfgs;
 }
 } // namespace UDMF
 } // namespace OHOS

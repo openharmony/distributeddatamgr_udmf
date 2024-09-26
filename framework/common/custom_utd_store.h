@@ -30,13 +30,17 @@ public:
     static CustomUtdStore &GetInstance();
     std::vector<TypeDescriptorCfg> GetTypeCfgs(const std::string &cfgFilePath);
     int32_t SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes, const std::string &cfgFilePath);
-
+    bool InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, const std::string &path,
+        std::vector<TypeDescriptorCfg> &customTyepCfgs);
+    bool UninstallCustomUtds(const std::string &bundleName, const std::string &path,
+        std::vector<TypeDescriptorCfg> &customTyepCfgs);
 private:
     CustomUtdStore();
     ~CustomUtdStore();
     int32_t SavaCfgFile(const std::string &jsonData, const std::string &cfgFilePath);
     bool CreateDirectory(const std::string &path) const;
-
+    void ProcessUtdForSave(const CustomUtdCfgs &utdTypes, std::vector<TypeDescriptorCfg> &customTyepCfgs,
+        const std::string &bundleName);
     CustomUtdJsonParser utdJsonParser_;
 };
 } // namespace UDMF

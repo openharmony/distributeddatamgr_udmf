@@ -44,6 +44,8 @@ public:
     Status GetUniformDataTypesByMIMEType(const std::string &mimeType, std::vector<std::string> &typeIds,
                                         const std::string &belongsTo = DEFAULT_TYPE_ID);
     Status IsUtd(std::string typeId, bool &result);
+    void InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user);
+    void UninstallCustomUtds(const std::string &bundleName, int32_t user);
 
 private:
     UtdClient();
@@ -59,10 +61,9 @@ private:
     Status GetFlexibleTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
     std::string GetTypeIdFromCfg(const std::string &mimeType);
     std::vector<std::string> GetTypeIdsFromCfg(const std::string &mimeType);
-    void SubscribeUtdChange();
+    void UpdateGraph(const std::vector<TypeDescriptorCfg> &customTyepCfgs);
 
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
-    std::shared_ptr<UtdChangeSubscriber> subscriber_;
     std::shared_mutex utdMutex_;
 };
 } // namespace UDMF
