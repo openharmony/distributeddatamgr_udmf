@@ -24,14 +24,18 @@
 #include "os_account_manager.h"
 namespace OHOS {
 namespace UDMF {
-constexpr const char* CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
-constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/";
-constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/distributeddata/utd/utd-adt.json";
 constexpr const int MAX_UTD_LENGTH = 256;
 
 UtdClient::UtdClient()
 {
-    Init();
+    if(!Init()) {
+        LOG_WARN(UDMF_CLIENT, "construct UtdClient failed, try again.");
+        auto updateTask = []() {
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+            UtdClient::GetInstance().Init();
+        };
+        std::thread(updateTask).detach();
+    }
     LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
 }
 
@@ -45,21 +49,27 @@ UtdClient &UtdClient::GetInstance()
     return *instance;
 }
 
-void UtdClient::Init()
+bool UtdClient::Init()
 {
+    bool result = true;
     std::unique_lock<std::shared_mutex> lock(utdMutex_);
     descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
-    std::string customUtdPath = GetCustomUtdPath();
-    if (!customUtdPath.empty()) {
-        std::vector<TypeDescriptorCfg> customTypes =
-            CustomUtdStore::GetInstance().GetTypeCfgs(customUtdPath);
-        LOG_INFO(UDMF_CLIENT, "get customUtd. path:%{public}s, size:%{public}zu",
-                 customUtdPath.c_str(), customTypes.size());
-        if (!customTypes.empty()) {
-            descriptorCfgs_.insert(descriptorCfgs_.end(), customTypes.begin(), customTypes.end());
+    std::vector<TypeDescriptorCfg> customTypes;
+    if (IsHapTokenType()) {
+        customTypes = CustomUtdStore::GetInstance().GetHapTypeCfgs();
+    } else {
+        int32_t userId = DEFAULT_USER_ID;
+        if (!GetCurrentActiveUserId(userId)) {
+            result = false;
         }
+        customTypes = CustomUtdStore::GetInstance().GetTypeCfgs(userId);
+    }
+    LOG_INFO(UDMF_CLIENT, "get customUtd, size:%{public}zu", customTypes.size());
+    if (!customTypes.empty()) {
+        descriptorCfgs_.insert(descriptorCfgs_.end(), customTypes.begin(), customTypes.end());
     }
     UtdGraph::GetInstance().InitUtdGraph(descriptorCfgs_);
+    return result;
 }
 
 Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor)
@@ -357,20 +367,6 @@ bool UtdClient::IsHapTokenType()
     return false;
 }
 
-std::string UtdClient::GetCustomUtdPath()
-{
-    if (IsHapTokenType()) {
-        return std::string(CUSTOM_UTD_HAP_DIR);
-    }
-    int32_t userId = DEFAULT_USER_ID;
-    if (GetCurrentActiveUserId(userId) != Status::E_OK) {
-        userId = DEFAULT_USER_ID;
-    }
-    std::string customUtdSaPath = std::string(CUSTOM_UTD_SA_DIR) +
-                                  std::to_string(userId) + std::string(CUSTOM_UTD_SA_SUB_DIR);
-    return customUtdSaPath;
-}
-
 Status UtdClient::GetCurrentActiveUserId(int32_t& userId)
 {
     std::vector<int32_t> localIds;
@@ -389,16 +385,15 @@ void UtdClient::InstallCustomUtds(const std::string &bundleName, const std::stri
         return;
     }
     LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
-    std::string path = CUSTOM_UTD_SA_DIR + std::to_string(user) + CUSTOM_UTD_SA_SUB_DIR;
-    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetTypeCfgs(path);
-    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, path, customTyepCfgs)) {
+    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetTypeCfgs(user);
+    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user, customTyepCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
             bundleName.c_str(), user);
         return;
     }
     UpdateGraph(customTyepCfgs);
     if (!jsonStr.empty()) {
-        if (!CustomUtdStore::GetInstance().InstallCustomUtds(bundleName, jsonStr, path, customTyepCfgs)) {
+        if (!CustomUtdStore::GetInstance().InstallCustomUtds(bundleName, jsonStr, user, customTyepCfgs)) {
             LOG_ERROR(UDMF_CLIENT, "no custom utd installed. bundleName:%{public}s, user:%{public}d",
                 bundleName.c_str(), user);
             return;
@@ -413,9 +408,8 @@ void UtdClient::UninstallCustomUtds(const std::string &bundleName, int32_t user)
         return;
     }
     LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
-    std::string path = CUSTOM_UTD_SA_DIR + std::to_string(user) + CUSTOM_UTD_SA_SUB_DIR;
-    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetTypeCfgs(path);
-    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, path, customTyepCfgs)) {
+    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetTypeCfgs(user);
+    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user, customTyepCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
             bundleName.c_str(), user);
         return;

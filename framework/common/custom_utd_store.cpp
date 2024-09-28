@@ -27,6 +27,10 @@
 namespace OHOS {
 namespace UDMF {
 constexpr const char* UTD_CFG_FILE = "utd-adt.json";
+constexpr const char* CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
+constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/";
+constexpr const char* OLD_CUSTOM_UTD_SA_SUB_DIR = "/distributeddata/utd/";
+constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/utdtypes/utd/";
 
 CustomUtdStore::CustomUtdStore()
 {
@@ -42,8 +46,30 @@ CustomUtdStore &CustomUtdStore::GetInstance()
     return utdCustomPersistence;
 }
 
-std::vector<TypeDescriptorCfg> CustomUtdStore::GetTypeCfgs(const std::string &cfgFilePath)
+std::vector<TypeDescriptorCfg> CustomUtdStore::GetHapTypeCfgs()
 {
+    LOG_DEBUG(UDMF_CLIENT, "get utdcustom from cfg, Path:%{public}s.", CUSTOM_UTD_HAP_DIR);
+    std::string jsonStr;
+    std::ifstream fin(CUSTOM_UTD_HAP_DIR);
+    while (fin.good()) {
+        std::string line;
+        std::getline(fin, line);
+        jsonStr += line;
+    }
+    std::vector<TypeDescriptorCfg> customUtdTypes;
+    utdJsonParser_.ParseStoredCustomUtdJson(jsonStr, customUtdTypes);
+    LOG_DEBUG(UDMF_CLIENT, "GetTypeCfgs, customUtdTypes total:%{public}zu.", customUtdTypes.size());
+    return customUtdTypes;
+}
+
+std::vector<TypeDescriptorCfg> CustomUtdStore::GetTypeCfgs(int32_t userId)
+{
+    std::string path = CUSTOM_UTD_SA_DIR + std::to_string(userId) + CUSTOM_UTD_SA_SUB_DIR;
+    std::string old_path = CUSTOM_UTD_SA_DIR + std::to_string(userId) + OLD_CUSTOM_UTD_SA_SUB_DIR;
+    std::string cfgFilePath = path;
+    if (access(path.c_str(), F_OK) != 0 && access(old_path.c_str(), F_OK) == 0) {
+        cfgFilePath = old_path;
+    }
     LOG_DEBUG(UDMF_CLIENT, "get utdcustom from cfg, Path:%{public}s.", cfgFilePath.c_str());
     std::string jsonStr;
     std::ifstream fin(cfgFilePath);
@@ -58,15 +84,13 @@ std::vector<TypeDescriptorCfg> CustomUtdStore::GetTypeCfgs(const std::string &cf
     return customUtdTypes;
 }
 
-int32_t CustomUtdStore::SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes,
-                                     const std::string &cfgFilePath)
+int32_t CustomUtdStore::SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes, int32_t user)
 {
     LOG_DEBUG(UDMF_CLIENT, "customUtdTypes total:%{public}zu.", customUtdTypes.size());
     std::string jsonData;
-    std::string cfgFileName = UTD_CFG_FILE;
-    std::string cfgFileDir = cfgFilePath.substr(0, cfgFilePath.length() - cfgFileName.length());
+    std::string cfgFileDir = CUSTOM_UTD_SA_DIR + std::to_string(user) + CUSTOM_UTD_SA_SUB_DIR;
     if (utdJsonParser_.ConvertUtdCfgsToJson(customUtdTypes, jsonData) && CreateDirectory(cfgFileDir)) {
-        SavaCfgFile(jsonData, cfgFilePath);
+        SavaCfgFile(jsonData, cfgFileDir.append(UTD_CFG_FILE));
     }
     return 0;
 }
@@ -122,7 +146,7 @@ bool CustomUtdStore::CreateDirectory(const std::string &path) const
 }
 
 bool CustomUtdStore::InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr,
-    const std::string &path, std::vector<TypeDescriptorCfg> &customTyepCfgs)
+    int32_t user, std::vector<TypeDescriptorCfg> &customTyepCfgs)
 {
     CustomUtdCfgs typeCfgs;
     if (!utdJsonParser_.ParseUserCustomUtdJson(jsonStr, typeCfgs.first, typeCfgs.second)) {
@@ -138,14 +162,14 @@ bool CustomUtdStore::InstallCustomUtds(const std::string &bundleName, const std:
     }
 
     ProcessUtdForSave(typeCfgs, customTyepCfgs, bundleName);
-    if (CustomUtdStore::GetInstance().SaveTypeCfgs(customTyepCfgs, path) != E_OK) {
+    if (CustomUtdStore::GetInstance().SaveTypeCfgs(customTyepCfgs, user) != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Save failed, bundleName: %{public}s", bundleName.c_str());
         return false;
     }
     return true;
 }
 
-bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, const std::string &path,
+bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, int32_t user,
     std::vector<TypeDescriptorCfg> &customTyepCfgs)
 {
     for (auto iter = customTyepCfgs.begin(); iter != customTyepCfgs.end();) {
@@ -164,7 +188,7 @@ bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, const st
         LOG_ERROR(UDMF_CLIENT, "belongingToTypes check failed. bundleName:%{public}s", bundleName.c_str());
         return false;
     }
-    if (CustomUtdStore::GetInstance().SaveTypeCfgs(customTyepCfgs, path) != E_OK) {
+    if (CustomUtdStore::GetInstance().SaveTypeCfgs(customTyepCfgs, user) != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s", bundleName.c_str());
         return false;
     }
