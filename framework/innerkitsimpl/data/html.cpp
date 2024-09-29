@@ -14,7 +14,6 @@
  */
 
 #include "html.h"
-#include "udmf_meta.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -94,7 +93,7 @@ void Html::InitObject()
         auto value = value_;
         value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[UNIFORM_DATA_TYPE] = UDMF_META_HTML;
+        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[HTML_CONTENT] = htmlContent_;
         object->value_[PLAIN_CONTENT] = plainContent_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
