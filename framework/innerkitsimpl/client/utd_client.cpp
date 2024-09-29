@@ -28,7 +28,7 @@ constexpr const int MAX_UTD_LENGTH = 256;
 
 UtdClient::UtdClient()
 {
-    if(!Init()) {
+    if (!Init()) {
         LOG_WARN(UDMF_CLIENT, "construct UtdClient failed, try again.");
         auto updateTask = []() {
             std::this_thread::sleep_for(std::chrono::seconds(3));

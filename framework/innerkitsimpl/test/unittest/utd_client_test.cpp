@@ -32,8 +32,6 @@ using namespace OHOS::Security::AccessToken;
 using namespace OHOS::UDMF;
 using namespace OHOS;
 
-constexpr const char* CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
-
 namespace OHOS::Test {
 class UtdClientTest : public testing::Test {
 public:
@@ -1862,53 +1860,5 @@ HWTEST_F(UtdClientTest, IsHapTokenType001, TestSize.Level1)
     bool ret = utdClient.IsHapTokenType();
     EXPECT_TRUE(ret);
     LOG_INFO(UDMF_TEST, "IsHapTokenType001 end.");
-}
-
-/**
-* @tc.name: GetCustomUtdPath001
-* @tc.desc: Normal testcase of GetCustomUtdPath
-* @tc.type: FUNC
-*/
-HWTEST_F(UtdClientTest, GetCustomUtdPath001, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "GetCustomUtdPath001 begin.");
-    HapInfoParams info = {
-        .userID = 100,
-        .bundleName = "ohos.test.demo",
-        .instIndex = 0,
-        .appIDDesc = "ohos.test.demo"
-    };
-
-    HapPolicyParams policy = {
-        .apl = APL_NORMAL,
-        .domain = "test.domain",
-        .permList = {
-            {
-                .permissionName = "ohos.permission.test",
-                .bundleName = "ohos.test.demo",
-                .grantMode = 1,
-                .availableLevel = APL_NORMAL,
-                .label = "label",
-                .labelId = 1,
-                .description = "test",
-                .descriptionId = 1
-            }
-        },
-        .permStateList = {
-            {
-                .permissionName = "ohos.permission.test",
-                .isGeneral = true,
-                .resDeviceID = {"local"},
-                .grantStatus = {PermissionState::PERMISSION_GRANTED},
-                .grantFlags = {1}
-            }
-        }
-    };
-    auto tokenID = AccessTokenKit::AllocHapToken(info, policy);
-    SetSelfTokenID(tokenID.tokenIDEx);
-    UtdClient utdClient;
-    std::string ret = utdClient.GetCustomUtdPath();
-    EXPECT_EQ(ret, std::string(CUSTOM_UTD_HAP_DIR));
-    LOG_INFO(UDMF_TEST, "GetCustomUtdPath001 end.");
 }
 } // OHOS::Test

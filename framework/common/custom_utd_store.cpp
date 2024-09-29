@@ -70,6 +70,7 @@ std::vector<TypeDescriptorCfg> CustomUtdStore::GetTypeCfgs(int32_t userId)
     if (access(path.c_str(), F_OK) != 0 && access(old_path.c_str(), F_OK) == 0) {
         cfgFilePath = old_path;
     }
+    cfgFilePath.append(UTD_CFG_FILE);
     LOG_DEBUG(UDMF_CLIENT, "get utdcustom from cfg, Path:%{public}s.", cfgFilePath.c_str());
     std::string jsonStr;
     std::ifstream fin(cfgFilePath);
