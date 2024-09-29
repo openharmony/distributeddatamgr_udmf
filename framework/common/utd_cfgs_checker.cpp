@@ -78,7 +78,7 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
     }
     for (TypeDescriptorCfg &typeCfg : inputTypeCfgs) {
         for (std::string filenames : typeCfg.filenameExtensions) {
-            if (filenames.empty() || filenames[0] != FILE_EXTENSION_PREFIX) {
+            if (filenames.size() <= 1 || filenames[0] != FILE_EXTENSION_PREFIX) {
                 LOG_ERROR(UDMF_CLIENT, "Extension not valid, extension: %{public}s, bundleName: %{public}s.",
                     filenames.c_str(), bundleName.c_str());
                 return false;

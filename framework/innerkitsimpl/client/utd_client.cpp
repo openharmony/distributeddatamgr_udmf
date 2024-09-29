@@ -59,7 +59,7 @@ bool UtdClient::Init()
         customTypes = CustomUtdStore::GetInstance().GetHapTypeCfgs();
     } else {
         int32_t userId = DEFAULT_USER_ID;
-        if (!GetCurrentActiveUserId(userId)) {
+        if (GetCurrentActiveUserId(userId) != Status::E_OK) {
             result = false;
         }
         customTypes = CustomUtdStore::GetInstance().GetTypeCfgs(userId);
