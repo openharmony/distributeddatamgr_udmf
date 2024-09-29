@@ -16,7 +16,6 @@
 
 #include "system_defined_pixelmap.h"
 #include "logger.h"
-#include "udmf_meta.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -98,7 +97,7 @@ void SystemDefinedPixelMap::InitObject()
         } else {
             object->value_[PIXEL_MAP] = pixelMap;
         }
-        object->value_[UNIFORM_DATA_TYPE] = UDMF_META_OPENHARMONY_PIXEL_MAP;
+        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
         object->value_[VALUE_TYPE] = value;
     }

@@ -14,7 +14,6 @@
  */
 
 #include "system_defined_appitem.h"
-#include "udmf_meta.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -172,7 +171,7 @@ void SystemDefinedAppItem::InitObject()
         auto value = value_;
         value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[UNIFORM_DATA_TYPE] = UDMF_META_OPENHARMONY_APP_ITEM;
+        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[APP_ID] = appId_;
         object->value_[APP_NAME] = appName_;
         object->value_[APP_ICON_ID] = appIconId_;

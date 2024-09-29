@@ -14,7 +14,6 @@
  */
 
 #include "link.h"
-#include "udmf_meta.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -96,7 +95,7 @@ void Link::InitObject()
         auto value = value_;
         value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[UNIFORM_DATA_TYPE] = UDMF_META_HYPERLINK;
+        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[URL] = url_;
         object->value_[DESCRIPTION] = description_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
