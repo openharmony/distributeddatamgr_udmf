@@ -301,8 +301,7 @@ Status UtdClient::IsUtd(std::string typeId, bool &result)
             result = true;
             return Status::E_OK;
         }
-        constexpr const char *customUtdRegexRule =
-            R"(^([A-Za-z][\w]*[A-Za-z\d])(\.([A-Za-z\d]+_?)+[A-Za-z\d]+){2,}(\.[A-Za-z\d]+[-|\.]?[A-Za-z\d]+)+)";
+        constexpr const char *customUtdRegexRule = R"(^([A-Za-z]\w*)(\.\w+)+(\.[A-Za-z\d-]+)+)";
         if (std::regex_match(typeId, std::regex(customUtdRegexRule))) {
             result = true;
             return Status::E_OK;
