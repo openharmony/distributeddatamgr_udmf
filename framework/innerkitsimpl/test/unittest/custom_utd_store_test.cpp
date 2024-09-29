@@ -27,7 +27,7 @@ using namespace testing::ext;
 using namespace OHOS::UDMF;
 using namespace OHOS;
 namespace OHOS::Test {
-constexpr const int32_t user = 1000000;
+constexpr const int32_t USERID = 1000000;
 constexpr const char* TEST_CFG_FILE = "/data/1000000/utd-adt.json";
 constexpr const char* TEST_CFG_DIR = "/data/1000000/";
 
