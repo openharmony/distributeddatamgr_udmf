@@ -2992,7 +2992,7 @@ std::vector<TypeDescriptorCfg> PresetTypeDescriptors::typeDescriptors_ = {
      "JSON5 data interchange format",
      REFERENCE_URL,
      ""},
-     {"com.monkeysaudio.ape-audio",
+    {"com.monkeysaudio.ape-audio",
      {"general.audio"},
      {".ape"},
      {"audio/x-monkeys-audio"},
