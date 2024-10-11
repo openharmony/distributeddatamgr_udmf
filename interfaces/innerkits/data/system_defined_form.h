@@ -41,6 +41,8 @@ public:
     void SetItems(UDDetails &details);
     UDDetails GetItems();
 
+    void InitObject() override;
+
 private:
     int32_t formId_{-1};
     std::string formName_;
@@ -48,11 +50,6 @@ private:
     std::string abilityName_;
     std::string module_;
 
-    constexpr static const char *FORMID = "formId";
-    constexpr static const char *FORMNAME = "formName";
-    constexpr static const char *MODULE = "module";
-    constexpr static const char *BUNDLENAME = "bundleName";
-    constexpr static const char *ABILITYNAME = "abilityName";
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -35,10 +35,10 @@ public:
     std::string GetDescription() const;
     void SetDescription(const std::string &description);
     ValueType GetValue() override;
+    void InitObject() override;
 
     static bool CheckValue(const ValueType &value);
 private:
-    void InitObject();
 
     constexpr static const char *URL = "url";
     constexpr static const char *DESCRIPTION = "description";

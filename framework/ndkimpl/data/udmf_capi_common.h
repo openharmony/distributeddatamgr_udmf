@@ -21,13 +21,16 @@
 #include <mutex>
 #include <cstdint>
 
+# define MAX_GENERAL_ENTRY_SIZE (100 * 1024 * 1024)
+
 struct UdsObject {
     const int64_t cid;
     std::shared_ptr<OHOS::UDMF::Object> obj;
     std::mutex mutex;
     explicit UdsObject(int cid);
-    const char* GetUdsValue(const char* paramName);
-    int SetUdsValue(const char* paramName, const char* pramValue);
+    template<typename T> bool HasObjectKey(const char* paramName);
+    template<typename T> T* GetUdsValue(const char* paramName);
+    template<typename T> int SetUdsValue(const char* paramName, const T pramValue);
 };
 
 enum NdkStructId : std::int64_t {
@@ -39,6 +42,9 @@ enum NdkStructId : std::int64_t {
     UDMF_UNIFIED_DATA_STRUCT_ID,
     UDMF_UNIFIED_RECORD_STRUCT_ID,
     UDMF_UNIFIED_DATA_PROPERTIES_ID,
+    UDS_FILE_URI_STRUCT_ID,
+    UDS_PIXEL_MAP_STRUCT_ID,
+    UDS_ARRAY_BUFFER_STRUCT_ID,
 };
 
 struct OH_Utd {
@@ -68,6 +74,15 @@ struct OH_UdsHtml : public UdsObject {
 struct OH_UdsAppItem : public UdsObject {
     OH_UdsAppItem();
 };
+struct OH_UdsFileUri : public UdsObject {
+    OH_UdsFileUri();
+};
+struct OH_UdsPixelMap : public UdsObject {
+    OH_UdsPixelMap();
+};
+struct OH_UdsArrayBuffer : public UdsObject {
+    OH_UdsArrayBuffer();
+};
 
 struct OH_UdmfRecord {
     const int64_t cid = UDMF_UNIFIED_RECORD_STRUCT_ID;
@@ -76,6 +91,7 @@ struct OH_UdmfRecord {
     unsigned int recordDataLen{0};
     char **typesArray{nullptr};
     unsigned int typesCount{0};
+    char *lastType{nullptr};
     std::mutex mutex;
 };
 
@@ -96,20 +112,8 @@ struct OH_UdmfProperty {
     std::string extraStr;
 };
 
-constexpr const char* UNIFORM_DATA_TYPE = "uniformDataType";
-constexpr const char* CONTENT = "content";
-constexpr const char* ABSTRACT = "abstract";
-constexpr const char* URL = "url";
-constexpr const char* DESCRIPTION = "description";
-constexpr const char* HTML_CONTENT = "htmlContent";
-constexpr const char* PLAIN_CONTENT = "plainContent";
-constexpr const char* APP_ID = "appId";
-constexpr const char* APP_NAME = "appName";
-constexpr const char* APP_ICON_ID = "appIconId";
-constexpr const char* APP_LABEL_ID = "appLabelId";
-constexpr const char* BUNDLE_NAME = "bundleName";
-constexpr const char* ABILITY_NAME = "abilityName";
-
 bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid);
+
+bool IsInvalidUdsObjectByType(const UdsObject* pThis, const OHOS::UDMF::UDType& type);
 
 #endif

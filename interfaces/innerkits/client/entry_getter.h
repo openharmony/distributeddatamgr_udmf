@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,22 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef UDMF_UNIFIED_DATA_PROPERTIES_H
-#define UDMF_UNIFIED_DATA_PROPERTIES_H
 
-#include "want_params.h"
+#ifndef UDMF_ENTRY_GETTER_H
+#define UDMF_ENTRY_GETTER_H
+
 #include "unified_meta.h"
-#include "visibility.h"
+
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT UnifiedDataProperties {
+class EntryGetter {
 public:
-    std::string tag;
-    AAFwk::WantParams extras;
-    ShareOptions shareOptions = CROSS_APP;
-    std::int64_t timestamp;
-    bool isRemote;
+    EntryGetter() = default;
+    virtual ~EntryGetter() = default;
+
+    virtual ValueType GetValueByType(const std::string &utdId) = 0;
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_UNIFIED_DATA_PROPERTIES_H
+#endif // UDMF_ENTRY_GETTER_H

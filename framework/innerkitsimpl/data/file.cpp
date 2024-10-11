@@ -31,6 +31,15 @@ File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
     this->dataType_ = FILE;
     if (std::holds_alternative<std::string>(value)) {
         oriUri_ = std::get<std::string>(value);
+    } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        auto object = std::get<std::shared_ptr<Object>>(value);
+        object->GetValue(ORI_URI, oriUri_);
+        object->GetValue(REMOTE_URI, remoteUri_);
+        std::shared_ptr<Object> detailObj = nullptr;
+        if (object->GetValue(DETAILS, detailObj)) {
+            details_ = ObjectUtils::ConvertToUDDetails(detailObj);
+        }
+        hasObject_ = true;
     }
 }
 
@@ -47,6 +56,10 @@ std::string File::GetUri() const
 void File::SetUri(const std::string &uri)
 {
     this->oriUri_ = uri;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[ORI_URI] = oriUri_;
+    }
 }
 
 std::string File::GetRemoteUri() const
@@ -57,16 +70,39 @@ std::string File::GetRemoteUri() const
 void File::SetRemoteUri(const std::string &uri)
 {
     this->remoteUri_ = uri;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[REMOTE_URI] = remoteUri_;
+    }
 }
 
 void File::SetDetails(UDDetails &variantMap)
 {
     this->details_ = variantMap;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+    }
 }
 
 UDDetails File::GetDetails() const
 {
     return this->details_;
 }
+
+void File::InitObject()
+{
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = value_;
+        value_ = std::make_shared<Object>();
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
+        object->value_[ORI_URI] = oriUri_;
+        object->value_[REMOTE_URI] = remoteUri_;
+        object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        object->value_["VALUE_TYPE"] = value;
+    }
+}
+
 } // namespace UDMF
 } // namespace OHOS

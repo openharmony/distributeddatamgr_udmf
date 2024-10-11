@@ -15,19 +15,50 @@
 #define LOG_TAG "Uds"
 
 #include "uds.h"
-#include <string>
 #include "logger.h"
 #include "utd_common.h"
+#include "unified_meta.h"
 #include "unified_record.h"
 #include "udmf_capi_common.h"
 #include "udmf_meta.h"
 #include "udmf_err_code.h"
+#include "pixel_map.h"
+#include "pixelmap_native_impl.h"
 
 using namespace OHOS::UDMF;
+
+static const char* GetUdsStrValue(UdsObject* pThis, NdkStructId ndkStructId, const char* pramName)
+{
+    if (IsInvalidUdsObjectPtr(pThis, ndkStructId)) {
+        return nullptr;
+    }
+    auto value = pThis->GetUdsValue<std::string>(pramName);
+    return value == nullptr ? nullptr : value->c_str();
+}
 
 bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid)
 {
     return pThis == nullptr || pThis->cid != cid || pThis->obj == nullptr;
+}
+
+bool IsInvalidUdsObjectByType(const UdsObject* pThis, const UDType& type)
+{
+    switch (type) {
+        case PLAIN_TEXT:
+            return IsInvalidUdsObjectPtr(pThis, UDS_PLAIN_TEXT_STRUCT_ID);
+        case HYPERLINK:
+            return IsInvalidUdsObjectPtr(pThis, UDS_HYPERLINK_STRUCT_ID);
+        case HTML:
+            return IsInvalidUdsObjectPtr(pThis, UDS_HTML_STRUCT_ID);
+        case SYSTEM_DEFINED_APP_ITEM:
+            return IsInvalidUdsObjectPtr(pThis, UDS_APP_ITEM_STRUCT_ID);
+        case FILE_URI:
+            return IsInvalidUdsObjectPtr(pThis, UDS_FILE_URI_STRUCT_ID);
+        case SYSTEM_DEFINED_PIXEL_MAP:
+            return IsInvalidUdsObjectPtr(pThis, UDS_PIXEL_MAP_STRUCT_ID);
+        default:
+            return false;
+    }
 }
 
 UdsObject::UdsObject(const int cid) : cid(cid) {}
@@ -40,19 +71,36 @@ OH_UdsHtml::OH_UdsHtml() : UdsObject(NdkStructId::UDS_HTML_STRUCT_ID) {}
 
 OH_UdsAppItem::OH_UdsAppItem() : UdsObject(NdkStructId::UDS_APP_ITEM_STRUCT_ID) {}
 
-const char* UdsObject::GetUdsValue(const char* paramName)
+OH_UdsFileUri::OH_UdsFileUri() : UdsObject(NdkStructId::UDS_FILE_URI_STRUCT_ID) {}
+
+OH_UdsPixelMap::OH_UdsPixelMap() : UdsObject(NdkStructId::UDS_PIXEL_MAP_STRUCT_ID) {}
+
+OH_UdsArrayBuffer::OH_UdsArrayBuffer() : UdsObject(NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID) {}
+
+template<typename T>
+bool UdsObject::HasObjectKey(const char* paramName)
 {
-    if (obj->value_.find(paramName) == obj->value_.end()) {
+    auto it = obj->value_.find(paramName);
+    if (it == obj->value_.end() || !std::holds_alternative<T>(it->second)) {
         LOG_ERROR(UDMF_CAPI, "Don't have property %{public}s.", paramName);
-        return nullptr;
+        return false;
     }
-    return (std::get_if<std::string>(&(obj->value_[paramName])))->c_str();
+    return true;
 }
 
-int UdsObject::SetUdsValue(const char* paramName, const char* pramValue)
+template<typename T>
+T* UdsObject::GetUdsValue(const char* paramName)
 {
-    if (obj->value_.find(paramName) == obj->value_.end()) {
-        LOG_ERROR(UDMF_CAPI, "Can't set property %{public}s.", paramName);
+    if (!HasObjectKey<T>(paramName)) {
+        return nullptr;
+    }
+    return std::get_if<T>(&(obj->value_[paramName]));
+}
+
+template<typename T>
+int UdsObject::SetUdsValue(const char* paramName, const T pramValue)
+{
+    if (!HasObjectKey<T>(paramName)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     std::lock_guard<std::mutex> lock(mutex);
@@ -83,26 +131,17 @@ void OH_UdsPlainText_Destroy(OH_UdsPlainText* pThis)
 
 const char* OH_UdsPlainText_GetType(OH_UdsPlainText* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(UNIFORM_DATA_TYPE);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID, UNIFORM_DATA_TYPE);
 }
 
 const char* OH_UdsPlainText_GetContent(OH_UdsPlainText* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(CONTENT);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID, CONTENT);
 }
 
 const char* OH_UdsPlainText_GetAbstract(OH_UdsPlainText* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(ABSTRACT);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID, ABSTRACT);
 }
 
 int OH_UdsPlainText_SetContent(OH_UdsPlainText* pThis, const char* content)
@@ -110,7 +149,7 @@ int OH_UdsPlainText_SetContent(OH_UdsPlainText* pThis, const char* content)
     if (content == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue(CONTENT, content);
+    return pThis->SetUdsValue<std::string>(CONTENT, content);
 }
 
 int OH_UdsPlainText_SetAbstract(OH_UdsPlainText* pThis, const char* abstract)
@@ -118,7 +157,7 @@ int OH_UdsPlainText_SetAbstract(OH_UdsPlainText* pThis, const char* abstract)
     if (abstract == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue(ABSTRACT, abstract);
+    return pThis->SetUdsValue<std::string>(ABSTRACT, abstract);
 }
 
 OH_UdsHyperlink* OH_UdsHyperlink_Create()
@@ -144,26 +183,17 @@ void OH_UdsHyperlink_Destroy(OH_UdsHyperlink* pThis)
 
 const char* OH_UdsHyperlink_GetType(OH_UdsHyperlink* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HYPERLINK_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(UNIFORM_DATA_TYPE);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_HYPERLINK_STRUCT_ID, UNIFORM_DATA_TYPE);
 }
 
 const char* OH_UdsHyperlink_GetUrl(OH_UdsHyperlink* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HYPERLINK_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(URL);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_HYPERLINK_STRUCT_ID, URL);
 }
 
 const char* OH_UdsHyperlink_GetDescription(OH_UdsHyperlink* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HYPERLINK_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(DESCRIPTION);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_HYPERLINK_STRUCT_ID, DESCRIPTION);
 }
 
 int OH_UdsHyperlink_SetUrl(OH_UdsHyperlink* pThis, const char* url)
@@ -171,7 +201,7 @@ int OH_UdsHyperlink_SetUrl(OH_UdsHyperlink* pThis, const char* url)
     if (url == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HYPERLINK_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue(URL, url);
+    return pThis->SetUdsValue<std::string>(URL, url);
 }
 
 int OH_UdsHyperlink_SetDescription(OH_UdsHyperlink* pThis, const char* description)
@@ -179,7 +209,7 @@ int OH_UdsHyperlink_SetDescription(OH_UdsHyperlink* pThis, const char* descripti
     if (description == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HYPERLINK_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue(DESCRIPTION, description);
+    return pThis->SetUdsValue<std::string>(DESCRIPTION, description);
 }
 
 OH_UdsHtml* OH_UdsHtml_Create()
@@ -205,26 +235,17 @@ void OH_UdsHtml_Destroy(OH_UdsHtml* pThis)
 
 const char* OH_UdsHtml_GetType(OH_UdsHtml* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HTML_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(UNIFORM_DATA_TYPE);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_HTML_STRUCT_ID, UNIFORM_DATA_TYPE);
 }
 
 const char* OH_UdsHtml_GetContent(OH_UdsHtml* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HTML_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(HTML_CONTENT);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_HTML_STRUCT_ID, HTML_CONTENT);
 }
 
 const char* OH_UdsHtml_GetPlainContent(OH_UdsHtml* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HTML_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(PLAIN_CONTENT);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_HTML_STRUCT_ID, PLAIN_CONTENT);
 }
 
 int OH_UdsHtml_SetContent(OH_UdsHtml* pThis, const char* content)
@@ -232,7 +253,7 @@ int OH_UdsHtml_SetContent(OH_UdsHtml* pThis, const char* content)
     if (content == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HTML_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue(HTML_CONTENT, content);
+    return pThis->SetUdsValue<std::string>(HTML_CONTENT, content);
 }
 
 int OH_UdsHtml_SetPlainContent(OH_UdsHtml* pThis, const char* plainContent)
@@ -240,7 +261,7 @@ int OH_UdsHtml_SetPlainContent(OH_UdsHtml* pThis, const char* plainContent)
     if (plainContent == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_HTML_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue(PLAIN_CONTENT, plainContent);
+    return pThis->SetUdsValue<std::string>(PLAIN_CONTENT, plainContent);
 }
 
 OH_UdsAppItem* OH_UdsAppItem_Create()
@@ -270,58 +291,37 @@ void OH_UdsAppItem_Destroy(OH_UdsAppItem* pThis)
 
 const char* OH_UdsAppItem_GetType(OH_UdsAppItem* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(UNIFORM_DATA_TYPE);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID, UNIFORM_DATA_TYPE);
 }
 
 const char* OH_UdsAppItem_GetId(OH_UdsAppItem* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(APP_ID);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID, APP_ID);
 }
 
 const char* OH_UdsAppItem_GetName(OH_UdsAppItem* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(APP_NAME);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID, APP_NAME);
 }
 
 const char* OH_UdsAppItem_GetIconId(OH_UdsAppItem* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(APP_ICON_ID);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID, APP_ICON_ID);
 }
 
 const char* OH_UdsAppItem_GetLabelId(OH_UdsAppItem* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(APP_LABEL_ID);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID, APP_LABEL_ID);
 }
 
 const char* OH_UdsAppItem_GetBundleName(OH_UdsAppItem* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(BUNDLE_NAME);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID, BUNDLE_NAME);
 }
 
 const char* OH_UdsAppItem_GetAbilityName(OH_UdsAppItem* pThis)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
-        return nullptr;
-    }
-    return pThis->GetUdsValue(ABILITY_NAME);
+    return GetUdsStrValue(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID, ABILITY_NAME);
 }
 
 int OH_UdsAppItem_SetId(OH_UdsAppItem* pThis, const char* appId)
@@ -329,7 +329,7 @@ int OH_UdsAppItem_SetId(OH_UdsAppItem* pThis, const char* appId)
     if (appId == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue(APP_ID, appId);
+    return pThis->SetUdsValue<std::string>(APP_ID, appId);
 }
 
 int OH_UdsAppItem_SetName(OH_UdsAppItem* pThis, const char* appName)
@@ -337,7 +337,7 @@ int OH_UdsAppItem_SetName(OH_UdsAppItem* pThis, const char* appName)
     if (appName == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue(APP_NAME, appName);
+    return pThis->SetUdsValue<std::string>(APP_NAME, appName);
 }
 
 int OH_UdsAppItem_SetIconId(OH_UdsAppItem* pThis, const char* appIconId)
@@ -345,7 +345,7 @@ int OH_UdsAppItem_SetIconId(OH_UdsAppItem* pThis, const char* appIconId)
     if (appIconId == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue(APP_ICON_ID, appIconId);
+    return pThis->SetUdsValue<std::string>(APP_ICON_ID, appIconId);
 }
 
 int OH_UdsAppItem_SetLabelId(OH_UdsAppItem* pThis, const char* appLabelId)
@@ -353,7 +353,7 @@ int OH_UdsAppItem_SetLabelId(OH_UdsAppItem* pThis, const char* appLabelId)
     if (appLabelId == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue(APP_LABEL_ID, appLabelId);
+    return pThis->SetUdsValue<std::string>(APP_LABEL_ID, appLabelId);
 }
 
 int OH_UdsAppItem_SetBundleName(OH_UdsAppItem* pThis, const char* bundleName)
@@ -361,7 +361,7 @@ int OH_UdsAppItem_SetBundleName(OH_UdsAppItem* pThis, const char* bundleName)
     if (bundleName == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue(BUNDLE_NAME, bundleName);
+    return pThis->SetUdsValue<std::string>(BUNDLE_NAME, bundleName);
 }
 
 int OH_UdsAppItem_SetAbilityName(OH_UdsAppItem* pThis, const char* abilityName)
@@ -369,5 +369,162 @@ int OH_UdsAppItem_SetAbilityName(OH_UdsAppItem* pThis, const char* abilityName)
     if (abilityName == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_APP_ITEM_STRUCT_ID)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    return pThis->SetUdsValue(ABILITY_NAME, abilityName);
+    return pThis->SetUdsValue<std::string>(ABILITY_NAME, abilityName);
+}
+
+OH_UdsFileUri* OH_UdsFileUri_Create()
+{
+    OH_UdsFileUri* fileUri = new (std::nothrow) OH_UdsFileUri();
+    if (fileUri == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
+        return nullptr;
+    }
+    fileUri->obj = std::make_shared<Object>();
+    fileUri->obj->value_[UNIFORM_DATA_TYPE] = UDMF_META_GENERAL_FILE_URI;
+    fileUri->obj->value_[FILE_URI_PARAM] = "";
+    fileUri->obj->value_[FILE_TYPE] = "";
+    return fileUri;
+}
+
+void OH_UdsFileUri_Destroy(OH_UdsFileUri* pThis)
+{
+    if (pThis != nullptr && pThis->cid == NdkStructId::UDS_FILE_URI_STRUCT_ID) {
+        delete pThis;
+    }
+}
+
+const char* OH_UdsFileUri_GetType(OH_UdsFileUri* pThis)
+{
+    return GetUdsStrValue(pThis, NdkStructId::UDS_FILE_URI_STRUCT_ID, UNIFORM_DATA_TYPE);
+}
+
+const char* OH_UdsFileUri_GetFileUri(OH_UdsFileUri* pThis)
+{
+    return GetUdsStrValue(pThis, NdkStructId::UDS_FILE_URI_STRUCT_ID, FILE_URI_PARAM);
+}
+
+const char* OH_UdsFileUri_GetFileType(OH_UdsFileUri* pThis)
+{
+    return GetUdsStrValue(pThis, NdkStructId::UDS_FILE_URI_STRUCT_ID, FILE_TYPE);
+}
+
+int OH_UdsFileUri_SetFileUri(OH_UdsFileUri* pThis, const char* fileUri)
+{
+    if (fileUri == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_FILE_URI_STRUCT_ID)) {
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
+    }
+    return pThis->SetUdsValue<std::string>(FILE_URI_PARAM, fileUri);
+}
+
+int OH_UdsFileUri_SetFileType(OH_UdsFileUri* pThis, const char* fileType)
+{
+    if (fileType == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_FILE_URI_STRUCT_ID)) {
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
+    }
+    return pThis->SetUdsValue<std::string>(FILE_TYPE, fileType);
+}
+
+OH_UdsPixelMap* OH_UdsPixelMap_Create()
+{
+    OH_UdsPixelMap* pixelMap = new (std::nothrow) OH_UdsPixelMap();
+    if (pixelMap == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
+        return nullptr;
+    }
+    pixelMap->obj = std::make_shared<Object>();
+    pixelMap->obj->value_[UNIFORM_DATA_TYPE] = UDMF_META_OPENHARMONY_PIXEL_MAP;
+    pixelMap->obj->value_[PIXEL_MAP] = std::make_shared<OHOS::Media::PixelMap>();
+    return pixelMap;
+}
+
+void OH_UdsPixelMap_Destroy(OH_UdsPixelMap* pThis)
+{
+    if (pThis != nullptr && pThis->cid == NdkStructId::UDS_PIXEL_MAP_STRUCT_ID) {
+        delete pThis;
+    }
+}
+
+const char* OH_UdsPixelMap_GetType(OH_UdsPixelMap* pThis)
+{
+    return GetUdsStrValue(pThis, NdkStructId::UDS_PIXEL_MAP_STRUCT_ID, UNIFORM_DATA_TYPE);
+}
+
+void OH_UdsPixelMap_GetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelmapNative)
+{
+    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_PIXEL_MAP_STRUCT_ID)) {
+        return;
+    }
+    auto pixelMap = pThis->GetUdsValue<std::shared_ptr<OHOS::Media::PixelMap>>(PIXEL_MAP);
+    if (pixelMap != nullptr) {
+        *pixelmapNative = OH_PixelmapNative(*pixelMap);
+    }
+}
+
+int OH_UdsPixelMap_SetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelmapNative)
+{
+    if (pixelmapNative == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_PIXEL_MAP_STRUCT_ID)) {
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
+    }
+    return pThis->SetUdsValue<std::shared_ptr<OHOS::Media::PixelMap>>(PIXEL_MAP, pixelmapNative->GetInnerPixelmap());
+}
+
+OH_UdsArrayBuffer* OH_UdsArrayBuffer_Create()
+{
+    auto *buffer = new (std::nothrow) OH_UdsArrayBuffer();
+    if (buffer == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
+        return nullptr;
+    }
+    buffer->obj = std::make_shared<Object>();
+    buffer->obj->value_[UNIFORM_DATA_TYPE] = "";
+    buffer->obj->value_[ARRAY_BUFFER] = std::vector<uint8_t>();
+    buffer->obj->value_[ARRAY_BUFFER_LENGTH] = 0;
+    return buffer;
+}
+
+int OH_UdsArrayBuffer_Destroy(OH_UdsArrayBuffer* buffer)
+{
+    if (IsInvalidUdsObjectPtr(buffer, NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID)) {
+        LOG_ERROR(UDMF_CAPI, "Param is invalid.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    delete buffer;
+    return UDMF_E_OK;
+}
+
+int OH_UdsArrayBuffer_SetData(OH_UdsArrayBuffer* buffer, unsigned char* data, unsigned int len)
+{
+    if (data == nullptr || len == 0 || IsInvalidUdsObjectPtr(buffer, NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID) ||
+        len > MAX_GENERAL_ENTRY_SIZE) {
+        LOG_ERROR(UDMF_CAPI, "Param is invalid.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    std::vector<uint8_t> arrayBuffer(data, data + len);
+    int ret = buffer->SetUdsValue<std::vector<uint8_t>>(ARRAY_BUFFER, arrayBuffer);
+    if (ret != UDMF_E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory. ret: %{public}d", ret);
+        return ret;
+    }
+    ret = buffer->SetUdsValue<int>(ARRAY_BUFFER_LENGTH, static_cast<int>(len));
+    return ret;
+}
+
+int OH_UdsArrayBuffer_GetData(OH_UdsArrayBuffer* buffer, unsigned char** data, unsigned int* len)
+{
+    if (buffer == nullptr || IsInvalidUdsObjectPtr(buffer, NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID)) {
+        LOG_ERROR(UDMF_CAPI, "Param is invalid.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    const auto arrayBuffer = buffer->GetUdsValue<std::vector<uint8_t>>(ARRAY_BUFFER);
+    if (arrayBuffer == nullptr || arrayBuffer->empty()) {
+        return UDMF_ERR;
+    }
+    const auto length = buffer->GetUdsValue<int>(ARRAY_BUFFER_LENGTH);
+    if (length == nullptr || *length <= 0 || *length > MAX_GENERAL_ENTRY_SIZE) {
+        return UDMF_ERR;
+    }
+
+    *data = arrayBuffer->data();
+    *len = *length;
+    return UDMF_E_OK;
 }
