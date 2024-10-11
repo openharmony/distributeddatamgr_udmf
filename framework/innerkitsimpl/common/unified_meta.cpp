@@ -458,7 +458,23 @@ static constexpr UtdType UTD_TYPES[] = {
     { HMOS_WIFI, "HMOS_WIFI", "com.huawei.hmos.settings.wifi" },
     { TEL, "TEL", "general.tel" },
     { ETS, "ETS", "general.ets" },
-    { JSON5, "JSON5", "general.json5" }
+    { JSON5, "JSON5", "general.json5" },
+    { APE_AUDIO, "APE_AUDIO", "com.monkeysaudio.ape-audio" },
+    { OPUS_AUDIO, "OPUS_AUDIO", "org.xiph.opus-audio"},
+    { CONF, "CONF", "general.conf" },
+    { MICROSOFT_DOS_BATCH, "MICROSOFT_DOS_BATCH", "com.microsoft.dos-batch" },
+    { MICROSOFT_VBSCRIPT, "MICROSOFT_VBSCRIPT", "com.microsoft.vbscript" },
+    { ION, "ION", "general.ion" },
+    { MICROSOFT_REGISTRY, "MICROSOFT_REGISTRY", "com.microsoft.registry" },
+    { MICROSOFT_CATALOG, "MICROSOFT_CATALOG", "com.microsoft.catalog" },
+    { MICROSOFT_POWERSHELL_SCRIPT, "MICROSOFT_POWERSHELL_SCRIPT", "com.microsoft.powershell-script" },
+    { W3_WOFF, "W3_WOFF", "org.w3.woff" },
+    { SQLITE_DATABASE, "SQLITE_DATABASE", "org.sqlite.database" },
+    { MICROSOFT_SYS, "MICROSOFT_SYS", "com.microsoft.sys" },
+    { MICROSOFT_INF, "MICROSOFT_INF", "com.microsoft.inf" },
+    { MICROSOFT_PDB, "MICROSOFT_PDB", "com.microsoft.pdb" },
+    { MICROSOFT_TLB, "MICROSOFT_TLB", "com.microsoft.tlb" },
+    { MICROSOFT_SCCD, "MICROSOFT_SCCD", "com.microsoft.sccd" }
 };
 
 namespace UtdUtils {
