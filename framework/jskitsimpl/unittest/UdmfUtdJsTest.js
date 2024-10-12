@@ -29,7 +29,7 @@ describe('UdmfUtdJSTest', function () {
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
-  it ('UdmfTestTypeDescriptor001', 0, function () {
+  it('UdmfTestTypeDescriptor001', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor001:';
     console.info(TAG, 'start');
     let typeObj = UTD.getTypeDescriptor('general.invalidType');
@@ -47,7 +47,7 @@ describe('UdmfUtdJSTest', function () {
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
-  it ('UdmfTestTypeDescriptor002', 0, function () {
+  it('UdmfTestTypeDescriptor002', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor002:';
     console.info(TAG, 'start');
     let typeObj = UTD.getTypeDescriptor('com.adobe.photoshop-image');
@@ -81,7 +81,7 @@ describe('UdmfUtdJSTest', function () {
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
-  it ('UdmfTestTypeDescriptor003', 0, function () {
+  it('UdmfTestTypeDescriptor003', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor003:';
     console.info(TAG, 'start');
     let typeObj = UTD.getTypeDescriptor('general.type-script');
@@ -104,7 +104,7 @@ describe('UdmfUtdJSTest', function () {
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
-  it ('UdmfTestTypeDescriptor004', 0, function () {
+  it('UdmfTestTypeDescriptor004', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor004:';
     console.info(TAG, 'start');
     try {
@@ -123,7 +123,7 @@ describe('UdmfUtdJSTest', function () {
  * @tc.type: FUNC
  * @tc.require: issueNumber
  */
-  it ('UdmfTestTypeDescriptor005', 0, function () {
+  it('UdmfTestTypeDescriptor005', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor005:';
     console.info(TAG, 'start');
     let typeObj = UTD.getTypeDescriptor('com.adobe.photoshop-image', INVALID_TYPE1, INVALID_TYPE2);
@@ -153,7 +153,7 @@ describe('UdmfUtdJSTest', function () {
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
-  it ('UdmfTestTypeDescriptor006', 0, function () {
+  it('UdmfTestTypeDescriptor006', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor006:';
     console.info(TAG, 'start');
     for (let utdType in UTD.UniformDataType) {
@@ -190,7 +190,7 @@ describe('UdmfUtdJSTest', function () {
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
-  it ('UdmfTestTypeDescriptor008', 0, function () {
+  it('UdmfTestTypeDescriptor008', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor008:';
     console.info(TAG, 'start');
     let typeObj = UTD.getTypeDescriptor('general.type-script');
@@ -211,7 +211,7 @@ describe('UdmfUtdJSTest', function () {
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
-  it ('UdmfTestTypeDescriptor009', 0, function () {
+  it('UdmfTestTypeDescriptor009', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor009:';
     console.info(TAG, 'start');
     expect(UTD.UniformDataType.TEXT).assertEqual('general.text');
@@ -252,7 +252,7 @@ describe('UdmfUtdJSTest', function () {
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
-  it ('UdmfTestTypeDescriptor010', 0, function () {
+  it('UdmfTestTypeDescriptor010', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor010:';
     console.info(TAG, 'start');
     expect(UTD.UniformDataType.PNG).assertEqual('general.png');
@@ -294,7 +294,7 @@ describe('UdmfUtdJSTest', function () {
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
-  it ('UdmfTestTypeDescriptor011', 0, function () {
+  it('UdmfTestTypeDescriptor011', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor011:';
     console.info(TAG, 'start');
     expect(UTD.UniformDataType.WINDOWS_MEDIA_WMA).assertEqual('com.microsoft.windows-media-wma');
@@ -335,7 +335,7 @@ describe('UdmfUtdJSTest', function () {
   * @tc.type: FUNC
   * @tc.require: issueNumber
   */
-  it ('UdmfTestTypeDescriptor012', 0, function () {
+  it('UdmfTestTypeDescriptor012', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor012:';
     console.info(TAG, 'start');
     let typeObj = UTD.getTypeDescriptor('general.type-script');
@@ -351,7 +351,7 @@ describe('UdmfUtdJSTest', function () {
   * @tc.type: FUNC
   * @tc.require: issueNumber
   */
-  it ('UdmfTestTypeDescriptor013', 0, function () {
+  it('UdmfTestTypeDescriptor013', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor013:';
     console.info(TAG, 'start');
     let typeObj = UTD.getTypeDescriptor('general.type-script');
@@ -367,7 +367,7 @@ describe('UdmfUtdJSTest', function () {
   * @tc.type: FUNC
   * @tc.require: issueNumber
   */
-  it ('UdmfTestTypeDescriptor014', 0, function () {
+  it('UdmfTestTypeDescriptor014', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor014:';
     console.info(TAG, 'start');
     let typeObj = UTD.getTypeDescriptor('general.text');
@@ -383,7 +383,7 @@ describe('UdmfUtdJSTest', function () {
   * @tc.type: FUNC
   * @tc.require: issueNumber
   */
-  it ('UdmfTestTypeDescriptor015', 0, function () {
+  it('UdmfTestTypeDescriptor015', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor015:';
     console.info(TAG, 'start');
     let typeId = UTD.getUniformDataTypeByFilenameExtension('.ts', 'general.text');
@@ -398,7 +398,7 @@ describe('UdmfUtdJSTest', function () {
   * @tc.type: FUNC
   * @tc.require: issueNumber
   */
-  it ('UdmfTestTypeDescriptor016', 0, function () {
+  it('UdmfTestTypeDescriptor016', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor016:';
     console.info(TAG, 'start');
     let typeId = UTD.getUniformDataTypeByMIMEType('application/vnd.ms-excel', 'general.object');
