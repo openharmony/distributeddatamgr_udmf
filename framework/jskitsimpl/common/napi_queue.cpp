@@ -23,12 +23,6 @@ ContextBase::~ContextBase()
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "no memory leak after callback or promise[resolved/rejected]");
     if (env != nullptr) {
-        if (work != nullptr) {
-            napi_delete_async_work(env, work);
-        }
-        if (callbackRef != nullptr) {
-            napi_delete_reference(env, callbackRef);
-        }
         napi_delete_reference(env, selfRef);
         env = nullptr;
     }
@@ -71,13 +65,16 @@ void ContextBase::GetCbInfo(napi_env envi, napi_callback_info info, NapiCbInfoPa
     }
 }
 
-napi_value NapiQueue::AsyncWork(napi_env env, std::shared_ptr<ContextBase> ctxt, const std::string &name,
+napi_value NapiQueue::AsyncWork(napi_env env, std::shared_ptr<ContextBase> contextBase, const std::string &name,
     NapiAsyncExecute execute, NapiAsyncComplete complete)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork name = %{public}s", name.c_str());
-    ctxt->execute = std::move(execute);
-    ctxt->complete = std::move(complete);
+    AsyncContext *aCtx = new AsyncContext;
+    aCtx->ctxt = std::move(contextBase);
+    aCtx->execute = std::move(execute);
+    aCtx->complete = std::move(complete);
     LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork move func finish");
+    auto ctxt = aCtx->ctxt;
     napi_value promise = nullptr;
     if (ctxt->callbackRef == nullptr) {
         LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork has promise");
@@ -91,38 +88,14 @@ napi_value NapiQueue::AsyncWork(napi_env env, std::shared_ptr<ContextBase> ctxt,
     LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork create string start");
     napi_create_string_utf8(ctxt->env, name.c_str(), NAPI_AUTO_LENGTH, &resource);
     LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork create string finish");
-    napi_create_async_work(ctxt->env, nullptr, resource,
-        [](napi_env env, void *data) {
-            LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork start execute");
-            ASSERT_VOID(data != nullptr, "no data");
-            auto ctxt = reinterpret_cast<ContextBase *>(data);
-            LOG_DEBUG(UDMF_KITS_NAPI, "napi_async_execute_callback ctxt->status = %{public}d", ctxt->status);
-            if (ctxt->execute && ctxt->status == napi_ok) {
-                LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork do user design execute");
-                ctxt->execute();
-            }
-            LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork finish execute");
-        },
-        [](napi_env env, napi_status status, void *data) {
-            LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork start output");
-            ASSERT_VOID(data != nullptr, "no data");
-            auto ctxt = reinterpret_cast<ContextBase *>(data);
-            LOG_DEBUG(UDMF_KITS_NAPI, "napi_async_complete_callback status = %{public}d, ctxt->status = %{public}d",
-                status, ctxt->status);
-            if ((status != napi_ok) && (ctxt->status == napi_ok)) {
-                LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork check status");
-                ctxt->status = status;
-            }
-            if ((ctxt->complete) && (status == napi_ok) && (ctxt->status == napi_ok)) {
-                LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork do user design output");
-                ctxt->complete(ctxt->output);
-            }
-            GenerateOutput(ctxt);
-            LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork finish output");
-        },
-        reinterpret_cast<void *>(ctxt.get()), &ctxt->work);
-    napi_queue_async_work(ctxt->env, ctxt->work);
-    ctxt->hold = ctxt; // save crossing-thread ctxt.
+    napi_create_async_work(ctxt->env, nullptr, resource, onExecute, onComplete, reinterpret_cast<void *>(aCtx),
+        &aCtx->work);
+    auto status = napi_queue_async_work(ctxt->env, aCtx->work);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "async work failed: %{public}d", status);
+        napi_get_undefined(env, &promise);
+        delete aCtx;
+    }
     return promise;
 }
 
@@ -168,8 +141,42 @@ void NapiQueue::GenerateOutput(ContextBase *ctxt)
         LOG_DEBUG(UDMF_KITS_NAPI, "call callback function");
         napi_call_function(ctxt->env, nullptr, callback, RESULT_ALL, result, &callbackResult);
     }
-    ctxt->hold.reset(); // release ctxt.
     LOG_DEBUG(UDMF_KITS_NAPI, "GenerateOutput stop");
+}
+
+void NapiQueue::onExecute(napi_env env, void *data)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork start execute");
+    ASSERT_VOID(data != nullptr, "no data");
+    auto actxt = reinterpret_cast<AsyncContext *>(data);
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_async_execute_callback ctxt->status = %{public}d", actxt->ctxt->status);
+    if (actxt->execute && actxt->ctxt->status == napi_ok) {
+        LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork do user design execute");
+        actxt->execute();
+    }
+    LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork finish execute");
+}
+
+void NapiQueue::onComplete(napi_env env, napi_status status, void *data)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork start output");
+    ASSERT_VOID(data != nullptr, "no data");
+    auto actxt = reinterpret_cast<AsyncContext *>(data);
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_async_complete_callback status = %{public}d, ctxt->status = %{public}d", status,
+        actxt->ctxt->status);
+    if ((status != napi_ok) && (actxt->ctxt->status == napi_ok)) {
+        LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork check status");
+        actxt->ctxt->status = status;
+    }
+    if ((actxt->complete) && (status == napi_ok) && (actxt->ctxt->status == napi_ok)) {
+        LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork do user design output");
+        actxt->complete(actxt->ctxt->output);
+    }
+    GenerateOutput(actxt->ctxt.get());
+    LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork finish output");
+    napi_delete_reference(env, actxt->ctxt->callbackRef);
+    napi_delete_async_work(env, actxt->work);
+    delete actxt;
 }
 } // namespace UDMF
 } // namespace OHOS
