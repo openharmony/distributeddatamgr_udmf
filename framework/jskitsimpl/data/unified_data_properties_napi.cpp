@@ -54,6 +54,9 @@ void UnifiedDataPropertiesNapi::Destructor(napi_env env, void *data, void *hint)
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi finalize.");
     auto *properties = static_cast<UnifiedDataPropertiesNapi *>(data);
     ASSERT_VOID(properties != nullptr, "finalize null!");
+    if (properties->delayDataRef_ != nullptr) {
+        napi_delete_reference(env, properties->delayDataRef_);
+    }
     delete properties;
 }
 
@@ -208,6 +211,9 @@ napi_value UnifiedDataPropertiesNapi::SetDelayData(napi_env env, napi_callback_i
     auto properties = static_cast<UnifiedDataPropertiesNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (properties != nullptr && properties->value_ != nullptr),
         Status::E_ERROR, "invalid object!");
+    if (properties->delayDataRef_ != nullptr) {
+        napi_delete_reference(env, properties->delayDataRef_);
+    }
     ctxt->status = napi_create_reference(env, handler, 1, &ref);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "napi_create_reference failed");
     properties->delayDataRef_ = ref;

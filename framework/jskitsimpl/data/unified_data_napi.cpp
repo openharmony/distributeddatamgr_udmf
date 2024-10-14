@@ -89,6 +89,9 @@ void UnifiedDataNapi::Destructor(napi_env env, void *data, void *hint)
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi finalize.");
     auto *uData = static_cast<UnifiedDataNapi *>(data);
     ASSERT_VOID(uData != nullptr, "finalize null!");
+    if (uData->propertyRef_ != nullptr) {
+        napi_delete_reference(env, uData->propertyRef_);
+    }
     delete uData;
 }
 
