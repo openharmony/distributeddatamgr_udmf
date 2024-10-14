@@ -171,7 +171,7 @@ describe('UdmfUtdJSTest', function () {
    * @tc.type: FUNC
    * @tc.require: issueNumber
    */
-  it ('UdmfTestTypeDescriptor007', 0, function () {
+  it('UdmfTestTypeDescriptor007', 0, function () {
     const TAG = 'UdmfTestTypeDescriptor007:';
     console.info(TAG, 'start');
     try {
