@@ -29,7 +29,6 @@ public:
     static bool Pack(UnifiedData &data);
     static bool Unpack(UnifiedData &data);
     static void GetSummary(const UnifiedData &data, Summary &summary);
-
 private:
     static void CreateDirIfNotExist(const std::string& dirPath, const mode_t& mode);
     static bool SaveUDataToFile(const std::string &dataFile, UnifiedData &data);

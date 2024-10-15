@@ -27,7 +27,7 @@ Link::Link(const std::string &url) : Link(url, "")
 
 Link::Link(UDType type, ValueType value) : Text(type, value)
 {
-    this->dataType_ = HYPERLINK;
+    SetType(HYPERLINK);
     if (std::holds_alternative<std::string>(value)) {
         url_ = std::get<std::string>(value);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
@@ -38,6 +38,7 @@ Link::Link(UDType type, ValueType value) : Text(type, value)
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
         }
+        hasObject_ = true;
     }
 }
 
@@ -46,7 +47,7 @@ Link::Link(const std::string &url, const std::string &description)
     if (url.length() >= MAX_TEXT_LEN || description.length() >= MAX_TEXT_LEN) {
         return;
     }
-    this->dataType_ = HYPERLINK;
+    SetType(HYPERLINK);
     this->url_ = url;
     this->description_ = description;
 }
@@ -67,7 +68,9 @@ void Link::SetUrl(const std::string &url)
         return;
     }
     this->url_ = url;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[URL] = url_;
+    }
 }
 
 std::string Link::GetDescription() const
@@ -81,7 +84,9 @@ void Link::SetDescription(const std::string &description)
         return;
     }
     this->description_ = description;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        std::get<std::shared_ptr<Object>>(value_)->value_[DESCRIPTION] = description_;
+    }
 }
 
 ValueType Link::GetValue()
@@ -95,12 +100,15 @@ ValueType Link::GetValue()
 
 void Link::InitObject()
 {
-    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = value_;
+        value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[URL] = url_;
         object->value_[DESCRIPTION] = description_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        object->value_["VALUE_TYPE"] = value;
     }
 }
 } // namespace UDMF

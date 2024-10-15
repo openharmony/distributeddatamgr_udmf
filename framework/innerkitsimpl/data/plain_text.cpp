@@ -26,14 +26,14 @@ PlainText::PlainText(const std::string &content, const std::string &abstract)
     if (content.length() >= MAX_TEXT_LEN) {
         return;
     }
-    this->dataType_ = PLAIN_TEXT;
+    SetType(PLAIN_TEXT);
     this->content_ = content;
     this->abstract_ = abstract;
 }
 
 PlainText::PlainText(UDType type, ValueType value) : Text(type, value)
 {
-    this->dataType_ = PLAIN_TEXT;
+    SetType(PLAIN_TEXT);
     if (std::holds_alternative<std::string>(value)) {
         content_ = std::get<std::string>(value);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
@@ -44,6 +44,7 @@ PlainText::PlainText(UDType type, ValueType value) : Text(type, value)
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
         }
+        hasObject_ = true;
     }
 }
 
@@ -63,7 +64,10 @@ void PlainText::SetContent(const std::string &text)
         return;
     }
     this->content_ = text;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[TEXT_CONTENT] = content_;
+    }
 }
 
 std::string PlainText::GetAbstract() const
@@ -77,7 +81,10 @@ void PlainText::SetAbstract(const std::string &abstract)
         return;
     }
     this->abstract_ = abstract;
-    InitObject();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[ABSTRACT] = abstract_;
+    }
 }
 
 ValueType PlainText::GetValue()
@@ -91,12 +98,15 @@ ValueType PlainText::GetValue()
 
 void PlainText::InitObject()
 {
-    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = value_;
+        value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[TEXT_CONTENT] = content_;
         object->value_[ABSTRACT] = abstract_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        object->value_["VALUE_TYPE"] = value;
     }
 }
 } // namespace UDMF

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,28 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_SYSTEM_DEFINED_PIXELMAP_H
-#define UDMF_SYSTEM_DEFINED_PIXELMAP_H
+#ifndef DATA_PROVIDER_IMPL_H
+#define DATA_PROVIDER_IMPL_H
 
-#include "system_defined_record.h"
-#include "visibility.h"
+#include "entry_getter.h"
+#include "udmf.h"
+
+struct OH_UdmfRecordProvider {
+    OH_UdmfRecordProvider_GetData callback { nullptr };
+    void* context { nullptr };
+    UdmfData_Finalize finalize { nullptr };
+};
+
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT SystemDefinedPixelMap : public SystemDefinedRecord {
+class DataProviderImpl : public EntryGetter {
 public:
-    SystemDefinedPixelMap();
-    explicit SystemDefinedPixelMap(std::vector<uint8_t> &data);
-    SystemDefinedPixelMap(UDType type, ValueType value);
-
-    int64_t GetSize() override;
-
-    std::vector<uint8_t> GetRawData() const;
-    void SetRawData(const std::vector<uint8_t> &rawData);
-
-    void InitObject() override;
+    void SetInnerProvider(OH_UdmfRecordProvider* provider);
+    OH_UdmfRecordProvider* GetInnerProvider();
+    ValueType GetValueByType(const std::string &utdId) override;
 private:
-    std::vector<uint8_t> rawData_;
+    OH_UdmfRecordProvider* innerProvider_;
 };
+
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_SYSTEM_DEFINED_PIXELMAP_H
+
+#endif /* DATA_PROVIDER_IMPL_H */

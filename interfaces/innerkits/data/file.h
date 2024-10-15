@@ -35,6 +35,7 @@ public:
 
     void SetDetails(UDDetails &variantMap);
     UDDetails GetDetails() const;
+    void InitObject() override;
 
 protected:
     std::string oriUri_;

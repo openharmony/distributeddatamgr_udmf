@@ -31,6 +31,34 @@
 
 namespace OHOS {
 namespace UDMF {
+constexpr const char* UNIFORM_DATA_TYPE = "uniformDataType";
+constexpr const char* CONTENT = "textContent";
+constexpr const char* ABSTRACT = "abstract";
+constexpr const char* URL = "url";
+constexpr const char* DESCRIPTION = "description";
+constexpr const char* HTML_CONTENT = "htmlContent";
+constexpr const char* PLAIN_CONTENT = "plainContent";
+constexpr const char* APP_ID = "appId";
+constexpr const char* APP_NAME = "appName";
+constexpr const char* APP_ICON_ID = "appIconId";
+constexpr const char* APP_LABEL_ID = "appLabelId";
+constexpr const char* BUNDLE_NAME = "bundleName";
+constexpr const char* ABILITY_NAME = "abilityName";
+constexpr const char* FILE_URI_PARAM = "oriUri";
+constexpr const char* FILE_TYPE = "fileType";
+constexpr const char* PIXEL_MAP = "pixelMap";
+constexpr const char* ARRAY_BUFFER = "arrayBuffer";
+constexpr const char* ARRAY_BUFFER_LENGTH = "arrayBufferLen";
+constexpr static const char *FORMID = "formId";
+constexpr static const char *FORMNAME = "formName";
+constexpr static const char *MODULE = "module";
+constexpr static const char *BUNDLENAME = "bundleName";
+constexpr static const char *ABILITYNAME = "abilityName";
+constexpr static const char *ORI_URI = "oriUri";
+constexpr static const char *REMOTE_URI = "remoteUri";
+constexpr static const char *APPLICATION_DEFINED_TYPE = "applicationDefinedType";
+constexpr static const char *RAW_DATA = "rawData";
+
 enum UDType : int32_t {
     ENTITY = 0,
     OBJECT,
@@ -527,9 +555,17 @@ struct Object;
 using ValueType = std::variant<std::monostate, int32_t, int64_t, double, bool, std::string, std::vector<uint8_t>,
     std::shared_ptr<OHOS::AAFwk::Want>, std::shared_ptr<OHOS::Media::PixelMap>, std::shared_ptr<Object>, nullptr_t>;
 
-struct Object {
-    bool GetValue(const std::string &key, std::string &value);
-    bool GetValue(const std::string &key, std::shared_ptr<Object> &value);
+struct API_EXPORT Object {
+    template<typename T>
+    bool GetValue(const std::string &key, T &value)
+    {
+        auto it = value_.find(key);
+        if (it != value_.end() && std::holds_alternative<T>(it->second)) {
+            value = std::get<T>(it->second);
+            return true;
+        }
+        return false;
+    }
 
     std::map<std::string, ValueType> value_;
 };
