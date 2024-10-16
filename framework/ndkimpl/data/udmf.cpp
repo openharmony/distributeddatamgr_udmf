@@ -39,7 +39,6 @@
 using namespace OHOS::UDMF;
 
 static constexpr uint64_t MAX_RECORDS_COUNT = 4 * 1024 * 1024;
-static constexpr uint64_t MAX_RECORDS_SIZE = 4 * 1024 * 1024;
 static constexpr uint64_t MAX_KEY_STRING_LEN = 1 * 1024 * 1024;
 static const std::map<std::string, UDType> FILE_TYPES = {
     { UDMF_META_GENERAL_FILE, UDType::FILE },
@@ -446,6 +445,10 @@ int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId,
 
 static int GetValueFromUdsArrayBuffer(OH_UdmfRecord *record, const char *typeId, ValueType value)
 {
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        LOG_ERROR(UDMF_CAPI, "valueType is not object sptr!");
+        return UDMF_ERR;
+    }
     OH_UdsArrayBuffer *buffer = OH_UdsArrayBuffer_Create();
     buffer->obj = std::get<std::shared_ptr<Object>>(value);
 
@@ -466,7 +469,7 @@ static int GetValueFromUint8Array(OH_UdmfRecord *record, const char *typeId, Val
         return UDMF_ERR;
     }
     record->recordDataLen = recordValue->size();
-    if (record->recordDataLen > MAX_RECORDS_SIZE) {
+    if (record->recordDataLen > MAX_GENERAL_ENTRY_SIZE) {
         LOG_INFO(UDMF_CAPI, "data size exceeds maximum size");
         return UDMF_ERR;
     }
@@ -500,10 +503,7 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* record, const char* typeId, uns
         *count = record->recordDataLen;
         return UDMF_E_OK;
     }
-    if (record->recordData != nullptr) {
-        delete[] record->recordData;
-        record->recordData = nullptr;
-    }
+
     auto value = record->record_->GetEntry(typeId);
 
     int result = UDMF_ERR;
@@ -587,7 +587,7 @@ int OH_UdmfRecord_AddFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
             AddUds<Audio>(record, fileUri, UDType::AUDIO);
             break;
         case UDType::FOLDER:
-            AddUds<Audio>(record, fileUri, UDType::FOLDER);
+            AddUds<Folder>(record, fileUri, UDType::FOLDER);
             break;
         case UDType::IMAGE:
             AddUds<Image>(record, fileUri, UDType::IMAGE);
@@ -674,6 +674,9 @@ int OH_UdmfRecord_GetFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(fileUri, UDS_FILE_URI_STRUCT_ID)) {
         return UDMF_E_INVALID_PARAM;
     }
+    if (GetUds(record, fileUri, UDType::FILE_URI) == UDMF_E_OK) {
+        return UDMF_E_OK;
+    }
     for (auto fileType : FILE_TYPES) {
         int ret = GetUds(record, fileUri, fileType.second);
         if (ret == UDMF_E_OK) {
@@ -683,7 +686,7 @@ int OH_UdmfRecord_GetFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
         }
     }
     LOG_ERROR(UDMF_CAPI, "could't find file uri");
-    return UDMF_ERR;
+    return UDMF_E_INVALID_PARAM;
 }
 
 int OH_UdmfRecord_GetPixelMap(OH_UdmfRecord* record, OH_UdsPixelMap* pixelMap)
@@ -866,13 +869,17 @@ int OH_UdmfRecord_SetProvider(OH_UdmfRecord* record, const char* const* types, u
     }
     std::shared_ptr<DataProviderImpl> providerBox = std::make_shared<DataProviderImpl>();
     providerBox->SetInnerProvider(provider);
-    std::set<std::string> udTypes;
+    std::vector<std::string> udTypes;
+    std::set<std::string> udTypeSet;
     for (unsigned int i = 0; i < count; ++i) {
         if (types[i] == nullptr) {
             LOG_ERROR(UDMF_CAPI, "The type with index %{public}d is empty", i);
             continue;
         }
-        udTypes.emplace(types[i]);
+        if (udTypeSet.count(types[i]) == 0) {
+            udTypeSet.emplace(types[i]);
+            udTypes.emplace_back(types[i]);
+        }
     }
     record->record_->SetEntryGetter(udTypes, providerBox);
     return UDMF_E_OK;
