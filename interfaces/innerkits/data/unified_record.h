@@ -51,7 +51,7 @@ public:
     ValueType GetEntry(const std::string &utdId);
     std::shared_ptr<std::map<std::string, ValueType>> GetEntries() const;
 	
-    void SetEntryGetter(const std::set<std::string> &utdIds, const std::shared_ptr<EntryGetter> entryGetter);
+    void SetEntryGetter(const std::vector<std::string> &utdIds, const std::shared_ptr<EntryGetter> &entryGetter);
     std::shared_ptr<EntryGetter> GetEntryGetter();
     void SetDataId(uint32_t dataId);
     uint32_t GetDataId() const;

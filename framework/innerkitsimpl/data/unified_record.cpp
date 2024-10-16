@@ -16,6 +16,7 @@
 #include "unified_record.h"
 
 #include "getter_system.h"
+#include "logger.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -174,12 +175,18 @@ uint32_t UnifiedRecord::GetRecordId() const
     return recordId_;
 }
 
-void UnifiedRecord::SetEntryGetter(const std::set<std::string> &utdIds, const std::shared_ptr<EntryGetter> entryGetter)
+void UnifiedRecord::SetEntryGetter(
+    const std::vector<std::string> &utdIds,
+    const std::shared_ptr<EntryGetter> &entryGetter)
 {
-    for (auto utdId : utdIds) {
+    for (auto const &utdId : utdIds) {
+        if (HasType(utdId)) {
+            LOG_WARN(UDMF_FRAMEWORK, "already has the utdId: %{public}s", utdId.c_str());
+            continue;
+        }
         AddEntry(utdId, ValueType());
     }
-    entryGetter_ = std::move(entryGetter);
+    entryGetter_ = entryGetter;
 }
 
 std::shared_ptr<EntryGetter> UnifiedRecord::GetEntryGetter()
