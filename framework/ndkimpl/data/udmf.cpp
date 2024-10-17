@@ -859,13 +859,17 @@ int OH_UdmfRecord_SetProvider(OH_UdmfRecord* record, const char* const* types, u
     }
     std::shared_ptr<DataProviderImpl> providerBox = std::make_shared<DataProviderImpl>();
     providerBox->SetInnerProvider(provider);
-    std::set<std::string> udTypes;
+    std::vector<std::string> udTypes;
+    std::set<std::string> udTypeSet;
     for (unsigned int i = 0; i < count; ++i) {
         if (types[i] == nullptr) {
             LOG_ERROR(UDMF_CAPI, "The type with index %{public}d is empty", i);
             continue;
         }
-        udTypes.emplace(types[i]);
+        if (udTypeSet.count(types[i]) == 0) {
+            udTypeSet.emplace(types[i]);
+            udTypes.emplace_back(types[i]);
+        }
     }
     record->record_->SetEntryGetter(udTypes, providerBox);
     return UDMF_E_OK;
