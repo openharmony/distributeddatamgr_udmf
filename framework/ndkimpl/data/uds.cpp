@@ -97,7 +97,7 @@ T* UdsObject::GetUdsValue(const char* paramName)
 }
 
 template<typename T>
-int UdsObject::SetUdsValue(const char* paramName, const T pramValue)
+int UdsObject::SetUdsValue(const char* paramName, const T &pramValue)
 {
     if (!HasObjectKey<T>(paramName)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
