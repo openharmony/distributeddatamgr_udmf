@@ -492,12 +492,12 @@ static constexpr UtdType UTD_TYPES[] = {
     { RAF_RAW_IMAGE, "RAF_RAW_IMAGE", "com.fujifilm.raf-raw-image" },
     { NRW_RAW_IMAGE, "NRW_RAW_IMAGE", "com.nikon.nrw-raw-image" },
     { RW2_RAW_IMAGE, "RW2_RAW_IMAGE", "com.panasonic.rw2-raw-image" },
-    { PEF_RAW_IAMGE, "PEF_RAW_IAMGE", "com.pentax.pef-raw-image" },
+    { PEF_RAW_IMAGE, "PEF_RAW_IMAGE", "com.pentax.pef-raw-image" },
     { SRW_RAW_IMAGE, "SRW_RAW_IMAGE", "com.sumsung.srw-raw-image" },
     { ERF_RAW_IMAGE, "ERF_RAW_IMAGE", "com.epson.erf-raw-image" },
     { ORF_RAW_IMAGE, "ORF_RAW_IMAGE", "com.olympus.orf-raw-image" },
     { IEF_IMAGE, "IEF_IMAGE", "general.ief-image" },
-    { ART_IAMGE, "ART_IAMGE", "com.aol.art-image" },
+    { ART_IMAGE, "ART_IMAGE", "com.aol.art-image" },
     { CONTENT_FORM, "CONTENT_FORM", "general.content-form" }
 };
 

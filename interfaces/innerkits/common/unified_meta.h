@@ -513,12 +513,12 @@ enum UDType : int32_t {
     RAF_RAW_IMAGE,
     NRW_RAW_IMAGE,
     RW2_RAW_IMAGE,
-    PEF_RAW_IAMGE,
+    PEF_RAW_IMAGE,
     SRW_RAW_IMAGE,
     ERF_RAW_IMAGE,
     ORF_RAW_IMAGE,
     IEF_IMAGE,
-    ART_IAMGE,
+    ART_IMAGE,
     CONTENT_FORM
 };
 
