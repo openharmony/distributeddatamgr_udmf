@@ -495,7 +495,6 @@ enum UDType : int32_t {
     MICROSOFT_PDB,
     MICROSOFT_TLB,
     MICROSOFT_SCCD,
-    UD_BUTT,
     ADOBE_F4V,
     MP2T,
     YOUTUBE_VIDEO,
@@ -519,7 +518,8 @@ enum UDType : int32_t {
     ORF_RAW_IMAGE,
     IEF_IMAGE,
     ART_IMAGE,
-    CONTENT_FORM
+    CONTENT_FORM,
+    UD_BUTT
 };
 
 struct UtdType {
