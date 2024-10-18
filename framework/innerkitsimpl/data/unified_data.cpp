@@ -69,14 +69,15 @@ void UnifiedData::AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>> &
 {
     for (auto &record :records) {
         if (record == nullptr) {
-            return;
+            LOG_ERROR(UDMF_FRAMEWORK, "Invalid record, skip!");
+            continue;
         }
         record->SetRecordId(++recordId_);
         this->records_.push_back(record);
     }
 }
 
-std::shared_ptr<UnifiedRecord> UnifiedData::GetRecordAt(std::size_t index)
+std::shared_ptr<UnifiedRecord> UnifiedData::GetRecordAt(std::size_t index) const
 {
     if (records_.size() > index) {
         return records_[index];
@@ -92,17 +93,6 @@ void UnifiedData::SetRecords(std::vector<std::shared_ptr<UnifiedRecord>> records
 std::vector<std::shared_ptr<UnifiedRecord>> UnifiedData::GetRecords() const
 {
     return this->records_;
-}
-
-std::string UnifiedData::GetTypes()
-{
-    std::string types;
-    for (const auto &record : records_) {
-        for (const auto &type : record->GetUtdIds()) {
-            types.append("-").append(type);
-        }
-    }
-    return types;
 }
 
 std::vector<std::string> UnifiedData::GetTypesLabels() const
@@ -137,6 +127,10 @@ std::vector<std::string> UnifiedData::GetEntriesTypes() const
 bool UnifiedData::HasTypeInEntries(const std::string &type) const
 {
     for (const auto &record : records_) {
+        if (record == nullptr) {
+            LOG_ERROR(UDMF_FRAMEWORK, "Invalid record, skip!");
+            continue;
+        }
         auto types = record->GetUtdIds();
         if (types.find(type) != types.end()) {
             return true;
