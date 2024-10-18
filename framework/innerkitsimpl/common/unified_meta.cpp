@@ -498,7 +498,9 @@ static constexpr UtdType UTD_TYPES[] = {
     { ORF_RAW_IMAGE, "ORF_RAW_IMAGE", "com.olympus.orf-raw-image" },
     { IEF_IMAGE, "IEF_IMAGE", "general.ief-image" },
     { ART_IMAGE, "ART_IMAGE", "com.aol.art-image" },
-    { CONTENT_FORM, "CONTENT_FORM", "general.content-form" }
+    { CONTENT_FORM, "CONTENT_FORM", "general.content-form" },
+    { M4P_AUDIO, "M4P_AUDIO", "com.apple.m4p-audio" },
+    { AC3_AUDIO, "AC3_AUDIO", "general.ac3-audio" }
 };
 
 namespace UtdUtils {
