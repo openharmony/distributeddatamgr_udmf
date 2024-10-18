@@ -519,9 +519,9 @@ enum UDType : int32_t {
     IEF_IMAGE,
     ART_IMAGE,
     CONTENT_FORM,
-    UD_BUTT,
     M4P_AUDIO,
-    AC3_AUDIO
+    AC3_AUDIO,
+    UD_BUTT
 };
 
 struct UtdType {
