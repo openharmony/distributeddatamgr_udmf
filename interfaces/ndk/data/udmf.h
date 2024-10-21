@@ -335,7 +335,7 @@ int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId,
                                   const unsigned char* entry, unsigned int count);
 
 /**
- * @brief Add one {OH_UdsPlainText} data to the {@link OH_UdmfRecord} record.
+ * @brief Add one {@link OH_UdsPlainText} data to the {@link OH_UdmfRecord} record.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param plainText Represents a pointer to an instance of {@link OH_UdsPlainText}.
@@ -348,7 +348,7 @@ int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId,
 int OH_UdmfRecord_AddPlainText(OH_UdmfRecord* pThis, OH_UdsPlainText* plainText);
 
 /**
- * @brief Add one {OH_UdsHyperlink} data to the {@link OH_UdmfRecord} record.
+ * @brief Add one {@link OH_UdsHyperlink} data to the {@link OH_UdmfRecord} record.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param hyperlink Represents a pointer to an instance of {@link OH_UdsHyperlink}.
@@ -361,7 +361,7 @@ int OH_UdmfRecord_AddPlainText(OH_UdmfRecord* pThis, OH_UdsPlainText* plainText)
 int OH_UdmfRecord_AddHyperlink(OH_UdmfRecord* pThis, OH_UdsHyperlink* hyperlink);
 
 /**
- * @brief Add one {OH_UdsHtml} data to the {@link OH_UdmfRecord} record.
+ * @brief Add one {@link OH_UdsHtml} data to the {@link OH_UdmfRecord} record.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param html Represents a pointer to an instance of {@link OH_UdsHtml}.
@@ -374,7 +374,7 @@ int OH_UdmfRecord_AddHyperlink(OH_UdmfRecord* pThis, OH_UdsHyperlink* hyperlink)
 int OH_UdmfRecord_AddHtml(OH_UdmfRecord* pThis, OH_UdsHtml* html);
 
 /**
- * @brief Add one {OH_UdsAppItem} data to the {@link OH_UdmfRecord} record.
+ * @brief Add one {@link OH_UdsAppItem} data to the {@link OH_UdmfRecord} record.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param appItem Represents a pointer to an instance of {@link OH_UdsAppItem}.
@@ -387,7 +387,7 @@ int OH_UdmfRecord_AddHtml(OH_UdmfRecord* pThis, OH_UdsHtml* html);
 int OH_UdmfRecord_AddAppItem(OH_UdmfRecord* pThis, OH_UdsAppItem* appItem);
 
 /**
- * @brief Add one {OH_UdsFileUri} data to the {@link OH_UdmfRecord} record.
+ * @brief Add one {@link OH_UdsFileUri} data to the {@link OH_UdmfRecord} record.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param fileUri Represents a pointer to an instance of {@link OH_UdsFileUri}.
@@ -400,7 +400,7 @@ int OH_UdmfRecord_AddAppItem(OH_UdmfRecord* pThis, OH_UdsAppItem* appItem);
 int OH_UdmfRecord_AddFileUri(OH_UdmfRecord* pThis, OH_UdsFileUri* fileUri);
 
 /**
- * @brief Add one {OH_UdsPixelMap} data to the {@link OH_UdmfRecord} record.
+ * @brief Add one {@link OH_UdsPixelMap} data to the {@link OH_UdmfRecord} record.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param pixelMap Represents a pointer to an instance of {@link OH_UdsPixelMap}.
@@ -425,6 +425,19 @@ int OH_UdmfRecord_AddPixelMap(OH_UdmfRecord* pThis, OH_UdsPixelMap* pixelMap);
  * @since 13
  */
 int OH_UdmfRecord_AddArrayBuffer(OH_UdmfRecord* record, const char* type, OH_UdsArrayBuffer* buffer);
+
+/**
+ * @brief Add one {@link OH_UdsContentForm} data to the {@link OH_UdmfRecord} record.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
+ * @param contentForm Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdmfRecord OH_UdsContentForm Udmf_ErrCode.
+ * @since 14
+ */
+int OH_UdmfRecord_AddContentForm(OH_UdmfRecord* pThis, OH_UdsContentForm* contentForm);
 
 /**
  * @brief Get all types in the {@link OH_UdmfRecord} record.
@@ -455,7 +468,7 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* pThis, const char* typeId,
     unsigned char** entry, unsigned int* count);
 
 /**
- * @brief Get one {OH_UdsPlainText} data from the {@link OH_UdmfRecord} record.
+ * @brief Get one {@link OH_UdsPlainText} data from the {@link OH_UdmfRecord} record.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param plainText Represents a pointer to an instance of {@link OH_UdsPlainText}.
@@ -468,7 +481,7 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* pThis, const char* typeId,
 int OH_UdmfRecord_GetPlainText(OH_UdmfRecord* pThis, OH_UdsPlainText* plainText);
 
 /**
- * @brief Get one {OH_UdsHyperlink} data from the {@link OH_UdmfRecord} record.
+ * @brief Get one {@link OH_UdsHyperlink} data from the {@link OH_UdmfRecord} record.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param hyperlink Represents a pointer to an instance of {@link OH_UdsHyperlink}.
@@ -481,7 +494,7 @@ int OH_UdmfRecord_GetPlainText(OH_UdmfRecord* pThis, OH_UdsPlainText* plainText)
 int OH_UdmfRecord_GetHyperlink(OH_UdmfRecord* pThis, OH_UdsHyperlink* hyperlink);
 
 /**
- * @brief Get one {OH_UdsHtml} data from the {@link OH_UdmfRecord} record.
+ * @brief Get one {@link OH_UdsHtml} data from the {@link OH_UdmfRecord} record.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param html Represents a pointer to an instance of {@link OH_UdsHtml}.
@@ -494,7 +507,7 @@ int OH_UdmfRecord_GetHyperlink(OH_UdmfRecord* pThis, OH_UdsHyperlink* hyperlink)
 int OH_UdmfRecord_GetHtml(OH_UdmfRecord* pThis, OH_UdsHtml* html);
 
 /**
- * @brief Get one {OH_UdsAppItem} data from the {@link OH_UdmfRecord} record.
+ * @brief Get one {@link OH_UdsAppItem} data from the {@link OH_UdmfRecord} record.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param appItem Represents a pointer to an instance of {@link OH_UdsAppItem}.
@@ -507,7 +520,7 @@ int OH_UdmfRecord_GetHtml(OH_UdmfRecord* pThis, OH_UdsHtml* html);
 int OH_UdmfRecord_GetAppItem(OH_UdmfRecord* pThis, OH_UdsAppItem* appItem);
 
 /**
- * @brief Get one {OH_UdsFileUri} data from the {@link OH_UdmfRecord} record.
+ * @brief Get one {@link OH_UdsFileUri} data from the {@link OH_UdmfRecord} record.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param fileUri Represents a pointer to an instance of {@link OH_UdsFileUri}.
@@ -520,7 +533,7 @@ int OH_UdmfRecord_GetAppItem(OH_UdmfRecord* pThis, OH_UdsAppItem* appItem);
 int OH_UdmfRecord_GetFileUri(OH_UdmfRecord* pThis, OH_UdsFileUri* fileUri);
 
 /**
- * @brief Get one {OH_UdsPixelMap} data from the {@link OH_UdmfRecord} record.
+ * @brief Get one {@link OH_UdsPixelMap} data from the {@link OH_UdmfRecord} record.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
  * @param pixelMap Represents a pointer to an instance of {@link OH_UdsPixelMap}.
@@ -531,6 +544,33 @@ int OH_UdmfRecord_GetFileUri(OH_UdmfRecord* pThis, OH_UdsFileUri* fileUri);
  * @since 13
  */
 int OH_UdmfRecord_GetPixelMap(OH_UdmfRecord* pThis, OH_UdsPixelMap* pixelMap);
+
+/**
+ * @brief Get one {@link OH_UdsArrayBuffer} data from the {@link OH_UdmfRecord} record.
+ *
+ * @param record Represents a pointer to an instance of {@link OH_UdmfRecord}.
+ * @param type Represents record type, reference udmf_meta.h.
+ * @param buffer Represents a pointer to an instance of {@link OH_UdsArrayBuffer}.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdmfRecord OH_UdsArrayBuffer Udmf_ErrCode.
+ * @since 13
+ */
+int OH_UdmfRecord_GetArrayBuffer(OH_UdmfRecord* record, const char* type, OH_UdsArrayBuffer* buffer);
+
+/**
+ * @brief Get one {@link OH_UdsContentForm} data from the {@link OH_UdmfRecord} record.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfRecord}.
+ * @param contentForm Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdmfRecord OH_UdsContentForm Udmf_ErrCode.
+ * @since 14
+ */
+int OH_UdmfRecord_GetContentForm(OH_UdmfRecord* pThis, OH_UdsContentForm* contentForm);
 
 /**
  * @brief Set the data provider of the types.
@@ -547,20 +587,6 @@ int OH_UdmfRecord_GetPixelMap(OH_UdmfRecord* pThis, OH_UdsPixelMap* pixelMap);
  */
 int OH_UdmfRecord_SetProvider(OH_UdmfRecord* pThis, const char* const* types, unsigned int count,
     OH_UdmfRecordProvider* provider);
-
-/**
- * @brief Get one {@link OH_UdsArrayBuffer} data from the {@link OH_UdmfRecord} record.
- *
- * @param record Represents a pointer to an instance of {@link OH_UdmfRecord}.
- * @param type Represents record type, reference udmf_meta.h.
- * @param buffer Represents a pointer to an instance of {@link OH_UdsArrayBuffer}.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
- *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfRecord OH_UdsArrayBuffer Udmf_ErrCode.
- * @since 13
- */
-int OH_UdmfRecord_GetArrayBuffer(OH_UdmfRecord* record, const char* type, OH_UdsArrayBuffer* buffer);
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdmfProperty}

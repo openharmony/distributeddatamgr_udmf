@@ -997,6 +997,13 @@ extern "C" {
  */
 #define UDMF_META_GENERAL_FILE_URI "general.file-uri"
 
+/**
+ * @brief A specific type of uniform data type.
+ *
+ * @since 14
+ */
+#define UDMF_METE_GENERAL_CONTENT_FORM "general.content-form"
+
 #ifdef __cplusplus
 };
 #endif

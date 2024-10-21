@@ -124,11 +124,7 @@ ohos_unittest("UtdClientTest") {
 ohos_unittest("NdkDataConversionTest") {
   module_out_path = module_output_path
 
-  sources = [
-    "${udmf_framework_path}/ndkimpl/data/udmf.cpp",
-    "${udmf_framework_path}/ndkimpl/data/uds.cpp",
-    "ndk_data_conversion_test.cpp",
-  ]
+  sources = [ "ndk_data_conversion_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
