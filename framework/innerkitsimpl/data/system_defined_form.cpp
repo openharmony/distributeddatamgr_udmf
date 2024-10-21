@@ -29,8 +29,8 @@ SystemDefinedForm::SystemDefinedForm(UDType type, ValueType value) : SystemDefin
         auto object = std::get<std::shared_ptr<Object>>(value);
         object->GetValue(FORMID, formId_);
         object->GetValue(FORMNAME, formName_);
-        object->GetValue(BUNDLENAME, bundleName_);
-        object->GetValue(ABILITYNAME, abilityName_);
+        object->GetValue(BUNDLE_NAME, bundleName_);
+        object->GetValue(ABILITY_NAME, abilityName_);
         object->GetValue(MODULE, module_);
         std::shared_ptr<Object> detailObj = nullptr;
         if (object->GetValue(DETAILS, detailObj)) {
@@ -81,7 +81,7 @@ void SystemDefinedForm::SetBundleName(const std::string &bundleName)
 {
     this->bundleName_ = bundleName;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[BUNDLENAME] = bundleName_;
+        std::get<std::shared_ptr<Object>>(value_)->value_[BUNDLE_NAME] = bundleName_;
     }
 }
 
@@ -94,7 +94,7 @@ void SystemDefinedForm::SetAbilityName(const std::string &abilityName)
 {
     this->abilityName_ = abilityName;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[ABILITYNAME] = abilityName_;
+        std::get<std::shared_ptr<Object>>(value_)->value_[ABILITY_NAME] = abilityName_;
     }
 }
 
@@ -132,10 +132,10 @@ void SystemDefinedForm::SetItems(UDDetails& details)
         if (item.first == MODULE) {
             SetModule(*value);
         }
-        if (item.first == BUNDLENAME) {
+        if (item.first == BUNDLE_NAME) {
             SetBundleName(*value);
         }
-        if (item.first == ABILITYNAME) {
+        if (item.first == ABILITY_NAME) {
             SetAbilityName(*value);
         }
     }
@@ -147,8 +147,8 @@ UDDetails SystemDefinedForm::GetItems()
     items[FORMID] = GetFormId();
     items[FORMNAME] = GetFormName();
     items[MODULE] = GetModule();
-    items[BUNDLENAME] = GetBundleName();
-    items[ABILITYNAME] = GetAbilityName();
+    items[BUNDLE_NAME] = GetBundleName();
+    items[ABILITY_NAME] = GetAbilityName();
     return items;
 }
 
@@ -161,11 +161,11 @@ void SystemDefinedForm::InitObject()
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[FORMID] = formId_;
         object->value_[FORMNAME] = formName_;
-        object->value_[BUNDLENAME] = bundleName_;
-        object->value_[ABILITYNAME] = abilityName_;
+        object->value_[BUNDLE_NAME] = bundleName_;
+        object->value_[ABILITY_NAME] = abilityName_;
         object->value_[MODULE] = module_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_["VALUE_TYPE"] = value;
+        object->value_[VALUE_TYPE] = value;
     }
 }
 

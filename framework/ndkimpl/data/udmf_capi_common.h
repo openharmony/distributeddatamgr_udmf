@@ -45,6 +45,7 @@ enum NdkStructId : std::int64_t {
     UDS_FILE_URI_STRUCT_ID,
     UDS_PIXEL_MAP_STRUCT_ID,
     UDS_ARRAY_BUFFER_STRUCT_ID,
+    UDS_CONTENT_FORM_STRUCT_ID
 };
 
 struct OH_Utd {
@@ -82,6 +83,9 @@ struct OH_UdsPixelMap : public UdsObject {
 };
 struct OH_UdsArrayBuffer : public UdsObject {
     OH_UdsArrayBuffer();
+};
+struct OH_UdsContentForm : public UdsObject {
+    OH_UdsContentForm();
 };
 
 struct OH_UdmfRecord {

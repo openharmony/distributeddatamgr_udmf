@@ -1457,7 +1457,8 @@ HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByOpenHarmonyArrayBuffer002, TestSize.Leve
  * @tc.desc: test OH_UdmfRecord_AddArrayBuffer with invalid param
  * @tc.type: FUNC
  */
-HWTEST_F(UDMFTest, OH_Udmf_GetArrayBufferFromRecord001, TestSize.Level0) {
+HWTEST_F(UDMFTest, OH_Udmf_GetArrayBufferFromRecord001, TestSize.Level0)
+{
     unsigned char data1[] = "Hello world";
     unsigned int len1 = sizeof(data1);
     OH_UdsArrayBuffer *buffer1 = OH_UdsArrayBuffer_Create();
@@ -1488,7 +1489,7 @@ HWTEST_F(UDMFTest, OH_Udmf_GetArrayBufferFromRecord001, TestSize.Level0) {
     OH_UdsArrayBuffer_Destroy(buffer2);
 }
 
-/*
+/**
  * @tc.name: OH_UdmfData_GetPrimaryPlainText001
  * @tc.desc: Normal testcase of OH_UdmfData_GetPrimaryPlainText
  * @tc.type: FUNC
@@ -1937,5 +1938,50 @@ HWTEST_F(UDMFTest, FileUriTest001, TestSize.Level1)
             }
         }
     }
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData006
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData006, TestSize.Level1)
+{
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsContentForm *contentForm = OH_UdsContentForm_Create();
+    unsigned char thumbData[] = {0, 1, 2, 3, 4};
+    OH_UdsContentForm_SetThumbData(contentForm, thumbData, 5);
+    OH_UdsContentForm_SetDescription(contentForm, "description");
+    OH_UdmfRecord_AddContentForm(record, contentForm);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_DRAG;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    int getRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    unsigned int count = 0;
+    OH_UdmfRecord **getRecords = OH_UdmfData_GetRecords(readUnifiedData, &count);
+    EXPECT_EQ(count, 1);
+    OH_UdsContentForm *getContentForm = OH_UdsContentForm_Create();
+    OH_UdmfRecord_GetContentForm(getRecords[0], getContentForm);
+    EXPECT_EQ("description", std::string(OH_UdsContentForm_GetDescription(getContentForm)));
+
+    unsigned char *readThumbData;
+    unsigned int thumbDataLen = 0;
+    OH_UdsContentForm_GetThumbData(getContentForm, &readThumbData, &thumbDataLen);
+    ASSERT_EQ(5, thumbDataLen);
+    ASSERT_TRUE(CheckUnsignedChar(thumbData, readThumbData, thumbDataLen));
+
+    OH_UdsContentForm_Destroy(contentForm);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+
+    OH_UdsContentForm_Destroy(getContentForm);
+    OH_UdmfData_Destroy(readUnifiedData);
 }
 }
