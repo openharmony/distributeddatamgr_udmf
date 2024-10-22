@@ -2414,7 +2414,7 @@ std::vector<TypeDescriptorCfg> PresetTypeDescriptors::typeDescriptors_ = {
     {"com.adobe.flash",
      {"general.video"},
      {".swf", ".flv"},
-     {"application/x-shockwave-flash"},
+     {"application/x-shockwave-flash", "video/x-flv"},
      "Shockwave flash movie",
      REFERENCE_URL,
      ""},
