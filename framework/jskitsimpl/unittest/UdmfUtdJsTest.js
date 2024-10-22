@@ -293,7 +293,7 @@ describe('UdmfUtdJSTest', function () {
     expect(UTD.UniformDataType.MPEG1).assertEqual('general.mpeg-1');
     expect(UTD.UniformDataType.REALMEDIA_VBR).assertEqual('com.real.realmedia-vbr');
     expect(UTD.UniformDataType.REAL_REALVIDEO).assertEqual('com.real.realvideo');
-    expect(UTD.UniformDataType.DIVX_VIDEO).assertEqual('DIVX_VIDEO", "general.divx-video');
+    expect(UTD.UniformDataType.DIVX_VIDEO).assertEqual('general.divx-video');
     expect(UTD.UniformDataType.CSIRO_ANNODEX).assertEqual('org.csiro.annodex');
     expect(UTD.UniformDataType.OGV).assertEqual('general.ogv');
     expect(UTD.UniformDataType.LSF_VIDEO).assertEqual('com.microsoft.lsf-video');
