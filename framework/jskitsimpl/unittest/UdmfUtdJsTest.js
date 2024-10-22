@@ -285,6 +285,19 @@ describe('UdmfUtdJSTest', function () {
     expect(UTD.UniformDataType.MP3).assertEqual('general.mp3');
     expect(UTD.UniformDataType.OGG).assertEqual('general.ogg');
     expect(UTD.UniformDataType.PCM).assertEqual('general.pcm');
+    expect(UTD.UniformDataType.ADOBE_F4V).assertEqual('com.adobe.f4v');
+    expect(UTD.UniformDataType.MP2T).assertEqual('general.mp2t');
+    expect(UTD.UniformDataType.YOUTUBE_VIDEO).assertEqual('com.youtube.video');
+    expect(UTD.UniformDataType.WEBEX_VIDEO).assertEqual('com.cisco.webex-video');
+    expect(UTD.UniformDataType.MPEG2).assertEqual('general.mpeg-2');
+    expect(UTD.UniformDataType.MPEG1).assertEqual('general.mpeg-1');
+    expect(UTD.UniformDataType.REALMEDIA_VBR).assertEqual('com.real.realmedia-vbr');
+    expect(UTD.UniformDataType.REAL_REALVIDEO).assertEqual('com.real.realvideo');
+    expect(UTD.UniformDataType.DIVX_VIDEO).assertEqual('general.divx-video');
+    expect(UTD.UniformDataType.CSIRO_ANNODEX).assertEqual('org.csiro.annodex');
+    expect(UTD.UniformDataType.OGV).assertEqual('general.ogv');
+    expect(UTD.UniformDataType.LSF_VIDEO).assertEqual('com.microsoft.lsf-video');
+    expect(UTD.UniformDataType.H264_VIDEO).assertEqual('general.h264-video');
     console.info(TAG, 'end');
   });
 
@@ -326,6 +339,19 @@ describe('UdmfUtdJSTest', function () {
     expect(UTD.UniformDataType.OPENHARMONY_APP_ITEM).assertEqual('openharmony.app-item');
     expect(UTD.UniformDataType.OPENHARMONY_PIXEL_MAP).assertEqual('openharmony.pixel-map');
     expect(UTD.UniformDataType.OPENHARMONY_ATOMIC_SERVICE).assertEqual('openharmony.atomic-service');
+    expect(UTD.UniformDataType.JPEG2000).assertEqual('general.jpeg-2000');
+    expect(UTD.UniformDataType.RAF_RAW_IMAGE).assertEqual('com.fujifilm.raf-raw-image');
+    expect(UTD.UniformDataType.NRW_RAW_IMAGE).assertEqual('com.nikon.nrw-raw-image');
+    expect(UTD.UniformDataType.RW2_RAW_IMAGE).assertEqual('com.panasonic.rw2-raw-image');
+    expect(UTD.UniformDataType.PEF_RAW_IMAGE).assertEqual('com.pentax.pef-raw-image');
+    expect(UTD.UniformDataType.SRW_RAW_IMAGE).assertEqual('com.sumsung.srw-raw-image');
+    expect(UTD.UniformDataType.ERF_RAW_IMAGE).assertEqual('com.epson.erf-raw-image');
+    expect(UTD.UniformDataType.ORF_RAW_IMAGE).assertEqual('com.olympus.orf-raw-image');
+    expect(UTD.UniformDataType.IEF_IMAGE).assertEqual('general.ief-image');
+    expect(UTD.UniformDataType.ART_IMAGE).assertEqual('com.aol.art-image');
+    expect(UTD.UniformDataType.CONTENT_FORM).assertEqual('general.content-form');
+    expect(UTD.UniformDataType.M4P_AUDIO).assertEqual('com.apple.m4p-audio');
+    expect(UTD.UniformDataType.AC3_AUDIO).assertEqual('general.ac3-audio');
     console.info(TAG, 'end');
   });
 
@@ -983,6 +1009,206 @@ describe('UdmfUtdJSTest', function () {
       console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
       expect(e.code === ERROR_PARAMETER).assertTrue();
     }
+    console.info(TAG, 'end');
+  });
+
+  /*
+   * @tc.name UdmfTestTypeDescriptor046
+   * @tc.desc Test Js Api
+   * @tc.type: FUNC
+   * @tc.require: issueIAY1VI
+   */
+  it('UdmfTestTypeDescriptor046', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor046:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('com.adobe.f4v');
+    let typeId = typeObj.typeId;
+    let belonging = typeObj.belongingToTypes;
+    let description = typeObj.description;
+    let referenceURL = typeObj.referenceURL;
+    let iconFile = typeObj.iconFile;
+    let filenameExtensions = typeObj.filenameExtensions;
+    let mimeTypes = typeObj.mimeTypes;
+    console.info(TAG, ', typeId: ' + typeId + ', ' + Object.prototype.toString.call(typeId) +
+      ', belongingToTypes: ' + belonging + ', ' + Object.prototype.toString.call(belonging));
+    console.info(TAG, 'description: ' + typeObj.description + ', ' + Object.prototype.toString.call(description));
+    console.info(TAG, 'referenceURL: ' + referenceURL + ', ' + Object.prototype.toString.call(referenceURL) +
+      ', iconFile: ' + iconFile + ', ' + Object.prototype.toString.call(iconFile));
+    expect(typeObj.typeId).assertEqual(UTD.UniformDataType.ADOBE_F4V);
+    expect(typeObj.belongingToTypes[0]).assertEqual('general.video');
+    expect(typeObj.description).assertEqual('Flash MP4 Video File');
+    let equalStr = 'https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/' +
+      'apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype';
+    expect(typeObj.referenceURL).assertEqual(equalStr);
+    expect(typeObj.iconFile).assertEqual('');
+    expect(typeObj.filenameExtensions[0]).assertEqual('.f4v');
+    expect(typeObj.mimeTypes[0]).assertEqual('video/mp4');
+    console.info(TAG, 'end');
+  });
+
+  /*
+   * @tc.name UdmfTestTypeDescriptor047
+   * @tc.desc Test Js Api
+   * @tc.type: FUNC
+   * @tc.require: issueIAY1VI
+   */
+  it('UdmfTestTypeDescriptor047', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor047:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('general.ac3-audio');
+    let typeId = typeObj.typeId;
+    let belonging = typeObj.belongingToTypes;
+    let description = typeObj.description;
+    let referenceURL = typeObj.referenceURL;
+    let iconFile = typeObj.iconFile;
+    let filenameExtensions = typeObj.filenameExtensions;
+    let mimeTypes = typeObj.mimeTypes;
+    console.info(TAG, ', typeId: ' + typeId + ', ' + Object.prototype.toString.call(typeId) +
+      ', belongingToTypes: ' + belonging + ', ' + Object.prototype.toString.call(belonging));
+    console.info(TAG, 'description: ' + typeObj.description + ', ' + Object.prototype.toString.call(description));
+    console.info(TAG, 'referenceURL: ' + referenceURL + ', ' + Object.prototype.toString.call(referenceURL) +
+      ', iconFile: ' + iconFile + ', ' + Object.prototype.toString.call(iconFile));
+    expect(typeObj.typeId).assertEqual(UTD.UniformDataType.AC3_AUDIO);
+    expect(typeObj.belongingToTypes[0]).assertEqual('general.audio');
+    expect(typeObj.description).assertEqual('Audio Codec 3 File Format');
+    let equalStr = 'https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/' +
+      'apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype';
+    expect(typeObj.referenceURL).assertEqual(equalStr);
+    expect(typeObj.iconFile).assertEqual('');
+    expect(typeObj.filenameExtensions[0]).assertEqual('.ac3');
+    expect(typeObj.mimeTypes[0]).assertEqual('audio/ac3');
+    console.info(TAG, 'end');
+  });
+
+  /*
+   * @tc.name UdmfTestTypeDescriptor048
+   * @tc.desc Test Js Api isLowerLevelType
+   * @tc.type: FUNC
+   * @tc.require: issueIAY1VI
+   */
+  it('UdmfTestTypeDescriptor048', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor048:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('com.aol.art-image');
+    let belongsToRet = typeObj.belongsTo('general.image');
+    expect(belongsToRet === true).assertTrue();
+    let LowerLevelRet = typeObj.isLowerLevelType('general.object');
+    expect(LowerLevelRet === true).assertTrue();
+    console.info(TAG, 'end');
+  });
+
+  /*
+   * @tc.name UdmfTestTypeDescriptor049
+   * @tc.desc Test Js Api isLowerLevelType
+   * @tc.type: FUNC
+   * @tc.require: issueIAY1VI
+   */
+   it('UdmfTestTypeDescriptor049', 0, function () {
+     const TAG = 'UdmfTestTypeDescriptor049:';
+     console.info(TAG, 'start');
+     let typeObj = UTD.getTypeDescriptor('com.aol.art-image');
+     let belongsToRet = typeObj.belongsTo('general.image');
+     expect(belongsToRet === true).assertTrue();
+     let LowerLevelRet = typeObj.isLowerLevelType('general.object');
+     expect(LowerLevelRet === true).assertTrue();
+     console.info(TAG, 'end');
+   });
+
+  /*
+   * @tc.name UdmfTestTypeDescriptor050
+   * @tc.desc Test Js Api isHigherLevelType
+   * @tc.type: FUNC
+   * @tc.require: issueIAY1VI
+   */
+   it('UdmfTestTypeDescriptor050', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor050:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('com.apple.m4p-audio');
+    let belongsToRet = typeObj.belongsTo('general.audio');
+    expect(belongsToRet === true).assertTrue();
+    let higherLevelRet = UTD.getTypeDescriptor('general.media').isHigherLevelType(UTD.UniformDataType.M4P_AUDIO);
+    expect(higherLevelRet === true).assertTrue();
+    console.info(TAG, 'end');
+  });
+
+  /*
+   * @tc.name UdmfTestTypeDescriptor051
+   * @tc.desc Test Js Api getUniformDataTypeByFilenameExtension
+   * @tc.type: FUNC
+   * @tc.require: issueIAY1VI
+   */
+  it('UdmfTestTypeDescriptor051', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor051:';
+    console.info(TAG, 'start');
+    let typeId = UTD.getUniformDataTypeByFilenameExtension('.nrw');
+    expect(typeId === 'com.nikon.nrw-raw-image').assertTrue();
+    console.info(TAG, 'typeDescriptor, ret ' + typeId);
+    console.info(TAG, 'end');
+  });
+
+  /*
+   * @tc.name UdmfTestTypeDescriptor052
+   * @tc.desc Test utd(general.mpeg-4) filename extension
+   * @tc.type: FUNC
+   * @tc.require: issueIAY1VI
+   */
+  it('UdmfTestTypeDescriptor052', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor052:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('general.mpeg-4');
+    let filenameExtensions = typeObj.filenameExtensions;
+    expect(typeObj.filenameExtensions[0]).assertEqual('.mp4');
+    expect(typeObj.filenameExtensions[1]).assertEqual('.mp4v');
+    expect(typeObj.filenameExtensions[2]).assertEqual('.mpeg4');
+    console.info(TAG, 'end');
+  });
+
+  /*
+   * @tc.name UdmfTestTypeDescriptor053
+   * @tc.desc Test utd(general.heif) filename extension
+   * @tc.type: FUNC
+   * @tc.require: issueIAY1VI
+   */
+  it('UdmfTestTypeDescriptor053', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor053:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('general.heif');
+    let filenameExtensions = typeObj.filenameExtensions;
+    expect(typeObj.filenameExtensions[0]).assertEqual('.heif');
+    expect(typeObj.filenameExtensions[1]).assertEqual('.heifs');
+    expect(typeObj.filenameExtensions[2]).assertEqual('.hif');
+    console.info(TAG, 'end');
+  });
+
+  /*
+   * @tc.name UdmfTestTypeDescriptor054
+   * @tc.desc Test utd(general.mpeg-4-audio) filename extension
+   * @tc.type: FUNC
+   * @tc.require: issueIAY1VI
+   */
+  it('UdmfTestTypeDescriptor054', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor054:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('general.mpeg-4-audio');
+    let filenameExtensions = typeObj.filenameExtensions;
+    expect(typeObj.filenameExtensions[0]).assertEqual('.m4a');
+    expect(typeObj.filenameExtensions[1]).assertEqual('.m4b');
+    console.info(TAG, 'end');
+  });
+
+  /*
+   * @tc.name UdmfTestTypeDescriptor055
+   * @tc.desc Test utd(general.heic) filename extension
+   * @tc.type: FUNC
+   * @tc.require: issueIAY1VI
+   */
+  it('UdmfTestTypeDescriptor055', 0, function () {
+    const TAG = 'UdmfTestTypeDescriptor055:';
+    console.info(TAG, 'start');
+    let typeObj = UTD.getTypeDescriptor('general.heic');
+    let filenameExtensions = typeObj.filenameExtensions;
+    expect(typeObj.filenameExtensions[0]).assertEqual('.heic');
+    expect(typeObj.filenameExtensions[1]).assertEqual('.heics');
     console.info(TAG, 'end');
   });
 });
