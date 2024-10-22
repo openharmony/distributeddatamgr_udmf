@@ -34,7 +34,7 @@ public:
 
     void AddRecord(const std::shared_ptr<UnifiedRecord> &record);
     void AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>> &records);
-    std::shared_ptr<UnifiedRecord> GetRecordAt(std::size_t index);
+    std::shared_ptr<UnifiedRecord> GetRecordAt(std::size_t index) const;
     void SetRecords(std::vector<std::shared_ptr<UnifiedRecord>> records);
     std::vector<std::shared_ptr<UnifiedRecord>> GetRecords() const;
 
