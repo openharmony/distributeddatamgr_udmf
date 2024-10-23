@@ -56,6 +56,12 @@ constexpr const char *ORI_URI = "oriUri";
 constexpr const char *REMOTE_URI = "remoteUri";
 constexpr const char *DETAILS = "details";
 constexpr const char *VALUE_TYPE = "VALUE_TYPE";
+constexpr const char *THUMB_DATA = "thumbData";
+constexpr const char *THUMB_DATA_LENGTH = "thumbDataLen";
+constexpr const char *TITLE = "title";
+constexpr const char* APP_ICON = "appIcon";
+constexpr const char* APP_ICON_LENGTH = "appIconLen";
+constexpr const char* LINK_URL = "linkUrl";
 
 enum UDType : int32_t {
     ENTITY = 0,

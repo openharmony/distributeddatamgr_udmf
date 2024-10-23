@@ -600,30 +600,33 @@ HWTEST_F(NdkDataConversionTest, ConvertApplicationDefined_004, TestSize.Level1)
 }
 
 /* *
- * @tc.name: ConvertHtml_001
- * @tc.desc: test html conversion between JS and C-API
+ * @tc.name: ConvertOhtherUds_001
+ * @tc.desc: test other conversion between JS and C-API
  * @tc.type: FUNC
  */
-HWTEST_F(NdkDataConversionTest, ConvertHtml_001, TestSize.Level1)
+HWTEST_F(NdkDataConversionTest, ConvertOhtherUds_001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "ConvertHtml_001 begin.");
+    LOG_INFO(UDMF_TEST, "ConvertOhtherUds_001 begin.");
     std::string definedTypeId = "person_app_demo";
     std::shared_ptr<Html> html = std::make_shared<Html>("htmlContent", "plainContent");
+    std::map<std::string, ValueType> value;
+    std::vector<uint8_t> thumbData = {1, 2, 3, 4, 5};
+    auto obj = std::make_shared<Object>();
+    obj->value_.emplace(UNIFORM_DATA_TYPE, "general.content-form");
+    obj->value_.emplace(TITLE, "title");
+    obj->value_.emplace(THUMB_DATA, thumbData);
+    std::shared_ptr<UnifiedRecord> contentForm = std::make_shared<UnifiedRecord>(UDType::CONTENT_FORM, obj);
     UnifiedData data;
-    std::vector<std::shared_ptr<UnifiedRecord>> records = { html };
+    std::vector<std::shared_ptr<UnifiedRecord>> records = { html, contentForm };
     data.SetRecords(records);
 
     std::string key;
-    CustomOption option = {
-        .intention = UD_INTENTION_DRAG
-    };
+    CustomOption option = { .intention = UD_INTENTION_DRAG };
     auto setRet = UdmfClient::GetInstance().SetData(option, data, key);
     EXPECT_EQ(setRet, E_OK);
 
     std::shared_ptr<UnifiedData> readData = std::make_shared<UnifiedData>();
-    QueryOption query = {
-        .key = key
-    };
+    QueryOption query = { .key = key };
     auto getRet = UdmfClient::GetInstance().GetData(query, *readData);
     EXPECT_EQ(getRet, E_OK);
 
@@ -631,27 +634,39 @@ HWTEST_F(NdkDataConversionTest, ConvertHtml_001, TestSize.Level1)
     NdkDataConversion::GetNdkUnifiedData(readData, ndkData);
     unsigned int count;
     OH_UdmfData_GetRecords(ndkData, &count);
-    EXPECT_EQ(1, count);
+    EXPECT_EQ(2, count);
     auto record = OH_UdmfData_GetRecord(ndkData, 0);
     auto htmlNdk = OH_UdsHtml_Create();
     auto result = OH_UdmfRecord_GetHtml(record, htmlNdk);
     EXPECT_EQ(0, result);
+    EXPECT_EQ("general.html", std::string(OH_UdsHtml_GetType(htmlNdk)));
     EXPECT_EQ("htmlContent", std::string(OH_UdsHtml_GetContent(htmlNdk)));
     EXPECT_EQ("plainContent", std::string(OH_UdsHtml_GetPlainContent(htmlNdk)));
 
+    auto contentFormRecord = OH_UdmfData_GetRecord(ndkData, 1);
+    auto contentFormNdk = OH_UdsContentForm_Create();
+    result = OH_UdmfRecord_GetContentForm(contentFormRecord, contentFormNdk);
+    EXPECT_EQ(0, result);
+    EXPECT_EQ("general.content-form", std::string(OH_UdsContentForm_GetType(contentFormNdk)));
+    EXPECT_EQ("title", std::string(OH_UdsContentForm_GetTitle(contentFormNdk)));
+    unsigned char *readThumbData;
+    unsigned int thumbDataLen = 0;
+    EXPECT_EQ(0, OH_UdsContentForm_GetThumbData(contentFormNdk, &readThumbData, &thumbDataLen));
+    EXPECT_EQ(5, thumbDataLen);
     OH_UdsHtml_Destroy(htmlNdk);
+    OH_UdsContentForm_Destroy(contentFormNdk);
     OH_UdmfData_Destroy(ndkData);
-    LOG_INFO(UDMF_TEST, "ConvertHtml_001 end.");
+    LOG_INFO(UDMF_TEST, "ConvertOhtherUds_001 end.");
 }
 
 /* *
- * @tc.name: ConvertHtml_002
+ * @tc.name: ConvertOhtherUds_002
  * @tc.desc: test html conversion between JS and C-API
  * @tc.type: FUNC
  */
-HWTEST_F(NdkDataConversionTest, ConvertHtml_002, TestSize.Level1)
+HWTEST_F(NdkDataConversionTest, ConvertOhtherUds_002, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "ConvertHtml_002 begin.");
+    LOG_INFO(UDMF_TEST, "ConvertOhtherUds_002 begin.");
     auto htmlNdk = OH_UdsHtml_Create();
     OH_UdsHtml_SetContent(htmlNdk, "htmlContent");
     OH_UdsHtml_SetPlainContent(htmlNdk, "plainContent");
@@ -659,20 +674,24 @@ HWTEST_F(NdkDataConversionTest, ConvertHtml_002, TestSize.Level1)
     OH_UdmfRecord_AddHtml(record, htmlNdk);
     auto ndkData = OH_UdmfData_Create();
     OH_UdmfData_AddRecord(ndkData, record);
+    auto record2 = OH_UdmfRecord_Create();
+    auto contentFormNdk = OH_UdsContentForm_Create();
+    OH_UdsContentForm_SetTitle(contentFormNdk, "title");
+    unsigned char thumbData[] = {0, 1, 2, 3, 4};
+    OH_UdsContentForm_SetThumbData(contentFormNdk, thumbData, 5);
+    OH_UdmfRecord_AddContentForm(record2, contentFormNdk);
+    OH_UdmfData_AddRecord(ndkData, record2);
+
     std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
     auto conversionStatus = NdkDataConversion::GetNativeUnifiedData(ndkData, unifiedData);
     EXPECT_EQ(conversionStatus, E_OK);
     std::string key;
-    CustomOption option = {
-        .intention = UD_INTENTION_DRAG
-    };
+    CustomOption option = { .intention = UD_INTENTION_DRAG };
     auto setRet = UdmfClient::GetInstance().SetData(option, *unifiedData, key);
     EXPECT_EQ(setRet, E_OK);
 
     std::shared_ptr<UnifiedData> readData = std::make_shared<UnifiedData>();
-    QueryOption query = {
-        .key = key
-    };
+    QueryOption query = { .key = key };
     auto getRet = UdmfClient::GetInstance().GetData(query, *readData);
     EXPECT_EQ(getRet, E_OK);
 
@@ -681,9 +700,19 @@ HWTEST_F(NdkDataConversionTest, ConvertHtml_002, TestSize.Level1)
     EXPECT_EQ("htmlContent", html->GetHtmlContent());
     EXPECT_EQ("plainContent", html->GetPlainContent());
 
+    auto contentForm = readData->GetRecordAt(1);
+    auto value = contentForm->GetValue();
+    auto obj = std::get<std::shared_ptr<Object>>(value);
+    EXPECT_EQ("general.content-form", std::get<std::string>(obj->value_[UNIFORM_DATA_TYPE]));
+    EXPECT_EQ(5, std::get<int>(obj->value_[THUMB_DATA_LENGTH]));
+    auto readThumbData = std::get<std::vector<uint8_t>>(obj->value_[THUMB_DATA]);
+    EXPECT_EQ(4, readThumbData.at(4));
+
     OH_UdsHtml_Destroy(htmlNdk);
+    OH_UdsContentForm_Destroy(contentFormNdk);
     OH_UdmfRecord_Destroy(record);
+    OH_UdmfRecord_Destroy(record2);
     OH_UdmfData_Destroy(ndkData);
-    LOG_INFO(UDMF_TEST, "ConvertHtml_002 end.");
+    LOG_INFO(UDMF_TEST, "ConvertOhtherUds_002 end.");
 }
 }

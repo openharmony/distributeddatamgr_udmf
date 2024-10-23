@@ -87,6 +87,13 @@ typedef struct OH_UdsFileUri OH_UdsFileUri;
 typedef struct OH_UdsPixelMap OH_UdsPixelMap;
 
 /**
+ * @brief Describes the unified data struct of content form.
+ *
+ * @since 14
+ */
+typedef struct OH_UdsContentForm OH_UdsContentForm;
+
+/**
  * @brief Describes the of pixel map native.
  *
  * @since 13
@@ -668,6 +675,185 @@ int OH_UdsArrayBuffer_SetData(OH_UdsArrayBuffer* buffer, unsigned char* data, un
  * @since 13
  */
 int OH_UdsArrayBuffer_GetData(OH_UdsArrayBuffer* buffer, unsigned char** data, unsigned int* len);
+
+/**
+ * @brief Creation a pointer to the instance of the {@link OH_UdsContentForm}.
+ *
+ * @return If the operation is successful, a pointer to the instance of the {@link OH_UdsContentForm}
+ * structure is returned. If the operation is failed, nullptr is returned.
+ * @see OH_UdsContentForm
+ * @since 14
+ */
+OH_UdsContentForm* OH_UdsContentForm_Create();
+
+/**
+ * @brief Destroy a pointer that points to the {@link OH_UdsContentForm} instance.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @see OH_UdsContentForm
+ * @since 14
+ */
+void OH_UdsContentForm_Destroy(OH_UdsContentForm* pThis);
+
+/**
+ * @brief Get type id from the {@link OH_UdsContentForm}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @return Returns a pointer of the value string when input args normally, otherwise return nullptr.
+ * @see OH_UdsContentForm
+ * @since 14
+ */
+const char* OH_UdsContentForm_GetType(OH_UdsContentForm* pThis);
+
+/**
+ * @brief Get thumb data from the {@link OH_UdsContentForm}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @param thumbData Represents a pointer to thumb data that is a output param.
+ * @param len Represents the thumb data length that is a output param.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ *         {@link UDMF_ERR} Internal data error.
+ * @see OH_UdsContentForm Udmf_ErrCode
+ * @since 14
+ */
+int OH_UdsContentForm_GetThumbData(OH_UdsContentForm* pThis, unsigned char** thumbData, unsigned int* len);
+
+/**
+ * @brief Get description from the {@link OH_UdsContentForm}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @return Returns a pointer of the value string when input args normally, otherwise return nullptr.
+ * @see OH_UdsContentForm
+ * @since 14
+ */
+const char* OH_UdsContentForm_GetDescription(OH_UdsContentForm* pThis);
+
+/**
+ * @brief Get title from the {@link OH_UdsContentForm}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @return Returns a pointer of the value string when input args normally, otherwise return nullptr.
+ * @see OH_UdsContentForm
+ * @since 14
+ */
+const char* OH_UdsContentForm_GetTitle(OH_UdsContentForm* pThis);
+
+/**
+ * @brief Get thumb data from the {@link OH_UdsContentForm}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @param appIcon Represents a pointer to app icon that is a output param.
+ * @param len Represents the app icon length that is a output param.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ *         {@link UDMF_ERR} Internal data error.
+ * @see OH_UdsContentForm Udmf_ErrCode
+ * @since 14
+ */
+int OH_UdsContentForm_GetAppIcon(OH_UdsContentForm* pThis, unsigned char** appIcon, unsigned int* len);
+
+/**
+ * @brief Get app name from the {@link OH_UdsContentForm}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @return Returns a pointer of the value string when input args normally, otherwise return nullptr.
+ * @see OH_UdsContentForm
+ * @since 14
+ */
+const char* OH_UdsContentForm_GetAppName(OH_UdsContentForm* pThis);
+
+/**
+ * @brief Get link url from the {@link OH_UdsContentForm}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @return Returns a pointer of the value string when input args normally, otherwise return nullptr.
+ * @see OH_UdsContentForm
+ * @since 14
+ */
+const char* OH_UdsContentForm_GetLinkUri(OH_UdsContentForm* pThis);
+
+/**
+ * @brief Set thumb data to the {@link OH_UdsContentForm}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @param thumbData Represents the thumb data.
+ * @param len Represents the length of thumb data param.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsContentForm Udmf_ErrCode
+ * @since 14
+ */
+int OH_UdsContentForm_SetThumbData(OH_UdsContentForm* pThis, const unsigned char* thumbData, unsigned int len);
+
+/**
+ * @brief Set description to the {@link OH_UdsContentForm}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @param description Represents a description string.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsContentForm Udmf_ErrCode
+ * @since 14
+ */
+int OH_UdsContentForm_SetDescription(OH_UdsContentForm* pThis, const char* description);
+
+/**
+ * @brief Set title to the {@link OH_UdsContentForm}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @param title Represents a title string.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsContentForm Udmf_ErrCode
+ * @since 14
+ */
+int OH_UdsContentForm_SetTitle(OH_UdsContentForm* pThis, const char* title);
+
+/**
+ * @brief Set thumb data to the {@link OH_UdsContentForm}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @param appIcon Represents the app icon.
+ * @param len Represents the length of app icon param.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsContentForm Udmf_ErrCode
+ * @since 14
+ */
+int OH_UdsContentForm_SetAppIcon(OH_UdsContentForm* pThis, const unsigned char* appIcon, unsigned int len);
+
+/**
+ * @brief Set app name to the {@link OH_UdsContentForm}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @param appName Represents a app name string.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsContentForm Udmf_ErrCode
+ * @since 14
+ */
+int OH_UdsContentForm_SetAppName(OH_UdsContentForm* pThis, const char* appName);
+
+/**
+ * @brief Set link uri to the {@link OH_UdsContentForm}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsContentForm}.
+ * @param linkUri Represents a link uri string.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsContentForm Udmf_ErrCode
+ * @since 14
+ */
+int OH_UdsContentForm_SetLinkUri(OH_UdsContentForm* pThis, const char* linkUri);
 
 #ifdef __cplusplus
 };

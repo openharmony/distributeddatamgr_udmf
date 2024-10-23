@@ -627,6 +627,15 @@ int OH_UdmfRecord_AddArrayBuffer(OH_UdmfRecord* record, const char* type, OH_Uds
     return OH_UdmfRecord_AddGeneralEntry(record, type, entry, size);
 }
 
+int OH_UdmfRecord_AddContentForm(OH_UdmfRecord* record, OH_UdsContentForm* contentForm)
+{
+    if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(contentForm, UDS_CONTENT_FORM_STRUCT_ID)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    AddUds<UnifiedRecord>(record, contentForm, UDType::CONTENT_FORM);
+    return UDMF_E_OK;
+}
+
 int OH_UdmfRecord_GetPlainText(OH_UdmfRecord* record, OH_UdsPlainText* plainText)
 {
     if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(plainText, UDS_PLAIN_TEXT_STRUCT_ID)) {
@@ -697,6 +706,14 @@ int OH_UdmfRecord_GetArrayBuffer(OH_UdmfRecord* record, const char* type, OH_Uds
         return ret;
     }
     return OH_UdsArrayBuffer_SetData(buffer, entry, size);
+}
+
+int OH_UdmfRecord_GetContentForm(OH_UdmfRecord* record, OH_UdsContentForm* contentForm)
+{
+    if (!IsUnifiedRecordValid(record) || IsInvalidUdsObjectPtr(contentForm, UDS_CONTENT_FORM_STRUCT_ID)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    return GetUds(record, contentForm, UDType::CONTENT_FORM);
 }
 
 OH_UdmfProperty* OH_UdmfProperty_Create(OH_UdmfData* data)
