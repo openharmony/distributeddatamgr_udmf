@@ -54,7 +54,6 @@ struct ContextBase {
 
 private:
     napi_deferred deferred = nullptr;
-    napi_async_work work = nullptr;
     napi_ref callbackRef = nullptr;
     napi_ref selfRef = nullptr;
 
@@ -180,7 +179,18 @@ private:
         RESULT_ALL = 2
     };
 
+    struct AsyncContext {
+        std::shared_ptr<ContextBase> ctxt;
+        NapiAsyncExecute execute = nullptr;
+        NapiAsyncComplete complete = nullptr;
+        napi_deferred deferred = nullptr;
+        napi_async_work work = nullptr;
+    };
+
     static void GenerateOutput(ContextBase *ctxt);
+
+    static void onExecute(napi_env env, void *data);
+    static void onComplete(napi_env env, napi_status status, void *data);
 };
 } // namespace UDMF
 } // namespace OHOS
