@@ -3288,7 +3288,7 @@ void PresetTypeDescriptors::InitDescriptors()
          "Audio Codec 3 File Format",
          REFERENCE_URL,
          ""}
-    }
+    };
 };
 } // namespace UDMF
 } // namespace OHOS
