@@ -73,7 +73,6 @@ config("arkui_x_udmf_config") {
 }
 
 arkui_x_public_source = [
-  "${udmf_framework_path}/innerkitsimpl/client/getter_system.cpp",
   "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
   "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
@@ -103,9 +102,9 @@ ohos_source_set("arkui_x_udmf_data") {
     "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
     "${udmf_framework_path}/common/custom_utd_store.cpp",
     "${udmf_framework_path}/common/graph.cpp",
+    "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
     "${udmf_framework_path}/common/utd_graph.cpp",
-    "${udmf_root_path}/adapter/framework/common/udmf_utils.cpp",
   ]
 
   sources += arkui_x_public_source
