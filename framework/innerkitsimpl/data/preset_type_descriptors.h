@@ -29,8 +29,8 @@ private:
     ~PresetTypeDescriptors();
     PresetTypeDescriptors(const PresetTypeDescriptors &obj) = delete;
     PresetTypeDescriptors &operator=(const PresetTypeDescriptors &obj) = delete;
-
-    static std::vector<TypeDescriptorCfg> typeDescriptors_;
+    void InitDescriptors();
+    std::vector<TypeDescriptorCfg> typeDescriptors_;
 };
 } // namespace UDMF
 } // namespace OHOS
