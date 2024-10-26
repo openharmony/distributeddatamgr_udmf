@@ -2967,6 +2967,20 @@ void PresetTypeDescriptors::InitDescriptors()
          "OpenHarmony system defined application package",
          REFERENCE_URL,
          ""},
+        {"com.huawei.hmos.settings.wifi",
+         {"general.text"},
+         {".hmoswifi"},
+         {},
+         "HarmonyOS WIFI sharing setting",
+         REFERENCE_URL,
+         ""},
+        {"general.tel",
+         {"general.text"},
+         {".tel"},
+         {},
+         "TEL schematic diagram file format",
+         REFERENCE_URL,
+         ""},
     };
 }
 } // namespace UDMF
