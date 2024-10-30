@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,34 +15,15 @@
 
 #ifndef UDMF_TLV_OBJECT_H
 #define UDMF_TLV_OBJECT_H
-
-#include <cstdio>
+#include <cstddef>
+#include <type_traits>
 #include "securec.h"
-#include "error_code.h"
 #include "unified_meta.h"
-#include "unified_types.h"
 #include "endian_converter.h"
-#include "visibility.h"
+#include "tlv_tag.h"
+
 namespace OHOS {
 namespace UDMF {
-enum class TAG {
-    TAG_INT32 = 0x0000,
-    TAG_INT64,
-    TAG_UINT32,
-    TAG_UINT64,
-    TAG_BOOL,
-    TAG_DOUBLE,
-    TAG_STRING,
-    TAG_VECTOR,
-    TAG_MAP,
-    TAG_WANT,
-    TAG_PIXELMAP,
-    TAG_OBJECT,
-    TAG_NULL,
-    TAG_UNDEFINED,
-    TAG_BUTT,
-};
-
 #pragma pack(1)
 struct TLVHead {
     uint16_t tag;
@@ -59,98 +40,83 @@ public:
     void SetFile(std::FILE *file);
     void UpdateSize();
     std::vector<std::uint8_t> GetBuffer();
-    void Count(const uint32_t value);
-    void Count(const uint64_t value);
-    void Count(const int32_t value);
-    void Count(const int64_t value);
-    void Count(const float value);
-    void Count(const double value);
-    void Count(const std::string &value);
-    void Count(const std::vector<uint8_t> &value);
-    void Count(const UDVariant &value);
-    void Count(const ValueType &value);
-    void Count(const UDDetails &value);
-    void Count(const UnifiedKey &value);
-    void Count(const Privilege &value);
-    void Count(const std::shared_ptr<OHOS::AAFwk::Want> &value);
-    void Count(const std::shared_ptr<OHOS::Media::PixelMap> &value);
-    void Count(const std::shared_ptr<Object> &value);
-    void Count(const std::monostate &value);
-    void Count(const void *value);
+    size_t GetTotal();
+    size_t GetCursor();
+    size_t OffsetHead();
+    void ResetCursor();
 
-    template<typename T> bool WriteBasic(TAG type, const T &value);
-    template<typename T> bool ReadBasic(T &value);
-    bool WriteString(const std::string &value);
-    bool ReadString(std::string &value);
-    bool WriteVector(const std::vector<uint8_t> &value);
-    bool ReadVector(std::vector<uint8_t> &value);
-    bool WriteVariant(const UDVariant &value);
-    bool ReadVariant(UDVariant &value);
-    bool WriteVariant(const ValueType &value);
-    bool ReadVariant(ValueType &value);
-    bool WriteMap(const UDDetails &value);
-    bool ReadMap(UDDetails &value);
-    bool WriteObject(const std::shared_ptr<Object> &value);
-    bool ReadObject(std::shared_ptr<Object> &value);
-    bool WriteWant(const std::shared_ptr<OHOS::AAFwk::Want> &value);
-    bool ReadWant(std::shared_ptr<OHOS::AAFwk::Want> &value);
-    bool WritePixelMap(const std::shared_ptr<OHOS::Media::PixelMap> &value);
-    bool ReadPixelMap(std::shared_ptr<OHOS::Media::PixelMap> &value);
-    bool WriteUndefined(const std::monostate &value);
-    bool ReadUndefined(std::monostate &value);
-    bool WriteNull(const void *value);
-    bool ReadNull(void *value);
+    size_t Count(const std::string &value);
+    size_t Count(const std::vector<uint8_t> &value);
+    size_t Count(const OHOS::AAFwk::Want &value);
+    size_t Count(const std::monostate &value);
+    size_t Count(const void *value);
 
-private:
-    bool WriteVariantInner(TAG &tag, const UDVariant &value);
-    bool ReadVariantInner(uint16_t tag, UDVariant &value);
-    bool WriteVariantInner(TAG &tag, const ValueType &value);
-    bool ReadVariantInner(uint16_t tag, ValueType &value);
+    bool Write(TAG tag, const std::string &value);
+    bool Write(TAG tag, const std::vector<uint8_t> &value);
+    bool Write(TAG tag, const OHOS::AAFwk::Want &value);
+    bool Write(TAG tag, const std::monostate &value);
+    bool Write(TAG tag, const void *value);
+
+    bool Read(std::string &value, const TLVHead &head);
+    bool Read(std::vector<uint8_t> &value, const TLVHead &head);
+    bool Read(OHOS::AAFwk::Want &value, const TLVHead &head);
+    bool Read(std::monostate &value, const TLVHead &head);
+    bool Read(void *value, const TLVHead &head);
+
+    template <typename T> size_t CountBasic(const T &value);
+    template <typename T> bool WriteBasic(TAG type, const T &value);
+    template <typename T> bool ReadBasic(T &value, const TLVHead &head);
+
+    size_t CountHead();
+    bool WriteHead(uint16_t tag, uint32_t len);
+    bool WriteBackHead(uint16_t tag, size_t tagCursor, uint32_t len);
     bool ReadHead(TLVHead &head);
-    void WriteHead(uint16_t type, size_t tagCursor, uint32_t len);
+
+    bool Skip(TLVHead &head);
     bool HasExpectBuffer(const uint32_t expectLen) const;
-    bool PrepareHeader(size_t size, size_t &tagCursor, size_t &valueCursor);
-    void PrepareBuffer(size_t size);
     bool SaveBufferToFile();
+    bool SaveBufferToFileFront(size_t tagCursor, uint32_t len);
     bool LoadBufferFormFile(size_t size);
 
+
 private:
+    void PrepareBufferForFile(size_t size);
+    std::uint8_t *GetStartCursor();
+
     std::size_t total_ = 0;
     std::size_t cursor_ = 0;
     std::vector<std::uint8_t> *buffer_;
     std::FILE *file_ = nullptr;
 };
 
-template<typename T>
-bool TLVObject::WriteBasic(TAG type, const T &value)
+template <typename T> size_t TLVObject::CountBasic(const T &value)
 {
-    PrepareBuffer(sizeof(TLVHead) + sizeof(value));
+    static_assert(std::is_fundamental<T>::value, "T must be a fundamental type.");
+    auto size = sizeof(value) + sizeof(TLVHead);
+    total_ += size;
+    return size;
+}
+
+template <typename T> bool TLVObject::WriteBasic(TAG type, const T &value)
+{
+    static_assert(std::is_fundamental<T>::value, "T must be a fundamental type.");
     if (!HasExpectBuffer(sizeof(TLVHead) + sizeof(value))) {
         return false;
     }
-    auto *tlvHead = reinterpret_cast<TLVHead*>(buffer_->data() + cursor_);
+    auto tlvHead = reinterpret_cast<TLVHead *>(GetStartCursor());
     tlvHead->tag = HostToNet(static_cast<uint16_t>(type));
     tlvHead->len = HostToNet((uint32_t)sizeof(value));
     auto valueBuff = HostToNet(value);
-    size_t maxSize = sizeof(value) + 1;
-    auto ret = memcpy_s(tlvHead->value, maxSize, &valueBuff, sizeof(value));
-    if (ret != EOK) {
-        return false;
-    }
-    if (!SaveBufferToFile()) {
+    if (memcpy_s(tlvHead->value, sizeof(value), &valueBuff, sizeof(value)) != EOK) {
         return false;
     }
     cursor_ += sizeof(TLVHead) + sizeof(value);
-    return true;
+    return SaveBufferToFile();
 }
 
-template<typename T>
-bool TLVObject::ReadBasic(T &value)
+template <typename T> bool TLVObject::ReadBasic(T &value, const TLVHead &head)
 {
-    TLVHead head {};
-    if (!ReadHead(head)) {
-        return false;
-    }
+    static_assert(std::is_fundamental<T>::value, "T must be a fundamental type.");
     if (head.len == 0 || head.len != sizeof(T)) {
         return false;
     }
@@ -160,18 +126,15 @@ bool TLVObject::ReadBasic(T &value)
     if (!LoadBufferFormFile(head.len)) {
         return false;
     }
-    auto ret = memcpy_s(&value, sizeof(T), buffer_->data() + cursor_, sizeof(T));
+    auto startCursor = GetStartCursor();
+    auto ret = memcpy_s(&value, sizeof(T), startCursor, sizeof(T));
     if (ret != EOK) {
         return false;
     }
     value = NetToHost(value);
     cursor_ += sizeof(T);
-    if (file_ != nullptr) {
-        cursor_ += sizeof(TLVHead);
-    }
     return true;
 }
-
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_TLV_OBJECT_H

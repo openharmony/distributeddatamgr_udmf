@@ -452,6 +452,7 @@ static int GetValueFromUdsArrayBuffer(OH_UdmfRecord *record, const char *typeId,
     int ret = OH_UdsArrayBuffer_GetData(buffer, &record->recordData, &record->recordDataLen);
     if (ret != UDMF_E_OK) {
         LOG_ERROR(UDMF_CAPI, "get data from buffer failed. ret: %{public}d", ret);
+        OH_UdsArrayBuffer_Destroy(buffer);
         return ret;
     }
     record->lastType = const_cast<char*>(typeId);

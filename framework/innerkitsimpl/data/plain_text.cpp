@@ -87,15 +87,6 @@ void PlainText::SetAbstract(const std::string &abstract)
     }
 }
 
-ValueType PlainText::GetValue()
-{
-    if (std::holds_alternative<std::monostate>(value_)) {
-        value_ = std::make_shared<Object>();
-    }
-    InitObject();
-    return value_;
-}
-
 void PlainText::InitObject()
 {
     if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {

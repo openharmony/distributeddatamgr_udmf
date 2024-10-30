@@ -21,10 +21,12 @@ config("module_private_config") {
     "${udmf_interfaces_path}/innerkits/client",
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_interfaces_path}/innerkits/convert",
     "${udmf_interfaces_path}/ndk/data",
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/innerkits/service",
-    "${udmf_framework_path}/innerkits/convert",
+    "${udmf_framework_path}/innerkitsimpl/client/",
+    "${udmf_framework_path}/innerkitsimpl/test/unittest/mock/include",
     "${udmf_framework_path}/ndkimpl/data",
   ]
 }
@@ -43,6 +45,9 @@ common_external_deps = [
   "c_utils:utils",
   "hilog:libhilog",
   "image_framework:image",
+  "image_framework:image",
+  "image_framework:image_native",
+  "image_framework:pixelmap",
   "ipc:ipc_core",
   "kv_store:distributeddata_inner",
   "samgr:samgr_proxy",
@@ -109,14 +114,256 @@ ohos_unittest("NdkDataConversionTest") {
   external_deps = common_external_deps
 }
 
+ohos_unittest("ApplicationDefineRecordTest") {
+  module_out_path = module_output_path
+
+  sources = [ "application_defined_record_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("AudioTest") {
+  module_out_path = module_output_path
+
+  sources = [ "audio_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("FileDataTest") {
+  module_out_path = module_output_path
+
+  sources = [ "file_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("FlexibleTypeTest") {
+  module_out_path = module_output_path
+
+  sources = [ "flexible_type_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("FolderTest") {
+  module_out_path = module_output_path
+
+  sources = [ "folder_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("HtmlTest") {
+  module_out_path = module_output_path
+
+  sources = [ "html_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("ImageTest") {
+  module_out_path = module_output_path
+
+  sources = [ "image_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("LinkTest") {
+  module_out_path = module_output_path
+
+  sources = [ "link_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("PlainTextTest") {
+  module_out_path = module_output_path
+
+  sources = [ "plain_text_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("SystemDefinedAppitemTest") {
+  module_out_path = module_output_path
+
+  sources = [ "system_defined_appitem_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("SystemDefinedFormTest") {
+  module_out_path = module_output_path
+
+  sources = [ "system_defined_form_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("SystemDefinedPixelMapTest") {
+  module_out_path = module_output_path
+
+  sources = [ "system_defined_pixelmap_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("SystemDefinedRecordTest") {
+  module_out_path = module_output_path
+
+  sources = [ "system_defined_record_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("TextTest") {
+  module_out_path = module_output_path
+
+  sources = [ "text_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("UnifiedDataTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unified_data_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
 
   deps = [
+    ":ApplicationDefineRecordTest",
+    ":AudioTest",
+    ":FileDataTest",
+    ":FlexibleTypeTest",
+    ":FolderTest",
+    ":HtmlTest",
+    ":ImageTest",
+    ":LinkTest",
     ":NdkDataConversionTest",
+    ":PlainTextTest",
+    ":SystemDefinedAppitemTest",
+    ":SystemDefinedFormTest",
+    ":SystemDefinedPixelMapTest",
+    ":SystemDefinedRecordTest",
+    ":TextTest",
     ":UdmfClientSystemHapTest",
     ":UdmfClientTest",
+    ":UnifiedDataTest",
     ":UtdClientTest",
   ]
 }

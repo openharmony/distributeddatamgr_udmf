@@ -15,11 +15,9 @@
 #define LOG_TAG "UdmfServiceProxy"
 #include "udmf_service_proxy.h"
 
-#include "ipc_types.h"
-
 #include "logger.h"
-#include "tlv_util.h"
 #include "udmf_types_util.h"
+#include "udmf_conversion.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -55,6 +53,7 @@ UdmfServiceProxy::UdmfServiceProxy(const sptr<IRemoteObject> &object) : IRemoteP
 
 int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
 {
+    UdmfConversion::InitValueObject(unifiedData);
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_DATA, reply, option, unifiedData);
     if (status != E_OK) {
@@ -101,6 +100,7 @@ int32_t UdmfServiceProxy::GetBatchData(const QueryOption &query, std::vector<Uni
 
 int32_t UdmfServiceProxy::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
 {
+    UdmfConversion::InitValueObject(unifiedData);
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::UPDATE_DATA, reply, query, unifiedData);
     if (status != E_OK) {
@@ -115,8 +115,8 @@ int32_t UdmfServiceProxy::DeleteData(const QueryOption &query, std::vector<Unifi
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::DELETE_DATA, reply, query);
     if (status != E_OK) {
-        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x,key: %{public}s, intention:%{public}s", status, query.key.c_str(),
-                  UD_INTENTION_MAP.at(query.intention).c_str());
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x,key: %{public}s, intention:%{public}d", status, query.key.c_str(),
+                  query.intention);
         return status;
     }
     if (!ITypesUtil::Unmarshal(reply, unifiedDataSet)) {

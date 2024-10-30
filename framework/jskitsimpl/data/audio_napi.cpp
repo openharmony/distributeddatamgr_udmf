@@ -17,9 +17,6 @@
 
 #include "audio.h"
 #include "file_napi.h"
-#include "napi_data_utils.h"
-#include "napi_error_utils.h"
-#include "napi_queue.h"
 #include "unified_record_napi.h"
 
 namespace OHOS {

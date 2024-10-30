@@ -30,6 +30,7 @@ group("unittest") {
   testonly = true
 
   deps = [
+    "framework/common/unittest:unittest",
     "framework/innerkitsimpl/test/unittest:unittest",
     "framework/jskitsimpl/unittest:unittest",
     "framework/ndkimpl/unittest:unittest",

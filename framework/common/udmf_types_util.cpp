@@ -15,10 +15,9 @@
 #define LOG_TAG "UdmfTypesUtil"
 #include "udmf_types_util.h"
 
-#include <string>
-
 #include "logger.h"
 #include "tlv_util.h"
+#include "udmf_conversion.h"
 
 namespace OHOS {
 namespace ITypesUtil {
@@ -28,7 +27,7 @@ bool Marshalling(const UnifiedData &input, MessageParcel &parcel)
 {
     std::vector<uint8_t> dataBytes;
     auto recordTlv = TLVObject(dataBytes);
-    if (!TLVUtil::Writing(input, recordTlv)) {
+    if (!TLVUtil::Writing(input, recordTlv, TAG::TAG_UNIFIED_DATA)) {
         LOG_ERROR(UDMF_SERVICE, "TLV writing failed!");
         return false;
     }
@@ -55,11 +54,12 @@ bool Unmarshalling(UnifiedData &output, MessageParcel &parcel)
     }
     const uint8_t *data = reinterpret_cast<const uint8_t *>(rawData);
     std::vector<uint8_t> dataBytes(data, data + size);
-    auto recordTlv = TLVObject(dataBytes);
-    if (!TLVUtil::Reading(output, recordTlv)) {
+    auto dataTlv = TLVObject(dataBytes);
+    if (!TLVUtil::ReadTlv(output, dataTlv, TAG::TAG_UNIFIED_DATA)) {
         LOG_ERROR(UDMF_SERVICE, "Unmarshall unified data failed!");
         return false;
     }
+    UdmfConversion::ConvertRecordToSubclass(output);
     return true;
 }
 
@@ -68,7 +68,7 @@ bool Marshalling(const std::vector<UnifiedData> &input, MessageParcel &parcel)
 {
     std::vector<uint8_t> dataSetBytes;
     auto recordTlv = TLVObject(dataSetBytes);
-    if (!TLVUtil::Writing(input, recordTlv)) {
+    if (!TLVUtil::Writing(input, recordTlv, TAG::TAG_UNIFIED_DATA)) {
         LOG_ERROR(UDMF_SERVICE, "TLV writing failed!");
         return false;
     }
@@ -94,11 +94,12 @@ bool Unmarshalling(std::vector<UnifiedData> &output, MessageParcel &parcel)
         return false;
     }
     std::vector<uint8_t> dataSetBytes(rawData, rawData + size);
-    auto recordTlv = TLVObject(dataSetBytes);
-    if (!TLVUtil::Reading(output, recordTlv)) {
+    auto dataTlv = TLVObject(dataSetBytes);
+    if (!TLVUtil::ReadTlv(output, dataTlv, TAG::TAG_UNIFIED_DATA)) {
         LOG_ERROR(UDMF_SERVICE, "Unmarshall unified data set failed!");
         return false;
     }
+    UdmfConversion::ConvertRecordToSubclass(output);
     return true;
 }
 

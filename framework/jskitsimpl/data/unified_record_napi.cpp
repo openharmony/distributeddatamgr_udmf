@@ -15,10 +15,6 @@
 #define LOG_TAG "UnifiedRecordNapi"
 #include "unified_record_napi.h"
 
-#include "napi_data_utils.h"
-#include "napi_error_utils.h"
-#include "napi_queue.h"
-
 #include "plain_text.h"
 #include "html.h"
 #include "link.h"

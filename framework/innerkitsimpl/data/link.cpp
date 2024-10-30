@@ -89,15 +89,6 @@ void Link::SetDescription(const std::string &description)
     }
 }
 
-ValueType Link::GetValue()
-{
-    if (std::holds_alternative<std::monostate>(value_)) {
-        value_ = std::make_shared<Object>();
-    }
-    InitObject();
-    return value_;
-}
-
 void Link::InitObject()
 {
     if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {

@@ -16,11 +16,8 @@
 #include "unified_data_channel_napi.h"
 
 #include "napi_data_utils.h"
-#include "napi_error_utils.h"
-#include "napi_queue.h"
 #include "udmf_client.h"
 #include "unified_data_napi.h"
-#include "unified_meta.h"
 
 namespace OHOS {
 namespace UDMF {

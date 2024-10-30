@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #define LOG_TAG "UDMFUniformTypModule"
-#include "logger.h"
 #include "uniform_type_descriptor_napi.h"
 #include "type_descriptor_napi.h"
 

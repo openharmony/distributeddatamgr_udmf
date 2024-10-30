@@ -15,11 +15,6 @@
 #define LOG_TAG "UniformTypeDescriptorNapi"
 #include "uniform_type_descriptor_napi.h"
 #include "napi_data_utils.h"
-#include "napi_error_utils.h"
-#include "napi_queue.h"
-#include "unified_meta.h"
-#include "type_descriptor_napi.h"
-#include "type_descriptor.h"
 #include "utd_client.h"
 
 namespace OHOS {
