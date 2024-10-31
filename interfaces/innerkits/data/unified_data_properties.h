@@ -24,7 +24,7 @@ class API_EXPORT UnifiedDataProperties {
 public:
     std::string tag;
     AAFwk::WantParams extras;
-    ShareOptions shareOptions = CROSS_APP;
+    ShareOptions shareOptions = CROSS_DEVICE;
     std::int64_t timestamp;
     bool isRemote;
 };

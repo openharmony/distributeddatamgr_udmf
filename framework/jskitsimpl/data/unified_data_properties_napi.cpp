@@ -137,7 +137,8 @@ napi_value UnifiedDataPropertiesNapi::GetShareOptions(napi_env env, napi_callbac
     auto properties = GetPropertiesNapi(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (properties != nullptr && properties->value_ != nullptr),
         Status::E_ERROR, "invalid object!");
-    ctxt->status = NapiDataUtils::SetValue(env, properties->value_->shareOptions, ctxt->output);
+    ctxt->status = NapiDataUtils::SetValue(env,
+        properties->value_->shareOptions == CROSS_DEVICE ? CROSS_APP : properties->value_->shareOptions, ctxt->output);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set ShareOptions failed");
     return ctxt->output;
 }

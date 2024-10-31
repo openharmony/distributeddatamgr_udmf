@@ -571,6 +571,7 @@ static const std::unordered_map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
 enum ShareOptions : int32_t {
     IN_APP,
     CROSS_APP,
+    CROSS_DEVICE,
     SHARE_OPTIONS_BUTT,
 };
 
