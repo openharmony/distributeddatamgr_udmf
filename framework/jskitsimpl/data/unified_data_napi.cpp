@@ -76,6 +76,10 @@ napi_value UnifiedDataNapi::New(napi_env env, napi_callback_info info)
     UnifiedDataPropertiesNapi* propertiesNapi = nullptr;
     uData->propertyRef_ = NewWithRef(env, argc, argv, reinterpret_cast<void **>(&propertiesNapi),
         UnifiedDataPropertiesNapi::Constructor(env));
+    if (propertiesNapi == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "new UnifiedDataPropertiesNapi failed!");
+        return nullptr;
+    }
     uData->value_ = std::make_shared<UnifiedData>(propertiesNapi->value_);
     if (uRecord) {
         uData->value_->AddRecord(uRecord->value_);
