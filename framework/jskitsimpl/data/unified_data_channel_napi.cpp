@@ -227,7 +227,6 @@ napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info i
     };
 
     auto output = [env, ctxt](napi_value &result) {
-        ASSERT_WITH_ERRCODE(ctxt, !ctxt->unifiedDataSet.empty(), E_ERROR, "unifiedDataSet is empty!");
         ctxt->status = napi_create_array_with_length(env, ctxt->unifiedDataSet.size(), &ctxt->output);
         ASSERT_WITH_ERRCODE(ctxt, ctxt->status == napi_ok, E_ERROR, "napi_create_array_with_length failed!");
         int index = 0;
