@@ -754,6 +754,7 @@ Udmf_ShareOption OH_UdmfProperty_GetShareOption(OH_UdmfProperty* properties)
         case ShareOptions::IN_APP:
             return Udmf_ShareOption::SHARE_OPTIONS_IN_APP;
         case ShareOptions::CROSS_APP:
+        case ShareOptions::CROSS_DEVICE:
             return Udmf_ShareOption::SHARE_OPTIONS_CROSS_APP;
         default:
             return Udmf_ShareOption::SHARE_OPTIONS_INVALID;
