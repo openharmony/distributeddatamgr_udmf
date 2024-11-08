@@ -527,6 +527,8 @@ enum UDType : int32_t {
     CONTENT_FORM,
     M4P_AUDIO,
     AC3_AUDIO,
+    OPENHARMONY_HSP,
+    OPENHARMONY_HAR,
     UD_BUTT
 };
 

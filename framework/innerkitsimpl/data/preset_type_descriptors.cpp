@@ -3287,6 +3287,20 @@ void PresetTypeDescriptors::InitDescriptors()
          {"audio/ac3"},
          "Audio Codec 3 File Format",
          REFERENCE_URL,
+         ""},
+        {"openharmony.hsp",
+         {"openharmony.package"},
+         {".hsp"},
+         {},
+         "Harmony Shared Package",
+         REFERENCE_URL,
+         ""},
+        {"openharmony.har",
+         {"openharmony.package"},
+         {".har"},
+         {},
+         "Harmony Archive",
+         REFERENCE_URL,
          ""}
     };
 };
