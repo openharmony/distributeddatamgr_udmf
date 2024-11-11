@@ -31,6 +31,7 @@ describe('UdmfPromiseJSTest', function () {
   const optionsValid = { intention: 'DataHub', };
   const optionsInValidIntention = { intention: 'Drag', };
   const optionsInValidKey = { key: 'udmf://drag/com.test.demo/123456789', };
+  const optionsValidKey = { key: 'udmf://DataHub/com.test.demo/123456789', };
   const optionsInValidAll = { intention: 'DataHub', key: 'udmf://drag/com.test.demo/123456789' };
   const unifiedData01 = new UDC.UnifiedData(gPlainText1);
   const unifiedData02 = new UDC.UnifiedData(gPlainText2);
@@ -397,6 +398,33 @@ describe('UdmfPromiseJSTest', function () {
           expect(null).assertFail();
           done();
         });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfDeleteDataPromiseEmptyDataTest
+   * @tc.desc Test Js Api deleteData with empty data
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfDeleteDataPromiseEmptyDataTest', 0, async function (done) {
+    const TAG = 'UdmfDeleteDataPromiseEmptyDataTest:';
+    console.info(TAG, 'start');
+    try {
+      UDC.deleteData(optionsValidKey).then((data) => {
+        console.error(TAG, 'delete data success!');
+        expect(data.length).assertEqual(0);
+        done();
       }).catch(() => {
         console.error(TAG, 'Unreachable code!');
         expect(null).assertFail();
