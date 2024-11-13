@@ -98,9 +98,11 @@ napi_value HtmlNapi::SetPlainContent(napi_env env, napi_callback_info info)
     auto input = [env, ctxt, &plainContent](size_t argc, napi_value *argv) {
         ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
             Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
-        ctxt->status = NapiDataUtils::GetValue(env, argv[0], plainContent);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
-            Status::E_INVALID_PARAMETERS, "Parameter error: parameter plainContent type must be string");
+        if (!NapiDataUtils::IsUndefinedOrNull(env, argv[0])) {
+            ctxt->status = NapiDataUtils::GetValue(env, argv[0], plainContent);
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+                Status::E_INVALID_PARAMETERS, "Parameter error: parameter plainContent type must be string");
+        }
     };
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
