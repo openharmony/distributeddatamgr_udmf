@@ -112,6 +112,9 @@ public:
     static bool IsTypeForNapiValue(napi_env env, napi_value param, napi_valuetype expectType);
 
     static bool IsNull(napi_env env, napi_value value);
+
+    static bool IsUndefinedOrNull(napi_env env, napi_value value);
+
     /* napi_define_class wrapper */
     static napi_value DefineClass(napi_env env, const std::string &name, const napi_property_descriptor *properties,
         size_t count, napi_callback newcb);
