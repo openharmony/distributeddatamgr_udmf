@@ -19,7 +19,8 @@
 namespace OHOS {
 namespace UDMF {
 using namespace RadarReporter;
-void RadarReporterAdapter::ReportNormal(std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t state)
+void RadarReporterAdapter::ReportNormal(
+    std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t state)
 {
     struct HiSysEventParam params[] = {
         { .name = { "ORG_PKG" },
