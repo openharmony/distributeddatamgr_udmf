@@ -28,15 +28,20 @@ namespace UDMF {
 class API_EXPORT CustomUtdStore {
 public:
     static CustomUtdStore &GetInstance();
-    std::vector<TypeDescriptorCfg> GetTypeCfgs(const std::string &cfgFilePath);
-    int32_t SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes, const std::string &cfgFilePath);
-
+    std::vector<TypeDescriptorCfg> GetTypeCfgs(int32_t userId);
+    std::vector<TypeDescriptorCfg> GetHapTypeCfgs();
+    int32_t SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes, int32_t user);
+    bool InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user,
+        std::vector<TypeDescriptorCfg> &customTyepCfgs);
+    bool UninstallCustomUtds(const std::string &bundleName, int32_t user,
+        std::vector<TypeDescriptorCfg> &customTyepCfgs);
 private:
     CustomUtdStore();
     ~CustomUtdStore();
     int32_t SavaCfgFile(const std::string &jsonData, const std::string &cfgFilePath);
     bool CreateDirectory(const std::string &path) const;
-
+    void ProcessUtdForSave(const CustomUtdCfgs &utdTypes, std::vector<TypeDescriptorCfg> &customTyepCfgs,
+        const std::string &bundleName);
     CustomUtdJsonParser utdJsonParser_;
 };
 } // namespace UDMF

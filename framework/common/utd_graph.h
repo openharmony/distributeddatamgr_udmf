@@ -33,17 +33,15 @@ public:
     bool IsValidType(const std::string &node);
     void InitUtdGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs);
     bool IsLowerLevelType(const std::string &lowerLevelType, const std::string &heigitLevelType);
-    bool IsDAG();
+    std::unique_ptr<Graph> ConstructNewGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs);
+    void Update(std::unique_ptr<Graph> graph);
 private:
     UtdGraph();
     ~UtdGraph();
     UtdGraph(const UtdGraph &obj) = delete;
     UtdGraph &operator=(const UtdGraph &obj) = delete;
-    int32_t GetIndex(const std::string &node);
-    void AddEdge(const std::string &startNode, const std::string &endNode);
     std::mutex graphMutex_;
     std::unique_ptr<Graph> graph_;
-    std::map<std::string, uint32_t> typeIdIndex_;
 };
 } // namespace UDMF
 } // namespace OHOS

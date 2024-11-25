@@ -27,8 +27,9 @@ using namespace testing::ext;
 using namespace OHOS::UDMF;
 using namespace OHOS;
 namespace OHOS::Test {
-constexpr const char* TEST_CFG_FILE = "/data/100-test/utd-adt.json";
-constexpr const char* TEST_CFG_DIR = "/data/100-test/";
+constexpr const int32_t USERID = 1000000;
+constexpr const char* TEST_CFG_FILE = "/data/1000000/utd-adt.json";
+constexpr const char* TEST_CFG_DIR = "/data/1000000/";
 
 constexpr const char* TEST_DATA2 = "{\
     \"CustomUTDs\": [{\
@@ -94,11 +95,11 @@ HWTEST_F(CustomUtdStoreTest, SaveTypeCfgs001, TestSize.Level1)
     std::vector<TypeDescriptorCfg> typesCfg;
     CustomUtdJsonParser parser;
     parser.ParseStoredCustomUtdJson(TEST_DATA2, typesCfg);
-    auto status = CustomUtdStore::GetInstance().SaveTypeCfgs(typesCfg, TEST_CFG_FILE);
+    auto status = CustomUtdStore::GetInstance().SaveTypeCfgs(typesCfg, USERID);
     EXPECT_EQ(status, E_OK);
 
     typesCfg.clear();
-    typesCfg = CustomUtdStore::GetInstance().GetTypeCfgs(TEST_CFG_FILE);
+    typesCfg = CustomUtdStore::GetInstance().GetTypeCfgs(USERID);
     TypeDescriptorCfg type1 = *(typesCfg.begin());
     EXPECT_EQ(type1.typeId, "com.example.utdtest.document");
     EXPECT_EQ(*(type1.belongingToTypes.begin()), "com.example.utdtest2.document");

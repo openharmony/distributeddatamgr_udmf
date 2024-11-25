@@ -70,7 +70,7 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph001, TestSize.Level1)
     uint32_t vextexNum = 1;
     vector<vector<uint32_t>> edges={{TestNodes::POINT_A, TestNodes::POINT_A},
     };
-    Graph graph(vextexNum);
+    Graph graph(vextexNum, {});
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
     }
@@ -92,7 +92,7 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph002, TestSize.Level1)
     vector<vector<uint32_t>> edges={{TestNodes::POINT_A, TestNodes::POINT_B},
                                     {TestNodes::POINT_B, TestNodes::POINT_A},
     };
-    Graph graph(vextexNum);
+    Graph graph(vextexNum, {});
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
     }
@@ -115,7 +115,7 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph003, TestSize.Level1)
                                     {TestNodes::POINT_B, TestNodes::POINT_C},
                                     {TestNodes::POINT_C, TestNodes::POINT_A}
     };
-    Graph graph(vextexNum);
+    Graph graph(vextexNum, {});
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
     }
@@ -138,7 +138,7 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph004, TestSize.Level1)
                                     {TestNodes::POINT_B, TestNodes::POINT_C},
                                     {TestNodes::POINT_C, TestNodes::POINT_B},
     };
-    Graph graph(vextexNum);
+    Graph graph(vextexNum, {});
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
     }
@@ -168,7 +168,7 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph005, TestSize.Level1)
         {TestNodes::POINT_G, TestNodes::POINT_H},
         {TestNodes::POINT_H, TestNodes::POINT_E},
     };
-    Graph graph(vextexNum);
+    Graph graph(vextexNum, {});
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
     }
@@ -197,7 +197,7 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph006, TestSize.Level1)
         {TestNodes::POINT_E, TestNodes::POINT_G},
         {TestNodes::POINT_G, TestNodes::POINT_H},
     };
-    Graph graph(vextexNum);
+    Graph graph(vextexNum, {});
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
     }
@@ -223,7 +223,7 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph007, TestSize.Level1)
         {TestNodes::POINT_C, TestNodes::POINT_D},
         {TestNodes::POINT_B, TestNodes::POINT_C},
     };
-    Graph graph(vextexNum);
+    Graph graph(vextexNum, {});
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
     }
@@ -249,7 +249,7 @@ HWTEST_F(GraphTest, DfsUnconnectedGraph008, TestSize.Level1)
         {TestNodes::POINT_F, TestNodes::POINT_G},
         {TestNodes::POINT_G, TestNodes::POINT_H},
     };
-    Graph graph(vextexNum);
+    Graph graph(vextexNum, {});
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
     }
@@ -278,7 +278,7 @@ HWTEST_F(GraphTest, DfsHasData001, TestSize.Level1)
         {TestNodes::POINT_E, TestNodes::POINT_G},
         {TestNodes::POINT_G, TestNodes::POINT_H},
     };
-    Graph graph(vextexNum);
+    Graph graph(vextexNum, {});
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
     }
@@ -331,7 +331,7 @@ HWTEST_F(GraphTest, DfsHasData002, TestSize.Level1)
         {TestNodes::POINT_F, TestNodes::POINT_G},
         {TestNodes::POINT_G, TestNodes::POINT_H},
     };
-    Graph graph(vextexNum);
+    Graph graph(vextexNum, {});
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
     }
