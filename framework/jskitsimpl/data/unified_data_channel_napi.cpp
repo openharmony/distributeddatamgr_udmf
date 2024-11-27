@@ -45,6 +45,10 @@ napi_value UnifiedDataChannelNapi::CreateIntention(napi_env env)
 {
     napi_value intention = nullptr;
     napi_create_object(env, &intention);
+    if (intention == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "create intention failed!");
+        return nullptr;
+    }
     SetNamedProperty(env, intention, JS_UD_INTENTION_NAME_MAP.at(UD_INTENTION_DATA_HUB),
         UD_INTENTION_MAP.at(UD_INTENTION_DATA_HUB));
     SetNamedProperty(env, intention, JS_UD_INTENTION_NAME_MAP.at(UD_INTENTION_DRAG),

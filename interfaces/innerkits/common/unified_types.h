@@ -92,17 +92,17 @@ struct AsyncProcessInfo {
     AsyncTaskStatus syncStatus;
     AsyncTaskStatus permStatus;
     std::string srcDevName;
-    uint32_t syncFinished;
-    uint32_t syncTotal;
-    uint32_t syncId;
-    uint32_t permFnished;
-    uint32_t permTotal;
+    uint32_t syncFinished = 0;
+    uint32_t syncTotal = 0;
+    uint32_t syncId = 0;
+    uint32_t permFnished = 0;
+    uint32_t permTotal = 0;
 };
 
 struct ProgressInfo {
     std::string srcDevName;
     AsyncTaskStatus status;
-    uint32_t progress;
+    uint32_t progress = 0;
 };
 } // namespace UDMF
 } // namespace OHOS

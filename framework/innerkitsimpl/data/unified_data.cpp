@@ -27,6 +27,10 @@ UnifiedData::UnifiedData()
 
 UnifiedData::UnifiedData(std::shared_ptr<UnifiedDataProperties> properties)
 {
+    if (properties == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid properties!");
+        return;
+    }
     properties_ = properties;
     auto duration = std::chrono::system_clock::now().time_since_epoch();
     properties_->timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
