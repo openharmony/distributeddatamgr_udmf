@@ -83,10 +83,14 @@ static void DestroyUnifiedRecordArray(OH_UdmfRecord**& records, unsigned int& co
 static char** StrVectorToTypesArray(const std::vector<std::string>& strVector)
 {
     unsigned int vectorSize = strVector.size();
-    if (vectorSize > MAX_RECORDS_COUNT) {
+    if (vectorSize == 0 || vectorSize > MAX_RECORDS_COUNT) {
         return nullptr;
     }
-    char** typesArray = new (std::nothrow) char* [vectorSize] {nullptr};
+    char** typesArray = new (std::nothrow) char* [vectorSize];
+    if (typesArray == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "create types array failed!");
+        return nullptr;
+    }
     for (unsigned int i = 0; i < vectorSize; ++i) {
         unsigned int strLen = strVector[i].length() + 1;
         if (strLen > MAX_KEY_STRING_LEN) {
