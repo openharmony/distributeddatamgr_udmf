@@ -16,7 +16,6 @@
 #include "unified_data_channel_napi.h"
 
 #include "napi_data_utils.h"
-#include "udmf_client.h"
 #include "unified_data_napi.h"
 
 namespace OHOS {
@@ -80,6 +79,8 @@ napi_value UnifiedDataChannelNapi::InsertData(napi_env env, napi_callback_info i
         ASSERT_BUSINESS_ERR(ctxt, argc >= 2,
             E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = GetNamedProperty(env, argv[0], "intention", intention);
+        ASSERT_BUSINESS_ERR(ctxt, UnifiedDataUtils::GetIntentionByString(intention) != UD_INTENTION_DRAG,
+            E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid");
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && UnifiedDataUtils::IsPersist(intention),
             E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
         ctxt->status = napi_unwrap(env, argv[1], reinterpret_cast<void **>(&unifiedDataNapi));
@@ -156,6 +157,8 @@ napi_value UnifiedDataChannelNapi::QueryData(napi_env env, napi_callback_info in
         auto options = argv[0];
         keyStatus = GetNamedProperty(env, options, "key", ctxt->key);
         intentionStatus = GetNamedProperty(env, options, "intention", intention);
+        ASSERT_BUSINESS_ERR(ctxt, UnifiedDataUtils::GetIntentionByString(intention) != UD_INTENTION_DRAG,
+            E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid");
         ASSERT_BUSINESS_ERR(ctxt, (keyStatus == napi_ok || intentionStatus == napi_ok) &&
             UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
             E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
@@ -174,18 +177,8 @@ napi_value UnifiedDataChannelNapi::QueryData(napi_env env, napi_callback_info in
     };
     auto output = [env, ctxt](napi_value &result) {
         ASSERT_WITH_ERRCODE(ctxt, !ctxt->unifiedDataSet.empty(), E_ERROR, "unifiedDataSet is empty!");
-        ctxt->status = napi_create_array_with_length(env, ctxt->unifiedDataSet.size(), &ctxt->output);
-        ASSERT_WITH_ERRCODE(ctxt, ctxt->status == napi_ok, E_ERROR, "napi_create_array_with_length failed!");
-        int index = 0;
-        for (const UnifiedData &data : ctxt->unifiedDataSet) {
-            std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
-            unifiedData->SetRecords(data.GetRecords());
-            napi_value dataNapi = nullptr;
-            UnifiedDataNapi::NewInstance(env, unifiedData, dataNapi);
-            ctxt->status = napi_set_element(env, ctxt->output, index++, dataNapi);
-            ASSERT_WITH_ERRCODE(ctxt, ctxt->status == napi_ok, E_ERROR, "napi_set_element failed!");
-        }
-        result = ctxt->output;
+        ctxt->status = ConvertUnifiedDataSetToNapi(env, ctxt->unifiedDataSet, result);
+        ASSERT_WITH_ERRCODE(ctxt, ctxt->status == napi_ok, E_ERROR, "ConvertUnifiedDataSetToNapi failed!");
     };
     return NapiQueue::AsyncWork(env, ctxt, std::string(__FUNCTION__), execute, output);
 }
@@ -209,6 +202,9 @@ napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info i
         napi_value options = argv[0];
         keyStatus = GetNamedProperty(env, options, "key", ctxt->key);
         intentionStatus = GetNamedProperty(env, options, "intention", intention);
+        ASSERT_BUSINESS_ERR(ctxt, intention.empty() ||
+            UnifiedDataUtils::GetIntentionByString(intention) == UD_INTENTION_DATA_HUB,
+            E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid");
         ASSERT_BUSINESS_ERR(ctxt,
             (keyStatus == napi_ok || intentionStatus == napi_ok) &&
                 UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
@@ -227,18 +223,8 @@ napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info i
     };
 
     auto output = [env, ctxt](napi_value &result) {
-        ctxt->status = napi_create_array_with_length(env, ctxt->unifiedDataSet.size(), &ctxt->output);
-        ASSERT_WITH_ERRCODE(ctxt, ctxt->status == napi_ok, E_ERROR, "napi_create_array_with_length failed!");
-        int index = 0;
-        for (const UnifiedData &data : ctxt->unifiedDataSet) {
-            std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
-            unifiedData->SetRecords(data.GetRecords());
-            napi_value dataNapi = nullptr;
-            UnifiedDataNapi::NewInstance(env, unifiedData, dataNapi);
-            ctxt->status = napi_set_element(env, ctxt->output, index++, dataNapi);
-            ASSERT_WITH_ERRCODE(ctxt, ctxt->status == napi_ok, E_ERROR, "napi_set_element failed!");
-        }
-        result = ctxt->output;
+        ctxt->status = ConvertUnifiedDataSetToNapi(env, ctxt->unifiedDataSet, result);
+        ASSERT_WITH_ERRCODE(ctxt, ctxt->status == napi_ok, E_ERROR, "ConvertUnifiedDataSetToNapi failed!");
     };
     return NapiQueue::AsyncWork(env, ctxt, std::string(__FUNCTION__), execute, output);
 }
@@ -318,7 +304,7 @@ napi_value UnifiedDataChannelNapi::SetAppShareOptions(napi_env env, napi_callbac
     std::transform(intention.begin(), intention.end(), intention.begin(), ::tolower); // js : Drag --> drag
     status = UdmfClient::GetInstance().SetAppShareOption(intention, static_cast<ShareOptions>(shareOptionValue));
     ASSERT_BUSINESS_ERR_VOID(ctxt, !(status == E_SETTINGS_EXISTED), E_SETTINGS_EXISTED, "Settings already exist!");
-    ASSERT_BUSINESS_ERR_VOID(ctxt, !(status == E_NO_PERMISSION), E_NO_SYSTEM_PERMISSION, "Permission denied!");
+    ASSERT_BUSINESS_ERR_VOID(ctxt, status != E_NO_PERMISSION, E_NO_PERMISSION, "Permission denied!");
     ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
     return nullptr;
 }
@@ -344,9 +330,32 @@ napi_value UnifiedDataChannelNapi::RemoveAppShareOptions(napi_env env, napi_call
     std::transform(intention.begin(), intention.end(), intention.begin(), ::tolower); // js : Drag --> drag
     auto status = E_OK;
     status = UdmfClient::GetInstance().RemoveAppShareOption(intention);
-    ASSERT_BUSINESS_ERR_VOID(ctxt, !(status == E_NO_PERMISSION), E_NO_SYSTEM_PERMISSION, "Permission denied!");
+    ASSERT_BUSINESS_ERR_VOID(ctxt, status != E_NO_PERMISSION, E_NO_PERMISSION, "Permission denied!");
     ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
     return nullptr;
+}
+
+napi_status UnifiedDataChannelNapi::ConvertUnifiedDataSetToNapi(
+    napi_env env, const std::vector<UnifiedData> &dataSet, napi_value &output)
+{
+    auto status = napi_create_array_with_length(env, dataSet.size(), &output);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_create_array_with_length failed!");
+        return napi_generic_failure;
+    }
+    int index = 0;
+    for (const UnifiedData &data : dataSet) {
+        std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
+        unifiedData->SetRecords(data.GetRecords());
+        napi_value dataNapi = nullptr;
+        UnifiedDataNapi::NewInstance(env, unifiedData, dataNapi);
+        status = napi_set_element(env, output, index++, dataNapi);
+        if (status != napi_ok) {
+            LOG_ERROR(UDMF_KITS_NAPI, "napi_set_element failed!");
+            return napi_generic_failure;
+        }
+    }
+    return napi_ok;
 }
 } // namespace UDMF
 } // namespace OHOS
