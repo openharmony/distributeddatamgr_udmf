@@ -58,6 +58,10 @@ void UtdGraph::InitUtdGraph(const std::vector<TypeDescriptorCfg> &descriptorCfgs
 
 bool UtdGraph::IsLowerLevelType(const std::string &lowerLevelType, const std::string &heigitLevelType)
 {
+    if (graph_ == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "graph_ is nullptr.");
+        return false;
+    }
     std::unique_lock<std::mutex> lock(graphMutex_);
     bool isFind = false;
     int32_t start = graph_->GetIndex(lowerLevelType);

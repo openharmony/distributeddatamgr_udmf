@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "HTML"
 #include "html.h"
+#include "logger.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -25,6 +27,9 @@ Html::Html()
 Html::Html(const std::string &htmlContent, const std::string &plainContent)
 {
     if (plainContent.length() >= MAX_TEXT_LEN || htmlContent.length() >= MAX_TEXT_LEN) {
+        LOG_ERROR(UDMF_KITS_INNER,
+            "htmlContent or plainContent is too long, plainContent.length:%{public}d, htmlContent.length:%{public}d",
+            plainContent.length(), htmlContent.length());
         return;
     }
     SetType(HTML);
@@ -62,6 +67,7 @@ std::string Html::GetHtmlContent() const
 void Html::SetHtmlContent(const std::string &htmlContent)
 {
     if (htmlContent.length() >= MAX_TEXT_LEN) {
+        LOG_ERROR(UDMF_KITS_INNER, "htmlContent is too long, htmlContent.length:%{public}d", htmlContent.length());
         return;
     }
     this->htmlContent_ = htmlContent;
@@ -78,6 +84,7 @@ std::string Html::GetPlainContent() const
 void Html::SetPlainContent(const std::string &plainContent)
 {
     if (plainContent.length() >= MAX_TEXT_LEN) {
+        LOG_ERROR(UDMF_KITS_INNER, "plainContent is too long, plainContent.length:%{public}d", plainContent.length());
         return;
     }
     this->plainContent_ = plainContent;

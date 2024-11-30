@@ -75,6 +75,10 @@ bool CustomUtdJsonParser::ConvertUtdCfgsToJson(const std::vector<TypeDescriptorC
     json* CustomUTDs = cJSON_CreateArray();
     for (auto utdTypeCfg : typesCfg) {
         json* jsonItem = cJSON_CreateObject();
+        if (jsonItem == nullptr) {
+            LOG_ERROR(UDMF_CLIENT, "Create jsonItem failed.");
+            return false;
+        }
         cJSON_AddStringToObject(jsonItem, TYPEID, utdTypeCfg.typeId.c_str());
         std::vector<std::string> belongingToTypes(utdTypeCfg.belongingToTypes.begin(),
                                                   utdTypeCfg.belongingToTypes.end());
