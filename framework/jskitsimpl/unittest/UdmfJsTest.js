@@ -30,6 +30,8 @@ const LONG_TEST2M = 'a'.repeat(NUM_2M);
 const LONG_TESTOVER2M = 'a'.repeat((NUM_2M + 1));
 
 let U8_ARRAY = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+const ERROR_PARAMETER = '401';
+const NO_PERMISSION = '201';
 
 describe('UdmfJSTest', function () {
 
@@ -1690,5 +1692,81 @@ describe('UdmfJSTest', function () {
       expect(null).assertFail();
       done();
     }
+  });
+
+  /**
+   * @tc.name UdmfSetAppShareOptionsTest001
+   * @tc.desc Test Js Api setAppShareOptions, error intention
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UdmfSetAppShareOptionsTest001', 0, function () {
+    const TAG = 'UdmfSetAppShareOptionsTest001:';
+    console.info(TAG, 'start');
+    try {
+      UDC.setAppShareOptions(UDC.Intention.DATA_HUB, UDC.ShareOptions.IN_APP);
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+    } catch (e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfSetAppShareOptionsTest002
+   * @tc.desc Test Js Api setAppShareOptions, has sys permission
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UdmfSetAppShareOptionsTest002', 0, function () {
+    const TAG = 'UdmfSetAppShareOptionsTest002:';
+    console.info(TAG, 'start');
+    try {
+      UDC.setAppShareOptions(UDC.Intention.DRAG, UDC.ShareOptions.IN_APP);
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfRemoveAppShareOptionsTest001
+   * @tc.desc Test Js Api removeAppShareOptions, error intention
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UdmfRemoveAppShareOptionsTest001', 0, function () {
+    const TAG = 'UdmfRemoveAppShareOptionsTest001:';
+    console.info(TAG, 'start');
+    try {
+      UDC.removeAppShareOptions(UDC.Intention.DATA_HUB);
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+    } catch (e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name UdmfRemoveAppShareOptionsTest002
+   * @tc.desc Test Js Api removeAppShareOptions, has sys permission
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UdmfRemoveAppShareOptionsTest002', 0, function () {
+    const TAG = 'UdmfRemoveAppShareOptionsTest002:';
+    console.info(TAG, 'start');
+    try {
+      UDC.removeAppShareOptions(UDC.Intention.DRAG);
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+    }
+    console.info(TAG, 'end');
   });
 });
