@@ -28,7 +28,7 @@ Html::Html(const std::string &htmlContent, const std::string &plainContent)
 {
     if (plainContent.length() >= MAX_TEXT_LEN || htmlContent.length() >= MAX_TEXT_LEN) {
         LOG_ERROR(UDMF_KITS_INNER,
-            "htmlContent or plainContent is too long, plainContent.length:%{public}d, htmlContent.length:%{public}d",
+            "htmlContent or plainContent is too long, plainContent.length:%{public}zu, htmlContent.length:%{public}zu",
             plainContent.length(), htmlContent.length());
         return;
     }
@@ -67,7 +67,7 @@ std::string Html::GetHtmlContent() const
 void Html::SetHtmlContent(const std::string &htmlContent)
 {
     if (htmlContent.length() >= MAX_TEXT_LEN) {
-        LOG_ERROR(UDMF_KITS_INNER, "htmlContent is too long, htmlContent.length:%{public}d", htmlContent.length());
+        LOG_ERROR(UDMF_KITS_INNER, "htmlContent is too long, htmlContent.length:%{public}zu", htmlContent.length());
         return;
     }
     this->htmlContent_ = htmlContent;
@@ -84,7 +84,7 @@ std::string Html::GetPlainContent() const
 void Html::SetPlainContent(const std::string &plainContent)
 {
     if (plainContent.length() >= MAX_TEXT_LEN) {
-        LOG_ERROR(UDMF_KITS_INNER, "plainContent is too long, plainContent.length:%{public}d", plainContent.length());
+        LOG_ERROR(UDMF_KITS_INNER, "plainContent is too long, plainContent.length:%{public}zu", plainContent.length());
         return;
     }
     this->plainContent_ = plainContent;
