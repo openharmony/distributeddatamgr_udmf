@@ -26,7 +26,7 @@ PlainText::PlainText() : PlainText("", "")
 PlainText::PlainText(const std::string &content, const std::string &abstract)
 {
     if (content.length() >= MAX_TEXT_LEN) {
-        LOG_ERROR(UDMF_KITS_INNER, "content is too long, content.length:%{public}d", content.length());
+        LOG_ERROR(UDMF_KITS_INNER, "content is too long, content.length:%{public}zu", content.length());
         return;
     }
     SetType(PLAIN_TEXT);
@@ -64,7 +64,7 @@ std::string PlainText::GetContent() const
 void PlainText::SetContent(const std::string &text)
 {
     if (text.length() >= MAX_TEXT_LEN) {
-        LOG_ERROR(UDMF_KITS_INNER, "text is too long, text.length:%{public}d", text.length());
+        LOG_ERROR(UDMF_KITS_INNER, "text is too long, text.length:%{public}zu", text.length());
         return;
     }
     this->content_ = text;
@@ -82,7 +82,7 @@ std::string PlainText::GetAbstract() const
 void PlainText::SetAbstract(const std::string &abstract)
 {
     if (abstract.length() >= MAX_TEXT_LEN) {
-        LOG_ERROR(UDMF_KITS_INNER, "abstract is too long!, abstract.length:%{public}d", abstract.length());
+        LOG_ERROR(UDMF_KITS_INNER, "abstract is too long!, abstract.length:%{public}zu", abstract.length());
         return;
     }
     this->abstract_ = abstract;
