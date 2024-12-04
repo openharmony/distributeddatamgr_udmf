@@ -88,7 +88,8 @@ static char** StrVectorToTypesArray(const std::vector<std::string>& strVector)
     }
     char** typesArray = new (std::nothrow) char* [vectorSize];
     if (typesArray == nullptr) {
-        LOG_ERROR(UDMF_CAPI, "create types array failed!");
+        LOG_ERROR(UDMF_CAPI, "create types array failed!, vectorSize: %{public}d, MAX_RECORDS_COUNT: %{public}" PRIu64,
+            vectorSize, MAX_RECORDS_COUNT);
         return nullptr;
     }
     for (unsigned int i = 0; i < vectorSize; ++i) {
