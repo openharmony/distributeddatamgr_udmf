@@ -43,8 +43,8 @@ template<>
 bool Unmarshalling(UnifiedData &output, MessageParcel &parcel)
 {
     auto size = parcel.ReadInt32();
-    if (size == 0) {
-        LOG_ERROR(UDMF_SERVICE, "UnifiedData is empty!");
+    if (size <= 0 || size > UnifiedData::MAX_DATA_SIZE) {
+        LOG_ERROR(UDMF_SERVICE, "UnifiedData is empty or too large!");
         return false;
     }
     auto rawData = parcel.ReadRawData(size);
@@ -84,8 +84,8 @@ template<>
 bool Unmarshalling(std::vector<UnifiedData> &output, MessageParcel &parcel)
 {
     auto size = parcel.ReadInt32();
-    if (size == 0) {
-        LOG_ERROR(UDMF_SERVICE, "UnifiedDataSet is empty!");
+    if (size <= 0 || size > UnifiedData::MAX_DATA_SIZE) {
+        LOG_ERROR(UDMF_SERVICE, "UnifiedDataSet is empty or too large!");
         return false;
     }
     const uint8_t *rawData = reinterpret_cast<const uint8_t *>(parcel.ReadRawData(size));
