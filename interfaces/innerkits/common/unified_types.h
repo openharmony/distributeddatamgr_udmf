@@ -89,8 +89,8 @@ enum AsyncTaskStatus : uint32_t {
 };
 
 struct AsyncProcessInfo {
-    AsyncTaskStatus syncStatus;
-    AsyncTaskStatus permStatus;
+    AsyncTaskStatus syncStatus { ASYNC_IDLE };
+    AsyncTaskStatus permStatus { ASYNC_IDLE };
     std::string srcDevName;
     uint32_t syncFinished = 0;
     uint32_t syncTotal = 0;
