@@ -27,16 +27,43 @@
 
 using namespace OHOS::UDMF;
 
-static const char* GetUdsStrValue(UdsObject* pThis, NdkStructId ndkStructId, const char* pramName)
+static const char* GetUdsStrValue(UdsObject* pThis, NdkStructId ndkStructId, const char* paramName)
 {
     if (IsInvalidUdsObjectPtr(pThis, ndkStructId)) {
         return nullptr;
     }
-    auto value = pThis->GetUdsValue<std::string>(pramName);
+    auto value = pThis->GetUdsValue<std::string>(paramName);
     return value == nullptr ? nullptr : value->c_str();
 }
 
-bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid)
+static int GetUdsUint8Value(UdsObject* pThis, const char* paramName, const char* paramNameLen, unsigned char** data,
+    unsigned int* len)
+{
+    auto value = pThis->GetUdsValue<std::vector<uint8_t>>(paramName);
+    if (value == nullptr) {
+        return UDMF_ERR;
+    }
+    auto lengthPtr = pThis->GetUdsValue<int>(paramNameLen);
+    int length;
+    if (lengthPtr == nullptr) {
+        if (value->size() > MAX_GENERAL_ENTRY_SIZE) {
+            LOG_ERROR(UDMF_CAPI, "length invalid. value'size = %{public}zu", value->size());
+            return UDMF_ERR;
+        }
+        length = static_cast<int>(value->size());
+    } else {
+        length = *lengthPtr;
+    }
+    if (length < 0 || length > MAX_GENERAL_ENTRY_SIZE) {
+        LOG_ERROR(UDMF_CAPI, "length invalid!  length'size = %{public}zu", length);
+        return UDMF_ERR;
+    }
+    *data = value->data();
+    *len = length;
+    return UDMF_E_OK;
+}
+
+bool IsInvalidUdsObjectPtr(const UdsObject *pThis, int cid)
 {
     return pThis == nullptr || pThis->cid != cid || pThis->obj == nullptr;
 }
@@ -77,8 +104,9 @@ OH_UdsPixelMap::OH_UdsPixelMap() : UdsObject(NdkStructId::UDS_PIXEL_MAP_STRUCT_I
 
 OH_UdsArrayBuffer::OH_UdsArrayBuffer() : UdsObject(NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID) {}
 
-template<typename T>
-bool UdsObject::HasObjectKey(const char* paramName)
+OH_UdsContentForm::OH_UdsContentForm() : UdsObject(NdkStructId::UDS_CONTENT_FORM_STRUCT_ID) {}
+
+template <typename T> bool UdsObject::HasObjectKey(const char* paramName)
 {
     auto it = obj->value_.find(paramName);
     if (it == obj->value_.end() || !std::holds_alternative<T>(it->second)) {
@@ -511,20 +539,142 @@ int OH_UdsArrayBuffer_SetData(OH_UdsArrayBuffer* buffer, unsigned char* data, un
 
 int OH_UdsArrayBuffer_GetData(OH_UdsArrayBuffer* buffer, unsigned char** data, unsigned int* len)
 {
-    if (buffer == nullptr || IsInvalidUdsObjectPtr(buffer, NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID)) {
+    if (IsInvalidUdsObjectPtr(buffer, NdkStructId::UDS_ARRAY_BUFFER_STRUCT_ID)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    return GetUdsUint8Value(buffer, ARRAY_BUFFER, ARRAY_BUFFER_LENGTH, data, len);
+}
+
+OH_UdsContentForm* OH_UdsContentForm_Create()
+{
+    auto contentForm = new (std::nothrow) OH_UdsContentForm();
+    if (contentForm == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
+        return nullptr;
+    }
+    contentForm->obj = std::make_shared<Object>();
+    contentForm->obj->value_[UNIFORM_DATA_TYPE] = UDMF_METE_GENERAL_CONTENT_FORM;
+    contentForm->obj->value_[THUMB_DATA] = std::vector<uint8_t>();
+    contentForm->obj->value_[THUMB_DATA_LENGTH] = 0;
+    contentForm->obj->value_[DESCRIPTION] = "";
+    contentForm->obj->value_[TITLE] = "";
+    contentForm->obj->value_[APP_ICON] = std::vector<uint8_t>();
+    contentForm->obj->value_[APP_ICON_LENGTH] = 0;
+    contentForm->obj->value_[APP_NAME] = "";
+    contentForm->obj->value_[LINK_URL] = "";
+    return contentForm;
+}
+
+void OH_UdsContentForm_Destroy(OH_UdsContentForm* pThis)
+{
+    if (pThis != nullptr && pThis->cid == NdkStructId::UDS_CONTENT_FORM_STRUCT_ID) {
+        delete pThis;
+    }
+}
+
+const char* OH_UdsContentForm_GetType(OH_UdsContentForm* pThis)
+{
+    return GetUdsStrValue(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID, UNIFORM_DATA_TYPE);
+}
+
+int OH_UdsContentForm_GetThumbData(OH_UdsContentForm* pThis, unsigned char** thumbData, unsigned int* len)
+{
+    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    return GetUdsUint8Value(pThis, THUMB_DATA, THUMB_DATA_LENGTH, thumbData, len);
+}
+
+const char* OH_UdsContentForm_GetDescription(OH_UdsContentForm* pThis)
+{
+    return GetUdsStrValue(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID, DESCRIPTION);
+}
+
+const char* OH_UdsContentForm_GetTitle(OH_UdsContentForm* pThis)
+{
+    return GetUdsStrValue(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID, TITLE);
+}
+
+int OH_UdsContentForm_GetAppIcon(OH_UdsContentForm* pThis, unsigned char** appIcon, unsigned int* len)
+{
+    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    return GetUdsUint8Value(pThis, APP_ICON, APP_ICON_LENGTH, appIcon, len);
+}
+
+const char* OH_UdsContentForm_GetAppName(OH_UdsContentForm* pThis)
+{
+    return GetUdsStrValue(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID, APP_NAME);
+}
+
+const char* OH_UdsContentForm_GetLinkUri(OH_UdsContentForm* pThis)
+{
+    return GetUdsStrValue(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID, LINK_URL);
+}
+
+int OH_UdsContentForm_SetThumbData(OH_UdsContentForm* pThis, const unsigned char* thumbData, unsigned int len)
+{
+    if (thumbData == nullptr || len == 0 || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID) ||
+        len > MAX_GENERAL_ENTRY_SIZE) {
         LOG_ERROR(UDMF_CAPI, "Param is invalid.");
         return UDMF_E_INVALID_PARAM;
     }
-    const auto arrayBuffer = buffer->GetUdsValue<std::vector<uint8_t>>(ARRAY_BUFFER);
-    if (arrayBuffer == nullptr || arrayBuffer->empty()) {
-        return UDMF_ERR;
+    std::vector<uint8_t> data(thumbData, thumbData + len);
+    int ret = pThis->SetUdsValue<std::vector<uint8_t>>(THUMB_DATA, data);
+    if (ret != UDMF_E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory. ret: %{public}d", ret);
+        return ret;
     }
-    const auto length = buffer->GetUdsValue<int>(ARRAY_BUFFER_LENGTH);
-    if (length == nullptr || *length <= 0 || *length > MAX_GENERAL_ENTRY_SIZE) {
-        return UDMF_ERR;
-    }
+    ret = pThis->SetUdsValue<int>(THUMB_DATA_LENGTH, static_cast<int>(len));
+    return ret;
+}
 
-    *data = arrayBuffer->data();
-    *len = *length;
-    return UDMF_E_OK;
+int OH_UdsContentForm_SetDescription(OH_UdsContentForm* pThis, const char* description)
+{
+    if (description == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID)) {
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
+    }
+    return pThis->SetUdsValue<std::string>(DESCRIPTION, description);
+}
+
+int OH_UdsContentForm_SetTitle(OH_UdsContentForm* pThis, const char* title)
+{
+    if (title == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID)) {
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
+    }
+    return pThis->SetUdsValue<std::string>(TITLE, title);
+}
+
+int OH_UdsContentForm_SetAppIcon(OH_UdsContentForm* pThis, const unsigned char* appIcon, unsigned int len)
+{
+    if (appIcon == nullptr || len == 0 || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID) ||
+        len > MAX_GENERAL_ENTRY_SIZE) {
+        LOG_ERROR(UDMF_CAPI, "Param is invalid.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    std::vector<uint8_t> data(appIcon, appIcon + len);
+    int ret = pThis->SetUdsValue<std::vector<uint8_t>>(APP_ICON, data);
+    if (ret != UDMF_E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory. ret: %{public}d", ret);
+        return ret;
+    }
+    ret = pThis->SetUdsValue<int>(APP_ICON_LENGTH, static_cast<int>(len));
+    return ret;
+}
+
+int OH_UdsContentForm_SetAppName(OH_UdsContentForm* pThis, const char* appName)
+{
+    if (appName == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID)) {
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
+    }
+    return pThis->SetUdsValue<std::string>(APP_NAME, appName);
+}
+
+int OH_UdsContentForm_SetLinkUri(OH_UdsContentForm* pThis, const char* linkUri)
+{
+    if (linkUri == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID)) {
+        return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
+    }
+    return pThis->SetUdsValue<std::string>(LINK_URL, linkUri);
 }

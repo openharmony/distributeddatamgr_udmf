@@ -1081,4 +1081,44 @@ HWTEST_F(UdsTest, OH_UdsArrayBuffer_SetData_001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "OH_UdsArrayBuffer_SetData_001 end.");
 }
 
+/**
+ * @tc.name: OH_UdsContentForm_SetAndGetParm_001
+ * @tc.desc: Normal testcase of OH_UdsContentForm's interface
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsContentForm_SetAndGetParm_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsContentForm_SetAndGetParm_001 begin.");
+    auto contentForm = OH_UdsContentForm_Create();
+    EXPECT_EQ(UDMF_METE_GENERAL_CONTENT_FORM, std::string(OH_UdsContentForm_GetType(contentForm)));
+    unsigned char thumbData[] = {0, 1, 2, 3, 4};
+    unsigned char appIcon[] = {5, 6, 7, 8, 9};
+    auto result = OH_UdsContentForm_SetThumbData(contentForm, thumbData, 5);
+    result = (result == UDMF_E_OK) && OH_UdsContentForm_SetDescription(contentForm, "description");
+    result = (result == UDMF_E_OK) && OH_UdsContentForm_SetTitle(contentForm, "title");
+    result = (result == UDMF_E_OK) && OH_UdsContentForm_SetAppIcon(contentForm, appIcon, 5);
+    result = (result == UDMF_E_OK) && OH_UdsContentForm_SetAppName(contentForm, "appName");
+    result = (result == UDMF_E_OK) && OH_UdsContentForm_SetLinkUri(contentForm, "link url");
+    EXPECT_EQ(UDMF_E_OK, result);
+    EXPECT_EQ("description", std::string(OH_UdsContentForm_GetDescription(contentForm)));
+    EXPECT_EQ("title", std::string(OH_UdsContentForm_GetTitle(contentForm)));
+    EXPECT_EQ("appName", std::string(OH_UdsContentForm_GetAppName(contentForm)));
+    EXPECT_EQ("link url", std::string(OH_UdsContentForm_GetLinkUri(contentForm)));
+
+    unsigned char *readThumbData;
+    unsigned int thumbDataLen = 0;
+    result = OH_UdsContentForm_GetThumbData(contentForm, &readThumbData, &thumbDataLen);
+    ASSERT_EQ(5, thumbDataLen);
+    ASSERT_TRUE(CheckUnsignedChar(thumbData, readThumbData, thumbDataLen));
+
+    unsigned char *readAppIcon;
+    unsigned int appIconLen = 0;
+    result = OH_UdsContentForm_GetAppIcon(contentForm, &readAppIcon, &appIconLen);
+    ASSERT_EQ(5, thumbDataLen);
+    ASSERT_TRUE(CheckUnsignedChar(thumbData, readThumbData, thumbDataLen));
+
+    OH_UdsContentForm_Destroy(contentForm);
+    LOG_INFO(UDMF_TEST, "OH_UdsContentForm_SetAndGetParm_001 end.");
+}
+
 }
