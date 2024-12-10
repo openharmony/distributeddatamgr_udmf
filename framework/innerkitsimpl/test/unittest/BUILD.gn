@@ -118,6 +118,16 @@ ohos_unittest("UdmfClientHapPermissionTest") {
   external_deps = common_external_deps
 }
 
+ohos_unittest("UdmfClientSaInvokeTest") {
+  module_out_path = module_output_path
+
+  sources = [ "udmf_client_sa_invoke_test.cpp" ]
+
+  deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
+
+  external_deps = common_external_deps
+}
+
 ohos_unittest("UtdClientTest") {
   module_out_path = module_output_path
 
@@ -515,6 +525,7 @@ group("unittest") {
     ":TextTest",
     ":UdmfClientAbnormalTest",
     ":UdmfClientHapPermissionTest",
+    ":UdmfClientSaInvokeTest",
     ":UdmfClientSystemHapTest",
     ":UdmfClientTest",
     ":UnifiedDataHelperTest",
