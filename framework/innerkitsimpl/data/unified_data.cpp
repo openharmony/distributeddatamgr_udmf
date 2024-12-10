@@ -176,6 +176,18 @@ bool UnifiedData::IsComplete()
     return true;
 }
 
+bool UnifiedData::HasFileType() const
+{
+    std::set<UDType> fileTypes = {UDType::FILE, UDType::IMAGE, UDType::VIDEO, UDType::AUDIO, UDType::FOLDER};
+    auto types = GetUDTyps();
+    for (auto udType : types) {
+        if (fileTypes.find(udType) != fileTypes.end()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void UnifiedData::SetProperties(std::shared_ptr<UnifiedDataProperties> properties)
 {
     if (!properties) {
@@ -205,5 +217,15 @@ void UnifiedData::SetChannelName(const std::string &name)
 {
     channelName_ = std::move(name);
 }
+
+std::set<UDType> UnifiedData::GetUDTyps() const
+{
+    std::set<UDType> types;
+    for (const auto &record : records_) {
+        types.insert(record->GetType());
+    }
+    return types;
+}
+
 } // namespace UDMF
 } // namespace OHOS
