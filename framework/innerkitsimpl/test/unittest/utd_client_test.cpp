@@ -25,11 +25,13 @@
 #include "utd_client.h"
 #include "type_descriptor.h"
 #include "preset_type_descriptors.h"
+#include "utd_graph.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
 using namespace OHOS::UDMF;
 using namespace OHOS;
+
 namespace OHOS::Test {
 class UtdClientTest : public testing::Test {
 public:

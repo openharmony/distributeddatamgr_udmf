@@ -16,6 +16,7 @@
 #ifndef UDMF_GRAPH_H
 #define UDMF_GRAPH_H
 
+#include <map>
 #include <vector>
 #include <iostream>
 #include <stack>
@@ -34,16 +35,21 @@ struct VertexNode {
 };
 class Graph {
 public:
-    explicit Graph(uint32_t vertexNum);
+    explicit Graph(uint32_t vertexNum, const std::map<std::string, uint32_t> &typeIdIndex);
     ~Graph();
     using Action = std::function<bool(uint32_t node)>;
+    void AddEdge(const std::string &startNode, const std::string &endNode);
     void AddEdge(uint32_t start, uint32_t end);
     bool Dfs(uint32_t startNode, Action action, bool isInit = true);
     bool DfsUnconnectedGraph(Action action);
+    bool IsValidType(const std::string &node);
+    int32_t GetIndex(const std::string &node);
+    bool IsDAG();
 private:
     uint32_t vertexNum_;
     std::vector<VertexNode> adjList_;  // Adjacency List
     std::vector<uint32_t> visited_;    // Determine whether the vertex has been accessed, index=vertex value
+    std::map<std::string, uint32_t> typeIdIndex_;
 };
 } // namespace UDMF
 } // namespace OHOS
