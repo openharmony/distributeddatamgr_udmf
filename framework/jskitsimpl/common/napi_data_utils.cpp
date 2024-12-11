@@ -376,8 +376,8 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
     napi_status status = napi_typeof(env, in, &type);
     LOG_ERROR_RETURN((status == napi_ok) && (type == napi_object), "invalid type", napi_invalid_arg);
     TypeDescriptorNapi *descriptorNapi = nullptr;
-    napi_unwrap(env, in, reinterpret_cast<void **>(&descriptorNapi));
-    LOG_ERROR_RETURN((descriptorNapi != nullptr), "invalid type", napi_invalid_arg);
+    auto unwrap = napi_unwrap(env, in, reinterpret_cast<void **>(&descriptorNapi));
+    LOG_ERROR_RETURN((descriptorNapi != nullptr || unwrap == napi_ok), "invalid type", napi_invalid_arg);
     descriptor = descriptorNapi->value_;
     if (descriptor == nullptr) {
         LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> GetValue TypeDescriptor failed ");
