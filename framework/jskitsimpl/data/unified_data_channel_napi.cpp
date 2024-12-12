@@ -137,7 +137,8 @@ napi_value UnifiedDataChannelNapi::UpdateData(napi_env env, napi_callback_info i
     auto execute = [ctxt]() {
         QueryOption option = { .key = ctxt->key };
         auto status = UdmfClient::GetInstance().UpdateData(option, *(ctxt->unifiedData));
-        ASSERT_WITH_ERRCODE(ctxt, status == E_OK, status, "UpdateData failed!");
+        ASSERT_WITH_ERRCODE(ctxt, status == E_OK, E_INVALID_PARAMETERS,
+            "Parameter error: The unifiedData parameter is invalid!");
     };
     return NapiQueue::AsyncWork(env, ctxt, std::string(__FUNCTION__), execute);
 }
@@ -180,7 +181,8 @@ napi_value UnifiedDataChannelNapi::QueryData(napi_env env, napi_callback_info in
         ASSERT_WITH_ERRCODE(ctxt, status == E_OK, status, "QueryData failed!");
     };
     auto output = [env, ctxt](napi_value &result) {
-        ASSERT_WITH_ERRCODE(ctxt, !ctxt->unifiedDataSet.empty(), E_ERROR, "unifiedDataSet is empty!");
+        ASSERT_WITH_ERRCODE(ctxt, !ctxt->unifiedDataSet.empty(), E_INVALID_PARAMETERS,
+            "Parameter error: The unifiedDataSet parameter is empty!");
         ctxt->status = ConvertUnifiedDataSetToNapi(env, ctxt->unifiedDataSet, result);
         ASSERT_WITH_ERRCODE(ctxt, ctxt->status == napi_ok, E_ERROR, "ConvertUnifiedDataSetToNapi failed!");
     };
