@@ -194,6 +194,10 @@ void UnifiedData::SetProperties(std::shared_ptr<UnifiedDataProperties> propertie
         LOG_ERROR(UDMF_FRAMEWORK, "properties is null!");
         return;
     }
+    if (properties_ == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "properties_ is nullptr!");
+        return;
+    }
     properties->timestamp = properties_->timestamp;
     properties_ = properties;
 }
