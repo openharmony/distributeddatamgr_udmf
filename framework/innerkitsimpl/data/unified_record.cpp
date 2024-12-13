@@ -31,6 +31,38 @@ UnifiedRecord::UnifiedRecord(UDType type)
     utdId_ = UtdUtils::GetUtdIdFromUtdEnum(type);
 }
 
+UnifiedRecord::UnifiedRecord(const UnifiedRecord& other)
+{
+    std::lock_guard<std::recursive_mutex> lock(other.mutex_);
+    dataType_ = other.dataType_;
+    value_ = other.value_;
+    hasObject_ = other.hasObject_;
+    uid_ = other.uid_;
+    utdId_ = other.utdId_;
+    entries_ = other.entries_;
+    dataId_ = other.dataId_;
+    recordId_ = other.recordId_;
+    channelName_ = other.channelName_;
+    entryGetter_ = other.entryGetter_;
+}
+
+UnifiedRecord &UnifiedRecord::operator=(const UnifiedRecord& other)
+{
+    if (this != &other) {
+        std::lock_guard<std::recursive_mutex> lock1(mutex_);
+        std::lock_guard<std::recursive_mutex> lock2(other.mutex_);
+        dataType_ = other.dataType_;
+        value_ = other.value_;
+        hasObject_ = other.hasObject_;
+        uid_ = other.uid_;
+        utdId_ = other.utdId_;
+        entries_ = other.entries_;
+        dataId_ = other.dataId_;
+        recordId_ = other.recordId_;
+    }
+    return *this;
+}
+
 UnifiedRecord::UnifiedRecord(UDType type, ValueType value)
 {
     dataType_ = type;
@@ -92,6 +124,7 @@ bool UnifiedRecord::HasType(const std::string &utdId) const
 
 void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (utdId == utdId_ || utdId_.empty()) {
         utdId_ = utdId;
         value_ = std::move(value);
@@ -108,6 +141,7 @@ void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
 
 ValueType UnifiedRecord::GetEntry(const std::string &utdId)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (utdId_ == utdId && !(std::holds_alternative<std::monostate>(value_))) {
         return value_;
     }
