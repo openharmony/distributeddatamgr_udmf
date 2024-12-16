@@ -292,7 +292,7 @@ template <typename T, typename R> bool Reading(std::map<T, R> &output, TLVObject
     return true;
 }
 
-template <typename _InTp> size_t CountVariant(TLVObject &data, uint32_t step, const _InTp &intput)
+template <typename _InTp> size_t CountVariant(TLVObject &data, uint32_t step, const _InTp &input)
 {
     return 0;
 }
