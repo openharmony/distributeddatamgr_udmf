@@ -19,16 +19,17 @@ namespace OHOS {
 namespace UDMF {
 Folder::Folder() : Folder("")
 {
+    SetType(FOLDER);
 }
 
 Folder::Folder(const std::string &uri) : File(uri)
 {
-    this->dataType_ = FOLDER;
+    SetType(FOLDER);
 }
 
 Folder::Folder(UDType type, ValueType value) : File(type, value)
 {
-    this->dataType_ = FOLDER;
+    SetType(FOLDER);
 }
 } // namespace UDMF
 } // namespace OHOS

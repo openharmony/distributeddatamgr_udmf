@@ -179,7 +179,7 @@ void SystemDefinedAppItem::InitObject()
         object->value_[BUNDLE_NAME] = bundleName_;
         object->value_[ABILITY_NAME] = abilityName_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_[VALUE_TYPE] = value;
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 } // namespace UDMF

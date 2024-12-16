@@ -59,7 +59,6 @@ bool Unmarshalling(UnifiedData &output, MessageParcel &parcel)
         LOG_ERROR(UDMF_SERVICE, "Unmarshall unified data failed!");
         return false;
     }
-    UdmfConversion::ConvertRecordToSubclass(output);
     return true;
 }
 
@@ -99,7 +98,6 @@ bool Unmarshalling(std::vector<UnifiedData> &output, MessageParcel &parcel)
         LOG_ERROR(UDMF_SERVICE, "Unmarshall unified data set failed!");
         return false;
     }
-    UdmfConversion::ConvertRecordToSubclass(output);
     return true;
 }
 

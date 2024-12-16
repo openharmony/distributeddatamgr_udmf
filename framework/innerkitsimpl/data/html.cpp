@@ -104,7 +104,7 @@ void Html::InitObject()
         object->value_[HTML_CONTENT] = htmlContent_;
         object->value_[PLAIN_CONTENT] = plainContent_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_[VALUE_TYPE] = value;
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 } // namespace UDMF

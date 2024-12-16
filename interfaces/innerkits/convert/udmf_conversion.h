@@ -17,17 +17,16 @@
 #define UDMF_UDMF_CONVERSION_H
 
 #include "unified_data.h"
-#include "visibility.h"
 
 namespace OHOS::UDMF {
 class UdmfConversion {
 public:
-    static void API_EXPORT ConvertRecordToSubclass(std::shared_ptr<UnifiedRecord> &record);
-    static void API_EXPORT ConvertRecordToSubclass(UnifiedData &data);
-    static void API_EXPORT ConvertRecordToSubclass(std::vector<UnifiedData> &datas);
+    static void ConvertRecordToSubclass(std::shared_ptr<UnifiedRecord> &record);
+    static void ConvertRecordToSubclass(UnifiedData &data);
+    static void ConvertRecordToSubclass(std::vector<UnifiedData> &datas);
 
-    static void API_EXPORT InitValueObject(UnifiedData &data);
-    static void API_EXPORT InitValueObject(std::vector<UnifiedData> &datas);
+    static void InitValueObject(UnifiedData &data);
+    static void InitValueObject(std::vector<UnifiedData> &datas);
 
 private:
     static void SetValueWhenNotUds(std::shared_ptr<UnifiedRecord> record);
