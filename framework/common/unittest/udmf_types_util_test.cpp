@@ -273,10 +273,12 @@ HWTEST_F(UdmfTypesUtilTest, Marshalling005, TestSize.Level1)
 HWTEST_F(UdmfTypesUtilTest, Unmarshalling008, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Unmarshalling008 begin.");
-    UDType output = UDType::ENTITY;
+    UDType input = UDType::ENTITY;
     MessageParcel parcel;
-    ITypesUtil::Marshalling(output, parcel);
+    ITypesUtil::Marshalling(input, parcel);
+    UDType output;
     bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_EQ(input, output);
     EXPECT_TRUE(ret);
     LOG_INFO(UDMF_TEST, "Unmarshalling008 end.");
 }
@@ -289,10 +291,12 @@ HWTEST_F(UdmfTypesUtilTest, Unmarshalling008, TestSize.Level1)
 HWTEST_F(UdmfTypesUtilTest, Unmarshalling009, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Unmarshalling009 begin.");
-    Intention output = Intention::UD_INTENTION_DRAG;
+    Intention input = Intention::UD_INTENTION_DRAG;
     MessageParcel parcel;
-    ITypesUtil::Marshalling(output, parcel);
+    ITypesUtil::Marshalling(input, parcel);
+    Intention output;
     bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_EQ(input, output);
     EXPECT_TRUE(ret);
     LOG_INFO(UDMF_TEST, "Unmarshalling009 end.");
 }

@@ -22,7 +22,6 @@ config("module_private_config") {
     "${udmf_interfaces_path}/innerkits/convert",
     "${udmf_framework_path}/innerkitsimpl/data",
     "${udmf_framework_path}/common",
-    "${kv_store_path}/frameworks/common",
     "${udmf_interfaces_path}/innerkits/data",
     "${udmf_framework_path}/common/unittest/mock/include",
     "${udmf_framework_path}/innerkitsimpl/client/",
@@ -43,7 +42,6 @@ common_external_deps = [
   "hisysevent:libhisysevent",
   "hitrace:hitrace_meter",
   "hitrace:libhitracechain",
-  "image_framework:image",
   "image_framework:image",
   "image_framework:image_native",
   "image_framework:pixelmap",
@@ -150,11 +148,32 @@ ohos_unittest("TlvUtilTest") {
   ]
 }
 
+ohos_unittest("EndianConverterTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${udmf_framework_path}/common/endian_converter.cpp",
+    "endian_converter_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
 
   deps = [
+    ":EndianConverterTest",
     ":TlvUtilTest",
     ":UdmfTypesUtilAbnormalTest",
     ":UdmfTypesUtilTest",

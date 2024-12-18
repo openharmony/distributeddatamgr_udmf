@@ -15,6 +15,7 @@
 #define LOG_TAG "UnifiedRecordTest"
 
 #include <unistd.h>
+#include <thread>
 #include <gtest/gtest.h>
 #include <string>
 
@@ -165,5 +166,64 @@ HWTEST_F(UnifiedRecordTest, Constructor_003, TestSize.Level0)
     EXPECT_TRUE(std::holds_alternative<std::string>(entry2));
     auto entryStr2 = std::get_if<std::string>(&entry2);
     EXPECT_EQ(*entryStr2, "123456");
+}
+
+/**
+ * @tc.name: AddEntry_001
+ * @tc.desc: Normal testcase of AddEntry
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedRecordTest, AddEntry_001, TestSize.Level0)
+{
+    std::string utdId = "utdId";
+    ValueType value = "value";
+    UnifiedRecord unifiedRecord;
+    std::thread t1(&UnifiedRecord::AddEntry, std::ref(unifiedRecord), utdId, value);
+    EXPECT_NO_FATAL_FAILURE(t1.join());
+
+    std::string utdId1 = "utdId1";
+    ValueType value1 = "value1";
+    std::thread t2(&UnifiedRecord::AddEntry, std::ref(unifiedRecord), utdId1, value1);
+    EXPECT_NO_FATAL_FAILURE(t2.join());
+
+    std::string utdId2 = "utdId2";
+    ValueType value2 = "value2";
+    std::thread t3(&UnifiedRecord::AddEntry, std::ref(unifiedRecord), utdId2, value2);
+    EXPECT_NO_FATAL_FAILURE(t3.join());
+
+    std::string utdId3 = "utdId3";
+    ValueType value3 = "value3";
+    std::thread t4(&UnifiedRecord::AddEntry, std::ref(unifiedRecord), utdId3, value3);
+    EXPECT_NO_FATAL_FAILURE(t4.join());
+
+    std::string utdId4 = "utdId4";
+    ValueType value4 = "value4";
+    std::thread t5(&UnifiedRecord::AddEntry, std::ref(unifiedRecord), utdId4, value4);
+    EXPECT_NO_FATAL_FAILURE(t5.join());
+
+    std::string utdId5 = "utdId5";
+    ValueType value5 = "value5";
+    std::thread t6(&UnifiedRecord::AddEntry, std::ref(unifiedRecord), utdId5, value5);
+    EXPECT_NO_FATAL_FAILURE(t6.join());
+
+    std::string utdId6 = "utdId6";
+    ValueType value6 = "value6";
+    std::thread t7(&UnifiedRecord::AddEntry, std::ref(unifiedRecord), utdId6, value6);
+    EXPECT_NO_FATAL_FAILURE(t7.join());
+
+    std::string utdId7 = "utdId7";
+    ValueType value7 = "value7";
+    std::thread t8(&UnifiedRecord::AddEntry, std::ref(unifiedRecord), utdId7, value7);
+    EXPECT_NO_FATAL_FAILURE(t8.join());
+
+    std::string utdId8 = "utdId8";
+    ValueType value8 = "value8";
+    std::thread t9(&UnifiedRecord::AddEntry, std::ref(unifiedRecord), utdId8, value8);
+    EXPECT_NO_FATAL_FAILURE(t9.join());
+
+    std::string utdId9 = "utdId9";
+    ValueType value9 = "value9";
+    std::thread t10(&UnifiedRecord::AddEntry, std::ref(unifiedRecord), utdId9, value9);
+    EXPECT_NO_FATAL_FAILURE(t10.join());
 }
 } // OHOS::Test
