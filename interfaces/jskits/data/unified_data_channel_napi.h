@@ -20,6 +20,7 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "udmf_client.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -39,6 +40,8 @@ private:
     static napi_value CreateShareOptions(napi_env env, napi_callback_info info);
     static napi_value SetAppShareOptions(napi_env env, napi_callback_info info);
     static napi_value RemoveAppShareOptions(napi_env env, napi_callback_info info);
+    static napi_status ConvertUnifiedDataSetToNapi(
+        napi_env env, const std::vector<UnifiedData> &dataSet, napi_value &output);
 };
 } // namespace UDMF
 } // namespace OHOS
