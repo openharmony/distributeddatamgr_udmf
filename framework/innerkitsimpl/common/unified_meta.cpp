@@ -505,6 +505,10 @@ static constexpr UtdType UTD_TYPES[] = {
     { OPENHARMONY_HAR, "OPENHARMONY_HAR", "openharmony.har" }
 };
 
+static constexpr std::initializer_list<std::string_view> NOT_NEED_COUNT_VALUE_LIST = {
+    UNIFORM_DATA_TYPE, ARRAY_BUFFER_LENGTH, THUMB_DATA_LENGTH, APP_ICON_LENGTH
+};
+
 namespace UtdUtils {
 bool IsValidUtdId(const std::string &utdId)
 {
@@ -674,12 +678,86 @@ std::shared_ptr<Object> ObjectUtils::ConvertToObject(UDDetails &details)
 UDDetails ObjectUtils::ConvertToUDDetails(std::shared_ptr<Object> object)
 {
     UDDetails details;
+    if (object == nullptr) {
+        return details;
+    }
     for (auto [key, value] : object->value_) {
         if (!ConvertVariant(std::move(value), details[key])) {
             LOG_ERROR(UnifiedRecord, "object convert to UDDetails failed, object key is %{public}s", key.c_str());
         }
     }
     return details;
+}
+
+int64_t ObjectUtils::GetValueSize(const ValueType &value, bool isCalValueType)
+{
+    if (value.index() == 0) {
+        return 0;
+    }
+    if (std::holds_alternative<std::string>(value)) {
+        return std::get<std::string>(value).size();
+    }
+    if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        return GetObjectValueSize(std::get<std::shared_ptr<Object>>(value), isCalValueType);
+    }
+    if (std::holds_alternative<std::vector<uint8_t>>(value)) {
+        return std::get<std::vector<uint8_t>>(value).size();
+    }
+    if (std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(value)) {
+        auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value);
+        return pixelMap->GetByteCount();
+    }
+    if (std::holds_alternative<std::shared_ptr<OHOS::AAFwk::Want>>(value)) {
+        auto want = std::get<std::shared_ptr<OHOS::AAFwk::Want>>(value);
+        Parcel parcel;
+        if (!want->Marshalling(parcel)) {
+            LOG_ERROR(UDMF_FRAMEWORK, "Marshalling want error when GetValueSize!");
+            return 0;
+        }
+        return parcel.GetDataSize();
+    }
+    return std::visit([] (const auto &val) { return sizeof(val); }, value);
+}
+
+int64_t ObjectUtils::GetObjectValueSize(const std::shared_ptr<Object> object, bool isCalValueType)
+{
+    if (object == nullptr) {
+        return 0;
+    }
+    int64_t size = 0;
+    for (auto [key, value] : object->value_) {
+        if (std::find(NOT_NEED_COUNT_VALUE_LIST.begin(), NOT_NEED_COUNT_VALUE_LIST.end(), key)
+            != NOT_NEED_COUNT_VALUE_LIST.end()) {
+            continue;
+        }
+        if (key == VALUE_TYPE && isCalValueType) {
+            size += GetValueSize(value, false);
+            continue;
+        }
+        if (key == DETAILS) {
+            if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
+                LOG_ERROR(UDMF_FRAMEWORK, "Details is not correct!");
+                continue;
+            }
+            size += GetAllObjectSize(std::get<std::shared_ptr<Object>>(value));
+            continue;
+        }
+        size += GetValueSize(value, false);
+    }
+    return size;
+}
+
+
+int64_t ObjectUtils::GetAllObjectSize(const std::shared_ptr<Object> object)
+{
+    if (object == nullptr) {
+        return 0;
+    }
+    int64_t size = 0;
+    for (auto [key, value] : object->value_) {
+        size += key.size() + GetValueSize(value, false);
+    }
+    return size;
 }
 } // namespace UDMF
 } // namespace OHOS

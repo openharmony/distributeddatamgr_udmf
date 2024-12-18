@@ -19,16 +19,17 @@ namespace OHOS {
 namespace UDMF {
 Video::Video() : Video("")
 {
+    SetType(VIDEO);
 }
 
 Video::Video(const std::string &uri) : File(uri)
 {
-    this->dataType_ = VIDEO;
+    SetType(VIDEO);
 }
 
 Video::Video(UDType type, ValueType value) : File(type, value)
 {
-    this->dataType_ = VIDEO;
+    SetType(VIDEO);
 }
 } // namespace UDMF
 } // namespace OHOS

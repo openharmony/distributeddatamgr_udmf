@@ -86,7 +86,13 @@ void UnifiedRecord::SetType(const UDType &type)
 
 int64_t UnifiedRecord::GetSize()
 {
-    return 0;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = std::get<std::shared_ptr<Object>>(value_);
+        if (value->value_.size() == 1) {
+            return ObjectUtils::GetValueSize(value_, true);
+        }
+    }
+    return ObjectUtils::GetValueSize(value_, false);
 }
 
 std::string UnifiedRecord::GetUid() const
@@ -243,7 +249,7 @@ void UnifiedRecord::InitObject()
         auto value = value_;
         value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[VALUE_TYPE] = value;
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 

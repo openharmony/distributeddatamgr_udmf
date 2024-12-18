@@ -99,7 +99,7 @@ void SystemDefinedPixelMap::InitObject()
         }
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_[VALUE_TYPE] = value;
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 } // namespace UDMF

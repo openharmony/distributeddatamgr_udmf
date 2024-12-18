@@ -32,7 +32,6 @@ constexpr mode_t MODE = 0700;
 static constexpr int64_t MAX_KV_RECORD_SIZE = 2 * 1024 * 1024;
 static constexpr int64_t MAX_KV_DATA_SIZE = 4 * 1024 * 1024;
 static constexpr int64_t MAX_IPC_RAW_DATA_SIZE = 128 * 1024 * 1024;
-static constexpr int64_t MAX_SA_DRAG_RECORD_SIZE = 3.5 * 1024 * 1024;
 
 constexpr const char *TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/udata";
 constexpr const char *TEMP_UNIFIED_DATA_SUFFIX = ".ud";
@@ -118,6 +117,8 @@ void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
 
 bool UnifiedDataHelper::Pack(UnifiedData &data)
 {
+    UdmfConversion::InitValueObject(data);
+
     Summary summary;
     GetSummary(data, summary);
 
@@ -232,13 +233,6 @@ int32_t UnifiedDataHelper::ProcessBigData(UnifiedData &data, Intention intention
     if (size > MAX_IPC_RAW_DATA_SIZE) {
         LOG_ERROR(UDMF_SERVICE, "Exceeded ipc-send data limit, totalSize:%{public}" PRId64 " !", size);
         return E_INVALID_PARAMETERS;
-    }
-    for (const auto &record : data.GetRecords()) {
-        auto recordSize = record->GetSize();
-        if (recordSize > MAX_SA_DRAG_RECORD_SIZE) {
-            LOG_ERROR(UDMF_SERVICE, "Exceeded drag single record limit, totalSize:%{public}" PRId64 " !", recordSize);
-            return E_INVALID_PARAMETERS;
-        }
     }
     LOG_DEBUG(UDMF_SERVICE, "Processing udmf data in memory");
     return E_OK;

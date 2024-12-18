@@ -19,16 +19,17 @@ namespace OHOS {
 namespace UDMF {
 Audio::Audio() : Audio("")
 {
+    SetType(AUDIO);
 }
 
 Audio::Audio(const std::string &uri) : File(uri)
 {
-    this->dataType_ = AUDIO;
+    SetType(AUDIO);
 }
 
 Audio::Audio(UDType type, ValueType value) : File(type, value)
 {
-    this->dataType_ = AUDIO;
+    SetType(AUDIO);
 }
 } // namespace UDMF
 } // namespace OHOS

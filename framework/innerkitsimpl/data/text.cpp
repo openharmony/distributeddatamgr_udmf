@@ -64,7 +64,7 @@ void Text::InitObject()
         value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_[VALUE_TYPE] = value;
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 } // namespace UDMF

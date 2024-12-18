@@ -1233,6 +1233,16 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     std::shared_ptr<UnifiedRecord> record7 = std::make_shared<ApplicationDefinedRecord>(applicationDefinedRecord);
     data.AddRecord(record7);
 
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "http://demo.com";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record8 = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record8);
+
+    auto record9 = std::make_shared<UnifiedRecord>(PNG, "http://demo.com");
+    data.AddRecord(record9);
+
     auto status = UdmfClient::GetInstance().SetData(option1, data, key);
     ASSERT_EQ(status, E_OK);
 
@@ -1247,16 +1257,20 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     size += record5->GetSize();
     size += record6->GetSize();
     size += record7->GetSize();
+    size += record8->GetSize();
+    size += record9->GetSize();
 
-    ASSERT_EQ(status, E_OK);
-    ASSERT_EQ(summary.totalSize, size);
-    ASSERT_EQ(summary.summary["general.text"], record1->GetSize());
-    ASSERT_EQ(summary.summary["general.plain-text"], record2->GetSize());
-    ASSERT_EQ(summary.summary["general.file"], record3->GetSize());
-    ASSERT_EQ(summary.summary["general.image"], record4->GetSize());
-    ASSERT_EQ(summary.summary["SystemDefinedType"], record5->GetSize());
-    ASSERT_EQ(summary.summary["openharmony.form"], record6->GetSize());
-    ASSERT_EQ(summary.summary["ApplicationDefinedType"], record7->GetSize());
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(summary.totalSize, size);
+    EXPECT_EQ(summary.summary["general.text"], record1->GetSize());
+    EXPECT_EQ(summary.summary["general.plain-text"], record2->GetSize());
+    EXPECT_EQ(summary.summary["general.file"], record3->GetSize());
+    EXPECT_EQ(summary.summary["general.image"], record4->GetSize());
+    EXPECT_EQ(summary.summary["SystemDefinedType"], record5->GetSize());
+    EXPECT_EQ(summary.summary["openharmony.form"], record6->GetSize());
+    EXPECT_EQ(summary.summary["ApplicationDefinedType"], record7->GetSize());
+    EXPECT_EQ(summary.summary["general.file-uri"], record8->GetSize());
+    EXPECT_EQ(summary.summary["general.png"], record9->GetSize());
 
     LOG_INFO(UDMF_TEST, "GetSummary001 end.");
 }

@@ -127,7 +127,10 @@ ohos_unittest("UdmfTypesUtilAbnormalTest") {
 ohos_unittest("TlvUtilTest") {
   module_out_path = module_output_path
 
-  sources = [ "tlv_util_test.cpp" ]
+  sources = [
+    "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
+    "tlv_util_test.cpp",
+  ]
 
   configs = [ ":module_private_config" ]
 

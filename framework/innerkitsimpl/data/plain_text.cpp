@@ -21,6 +21,7 @@ namespace OHOS {
 namespace UDMF {
 PlainText::PlainText() : PlainText("", "")
 {
+    SetType(PLAIN_TEXT);
 }
 
 PlainText::PlainText(const std::string &content, const std::string &abstract)
@@ -102,7 +103,7 @@ void PlainText::InitObject()
         object->value_[CONTENT] = content_;
         object->value_[ABSTRACT] = abstract_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_[VALUE_TYPE] = value;
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 } // namespace UDMF
