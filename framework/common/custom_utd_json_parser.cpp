@@ -78,6 +78,7 @@ bool CustomUtdJsonParser::ConvertUtdCfgsToJson(const std::vector<TypeDescriptorC
         if (jsonItem == nullptr) {
             LOG_ERROR(UDMF_CLIENT, "Create jsonItem failed.");
             cJSON_Delete(CustomUTDs);
+            cJSON_Delete(root);
             return false;
         }
         cJSON_AddStringToObject(jsonItem, TYPEID, utdTypeCfg.typeId.c_str());
