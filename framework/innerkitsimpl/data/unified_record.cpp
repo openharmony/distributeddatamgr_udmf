@@ -59,6 +59,8 @@ UnifiedRecord &UnifiedRecord::operator=(const UnifiedRecord& other)
         entries_ = other.entries_;
         dataId_ = other.dataId_;
         recordId_ = other.recordId_;
+        channelName_ = other.channelName_;
+        entryGetter_ = other.entryGetter_;
     }
     return *this;
 }
