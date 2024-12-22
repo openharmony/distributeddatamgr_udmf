@@ -29,9 +29,10 @@
 namespace OHOS {
 namespace UDMF {
 constexpr mode_t MODE = 0700;
-static constexpr int64_t MAX_KV_RECORD_SIZE = 2 * 1024 * 1024;
-static constexpr int64_t MAX_KV_DATA_SIZE = 4 * 1024 * 1024;
+static constexpr int64_t MAX_HAP_RECORD_SIZE = 2 * 1024 * 1024;
+static constexpr int64_t MAX_HAP_DATA_SIZE = 4 * 1024 * 1024;
 static constexpr int64_t MAX_IPC_RAW_DATA_SIZE = 128 * 1024 * 1024;
+static constexpr int64_t MAX_SA_DRAG_RECORD_SIZE  = 15 * 1024 * 1024 + 512 * 1024;
 
 constexpr const char *TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/udata";
 constexpr const char *TEMP_UNIFIED_DATA_SUFFIX = ".ud";
@@ -46,16 +47,18 @@ void UnifiedDataHelper::SetRootPath(const std::string &rootPath)
 
 bool UnifiedDataHelper::ExceedKVSizeLimit(UnifiedData &data)
 {
-    int64_t totalSize = data.GetSize();
-    if (data.GetSize() > MAX_KV_DATA_SIZE) {
-        LOG_INFO(UDMF_FRAMEWORK, "Exceeded KV data limit, totalSize:%{public}" PRId64 " !", totalSize);
-        return true;
-    }
+    int64_t totalSize = 0;
     for (const auto &record : data.GetRecords()) {
-        if (record->GetSize() > MAX_KV_RECORD_SIZE) {
-            LOG_INFO(UDMF_FRAMEWORK, "Exceeded KV record limit, recordSize:%{public}" PRId64 "!", record->GetSize());
+        auto recordSize = record->GetSize();
+        if (recordSize > MAX_HAP_RECORD_SIZE) {
+            LOG_INFO(UDMF_FRAMEWORK, "Exceeded 2M record limit, recordSize:%{public}" PRId64 "!", recordSize);
             return true;
         }
+        totalSize += recordSize;
+    }
+    if (totalSize > MAX_HAP_DATA_SIZE) {
+        LOG_INFO(UDMF_FRAMEWORK, "Exceeded 4M data limit, totalSize:%{public}" PRId64 " !", totalSize);
+        return true;
     }
     return false;
 }
@@ -229,9 +232,17 @@ int32_t UnifiedDataHelper::ProcessBigData(UnifiedData &data, Intention intention
         LOG_ERROR(UDMF_SERVICE, "Non-Drag cannot be used to process big data when SA initiates a request");
         return E_INVALID_PARAMETERS;
     }
-    auto size = data.GetSize();
-    if (size > MAX_IPC_RAW_DATA_SIZE) {
-        LOG_ERROR(UDMF_SERVICE, "Exceeded ipc-send data limit, totalSize:%{public}" PRId64 " !", size);
+    int64_t dataSize = 0;
+    for (const auto &record : data.GetRecords()) {
+        auto recordSize = record->GetSize();
+        if (recordSize > MAX_SA_DRAG_RECORD_SIZE) {
+            LOG_ERROR(UDMF_FRAMEWORK, "Exceeded KV record limit, recordSize:%{public}" PRId64 "!", recordSize);
+            return E_INVALID_PARAMETERS;
+        }
+        dataSize += recordSize;
+    }
+    if (dataSize > MAX_IPC_RAW_DATA_SIZE) {
+        LOG_ERROR(UDMF_SERVICE, "Exceeded ipc-send data limit, totalSize:%{public}" PRId64 " !", dataSize);
         return E_INVALID_PARAMETERS;
     }
     LOG_DEBUG(UDMF_SERVICE, "Processing udmf data in memory");
