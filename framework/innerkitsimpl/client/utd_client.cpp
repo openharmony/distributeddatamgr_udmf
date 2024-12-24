@@ -181,7 +181,7 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
         return Status::E_INVALID_PARAMETERS;
     }
     if (!IsValidFileExtension(fileExtension)) {
-        LOG_ERROR(UDMF_CLIENT, "invalid fileExtension. fileExtension:%{public}s, belongsTo:%{public}s ",
+        LOG_ERROR(UDMF_CLIENT, "invalid fileExtension. fileExtension:%{private}s, belongsTo:%{public}s ",
             fileExtension.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
