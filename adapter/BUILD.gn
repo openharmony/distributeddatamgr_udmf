@@ -69,6 +69,7 @@ config("arkui_x_udmf_config") {
     "${arkui_x_graphic_surface_path}/interfaces/inner_api/surface",
     "${arkui_x_graphic_surface_path}/interfaces/inner_api/utils",
     "${third_party_path}/skia",
+    "//plugins/bluetooth/common/mock",
   ]
 }
 
