@@ -256,9 +256,8 @@ HWTEST_F(UdmfClientHapPermissionTest, SetAppShareOption003, TestSize.Level1)
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
-    Text text1;
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Text>(text1);
-    data1.AddRecord(record1);
+    auto text1 = std::make_shared<Text>();
+    data1.AddRecord(text1);
     std::string key;
     status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
@@ -296,9 +295,8 @@ HWTEST_F(UdmfClientHapPermissionTest, SetAppShareOption004, TestSize.Level1)
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
-    Text text1;
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Text>(text1);
-    data1.AddRecord(record1);
+    auto text1 = std::make_shared<Text>();
+    data1.AddRecord(text1);
     std::string key;
     status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);

@@ -237,12 +237,11 @@ HWTEST_F(UdmfClientTest, SetData001, TestSize.Level1)
     EXPECT_EQ(status, E_INVALID_PARAMETERS);
 
     option = { .intention = Intention::UD_INTENTION_BUTT };
-    Text text;
+    auto text = std::make_shared<Text>();
     UDDetails details;
     details.insert({ "udmf_key", "udmf_value" });
-    text.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
-    data.AddRecord(record);
+    text->SetDetails(details);
+    data.AddRecord(text);
     status = UdmfClient::GetInstance().SetData(option, data, key);
     EXPECT_EQ(status, E_INVALID_PARAMETERS);
 
@@ -267,12 +266,11 @@ HWTEST_F(UdmfClientTest, SetData002, TestSize.Level1)
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
-    Text text1;
+    auto text1 = std::make_shared<Text>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    text1.SetDetails(details1);
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Text>(text1);
-    data1.AddRecord(record1);
+    text1->SetDetails(details1);
+    data1.AddRecord(text1);
     std::string key;
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
@@ -309,14 +307,13 @@ HWTEST_F(UdmfClientTest, SetData003, TestSize.Level1)
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
-    PlainText plainText1;
+    auto plainText1 = std::make_shared<PlainText>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    plainText1.SetDetails(details1);
-    plainText1.SetContent("content");
-    plainText1.SetAbstract("abstract");
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(plainText1);
-    data1.AddRecord(record1);
+    plainText1->SetDetails(details1);
+    plainText1->SetContent("content");
+    plainText1->SetAbstract("abstract");
+    data1.AddRecord(plainText1);
     std::string key;
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
@@ -339,8 +336,8 @@ HWTEST_F(UdmfClientTest, SetData003, TestSize.Level1)
 
     auto plainText2 = static_cast<PlainText *>(record2.get());
     ASSERT_NE(plainText2, nullptr);
-    EXPECT_EQ(plainText1.GetContent(), plainText2->GetContent());
-    EXPECT_EQ(plainText1.GetAbstract(), plainText2->GetAbstract());
+    EXPECT_EQ(plainText1->GetContent(), plainText2->GetContent());
+    EXPECT_EQ(plainText1->GetAbstract(), plainText2->GetAbstract());
 
     GetEmptyData(option2);
 
@@ -359,14 +356,13 @@ HWTEST_F(UdmfClientTest, SetData004, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    Html html1;
+    auto html1 = std::make_shared<Html>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    html1.SetDetails(details1);
-    html1.SetHtmlContent("htmlcontent");
-    html1.SetPlainContent("plainContent");
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Html>(html1);
-    data1.AddRecord(record1);
+    html1->SetDetails(details1);
+    html1->SetHtmlContent("htmlcontent");
+    html1->SetPlainContent("plainContent");
+    data1.AddRecord(html1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -388,8 +384,8 @@ HWTEST_F(UdmfClientTest, SetData004, TestSize.Level1)
 
     auto html2 = static_cast<Html *>(record2.get());
     ASSERT_NE(html2, nullptr);
-    EXPECT_EQ(html1.GetHtmlContent(), html2->GetHtmlContent());
-    EXPECT_EQ(html1.GetPlainContent(), html2->GetPlainContent());
+    EXPECT_EQ(html1->GetHtmlContent(), html2->GetHtmlContent());
+    EXPECT_EQ(html1->GetPlainContent(), html2->GetPlainContent());
 
     GetEmptyData(option2);
 
@@ -408,14 +404,13 @@ HWTEST_F(UdmfClientTest, SetData005, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    Link link1;
+    auto link1 = std::make_shared<Link>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    link1.SetDetails(details1);
-    link1.SetUrl("url");
-    link1.SetDescription("description");
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Link>(link1);
-    data1.AddRecord(record1);
+    link1->SetDetails(details1);
+    link1->SetUrl("url");
+    link1->SetDescription("description");
+    data1.AddRecord(link1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -437,8 +432,8 @@ HWTEST_F(UdmfClientTest, SetData005, TestSize.Level1)
 
     auto link2 = static_cast<Link *>(record2.get());
     ASSERT_NE(link2, nullptr);
-    EXPECT_EQ(link1.GetUrl(), link2->GetUrl());
-    EXPECT_EQ(link1.GetDescription(), link2->GetDescription());
+    EXPECT_EQ(link1->GetUrl(), link2->GetUrl());
+    EXPECT_EQ(link1->GetDescription(), link2->GetDescription());
 
     GetEmptyData(option2);
 
@@ -457,13 +452,12 @@ HWTEST_F(UdmfClientTest, SetData006, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    File file1;
-    file1.SetRemoteUri("remoteUri");
+    auto file1 = std::make_shared<File>();
+    file1->SetRemoteUri("remoteUri");
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    file1.SetDetails(details1);
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<File>(file1);
-    data1.AddRecord(record1);
+    file1->SetDetails(details1);
+    data1.AddRecord(file1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -481,7 +475,7 @@ HWTEST_F(UdmfClientTest, SetData006, TestSize.Level1)
 
     auto file2 = static_cast<File *>(record2.get());
     ASSERT_NE(file2, nullptr);
-    EXPECT_EQ(file1.GetRemoteUri(), file2->GetRemoteUri());
+    EXPECT_EQ(file1->GetRemoteUri(), file2->GetRemoteUri());
     CompareDetails(file2->GetDetails());
 
     GetEmptyData(option2);
@@ -501,13 +495,12 @@ HWTEST_F(UdmfClientTest, SetData007, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    Image image1;
+    auto image1 = std::make_shared<Image>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    image1.SetDetails(details1);
-    image1.SetRemoteUri("remoteUri");
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Image>(image1);
-    data1.AddRecord(record1);
+    image1->SetDetails(details1);
+    image1->SetRemoteUri("remoteUri");
+    data1.AddRecord(image1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -529,7 +522,7 @@ HWTEST_F(UdmfClientTest, SetData007, TestSize.Level1)
 
     auto image2 = static_cast<Image *>(record2.get());
     ASSERT_NE(image2, nullptr);
-    EXPECT_EQ(image1.GetRemoteUri(), image2->GetRemoteUri());
+    EXPECT_EQ(image1->GetRemoteUri(), image2->GetRemoteUri());
 
     GetEmptyData(option2);
 
@@ -548,13 +541,12 @@ HWTEST_F(UdmfClientTest, SetData008, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    Video video1;
+    auto video1 = std::make_shared<Video>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    video1.SetDetails(details1);
-    video1.SetRemoteUri("remoteUri");
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Video>(video1);
-    data1.AddRecord(record1);
+    video1->SetDetails(details1);
+    video1->SetRemoteUri("remoteUri");
+    data1.AddRecord(video1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -576,7 +568,7 @@ HWTEST_F(UdmfClientTest, SetData008, TestSize.Level1)
 
     auto video2 = static_cast<Video *>(record2.get());
     ASSERT_NE(video2, nullptr);
-    EXPECT_EQ(video1.GetRemoteUri(), video2->GetRemoteUri());
+    EXPECT_EQ(video1->GetRemoteUri(), video2->GetRemoteUri());
 
     GetEmptyData(option2);
 
@@ -595,13 +587,12 @@ HWTEST_F(UdmfClientTest, SetData009, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    Audio audio1;
+    auto audio1 = std::make_shared<Audio>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    audio1.SetDetails(details1);
-    audio1.SetRemoteUri("remoteUri");
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Audio>(audio1);
-    data1.AddRecord(record1);
+    audio1->SetDetails(details1);
+    audio1->SetRemoteUri("remoteUri");
+    data1.AddRecord(audio1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -623,7 +614,7 @@ HWTEST_F(UdmfClientTest, SetData009, TestSize.Level1)
 
     auto audio2 = static_cast<Audio *>(record2.get());
     ASSERT_NE(audio2, nullptr);
-    EXPECT_EQ(audio1.GetRemoteUri(), audio2->GetRemoteUri());
+    EXPECT_EQ(audio1->GetRemoteUri(), audio2->GetRemoteUri());
 
     GetEmptyData(option2);
 
@@ -642,13 +633,12 @@ HWTEST_F(UdmfClientTest, SetData010, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    Folder folder1;
+    auto folder1 = std::make_shared<Folder>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    folder1.SetDetails(details1);
-    folder1.SetRemoteUri("remoteUri");
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Folder>(folder1);
-    data1.AddRecord(record1);
+    folder1->SetDetails(details1);
+    folder1->SetRemoteUri("remoteUri");
+    data1.AddRecord(folder1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -670,7 +660,7 @@ HWTEST_F(UdmfClientTest, SetData010, TestSize.Level1)
 
     auto folder2 = static_cast<Folder *>(record2.get());
     ASSERT_NE(folder2, nullptr);
-    EXPECT_EQ(folder1.GetRemoteUri(), folder2->GetRemoteUri());
+    EXPECT_EQ(folder1->GetRemoteUri(), folder2->GetRemoteUri());
 
     GetEmptyData(option2);
 
@@ -689,12 +679,11 @@ HWTEST_F(UdmfClientTest, SetData011, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    SystemDefinedRecord systemDefinedRecord1;
+    auto systemDefinedRecord1 = std::make_shared<SystemDefinedRecord>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    systemDefinedRecord1.SetDetails(details1);
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<SystemDefinedRecord>(systemDefinedRecord1);
-    data1.AddRecord(record1);
+    systemDefinedRecord1->SetDetails(details1);
+    data1.AddRecord(systemDefinedRecord1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -731,17 +720,16 @@ HWTEST_F(UdmfClientTest, SetData012, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    SystemDefinedForm systemDefinedForm1;
+    auto systemDefinedForm1 = std::make_shared<SystemDefinedForm>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    systemDefinedForm1.SetDetails(details1);
-    systemDefinedForm1.SetFormId(123);
-    systemDefinedForm1.SetFormName("formName");
-    systemDefinedForm1.SetModule("module");
-    systemDefinedForm1.SetAbilityName("abilityName");
-    systemDefinedForm1.SetBundleName("bundleName");
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<SystemDefinedForm>(systemDefinedForm1);
-    data1.AddRecord(record1);
+    systemDefinedForm1->SetDetails(details1);
+    systemDefinedForm1->SetFormId(123);
+    systemDefinedForm1->SetFormName("formName");
+    systemDefinedForm1->SetModule("module");
+    systemDefinedForm1->SetAbilityName("abilityName");
+    systemDefinedForm1->SetBundleName("bundleName");
+    data1.AddRecord(systemDefinedForm1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -763,11 +751,11 @@ HWTEST_F(UdmfClientTest, SetData012, TestSize.Level1)
 
     auto systemDefinedForm2 = static_cast<SystemDefinedForm *>(record2.get());
     ASSERT_NE(systemDefinedForm2, nullptr);
-    EXPECT_EQ(systemDefinedForm1.GetFormId(), systemDefinedForm2->GetFormId());
-    EXPECT_EQ(systemDefinedForm1.GetFormName(), systemDefinedForm2->GetFormName());
-    EXPECT_EQ(systemDefinedForm1.GetBundleName(), systemDefinedForm2->GetBundleName());
-    EXPECT_EQ(systemDefinedForm1.GetAbilityName(), systemDefinedForm2->GetAbilityName());
-    EXPECT_EQ(systemDefinedForm1.GetModule(), systemDefinedForm2->GetModule());
+    EXPECT_EQ(systemDefinedForm1->GetFormId(), systemDefinedForm2->GetFormId());
+    EXPECT_EQ(systemDefinedForm1->GetFormName(), systemDefinedForm2->GetFormName());
+    EXPECT_EQ(systemDefinedForm1->GetBundleName(), systemDefinedForm2->GetBundleName());
+    EXPECT_EQ(systemDefinedForm1->GetAbilityName(), systemDefinedForm2->GetAbilityName());
+    EXPECT_EQ(systemDefinedForm1->GetModule(), systemDefinedForm2->GetModule());
 
     GetEmptyData(option2);
 
@@ -786,18 +774,17 @@ HWTEST_F(UdmfClientTest, SetData013, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    SystemDefinedAppItem systemDefinedAppItem1;
+    auto systemDefinedAppItem1 = std::make_shared<SystemDefinedAppItem>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    systemDefinedAppItem1.SetDetails(details1);
-    systemDefinedAppItem1.SetAppId("appId");
-    systemDefinedAppItem1.SetAppName("appName");
-    systemDefinedAppItem1.SetAppIconId("appIconId");
-    systemDefinedAppItem1.SetAppLabelId("appLabelId");
-    systemDefinedAppItem1.SetBundleName("bundleName");
-    systemDefinedAppItem1.SetAbilityName("abilityName");
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<SystemDefinedAppItem>(systemDefinedAppItem1);
-    data1.AddRecord(record1);
+    systemDefinedAppItem1->SetDetails(details1);
+    systemDefinedAppItem1->SetAppId("appId");
+    systemDefinedAppItem1->SetAppName("appName");
+    systemDefinedAppItem1->SetAppIconId("appIconId");
+    systemDefinedAppItem1->SetAppLabelId("appLabelId");
+    systemDefinedAppItem1->SetBundleName("bundleName");
+    systemDefinedAppItem1->SetAbilityName("abilityName");
+    data1.AddRecord(systemDefinedAppItem1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -819,12 +806,12 @@ HWTEST_F(UdmfClientTest, SetData013, TestSize.Level1)
 
     auto systemDefinedAppItem2 = static_cast<SystemDefinedAppItem *>(record2.get());
     ASSERT_NE(systemDefinedAppItem2, nullptr);
-    EXPECT_EQ(systemDefinedAppItem1.GetAppId(), systemDefinedAppItem2->GetAppId());
-    EXPECT_EQ(systemDefinedAppItem1.GetAppName(), systemDefinedAppItem2->GetAppName());
-    EXPECT_EQ(systemDefinedAppItem1.GetBundleName(), systemDefinedAppItem2->GetBundleName());
-    EXPECT_EQ(systemDefinedAppItem1.GetAbilityName(), systemDefinedAppItem2->GetAbilityName());
-    EXPECT_EQ(systemDefinedAppItem1.GetAppIconId(), systemDefinedAppItem2->GetAppIconId());
-    EXPECT_EQ(systemDefinedAppItem1.GetAppLabelId(), systemDefinedAppItem2->GetAppLabelId());
+    EXPECT_EQ(systemDefinedAppItem1->GetAppId(), systemDefinedAppItem2->GetAppId());
+    EXPECT_EQ(systemDefinedAppItem1->GetAppName(), systemDefinedAppItem2->GetAppName());
+    EXPECT_EQ(systemDefinedAppItem1->GetBundleName(), systemDefinedAppItem2->GetBundleName());
+    EXPECT_EQ(systemDefinedAppItem1->GetAbilityName(), systemDefinedAppItem2->GetAbilityName());
+    EXPECT_EQ(systemDefinedAppItem1->GetAppIconId(), systemDefinedAppItem2->GetAppIconId());
+    EXPECT_EQ(systemDefinedAppItem1->GetAppLabelId(), systemDefinedAppItem2->GetAppLabelId());
 
     GetEmptyData(option2);
 
@@ -843,10 +830,10 @@ HWTEST_F(UdmfClientTest, SetData014, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    SystemDefinedPixelMap systemDefinedPixelMap1;
+    auto systemDefinedPixelMap1 = std::make_shared<SystemDefinedPixelMap>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    systemDefinedPixelMap1.SetDetails(details1);
+    systemDefinedPixelMap1->SetDetails(details1);
     std::vector<uint8_t> rawData1;
 
     uint32_t color[100] = { 3, 7, 9, 9, 7, 6 };
@@ -858,9 +845,8 @@ HWTEST_F(UdmfClientTest, SetData014, TestSize.Level1)
     std::shared_ptr<OHOS::Media::PixelMap> pixelMapIn = move(pixelMap);
     pixelMapIn->EncodeTlv(rawData1);
 
-    systemDefinedPixelMap1.SetRawData(rawData1);
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<SystemDefinedPixelMap>(systemDefinedPixelMap1);
-    data1.AddRecord(record1);
+    systemDefinedPixelMap1->SetRawData(rawData1);
+    data1.AddRecord(systemDefinedPixelMap1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -905,12 +891,11 @@ HWTEST_F(UdmfClientTest, SetData015, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    ApplicationDefinedRecord applicationDefinedRecord1;
-    applicationDefinedRecord1.SetApplicationDefinedType("applicationDefinedType");
+    auto applicationDefinedRecord1 = std::make_shared<ApplicationDefinedRecord>();
+    applicationDefinedRecord1->SetApplicationDefinedType("applicationDefinedType");
     std::vector<uint8_t> rawData1 = { 1, 2, 3, 4, 5 };
-    applicationDefinedRecord1.SetRawData(rawData1);
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<ApplicationDefinedRecord>(applicationDefinedRecord1);
-    data1.AddRecord(record1);
+    applicationDefinedRecord1->SetRawData(rawData1);
+    data1.AddRecord(applicationDefinedRecord1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -928,7 +913,7 @@ HWTEST_F(UdmfClientTest, SetData015, TestSize.Level1)
 
     auto applicationDefinedRecord2 = static_cast<ApplicationDefinedRecord *>(record2.get());
     ASSERT_NE(applicationDefinedRecord2, nullptr);
-    EXPECT_EQ(applicationDefinedRecord1.GetApplicationDefinedType(),
+    EXPECT_EQ(applicationDefinedRecord1->GetApplicationDefinedType(),
               applicationDefinedRecord2->GetApplicationDefinedType());
     auto rawData2 = applicationDefinedRecord2->GetRawData();
     EXPECT_EQ(rawData1.size(), rawData2.size());
@@ -1030,10 +1015,9 @@ HWTEST_F(UdmfClientTest, SetData018, TestSize.Level1)
         value += "11";
     }
     details.insert({ value, value });
-    Text text;
-    text.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
-    inputData.AddRecord(record);
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
+    inputData.AddRecord(text);
 
     auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
     ASSERT_EQ(status, E_OK);
@@ -1066,10 +1050,9 @@ HWTEST_F(UdmfClientTest, SetData019, TestSize.Level1)
     }
     details.insert({ value, value });
     details.insert({ "udmf_key", "udmf_value" });
-    Text text;
-    text.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
-    inputData.AddRecord(record);
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
+    inputData.AddRecord(text);
 
     UnifiedDataHelper::SetRootPath("/data/udmf_test/");
     auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
@@ -1103,11 +1086,10 @@ HWTEST_F(UdmfClientTest, SetData020, TestSize.Level1)
         value += "11";
     }
     details.insert({ value, value });
-    Text text;
-    text.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
     for (int i = 0; i < 2; ++i) {
-        inputData.AddRecord(record);
+        inputData.AddRecord(text);
     }
     auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
     ASSERT_EQ(status, E_OK);
@@ -1185,54 +1167,47 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     UDDetails details;
     details.insert({ "udmf_key", "udmf_value" });
 
-    Text text;
-    text.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Text>(text);
-    data.AddRecord(record1);
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
+    data.AddRecord(text);
 
-    PlainText plainText;
-    plainText.SetDetails(details);
-    plainText.SetContent("content");
-    plainText.SetAbstract("abstract");
-    std::shared_ptr<UnifiedRecord> record2 = std::make_shared<PlainText>(plainText);
-    data.AddRecord(record2);
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetDetails(details);
+    plainText->SetContent("content");
+    plainText->SetAbstract("abstract");
+    data.AddRecord(plainText);
 
-    File file;
-    file.SetDetails(details);
-    file.SetUri("uri");
-    file.SetRemoteUri("remoteUri");
-    std::shared_ptr<UnifiedRecord> record3 = std::make_shared<File>(file);
-    data.AddRecord(record3);
+    auto file = std::make_shared<File>();
+    file->SetDetails(details);
+    file->SetUri("uri");
+    file->SetRemoteUri("remoteUri");
+    data.AddRecord(file);
 
-    Image image;
-    file.SetDetails(details);
-    image.SetUri("uri");
-    image.SetRemoteUri("remoteUri");
-    std::shared_ptr<UnifiedRecord> record4 = std::make_shared<Image>(image);
-    data.AddRecord(record4);
+    auto image = std::make_shared<Image>();
+    file->SetDetails(details);
+    image->SetUri("uri");
+    image->SetRemoteUri("remoteUri");
+    data.AddRecord(image);
 
-    SystemDefinedRecord systemDefinedRecord;
-    systemDefinedRecord.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record5 = std::make_shared<SystemDefinedRecord>(systemDefinedRecord);
-    data.AddRecord(record5);
+    auto systemDefinedRecord = std::make_shared<SystemDefinedRecord>();
+    systemDefinedRecord->SetDetails(details);
+    data.AddRecord(systemDefinedRecord);
 
-    SystemDefinedForm systemDefinedForm;
-    systemDefinedForm.SetDetails(details);
-    systemDefinedForm.SetFormId(123);
-    systemDefinedForm.SetFormName("formName");
-    systemDefinedForm.SetModule("module");
-    systemDefinedForm.SetAbilityName("abilityName");
-    systemDefinedForm.SetBundleName("bundleName");
-    std::shared_ptr<UnifiedRecord> record6 = std::make_shared<SystemDefinedForm>(systemDefinedForm);
-    data.AddRecord(record6);
+    auto systemDefinedForm = std::make_shared<SystemDefinedForm>();
+    systemDefinedForm->SetDetails(details);
+    systemDefinedForm->SetFormId(123);
+    systemDefinedForm->SetFormName("formName");
+    systemDefinedForm->SetModule("module");
+    systemDefinedForm->SetAbilityName("abilityName");
+    systemDefinedForm->SetBundleName("bundleName");
+    data.AddRecord(systemDefinedForm);
 
-    ApplicationDefinedRecord applicationDefinedRecord;
-    applicationDefinedRecord.SetApplicationDefinedType("applicationDefinedType");
+    auto applicationDefinedRecord = std::make_shared<ApplicationDefinedRecord>();
+    applicationDefinedRecord->SetApplicationDefinedType("applicationDefinedType");
     std::vector<uint8_t> rawData = { 1, 2, 3, 4, 5 };
-    applicationDefinedRecord.SetRawData(rawData);
-    std::shared_ptr<UnifiedRecord> record7 = std::make_shared<ApplicationDefinedRecord>(applicationDefinedRecord);
-    data.AddRecord(record7);
-	
+    applicationDefinedRecord->SetRawData(rawData);
+    data.AddRecord(applicationDefinedRecord);
+
     std::shared_ptr<Object> obj = std::make_shared<Object>();
     obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
     obj->value_[FILE_URI_PARAM] = "http://demo.com";
@@ -1249,25 +1224,25 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     Summary summary;
     status = UdmfClient::GetInstance().GetSummary(option2, summary);
 
-    auto size = record1->GetSize();
-    size += record2->GetSize();
-    size += record3->GetSize();
-    size += record4->GetSize();
-    size += record5->GetSize();
-    size += record6->GetSize();
-    size += record7->GetSize();
+    auto size = text->GetSize();
+    size += plainText->GetSize();
+    size += file->GetSize();
+    size += image->GetSize();
+    size += systemDefinedRecord->GetSize();
+    size += systemDefinedForm->GetSize();
+    size += applicationDefinedRecord->GetSize();
     size += record8->GetSize();
     size += record9->GetSize();
 
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(summary.totalSize, size);
-    EXPECT_EQ(summary.summary["general.text"], record1->GetSize());
-    EXPECT_EQ(summary.summary["general.plain-text"], record2->GetSize());
-    EXPECT_EQ(summary.summary["general.file"], record3->GetSize());
-    EXPECT_EQ(summary.summary["general.image"], record4->GetSize());
-    EXPECT_EQ(summary.summary["SystemDefinedType"], record5->GetSize());
-    EXPECT_EQ(summary.summary["openharmony.form"], record6->GetSize());
-    EXPECT_EQ(summary.summary["ApplicationDefinedType"], record7->GetSize());
+    EXPECT_EQ(summary.summary["general.text"], text->GetSize());
+    EXPECT_EQ(summary.summary["general.plain-text"], plainText->GetSize());
+    EXPECT_EQ(summary.summary["general.file"], file->GetSize());
+    EXPECT_EQ(summary.summary["general.image"], image->GetSize());
+    EXPECT_EQ(summary.summary["SystemDefinedType"], systemDefinedRecord->GetSize());
+    EXPECT_EQ(summary.summary["openharmony.form"], systemDefinedForm->GetSize());
+    EXPECT_EQ(summary.summary["ApplicationDefinedType"], applicationDefinedRecord->GetSize());
     EXPECT_EQ(summary.summary["general.file-uri"], record8->GetSize());
     EXPECT_EQ(summary.summary["general.png"], record9->GetSize());
 
@@ -1335,12 +1310,11 @@ HWTEST_F(UdmfClientTest, AddPrivilege001, TestSize.Level1)
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data;
-    Text text;
+    auto text = std::make_shared<Text>();
     UDDetails details;
     details.insert({ "udmf_key", "udmf_value" });
-    text.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
-    data.AddRecord(record);
+    text->SetDetails(details);
+    data.AddRecord(text);
     std::string key;
     auto status = UdmfClient::GetInstance().SetData(option1, data, key);
     ASSERT_EQ(status, E_OK);
@@ -1418,12 +1392,11 @@ HWTEST_F(UdmfClientTest, AddPrivilege003, TestSize.Level1)
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data;
-    Text text;
+    auto text = std::make_shared<Text>();
     UDDetails details;
     details.insert({ "udmf_key", "udmf_value" });
-    text.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
-    data.AddRecord(record);
+    text->SetDetails(details);
+    data.AddRecord(text);
     std::string key;
     auto status = UdmfClient::GetInstance().SetData(option1, data, key);
     ASSERT_EQ(status, E_OK);
@@ -1451,12 +1424,11 @@ HWTEST_F(UdmfClientTest, AddPrivilege004, TestSize.Level1)
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data;
-    Text text;
+    auto text = std::make_shared<Text>();
     UDDetails details;
     details.insert({ "udmf_key", "udmf_value" });
-    text.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
-    data.AddRecord(record);
+    text->SetDetails(details);
+    data.AddRecord(text);
     std::string key;
     auto status = UdmfClient::GetInstance().SetData(option1, data, key);
     ASSERT_EQ(status, E_OK);
@@ -1484,12 +1456,11 @@ HWTEST_F(UdmfClientTest, AddPrivilege005, TestSize.Level1)
 
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data;
-    Text text;
+    auto text = std::make_shared<Text>();
     UDDetails details;
     details.insert({ "udmf_key", "udmf_value" });
-    text.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
-    data.AddRecord(record);
+    text->SetDetails(details);
+    data.AddRecord(text);
     std::string key;
     auto status = UdmfClient::GetInstance().SetData(option1, data, key);
     ASSERT_EQ(status, E_OK);
@@ -1535,13 +1506,12 @@ HWTEST_F(UdmfClientTest, GetSelfData001, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    File file1;
-    file1.SetRemoteUri("remoteUri");
+    auto file1 = std::make_shared<File>();
+    file1->SetRemoteUri("remoteUri");
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    file1.SetDetails(details1);
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<File>(file1);
-    data1.AddRecord(record1);
+    file1->SetDetails(details1);
+    data1.AddRecord(file1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -1557,7 +1527,7 @@ HWTEST_F(UdmfClientTest, GetSelfData001, TestSize.Level1)
 
     auto file2 = static_cast<File *>(record2.get());
     ASSERT_NE(file2, nullptr);
-    EXPECT_EQ(file1.GetRemoteUri(), file2->GetRemoteUri());
+    EXPECT_EQ(file1->GetRemoteUri(), file2->GetRemoteUri());
     CompareDetails(file2->GetDetails());
 
     GetEmptyData(option2);
@@ -1577,13 +1547,12 @@ HWTEST_F(UdmfClientTest, GetSelfData002, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    File file1;
-    file1.SetRemoteUri("remoteUri");
+    auto file1 = std::make_shared<File>();
+    file1->SetRemoteUri("remoteUri");
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    file1.SetDetails(details1);
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<File>(file1);
-    data1.AddRecord(record1);
+    file1->SetDetails(details1);
+    data1.AddRecord(file1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -1601,7 +1570,7 @@ HWTEST_F(UdmfClientTest, GetSelfData002, TestSize.Level1)
 
     auto file2 = static_cast<File *>(record2.get());
     ASSERT_NE(file2, nullptr);
-    EXPECT_EQ(file1.GetRemoteUri(), file2->GetRemoteUri());
+    EXPECT_EQ(file1->GetRemoteUri(), file2->GetRemoteUri());
     CompareDetails(file2->GetDetails());
 
     GetEmptyData(option2);
@@ -1628,19 +1597,15 @@ HWTEST_F(UdmfClientTest, SetData021, TestSize.Level1)
 
     CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data1;
-    PlainText plainText1;
-    plainText1.SetContent("content1");
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(plainText1);
-    data1.AddRecord(record1);
+    auto plainText1 = std::make_shared<PlainText>();
+    plainText1->SetContent("content1");
+    data1.AddRecord(plainText1);
     std::string key;
     status = UdmfClient::GetInstance().SetData(customOption, data1, key);
     ASSERT_EQ(status, E_OK);
-
     UnifiedData data2;
-    PlainText plainText2;
-    plainText1.SetContent("content2");
-    std::shared_ptr<UnifiedRecord> record2 = std::make_shared<PlainText>(plainText1);
-    data2.AddRecord(record2);
+    plainText1->SetContent("content2");
+    data2.AddRecord(plainText1);
     status = UdmfClient::GetInstance().SetData(customOption, data2, key);
     ASSERT_EQ(status, E_OK);
 
@@ -1672,10 +1637,9 @@ HWTEST_F(UdmfClientTest, UpdateData001, TestSize.Level1)
 
     CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data1;
-    PlainText plainText1;
-    plainText1.SetContent("content1");
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(plainText1);
-    data1.AddRecord(record1);
+    auto plainText1 = std::make_shared<PlainText>();
+    plainText1->SetContent("content1");
+    data1.AddRecord(plainText1);
     std::string key;
     status = UdmfClient::GetInstance().SetData(customOption, data1, key);
     ASSERT_EQ(status, E_OK);
@@ -1697,17 +1661,15 @@ HWTEST_F(UdmfClientTest, UpdateData002, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "UpdateData002 begin.");
 
     UnifiedData data;
-    PlainText plainText;
-    plainText.SetContent("content");
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<PlainText>(plainText);
-    data.AddRecord(record);
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetContent("content");
+    data.AddRecord(plainText);
 
     CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data1;
-    PlainText plainText1;
-    plainText1.SetContent("content1");
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(plainText1);
-    data1.AddRecord(record1);
+    auto plainText1 = std::make_shared<PlainText>();
+    plainText1->SetContent("content1");
+    data1.AddRecord(plainText1);
     std::string key;
     auto status = UdmfClient::GetInstance().SetData(customOption, data1, key);
 
@@ -1784,10 +1746,9 @@ HWTEST_F(UdmfClientTest, QueryData002, TestSize.Level1)
 
     CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data;
-    PlainText plainText;
-    plainText.SetContent("content1");
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<PlainText>(plainText);
-    data.AddRecord(record);
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetContent("content1");
+    data.AddRecord(plainText);
     std::string key;
     status = UdmfClient::GetInstance().SetData(customOption, data, key);
     ASSERT_EQ(status, E_OK);
@@ -1805,9 +1766,9 @@ HWTEST_F(UdmfClientTest, QueryData002, TestSize.Level1)
     ASSERT_EQ(plainText2->GetContent(), "content1");
 
     UnifiedData data2;
-    plainText.SetContent("content2");
-    record = std::make_shared<PlainText>(plainText);
-    data2.AddRecord(record);
+    plainText = std::make_shared<PlainText>();
+    plainText->SetContent("content2");
+    data2.AddRecord(plainText);
     status = UdmfClient::GetInstance().SetData(customOption, data2, key);
     ASSERT_EQ(status, E_OK);
 
@@ -1876,10 +1837,9 @@ HWTEST_F(UdmfClientTest, DeleteData002, TestSize.Level1)
 
     CustomOption customOption = { .intention = UD_INTENTION_DATA_HUB };
     UnifiedData data;
-    PlainText plainText;
-    plainText.SetContent("content1");
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<PlainText>(plainText);
-    data.AddRecord(record);
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetContent("content1");
+    data.AddRecord(plainText);
     std::string key;
     auto status = UdmfClient::GetInstance().SetData(customOption, data, key);
     ASSERT_EQ(status, E_OK);
@@ -1939,11 +1899,10 @@ HWTEST_F(UdmfClientTest, SetData022, TestSize.Level1)
     }
     details.insert({ value, value });
     details.insert({ "udmf_key", "udmf_value" });
-    Text text;
-    text.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<Text>(text);
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
     for (int i = 0; i < 2; ++i) {
-        inputData.AddRecord(record);
+        inputData.AddRecord(text);
     }
     UnifiedDataHelper::SetRootPath("/data/udmf_test/");
     auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
@@ -1980,7 +1939,7 @@ HWTEST_F(UdmfClientTest, SetData023, TestSize.Level1)
     Text text;
     text.SetDetails(details);
     for (int64_t i = 0; i < 100; ++i) {
-        auto record = std::make_shared<Text>(text);
+        auto record = std::make_shared<Text>();
         inputData.AddRecord(record);
     }
     auto records = inputData.GetRecords();
@@ -2017,11 +1976,10 @@ HWTEST_F(UdmfClientTest, SetData024, TestSize.Level1)
         value += "11";
     }
     details.insert({ value, value });
-    Text text;
-    text.SetDetails(details);
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
     for (int64_t i = 0; i < 101; ++i) {
-        auto record = std::make_shared<Text>(text);
-        inputData.AddRecord(record);
+        inputData.AddRecord(text);
     }
     auto records = inputData.GetRecords();
     LOG_INFO(UDMF_TEST, "SetData024 inputData.size() = %{public}zu", records.size());
@@ -2046,15 +2004,14 @@ HWTEST_F(UdmfClientTest, SetData025, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    SystemDefinedPixelMap systemDefinedPixelMap1;
+    auto systemDefinedPixelMap1 = std::make_shared<SystemDefinedPixelMap>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    systemDefinedPixelMap1.SetDetails(details1);
+    systemDefinedPixelMap1->SetDetails(details1);
     std::vector<uint8_t> rawData1 = { 1, 2, 3, 4, 5 };
 
-    systemDefinedPixelMap1.SetRawData(rawData1);
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<SystemDefinedPixelMap>(systemDefinedPixelMap1);
-    data1.AddRecord(record1);
+    systemDefinedPixelMap1->SetRawData(rawData1);
+    data1.AddRecord(systemDefinedPixelMap1);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
 
@@ -2097,16 +2054,15 @@ HWTEST_F(UdmfClientTest, SetData026, TestSize.Level1)
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data1;
     std::string key;
-    SystemDefinedPixelMap systemDefinedPixelMap1;
+    auto systemDefinedPixelMap1 = std::make_shared<SystemDefinedPixelMap>();
     UDDetails details1;
     details1.insert({ "udmf_key", "udmf_value" });
-    systemDefinedPixelMap1.SetDetails(details1);
+    systemDefinedPixelMap1->SetDetails(details1);
     std::vector<uint8_t> rawData1 = { 1, 2, 3, 4, 5 };
 
-    systemDefinedPixelMap1.SetRawData(rawData1);
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<SystemDefinedPixelMap>(systemDefinedPixelMap1);
+    systemDefinedPixelMap1->SetRawData(rawData1);
     std::shared_ptr<UnifiedRecord> record2 = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "this is a content");
-    data1.AddRecord(record1);
+    data1.AddRecord(systemDefinedPixelMap1);
     data1.AddRecord(record2);
     auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
     ASSERT_EQ(status, E_OK);
@@ -2165,17 +2121,15 @@ HWTEST_F(UdmfClientTest, GetSummary003, TestSize.Level1)
     }
     details.insert({ value, value });
 
-    Text text;
-    text.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Text>(text);
-    data.AddRecord(record1);
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
+    data.AddRecord(text);
 
-    PlainText plainText;
-    plainText.SetDetails(details);
-    plainText.SetContent("content");
-    plainText.SetAbstract("abstract");
-    std::shared_ptr<UnifiedRecord> record2 = std::make_shared<PlainText>(plainText);
-    data.AddRecord(record2);
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetDetails(details);
+    plainText->SetContent("content");
+    plainText->SetAbstract("abstract");
+    data.AddRecord(plainText);
 
     UnifiedDataHelper::SetRootPath("/data/udmf_test/");
     auto status = UdmfClient::GetInstance().SetData(option1, data, key);
@@ -2186,13 +2140,13 @@ HWTEST_F(UdmfClientTest, GetSummary003, TestSize.Level1)
     Summary summary;
     status = UdmfClient::GetInstance().GetSummary(option2, summary);
 
-    auto size = record1->GetSize();
-    size += record2->GetSize();
+    auto size = text->GetSize();
+    size += plainText->GetSize();
 
     ASSERT_EQ(status, E_OK);
     ASSERT_EQ(summary.totalSize, size);
-    ASSERT_EQ(summary.summary["general.text"], record1->GetSize());
-    ASSERT_EQ(summary.summary["general.plain-text"], record2->GetSize());
+    ASSERT_EQ(summary.summary["general.text"], text->GetSize());
+    ASSERT_EQ(summary.summary["general.plain-text"], plainText->GetSize());
 
     LOG_INFO(UDMF_TEST, "GetSummary003 end.");
 }
@@ -2213,17 +2167,15 @@ HWTEST_F(UdmfClientTest, IsRemoteData001, TestSize.Level1)
     UDDetails details;
     details.insert({ "udmf_key", "udmf_value" });
 
-    Text text;
-    text.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Text>(text);
-    data.AddRecord(record1);
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
+    data.AddRecord(text);
 
-    PlainText plainText;
-    plainText.SetDetails(details);
-    plainText.SetContent("content");
-    plainText.SetAbstract("abstract");
-    std::shared_ptr<UnifiedRecord> record2 = std::make_shared<PlainText>(plainText);
-    data.AddRecord(record2);
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetDetails(details);
+    plainText->SetContent("content");
+    plainText->SetAbstract("abstract");
+    data.AddRecord(plainText);
 
     auto status = UdmfClient::GetInstance().SetData(option1, data, key);
     ASSERT_EQ(status, E_OK);
@@ -2249,13 +2201,11 @@ HWTEST_F(UdmfClientTest, GetTypesLabels001, TestSize.Level1)
     UnifiedData data;
     UDDetails details;
     details.insert({ "udmf_key", "udmf_value" });
-    Text text;
-    text.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<Text>(text);
-    PlainText plainText;
-    plainText.SetDetails(details);
-    std::shared_ptr<UnifiedRecord> record2 = std::make_shared<PlainText>(plainText);
-    std::vector<std::shared_ptr<UnifiedRecord>> records = {record1, record2};
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetDetails(details);
+    std::vector<std::shared_ptr<UnifiedRecord>> records = {text, plainText};
     data.AddRecords(records);
 
     std::vector<std::string> types = {"general.text", "general.plain-text"};
