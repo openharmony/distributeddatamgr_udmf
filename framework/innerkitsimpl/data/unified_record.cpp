@@ -31,40 +31,6 @@ UnifiedRecord::UnifiedRecord(UDType type)
     utdId_ = UtdUtils::GetUtdIdFromUtdEnum(type);
 }
 
-UnifiedRecord::UnifiedRecord(const UnifiedRecord& other)
-{
-    std::lock_guard<std::recursive_mutex> lock(other.mutex_);
-    dataType_ = other.dataType_;
-    value_ = other.value_;
-    hasObject_ = other.hasObject_;
-    uid_ = other.uid_;
-    utdId_ = other.utdId_;
-    entries_ = other.entries_;
-    dataId_ = other.dataId_;
-    recordId_ = other.recordId_;
-    channelName_ = other.channelName_;
-    entryGetter_ = other.entryGetter_;
-}
-
-UnifiedRecord &UnifiedRecord::operator=(const UnifiedRecord& other)
-{
-    if (this != &other) {
-        std::lock_guard<std::recursive_mutex> lock1(mutex_);
-        std::lock_guard<std::recursive_mutex> lock2(other.mutex_);
-        dataType_ = other.dataType_;
-        value_ = other.value_;
-        hasObject_ = other.hasObject_;
-        uid_ = other.uid_;
-        utdId_ = other.utdId_;
-        entries_ = other.entries_;
-        dataId_ = other.dataId_;
-        recordId_ = other.recordId_;
-        channelName_ = other.channelName_;
-        entryGetter_ = other.entryGetter_;
-    }
-    return *this;
-}
-
 UnifiedRecord::UnifiedRecord(UDType type, ValueType value)
 {
     dataType_ = type;

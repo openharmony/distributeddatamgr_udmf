@@ -152,12 +152,11 @@ void NdkDataConversionTest::SetHapToken1()
 HWTEST_F(NdkDataConversionTest, GetNativeUnifiedData_001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetNativeUnifiedData_001 begin.");
-    UnifiedRecord unifiedRecord;
+    auto unifiedRecord = std::make_shared<UnifiedRecord>();
     const std::string uid("typeId");
-    unifiedRecord.SetUid(uid);
+    unifiedRecord->SetUid(uid);
     OH_UdmfData *ndkData = OH_UdmfData_Create();
-    const std::shared_ptr<UnifiedRecord> recordPtr = std::make_shared<UnifiedRecord>(unifiedRecord);
-    ndkData->unifiedData_->AddRecord(recordPtr);
+    ndkData->unifiedData_->AddRecord(unifiedRecord);
     auto data = std::make_shared<UnifiedData>();
 
     Status status = NdkDataConversion::GetNativeUnifiedData(ndkData, data);
@@ -200,12 +199,11 @@ HWTEST_F(NdkDataConversionTest, GetNativeUnifiedData_002, TestSize.Level1)
 HWTEST_F(NdkDataConversionTest, GetNdkUnifiedData_001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetNdkUnifiedData_001 begin.");
-    UnifiedRecord unifiedRecord;
+    auto unifiedRecord = std::make_shared<UnifiedRecord>();
     const std::string uid("typeId");
-    unifiedRecord.SetUid(uid);
-    const std::shared_ptr<UnifiedRecord> recordPtr = std::make_shared<UnifiedRecord>(unifiedRecord);
+    unifiedRecord->SetUid(uid);
     auto data = std::make_shared<UnifiedData>();
-    data->AddRecord(recordPtr);
+    data->AddRecord(unifiedRecord);
     OH_UdmfData *ndkData = OH_UdmfData_Create();
     Status status = NdkDataConversion::GetNdkUnifiedData(data, ndkData);
     ASSERT_EQ(E_OK, status);

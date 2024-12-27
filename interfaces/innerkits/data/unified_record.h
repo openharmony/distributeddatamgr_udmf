@@ -32,8 +32,10 @@ public:
     UnifiedRecord(UDType type, ValueType value);
     virtual ~UnifiedRecord() = default;
 
-    UnifiedRecord(const UnifiedRecord& other);
-    UnifiedRecord& operator=(const UnifiedRecord& other);
+    UnifiedRecord(const UnifiedRecord& other) = delete;
+    UnifiedRecord& operator=(const UnifiedRecord& other) = delete;
+    UnifiedRecord(UnifiedRecord &&other) = delete;
+    UnifiedRecord& operator=(UnifiedRecord &&other) = delete;
 
     UDType GetType() const;
     void SetType(const UDType &type);
