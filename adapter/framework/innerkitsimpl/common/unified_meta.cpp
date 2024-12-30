@@ -712,8 +712,8 @@ int64_t ObjectUtils::GetValueSize(const ValueType &value, bool isCalValueType)
         return pixelMap->GetByteCount();
     }
     if (std::holds_alternative<std::shared_ptr<OHOS::AAFwk::Want>>(value)) {
-       // ArkUI-X does not support want.Marshalling
-       return 0;
+        // ArkUI-X does not support want.Marshalling
+        return 0;
     }
     return std::visit([] (const auto &val) { return sizeof(val); }, value);
 }
