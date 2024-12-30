@@ -502,7 +502,11 @@ static constexpr UtdType UTD_TYPES[] = {
     { M4P_AUDIO, "M4P_AUDIO", "com.apple.m4p-audio" },
     { AC3_AUDIO, "AC3_AUDIO", "general.ac3-audio" },
     { OPENHARMONY_HSP, "OPENHARMONY_HSP", "openharmony.hsp" },
-    { OPENHARMONY_HAR, "OPENHARMONY_HAR", "openharmony.har" }
+    { OPENHARMONY_HAR, "OPENHARMONY_HAR", "openharmony.har" },
+    { OPENHARMONY_GOPAINT, "OPENHARMONY_GOPAINT", "openharmony.gopaint" },
+    { OPENHARMONY_GOBRUSH, "OPENHARMONY_GOBRUSH", "openharmony.gobrush" },
+    { OPENHARMONY_GOBRUSHES, "OPENHARMONY_GOBRUSHES", "openharmony.gobrushes" },
+    { OPENHARMONY_GOCOLOR, "OPENHARMONY_GOCOLOR", "openharmony.gocolor" }
 };
 
 static constexpr std::initializer_list<std::string_view> NOT_NEED_COUNT_VALUE_LIST = {
@@ -691,17 +695,68 @@ UDDetails ObjectUtils::ConvertToUDDetails(std::shared_ptr<Object> object)
 
 int64_t ObjectUtils::GetValueSize(const ValueType &value, bool isCalValueType)
 {
-    return 0;
+    if (value.index() == 0) {
+        return 0;
+    }
+    if (std::holds_alternative<std::string>(value)) {
+        return std::get<std::string>(value).size();
+    }
+    if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        return GetObjectValueSize(std::get<std::shared_ptr<Object>>(value), isCalValueType);
+    }
+    if (std::holds_alternative<std::vector<uint8_t>>(value)) {
+        return std::get<std::vector<uint8_t>>(value).size();
+    }
+    if (std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(value)) {
+        auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value);
+        return pixelMap->GetByteCount();
+    }
+    if (std::holds_alternative<std::shared_ptr<OHOS::AAFwk::Want>>(value)) {
+       // ArkUI-X does not support want.Marshalling
+       return 0;
+    }
+    return std::visit([] (const auto &val) { return sizeof(val); }, value);
 }
 
 int64_t ObjectUtils::GetObjectValueSize(const std::shared_ptr<Object> object, bool isCalValueType)
 {
-    return 0;
+    if (object == nullptr) {
+        return 0;
+    }
+    int64_t size = 0;
+    for (auto [key, value] : object->value_) {
+        if (std::find(NOT_NEED_COUNT_VALUE_LIST.begin(), NOT_NEED_COUNT_VALUE_LIST.end(), key)
+            != NOT_NEED_COUNT_VALUE_LIST.end()) {
+            continue;
+        }
+        if (key == VALUE_TYPE && isCalValueType) {
+            size += GetValueSize(value, false);
+            continue;
+        }
+        if (key == DETAILS) {
+            if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
+                LOG_ERROR(UDMF_FRAMEWORK, "Details is not correct!");
+                continue;
+            }
+            size += GetAllObjectSize(std::get<std::shared_ptr<Object>>(value));
+            continue;
+        }
+        size += GetValueSize(value, false);
+    }
+    return size;
 }
+
 
 int64_t ObjectUtils::GetAllObjectSize(const std::shared_ptr<Object> object)
 {
-    return 0;
+    if (object == nullptr) {
+        return 0;
+    }
+    int64_t size = 0;
+    for (auto [key, value] : object->value_) {
+        size += key.size() + GetValueSize(value, false);
+    }
+    return size;
 }
 } // namespace UDMF
 } // namespace OHOS
