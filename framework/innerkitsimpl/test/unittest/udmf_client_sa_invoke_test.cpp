@@ -30,8 +30,14 @@ using namespace OHOS::Security::AccessToken;
 using namespace OHOS::UDMF;
 using namespace OHOS;
 namespace OHOS::Test {
+constexpr const int32_t FIVE = 5;
+constexpr const int32_t TEN = 10;
+
 class UdmfClientSaInvokeTest : public testing::Test {
 public:
+
+    void SetDataTest();
+
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp() override;
@@ -60,6 +66,49 @@ void UdmfClientSaInvokeTest::SetHapToken()
 {
     auto tokenId = AccessTokenKit::GetNativeTokenId("msdp_sa");
     SetSelfTokenID(tokenId);
+}
+
+/**
+* @tc.name: SetDataTest
+* @tc.desc: Test set data success. Record size more than 4M and less than 15.5M.
+* @tc.type: FUNC
+*/
+void UdmfClientSaInvokeTest::SetDataTest()
+{
+    LOG_INFO(UDMF_TEST, "SetDataTest begin.");
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    std::vector<uint8_t> rawData;
+    for (int i = 0; i < FIVE * 1024 * 1024; i++) {
+        rawData.emplace_back(1);
+    }
+    auto pixelMap = std::make_shared<SystemDefinedPixelMap>(rawData);
+    UnifiedData data;
+    data.AddRecord(pixelMap);
+
+    std::vector<uint8_t> rawData2;
+    for (int i = 0; i < TEN * 1024 * 1024; i++) {
+        rawData2.emplace_back(1);
+    }
+    auto pixelMap2 = std::make_shared<SystemDefinedPixelMap>(rawData2);
+    data.AddRecord(pixelMap2);
+    auto recordSize = data.GetRecords().size();
+    
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(E_OK, status);
+
+    UnifiedData readData;
+    QueryOption queryOption = {.key = key};
+    status = UdmfClient::GetInstance().GetData(queryOption, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(recordSize, readData.GetRecords().size());
+    auto readPixelMap = std::static_pointer_cast<SystemDefinedPixelMap>(readData.GetRecordAt(0));
+    EXPECT_EQ(FIVE * 1024 * 1024, readPixelMap->GetRawData().size());
+
+    auto readPixelMap2 = std::static_pointer_cast<SystemDefinedPixelMap>(readData.GetRecordAt(1));
+    EXPECT_TRUE(readPixelMap2->GetRawData().size() == TEN * 1024 * 1024);
+    EXPECT_EQ(TEN * 1024 * 1024, readPixelMap2->GetRawData().size());
+    LOG_INFO(UDMF_TEST, "SetDataTest end.");
 }
 
 /**
@@ -231,44 +280,13 @@ HWTEST_F(UdmfClientSaInvokeTest, SetData005, TestSize.Level1)
 
 /**
 * @tc.name: SetData006
-* @tc.desc: Test set data success. Record size equals than 4M.
+* @tc.desc: Test set data success. Record size more than 4M and less than 15.5M.
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfClientSaInvokeTest, SetData006, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "SetData006 begin.");
-
-    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
-    std::vector<uint8_t> rawData;
-    for (int i = 0; i < 5 * 1024 * 1024; i++) {
-        rawData.emplace_back(1);
-    }
-    auto pixelMap = std::make_shared<SystemDefinedPixelMap>(rawData);
-    UnifiedData data;
-    data.AddRecord(pixelMap);
-
-    std::vector<uint8_t> rawData2;
-    for (int i = 0; i < 10 * 1024 * 1024; i++) {
-        rawData2.emplace_back(1);
-    }
-    auto pixelMap2 = std::make_shared<SystemDefinedPixelMap>(rawData2);
-    data.AddRecord(pixelMap2);
-
-    std::string key;
-    auto status = UdmfClient::GetInstance().SetData(option, data, key);
-    ASSERT_EQ(E_OK, status);
-
-    UnifiedData readData;
-    QueryOption queryOption = {.key = key};
-    status = UdmfClient::GetInstance().GetData(queryOption, readData);
-    ASSERT_EQ(E_OK, status);
-    ASSERT_EQ(2, readData.GetRecords().size());
-    auto readPixelMap = std::static_pointer_cast<SystemDefinedPixelMap>(readData.GetRecordAt(0));
-    EXPECT_EQ(5 * 1024 * 1024, readPixelMap->GetRawData().size());
-
-    auto readPixelMap2 = std::static_pointer_cast<SystemDefinedPixelMap>(readData.GetRecordAt(1));
-    EXPECT_TRUE(readPixelMap2->GetRawData().size() == 10 * 1024 * 1024);
-    EXPECT_EQ(10 * 1024 * 1024, readPixelMap2->GetRawData().size());
+    SetDataTest();
     LOG_INFO(UDMF_TEST, "SetData006 end.");
 }
 
@@ -297,7 +315,7 @@ HWTEST_F(UdmfClientSaInvokeTest, SetData007, TestSize.Level1)
 
 /**
 * @tc.name: SetData008
-* @tc.desc: Test set data error. Record size equals 15.5M.
+* @tc.desc: Test set data success. Record size equals 15.5M.
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfClientSaInvokeTest, SetData008, TestSize.Level1)
@@ -335,6 +353,77 @@ HWTEST_F(UdmfClientSaInvokeTest, SetData008, TestSize.Level1)
     auto readPixelMap2 = std::static_pointer_cast<SystemDefinedPixelMap>(readData.GetRecordAt(1));
     EXPECT_EQ(15 * 1024 * 1024, readPixelMap2->GetRawData().size());
     LOG_INFO(UDMF_TEST, "SetData008 end.");
+}
+
+/**
+* @tc.name: SetData009
+* @tc.desc: Test set data with diffient types.
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientSaInvokeTest, SetData009, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData009 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    std::vector<uint8_t> rawData;
+    for (int i = 0; i < FIVE * 1024 * 1024; i++) {
+        rawData.emplace_back(1);
+    }
+    auto pixelMap = std::make_shared<SystemDefinedPixelMap>(rawData);
+    UnifiedData data;
+    data.AddRecord(pixelMap);
+
+    std::string content;
+    for (int i = 0; i < FIVE * 1024 * 1024; i++) {
+        content.push_back('a');
+    }
+
+    auto plain_text = std::make_shared<PlainText>(content, "");
+    data.AddRecord(plain_text);
+
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(E_OK, status);
+
+    UnifiedData readData;
+    QueryOption queryOption = {.key = key};
+    status = UdmfClient::GetInstance().GetData(queryOption, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(2, readData.GetRecords().size());
+    auto readPixelMap1 = std::static_pointer_cast<SystemDefinedPixelMap>(readData.GetRecordAt(0));
+    EXPECT_EQ(FIVE * 1024 * 1024, readPixelMap1->GetRawData().size());
+
+    auto readPlainText = std::static_pointer_cast<PlainText>(readData.GetRecordAt(1));
+    EXPECT_EQ(FIVE * 1024 * 1024, readPlainText->GetContent().size());
+    LOG_INFO(UDMF_TEST, "SetData008 end.");
+}
+
+/**
+ * @tc.name: SetData010
+ * @tc.desc:  Test set data concurrently.
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientSaInvokeTest, SetData010, TestSize.Level0)
+{
+    LOG_INFO(UDMF_TEST, "SetData010 begin.");
+    std::thread t1([&]() {
+        SetDataTest();
+    });
+    EXPECT_NO_FATAL_FAILURE(t1.join());
+    std::thread t2([&]() {
+        SetDataTest();
+    });
+    EXPECT_NO_FATAL_FAILURE(t2.join());
+    std::thread t3([&]() {
+        SetDataTest();
+    });
+    EXPECT_NO_FATAL_FAILURE(t3.join());
+
+    std::thread t4([&]() {
+        SetDataTest();
+    });
+    EXPECT_NO_FATAL_FAILURE(t4.join());
+    LOG_INFO(UDMF_TEST, "SetData010 end.");
 }
 
 } // OHOS::Test
