@@ -25,6 +25,7 @@
 namespace OHOS {
 namespace UDMF {
 constexpr const int MAX_UTD_LENGTH = 256;
+constexpr const int MAX_FILE_EXTENSION_LENGTH = 14;
 
 UtdClient::UtdClient()
 {
@@ -181,7 +182,12 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
         return Status::E_INVALID_PARAMETERS;
     }
     if (!IsValidFileExtension(fileExtension)) {
-        LOG_ERROR(UDMF_CLIENT, "invalid fileExtension. fileExtension:%{private}s, belongsTo:%{public}s ",
+        if (fileExtension.size() > MAX_FILE_EXTENSION_LENGTH) {
+            LOG_ERROR(UDMF_CLIENT, "invalid fileExtension. fileExtension:%{private}s, belongsTo:%{public}s ",
+                fileExtension.c_str(), belongsTo.c_str());
+            return Status::E_INVALID_PARAMETERS;
+        }
+        LOG_ERROR(UDMF_CLIENT, "invalid fileExtension. fileExtension:%{public}s, belongsTo:%{public}s ",
             fileExtension.c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
