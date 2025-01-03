@@ -264,10 +264,9 @@ HWTEST_F(UdmfClientSystemHapTest, systemAppSetData001, TestSize.Level1)
 
     CustomOption customOption = { .intention = UD_INTENTION_DRAG };
     UnifiedData data;
-    PlainText plainText;
-    plainText.SetContent("systemApptestcontent1");
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<PlainText>(plainText);
-    data.AddRecord(record);
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetContent("systemApptestcontent1");
+    data.AddRecord(plainText);
     std::string key;
     status = UdmfClient::GetInstance().SetData(customOption, data, key);
     ASSERT_EQ(status, E_OK);
@@ -305,10 +304,9 @@ HWTEST_F(UdmfClientSystemHapTest, systemAppSetData002, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "systemAppSetData002 SetAppShareOption success.");
     CustomOption customOption = { .intention = UD_INTENTION_DRAG };
     UnifiedData data;
-    PlainText plainText;
-    plainText.SetContent("systemApptestcontent1");
-    std::shared_ptr<UnifiedRecord> record = std::make_shared<PlainText>(plainText);
-    data.AddRecord(record);
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetContent("systemApptestcontent1");
+    data.AddRecord(plainText);
     std::string key;
     status = UdmfClient::GetInstance().SetData(customOption, data, key);
     ASSERT_EQ(status, E_OK);
