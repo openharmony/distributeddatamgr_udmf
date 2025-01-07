@@ -70,6 +70,7 @@
           "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
           "header": {
             "header_files": [
+              "udmf_async_client.h",
               "udmf_client.h",
               "utd_client.h"
             ],
@@ -80,7 +81,9 @@
           "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
           "header": {
             "header_files": [
+              "async_task_params.h",
               "error_code.h",
+              "progress_queue.h",
               "unified_key.h",
               "unified_meta.h",
               "unified_types.h",

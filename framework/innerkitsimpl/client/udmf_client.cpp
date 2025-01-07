@@ -100,15 +100,12 @@ Status UdmfClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
     }
     RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
         BizScene::GET_DATA, GetDataStage::GET_DATA_BEGIN, StageRes::SUCCESS);
-    auto it = dataCache_.Find(query.key);
-    if (it.first) {
-        unifiedData = it.second;
-        dataCache_.Erase(query.key);
+    if (GetDataFromCache(query, unifiedData) == E_OK) {
         RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
             BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::SUCCESS, BizState::DFX_END);
         return E_OK;
     }
-    LOG_WARN(UDMF_CLIENT, "query data from cache failed! key = %{public}s", query.key.c_str());
+    LOG_INFO(UDMF_CLIENT, "Data not found in cache. key = %{public}s", query.key.c_str());
     int32_t ret = service->GetData(query, unifiedData);
     if (ret != E_OK) {
         RadarReporterAdapter::ReportFail(std::string(__FUNCTION__),
@@ -304,28 +301,16 @@ std::string UdmfClient::GetSelfBundleName()
     return hapInfo.bundleName;
 }
 
-Status UdmfClient::GetDataAsync(const QueryOption &query, ObtainDataCallback callback)
+Status UdmfClient::GetDataFromCache(const QueryOption &query, UnifiedData &unifiedData)
 {
-    asyncObtainData_.ClearTask();
-
-    auto it = this->dataCache_.Find(query.key);
+    auto it = dataCache_.Find(query.key);
     if (it.first) {
+        unifiedData = it.second;
         dataCache_.Erase(query.key);
-        ProgressInfo info{ "Local", ASYNC_SUCCESS, 100 };
-        callback(info, it.second);
         return E_OK;
     }
-
-    auto ret = asyncObtainData_.InitTask(query, callback);
-    if (ret == E_OK) {
-        ret = asyncObtainData_.RunTask();
-    }
-    if (ret != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "InitTask or RunTask faile ret=%{public}d", ret);
-        asyncObtainData_.ClearTask();
-        return ret;
-    }
-    return E_OK;
+    return E_NOT_FOUND;
 }
+
 } // namespace UDMF
 } // namespace OHOS

@@ -292,9 +292,9 @@ int32_t UdmfServiceClient::ObtainAsynProcess(AsyncProcessInfo& processInfo)
     return udmfProxy_->ObtainAsynProcess(processInfo);
 }
 
-int32_t UdmfServiceClient::ClearAsynProcess()
+int32_t UdmfServiceClient::ClearAsynProcessByKey(const std::string &businessUdKey)
 {
-    return udmfProxy_->ClearAsynProcess();
+    return udmfProxy_->ClearAsynProcessByKey(businessUdKey);
 }
 } // namespace UDMF
 } // namespace OHOS

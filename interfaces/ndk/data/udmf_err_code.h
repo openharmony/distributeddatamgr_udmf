@@ -66,6 +66,42 @@ typedef enum Udmf_ErrCode {
     UDMF_E_INVALID_PARAM = (UDMF_ERR + 1),
 } Udmf_ErrCode;
 
+/**
+ * @brief Indicates the error code information.
+ *
+ * @since 15
+ */
+typedef enum Udmf_ListenerStatus {
+    /**
+     * brief Indicates the finished status.
+     */
+    UDMF_FINISHED,
+    /**
+     * @brief Indicates that processing is still in progress.
+     */
+    UDMF_PROCESSING,
+    /**
+     * @brief Indicates that an internal error has occurred.
+     */
+    UDMF_INNER_ERROR,
+    /**
+     * @brief Indicates that the GetDataParams contains invalid parameters.
+     */
+    UDMF_INVALID_PARAMETERS,
+    /**
+     * @brief Indicates that no data is obtained.
+     */
+    UDMF_DATA_NOT_FOUND,
+    /**
+     * @brief Indicates that an error occurred in the synchronization process.
+     */
+    UDMF_SYNC_FAILED,
+    /**
+     * @brief that an error occurred during file copying.
+     */
+    UDMF_COPY_FILE_FAILED,
+} Udmf_ListenerStatus;
+
 #ifdef __cplusplus
 };
 #endif

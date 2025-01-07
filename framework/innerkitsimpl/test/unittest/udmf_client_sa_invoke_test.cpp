@@ -17,6 +17,7 @@
 
 #include "token_setproc.h"
 #include "accesstoken_kit.h"
+#include "executor_pool.h"
 #include "nativetoken_kit.h"
 
 #include "logger.h"

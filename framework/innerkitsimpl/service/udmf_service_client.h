@@ -45,7 +45,7 @@ public:
     int32_t GetAppShareOption(const std::string &intention, int32_t &shareOption) override;
     int32_t RemoveAppShareOption(const std::string &intention) override;
     int32_t ObtainAsynProcess(AsyncProcessInfo& processInfo) override;
-    int32_t ClearAsynProcess() override;
+    int32_t ClearAsynProcessByKey(const std::string &businessUdKey) override;
 
 private:
     class ServiceDeathRecipient : public IRemoteObject::DeathRecipient {

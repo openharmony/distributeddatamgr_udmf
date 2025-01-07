@@ -42,7 +42,7 @@ public:
     virtual int32_t GetAppShareOption(const std::string &, int32_t &) = 0;
     virtual int32_t RemoveAppShareOption(const std::string &) = 0;
     virtual int32_t ObtainAsynProcess(AsyncProcessInfo&) = 0;
-    virtual int32_t ClearAsynProcess() = 0;
+    virtual int32_t ClearAsynProcessByKey(const std::string &businessUdKey) = 0;
 public:
     static inline std::shared_ptr<MUdmfServiceClient> udmfServiceClient = nullptr;
 };
@@ -63,7 +63,7 @@ public:
     MOCK_METHOD(int32_t, GetAppShareOption, (const std::string &, int32_t &));
     MOCK_METHOD(int32_t, RemoveAppShareOption, (const std::string &));
     MOCK_METHOD(int32_t, ObtainAsynProcess, (AsyncProcessInfo&));
-    MOCK_METHOD(int32_t, ClearAsynProcess, ());
+    MOCK_METHOD(int32_t, ClearAsynProcessByKey, (const std::string &));
 };
 } // namespace UDMF
 } // namespace OHOS

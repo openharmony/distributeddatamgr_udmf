@@ -603,43 +603,6 @@ void UpdateDataFuzz(const uint8_t *data, size_t size)
     QueryOption option3 = { .key = skey };
     UdmfClient::GetInstance().UpdateData(option3, data3);
 }
-
-void GetDataAsyncByKeyFuzz(const uint8_t *data, size_t size)
-{
-    std::string skey(data, data + size);
-    CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
-    UnifiedData data1;
-    std::string key;
-    auto plainText = std::make_shared<PlainText>();
-    data1.AddRecord(plainText);
-    UdmfClient::GetInstance().SetData(option1, data1, key);
-
-    SetHapToken();
-    QueryOption option2 = { .key = skey };
-    auto callback = [](ProgressInfo progress, UnifiedData &outputData) {
-    };
-    UdmfClient::GetInstance().GetDataAsync(option2, callback);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-}
-
-void GetDataAsyncByIntentionFuzz(const uint8_t *data, size_t size)
-{
-    std::string skey(data, data + size);
-    CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
-    UnifiedData data1;
-    std::string key;
-    auto plainText = std::make_shared<PlainText>();
-    data1.AddRecord(plainText);
-    UdmfClient::GetInstance().SetData(option1, data1, key);
-
-    SetHapToken();
-    Intention intention = UnifiedDataUtils::GetIntentionByString(skey);
-    QueryOption option2 = { .intention = intention };
-    auto callback = [](ProgressInfo progress, UnifiedData &outputData) {
-    };
-    UdmfClient::GetInstance().GetDataAsync(option2, callback);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-}
 }
 
 /* Fuzzer entry point */
@@ -665,7 +628,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::DeleteDataByIntentionFuzz(data, size);
     OHOS::UpdateDataFuzz(data, size);
     OHOS::TearDown();
-    OHOS::GetDataAsyncByKeyFuzz(data, size);
-    OHOS::GetDataAsyncByIntentionFuzz(data, size);
     return 0;
 }
