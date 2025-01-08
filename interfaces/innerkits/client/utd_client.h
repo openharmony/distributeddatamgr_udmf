@@ -50,6 +50,7 @@ private:
     ~UtdClient();
     UtdClient(const UtdClient &obj) = delete;
     UtdClient &operator=(const UtdClient &obj) = delete;
+    std::string Anonymous(const std::string &name);
     void Init();
     bool IsHapTokenType();
     std::string GetCustomUtdPath();

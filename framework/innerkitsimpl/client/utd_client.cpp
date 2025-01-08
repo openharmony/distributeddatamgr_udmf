@@ -31,6 +31,16 @@ constexpr const char* CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
 constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/";
 constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/distributeddata/utd/utd-adt.json";
 
+constexpr const int MAX_FILE_EXTENSION_LENGTH = 14;
+constexpr const char *DEFAULT_ANONYMOUS = "******";
+std::string UtdClient::Anonymous(const std::string &fileExtension)
+{
+    if (fileExtension.length() <= MAX_FILE_EXTENSION_LENGTH) {
+        return fileExtension;
+    }
+    return (fileExtension.substr(0, MAX_FILE_EXTENSION_LENGTH) + DEFAULT_ANONYMOUS);
+}
+
 class UtdChangeSubscriber final : public EventFwk::CommonEventSubscriber {
 public:
     explicit UtdChangeSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo,
@@ -179,7 +189,7 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
     }
     if (!IsValidFileExtension(fileExtension)) {
         LOG_ERROR(UDMF_CLIENT, "invalid fileExtension. fileExtension:%{public}s, belongsTo:%{public}s ",
-            fileExtension.c_str(), belongsTo.c_str());
+            Anonymous(fileExtension).c_str(), belongsTo.c_str());
         return Status::E_INVALID_PARAMETERS;
     }
 
