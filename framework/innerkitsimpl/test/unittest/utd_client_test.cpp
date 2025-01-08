@@ -447,7 +447,6 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType007, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMEType007 end.");
 }
 
-
 /**
 * @tc.name: BelongsTo001
 * @tc.desc: Normal testcase of BelongsTo
