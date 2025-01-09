@@ -91,6 +91,38 @@ typedef enum Udmf_ShareOption {
 } Udmf_ShareOption;
 
 /**
+ * @brief Describe the types of file conflict options when getting data from the udmf.
+ *
+ * @since 15
+ */
+typedef enum Udmf_FileConflictOptions {
+    /**
+     * @brief Overwrite when dest uri has file with same name.
+     */
+    UDMF_OVERWRITE = 0,
+    /**
+     * @brief Skip when dest uri has file with same name.
+     */
+    UDMF_SKIP = 1,
+} Udmf_FileConflictOptions;
+
+/**
+ * @brief Describe the types of progress indicator when getting data from the udmf.
+ *
+ * @since 15
+*/
+typedef enum Udmf_ProgressIndicator {
+    /**
+     * @brief Getting data without system default progress indicator.
+    */
+    UDMF_NONE = 0,
+    /**
+     * @brief Getting data with system default progress indicator.
+    */
+    UDMF_DEFAULT = 1
+} Udmf_ProgressIndicator;
+
+/**
  * @brief Describes the unified data type.
  *
  * @since 12
@@ -117,6 +149,30 @@ typedef struct OH_UdmfRecordProvider OH_UdmfRecordProvider;
  * @since 12
  */
 typedef struct OH_UdmfProperty OH_UdmfProperty;
+
+/**
+ * @brief Represents the udmf progress information.
+ *
+ * @since 15
+*/
+typedef struct OH_Udmf_ProgressInfo OH_Udmf_ProgressInfo;
+
+/**
+ * @brief Represents the parameters of udmf get data with progress info.
+ *
+ * @since 15
+*/
+typedef struct OH_UdmfGetDataParams OH_UdmfGetDataParams;
+
+/**
+ * @brief Defines the callback function used to return the progress information and data.
+ *
+ * @param progressInfo The progress information notified to Application.
+ * @param data Represents the unified data.
+ * @since 15
+*/
+typedef void (*OH_Udmf_DataProgressListener)(OH_Udmf_ProgressInfo progressInfo, OH_UdmfData* data);
+
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdmfData}.
@@ -748,6 +804,68 @@ int OH_Udmf_GetUnifiedData(const char* key, Udmf_Intention intention, OH_UdmfDat
  */
 int OH_Udmf_SetUnifiedData(Udmf_Intention intention, OH_UdmfData* unifiedData,
     char* key, unsigned int keyLen);
+
+/**
+ * @brief Gets the progress from the {@OH_Udmf_ProgressInfo}.
+ *
+ * @param progressInfo Represents a pointer to an instance of {@link OH_Udmf_ProgressInfo}.
+ * @return Returns the progress.
+ * @see OH_Udmf_ProgressInfo
+ * @since 15
+ */
+int OH_UdmfProgressInfo_GetProgress(OH_Udmf_ProgressInfo* progressInfo);
+
+/**
+ * @brief Gets the status from the {@OH_Udmf_ProgressInfo}.
+ *
+ * @param progressInfo Represents a pointer to an instance of {@link OH_Udmf_ProgressInfo}.
+ * @return Returns the status code. See {@link Udmf_ListenerStatus}.
+ * @see OH_Udmf_ProgressInfo Udmf_ListenerStatus
+ * @since 15
+ */
+int OH_UdmfProgressInfo_GetStatus(OH_Udmf_ProgressInfo* progressInfo);
+
+/**
+ * @brief Sets the destination uri to the {@OH_UdmfGetDataParams}.
+ *
+ * @param params Represents a pointer to an instance of {@link OH_UdmfGetDataParams}.
+ * @param destUri Pointer to a destination uri.
+ * @see OH_UdmfGetDataParams
+ * @since 15
+ */
+void OH_UdmfGetDataParams_SetDestUri(OH_UdmfGetDataParams* params, const char* destUri);
+
+/**
+ * @brief Sets the file conflict options to the {@OH_UdmfGetDataParams}.
+ *
+ * @param params Represents a pointer to an instance of {@link OH_UdmfGetDataParams}.
+ * @param options Represents to the file conflict options.
+ * @see OH_UdmfGetDataParams Udmf_FileConflictOptions
+ * @since 15
+ */
+void OH_UdmfGetDataParams_SetFileConflictOptions(OH_UdmfGetDataParams* params, const Udmf_FileConflictOptions options);
+
+/**
+ * @brief Sets the progress indicator to the {@OH_UdmfGetDataParams}.
+ *
+ * @param params Represents a pointer to an instance of {@link OH_UdmfGetDataParams}.
+ * @param options Represents to the progress indicator.
+ * @see OH_UdmfGetDataParams Udmf_ProgressIndicator
+ * @since 15
+ */
+void OH_UdmfGetDataParams_SetProgressIndicator(OH_UdmfGetDataParams* params,
+    const Udmf_ProgressIndicator progressIndicator);
+
+/**
+ * @brief Sets the progress indicator to the {@OH_UdmfGetDataParams}.
+ *
+ * @param params Represents a pointer to an instance of {@link OH_UdmfGetDataParams}.
+ * @param options Represents to the data progress listener.
+ * @see OH_UdmfGetDataParams OH_Udmf_DataProgressListener
+ * @since 15
+ */
+void OH_UdmfGetDataParams_SetDataProgressListener(OH_UdmfGetDataParams* params,
+    const OH_Udmf_DataProgressListener dataProgressListener);
 
 #ifdef __cplusplus
 };

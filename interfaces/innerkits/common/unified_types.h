@@ -19,6 +19,7 @@
 #include <map>
 #include <string>
 
+#include "error_code.h"
 #include "unified_key.h"
 #include "unified_meta.h"
 
@@ -97,13 +98,16 @@ struct AsyncProcessInfo {
     uint32_t syncId = 0;
     uint32_t permFnished = 0;
     uint32_t permTotal = 0;
+    std::string businessUdKey;
 };
 
 struct ProgressInfo {
+    int32_t progress = 0;
+    int32_t progressStatus;
+    Status errorCode;
     std::string srcDevName;
-    AsyncTaskStatus status;
-    uint32_t progress = 0;
 };
+
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_UNIFIED_TYPES_H

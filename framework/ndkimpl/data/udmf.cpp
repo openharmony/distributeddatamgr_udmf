@@ -897,3 +897,47 @@ int OH_UdmfRecord_SetProvider(OH_UdmfRecord* record, const char* const* types, u
     record->record_->SetEntryGetter(udTypes, providerBox);
     return UDMF_E_OK;
 }
+
+int OH_UdmfProgressInfo_GetProgress(OH_Udmf_ProgressInfo* progressInfo)
+{
+    return progressInfo->progress;
+}
+
+int OH_UdmfProgressInfo_GetStatus(OH_Udmf_ProgressInfo* progressInfo)
+{
+    return progressInfo->status;
+}
+
+void OH_UdmfGetDataParams_SetDestUri(OH_UdmfGetDataParams* params, const char* destUri)
+{
+    if (destUri == nullptr) {
+        return;
+    }
+    params->destUri = std::string(destUri);
+}
+
+void OH_UdmfGetDataParams_SetFileConflictOptions(OH_UdmfGetDataParams* params, const Udmf_FileConflictOptions options)
+{
+    if (params == nullptr) {
+        return;
+    }
+    params->fileConflictOptions = options;
+}
+
+void OH_UdmfGetDataParams_SetProgressIndicator(OH_UdmfGetDataParams* params,
+    const Udmf_ProgressIndicator progressIndicator)
+{
+    if (params == nullptr) {
+        return;
+    }
+    params->progressIndicator = progressIndicator;
+}
+
+void OH_UdmfGetDataParams_SetDataProgressListener(OH_UdmfGetDataParams* params,
+    const OH_Udmf_DataProgressListener dataProgressListener)
+{
+    if (params == nullptr) {
+        return;
+    }
+    params->dataProgressListener = dataProgressListener;
+}

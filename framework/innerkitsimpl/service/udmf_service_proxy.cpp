@@ -200,7 +200,7 @@ int32_t UdmfServiceProxy::GetAppShareOption(const std::string &intention, int32_
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::GET_APP_SHARE_OPTION, reply, intention);
     if (status != E_OK) {
-        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x!", status);
+        LOG_WARN(UDMF_SERVICE, "status:0x%{public}x!", status);
         return status;
     }
 
@@ -239,7 +239,7 @@ int32_t UdmfServiceProxy::SendRequest(UdmfServiceInterfaceCode code, MessageParc
 int32_t UdmfServiceProxy::ObtainAsynProcess(AsyncProcessInfo &processInfo)
 {
     MessageParcel reply;
-    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::OBTAIN_ASYN_PROCESS, reply);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::OBTAIN_ASYN_PROCESS, reply, processInfo);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x", status);
         return status;
@@ -251,10 +251,10 @@ int32_t UdmfServiceProxy::ObtainAsynProcess(AsyncProcessInfo &processInfo)
     return E_OK;
 }
 
-int32_t UdmfServiceProxy::ClearAsynProcess()
+int32_t UdmfServiceProxy::ClearAsynProcessByKey(const std::string &businessUdKey)
 {
     MessageParcel reply;
-    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::CLEAR_ASYN_PROCESS, reply);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::CLEAR_ASYN_PROCESS_BY_KEY, reply, businessUdKey);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x", status);
         return status;

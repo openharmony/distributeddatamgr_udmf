@@ -107,12 +107,12 @@ int32_t UdmfServiceClient::Sync(const QueryOption &query, const std::vector<std:
     }
 }
 
-int32_t UdmfServiceClient::ClearAsynProcess()
+int32_t UdmfServiceClient::ClearAsynProcessByKey(const std::string &businessUdKey)
 {
     if (MUdmfServiceClient::udmfServiceClient == nullptr) {
         return -1;
     } else {
-        return MUdmfServiceClient::udmfServiceClient->ClearAsynProcess();
+        return MUdmfServiceClient::udmfServiceClient->ClearAsynProcessByKey(businessUdKey);
     }
 }
 
