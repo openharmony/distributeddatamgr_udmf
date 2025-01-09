@@ -30,7 +30,7 @@ bool GetDataParamsNapi::Convert2NativeValue(napi_env env, napi_value in, GetData
 
     napi_value jsProgressIndicator = nullptr;
     NAPI_CALL_BASE(env, napi_get_named_property(env, in, "progressIndicator", &jsProgressIndicator), false);
-    int32_t progressIndicator = ProgressIndicator::NONE;
+    int32_t progressIndicator = static_cast<int32_t>(ProgressIndicator::NONE);
     NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsProgressIndicator, progressIndicator), false);
     getDataParams.progressIndicator = static_cast<ProgressIndicator>(progressIndicator);
 
@@ -57,7 +57,7 @@ bool GetDataParamsNapi::Convert2NativeValue(napi_env env, napi_value in, GetData
     if (hasFileConflictOptions) {
         napi_value jsFileConflictOptions = nullptr;
         NAPI_CALL_BASE(env, napi_get_named_property(env, in, "fileConflictOptions", &jsFileConflictOptions), false);
-        int32_t fileConflictOptions = FileConflictOptions::OVERWRITE;
+        int32_t fileConflictOptions = static_cast<int32_t>(FileConflictOptions::OVERWRITE);
         NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsFileConflictOptions, fileConflictOptions), false);
         getDataParams.fileConflictOptions = static_cast<FileConflictOptions>(fileConflictOptions);
     }

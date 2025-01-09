@@ -31,12 +31,13 @@ static constexpr int32_t PROGRESS_GET_DATA_FINISHED = 20;
 
 UdmfCopyFile &UdmfCopyFile::GetInstance()
 {
-    static UdmfCopyFile pasteBoardCopyFile;
-    return pasteBoardCopyFile;
+    static UdmfCopyFile udmfCopyFile;
+    return udmfCopyFile;
 }
 
-int32_t UdmfCopyFile::CopyPasteData(const std::vector<std::string> &uris, std::unique_ptr<AsyncHelper> &asyncHelper)
+Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
 {
+    auto uris = asyncHelper->data.GetFileUris();
     if (!IsDirectory(asyncHelper->destUri)) {
         LOG_ERROR(UDMF_CLIENT, "DestUri is not directory.");
         return E_FS_ERROR;
@@ -65,11 +66,11 @@ int32_t UdmfCopyFile::CopyPasteData(const std::vector<std::string> &uris, std::u
         std::error_code errCode;
         if (std::filesystem::exists(destFileUri, errCode)
             && errCode.value() == E_OK
-            && asyncHelper->fileConflictOptions == SKIP) {
+            && asyncHelper->fileConflictOptions == FileConflictOptions::SKIP) {
             LOG_INFO(UDMF_CLIENT, "File has existed, skip.");
             continue;
         }
-        let listener = [&] (uint64_t processSize, uint64_t totalSize) {
+        auto listener = [&] (uint64_t processSize, uint64_t totalSize) {
             auto status = E_OK;
             if (asyncHelper->progressQueue.IsCancel()) {
                 status = E_COPY_FILE_FAILED;
@@ -78,16 +79,16 @@ int32_t UdmfCopyFile::CopyPasteData(const std::vector<std::string> &uris, std::u
             finishSize += processSize;
             auto processNum = PROGRESS_GET_DATA_FINISHED + finishSize / totalSize * 80 - 1;
             ProgressInfo progressInfo = { .progress = processNum, .errorCode = status };
-            UdmfAsyncClient::GetInstance().CallProgress(asyncHelper, progressInfo, nullptr);
+            // UdmfAsyncClient::GetInstance().CallProgress(asyncHelper, progressInfo, nullptr);
         }
         // copy(srcUri, destFileUri, listener);
     }
     return status;
 }
 
-int32_t UdmfCopyFile::GetTotalSize(const std::vector<std::string> &uris)
+int64_t UdmfCopyFile::GetTotalSize(const std::vector<std::string> &uris)
 {
-    int32_t g_totalSize = 0;
+    int64_t g_totalSize = 0;
     std::string srcUri;
     std::string srcPath;
     bool isFile;

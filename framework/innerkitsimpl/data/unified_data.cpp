@@ -18,6 +18,8 @@
 
 namespace OHOS {
 namespace UDMF {
+constexpr const char *FILE_SCHEME = "file";
+
 UnifiedData::UnifiedData()
 {
     properties_ = std::make_shared<UnifiedDataProperties>();

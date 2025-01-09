@@ -135,20 +135,21 @@ Status UdmfAsyncClient::GetDataTask(const QueryOption &query)
 Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
 {
     LOG_INFO(UDMF_CLIENT, "InvokeHap start!");
-    auto &asyncHelper = asyncHelperMap_.at(query.key);
+    auto &asyncHelper = asyncHelperMap_.at(businessUdKey);
     if (asyncHelper->progressQueue.IsCancel()) {
         LOG_INFO(UDMF_CLIENT, "Finished, not invoke hap.");
         return E_OK;
     }
-    if (asyncHelper.processKey.empty() || asyncHelper.cancelKey.empty()) {
+    if (asyncHelper->processKey.empty() || asyncHelper->cancelKey.empty()) {
         LOG_ERROR(UDMF_CLIENT, "Get key failed, not invoke hap.");
         return E_ERROR;
     }
-    auto status = UdmfServiceClient::GetInstance()->InvokeHap(asyncHelper.processKey, asyncHelper.cancelKey);
+    auto status = UdmfServiceClient::GetInstance()->InvokeHap(asyncHelper->processKey, asyncHelper->cancelKey);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Invoke hap failed, status=%{public}d", status);
+        return E_ERROR;
     }
-    return status;
+    return E_OK;
 }
 
 Status UdmfAsyncClient::RegisterAsyncHelper(const GetDataParams &params)
@@ -162,6 +163,8 @@ Status UdmfAsyncClient::RegisterAsyncHelper(const GetDataParams &params)
     asyncHelper->businessUdKey = params.query.key;
     asyncHelper->progressListener = params.progressListener;
     asyncHelper->progressIndicator = params.progressIndicator;
+    asyncHelper->fileConflictOptions = params.fileConflictOptions;
+    asyncHelper->destUri = params.destUri;
     asyncHelperMap_.insert_or_assign(params.query.key, std::move(asyncHelper));
     return E_OK;
 }
@@ -305,7 +308,11 @@ Status UdmfAsyncClient::UpdateProgressData(const std::string &progressUdKey, con
 
 Status UdmfAsyncClient::CopyFile(std::unique_ptr<AsyncHelper> &asyncHelper)
 {
-    auto status = UdmfCopyFile::GetInstance().CopyPasteData(asyncHelper);
+    if (asyncHelper->destUri.empty()) {
+        LOG_ERROR(UDMF_CLIENT, "No dest path, no copy.");
+        return E_ERROR;
+    }
+    auto status = UdmfCopyFile::GetInstance().Copy(asyncHelper);
     ProgressInfo progressInfo = {
         .progress = PROGRESS_ALL_FINISHED,
         .errorCode = status

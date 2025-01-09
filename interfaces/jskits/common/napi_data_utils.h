@@ -34,6 +34,7 @@
 #include "type_descriptor.h"
 #include "type_descriptor_napi.h"
 #include "pixel_map_napi.h"
+#include "napi_data_utils.h"
 
 namespace OHOS {
 namespace UDMF {

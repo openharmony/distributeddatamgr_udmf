@@ -25,15 +25,15 @@
 namespace OHOS {
 namespace UDMF {
 
-class PasteBoardCopyFile {
+class UdmfCopyFile {
 public:
-    static PasteBoardCopyFile &GetInstance();
-    int32_t CopyPasteData(const std::vector<std::string> &uris, std::unique_ptr<AsyncHelper> &asyncHelper);
+    static UdmfCopyFile &GetInstance();
+    Status Copy(std::unique_ptr<AsyncHelper> &asyncHelper);
 
 private:
-    PasteBoardCopyFile() = default;
-    ~PasteBoardCopyFile() = default;
-    int32_t GetTotalSize(const std::vector<std::string> &uris);
+    UdmfCopyFile() = default;
+    ~UdmfCopyFile() = default;
+    int64_t GetTotalSize(const std::vector<std::string> &uris);
     bool IsDirectory(const std::string &path);
     std::string GetFileName(const std::string &path);
     std::string GetRealPath(const std::string& path);
