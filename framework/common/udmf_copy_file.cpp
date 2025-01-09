@@ -46,38 +46,41 @@ int32_t UdmfCopyFile::CopyPasteData(const std::vector<std::string> &uris, std::u
     
     Status status = E_OK;
     for (size_t i = 0; i < uris.size(); i++) {
+        if (asyncHelper->progressQueue.IsCancel()) {
+            status = E_COPY_FILE_FAILED;
+            break;
+        }
         std::string srcUri = uris[i];
-        if (IsRemote(srcUri) && IsDirectory(srcUri)) {
-            LOG_ERROR(UDMF_CLIENT, "Remote source cannot be directory.");
+        if (IsDirectory(srcUri)) {
+            LOG_ERROR(UDMF_CLIENT, "Source cannot be directory.");
             status = E_COPY_FILE_FAILED;
             continue;
         }
-        if (IsFile(srcUri)) {
-            std::string fileName = GetFileName(srcUri);
-            std::string destFileUri = asyncHelper->destUri;
-            if (destFileUri.back() != '/') {
-                destFileUri += '/';
-            }
-            destFileUri = asyncHelper->destUri + fileName;
-            std::error_code errCode;
-            if (std::filesystem::exists(destFileUri, errCode)
-                && errCode.value() == E_OK
-                && asyncHelper->fileConflictOptions == SKIP) {
-                LOG_INFO(UDMF_CLIENT, "File has existed, skip.");
-                continue;
-            }
+        std::string fileName = GetFileName(srcUri);
+        std::string destFileUri = asyncHelper->destUri;
+        if (destFileUri.back() != '/') {
+            destFileUri += '/';
+        }
+        destFileUri = asyncHelper->destUri + fileName;
+        std::error_code errCode;
+        if (std::filesystem::exists(destFileUri, errCode)
+            && errCode.value() == E_OK
+            && asyncHelper->fileConflictOptions == SKIP) {
+            LOG_INFO(UDMF_CLIENT, "File has existed, skip.");
+            continue;
         }
         let listener = [&] (uint64_t processSize, uint64_t totalSize) {
+            auto status = E_OK;
+            if (asyncHelper->progressQueue.IsCancel()) {
+                status = E_COPY_FILE_FAILED;
+                // cancel();
+            }
             finishSize += processSize;
-            ProgressInfo progressInfo = { .progress = finishSize * 100 / totalSize, .errorCode = E_OK };
+            auto processNum = PROGRESS_GET_DATA_FINISHED + finishSize / totalSize * 80 - 1;
+            ProgressInfo progressInfo = { .progress = processNum, .errorCode = status };
             UdmfAsyncClient::GetInstance().CallProgress(asyncHelper, progressInfo, nullptr);
         }
         // copy(srcUri, destFileUri, listener);
-    }
-    let listener = [&] (uint64_t processSize, uint64_t totalSize) {
-        finishSize += processSize;
-        ProgressInfo progressInfo = { .progress = 100, .errorCode = status };
-        UdmfAsyncClient::GetInstance().CallProgress(asyncHelper, progressInfo, nullptr);
     }
     return status;
 }
@@ -93,9 +96,7 @@ int32_t UdmfCopyFile::GetTotalSize(const std::vector<std::string> &uris)
         srcPath = srcFileUri.GetRealPath();
         srcPath = GetRealPath(srcPath);
         isFile = IsFile(srcPath);
-        if (!isFile) {
-            g_totalSize += GetDirSize(srcPath);
-        } else {
+        if (isFile) {
             g_totalSize += GetFileSize(srcPath);
         }
     }
@@ -166,11 +167,6 @@ bool UdmfCopyFile::IsMediaUri(const std::string &uriPath)
     Uri uri(uriPath);
     std::string bundleName = uri.GetAuthority();
     return bundleName == MEDIA_BUNDLE;
-}
-
-uint64_t UdmfCopyFile::GetDirSize(std::string path)
-{
-    return 0;
 }
 
 uint64_t UdmfCopyFile::GetFileSize(const std::string &path)

@@ -44,7 +44,6 @@ private:
 
     // temp
     uint64_t GetFileSize(const std::string &path);
-    uint64_t GetDirSize(std::string path);
 };
 
 } // namespace UDMF

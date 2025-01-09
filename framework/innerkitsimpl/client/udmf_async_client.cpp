@@ -305,9 +305,10 @@ Status UdmfAsyncClient::UpdateProgressData(const std::string &progressUdKey, con
 
 Status UdmfAsyncClient::CopyFile(std::unique_ptr<AsyncHelper> &asyncHelper)
 {
+    auto status = UdmfCopyFile::GetInstance().CopyPasteData(asyncHelper);
     ProgressInfo progressInfo = {
         .progress = PROGRESS_ALL_FINISHED,
-        .errorCode = E_OK
+        .errorCode = status
     };
     CallProgress(asyncHelper, progressInfo, asyncHelper->data);
     return E_OK;
@@ -439,7 +440,7 @@ void UdmfAsyncClient::HandleCancelStatus(std::unique_ptr<AsyncHelper> &asyncHelp
             break;
         case CANCEL_PASTE:
             LOG_INFO(UDMF_CLIENT, "Progress cancel paste");
-            asyncHelper->progressQueue.cancelFlag_ = true;
+            asyncHelper->progressQueue.Cancel();
             break;
         case PASTE_TIME_OUT:
             LOG_ERROR(UDMF_CLIENT, "Progress timed out");
