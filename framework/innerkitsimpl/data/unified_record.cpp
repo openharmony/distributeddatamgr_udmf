@@ -226,5 +226,14 @@ bool UnifiedRecord::HasObject()
     return hasObject_;
 }
 
+bool UnifiedRecord::IsFileType()
+{
+    if (!std::holds_alternative<std::shared_ptr<Object>>(GetOriginValue())) {
+        return false;
+    }
+    auto obj = std::get<std::shared_ptr<Object>>(GetOriginValue());
+    return obj->value_.find(ORI_URI) != obj->value_.end();
+}
+
 } // namespace UDMF
 } // namespace OHOS

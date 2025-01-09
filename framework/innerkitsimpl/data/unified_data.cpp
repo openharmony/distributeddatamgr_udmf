@@ -231,5 +231,35 @@ std::set<UDType> UnifiedData::GetUDTyps() const
     return types;
 }
 
+std::vector<std::string> UnifiedData::GetFileUris() const
+{
+    std::vector<std::string> uris;
+    for (auto record : records_) {
+        if (record == nullptr || !record->IsFileType()) {
+            continue;
+        }
+        auto obj = std::get<std::shared_ptr<Object>>(record->GetOriginValue());
+        if (obj == nullptr) {
+            LOG_ERROR(UDMF_FRAMEWORK, "ValueType is not Object, Not convert to remote uri!");
+            continue;
+        }
+        std::string oriUri;
+        obj->GetValue(ORI_URI, oriUri);
+        if (oriUri.empty()) {
+            LOG_ERROR(UDMF_FRAMEWORK, "Get uri empty, plase check the uri.");
+            continue;
+        }
+        Uri uri(oriUri);
+        std::string scheme = uri.GetScheme();
+        std::transform(scheme.begin(), scheme.end(), scheme.begin(), ::tolower);
+        if (uri.GetAuthority().empty() || scheme != FILE_SCHEME) {
+            LOG_INFO(UDMF_FRAMEWORK, "Get uri authority empty or uri scheme not equals to file.");
+            continue;
+        }
+        uris.push_back(oriUri);
+    }
+    return uris;
+}
+
 } // namespace UDMF
 } // namespace OHOS

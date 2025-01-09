@@ -19,6 +19,7 @@
 #include "logger.h"
 #include "plain_text.h"
 #include "udmf_client.h"
+#include "udmf_copy_file.h"
 #include "udmf_service_client.h"
 
 namespace OHOS::UDMF {
@@ -92,13 +93,14 @@ Status UdmfAsyncClient::ProgressTask(const std::string &businessUdKey)
             Clear(businessUdKey);
             return status;
         }
-        status = SetCacncelData(businessUdKey);
+        status = SetCancelData(businessUdKey);
         if (status != E_OK) {
             Clear(businessUdKey);
             return status;
         }
     }
     while (asyncHelper->lastProgress >= PROGRESS_INIT && asyncHelper->lastProgress < PROGRESS_ALL_FINISHED) {
+        HandleCancelStatus(asyncHelper);
         if (asyncHelper->progressQueue.IsCancel()) {
             break;
         }
@@ -133,8 +135,20 @@ Status UdmfAsyncClient::GetDataTask(const QueryOption &query)
 Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
 {
     LOG_INFO(UDMF_CLIENT, "InvokeHap start!");
-    Clear(businessUdKey);
-    return E_OK;
+    auto &asyncHelper = asyncHelperMap_.at(query.key);
+    if (asyncHelper->progressQueue.IsCancel()) {
+        LOG_INFO(UDMF_CLIENT, "Finished, not invoke hap.");
+        return E_OK;
+    }
+    if (asyncHelper.processKey.empty() || asyncHelper.cancelKey.empty()) {
+        LOG_ERROR(UDMF_CLIENT, "Get key failed, not invoke hap.");
+        return E_ERROR;
+    }
+    auto status = UdmfServiceClient::GetInstance()->InvokeHap(asyncHelper.processKey, asyncHelper.cancelKey);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Invoke hap failed, status=%{public}d", status);
+    }
+    return status;
 }
 
 Status UdmfAsyncClient::RegisterAsyncHelper(const GetDataParams &params)
@@ -239,8 +253,29 @@ Status UdmfAsyncClient::SetProgressData(const std::string &businessUdKey)
     return E_OK;
 }
 
-Status UdmfAsyncClient::SetCacncelData(const std::string &businessUdKey)
+Status UdmfAsyncClient::SetCancelData(const std::string &businessUdKey)
 {
+    auto serviceClient = UdmfServiceClient::GetInstance();
+    if (serviceClient == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "UdmfServiceClient GetInstance failed");
+        return E_IPC;
+    }
+    std::string cancelKey;
+    CustomOption cusomOption = {
+        .intention = Intention::UD_INTENTION_DATA_HUB
+    };
+    auto obj = std::make_shared<Object>();
+    auto progressRecord = std::make_shared<PlainText>(UDType::PLAIN_TEXT, obj);
+    progressRecord->SetContent(std::to_string(PROGRESS_INIT));
+    UnifiedData cancelData;
+    cancelData.AddRecord(progressRecord);
+    auto status = serviceClient->SetData(cusomOption, cancelData, cancelKey);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Set cancel data error, status = %{public}d", status);
+        return static_cast<Status>(status);
+    }
+    auto &asyncHelper = asyncHelperMap_.at(businessUdKey);
+    asyncHelper->cancelKey = cancelKey;
     return E_OK;
 }
 
@@ -354,5 +389,64 @@ bool UdmfAsyncClient::IsParamValid(const GetDataParams &params)
         return false;
     }
     return true;
+}
+
+Status UdmfAsyncClient::GetCancelStatus(const std::string &cancelKey, std::string &value)
+{
+    QueryOption option = { .key = cancelKey };
+    std::vector<UnifiedData> data;
+    UdmfServiceClient::GetInstance()->GetBatchData(option, data);
+    if (data.empty()) {
+        LOG_INFO(UDMF_CLIENT, "data is empty");
+        return E_INVALID_PARAMETERS;
+    }
+    if (data[0].GetRecords().empty()) {
+        LOG_INFO(UDMF_CLIENT, "Getrecords is empty");
+        return E_INVALID_PARAMETERS;
+    }
+    auto outputRecord = data[0].GetRecordAt(0);
+    if (outputRecord == nullptr) {
+        LOG_INFO(UDMF_CLIENT, "outputRecord is nullptr");
+        return E_INVALID_PARAMETERS;
+    }
+    auto plainText = outputRecord->GetValue();
+    auto object = std::get<std::shared_ptr<Object>>(plainText);
+    if (object == nullptr) {
+        LOG_INFO(UDMF_CLIENT, "object is nullptr");
+        return E_INVALID_PARAMETERS;
+    }
+    object->GetValue(UDMF::CONTENT, value);
+    return E_OK;
+}
+
+void UdmfAsyncClient::HandleCancelStatus(std::unique_ptr<AsyncHelper> &asyncHelper)
+{
+    std::string defaultCancel = "0";
+    int32_t cancelStatus = 0;
+    auto ret = GetCancelStatus(asyncHelper->cancelKey, defaultCancel);
+    if (ret != E_OK) {
+        LOG_WARN(UDMF_CLIENT, "GetCancelStatus failed, status=%{public}d", ret);
+        return;
+    }
+    try {
+        cancelStatus = std::stoi(defaultCancel);
+    } catch (const std::exception& e) {
+        LOG_ERROR(UDMF_CLIENT, "cancelStatus error, cancelStatus=%{public}s", defaultCancel.c_str());
+        return;
+    }
+    switch (cancelStatus) {
+        case NORMAL_PASTE:
+            break;
+        case CANCEL_PASTE:
+            LOG_INFO(UDMF_CLIENT, "Progress cancel paste");
+            asyncHelper->progressQueue.cancelFlag_ = true;
+            break;
+        case PASTE_TIME_OUT:
+            LOG_ERROR(UDMF_CLIENT, "Progress timed out");
+            break;
+        default:
+            LOG_ERROR(UDMF_CLIENT, "status error, status=%{public}d", cancelStatus);
+            break;
+    }
 }
 } // namespace OHOS::UDMF

@@ -66,6 +66,7 @@ public:
 
     virtual void InitObject();
     bool HasObject();
+    bool IsFileType();
 protected:
     UDType dataType_;
     ValueType value_;

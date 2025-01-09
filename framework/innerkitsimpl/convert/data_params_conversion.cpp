@@ -40,6 +40,7 @@ Status DataParamsConversion::GetInnerDataParams(OH_UdmfGetDataParams &ndkDataPar
         OH_UdmfData *ndkData = OH_UdmfData_Create();
         NdkDataConversion::GetNdkUnifiedData(data, ndkData);
         ndkDataParams.dataProgressListener(ndkProgrssInfo, ndkData);
+        OH_UdmfData_Destroy(ndkData);
     };
     return Status::E_OK;
 }

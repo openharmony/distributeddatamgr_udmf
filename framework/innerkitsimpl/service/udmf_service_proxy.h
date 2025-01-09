@@ -49,6 +49,7 @@ public:
     int32_t RemoveAppShareOption(const std::string &intention) override;
     int32_t ObtainAsynProcess(AsyncProcessInfo &processInfo) override;
     int32_t ClearAsynProcessByKey(const std::string &businessUdKey) override;
+    int32_t InvokeHap(const std::string &progressKey, const std::string &cancelKey) override;
 private:
     static inline BrokerDelegator<UdmfServiceProxy> delegator_;
     int32_t SendRequest(UdmfServiceInterfaceCode code, MessageParcel &data,

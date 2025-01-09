@@ -25,7 +25,7 @@ void ProgressQueue::PushBack(ProgressInfo &progress)
 std::pair<bool, std::shared_ptr<ProgressInfo>> ProgressQueue::Poll()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if(queue_.empty()) {
+    if (queue_.empty()) {
         return {false, nullptr};
     }
     auto progressInfo = std::make_shared<ProgressInfo>(queue_.front());

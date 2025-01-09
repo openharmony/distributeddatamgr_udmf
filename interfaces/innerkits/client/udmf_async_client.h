@@ -39,7 +39,7 @@ private:
     Status GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper, const QueryOption &query);
     Status GetDataFromCache(std::unique_ptr<AsyncHelper> &asyncHelper, const QueryOption &query);
     Status SetProgressData(const std::string &businessUdKey);
-    Status SetCacncelData(const std::string &businessUdKey);
+    Status SetCancelData(const std::string &businessUdKey);
     Status UpdateProgressData(const std::string &progressUdKey, const ProgressInfo &progressInfo);
     Status CopyFile(std::unique_ptr<AsyncHelper> &asyncHelper);
     void CallProgress(std::unique_ptr<AsyncHelper> &asyncHelper, ProgressInfo &progressInfo,
@@ -47,6 +47,8 @@ private:
     Status Clear(const std::string &businessUdKey);
     Status ProcessUnifiedData(std::unique_ptr<AsyncHelper> &asyncHelper);
     bool IsParamValid(const GetDataParams &params);
+    Status GetCancelStatus(const std::string &cancelKey, std::string &value);
+    Status HandleCancelStatus(std::unique_ptr<AsyncHelper> &asyncHelper);
 
     ExecutorPool executor_;
     std::unordered_map<std::string, std::unique_ptr<AsyncHelper>> asyncHelperMap_;
