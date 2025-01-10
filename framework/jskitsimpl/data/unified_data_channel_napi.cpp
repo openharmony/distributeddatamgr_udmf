@@ -35,6 +35,9 @@ napi_value UnifiedDataChannelNapi::UnifiedDataChannelInit(napi_env env, napi_val
         DECLARE_NAPI_GETTER("ShareOptions", CreateShareOptions),
         DECLARE_NAPI_FUNCTION("setAppShareOptions", SetAppShareOptions),
         DECLARE_NAPI_FUNCTION("removeAppShareOptions", RemoveAppShareOptions),
+        DECLARE_NAPI_GETTER("FileConflictOptions", CreateFileConflictOptions),
+        DECLARE_NAPI_GETTER("ProgressIndicator", CreateProgressIndicator),
+        DECLARE_NAPI_GETTER("ListenerStatus", CreateListenerStatus),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));

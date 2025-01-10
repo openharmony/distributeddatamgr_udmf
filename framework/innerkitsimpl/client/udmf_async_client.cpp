@@ -52,7 +52,7 @@ UdmfAsyncClient &UdmfAsyncClient::GetInstance()
     return instance;
 }
 
-Status UdmfAsyncClient::StartAsyncDataRetireval(const GetDataParams &params)
+Status UdmfAsyncClient::StartAsyncDataRetrieval(const GetDataParams &params)
 {
     if (!IsParamValid(params)) {
         return E_INVALID_PARAMETERS;
@@ -324,7 +324,6 @@ Status UdmfAsyncClient::CopyFile(std::unique_ptr<AsyncHelper> &asyncHelper)
 void UdmfAsyncClient::CallProgress(std::unique_ptr<AsyncHelper> &asyncHelper, ProgressInfo &progressInfo,
     std::shared_ptr<UnifiedData> data)
 {
-    LOG_ERROR(UDMF_CLIENT, "progressInfo.errorCode = %{public}d", progressInfo.errorCode);
     if (progressInfo.errorCode == E_OK) {
         if (progressInfo.progress == PROGRESS_ALL_FINISHED) {
             progressInfo.progressStatus = ListenerStatus::FINISHED;

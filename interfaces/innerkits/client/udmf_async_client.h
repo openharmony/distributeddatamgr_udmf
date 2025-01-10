@@ -21,8 +21,9 @@
 namespace OHOS::UDMF {
 class UdmfAsyncClient {
 public:
+    friend class UdmfCopyFile;
     static UdmfAsyncClient API_EXPORT &GetInstance();
-    Status API_EXPORT StartAsyncDataRetireval(const GetDataParams &params);
+    Status API_EXPORT StartAsyncDataRetrieval(const GetDataParams &params);
     Status API_EXPORT Cancel(std::string businessUdKey);
 private:
     UdmfAsyncClient();

@@ -19,6 +19,7 @@
 #include <filesystem>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "copy/file_copy_manager.h"
 #include "file_uri.h"
 #include "logger.h"
 #include "udmf_async_client.h"
@@ -70,18 +71,20 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
             LOG_INFO(UDMF_CLIENT, "File has existed, skip.");
             continue;
         }
-        auto listener = [&] (uint64_t processSize, uint64_t totalSize) {
-            auto status = E_OK;
+
+        using ProcessCallBack = std::function<uint64_t(uint64_t processSize, uint64_t totalFileSize)>;
+        ProcessCallBack listener = [&] (uint64_t processSize, uint64_t totalFileSize) {
             if (asyncHelper->progressQueue.IsCancel()) {
-                status = E_COPY_FILE_FAILED;
-                // cancel();
+                Storage::DistributedFile::FileCopyManager::GetInstance()->Cancel();
+                return 0;
             }
             finishSize += processSize;
             auto processNum = PROGRESS_GET_DATA_FINISHED + finishSize / totalSize * 80 - 1;
-            ProgressInfo progressInfo = { .progress = processNum, .errorCode = status };
-            // UdmfAsyncClient::GetInstance().CallProgress(asyncHelper, progressInfo, nullptr);
+            ProgressInfo progressInfo = { .progress = processNum, .errorCode = E_OK };
+            UdmfAsyncClient::GetInstance().CallProgress(asyncHelper, progressInfo, nullptr);
+            return 0;
         }
-        // copy(srcUri, destFileUri, listener);
+        auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->Copy(srcUri, destFileUri, listener);
     }
     return status;
 }

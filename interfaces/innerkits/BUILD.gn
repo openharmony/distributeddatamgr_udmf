@@ -93,6 +93,7 @@ ohos_shared_library("udmf_client") {
     "bundle_framework:appexecfwk_core",
     "cJSON:cjson",
     "c_utils:utils",
+    "dfs_service:distributed_file_daemon_kit_inner",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
