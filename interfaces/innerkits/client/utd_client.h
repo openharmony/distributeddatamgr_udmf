@@ -52,6 +52,7 @@ private:
     ~UtdClient();
     UtdClient(const UtdClient &obj) = delete;
     UtdClient &operator=(const UtdClient &obj) = delete;
+    std::string Anonymous(const std::string &name);
     bool Init();
     bool IsHapTokenType();
     Status GetCurrentActiveUserId(int32_t& userId);

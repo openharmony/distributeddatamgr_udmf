@@ -447,7 +447,6 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType007, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMEType007 end.");
 }
 
-
 /**
 * @tc.name: BelongsTo001
 * @tc.desc: Normal testcase of BelongsTo
@@ -1762,6 +1761,23 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension005, TestSize.Leve
     Status ret = utdClient.GetUniformDataTypesByFilenameExtension(fileExtension, typeIds, belongsTo);
     EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension005 end.");
+}
+
+/**
+* @tc.name: GetUniformDataTypesByFilenameExtension006
+* @tc.desc: Normal testcase of GetUniformDataTypesByFilenameExtension, fileExtension is invaild
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension006 begin.");
+    std::string filenameExtension = "?application/x-mobi8-ebook";
+    std::vector<std::string> currTypes;
+    std::string blongsToType = "general.plain-text";
+    Status status =
+        UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(filenameExtension, currTypes, blongsToType);
+    ASSERT_EQ(status, Status::E_INVALID_PARAMETERS);
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension006 end.");
 }
 
 /**
