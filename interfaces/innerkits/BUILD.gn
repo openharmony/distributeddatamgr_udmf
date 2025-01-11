@@ -98,7 +98,6 @@ ohos_shared_library("udmf_client") {
     "hitrace:libhitracechain",
     "image_framework:image_native",
     "ipc:ipc_core",
-    "kv_store:distributeddata_inner",
     "kv_store:distributeddata_mgr",
     "samgr:samgr_proxy",
   ]
