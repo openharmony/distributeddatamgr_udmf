@@ -18,7 +18,7 @@ group("udmf_packages") {
     deps = [
       "interfaces/innerkits:udmf_client",
       "interfaces/innerkits:utd_client",
-      "interfaces/jskits:aip_core_napi",
+      "interfaces/jskits:intelligence_napi",
       "interfaces/jskits:udmf_data_napi",
       "interfaces/jskits:unifieddatachannel_napi",
       "interfaces/jskits:uniformtypedescriptor_napi",

@@ -808,25 +808,31 @@ void TextEmbeddingNapi::GetEmbeddingArrayCompleteCB(napi_env env, napi_status st
             ThrowIntelligenceErrByPromise(env, INNER_ERROR, "GetEmbeddingArrayCompleteCB failed", value);
         }
         napi_reject_deferred(env, textArrayCallbackData->deferred, value);
-    } else {
-        status = napi_create_array(env, &value);
+        status = napi_delete_async_work(env, textArrayCallbackData->asyncWork);
         if (status != napi_ok) {
-            AIP_HILOGE("napi_create_array failed");
-        } else {
-            for (size_t i = 0; i < ret.size(); ++i) {
-                napi_value res = nullptr;
-                napi_create_array(env, &res);
-                for (size_t j = 0; j < ret[i].size(); ++j) {
-                    napi_value jsDouble = nullptr;
-                    napi_create_double(env, static_cast<double>(ret[i][j]), &jsDouble);
-                    napi_set_element(env, res, j, jsDouble);
-                }
-                napi_set_element(env, value, i, res);
+            AIP_HILOGE("napi_delete_async_work failed");
+        }
+        delete textArrayCallbackData;
+        return;
+    }
+
+    status = napi_create_array(env, &value);
+    if (status != napi_ok) {
+        AIP_HILOGE("napi_create_array failed");
+    } else {
+        for (size_t i = 0; i < ret.size(); ++i) {
+            napi_value res = nullptr;
+            napi_create_array(env, &res);
+            for (size_t j = 0; j < ret[i].size(); ++j) {
+                napi_value jsDouble = nullptr;
+                napi_create_double(env, static_cast<double>(ret[i][j]), &jsDouble);
+                napi_set_element(env, res, j, jsDouble);
             }
-            status = napi_resolve_deferred(env, textArrayCallbackData->deferred, value);
-            if (status != napi_ok) {
-                AIP_HILOGE(" napi_resolve_deferred failed");
-            }
+            napi_set_element(env, value, i, res);
+        }
+        status = napi_resolve_deferred(env, textArrayCallbackData->deferred, value);
+        if (status != napi_ok) {
+            AIP_HILOGE(" napi_resolve_deferred failed");
         }
     }
 

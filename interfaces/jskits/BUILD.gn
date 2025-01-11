@@ -229,7 +229,7 @@ ohos_static_library("udmf_js_common") {
   part_name = "udmf"
 }
 
-ohos_shared_library("aip_core_napi") {
+ohos_shared_library("intelligence_napi") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
@@ -261,7 +261,7 @@ ohos_shared_library("aip_core_napi") {
   ]
 
   defines = [ "LOG_DOMAIN = 0xD001660" ]
-  relative_install_dir = "module"
+  relative_install_dir = "module/data"
   subsystem_name = "distributeddatamgr"
   part_name = "udmf"
 }

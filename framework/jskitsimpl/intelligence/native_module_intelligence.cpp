@@ -35,7 +35,7 @@ static napi_module DataIntelligenceModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = Export,
-    .nm_modname = "DataIntelligence",
+    .nm_modname = "data.intelligence",
     .nm_priv = ((void *)0),
     .reserved = { 0 }
 };
