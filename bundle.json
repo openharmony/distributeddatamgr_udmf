@@ -162,6 +162,15 @@
             ],
             "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/data"
           }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/jskits:intelligence_napi",
+          "header": {
+            "header_files": [
+              "i_aip_core_manager.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/jskits/intelligence"
+          }
         }
       ],
       "test": [

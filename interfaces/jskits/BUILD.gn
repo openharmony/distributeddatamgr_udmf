@@ -36,6 +36,10 @@ config("udmf_napi_config") {
   ]
 }
 
+config("aip_core_napi_config") {
+  include_dirs = [ "${udmf_interfaces_path}/jskits/intelligence" ]
+}
+
 ohos_shared_library("unifieddatachannel_napi") {
   branch_protector_ret = "pac_ret"
   sanitize = {
@@ -221,6 +225,43 @@ ohos_static_library("udmf_js_common") {
     "napi:ace_napi",
   ]
   public_external_deps = [ "image_framework:image" ]
+  subsystem_name = "distributeddatamgr"
+  part_name = "udmf"
+}
+
+ohos_shared_library("intelligence_napi") {
+  branch_protector_ret = "pac_ret"
+
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  sources = [
+    "${udmf_framework_path}/jskitsimpl/intelligence/aip_napi_error.cpp",
+    "${udmf_framework_path}/jskitsimpl/intelligence/aip_napi_utils.cpp",
+    "${udmf_framework_path}/jskitsimpl/intelligence/i_aip_core_manager_impl.cpp",
+    "${udmf_framework_path}/jskitsimpl/intelligence/image_embedding_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/intelligence/native_module_intelligence.cpp",
+    "${udmf_framework_path}/jskitsimpl/intelligence/text_embedding_napi.cpp",
+  ]
+
+  public_configs = [ ":aip_core_napi_config" ]
+
+  deps = []
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "napi:ace_napi",
+  ]
+
+  defines = [ "LOG_DOMAIN = 0xD001660" ]
+  relative_install_dir = "module/data"
   subsystem_name = "distributeddatamgr"
   part_name = "udmf"
 }
