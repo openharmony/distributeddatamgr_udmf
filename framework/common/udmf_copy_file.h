@@ -34,18 +34,13 @@ private:
     UdmfCopyFile() = default;
     ~UdmfCopyFile() = default;
     int64_t GetTotalSize(const std::vector<std::string> &uris);
-    bool IsDirectory(const std::string &path);
+    bool IsDirectory(const std::string &uri, bool isSource);
     std::string GetFileName(const std::string &path);
-    std::string GetRealPath(const std::string& path);
     bool IsRemote(const std::string &uri);
-    bool IsFile(const std::string &path);
-    bool IsMediaUri(const std::string &uriPath);
-    bool IsNormalUri(const std::string &path);
-
-    // temp
-    uint64_t GetFileSize(const std::string &path);
+    bool IsFile(const std::string &uri, bool isSource);
+    uint64_t GetFileSize(const std::string &uri, bool isSource);
 };
-
+ 
 } // namespace UDMF
 } // namespace OHOS
 #endif /* UDMF_COPY_FILE_H */

@@ -28,7 +28,9 @@ namespace OHOS {
 namespace UDMF {
 constexpr const char* NETWORK_PARA = "?networkid=";
 constexpr const char* MEDIA_BUNDLE = "media";
-static constexpr int32_t PROGRESS_GET_DATA_FINISHED = 20;
+static constexpr int32_t PROGRESS_COPY_START = 20;
+constexpr constexpr int32_t PROGRESS_INCRE = 80;
+constexpr constexpr int32_t MAX_PROGRESS = 99;
 
 UdmfCopyFile &UdmfCopyFile::GetInstance()
 {
@@ -38,11 +40,12 @@ UdmfCopyFile &UdmfCopyFile::GetInstance()
 
 Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
 {
-    auto uris = asyncHelper->data.GetFileUris();
-    if (!IsDirectory(asyncHelper->destUri)) {
+    if (!IsDirectory(asyncHelper->destUri, false)) {
         LOG_ERROR(UDMF_CLIENT, "DestUri is not directory.");
         return E_FS_ERROR;
     }
+    auto uris = asyncHelper->data->GetFileUris();
+    LOG_INFO(UDMF_CLIENT, "Uris size=%{public}zu", uris.size());
     uint64_t finishSize = 0;
     uint64_t totalSize = GetTotalSize(uris);
     
@@ -53,7 +56,7 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
             break;
         }
         std::string srcUri = uris[i];
-        if (IsDirectory(srcUri)) {
+        if (IsDirectory(srcUri, true)) {
             LOG_ERROR(UDMF_CLIENT, "Source cannot be directory.");
             status = E_COPY_FILE_FAILED;
             continue;
@@ -63,7 +66,7 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
         if (destFileUri.back() != '/') {
             destFileUri += '/';
         }
-        destFileUri = asyncHelper->destUri + fileName;
+        destFileUri += fileName;
         std::error_code errCode;
         if (std::filesystem::exists(destFileUri, errCode)
             && errCode.value() == E_OK
@@ -72,19 +75,29 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
             continue;
         }
 
-        using ProcessCallBack = std::function<uint64_t(uint64_t processSize, uint64_t totalFileSize)>;
+        uint64_t fileSize = 0;
+        using ProcessCallBack = std::function<uint64_t(uint64_t processSize, uint64_t totalFileSize)>;   
         ProcessCallBack listener = [&] (uint64_t processSize, uint64_t totalFileSize) {
+            Status status = E_OK;
             if (asyncHelper->progressQueue.IsCancel()) {
-                Storage::DistributedFile::FileCopyManager::GetInstance()->Cancel();
-                return 0;
+                auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->Cancel(srcUri, destFileUri);
+                if (ret != E_OK) {
+                    LOG_ERROR(UDMF_CLIENT, "Cancel failed. errno=%{public}d", ret);
+                    status = E_COPY_FILE_FAILED;
+                }
             }
-            finishSize += processSize;
-            auto processNum = PROGRESS_GET_DATA_FINISHED + finishSize / totalSize * 80 - 1;
-            ProgressInfo progressInfo = { .progress = processNum, .errorCode = E_OK };
+            fileSize = totalFileSize;
+            auto processNum = std::min(PROGRESS_COPY_START + int32_t((finishSize + processSize) * PROGRESS_INCRE / totalSize), MAX_PROGRESS);
+            ProgressInfo progressInfo = { .progress = processNum, .errorCode = status };
             UdmfAsyncClient::GetInstance().CallProgress(asyncHelper, progressInfo, nullptr);
             return 0;
-        }
+        };
         auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->Copy(srcUri, destFileUri, listener);
+        if (ret != E_OK) {
+            LOG_ERROR(UDMF_CLIENT, "Copy failed. errno=%{public}d", ret);
+            continue;
+        }
+        finishSize += fileSize;
     }
     return status;
 }
@@ -93,45 +106,23 @@ int64_t UdmfCopyFile::GetTotalSize(const std::vector<std::string> &uris)
 {
     int64_t g_totalSize = 0;
     std::string srcUri;
-    std::string srcPath;
-    bool isFile;
     for (const auto &srcUri : uris) {
-        AppFileService::ModuleFileUri::FileUri srcFileUri(srcUri);
-        srcPath = srcFileUri.GetRealPath();
-        srcPath = GetRealPath(srcPath);
-        isFile = IsFile(srcPath);
-        if (isFile) {
-            g_totalSize += GetFileSize(srcPath);
+        if (IsFile(srcUri, true)) {
+            g_totalSize += GetFileSize(srcUri, true);
         }
     }
     return g_totalSize;
 }
 
-std::string UdmfCopyFile::GetRealPath(const std::string& path)
+bool UdmfCopyFile::IsDirectory(const std::string &uri, bool isSource)
 {
-    std::filesystem::path tempPath(path);
-    std::filesystem::path realPath{};
-    for (const auto& component : tempPath) {
-        if (component == ".") {
-            continue;
-        } else if (component == "..") {
-            realPath = realPath.parent_path();
-        } else {
-            realPath /= component;
-        }
-    }
-    return realPath.string();
-}
-
-bool UdmfCopyFile::IsDirectory(const std::string &path)
-{
-    struct stat buf {};
-    int ret = stat(path.c_str(), &buf);
-    if (ret == -1) {
-        LOG_ERROR(UDMF_CLIENT, "Stat failed. errno=%{public}d", errno);
+    bool isDir = false;
+    auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->IsDirectory(uri, isSource, isDir);
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Is dir failed. errno=%{public}d", ret);
         return false;
     }
-    return (buf.st_mode & S_IFMT) == S_IFDIR;
+    return isDir;
 }
 
 bool UdmfCopyFile::IsRemote(const std::string &uri)
@@ -150,32 +141,26 @@ std::string UdmfCopyFile::GetFileName(const std::string &path)
     return filePath.filename();
 }
 
-bool UdmfCopyFile::IsFile(const std::string &path)
+bool UdmfCopyFile::IsFile(const std::string &uri, bool isSource)
 {
-    return IsNormalUri(path) || IsNormalUri(path);
-}
-
-bool UdmfCopyFile::IsNormalUri(const std::string &path)
-{
-    struct stat buf {};
-    int ret = stat(path.c_str(), &buf);
-    if (ret == -1) {
-        LOG_ERROR(UDMF_CLIENT, "Stat failed. errno=%{public}d", errno);
+    bool isDir = false;
+    auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->IsDirectory(uri, isSource, isDir);
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Is dir failed. errno=%{public}d", ret);
         return false;
     }
-    return (buf.st_mode & S_IFMT) == S_IFREG;
+    return !isDir;
 }
 
-bool UdmfCopyFile::IsMediaUri(const std::string &uriPath)
+uint64_t UdmfCopyFile::GetFileSize(const std::string &uri, bool isSource)
 {
-    Uri uri(uriPath);
-    std::string bundleName = uri.GetAuthority();
-    return bundleName == MEDIA_BUNDLE;
-}
-
-uint64_t UdmfCopyFile::GetFileSize(const std::string &path)
-{
-    return 100;
+    uint64_t size = 0;
+    auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->GetSize(uri, isSource, size);
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Get size failed. errno=%{public}d", ret);
+        return 0;
+    }
+    return size;
 }
 } // namespace UDMF
 } // namespace OHOS

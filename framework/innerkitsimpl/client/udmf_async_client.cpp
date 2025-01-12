@@ -100,10 +100,7 @@ Status UdmfAsyncClient::ProgressTask(const std::string &businessUdKey)
         }
     }
     while (asyncHelper->lastProgress >= PROGRESS_INIT && asyncHelper->lastProgress < PROGRESS_ALL_FINISHED) {
-        HandleCancelStatus(asyncHelper);
-        if (asyncHelper->progressQueue.IsCancel()) {
-            break;
-        }
+        HandleCancelStatus(asyncHelper); 
         auto pair = asyncHelper->progressQueue.Poll();
         if (!pair.first) {
             std::this_thread::sleep_for(std::chrono::milliseconds(READ_PROGRESS_INTERVAL));
@@ -400,7 +397,10 @@ bool UdmfAsyncClient::IsParamValid(const GetDataParams &params)
 
 Status UdmfAsyncClient::GetCancelStatus(const std::string &cancelKey, std::string &value)
 {
-    QueryOption option = { .key = cancelKey };
+    QueryOption option = {
+        .key = cancelKey,
+        .intention = Intention::UD_INTENTION_DATA_HUB
+    };
     std::vector<UnifiedData> data;
     UdmfServiceClient::GetInstance()->GetBatchData(option, data);
     if (data.empty()) {
@@ -428,6 +428,9 @@ Status UdmfAsyncClient::GetCancelStatus(const std::string &cancelKey, std::strin
 
 void UdmfAsyncClient::HandleCancelStatus(std::unique_ptr<AsyncHelper> &asyncHelper)
 {
+    if (asyncHelper->progressIndicator != ProgressIndicator::DEFAULT) {
+        return;
+    }
     std::string defaultCancel = "0";
     int32_t cancelStatus = 0;
     auto ret = GetCancelStatus(asyncHelper->cancelKey, defaultCancel);

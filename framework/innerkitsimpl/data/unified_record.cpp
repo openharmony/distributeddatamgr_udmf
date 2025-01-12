@@ -20,6 +20,8 @@
 
 namespace OHOS {
 namespace UDMF {
+constexpr UDType FILE_TYPES[] = {FILE, AUDIO, FOLDER, IMAGE, VIDEO};
+
 UnifiedRecord::UnifiedRecord()
 {
     dataType_ = UD_BUTT;
@@ -228,11 +230,16 @@ bool UnifiedRecord::HasObject()
 
 bool UnifiedRecord::IsFileType()
 {
-    if (!std::holds_alternative<std::shared_ptr<Object>>(GetOriginValue())) {
-        return false;
+    if (std::holds_alternative<std::shared_ptr<Object>>(GetOriginValue())) {
+        auto obj = std::get<std::shared_ptr<Object>>(GetOriginValue());
+        if (obj->value_.find(ORI_URI) != obj->value_.end()) {
+            return true;
+        }
     }
-    auto obj = std::get<std::shared_ptr<Object>>(GetOriginValue());
-    return obj->value_.find(ORI_URI) != obj->value_.end();
+    if (std::find(std::begin(FILE_TYPES), std::end(FILE_TYPES), GetType()) != std::end(FILE_TYPES)) {
+        return true;
+    }
+    return false;
 }
 
 } // namespace UDMF

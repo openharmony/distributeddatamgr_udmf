@@ -34,12 +34,12 @@ Status DataParamsConversion::GetInnerDataParams(OH_UdmfGetDataParams &ndkDataPar
         ndkProgrssInfo.progress = progressInfo.progress;
         ndkProgrssInfo.status = progressInfo.progressStatus;
         if (data == nullptr) {
-            ndkDataParams.dataProgressListener(ndkProgrssInfo, nullptr);
+            ndkDataParams.dataProgressListener(&ndkProgrssInfo, nullptr);
             return;
         }
         OH_UdmfData *ndkData = OH_UdmfData_Create();
         NdkDataConversion::GetNdkUnifiedData(data, ndkData);
-        ndkDataParams.dataProgressListener(ndkProgrssInfo, ndkData);
+        ndkDataParams.dataProgressListener(&ndkProgrssInfo, ndkData);
         OH_UdmfData_Destroy(ndkData);
     };
     return Status::E_OK;

@@ -177,9 +177,9 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetrieval002, TestSize.Level1)
     OH_UdmfGetDataParams_SetProgressIndicator(&param, Udmf_ProgressIndicator::UDMF_DEFAULT);
     OH_UdmfGetDataParams_SetDestUri(&param, "/test/demo");
     OH_UdmfGetDataParams_SetFileConflictOptions(&param, Udmf_FileConflictOptions::UDMF_SKIP);
-    OH_Udmf_DataProgressListener dataProgressListener = [](OH_Udmf_ProgressInfo progressInfo, OH_UdmfData *data) {
-        auto progress = OH_UdmfProgressInfo_GetProgress(&progressInfo);
-        auto status = OH_UdmfProgressInfo_GetStatus(&progressInfo);
+    OH_Udmf_DataProgressListener dataProgressListener = [](OH_Udmf_ProgressInfo *progressInfo, OH_UdmfData *data) {
+        auto progress = OH_UdmfProgressInfo_GetProgress(progressInfo);
+        auto status = OH_UdmfProgressInfo_GetStatus(progressInfo);
         LOG_INFO(UDMF_TEST, "Callback begin status=%{public}d, progress=%{public}d.", status, progress);
         if (data == nullptr) {
             ASSERT_TRUE(progress != 0);

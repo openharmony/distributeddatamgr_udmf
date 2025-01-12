@@ -14,6 +14,7 @@
  */
 #define LOG_TAG "UnifiedData"
 #include "unified_data.h"
+#include "file.h"
 #include "logger.h"
 
 namespace OHOS {
@@ -240,13 +241,14 @@ std::vector<std::string> UnifiedData::GetFileUris() const
         if (record == nullptr || !record->IsFileType()) {
             continue;
         }
-        auto obj = std::get<std::shared_ptr<Object>>(record->GetOriginValue());
-        if (obj == nullptr) {
-            LOG_ERROR(UDMF_FRAMEWORK, "ValueType is not Object, Not convert to remote uri!");
-            continue;
-        }
         std::string oriUri;
-        obj->GetValue(ORI_URI, oriUri);
+        if (std::holds_alternative<std::shared_ptr<Object>>(record->GetOriginValue())) {
+            auto obj = std::get<std::shared_ptr<Object>>(record->GetOriginValue());
+            obj->GetValue(ORI_URI, oriUri);
+        } else {
+            auto file = static_cast<File*>(record.get());
+            oriUri = file->GetUri();
+        }
         if (oriUri.empty()) {
             LOG_ERROR(UDMF_FRAMEWORK, "Get uri empty, plase check the uri.");
             continue;
