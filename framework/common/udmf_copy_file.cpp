@@ -52,7 +52,7 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
     Status status = E_OK;
     for (size_t i = 0; i < uris.size(); i++) {
         if (asyncHelper->progressQueue.IsCancel()) {
-            status = E_COPY_FILE_FAILED;
+            LOG_INFO(UDMF_CLIENT, "Copy file cancel");
             break;
         }
         std::string srcUri = uris[i];
@@ -67,10 +67,8 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
             destFileUri += '/';
         }
         destFileUri += fileName;
-        std::error_code errCode;
-        if (std::filesystem::exists(destFileUri, errCode)
-            && errCode.value() == E_OK
-            && asyncHelper->fileConflictOptions == FileConflictOptions::SKIP) {
+
+        if (asyncHelper->fileConflictOptions == FileConflictOptions::SKIP && IsFile(destFileUri)) {
             LOG_INFO(UDMF_CLIENT, "File has existed, skip.");
             continue;
         }
@@ -95,6 +93,7 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
         auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->Copy(srcUri, destFileUri, listener);
         if (ret != E_OK) {
             LOG_ERROR(UDMF_CLIENT, "Copy failed. errno=%{public}d", ret);
+            status = E_COPY_FILE_FAILED;
             continue;
         }
         finishSize += fileSize;
@@ -117,7 +116,7 @@ int64_t UdmfCopyFile::GetTotalSize(const std::vector<std::string> &uris)
 bool UdmfCopyFile::IsDirectory(const std::string &uri, bool isSource)
 {
     bool isDir = false;
-    auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->IsDirectory(uri, isSource, isDir);
+    auto ret = Storage::DistributedFile::FileSizeUtils::IsDirectory(uri, isSource, isDir);
     if (ret != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Is dir failed. errno=%{public}d", ret);
         return false;
@@ -144,7 +143,7 @@ std::string UdmfCopyFile::GetFileName(const std::string &path)
 bool UdmfCopyFile::IsFile(const std::string &uri, bool isSource)
 {
     bool isDir = false;
-    auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->IsDirectory(uri, isSource, isDir);
+    auto ret = Storage::DistributedFile::FileSizeUtils::IsDirectory(uri, isSource, isDir);
     if (ret != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Is dir failed. errno=%{public}d", ret);
         return false;
@@ -155,7 +154,7 @@ bool UdmfCopyFile::IsFile(const std::string &uri, bool isSource)
 uint64_t UdmfCopyFile::GetFileSize(const std::string &uri, bool isSource)
 {
     uint64_t size = 0;
-    auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->GetSize(uri, isSource, size);
+    auto ret = Storage::DistributedFile::FileSizeUtils::GetSize(uri, isSource, size);
     if (ret != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Get size failed. errno=%{public}d", ret);
         return 0;

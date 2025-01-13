@@ -67,7 +67,8 @@ struct AsyncHelper {
 enum ListenerStatus: int32_t {
     FINISHED = 0,
     PROCESSING,
-    INNER_ERROR,
+    CANCEL,
+    INNER_ERROR = 200,
     INVALID_PARAMETERS,
     DATA_NOT_FOUND,
     SYNC_FAILED,

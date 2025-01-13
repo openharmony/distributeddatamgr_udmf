@@ -306,8 +306,8 @@ Status UdmfAsyncClient::UpdateProgressData(const std::string &progressUdKey, con
 Status UdmfAsyncClient::CopyFile(std::unique_ptr<AsyncHelper> &asyncHelper)
 {
     if (asyncHelper->destUri.empty()) {
-        LOG_ERROR(UDMF_CLIENT, "No dest path, no copy.");
-        return E_ERROR;
+        LOG_INFO(UDMF_CLIENT, "No dest path, no copy.");
+        return E_OK;
     }
     auto status = UdmfCopyFile::GetInstance().Copy(asyncHelper);
     ProgressInfo progressInfo = {

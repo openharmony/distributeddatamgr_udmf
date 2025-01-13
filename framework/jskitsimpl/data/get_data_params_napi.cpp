@@ -99,7 +99,11 @@ bool GetDataParamsNapi::SetProgressListener(napi_env env, GetDataParams &getData
 
     getDataParams.progressListener = [key](ProgressInfo progressInfo, std::shared_ptr<UnifiedData> data) {
         bool listenerExist = tsfns.ComputeIfPresent(key, [&](const std::string &key, napi_threadsafe_function &tsfn) {
-            auto listenerArgs = new ListenerArgs;
+            auto listenerArgs = new (std::nothrow) ListenerArgs;
+            if (listenerArgs == nullptr) {
+                LOG_ERROR(UDMF_KITS_NAPI, "No memory for listenerArgs malloc");
+                return false;
+            }
             listenerArgs->progressInfo = progressInfo;
             if (data != nullptr) {
                 listenerArgs->unifiedData.SetRecords(data->GetRecords());
