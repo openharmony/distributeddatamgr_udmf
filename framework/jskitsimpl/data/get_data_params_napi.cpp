@@ -106,9 +106,17 @@ bool GetDataParamsNapi::SetProgressListener(napi_env env, GetDataParams &getData
                 return false;
             }
             listenerArgs->progressInfo = progressInfo;
+            listenerArgs->unifiedData = nullptr;
             if (data != nullptr) {
-                listenerArgs->unifiedData.SetRecords(data->GetRecords());
+                listenerArgs->unifiedData = new (std::nothrow) UnifiedData;
+                if (listenerArgs->unifiedData == nullptr) {
+                    LOG_ERROR(UDMF_KITS_NAPI, "No memory for unifiedData malloc");
+                    delete listenerArgs;
+                    return false;
+                }
+                listenerArgs->unifiedData->SetRecords(data->GetRecords());
             }
+
             auto status = napi_call_threadsafe_function(tsfn, listenerArgs, napi_tsfn_blocking);
             if (status != napi_ok) {
                 LOG_ERROR(UDMF_KITS_NAPI, "napi_call_threadsafe_function failed, status=%{public}d", status);
@@ -135,13 +143,22 @@ void GetDataParamsNapi::CallProgressListener(napi_env env, napi_value callback, 
 
     NapiDataUtils::SetValue(env, listenerArgs->progressInfo, param[0]);
 
-    std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
-    unifiedData->SetRecords(listenerArgs->unifiedData.GetRecords());
-    UnifiedDataNapi::NewInstance(env, unifiedData, param[1]);
+    if (listenerArgs->unifiedData == nullptr) {
+        NapiDataUtils::SetValue(env, nullptr, param[1]);
+    } else {
+        std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
+        unifiedData->SetRecords(listenerArgs->unifiedData->GetRecords());
+        UnifiedDataNapi::NewInstance(env, unifiedData, param[1]);
+    }
 
     auto status = napi_call_function(env, nullptr, callback, ListenerArgs::ARGV_SIZE, param, nullptr);
     if (status != napi_ok) {
         LOG_ERROR(UDMF_KITS_NAPI, "napi_call_function failed, status=%{public}d", status);
+    }
+
+    if (listenerArgs->unifiedData != nullptr) {
+        delete listenerArgs->unifiedData;
+        listenerArgs->unifiedData = nullptr;
     }
     delete listenerArgs;
 }

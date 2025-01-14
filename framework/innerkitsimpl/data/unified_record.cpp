@@ -15,12 +15,14 @@
 #define LOG_TAG "UnifiedRecord"
 #include "unified_record.h"
 
+#include "file.h"
 #include "getter_system.h"
 #include "logger.h"
 
 namespace OHOS {
 namespace UDMF {
 static constexpr UDType FILE_TYPES[] = {FILE, AUDIO, FOLDER, IMAGE, VIDEO};
+static constexpr const char *FILE_SCHEME = "file";
 
 UnifiedRecord::UnifiedRecord()
 {
@@ -228,15 +230,33 @@ bool UnifiedRecord::HasObject()
     return hasObject_;
 }
 
-bool UnifiedRecord::HasFileType()
+bool UnifiedRecord::HasFileType(std::string &fileUri) const
 {
+    fileUri.clear();
     if (std::holds_alternative<std::shared_ptr<Object>>(GetOriginValue())) {
         auto obj = std::get<std::shared_ptr<Object>>(GetOriginValue());
         if (obj->value_.find(ORI_URI) != obj->value_.end()) {
-            return true;
+            obj->GetValue(ORI_URI, fileUri);
         }
+    } else if (std::find(std::begin(FILE_TYPES), std::end(FILE_TYPES), GetType()) != std::end(FILE_TYPES)) {
+        auto file = static_cast<const File*>(this);
+        fileUri = file->GetUri();
+    } else {
+        return false;
     }
-    return std::find(std::begin(FILE_TYPES), std::end(FILE_TYPES), GetType()) != std::end(FILE_TYPES);
+
+    if (fileUri.empty()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Get uri empty, plase check the uri.");
+        return false;
+    }
+    Uri uri(fileUri);
+    std::string scheme = uri.GetScheme();
+    std::transform(scheme.begin(), scheme.end(), scheme.begin(), ::tolower);
+    if (uri.GetAuthority().empty() || scheme != FILE_SCHEME) {
+        LOG_INFO(UDMF_FRAMEWORK, "Get uri authority empty or uri scheme not equals to file.");
+        return false;
+    }
+    return true;
 }
 
 } // namespace UDMF

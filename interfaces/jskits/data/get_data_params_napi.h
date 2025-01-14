@@ -32,7 +32,7 @@ public:
 private:
     struct ListenerArgs {
         ProgressInfo progressInfo;
-        UnifiedData unifiedData;
+        UnifiedData *unifiedData;
         constexpr static size_t ARGV_SIZE = 2;
     };
 

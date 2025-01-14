@@ -66,7 +66,7 @@ public:
 
     virtual void InitObject();
     bool HasObject();
-    bool HasFileType();
+    bool HasFileType(std::string &fileUri) const;
 protected:
     UDType dataType_;
     ValueType value_;

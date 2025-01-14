@@ -14,13 +14,10 @@
  */
 #define LOG_TAG "UnifiedData"
 #include "unified_data.h"
-#include "file.h"
 #include "logger.h"
 
 namespace OHOS {
 namespace UDMF {
-constexpr const char *FILE_SCHEME = "file";
-
 UnifiedData::UnifiedData()
 {
     properties_ = std::make_shared<UnifiedDataProperties>();
@@ -238,26 +235,8 @@ std::vector<std::string> UnifiedData::GetFileUris() const
 {
     std::vector<std::string> uris;
     for (auto record : records_) {
-        if (record == nullptr || !record->HasFileType()) {
-            continue;
-        }
         std::string oriUri;
-        if (std::holds_alternative<std::shared_ptr<Object>>(record->GetOriginValue())) {
-            auto obj = std::get<std::shared_ptr<Object>>(record->GetOriginValue());
-            obj->GetValue(ORI_URI, oriUri);
-        } else {
-            auto file = static_cast<File*>(record.get());
-            oriUri = file->GetUri();
-        }
-        if (oriUri.empty()) {
-            LOG_ERROR(UDMF_FRAMEWORK, "Get uri empty, plase check the uri.");
-            continue;
-        }
-        Uri uri(oriUri);
-        std::string scheme = uri.GetScheme();
-        std::transform(scheme.begin(), scheme.end(), scheme.begin(), ::tolower);
-        if (uri.GetAuthority().empty() || scheme != FILE_SCHEME) {
-            LOG_INFO(UDMF_FRAMEWORK, "Get uri authority empty or uri scheme not equals to file.");
+        if (record == nullptr || !record->HasFileType(oriUri)) {
             continue;
         }
         uris.push_back(oriUri);

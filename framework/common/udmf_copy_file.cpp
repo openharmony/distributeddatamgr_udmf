@@ -49,14 +49,16 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
         LOG_ERROR(UDMF_CLIENT, "DestUri is not directory.");
         return E_FS_ERROR;
     }
-    auto uris = asyncHelper->data->GetFileUris();
-    LOG_INFO(UDMF_CLIENT, "Uris size=%{public}zu", uris.size());
     uint64_t finishSize = 0;
-    uint64_t totalSize = GetTotalSize(uris);
-    
+    uint64_t totalSize = GetTotalSize(asyncHelper->data->GetFileUris());
     Status status = E_OK;
-    for (size_t i = 0; i < uris.size(); i++) {
-        std::string srcUri = uris[i];
+    
+    auto records = asyncHelper->data->GetRecords();
+    for (size_t i = 0; i < records.size(); i++) {
+        std::string srcUri;
+        if (!records[i]->HasFileType(srcUri)) {
+            continue;
+        }
         if (IsDirectory(srcUri, true)) {
             LOG_ERROR(UDMF_CLIENT, "Source cannot be directory.");
             status = E_COPY_FILE_FAILED;
@@ -88,7 +90,7 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
                 }).detach();
             }
             fileSize = totalFileSize;
-            totalSize = std::max(totalSize, uint64(1));
+            totalSize = std::max(totalSize, uint64_t(1));
             auto processNum = std::min(PROGRESS_COPY_START + int32_t((finishSize + processSize) * PROGRESS_INCRE / totalSize), MAX_PROGRESS);
             ProgressInfo progressInfo = { .progress = processNum, .errorCode = E_OK };
             UdmfAsyncClient::GetInstance().CallProgress(asyncHelper, progressInfo, nullptr);
