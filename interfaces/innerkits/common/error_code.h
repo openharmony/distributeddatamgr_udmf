@@ -47,6 +47,7 @@ enum Status : int32_t {
     E_SYNC_FAILED,
     E_COPY_FILE_FAILED,
     E_IDEMPOTENT_ERROR,
+    E_COPY_CANCELED,
     E_BUTT,
 };
 

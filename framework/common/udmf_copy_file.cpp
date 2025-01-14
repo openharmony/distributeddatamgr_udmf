@@ -31,6 +31,7 @@ constexpr const char* MEDIA_BUNDLE = "media";
 static constexpr int32_t PROGRESS_COPY_START = 20;
 constexpr constexpr int32_t PROGRESS_INCRE = 80;
 constexpr constexpr int32_t MAX_PROGRESS = 99;
+constexpr constexpr int32_t DFS_CANCEL_STATUS = 204;
 
 UdmfCopyFile &UdmfCopyFile::GetInstance()
 {
@@ -40,6 +41,10 @@ UdmfCopyFile &UdmfCopyFile::GetInstance()
 
 Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
 {
+    if (asyncHelper->progressQueue.IsCancel()) {
+        LOG_INFO(UDMF_CLIENT, "Copy file cancel");
+        return E_COPY_CANCELED;
+    }
     if (!IsDirectory(asyncHelper->destUri, false)) {
         LOG_ERROR(UDMF_CLIENT, "DestUri is not directory.");
         return E_FS_ERROR;
@@ -51,10 +56,6 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
     
     Status status = E_OK;
     for (size_t i = 0; i < uris.size(); i++) {
-        if (asyncHelper->progressQueue.IsCancel()) {
-            LOG_INFO(UDMF_CLIENT, "Copy file cancel");
-            break;
-        }
         std::string srcUri = uris[i];
         if (IsDirectory(srcUri, true)) {
             LOG_ERROR(UDMF_CLIENT, "Source cannot be directory.");
@@ -74,30 +75,35 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
         }
 
         uint64_t fileSize = 0;
-        using ProcessCallBack = std::function<uint64_t(uint64_t processSize, uint64_t totalFileSize)>;   
+        using ProcessCallBack = std::function<void(uint64_t processSize, uint64_t totalFileSize)>;   
         ProcessCallBack listener = [&] (uint64_t processSize, uint64_t totalFileSize) {
-            Status status = E_OK;
             if (asyncHelper->progressQueue.IsCancel()) {
-                auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->Cancel(srcUri, destFileUri);
-                if (ret != E_OK) {
-                    LOG_ERROR(UDMF_CLIENT, "Cancel failed. errno=%{public}d", ret);
-                    status = E_COPY_FILE_FAILED;
-                }
+                LOG_INFO(UDMF_CLIENT, "Cancel copy.");
+                std::thread([&]() {
+                    auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->Cancel(srcUri, destFileUri);
+                    if (ret != E_OK) {
+                        LOG_ERROR(UDMF_CLIENT, "Cancel failed. errno=%{public}d", ret);
+                        status = E_COPY_FILE_FAILED;
+                    }
+                }).detach();
             }
             fileSize = totalFileSize;
             auto processNum = std::min(PROGRESS_COPY_START + int32_t((finishSize + processSize) * PROGRESS_INCRE / totalSize), MAX_PROGRESS);
-            ProgressInfo progressInfo = { .progress = processNum, .errorCode = status };
+            ProgressInfo progressInfo = { .progress = processNum, .errorCode = E_OK };
             UdmfAsyncClient::GetInstance().CallProgress(asyncHelper, progressInfo, nullptr);
-            return 0;
         };
         auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->Copy(srcUri, destFileUri, listener);
-        if (ret != E_OK) {
+        if (ret == DFS_CANCEL_STATUS) {
+            status = E_COPY_CANCELED;
+            break;
+        } else if (ret != E_OK) {
             LOG_ERROR(UDMF_CLIENT, "Copy failed. errno=%{public}d", ret);
             status = E_COPY_FILE_FAILED;
             continue;
         }
         finishSize += fileSize;
     }
+    LOG_INFO(UDMF_CLIENT, "Copy end.");
     return status;
 }
 

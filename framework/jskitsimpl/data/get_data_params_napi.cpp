@@ -72,6 +72,7 @@ bool GetDataParamsNapi::SetProgressListener(napi_env env, GetDataParams &getData
     LOG_DEBUG(UDMF_KITS_NAPI, "Start.");
     tsfns.Compute(key, [&](const std::string &key, napi_threadsafe_function &tsfn) {
         if (tsfn != nullptr) {
+            LOG_WARN(UDMF_KITS_NAPI, "Listener has existed!");
             napi_release_threadsafe_function(tsfn, napi_tsfn_release);
             tsfn = nullptr;
         }
@@ -111,16 +112,13 @@ bool GetDataParamsNapi::SetProgressListener(napi_env env, GetDataParams &getData
             auto status = napi_call_threadsafe_function(tsfn, listenerArgs, napi_tsfn_blocking);
             if (status != napi_ok) {
                 LOG_ERROR(UDMF_KITS_NAPI, "napi_call_threadsafe_function failed, status=%{public}d", status);
-                // delete listenerArgs;
                 return false;
             }
-            if (listenerArgs->progressInfo.progress >= PROGRESS_ALL_FINISHED ||
-                listenerArgs->progressInfo.progress < PROGRESS_INIT) {
+            if (progressInfo.progress >= PROGRESS_ALL_FINISHED ||
+                progressInfo.progress < PROGRESS_INIT) {
                 napi_release_threadsafe_function(tsfn, napi_tsfn_release);
-                // delete listenerArgs;
                 return false;
             }
-            // delete listenerArgs;
             return true;
         });
         if (!listenerExist) {
@@ -145,6 +143,7 @@ void GetDataParamsNapi::CallProgressListener(napi_env env, napi_value callback, 
     if (status != napi_ok) {
         LOG_ERROR(UDMF_KITS_NAPI, "napi_call_function failed, status=%{public}d", status);
     }
+    delete listenerArgs;
 }
 
 } // namespace UDMF

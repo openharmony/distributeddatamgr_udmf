@@ -35,7 +35,8 @@ static std::unordered_map<Status, int32_t> STATUS_MAP = {
     { E_INVALID_PARAMETERS, ListenerStatus::INVALID_PARAMETERS },
     { E_NOT_FOUND, ListenerStatus::DATA_NOT_FOUND },
     { E_SYNC_FAILED, ListenerStatus::SYNC_FAILED },
-    { E_COPY_FILE_FAILED, ListenerStatus::COPY_FILE_FAILED }
+    { E_COPY_FILE_FAILED, ListenerStatus::COPY_FILE_FAILED },
+    { E_COPY_CANCELED, ListenerStatus::CANCEL }
 };
 
 static constexpr int32_t PROGRESS_ERROR = -1;
@@ -292,7 +293,11 @@ Status UdmfAsyncClient::UpdateProgressData(const std::string &progressUdKey, con
     };
     auto obj = std::make_shared<Object>();
     auto progressRecord = std::make_shared<PlainText>(UDType::PLAIN_TEXT, obj);
-    progressRecord->SetContent(std::to_string(progressInfo.progress));
+    if (progressInfo.progress < PROGRESS_INIT) {
+        progressRecord->SetContent(std::to_string(PROGRESS_ALL_FINISHED));
+    } else {
+        progressRecord->SetContent(std::to_string(progressInfo.progress));
+    }
     UnifiedData progressData;
     progressData.AddRecord(progressRecord);
     auto status = serviceClient->UpdateData(queryOption, progressData);
