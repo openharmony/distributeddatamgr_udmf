@@ -33,6 +33,8 @@
 #include "system_defined_form.h"
 #include "system_defined_appitem.h"
 #include "system_defined_pixelmap.h"
+#include "udmf_async_client.h"
+#include "unified_types.h"
 
 using namespace OHOS;
 using namespace OHOS::Security::AccessToken;
@@ -604,7 +606,7 @@ void UpdateDataFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().UpdateData(option3, data3);
 }
 
-void StartAsyncDataRetirevalFuzz(const uint8_t *data, size_t size)
+void StartAsyncDataRetrievalFuzz(const uint8_t *data, size_t size)
 {
     CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
     UnifiedData data1;
@@ -619,11 +621,11 @@ void StartAsyncDataRetirevalFuzz(const uint8_t *data, size_t size)
     GetDataParams params = {.query = query};
     params.progressIndicator = ProgressIndicator::DEFAULT;
     params.progressListener = [](ProgressInfo progressInfo, std::shared_ptr<UnifiedData> data) {};
-    UdmfAsyncClient::GetInstance().StartAsyncDataRetireval(params);
+    UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
     std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
-void CancelAsyncDataRetirevalFuzz(const uint8_t *data, size_t size)
+void CancelAsyncDataRetrievalFuzz(const uint8_t *data, size_t size)
 {
     CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
     UnifiedData data1;
@@ -640,7 +642,7 @@ void CancelAsyncDataRetirevalFuzz(const uint8_t *data, size_t size)
     params.progressListener = [](ProgressInfo progressInfo, std::shared_ptr<UnifiedData> data) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     };
-    UdmfAsyncClient::GetInstance().StartAsyncDataRetireval(params);
+    UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
     UdmfAsyncClient::GetInstance().Cancel(key);
     std::this_thread::sleep_for(std::chrono::seconds(1));
 }
@@ -668,8 +670,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::DeleteDataByKeyFuzz(data, size);
     OHOS::DeleteDataByIntentionFuzz(data, size);
     OHOS::UpdateDataFuzz(data, size);
-    OHOS::StartAsyncDataRetirevalFuzz(data, size);
-    OHOS::CancelAsyncDataRetirevalFuzz(data, size);
+    OHOS::StartAsyncDataRetrievalFuzz(data, size);
+    OHOS::CancelAsyncDataRetrievalFuzz(data, size);
     OHOS::TearDown();
     return 0;
 }
