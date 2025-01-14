@@ -75,7 +75,7 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
         }
 
         uint64_t fileSize = 0;
-        using ProcessCallBack = std::function<void(uint64_t processSize, uint64_t totalFileSize)>;   
+        using ProcessCallBack = std::function<void(uint64_t processSize, uint64_t totalFileSize)>;
         ProcessCallBack listener = [&] (uint64_t processSize, uint64_t totalFileSize) {
             if (asyncHelper->progressQueue.IsCancel()) {
                 LOG_INFO(UDMF_CLIENT, "Cancel copy.");
@@ -88,6 +88,7 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
                 }).detach();
             }
             fileSize = totalFileSize;
+            totalSize = max(totalSize, 1);
             auto processNum = std::min(PROGRESS_COPY_START + int32_t((finishSize + processSize) * PROGRESS_INCRE / totalSize), MAX_PROGRESS);
             ProgressInfo progressInfo = { .progress = processNum, .errorCode = E_OK };
             UdmfAsyncClient::GetInstance().CallProgress(asyncHelper, progressInfo, nullptr);
@@ -109,14 +110,14 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
 
 int64_t UdmfCopyFile::GetTotalSize(const std::vector<std::string> &uris)
 {
-    int64_t g_totalSize = 0;
+    int64_t totalSize = 0;
     std::string srcUri;
     for (const auto &srcUri : uris) {
         if (IsFile(srcUri, true)) {
-            g_totalSize += GetFileSize(srcUri, true);
+            totalSize += GetFileSize(srcUri, true);
         }
     }
-    return g_totalSize;
+    return totalSize;
 }
 
 bool UdmfCopyFile::IsDirectory(const std::string &uri, bool isSource)

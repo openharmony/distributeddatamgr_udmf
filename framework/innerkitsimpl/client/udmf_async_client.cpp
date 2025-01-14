@@ -101,7 +101,7 @@ Status UdmfAsyncClient::ProgressTask(const std::string &businessUdKey)
         }
     }
     while (asyncHelper->lastProgress >= PROGRESS_INIT && asyncHelper->lastProgress < PROGRESS_ALL_FINISHED) {
-        HandleCancelStatus(asyncHelper); 
+        HandleCancelStatus(asyncHelper);
         auto pair = asyncHelper->progressQueue.Poll();
         if (!pair.first) {
             std::this_thread::sleep_for(std::chrono::milliseconds(READ_PROGRESS_INTERVAL));
