@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace UDMF {
-static constexpr char* NETWORK_PARA = "?networkid=";
+static constexpr const char* NETWORK_PARA = "?networkid=";
 static constexpr int32_t PROGRESS_COPY_START = 20;
 static constexpr int32_t PROGRESS_INCRE = 80;
 static constexpr int32_t MAX_PROGRESS = 99;
@@ -88,7 +88,7 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
                 }).detach();
             }
             fileSize = totalFileSize;
-            totalSize = max(totalSize, 1);
+            totalSize = std::max(totalSize, uint64(1));
             auto processNum = std::min(PROGRESS_COPY_START + int32_t((finishSize + processSize) * PROGRESS_INCRE / totalSize), MAX_PROGRESS);
             ProgressInfo progressInfo = { .progress = processNum, .errorCode = E_OK };
             UdmfAsyncClient::GetInstance().CallProgress(asyncHelper, progressInfo, nullptr);
