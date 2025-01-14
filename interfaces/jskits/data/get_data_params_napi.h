@@ -37,7 +37,7 @@ private:
     };
 
     static bool SetProgressListener(napi_env env, GetDataParams &getDataParam, napi_value callback, const std::string &key);
-    static void CallProgressListener(napi_env env, napi_value callback, void* context, void* data);
+    static void CallProgressListener(napi_env env, napi_value callback, void *context, void *data);
 
     static ConcurrentMap<std::string, napi_threadsafe_function> tsfns;
 };

@@ -133,6 +133,7 @@ Status UdmfAsyncClient::GetDataTask(const QueryOption &query)
 Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
 {
     LOG_INFO(UDMF_CLIENT, "InvokeHap start!");
+    Clear(businessUdKey);
     auto &asyncHelper = asyncHelperMap_.at(businessUdKey);
     if (asyncHelper->progressQueue.IsCancel()) {
         LOG_INFO(UDMF_CLIENT, "Finished, not invoke hap.");
@@ -410,22 +411,22 @@ Status UdmfAsyncClient::GetCancelStatus(const std::string &cancelKey, std::strin
     UdmfServiceClient::GetInstance()->GetBatchData(option, data);
     if (data.empty()) {
         LOG_INFO(UDMF_CLIENT, "data is empty");
-        return E_INVALID_PARAMETERS;
+        return E_ERROR;
     }
     if (data[0].GetRecords().empty()) {
         LOG_INFO(UDMF_CLIENT, "Getrecords is empty");
-        return E_INVALID_PARAMETERS;
+        return E_ERROR;
     }
     auto outputRecord = data[0].GetRecordAt(0);
     if (outputRecord == nullptr) {
         LOG_INFO(UDMF_CLIENT, "outputRecord is nullptr");
-        return E_INVALID_PARAMETERS;
+        return E_ERROR;
     }
     auto plainText = outputRecord->GetValue();
     auto object = std::get<std::shared_ptr<Object>>(plainText);
     if (object == nullptr) {
         LOG_INFO(UDMF_CLIENT, "object is nullptr");
-        return E_INVALID_PARAMETERS;
+        return E_ERROR;
     }
     object->GetValue(UDMF::CONTENT, value);
     return E_OK;

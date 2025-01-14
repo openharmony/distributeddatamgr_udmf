@@ -238,7 +238,7 @@ std::vector<std::string> UnifiedData::GetFileUris() const
 {
     std::vector<std::string> uris;
     for (auto record : records_) {
-        if (record == nullptr || !record->IsFileType()) {
+        if (record == nullptr || !record->HasFileType()) {
             continue;
         }
         std::string oriUri;

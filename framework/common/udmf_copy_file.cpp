@@ -20,18 +20,18 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "copy/file_copy_manager.h"
+#include "copy/file_size_utils.h"
 #include "file_uri.h"
 #include "logger.h"
 #include "udmf_async_client.h"
 
 namespace OHOS {
 namespace UDMF {
-constexpr const char* NETWORK_PARA = "?networkid=";
-constexpr const char* MEDIA_BUNDLE = "media";
+static constexpr char* NETWORK_PARA = "?networkid=";
 static constexpr int32_t PROGRESS_COPY_START = 20;
-constexpr constexpr int32_t PROGRESS_INCRE = 80;
-constexpr constexpr int32_t MAX_PROGRESS = 99;
-constexpr constexpr int32_t DFS_CANCEL_STATUS = 204;
+static constexpr int32_t PROGRESS_INCRE = 80;
+static constexpr int32_t MAX_PROGRESS = 99;
+static constexpr int32_t DFS_CANCEL_STATUS = 204;
 
 UdmfCopyFile &UdmfCopyFile::GetInstance()
 {
@@ -69,7 +69,7 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
         }
         destFileUri += fileName;
 
-        if (asyncHelper->fileConflictOptions == FileConflictOptions::SKIP && IsFile(destFileUri)) {
+        if (asyncHelper->fileConflictOptions == FileConflictOptions::SKIP && IsFile(destFileUri, false)) {
             LOG_INFO(UDMF_CLIENT, "File has existed, skip.");
             continue;
         }

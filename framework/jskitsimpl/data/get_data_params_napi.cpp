@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@ ConcurrentMap<std::string, napi_threadsafe_function> GetDataParamsNapi::tsfns;
 
 bool GetDataParamsNapi::Convert2NativeValue(napi_env env, napi_value in, GetDataParams &getDataParams, const std::string &key)
 {
-    LOG_INFO(UDMF_KITS_NAPI, "Start.");
+    LOG_DEBUG(UDMF_KITS_NAPI, "Start.");
 
     napi_value jsProgressIndicator = nullptr;
     NAPI_CALL_BASE(env, napi_get_named_property(env, in, "progressIndicator", &jsProgressIndicator), false);
@@ -128,7 +128,7 @@ bool GetDataParamsNapi::SetProgressListener(napi_env env, GetDataParams &getData
     return true;
 }
 
-void GetDataParamsNapi::CallProgressListener(napi_env env, napi_value callback, void* context, void* data)
+void GetDataParamsNapi::CallProgressListener(napi_env env, napi_value callback, void *context, void *data)
 {
     ListenerArgs* listenerArgs = static_cast<ListenerArgs*>(data);
     napi_value param[ListenerArgs::ARGV_SIZE];
