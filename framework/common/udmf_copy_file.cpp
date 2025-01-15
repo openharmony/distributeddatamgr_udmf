@@ -71,7 +71,6 @@ bool UdmfCopyFile::HandleRecord(const std::shared_ptr<UnifiedRecord> &record, Co
         context.processedData->AddRecord(record);
         return true;
     }
-
     if (IsDirectory(srcUri, true)) {
         LOG_ERROR(UDMF_CLIENT, "Source cannot be directory.");
         context.status = E_COPY_FILE_FAILED;
@@ -79,12 +78,10 @@ bool UdmfCopyFile::HandleRecord(const std::shared_ptr<UnifiedRecord> &record, Co
     }
 
     std::string destFileUri = ConstructDestUri(context.asyncHelper->destUri, srcUri);
-
     if (context.asyncHelper->fileConflictOptions == FileConflictOptions::SKIP && IsFile(destFileUri, false)) {
         LOG_INFO(UDMF_CLIENT, "File has existed, skip.");
         return true;
     }
-
     return CopyFile(srcUri, destFileUri, record, context);
 }
 
@@ -93,12 +90,10 @@ bool UdmfCopyFile::CopyFile(const std::string &srcUri, const std::string &destFi
 {
     uint64_t fileSize = 0;
     using ProcessCallBack = std::function<void(uint64_t processSize, uint64_t totalFileSize)>;
-
     ProcessCallBack listener = [&](uint64_t processSize, uint64_t totalFileSize) {
         fileSize = totalFileSize;
         HandleProgress(srcUri, destFileUri, context, processSize);
     };
-
     auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->Copy(srcUri, destFileUri, listener);
 
     if (ret == DFS_CANCEL_STATUS) {
@@ -116,7 +111,8 @@ bool UdmfCopyFile::CopyFile(const std::string &srcUri, const std::string &destFi
     return true;
 }
 
-void UdmfCopyFile::HandleProgress(const std::string &srcUri, const std::string &destFileUri, CopyContext &context, uint64_t processSize)
+void UdmfCopyFile::HandleProgress(const std::string &srcUri, const std::string &destFileUri,
+    CopyContext &context, uint64_t processSize)
 {
     if (context.asyncHelper->progressQueue.IsCancel()) {
         LOG_INFO(UDMF_CLIENT, "Cancel copy.");

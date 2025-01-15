@@ -38,7 +38,7 @@ private:
         Status status = E_OK;
         std::shared_ptr<UnifiedData> processedData;
 
-        CopyContext(std::unique_ptr<AsyncHelper> &helper)
+        explicit CopyContext(std::unique_ptr<AsyncHelper> &helper)
             : asyncHelper(helper),
             totalSize(UdmfCopyFile::GetInstance().GetTotalSize(helper->data->GetFileUris())),
             processedData(std::make_shared<UnifiedData>()) {}
