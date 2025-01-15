@@ -259,5 +259,18 @@ bool UnifiedRecord::HasFileType(std::string &fileUri) const
     return true;
 }
 
+void UnifiedRecord::SetFileUri(const std::string &fileUri)
+{
+    if (std::find(std::begin(FILE_TYPES), std::end(FILE_TYPES), GetType()) != std::end(FILE_TYPES)) {
+        auto file = static_cast<File*>(this);
+        file->SetUri(fileUri);
+    } else if (std::holds_alternative<std::shared_ptr<Object>>(GetOriginValue())) {
+        auto obj = std::get<std::shared_ptr<Object>>(GetOriginValue());
+        obj->value_[ORI_URI] = fileUri;
+    } else {
+        LOG_ERROR(UDMF_FRAMEWORK, "Record has no uri.");
+    }
+}
+
 } // namespace UDMF
 } // namespace OHOS

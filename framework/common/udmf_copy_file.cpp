@@ -52,11 +52,12 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
     uint64_t finishSize = 0;
     uint64_t totalSize = GetTotalSize(asyncHelper->data->GetFileUris());
     Status status = E_OK;
-    
-    auto records = asyncHelper->data->GetRecords();
-    for (size_t i = 0; i < records.size(); i++) {
+    auto processedData = std::make_shared<UnifiedData>();
+
+    for (auto record : asyncHelper->data->GetRecords()) {
         std::string srcUri;
-        if (!records[i]->HasFileType(srcUri)) {
+        if (!record->HasFileType(srcUri)) {
+            processedData->AddRecord(record);
             continue;
         }
         if (IsDirectory(srcUri, true)) {
@@ -105,7 +106,10 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
             continue;
         }
         finishSize += fileSize;
+        record->SetFileUri(destFileUri);
+        processedData->AddRecord(record);
     }
+    asyncHelper->data = processedData;
     LOG_INFO(UDMF_CLIENT, "Copy end.");
     return status;
 }
