@@ -95,7 +95,6 @@ bool UdmfCopyFile::CopyFile(const std::string &srcUri, const std::string &destFi
         HandleProgress(srcUri, destFileUri, context, processSize);
     };
     auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->Copy(srcUri, destFileUri, listener);
-
     if (ret == DFS_CANCEL_STATUS) {
         context.status = E_COPY_CANCELED;
         return false;

@@ -133,21 +133,24 @@ Status UdmfAsyncClient::GetDataTask(const QueryOption &query)
 Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
 {
     LOG_INFO(UDMF_CLIENT, "InvokeHap start!");
-    Clear(businessUdKey);
     auto &asyncHelper = asyncHelperMap_.at(businessUdKey);
     if (asyncHelper->progressQueue.IsCancel()) {
         LOG_INFO(UDMF_CLIENT, "Finished, not invoke hap.");
+        Clear(businessUdKey);
         return E_OK;
     }
     if (asyncHelper->processKey.empty() || asyncHelper->cancelKey.empty()) {
         LOG_ERROR(UDMF_CLIENT, "Get key failed, not invoke hap.");
+        Clear(businessUdKey);
         return E_ERROR;
     }
     auto status = UdmfServiceClient::GetInstance()->InvokeHap(asyncHelper->processKey, asyncHelper->cancelKey);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Invoke hap failed, status=%{public}d", status);
+        Clear(businessUdKey);
         return E_ERROR;
     }
+    Clear(businessUdKey);
     return E_OK;
 }
 
