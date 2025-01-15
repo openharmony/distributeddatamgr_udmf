@@ -171,7 +171,7 @@ typedef struct OH_UdmfGetDataParams OH_UdmfGetDataParams;
  * @param data Represents the unified data.
  * @since 15
 */
-typedef void (*OH_Udmf_DataProgressListener)(OH_Udmf_ProgressInfo progressInfo, OH_UdmfData* data);
+typedef void (*OH_Udmf_DataProgressListener)(OH_Udmf_ProgressInfo* progressInfo, OH_UdmfData* data);
 
 
 /**
@@ -824,6 +824,25 @@ int OH_UdmfProgressInfo_GetProgress(OH_Udmf_ProgressInfo* progressInfo);
  * @since 15
  */
 int OH_UdmfProgressInfo_GetStatus(OH_Udmf_ProgressInfo* progressInfo);
+
+/**
+ * @brief Creation a pointer to the instance of the {@link OH_UdmfGetDataParams}.
+ *
+ * @return If the operation is successful, a pointer to the instance of the {@link OH_UdmfGetDataParams}
+ * structure is returned. If the operation is failed, nullptr is returned.
+ * @see OH_UdmfGetDataParams
+ * @since 15
+ */
+OH_UdmfGetDataParams* OH_UdmfGetDataParams_Create();
+
+/**
+ * @brief Destroy a pointer that points to an instance of {@link OH_UdmfGetDataParams}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfGetDataParams}.
+ * @see OH_UdmfGetDataParams
+ * @since 15
+ */
+void OH_UdmfGetDataParams_Destroy(OH_UdmfGetDataParams* pThis);
 
 /**
  * @brief Sets the destination uri to the {@OH_UdmfGetDataParams}.

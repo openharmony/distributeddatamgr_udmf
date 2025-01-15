@@ -30,6 +30,7 @@
         "bundle_framework",
         "cJSON",
         "c_utils",
+        "dfs_service",
         "hilog",
         "hisysevent",
         "hitrace",

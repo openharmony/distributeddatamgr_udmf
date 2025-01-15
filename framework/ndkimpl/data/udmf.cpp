@@ -908,6 +908,24 @@ int OH_UdmfProgressInfo_GetStatus(OH_Udmf_ProgressInfo* progressInfo)
     return progressInfo->status;
 }
 
+OH_UdmfGetDataParams* OH_UdmfGetDataParams_Create()
+{
+    OH_UdmfGetDataParams *params =  new (std::nothrow) OH_UdmfGetDataParams();
+    if (params == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "allocate OH_UdmfGetDataParams memory fail");
+        return nullptr;
+    }
+    return params;
+}
+
+void OH_UdmfGetDataParams_Destroy(OH_UdmfGetDataParams* pThis)
+{
+    if (pThis == nullptr) {
+        return;
+    }
+    delete pThis;
+}
+
 void OH_UdmfGetDataParams_SetDestUri(OH_UdmfGetDataParams* params, const char* destUri)
 {
     if (destUri == nullptr) {

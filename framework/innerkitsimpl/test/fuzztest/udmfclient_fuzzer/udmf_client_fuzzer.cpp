@@ -33,6 +33,8 @@
 #include "system_defined_form.h"
 #include "system_defined_appitem.h"
 #include "system_defined_pixelmap.h"
+#include "udmf_async_client.h"
+#include "unified_types.h"
 
 using namespace OHOS;
 using namespace OHOS::Security::AccessToken;
@@ -603,6 +605,47 @@ void UpdateDataFuzz(const uint8_t *data, size_t size)
     QueryOption option3 = { .key = skey };
     UdmfClient::GetInstance().UpdateData(option3, data3);
 }
+
+void StartAsyncDataRetrievalFuzz(const uint8_t *data, size_t size)
+{
+    CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
+    UnifiedData data1;
+    std::string key;
+    auto plainText = std::make_shared<PlainText>();
+    std::string content(data, data + size);
+    plainText->SetContent(content);
+    data1.AddRecord(plainText);
+    UdmfClient::GetInstance().SetData(option1, data1, key);
+
+    QueryOption query = {.key = key, .intention = UDMF::UD_INTENTION_DRAG};
+    GetDataParams params = {.query = query};
+    params.progressIndicator = ProgressIndicator::DEFAULT;
+    params.progressListener = [](ProgressInfo progressInfo, std::shared_ptr<UnifiedData> data) {};
+    UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+}
+
+void CancelAsyncDataRetrievalFuzz(const uint8_t *data, size_t size)
+{
+    CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
+    UnifiedData data1;
+    std::string key;
+    auto plainText = std::make_shared<PlainText>();
+    std::string content(data, data + size);
+    plainText->SetContent(content);
+    data1.AddRecord(plainText);
+    UdmfClient::GetInstance().SetData(option1, data1, key);
+
+    QueryOption query = {.key = key, .intention = UDMF::UD_INTENTION_DRAG};
+    GetDataParams params = {.query = query};
+    params.progressIndicator = ProgressIndicator::NONE;
+    params.progressListener = [](ProgressInfo progressInfo, std::shared_ptr<UnifiedData> data) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    };
+    UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
+    UdmfAsyncClient::GetInstance().Cancel(key);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+}
 }
 
 /* Fuzzer entry point */
@@ -627,6 +670,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::DeleteDataByKeyFuzz(data, size);
     OHOS::DeleteDataByIntentionFuzz(data, size);
     OHOS::UpdateDataFuzz(data, size);
+    OHOS::StartAsyncDataRetrievalFuzz(data, size);
+    OHOS::CancelAsyncDataRetrievalFuzz(data, size);
     OHOS::TearDown();
     return 0;
 }

@@ -109,13 +109,13 @@ void UdmfAsyncClientTest::AllocHapToken()
 }
 
 /* *
- * @tc.name: StartAsyncDataRetireval001
+ * @tc.name: StartAsyncDataRetrieval001
  * @tc.desc: Test get data success.
  * @tc.type: FUNC
  */
-HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval001, TestSize.Level1)
+HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetrieval001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval001 begin.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval001 begin.");
 
     CustomOption customOption = {
         .intention = UDMF::UD_INTENTION_DRAG
@@ -142,24 +142,24 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval001, TestSize.Level1)
             return;
         }
         ASSERT_EQ(1, data->GetRecords().size());
-        LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval001 callback end.");
+        LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval001 callback end.");
     };
     params.query = query;
     params.progressIndicator = ProgressIndicator::NONE;
     params.progressListener = callback;
-    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetireval(params);
+    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
     ASSERT_EQ(E_OK, status);
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval001 end.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval001 end.");
 }
 
 /* *
- * @tc.name: StartAsyncDataRetireval002
+ * @tc.name: StartAsyncDataRetrieval002
  * @tc.desc: Test CAPI get data success.
  * @tc.type: FUNC
  */
-HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval002, TestSize.Level1)
+HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetrieval002, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval002 begin.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval002 begin.");
 
     CustomOption customOption = {
         .intention = UDMF::UD_INTENTION_DRAG
@@ -177,9 +177,9 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval002, TestSize.Level1)
     OH_UdmfGetDataParams_SetProgressIndicator(&param, Udmf_ProgressIndicator::UDMF_DEFAULT);
     OH_UdmfGetDataParams_SetDestUri(&param, "/test/demo");
     OH_UdmfGetDataParams_SetFileConflictOptions(&param, Udmf_FileConflictOptions::UDMF_SKIP);
-    OH_Udmf_DataProgressListener dataProgressListener = [](OH_Udmf_ProgressInfo progressInfo, OH_UdmfData *data) {
-        auto progress = OH_UdmfProgressInfo_GetProgress(&progressInfo);
-        auto status = OH_UdmfProgressInfo_GetStatus(&progressInfo);
+    OH_Udmf_DataProgressListener dataProgressListener = [](OH_Udmf_ProgressInfo *progressInfo, OH_UdmfData *data) {
+        auto progress = OH_UdmfProgressInfo_GetProgress(progressInfo);
+        auto status = OH_UdmfProgressInfo_GetStatus(progressInfo);
         LOG_INFO(UDMF_TEST, "Callback begin status=%{public}d, progress=%{public}d.", status, progress);
         if (data == nullptr) {
             ASSERT_TRUE(progress != 0);
@@ -188,7 +188,7 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval002, TestSize.Level1)
         unsigned int count = 0;
         OH_UdmfData_GetRecords(data, &count);
         ASSERT_EQ(1, count);
-        LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval002 callback end.");
+        LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval002 callback end.");
     };
     OH_UdmfGetDataParams_SetDataProgressListener(&param, dataProgressListener);
     QueryOption query = {
@@ -198,19 +198,19 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval002, TestSize.Level1)
     GetDataParams dataParams;
     status = DataParamsConversion::GetInnerDataParams(param, query, dataParams);
     ASSERT_EQ(E_OK, status);
-    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetireval(dataParams);
+    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(dataParams);
     ASSERT_EQ(E_OK, status);
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval002 end.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval002 end.");
 }
 
 /* *
- * @tc.name: StartAsyncDataRetireval003
+ * @tc.name: StartAsyncDataRetrieval003
  * @tc.desc: Test get cache data success.
  * @tc.type: FUNC
  */
-HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval003, TestSize.Level1)
+HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetrieval003, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval003 begin.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval003 begin.");
     auto status = UdmfClient::GetInstance().SetAppShareOption("drag", ShareOptions::IN_APP);
     ASSERT_EQ(E_OK, status);
 
@@ -239,27 +239,27 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval003, TestSize.Level1)
             return;
         }
         ASSERT_EQ(1, data->GetRecords().size());
-        LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval003 callback end.");
+        LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval003 callback end.");
     };
     params.query = query;
     params.progressIndicator = ProgressIndicator::DEFAULT;
     params.progressListener = callback;
-    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetireval(params);
+    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
     ASSERT_EQ(E_OK, status);
 
     status = UdmfClient::GetInstance().RemoveAppShareOption("drag");
     ASSERT_EQ(E_OK, status);
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval003 end.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval003 end.");
 }
 
 /* *
- * @tc.name: StartAsyncDataRetireval004
+ * @tc.name: StartAsyncDataRetrieval004
  * @tc.desc: Test get data cost 1s.
  * @tc.type: FUNC
  */
-HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval004, TestSize.Level1)
+HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetrieval004, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval004 begin.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval004 begin.");
 
     CustomOption customOption = {
         .intention = UDMF::UD_INTENTION_DRAG
@@ -287,26 +287,26 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval004, TestSize.Level1)
         }
         ASSERT_EQ(1, data->GetRecords().size());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval003 callback end.");
+        LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval003 callback end.");
     };
     params.query = query;
     params.progressIndicator = ProgressIndicator::NONE;
     params.progressListener = callback;
-    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetireval(params);
+    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ASSERT_EQ(E_OK, status);
 
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval004 end.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval004 end.");
 }
 
 /* *
- * @tc.name: StartAsyncDataRetireval005
+ * @tc.name: StartAsyncDataRetrieval005
  * @tc.desc: Test get no data.
  * @tc.type: FUNC
  */
-HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval005, TestSize.Level1)
+HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetrieval005, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval005 begin.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval005 begin.");
 
     GetDataParams params;
     QueryOption query = {
@@ -317,26 +317,26 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval005, TestSize.Level1)
         LOG_INFO(UDMF_TEST, "Callback begin status=%{public}d, progress=%{public}d, name=%{public}s.",
             progress.progressStatus, progress.progress, progress.srcDevName.c_str());
         if (progress.progressStatus == 4) {
-            LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval005 demo1 callback end.");
+            LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval005 demo1 callback end.");
             return;
         }
     };
     params.query = query;
     params.progressIndicator = ProgressIndicator::NONE;
     params.progressListener = callback;
-    auto status = UdmfAsyncClient::GetInstance().StartAsyncDataRetireval(params);
+    auto status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
     ASSERT_EQ(E_OK, status);
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval005 end.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval005 end.");
 }
 
 /* *
- * @tc.name: StartAsyncDataRetireval006
+ * @tc.name: StartAsyncDataRetrieval006
  * @tc.desc: Test invalid key.
  * @tc.type: FUNC
  */
-HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval006, TestSize.Level1)
+HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetrieval006, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval006 begin.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval006 begin.");
 
     GetDataParams params;
     QueryOption query = {
@@ -347,16 +347,16 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval006, TestSize.Level1)
         LOG_INFO(UDMF_TEST, "Callback begin status=%{public}d, progress=%{public}d, name=%{public}s.",
             progress.progressStatus, progress.progress, progress.srcDevName.c_str());
         if (progress.progressStatus == 3) {
-            LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval006 demo2 callback end.");
+            LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval006 demo2 callback end.");
             return;
         }
     };
     params.query = query;
     params.progressIndicator = ProgressIndicator::DEFAULT;
     params.progressListener = callback;
-    auto status = UdmfAsyncClient::GetInstance().StartAsyncDataRetireval(params);
+    auto status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
     ASSERT_EQ(E_OK, status);
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval006 end.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval006 end.");
 }
 
 Status UdmfAsyncClientTest::SetDataTest(std::string key, ProgressIndicator progressIndicator)
@@ -377,17 +377,17 @@ Status UdmfAsyncClientTest::SetDataTest(std::string key, ProgressIndicator progr
     params.query = query;
     params.progressIndicator = progressIndicator;
     params.progressListener = callback;
-    return UdmfAsyncClient::GetInstance().StartAsyncDataRetireval(params);
+    return UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
 }
 
 /* *
- * @tc.name: StartAsyncDataRetireval007
+ * @tc.name: StartAsyncDataRetrieval007
  * @tc.desc: Test multithreading different key.
  * @tc.type: FUNC
  */
-HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval007, TestSize.Level1)
+HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetrieval007, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval007 begin.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval007 begin.");
 
     CustomOption customOption = {
         .intention = UDMF::UD_INTENTION_DRAG
@@ -436,17 +436,17 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval007, TestSize.Level1)
         ASSERT_EQ(E_OK, status);
     });
     EXPECT_NO_FATAL_FAILURE(t3.join());
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval007 end.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval007 end.");
 }
 
 /* *
- * @tc.name: StartAsyncDataRetireval008
+ * @tc.name: StartAsyncDataRetrieval008
  * @tc.desc: Test multithreading same key.
  * @tc.type: FUNC
  */
-HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval008, TestSize.Level1)
+HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetrieval008, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval008 begin.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval008 begin.");
 
     CustomOption customOption = {
         .intention = UDMF::UD_INTENTION_DRAG
@@ -478,17 +478,17 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval008, TestSize.Level1)
         ASSERT_EQ(E_IDEMPOTENT_ERROR, status);
     });
     EXPECT_NO_FATAL_FAILURE(t3.join());
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval008 end.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval008 end.");
 }
 
 /* *
- * @tc.name: StartAsyncDataRetireval009
+ * @tc.name: StartAsyncDataRetrieval009
  * @tc.desc: Test Get File type.
  * @tc.type: FUNC
  */
-HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval009, TestSize.Level1)
+HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetrieval009, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval009 begin.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval009 begin.");
 
     CustomOption customOption = {
         .intention = UDMF::UD_INTENTION_DRAG
@@ -516,24 +516,24 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval009, TestSize.Level1)
             return;
         }
         ASSERT_EQ(1, data->GetRecords().size());
-        LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval009 callback end.");
+        LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval009 callback end.");
     };
     params.query = query;
     params.progressIndicator = ProgressIndicator::DEFAULT;
     params.progressListener = callback;
-    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetireval(params);
+    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
     ASSERT_EQ(E_OK, status);
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval009 end.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval009 end.");
 }
 
 /* *
- * @tc.name: StartAsyncDataRetireval010
+ * @tc.name: StartAsyncDataRetrieval010
  * @tc.desc: Test Invalid params.
  * @tc.type: FUNC
  */
-HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval010, TestSize.Level1)
+HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetrieval010, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval010 begin.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval010 begin.");
 
     GetDataParams params;
     QueryOption query = {
@@ -543,7 +543,7 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval010, TestSize.Level1)
     params.progressIndicator = ProgressIndicator::DEFAULT;
     auto callback = [this](ProgressInfo progress, std::shared_ptr<UnifiedData> data) {};
     params.progressListener = callback;
-    auto status = UdmfAsyncClient::GetInstance().StartAsyncDataRetireval(params);
+    auto status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
     ASSERT_EQ(E_INVALID_PARAMETERS, status);
 
     query = {
@@ -553,7 +553,7 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval010, TestSize.Level1)
     params.query = query;
     params.progressIndicator = ProgressIndicator::DEFAULT;
     params.progressListener = callback;
-    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetireval(params);
+    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
     ASSERT_EQ(E_INVALID_PARAMETERS, status);
 
     query = {
@@ -563,8 +563,8 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetireval010, TestSize.Level1)
     params.query = query;
     params.progressIndicator = ProgressIndicator::DEFAULT;
     params.progressListener = nullptr;
-    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetireval(params);
+    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
     ASSERT_EQ(E_INVALID_PARAMETERS, status);
-    LOG_INFO(UDMF_TEST, "StartAsyncDataRetireval010 end.");
+    LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval010 end.");
 }
 } // OHOS::Test

@@ -231,5 +231,18 @@ std::set<UDType> UnifiedData::GetUDTyps() const
     return types;
 }
 
+std::vector<std::string> UnifiedData::GetFileUris() const
+{
+    std::vector<std::string> uris;
+    for (auto record : records_) {
+        std::string oriUri;
+        if (record == nullptr || !record->HasFileType(oriUri)) {
+            continue;
+        }
+        uris.push_back(oriUri);
+    }
+    return uris;
+}
+
 } // namespace UDMF
 } // namespace OHOS

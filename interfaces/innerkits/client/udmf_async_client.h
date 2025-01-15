@@ -21,8 +21,9 @@
 namespace OHOS::UDMF {
 class UdmfAsyncClient {
 public:
+    friend class UdmfCopyFile;
     static UdmfAsyncClient API_EXPORT &GetInstance();
-    Status API_EXPORT StartAsyncDataRetireval(const GetDataParams &params);
+    Status API_EXPORT StartAsyncDataRetrieval(const GetDataParams &params);
     Status API_EXPORT Cancel(std::string businessUdKey);
 private:
     UdmfAsyncClient();
@@ -39,7 +40,7 @@ private:
     Status GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper, const QueryOption &query);
     Status GetDataFromCache(std::unique_ptr<AsyncHelper> &asyncHelper, const QueryOption &query);
     Status SetProgressData(const std::string &businessUdKey);
-    Status SetCacncelData(const std::string &businessUdKey);
+    Status SetCancelData(const std::string &businessUdKey);
     Status UpdateProgressData(const std::string &progressUdKey, const ProgressInfo &progressInfo);
     Status CopyFile(std::unique_ptr<AsyncHelper> &asyncHelper);
     void CallProgress(std::unique_ptr<AsyncHelper> &asyncHelper, ProgressInfo &progressInfo,
@@ -47,6 +48,8 @@ private:
     Status Clear(const std::string &businessUdKey);
     Status ProcessUnifiedData(std::unique_ptr<AsyncHelper> &asyncHelper);
     bool IsParamValid(const GetDataParams &params);
+    Status GetCancelStatus(const std::string &cancelKey, std::string &value);
+    void HandleCancelStatus(std::unique_ptr<AsyncHelper> &asyncHelper);
 
     ExecutorPool executor_;
     std::unordered_map<std::string, std::unique_ptr<AsyncHelper>> asyncHelperMap_;

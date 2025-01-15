@@ -15,6 +15,7 @@
 #define LOG_TAG "UnifiedDataChannelNapi"
 #include "unified_data_channel_napi.h"
 
+#include "async_task_params.h"
 #include "napi_data_utils.h"
 #include "unified_data_napi.h"
 
@@ -34,6 +35,9 @@ napi_value UnifiedDataChannelNapi::UnifiedDataChannelInit(napi_env env, napi_val
         DECLARE_NAPI_GETTER("ShareOptions", CreateShareOptions),
         DECLARE_NAPI_FUNCTION("setAppShareOptions", SetAppShareOptions),
         DECLARE_NAPI_FUNCTION("removeAppShareOptions", RemoveAppShareOptions),
+        DECLARE_NAPI_GETTER("FileConflictOptions", CreateFileConflictOptions),
+        DECLARE_NAPI_GETTER("ProgressIndicator", CreateProgressIndicator),
+        DECLARE_NAPI_GETTER("ListenerStatus", CreateListenerStatus),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
@@ -362,6 +366,67 @@ napi_status UnifiedDataChannelNapi::ConvertUnifiedDataSetToNapi(
         }
     }
     return napi_ok;
+}
+
+napi_value UnifiedDataChannelNapi::CreateFileConflictOptions(napi_env env, napi_callback_info info)
+{
+    napi_value jsFileOptions = nullptr;
+    napi_create_object(env, &jsFileOptions);
+
+    napi_value jsOverWrite;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(FileConflictOptions::OVERWRITE), jsOverWrite);
+    NAPI_CALL(env, napi_set_named_property(env, jsFileOptions, "OVERWRITE", jsOverWrite));
+
+    napi_value jsSkip;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(FileConflictOptions::SKIP), jsSkip);
+    NAPI_CALL(env, napi_set_named_property(env, jsFileOptions, "SKIP", jsSkip));
+    return jsFileOptions;
+}
+
+napi_value UnifiedDataChannelNapi::CreateProgressIndicator(napi_env env, napi_callback_info info)
+{
+    napi_value jsProgressIndicator = nullptr;
+    napi_create_object(env, &jsProgressIndicator);
+
+    napi_value jsNone;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(ProgressIndicator::NONE), jsNone);
+    NAPI_CALL(env, napi_set_named_property(env, jsProgressIndicator, "NONE", jsNone));
+
+    napi_value jsDefault;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(ProgressIndicator::DEFAULT), jsDefault);
+    NAPI_CALL(env, napi_set_named_property(env, jsProgressIndicator, "DEFAULT", jsDefault));
+    return jsProgressIndicator;
+}
+
+napi_value UnifiedDataChannelNapi::CreateListenerStatus(napi_env env, napi_callback_info info)
+{
+    napi_value jsListenerStatus = nullptr;
+    napi_create_object(env, &jsListenerStatus);
+
+    napi_value jsFinished;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(ListenerStatus::FINISHED), jsFinished);
+    NAPI_CALL(env, napi_set_named_property(env, jsListenerStatus, "FINISHED", jsFinished));
+
+    napi_value jsProcessing;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(ListenerStatus::PROCESSING), jsProcessing);
+    NAPI_CALL(env, napi_set_named_property(env, jsListenerStatus, "PROCESSING", jsProcessing));
+
+    napi_value jsInnerError;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(ListenerStatus::INNER_ERROR), jsInnerError);
+    NAPI_CALL(env, napi_set_named_property(env, jsListenerStatus, "INNER_ERROR", jsInnerError));
+
+    napi_value jsInvalidPara;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(ListenerStatus::INVALID_PARAMETERS), jsInvalidPara);
+    NAPI_CALL(env, napi_set_named_property(env, jsListenerStatus, "INVALID_PARAMETERS", jsInvalidPara));
+
+    napi_value jsSyncFail;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(ListenerStatus::SYNC_FAILED), jsSyncFail);
+    NAPI_CALL(env, napi_set_named_property(env, jsListenerStatus, "SYNC_FAILED", jsSyncFail));
+
+    napi_value jsCopyFail;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(ListenerStatus::COPY_FILE_FAILED), jsCopyFail);
+    NAPI_CALL(env, napi_set_named_property(env, jsListenerStatus, "COPY_FILE_FAILED", jsCopyFail));
+    return jsListenerStatus;
 }
 } // namespace UDMF
 } // namespace OHOS

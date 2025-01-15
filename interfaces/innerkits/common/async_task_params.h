@@ -55,9 +55,11 @@ struct AsyncHelper {
     ExecutorPool::TaskId getDataTask = ExecutorPool::INVALID_TASK_ID;
     ExecutorPool::TaskId progressTask = ExecutorPool::INVALID_TASK_ID;
     ProgressListener progressListener;
+    FileConflictOptions fileConflictOptions;
     std::string businessUdKey;
     std::string processKey;
     std::string cancelKey;
+    std::string destUri;
     std::shared_ptr<UnifiedData> data = std::make_shared<UnifiedData>();
     ProgressQueue progressQueue;
 };
@@ -65,11 +67,18 @@ struct AsyncHelper {
 enum ListenerStatus: int32_t {
     FINISHED = 0,
     PROCESSING,
-    INNER_ERROR,
+    CANCEL,
+    INNER_ERROR = 200,
     INVALID_PARAMETERS,
     DATA_NOT_FOUND,
     SYNC_FAILED,
     COPY_FILE_FAILED,
+};
+
+enum ProgressStatus {
+    NORMAL_PASTE = 0,
+    CANCEL_PASTE = 1,
+    PASTE_TIME_OUT = 2,
 };
 
 } // namespace OHOS::UDMF
