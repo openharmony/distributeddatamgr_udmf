@@ -31,8 +31,28 @@ public:
     Status Copy(std::unique_ptr<AsyncHelper> &asyncHelper);
 
 private:
+    struct CopyContext {
+        std::unique_ptr<AsyncHelper> &asyncHelper;
+        uint64_t finishSize = 0;
+        uint64_t totalSize = 0;
+        Status status = E_OK;
+        std::shared_ptr<UnifiedData> processedData;
+
+        CopyContext(std::unique_ptr<AsyncHelper> &helper)
+            : asyncHelper(helper),
+            totalSize(UdmfCopyFile::GetInstance().GetTotalSize(helper->data->GetFileUris())),
+            processedData(std::make_shared<UnifiedData>()) {}
+    };
+
     UdmfCopyFile() = default;
     ~UdmfCopyFile() = default;
+
+    bool HandleRecord(const std::shared_ptr<UnifiedRecord> &record, CopyContext &context);
+    bool CopyFile(const std::string &srcUri, const std::string &destFileUri,
+        const std::shared_ptr<UnifiedRecord> &record, CopyContext &context);
+    void HandleProgress(const std::string &srcUri, const std::string &destFileUri,
+        CopyContext &context, uint64_t processSize);
+    std::string ConstructDestUri(const std::string &destUri, const std::string &srcUri);
     int64_t GetTotalSize(const std::vector<std::string> &uris);
     bool IsDirectory(const std::string &uri, bool isSource);
     std::string GetFileName(const std::string &path);

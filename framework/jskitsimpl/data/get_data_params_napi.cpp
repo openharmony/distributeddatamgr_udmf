@@ -26,7 +26,8 @@ static constexpr int32_t PROGRESS_INIT = 0;
 static constexpr int32_t PROGRESS_ALL_FINISHED = 100;
 ConcurrentMap<std::string, napi_threadsafe_function> GetDataParamsNapi::tsfns;
 
-bool GetDataParamsNapi::Convert2NativeValue(napi_env env, napi_value in, GetDataParams &getDataParams, const std::string &key)
+bool GetDataParamsNapi::Convert2NativeValue(napi_env env, napi_value in,
+    GetDataParams &getDataParams, const std::string &key)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "Start.");
 
@@ -67,7 +68,8 @@ bool GetDataParamsNapi::Convert2NativeValue(napi_env env, napi_value in, GetData
     return true;
 }
 
-bool GetDataParamsNapi::SetProgressListener(napi_env env, GetDataParams &getDataParams, napi_value callback, const std::string &key)
+bool GetDataParamsNapi::SetProgressListener(napi_env env, GetDataParams &getDataParams,
+    napi_value callback, const std::string &key)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "Start.");
     tsfns.Compute(key, [&](const std::string &key, napi_threadsafe_function &tsfn) {
@@ -78,19 +80,8 @@ bool GetDataParamsNapi::SetProgressListener(napi_env env, GetDataParams &getData
         }
         napi_value workName;
         napi_create_string_utf8(env, "threadsafe_function", NAPI_AUTO_LENGTH, &workName);
-        auto status = napi_create_threadsafe_function(
-            env,
-            callback,
-            nullptr,
-            workName,
-            0,
-            1,
-            nullptr,
-            nullptr,
-            nullptr,
-            CallProgressListener,
-            &tsfn
-        );
+        auto status = napi_create_threadsafe_function(env, callback, nullptr, workName, 0, 1, nullptr,
+            nullptr, nullptr, CallProgressListener, &tsfn);
         if (status != napi_ok) {
             LOG_ERROR(UDMF_KITS_NAPI, "napi_create_threadsafe_function failed, status=%{public}d", status);
             return false;
@@ -100,23 +91,10 @@ bool GetDataParamsNapi::SetProgressListener(napi_env env, GetDataParams &getData
 
     getDataParams.progressListener = [key](ProgressInfo progressInfo, std::shared_ptr<UnifiedData> data) {
         bool listenerExist = tsfns.ComputeIfPresent(key, [&](const std::string &key, napi_threadsafe_function &tsfn) {
-            auto listenerArgs = new (std::nothrow) ListenerArgs;
+            auto listenerArgs = CreateListenerArgs(progressInfo, data);
             if (listenerArgs == nullptr) {
-                LOG_ERROR(UDMF_KITS_NAPI, "No memory for listenerArgs malloc");
                 return false;
             }
-            listenerArgs->progressInfo = progressInfo;
-            listenerArgs->unifiedData = nullptr;
-            if (data != nullptr) {
-                listenerArgs->unifiedData = new (std::nothrow) UnifiedData;
-                if (listenerArgs->unifiedData == nullptr) {
-                    LOG_ERROR(UDMF_KITS_NAPI, "No memory for unifiedData malloc");
-                    delete listenerArgs;
-                    return false;
-                }
-                listenerArgs->unifiedData->SetRecords(data->GetRecords());
-            }
-
             auto status = napi_call_threadsafe_function(tsfn, listenerArgs, napi_tsfn_blocking);
             if (status != napi_ok) {
                 LOG_ERROR(UDMF_KITS_NAPI, "napi_call_threadsafe_function failed, status=%{public}d", status);
@@ -156,11 +134,39 @@ void GetDataParamsNapi::CallProgressListener(napi_env env, napi_value callback, 
         LOG_ERROR(UDMF_KITS_NAPI, "napi_call_function failed, status=%{public}d", status);
     }
 
+    DeleteListenerArgs(listenerArgs);
+}
+
+GetDataParamsNapi::ListenerArgs* GetDataParamsNapi::CreateListenerArgs(
+    ProgressInfo progressInfo, std::shared_ptr<UnifiedData> data)
+{
+    auto listenerArgs = new (std::nothrow) ListenerArgs;
+    if (listenerArgs == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "No memory for listenerArgs malloc");
+        return nullptr;
+    }
+    listenerArgs->progressInfo = progressInfo;
+    listenerArgs->unifiedData = nullptr;
+    if (data != nullptr) {
+        listenerArgs->unifiedData = new (std::nothrow) UnifiedData;
+        if (listenerArgs->unifiedData == nullptr) {
+            LOG_ERROR(UDMF_KITS_NAPI, "No memory for unifiedData malloc");
+            delete listenerArgs;
+            return nullptr;
+        }
+        listenerArgs->unifiedData->SetRecords(data->GetRecords());
+    }
+    return listenerArgs;
+}
+
+void GetDataParamsNapi::DeleteListenerArgs(ListenerArgs *listenerArgs)
+{
     if (listenerArgs->unifiedData != nullptr) {
         delete listenerArgs->unifiedData;
         listenerArgs->unifiedData = nullptr;
     }
     delete listenerArgs;
+    listenerArgs = nullptr;
 }
 
 } // namespace UDMF

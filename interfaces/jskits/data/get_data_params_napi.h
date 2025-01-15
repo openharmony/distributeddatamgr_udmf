@@ -36,8 +36,11 @@ private:
         constexpr static size_t ARGV_SIZE = 2;
     };
 
-    static bool SetProgressListener(napi_env env, GetDataParams &getDataParam, napi_value callback, const std::string &key);
+    static bool SetProgressListener(napi_env env, GetDataParams &getDataParam,
+        napi_value callback, const std::string &key);
     static void CallProgressListener(napi_env env, napi_value callback, void *context, void *data);
+    static ListenerArgs* CreateListenerArgs(ProgressInfo progressInfo, std::shared_ptr<UnifiedData> data);
+    static void DeleteListenerArgs(ListenerArgs *listenerArgs);
 
     static ConcurrentMap<std::string, napi_threadsafe_function> tsfns;
 };
