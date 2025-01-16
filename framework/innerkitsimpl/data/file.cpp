@@ -45,7 +45,8 @@ File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
 
 int64_t File::GetSize()
 {
-    return this->oriUri_.size() + this->remoteUri_.size() + UnifiedDataUtils::GetDetailsSize(this->details_);
+    return this->oriUri_.size() + this->remoteUri_.size() + UnifiedDataUtils::GetDetailsSize(this->details_) +
+        GetInnerEntriesSize();
 }
 
 std::string File::GetUri() const

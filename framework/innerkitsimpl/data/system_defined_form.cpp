@@ -43,7 +43,7 @@ SystemDefinedForm::SystemDefinedForm(UDType type, ValueType value) : SystemDefin
 int64_t SystemDefinedForm::GetSize()
 {
     return UnifiedDataUtils::GetDetailsSize(this->details_) + sizeof(formId_) + this->formName_.size()
-           + this->bundleName_.size() + this->abilityName_.size() + this->module_.size();
+           + this->bundleName_.size() + this->abilityName_.size() + this->module_.size() + GetInnerEntriesSize();
 }
 
 int32_t SystemDefinedForm::GetFormId() const

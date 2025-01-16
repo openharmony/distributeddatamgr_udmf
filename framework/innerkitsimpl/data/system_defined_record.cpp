@@ -23,7 +23,7 @@ SystemDefinedRecord::SystemDefinedRecord() : UnifiedRecord(SYSTEM_DEFINED_RECORD
 
 int64_t SystemDefinedRecord::GetSize()
 {
-    return UnifiedDataUtils::GetDetailsSize(this->details_);
+    return UnifiedDataUtils::GetDetailsSize(this->details_) + GetInnerEntriesSize();
 }
 
 SystemDefinedRecord::SystemDefinedRecord(UDType type, ValueType value) : UnifiedRecord(type, value)

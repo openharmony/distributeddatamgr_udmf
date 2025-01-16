@@ -1249,6 +1249,61 @@ HWTEST_F(UDMFTest, OH_Udmf_MultiStyleRecord001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: OH_Udmf_MultiStyleRecord002
+ * @tc.desc: Normal testcase of OH_UdmfProperty_SetExtrasStringParam
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_MultiStyleRecord002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary005 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    auto object = std::make_shared<Object>();
+    object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(UDType::PLAIN_TEXT);
+    object->value_[CONTENT] = "content_";
+    object->value_[ABSTRACT] = "abstract_";
+    auto record = std::make_shared<UnifiedRecord>(UDType::PLAIN_TEXT, object);
+
+    std::vector<uint8_t> raw = {1, 2, 3, 4, 5};
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.content-form";
+    obj->value_[THUMB_DATA] = raw;
+    obj->value_[THUMB_DATA_LENGTH] = 5;
+    obj->value_[DESCRIPTION] = "descritpion";
+    obj->value_[TITLE] = "title";
+    obj->value_[APP_ICON_LENGTH] = 5;
+    obj->value_[APP_NAME] = "appName";
+    obj->value_[LINK_URL] = "linkUri";
+    auto contentForm = UnifiedRecord(CONTENT_FORM, obj);
+    record->AddEntry(contentForm.GetUtdId(), contentForm.GetOriginValue());
+
+    data.AddRecord(record);
+
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    ASSERT_EQ(status, E_OK);
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    int getRes = OH_Udmf_GetUnifiedData(key.c_str(), UDMF_INTENTION_DRAG, readUnifiedData);
+    ASSERT_EQ(getRes, E_OK);
+    unsigned int count = 0;
+    OH_UdmfRecord** readRecords = OH_UdmfData_GetRecords(readUnifiedData, &count);
+    ASSERT_EQ(count, 1);
+    for (int i = 0; i < count; i++) {
+        OH_UdsContentForm *contentForm = OH_UdsContentForm_Create();
+        OH_UdmfRecord_GetContentForm(readRecords[i], contentForm);
+        const char* desc = OH_UdsContentForm_GetDescription(contentForm);
+        EXPECT_EQ(std::string(desc), "descritpion");
+        OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
+        OH_UdmfRecord_GetPlainText(readRecords[i], plainText);
+        const char* text = OH_UdsPlainText_GetContent(plainText);
+        EXPECT_EQ(std::string(text), "content_");
+    }
+}
+
+/**
  * @tc.name: OH_UdmfRecordProvider_Create001
  * @tc.desc: Normal testcase of OH_UdmfRecordProvider_Create
  * @tc.type: FUNC
@@ -2130,10 +2185,13 @@ HWTEST_F(UDMFTest, FileUriTest004, TestSize.Level1)
 HWTEST_F(UDMFTest, FileUriTest005, TestSize.Level1)
 {
     std::string uri = "https://xxx/xx/xx.jpg";
-    std::shared_ptr<Folder> folder = std::make_shared<Folder>();
-    folder->SetUri(uri);
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = uri;
+    obj->value_[FILE_TYPE] = "general.img";
+    auto record = std::make_shared<UnifiedRecord>(UDType::FOLDER, obj);
     std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
-    unifiedData->AddRecord(folder);
+    unifiedData->AddRecord(record);
     std::string key;
     CustomOption option = {
         .intention = UD_INTENTION_DRAG
@@ -2187,6 +2245,63 @@ HWTEST_F(UDMFTest, FileUriTest006, TestSize.Level1)
     video->SetUri(uri);
     std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
     unifiedData->AddRecord(video);
+    std::string key;
+    CustomOption option = {
+        .intention = UD_INTENTION_DRAG
+    };
+    int setRet = UdmfClient::GetInstance().SetData(option, *unifiedData, key);
+    EXPECT_EQ(setRet, E_OK);
+
+    OH_UdmfData* udmfData = OH_UdmfData_Create();
+    OH_Udmf_GetUnifiedData(key.c_str(), UDMF_INTENTION_DRAG, udmfData);
+
+    unsigned int dataTypeCount;
+    char** dataTypes = OH_UdmfData_GetTypes(udmfData, &dataTypeCount);
+    EXPECT_EQ(dataTypeCount, 2);
+    EXPECT_NE(dataTypes, nullptr);
+    EXPECT_EQ(strcmp(dataTypes[0], UDMF_META_VIDEO), 0);
+    EXPECT_EQ(strcmp(dataTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+
+    unsigned int recordCount;
+    OH_UdmfRecord** records = OH_UdmfData_GetRecords(udmfData, &recordCount);
+    EXPECT_EQ(recordCount, 1);
+    EXPECT_NE(records, nullptr);
+
+    for (unsigned int idx = 0; idx < recordCount; ++idx) {
+        unsigned int recordTypeCount;
+        char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount);
+        EXPECT_EQ(recordTypeCount, 2);
+        EXPECT_NE(recordTypes, nullptr);
+        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_VIDEO), 0);
+        EXPECT_EQ(strcmp(recordTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+        for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
+            if (strcmp(recordTypes[recordIdx], UDMF_META_GENERAL_FILE_URI) == 0) {
+                OH_UdsFileUri* fileUri = OH_UdsFileUri_Create();
+                int getFileUriRet = OH_UdmfRecord_GetFileUri(records[idx], fileUri);
+                EXPECT_EQ(getFileUriRet, UDMF_E_OK);
+                const char* getFileUri = OH_UdsFileUri_GetFileUri(fileUri);
+                EXPECT_EQ(strcmp(getFileUri, uri.c_str()), 0);
+            }
+        }
+    }
+}
+
+/**
+ * @tc.name: FileUriTest007
+ * @tc.desc: test fileUri between js and capi
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, FileUriTest007, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = uri;
+    obj->value_[FILE_TYPE] = "general.img";
+    auto record = std::make_shared<UnifiedRecord>(UDType::VIDEO, obj);
+    std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
+    unifiedData->AddRecord(record);
     std::string key;
     CustomOption option = {
         .intention = UD_INTENTION_DRAG

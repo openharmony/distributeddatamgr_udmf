@@ -132,7 +132,8 @@ HWTEST_F(UnifiedRecordTest, Constructor_002, TestSize.Level0)
     auto entries = record.GetEntries();
     auto it = entries->find(utdId);
     ASSERT_TRUE(it != entries->end());
-    EXPECT_TRUE(std::holds_alternative<std::monostate>(it->second));
+    EXPECT_FALSE(std::holds_alternative<std::monostate>(it->second));
+    EXPECT_TRUE(std::holds_alternative<std::shared_ptr<Object>>(it->second));
 }
 
 /**
@@ -163,9 +164,7 @@ HWTEST_F(UnifiedRecordTest, Constructor_003, TestSize.Level0)
     auto it = entries->find(utdId);
     ASSERT_TRUE(it != entries->end());
     auto entry2 = it->second;
-    EXPECT_TRUE(std::holds_alternative<std::string>(entry2));
-    auto entryStr2 = std::get_if<std::string>(&entry2);
-    EXPECT_EQ(*entryStr2, "123456");
+    EXPECT_TRUE(std::holds_alternative<std::shared_ptr<Object>>(entry2));
 }
 
 /**

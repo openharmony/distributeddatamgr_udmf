@@ -72,7 +72,9 @@ enum class TAG : uint16_t {
     TAG_WANT,
     TAG_PIXELMAP,
     TAG_OBJECT_VALUE,
-    TAG_RUNTIME
+    TAG_RUNTIME,
+    TAG_RECORD_UTD_ID,
+    TAG_RECORD_ENTRIES,
 };
 }
 #endif //UDMF_TLV_TAG_H

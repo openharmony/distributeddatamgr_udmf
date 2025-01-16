@@ -28,6 +28,10 @@ napi_value PlainTextNapi::Constructor(napi_env env)
         /* PlainText extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
         DECLARE_NAPI_FUNCTION("getValue", UnifiedRecordNapi::GetValue),
+        DECLARE_NAPI_FUNCTION("addEntry", UnifiedRecordNapi::AddEntry),
+        DECLARE_NAPI_FUNCTION("getEntry", UnifiedRecordNapi::GetEntry),
+        DECLARE_NAPI_FUNCTION("getEntries", UnifiedRecordNapi::GetEntries),
+        DECLARE_NAPI_FUNCTION("getTypes", UnifiedRecordNapi::GetTypes),
         /* PlainText extends Text */
         DECLARE_NAPI_GETTER_SETTER("details", TextNapi::GetDetails, TextNapi::SetDetails),
         /* PlainText properties */

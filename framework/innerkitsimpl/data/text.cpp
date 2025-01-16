@@ -41,7 +41,7 @@ Text::Text(UDType type, ValueType value) : UnifiedRecord(type, value)
 
 int64_t Text::GetSize()
 {
-    return UnifiedDataUtils::GetDetailsSize(this->details_);
+    return UnifiedDataUtils::GetDetailsSize(this->details_) + GetInnerEntriesSize();
 }
 
 void Text::SetDetails(UDDetails &variantMap)
