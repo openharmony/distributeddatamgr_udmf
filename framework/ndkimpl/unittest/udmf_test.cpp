@@ -1249,6 +1249,61 @@ HWTEST_F(UDMFTest, OH_Udmf_MultiStyleRecord001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: OH_Udmf_MultiStyleRecord002
+ * @tc.desc: Normal testcase of OH_UdmfProperty_SetExtrasStringParam
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_MultiStyleRecord002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary005 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    auto object = std::make_shared<Object>();
+    object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(UDType::PLAIN_TEXT);
+    object->value_[CONTENT] = "content_";
+    object->value_[ABSTRACT] = "abstract_";
+    auto record = std::make_shared<UnifiedRecord>(UDType::PLAIN_TEXT, object);
+
+    std::vector<uint8_t> raw = {1, 2, 3, 4, 5};
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.content-form";
+    obj->value_[THUMB_DATA] = raw;
+    obj->value_[THUMB_DATA_LENGTH] = 5;
+    obj->value_[DESCRIPTION] = "descritpion";
+    obj->value_[TITLE] = "title";
+    obj->value_[APP_ICON_LENGTH] = 5;
+    obj->value_[APP_NAME] = "appName";
+    obj->value_[LINK_URL] = "linkUri";
+    auto contentForm = UnifiedRecord(CONTENT_FORM, obj);
+    record->AddEntry(contentForm.GetUtdId(), contentForm.GetOriginValue());
+
+    data.AddRecord(record);
+
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    ASSERT_EQ(status, E_OK);
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    int getRes = OH_Udmf_GetUnifiedData(key.c_str(), UDMF_INTENTION_DRAG, readUnifiedData);
+    ASSERT_EQ(getRes, E_OK);
+    unsigned int count = 0;
+    OH_UdmfRecord** readRecords = OH_UdmfData_GetRecords(readUnifiedData, &count);
+    ASSERT_EQ(count, 1);
+    for (int i = 0; i < count; i++) {
+        OH_UdsContentForm *contentForm = OH_UdsContentForm_Create();
+        OH_UdmfRecord_GetContentForm(readRecords[i], contentForm);
+        const char* desc = OH_UdsContentForm_GetDescription(contentForm);
+        EXPECT_EQ(std::string(desc), "descritpion");
+        OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
+        OH_UdmfRecord_GetPlainText(readRecords[i], plainText);
+        const char* text = OH_UdsPlainText_GetContent(plainText);
+        EXPECT_EQ(std::string(text), "content_");
+    }
+}
+
+/**
  * @tc.name: OH_UdmfRecordProvider_Create001
  * @tc.desc: Normal testcase of OH_UdmfRecordProvider_Create
  * @tc.type: FUNC

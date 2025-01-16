@@ -304,8 +304,7 @@ template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
     if (!data.Write(TAG::TAG_RECORD_UTD_ID, input.GetUtdId())) {
         return false;
     }
-    if (!input.GetInnerEntries()->empty()
-        && !TLVUtil::Writing(input.GetInnerEntries(), data, TAG::TAG_RECORD_ENTRIES)) {
+    if (!TLVUtil::Writing(input.GetInnerEntries(), data, TAG::TAG_RECORD_ENTRIES)) {
         return false;
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
