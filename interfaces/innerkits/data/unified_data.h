@@ -19,6 +19,7 @@
 #include "unified_data_properties.h"
 #include "unified_record.h"
 #include "visibility.h"
+#include <string>
 namespace OHOS {
 namespace UDMF {
 class API_EXPORT UnifiedData {
@@ -59,7 +60,7 @@ public:
     static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;
 
 private:
-    std::set<UDType> GetUDTyps() const;
+    std::set<std::string> GetTypIds() const;
 
     uint32_t dataId_ = 0;
     uint32_t recordId_ = 0;

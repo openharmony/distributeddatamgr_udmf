@@ -16,6 +16,7 @@
 #include "udmf_client.h"
 
 #include "dds_trace.h"
+#include "udmf_conversion.h"
 #include "udmf_radar_reporter.h"
 
 #include "logger.h"
@@ -177,6 +178,7 @@ Status UdmfClient::GetSummary(const QueryOption &query, Summary &summary)
     }
     auto it = dataCache_.Find(query.key);
     if (it.first) {
+        UdmfConversion::InitValueObject(it.second);
         UnifiedDataHelper::GetSummary(it.second, summary);
         LOG_INFO(UDMF_CLIENT, "GetSummary in cache! key = %{public}s", query.key.c_str());
         return E_OK;

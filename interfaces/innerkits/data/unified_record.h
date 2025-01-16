@@ -38,6 +38,7 @@ public:
     UnifiedRecord& operator=(UnifiedRecord &&other) = delete;
 
     UDType GetType() const;
+    std::vector<std::string> GetTypes() const;
     void SetType(const UDType &type);
     virtual int64_t GetSize();
 
@@ -54,7 +55,10 @@ public:
     bool HasType(const std::string &utdId) const;
     void AddEntry(const std::string &utdId, ValueType &&value);
     ValueType GetEntry(const std::string &utdId);
-    std::shared_ptr<std::map<std::string, ValueType>> GetEntries() const;
+    std::shared_ptr<std::map<std::string, ValueType>> GetEntries();
+    std::shared_ptr<std::map<std::string, ValueType>> GetInnerEntries() const;
+    void SetInnerEntries(std::shared_ptr<std::map<std::string, ValueType>> entries);
+    int64_t GetInnerEntriesSize();
 	
     void SetEntryGetter(const std::vector<std::string> &utdIds, const std::shared_ptr<EntryGetter> &entryGetter);
     std::shared_ptr<EntryGetter> GetEntryGetter();

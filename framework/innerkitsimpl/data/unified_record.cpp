@@ -50,6 +50,16 @@ UDType UnifiedRecord::GetType() const
     return this->dataType_;
 }
 
+std::vector<std::string> UnifiedRecord::GetTypes() const
+{
+    std::vector<std::string> types;
+    for (auto it = entries_->begin(); it != entries_->end(); it++) {
+        types.push_back(it->first);
+    }
+    types.push_back(utdId_);
+    return types;
+}
+
 void UnifiedRecord::SetType(const UDType &type)
 {
     dataType_ = type;
@@ -61,10 +71,10 @@ int64_t UnifiedRecord::GetSize()
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto value = std::get<std::shared_ptr<Object>>(value_);
         if (value->value_.size() == 1) {
-            return ObjectUtils::GetValueSize(value_, true);
+            return ObjectUtils::GetValueSize(value_, true) + GetInnerEntriesSize();
         }
     }
-    return ObjectUtils::GetValueSize(value_, false);
+    return ObjectUtils::GetValueSize(value_, false) + GetInnerEntriesSize();
 }
 
 std::string UnifiedRecord::GetUid() const
@@ -140,13 +150,43 @@ ValueType UnifiedRecord::GetEntry(const std::string &utdId)
     return std::monostate();
 }
 
-std::shared_ptr<std::map<std::string, ValueType>> UnifiedRecord::GetEntries() const
+std::shared_ptr<std::map<std::string, ValueType>> UnifiedRecord::GetEntries()
 {
     auto res = std::make_shared<std::map<std::string, ValueType>>(*entries_);
     if (!utdId_.empty()) {
-        res->insert_or_assign(utdId_, value_);
+        if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+            InitObject();
+            ValueType value = value_;
+            res->insert_or_assign(utdId_, std::move(value));
+            auto object = std::get<std::shared_ptr<Object>>(value_);
+            value_ = object->value_[VALUE_TYPE];   // restore value_
+        } else {
+            res->insert_or_assign(utdId_, value_);
+        }
     }
     return res;
+}
+
+std::shared_ptr<std::map<std::string, ValueType>> UnifiedRecord::GetInnerEntries() const
+{
+    return entries_;
+}
+
+void UnifiedRecord::SetInnerEntries(std::shared_ptr<std::map<std::string, ValueType>> entries)
+{
+    entries_ = entries;
+}
+
+int64_t UnifiedRecord::GetInnerEntriesSize()
+{
+    if (entries_ == nullptr) {
+        return 0;
+    }
+    int64_t size = 0;
+    for (auto &entry : *entries_) {
+        size += ObjectUtils::GetValueSize(entry.second, false);
+    }
+    return size;
 }
 
 std::set<std::string> UnifiedRecord::GetUtdIds() const

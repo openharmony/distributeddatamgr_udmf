@@ -36,6 +36,10 @@ napi_value UnifiedRecordNapi::Constructor(napi_env env)
         /* UnifiedRecord properties */
         DECLARE_NAPI_FUNCTION("getType", GetType),
         DECLARE_NAPI_FUNCTION("getValue", GetValue),
+        DECLARE_NAPI_FUNCTION("addEntry", AddEntry),
+        DECLARE_NAPI_FUNCTION("getEntry", GetEntry),
+        DECLARE_NAPI_FUNCTION("getEntries", GetEntries),
+        DECLARE_NAPI_FUNCTION("getTypes", GetTypes),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "UnifiedRecord", properties, count, UnifiedRecordNapi::New);
@@ -53,7 +57,7 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
         if (argc >= 2) {
             ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
             ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !type.empty(),
-                Status::E_INVALID_PARAMETERS, "Parameter error: parameter type type must be string");
+                Status::E_INVALID_PARAMETERS, "Parameter error: parameter type must be string");
             value = argv[1];
         }
     };
@@ -197,6 +201,17 @@ napi_value UnifiedRecordNapi::GetType(napi_env env, napi_callback_info info)
     return ctxt->output;
 }
 
+napi_value UnifiedRecordNapi::GetTypes(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    auto uRecord = GetUnifiedRecord(env, info, ctxt);
+    ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_ERROR, "invalid object!");
+    ctxt->status = NapiDataUtils::SetValue(env, uRecord->value_->GetTypes(), ctxt->output);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set type failed!");
+    return ctxt->output;
+}
+
 napi_value UnifiedRecordNapi::GetValue(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
@@ -215,6 +230,95 @@ napi_value UnifiedRecordNapi::GetValue(napi_env env, napi_callback_info info)
     } else {
         std::visit([&](const auto &value) { NapiDataUtils::SetValue(env, value, ctxt->output); },
             uRecord->value_->GetValue());
+    }
+    return ctxt->output;
+}
+
+napi_value UnifiedRecordNapi::AddEntry(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    std::string type;
+    napi_value napiValue = nullptr;
+    auto input = [env, ctxt, &type, &napiValue](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc >= 2,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        if (argc >= 2) {
+            ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !type.empty(),
+                Status::E_INVALID_PARAMETERS, "Parameter error: parameter type must be string");
+            napiValue = argv[1];
+        }
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
+    auto uRecord = static_cast<UnifiedRecordNapi *>(ctxt->native);
+    ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_ERROR, "invalid object!");
+    ValueType value;
+    GetNativeValue(env, type, napiValue, value);
+    uRecord->value_->AddEntry(type, std::move(value));
+    return nullptr;
+}
+
+napi_value UnifiedRecordNapi::GetEntry(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    std::string type;
+    auto input = [env, ctxt, &type](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc == 0 || argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        if (argc >= 1) {
+            ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !type.empty(),
+                Status::E_INVALID_PARAMETERS, "Parameter error: parameter type must be string");
+        }
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
+    auto uRecord = static_cast<UnifiedRecordNapi *>(ctxt->native);
+    ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_ERROR, "invalid object!");
+    ValueType entry = uRecord->value_->GetEntry(type);
+    if (std::holds_alternative<std::vector<uint8_t>>(entry)) {
+        auto value = std::get<std::vector<uint8_t>>(entry);
+        void *data = nullptr;
+        size_t len = value.size();
+        NAPI_CALL(env, napi_create_arraybuffer(env, len, &data, &ctxt->output));
+        if (memcpy_s(data, len, reinterpret_cast<const void *>(value.data()), len) != 0) {
+            LOG_ERROR(UDMF_KITS_NAPI, "memcpy_s failed");
+            return nullptr;
+        }
+    } else {
+        std::visit([&](const auto &value) { NapiDataUtils::SetValue(env, value, ctxt->output); },
+            entry);
+    }
+    return ctxt->output;
+}
+
+napi_value UnifiedRecordNapi::GetEntries(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    auto uRecord = GetUnifiedRecord(env, info, ctxt);
+    ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_ERROR, "invalid object!");
+    std::shared_ptr<std::map<std::string, ValueType>> entries = uRecord->value_->GetEntries();
+    napi_create_object(env, &ctxt->output);
+    for (auto &entry : *entries) {
+        napi_value napiValue = nullptr;
+        if (std::holds_alternative<std::vector<uint8_t>>(entry.second)) {
+            auto vecVal = std::get<std::vector<uint8_t>>(entry.second);
+            void *data = nullptr;
+            size_t len = vecVal.size();
+            NAPI_CALL(env, napi_create_arraybuffer(env, len, &data, &napiValue));
+            if (memcpy_s(data, len, reinterpret_cast<const void *>(vecVal.data()), len) != 0) {
+                LOG_ERROR(UDMF_KITS_NAPI, "memcpy_s failed");
+                return nullptr;
+            }
+        } else {
+            std::visit([&](const auto &value) { NapiDataUtils::SetValue(env, value, napiValue); },
+                entry.second);
+        }
+        napi_set_named_property(env, ctxt->output, entry.first.c_str(), napiValue);
     }
     return ctxt->output;
 }

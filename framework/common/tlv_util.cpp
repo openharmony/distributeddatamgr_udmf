@@ -279,7 +279,8 @@ template <> size_t CountBufferSize(const UnifiedRecord &input, TLVObject &data)
 {
     std::string version = UTILS::GetCurrentSdkVersion();
     return data.CountHead() + data.Count(version) + data.CountBasic(static_cast<int32_t>(input.GetType())) +
-        data.Count(input.GetUid()) + CountBufferSize(input.GetOriginValue(), data);
+        data.Count(input.GetUid()) + CountBufferSize(input.GetOriginValue(), data) + data.Count(input.GetUtdId()) +
+        CountBufferSize(input.GetInnerEntries(), data);
 }
 
 template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
@@ -300,6 +301,13 @@ template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
     if (!TLVUtil::Writing(input.GetOriginValue(), data, TAG::TAG_RECORD_VALUE)) {
         return false;
     }
+    if (!data.Write(TAG::TAG_RECORD_UTD_ID, input.GetUtdId())) {
+        return false;
+    }
+    if (!input.GetInnerEntries()->empty()
+        && !TLVUtil::Writing(input.GetInnerEntries(), data, TAG::TAG_RECORD_ENTRIES)) {
+        return false;
+    }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
 }
 
@@ -314,6 +322,8 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
         if (!data.ReadHead(headItem)) {
             return false;
         }
+        std::string utdId;
+        std::shared_ptr<std::map<std::string, ValueType>> entries;
         switch (headItem.tag) {
             case static_cast<uint16_t>(TAG::TAG_VERSION):
                 data.Skip(headItem);
@@ -335,6 +345,18 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
                     return false;
                 }
                 output.SetValue(value);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_RECORD_UTD_ID):
+                if (!data.Read(utdId, headItem)) {
+                    return false;
+                }
+                output.SetUtdId(std::move(utdId));
+                break;
+            case static_cast<uint16_t>(TAG::TAG_RECORD_ENTRIES):
+                if (!TLVUtil::Reading(entries, data, headItem)) {
+                    return false;
+                }
+                output.SetInnerEntries(entries);
                 break;
             default:
                 data.Skip(headItem);

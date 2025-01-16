@@ -18,6 +18,8 @@
 
 namespace OHOS {
 namespace UDMF {
+static std::set<std::string> FILE_TYPES = {
+    "general.file", "general.image", "general.video", "general.audio", "general.folder", "general.file-uri" };
 UnifiedData::UnifiedData()
 {
     properties_ = std::make_shared<UnifiedDataProperties>();
@@ -103,7 +105,9 @@ std::vector<std::string> UnifiedData::GetTypesLabels() const
 {
     std::vector<std::string> types;
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
-        types.push_back(UtdUtils::GetUtdIdFromUtdEnum(record->GetType()));
+        std::vector<std::string> recordTypes = record->GetTypes();
+        types.insert(types.end(),
+            std::make_move_iterator(recordTypes.begin()), std::make_move_iterator(recordTypes.end()));
     }
     return types;
 }
@@ -111,7 +115,8 @@ std::vector<std::string> UnifiedData::GetTypesLabels() const
 bool UnifiedData::HasType(const std::string &type) const
 {
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
-        if (UtdUtils::GetUtdIdFromUtdEnum(record->GetType()) == type) {
+        std::vector<std::string> recordTypes = record->GetTypes();
+        if (std::find(recordTypes.begin(), recordTypes.end(), type) != recordTypes.end()) {
             return true;
         }
     }
@@ -178,14 +183,11 @@ bool UnifiedData::IsComplete()
 
 bool UnifiedData::HasFileType() const
 {
-    std::set<UDType> fileTypes = {UDType::FILE, UDType::IMAGE, UDType::VIDEO, UDType::AUDIO, UDType::FOLDER};
-    auto types = GetUDTyps();
-    for (auto udType : types) {
-        if (fileTypes.find(udType) != fileTypes.end()) {
-            return true;
-        }
-    }
-    return false;
+    auto types = GetTypIds();
+    std::set<std::string> intersection;
+    std::set_intersection(FILE_TYPES.begin(), FILE_TYPES.end(), types.begin(), types.end(),
+        std::inserter(intersection, intersection.begin()));
+    return !intersection.empty();
 }
 
 void UnifiedData::SetProperties(std::shared_ptr<UnifiedDataProperties> properties)
@@ -222,11 +224,12 @@ void UnifiedData::SetChannelName(const std::string &name)
     channelName_ = std::move(name);
 }
 
-std::set<UDType> UnifiedData::GetUDTyps() const
+std::set<std::string> UnifiedData::GetTypIds() const
 {
-    std::set<UDType> types;
+    std::set<std::string> types;
     for (const auto &record : records_) {
-        types.insert(record->GetType());
+        std::set<std::string> recordTypes = record->GetUtdIds();
+        types.insert(recordTypes.begin(), recordTypes.end());
     }
     return types;
 }

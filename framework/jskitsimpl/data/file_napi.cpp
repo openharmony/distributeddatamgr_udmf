@@ -27,6 +27,10 @@ napi_value FileNapi::Constructor(napi_env env)
         /* File extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
         DECLARE_NAPI_FUNCTION("getValue", UnifiedRecordNapi::GetValue),
+        DECLARE_NAPI_FUNCTION("addEntry", UnifiedRecordNapi::AddEntry),
+        DECLARE_NAPI_FUNCTION("getEntry", UnifiedRecordNapi::GetEntry),
+        DECLARE_NAPI_FUNCTION("getEntries", UnifiedRecordNapi::GetEntries),
+        DECLARE_NAPI_FUNCTION("getTypes", UnifiedRecordNapi::GetTypes),
         /* File properties */
         DECLARE_NAPI_GETTER_SETTER("details", GetDetails, SetDetails),
         DECLARE_NAPI_GETTER_SETTER("uri", GetUri, SetUri),

@@ -106,15 +106,17 @@ void UnifiedDataHelper::CreateDirIfNotExist(const std::string& dirPath, const mo
 void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
 {
     for (const auto &record : data.GetRecords()) {
-        int64_t recordSize = record->GetSize();
-        auto udType = UtdUtils::GetUtdIdFromUtdEnum(record->GetType());
-        auto it = summary.summary.find(udType);
-        if (it == summary.summary.end()) {
-            summary.summary[udType] = recordSize;
-        } else {
-            summary.summary[udType] += recordSize;
+        auto entry = *record->GetEntries();
+        for (const auto &[utdId, value] : entry) {
+            auto valueSize = ObjectUtils::GetValueSize(value, false);
+            auto it = summary.summary.find(utdId);
+            if (it == summary.summary.end()) {
+                summary.summary[utdId] = valueSize;
+            } else {
+                summary.summary[utdId] += valueSize;
+            }
+            summary.totalSize += valueSize;
         }
-        summary.totalSize += recordSize;
     }
 }
 
