@@ -58,7 +58,7 @@ public:
     std::shared_ptr<std::map<std::string, ValueType>> GetEntries();
     std::shared_ptr<std::map<std::string, ValueType>> GetInnerEntries() const;
     void SetInnerEntries(std::shared_ptr<std::map<std::string, ValueType>> entries);
-    int64_t GetInnerEntriesSize();
+    int64_t GetInnerEntriesSize() const;
 	
     void SetEntryGetter(const std::vector<std::string> &utdIds, const std::shared_ptr<EntryGetter> &entryGetter);
     std::shared_ptr<EntryGetter> GetEntryGetter();

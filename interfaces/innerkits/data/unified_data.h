@@ -19,7 +19,6 @@
 #include "unified_data_properties.h"
 #include "unified_record.h"
 #include "visibility.h"
-#include <string>
 namespace OHOS {
 namespace UDMF {
 class API_EXPORT UnifiedData {

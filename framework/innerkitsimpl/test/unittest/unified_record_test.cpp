@@ -133,6 +133,7 @@ HWTEST_F(UnifiedRecordTest, Constructor_002, TestSize.Level0)
     auto it = entries->find(utdId);
     ASSERT_TRUE(it != entries->end());
     EXPECT_FALSE(std::holds_alternative<std::monostate>(it->second));
+    EXPECT_TRUE(std::holds_alternative<std::shared_ptr<Object>>(it->second));
 }
 
 /**

@@ -177,7 +177,7 @@ void UnifiedRecord::SetInnerEntries(std::shared_ptr<std::map<std::string, ValueT
     entries_ = entries;
 }
 
-int64_t UnifiedRecord::GetInnerEntriesSize()
+int64_t UnifiedRecord::GetInnerEntriesSize() const
 {
     if (entries_ == nullptr) {
         return 0;
