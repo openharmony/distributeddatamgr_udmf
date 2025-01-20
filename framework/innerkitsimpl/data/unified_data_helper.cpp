@@ -106,17 +106,7 @@ void UnifiedDataHelper::CreateDirIfNotExist(const std::string& dirPath, const mo
 void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
 {
     for (const auto &record : data.GetRecords()) {
-        auto entry = *record->GetEntries();
-        for (const auto &[utdId, value] : entry) {
-            auto valueSize = ObjectUtils::GetValueSize(value, false);
-            auto it = summary.summary.find(utdId);
-            if (it == summary.summary.end()) {
-                summary.summary[utdId] = valueSize;
-            } else {
-                summary.summary[utdId] += valueSize;
-            }
-            summary.totalSize += valueSize;
-        }
+        CalRecordSummary(*record->GetEntries(), summary);
     }
 }
 
@@ -249,6 +239,27 @@ int32_t UnifiedDataHelper::ProcessBigData(UnifiedData &data, Intention intention
     }
     LOG_DEBUG(UDMF_SERVICE, "Processing udmf data in memory");
     return E_OK;
+}
+
+void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry, Summary &summary)
+{
+    for (const auto &[utdId, value] : entry) {
+        auto typeId = utdId;
+        auto valueSize = ObjectUtils::GetValueSize(value, false);
+        if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+            auto object = std::get<std::shared_ptr<Object>>(value);
+            if (object->value_.find(APPLICATION_DEFINED_RECORD_MARK) != object->value_.end()) {
+                typeId = UtdUtils::GetUtdIdFromUtdEnum(APPLICATION_DEFINED_RECORD);
+            }
+        }
+        auto it = summary.summary.find(utdId);
+        if (it == summary.summary.end()) {
+            summary.summary[typeId] = valueSize;
+        } else {
+            summary.summary[typeId] += valueSize;
+        }
+        summary.totalSize += valueSize;
+    }
 }
 
 } // namespace UDMF

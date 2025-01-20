@@ -34,6 +34,7 @@ private:
     static void CreateDirIfNotExist(const std::string& dirPath, const mode_t& mode);
     static bool SaveUDataToFile(const std::string &dataFile, UnifiedData &data);
     static bool LoadUDataFromFile(const std::string &dataFile, UnifiedData &data);
+    static void CalRecordSummary(std::map<std::string, ValueType> &entries, Summary &summary);
     static std::string GetRootPath();
 
 private:
