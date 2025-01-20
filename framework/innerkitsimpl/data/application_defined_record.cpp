@@ -97,6 +97,7 @@ void ApplicationDefinedRecord::InitObject()
         object->value_[UNIFORM_DATA_TYPE] = applicationDefinedType;
         object->value_[ARRAY_BUFFER] = rawData_;
         object->value_[ARRAY_BUFFER_LENGTH] = static_cast<int>(rawData_.size());
+        object->value_["UDCConverFlag"] = true;
         object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }

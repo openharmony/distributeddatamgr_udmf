@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <variant>
 #define LOG_TAG "UnifiedDataHelper"
 #include "unified_data_helper.h"
 
@@ -108,7 +109,14 @@ void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
     for (const auto &record : data.GetRecords()) {
         auto entry = *record->GetEntries();
         for (const auto &[utdId, value] : entry) {
+            auto typeId = utdId;
             auto valueSize = ObjectUtils::GetValueSize(value, false);
+            if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+                auto object = std::get<std::shared_ptr<Object>>(value);
+                if (object->value_.find("UDCConverFlag") != object->value_.end()) {
+                    typeId = "ApplicationDefinedType";
+                }
+            }
             auto it = summary.summary.find(utdId);
             if (it == summary.summary.end()) {
                 summary.summary[utdId] = valueSize;
