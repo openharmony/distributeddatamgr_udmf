@@ -759,7 +759,7 @@ int64_t ObjectUtils::GetAllObjectSize(const std::shared_ptr<Object> object)
     }
     int64_t size = 0;
     for (auto [key, value] : object->value_) {
-        size += key.size() + GetValueSize(value, false);
+        size += static_cast<int64_t>(key.size()) + GetValueSize(value, false);
     }
     return size;
 }
