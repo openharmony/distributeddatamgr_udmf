@@ -1243,7 +1243,7 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     EXPECT_EQ(summary.summary["general.image"], image->GetSize());
     EXPECT_EQ(summary.summary["SystemDefinedType"], systemDefinedRecord->GetSize());
     EXPECT_EQ(summary.summary["openharmony.form"], systemDefinedForm->GetSize());
-    EXPECT_EQ(summary.summary["applicationDefinedType"], applicationDefinedRecord->GetSize());
+    EXPECT_EQ(summary.summary["ApplicationDefinedType"], applicationDefinedRecord->GetSize());
     EXPECT_EQ(summary.summary["general.file-uri"], record8->GetSize());
     EXPECT_EQ(summary.summary["general.png"], record9->GetSize());
 
@@ -2598,7 +2598,7 @@ HWTEST_F(UdmfClientTest, GetSummary004, TestSize.Level1)
     EXPECT_EQ(summary.summary["general.plain-text"], size1);
     EXPECT_EQ(summary.summary["general.image"], size2);
     EXPECT_EQ(summary.summary["openharmony.pixel-map"], size3);
-    EXPECT_EQ(summary.summary["my.type"], size4);
+    EXPECT_EQ(summary.summary["ApplicationDefinedType"], size4);
 
     EXPECT_EQ(summary.totalSize, record->GetSize());
 
@@ -2708,8 +2708,7 @@ HWTEST_F(UdmfClientTest, GetSummary005, TestSize.Level1)
     EXPECT_EQ(summary.summary["general.html"], size0);
     EXPECT_EQ(summary.summary["general.hyperlink"], size1);
     EXPECT_EQ(summary.summary["general.folder"], size2);
-    EXPECT_EQ(summary.summary["your.type"], size3);
-    EXPECT_EQ(summary.summary["my.type"], size4);
+    EXPECT_EQ(summary.summary["ApplicationDefinedType"], size3 + size4);
     EXPECT_EQ(summary.summary["openharmony.form"], size5);
     EXPECT_EQ(summary.summary["general.content-form"], size6);
 

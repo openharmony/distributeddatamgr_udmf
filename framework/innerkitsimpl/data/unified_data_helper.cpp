@@ -252,7 +252,7 @@ void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry
                 typeId = UtdUtils::GetUtdIdFromUtdEnum(APPLICATION_DEFINED_RECORD);
             }
         }
-        auto it = summary.summary.find(utdId);
+        auto it = summary.summary.find(typeId);
         if (it == summary.summary.end()) {
             summary.summary[typeId] = valueSize;
         } else {
