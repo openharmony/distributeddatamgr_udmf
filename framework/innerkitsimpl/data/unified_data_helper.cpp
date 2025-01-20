@@ -112,7 +112,7 @@ void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
             auto valueSize = ObjectUtils::GetValueSize(value, false);
             if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
                 auto object = std::get<std::shared_ptr<Object>>(value);
-                if (object->value_.find("UDCConverFlag") != object->value_.end()) {
+                if (object->value_.find(APPLICATION_DEFINED_RECORD_MARK) != object->value_.end()) {
                     typeId = UtdUtils::GetUtdIdFromUtdEnum(APPLICATION_DEFINED_RECORD);
                 }
             }
