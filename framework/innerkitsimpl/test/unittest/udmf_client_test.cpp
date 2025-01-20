@@ -1236,7 +1236,7 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     size += record9->GetSize();
 
     EXPECT_EQ(status, E_OK);
-    // EXPECT_EQ(summary.totalSize, size);
+    EXPECT_EQ(summary.totalSize, size);
     EXPECT_EQ(summary.summary["general.text"], text->GetSize());
     EXPECT_EQ(summary.summary["general.plain-text"], plainText->GetSize());
     EXPECT_EQ(summary.summary["general.file"], file->GetSize());
