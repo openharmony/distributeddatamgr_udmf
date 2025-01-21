@@ -378,7 +378,7 @@ template <> bool Writing(const EntryContainer &input, TLVObject &data, TAG tag)
 template <> bool Reading(EntryContainer &output, TLVObject &data, const TLVHead &head)
 {
     std::shared_ptr<std::map<std::string, ValueType>> entries;
-    if(!TLVUtil::Reading(entries, data, head)) {
+    if (!TLVUtil::Reading(entries, data, head)) {
         return false;
     }
     output.SetEntries(entries);
