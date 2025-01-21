@@ -588,6 +588,10 @@ void ImageEmbeddingNapi::LoadCompleteCB(napi_env env, napi_status status, void *
         }
         napi_reject_deferred(env, loadCallbackData->deferred, value);
     } else {
+        status = napi_get_undefined(env, &value);
+        if (status != napi_ok) {
+            AIP_HILOGE(" napi_get_undefined failed");
+        }
         status = napi_resolve_deferred(env, loadCallbackData->deferred, value);
         if (status != napi_ok) {
             AIP_HILOGE(" napi_resolve_deferred failed");
@@ -693,6 +697,10 @@ void ImageEmbeddingNapi::ReleaseCompleteCB(napi_env env, napi_status status, voi
         }
         napi_reject_deferred(env, releaseCallbackData->deferred, value);
     } else {
+        status = napi_get_undefined(env, &value);
+        if (status != napi_ok) {
+            AIP_HILOGE(" napi_get_undefined failed");
+        }
         status = napi_resolve_deferred(env, releaseCallbackData->deferred, value);
         if (status != napi_ok) {
             AIP_HILOGE(" napi_resolve_deferred failed");
