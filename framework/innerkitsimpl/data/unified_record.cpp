@@ -289,7 +289,7 @@ bool UnifiedRecord::HasFileType(std::string &fileUri) const
         LOG_ERROR(UDMF_FRAMEWORK, "Get uri empty, plase check the uri.");
         return false;
     }
-#if !defined(CROSS_PLATFORM)
+#ifndef CROSS_PLATFORM
     Uri uri(fileUri);
     std::string scheme = uri.GetScheme();
     std::transform(scheme.begin(), scheme.end(), scheme.begin(), ::tolower);
