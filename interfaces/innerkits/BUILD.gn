@@ -49,6 +49,7 @@ ohos_shared_library("udmf_client") {
   }
   sources = [
     "${udmf_framework_path}/common/endian_converter.cpp",
+    "${udmf_framework_path}/common/entry_container.cpp",
     "${udmf_framework_path}/common/tlv_object.cpp",
     "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/common/udmf_copy_file.cpp",

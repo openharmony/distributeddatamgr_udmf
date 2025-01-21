@@ -24,6 +24,7 @@
 #include "unified_key.h"
 #include "tlv_object.h"
 #include "unified_record.h"
+#include "entry_container.h"
 
 
 namespace OHOS {
@@ -92,6 +93,10 @@ template <> bool API_EXPORT Reading(UnifiedData &output, TLVObject &data, const 
 template <> size_t API_EXPORT CountBufferSize(const UnifiedRecord &input, TLVObject &data);
 template <> bool API_EXPORT Writing(const UnifiedRecord &input, TLVObject &data, TAG tag);
 template <> bool API_EXPORT Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &head);
+
+template <> size_t API_EXPORT CountBufferSize(const EntryContainer &input, TLVObject &data);
+template <> bool API_EXPORT Writing(const EntryContainer &input, TLVObject &data, TAG tag);
+template <> bool API_EXPORT Reading(EntryContainer &output, TLVObject &data, const TLVHead &head);
 
 template <> size_t API_EXPORT CountBufferSize(const Runtime &input, TLVObject &data);
 template <> bool API_EXPORT Writing(const Runtime &input, TLVObject &data, TAG tag);

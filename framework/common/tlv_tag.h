@@ -75,6 +75,7 @@ enum class TAG : uint16_t {
     TAG_RUNTIME,
     TAG_RECORD_UTD_ID,
     TAG_RECORD_ENTRIES,
+    TAG_INNER_ENTRIES,
 };
 }
 #endif //UDMF_TLV_TAG_H

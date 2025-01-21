@@ -145,6 +145,7 @@ template <> size_t CountBufferSize(const Object &input, TLVObject &data)
 
 template <> bool Writing(const Object &input, TLVObject &data, TAG tag)
 {
+    LOG_INFO(UDMF_FRAMEWORK, "Writing Object");
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -361,6 +362,26 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
                 data.Skip(headItem);
         }
     }
+    return true;
+}
+
+template <> size_t CountBufferSize(const EntryContainer &input, TLVObject &data)
+{
+    return CountBufferSize(input.GetEntries(), data);
+}
+
+template <> bool Writing(const EntryContainer &input, TLVObject &data, TAG tag)
+{
+    return Writing(input.GetEntries(), data, tag);
+}
+
+template <> bool Reading(EntryContainer &output, TLVObject &data, const TLVHead &head)
+{
+    std::shared_ptr<std::map<std::string, ValueType>> entries;
+    if(!TLVUtil::Reading(entries, data, head)) {
+        return false;
+    }
+    output.SetEntries(entries);
     return true;
 }
 
