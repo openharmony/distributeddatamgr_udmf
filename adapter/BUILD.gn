@@ -70,6 +70,8 @@ config("arkui_x_udmf_config") {
     "${arkui_x_graphic_surface_path}/interfaces/inner_api/utils",
     "${third_party_path}/skia",
   ]
+
+  defines = [ "CROSS_PLATFORM" ]
 }
 
 arkui_x_public_source = [
@@ -205,6 +207,7 @@ ohos_source_set("arkui_x_uniformtypedescriptor") {
 ohos_source_set("arkui_x_unifieddatachannel") {
   include_dirs = [
     "${ability_runtime_cross_platform_path}/frameworks/js/napi/napi_common",
+    "${kv_store_path}/interfaces/innerkits/distributeddata/include",
     "${udmf_root_path}/adapter/framework/innerkitsimpl/client",
     "${third_party_path}/bounds_checking_function/include",
   ]
@@ -217,7 +220,6 @@ ohos_source_set("arkui_x_unifieddatachannel") {
     "${udmf_framework_path}/jskitsimpl/data/audio_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/file_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/folder_napi.cpp",
-    "${udmf_framework_path}/jskitsimpl/data/get_data_params_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/html_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/image_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/link_napi.cpp",
@@ -263,6 +265,7 @@ ohos_source_set("arkui_x_udmf_data_napi") {
   include_dirs = [
     "${ability_runtime_cross_platform_path}/frameworks/js/napi/napi_common",
     "${ability_runtime_cross_platform_path}/interfaces/inner_api/want",
+    "${kv_store_path}/interfaces/innerkits/distributeddata/include",
   ]
 
   sources = [
@@ -273,7 +276,6 @@ ohos_source_set("arkui_x_udmf_data_napi") {
     "${udmf_framework_path}/jskitsimpl/data/audio_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/file_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/folder_napi.cpp",
-    "${udmf_framework_path}/jskitsimpl/data/get_data_params_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/html_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/image_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/link_napi.cpp",
