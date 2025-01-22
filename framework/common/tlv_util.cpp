@@ -592,7 +592,8 @@ template <> bool Writing(const std::shared_ptr<std::map<std::string, ValueType>>
     return Writing(*input, data, tag);
 }
 
-template <> bool Reading(std::shared_ptr<std::map<std::string, ValueType>> &output, TLVObject &data, const TLVHead &head)
+template <> bool Reading(std::shared_ptr<std::map<std::string, ValueType>> &output,
+    TLVObject &data, const TLVHead &head)
 {
     if (output == nullptr) {
         output = std::make_shared<std::map<std::string, ValueType>>();

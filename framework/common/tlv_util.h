@@ -109,10 +109,13 @@ template <> bool API_EXPORT Writing(const std::shared_ptr<OHOS::Media::PixelMap>
 template <>
 bool API_EXPORT Reading(std::shared_ptr<OHOS::Media::PixelMap> &output, TLVObject &data, const TLVHead &head);
 
-template <> size_t API_EXPORT CountBufferSize(const std::shared_ptr<std::map<std::string, ValueType>> &input, TLVObject &data);
-template <> bool API_EXPORT Writing(const std::shared_ptr<std::map<std::string, ValueType>> &input, TLVObject &data, TAG tag);
+template <> size_t API_EXPORT CountBufferSize(const std::shared_ptr<std::map<std::string, ValueType>> &input,
+    TLVObject &data);
+template <> bool API_EXPORT Writing(const std::shared_ptr<std::map<std::string, ValueType>> &input,
+    TLVObject &data, TAG tag);
 template <>
-bool API_EXPORT Reading(std::shared_ptr<std::map<std::string, ValueType>> &output, TLVObject &data, const TLVHead &head);
+bool API_EXPORT Reading(std::shared_ptr<std::map<std::string, ValueType>> &output,
+    TLVObject &data, const TLVHead &head);
 
 template <> size_t API_EXPORT CountBufferSize(const std::shared_ptr<OHOS::AAFwk::Want> &input, TLVObject &data);
 template <> bool API_EXPORT Writing(const std::shared_ptr<OHOS::AAFwk::Want> &input, TLVObject &data, TAG tag);
