@@ -17,8 +17,11 @@
 #define UDMF_TLV_UTIL_H
 
 
+#include <map>
+#include <string>
 #include <utility>
 #include <vector>
+#include "unified_meta.h"
 #include "unified_types.h"
 #include "unified_data.h"
 #include "unified_key.h"
@@ -110,6 +113,11 @@ template <> size_t API_EXPORT CountBufferSize(const std::shared_ptr<OHOS::Media:
 template <> bool API_EXPORT Writing(const std::shared_ptr<OHOS::Media::PixelMap> &input, TLVObject &data, TAG tag);
 template <>
 bool API_EXPORT Reading(std::shared_ptr<OHOS::Media::PixelMap> &output, TLVObject &data, const TLVHead &head);
+
+template <> size_t API_EXPORT CountBufferSize(const std::shared_ptr<std::map<std::string, ValueType>> &input, TLVObject &data);
+template <> bool API_EXPORT Writing(const std::shared_ptr<std::map<std::string, ValueType>> &input, TLVObject &data, TAG tag);
+template <>
+bool API_EXPORT Reading(std::shared_ptr<std::map<std::string, ValueType>> &output, TLVObject &data, const TLVHead &head);
 
 template <> size_t API_EXPORT CountBufferSize(const std::shared_ptr<OHOS::AAFwk::Want> &input, TLVObject &data);
 template <> bool API_EXPORT Writing(const std::shared_ptr<OHOS::AAFwk::Want> &input, TLVObject &data, TAG tag);
