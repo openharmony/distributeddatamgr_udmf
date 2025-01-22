@@ -35,17 +35,34 @@ int32_t PasteboardSignalStub::OnRemoteRequest(uint32_t code, MessageParcel &data
     pid_t uid = IPCSkeleton::GetCallingUid();
 
     LOG_INFO(UDMF_SERVICE, "CallingPid=%{public}d, CallingUid=%{public}d, code=%{public}u", pid, uid, code);
-    return HandleProgressSignalValue(data);
-
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);;
+    HandleProgressSignalValue(data);
+    return E_OK;
 }
 
-int32_t PasteboardSignalCallback::HandleProgressSignalValue(MessageParcel &data)
+void PasteboardSignalCallback::HandleProgressSignalValue(MessageParcel &data)
 {
+    int32_t cancelStatus = 0;
     std::string signalValue = data.ReadString();
-    int32_t ret = UdmfAsyncClient::GetInstance().Cancel(signalValue);
-    LOG_INFO(UDMF_SERVICE, "Cancel finished, ret=%{public}d.", ret);
-    return ret;
+
+    try {
+        cancelStatus = std::stoi(signalValue);
+    } catch (const std::exception& e) {
+        LOG_ERROR(UDMF_CLIENT, "Signal value error, signalValue=%{public}s", signalValue.c_str());
+        return;
+    }
+    switch (cancelStatus) {
+        case NORMAL_PASTE:
+            break;
+        case CANCEL_PASTE:
+            UdmfAsyncClient::GetInstance().CancelOnSingleTask();
+            break;
+        case PASTE_TIME_OUT:
+            LOG_ERROR(UDMF_CLIENT, "Progress timed out");
+            break;
+        default:
+            LOG_ERROR(UDMF_CLIENT, "status error, status=%{public}d", cancelStatus);
+            break;
+    }
 }
 } // namespace UDMF
 } // namespace OHOS

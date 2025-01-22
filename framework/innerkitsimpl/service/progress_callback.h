@@ -28,7 +28,7 @@ public:
     virtual ~IPasteboardSignal() override = default;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.miscservices.dialog.callback");
-    virtual int32_t HandleProgressSignalValue(MessageParcel &data) = 0;
+    virtual void HandleProgressSignalValue(MessageParcel &data) = 0;
 };
 
 class PasteboardSignalStub : public IRemoteStub<IPasteboardSignal> {
@@ -45,7 +45,7 @@ public:
     PasteboardSignalCallback() = default;
     virtual ~PasteboardSignalCallback() override = default;
 
-    int32_t HandleProgressSignalValue(MessageParcel &data) override;
+    void HandleProgressSignalValue(MessageParcel &data) override;
 };
 } // namespace UDMF
 } // namespace OHOS

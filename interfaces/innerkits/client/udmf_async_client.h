@@ -25,6 +25,7 @@ public:
     static UdmfAsyncClient API_EXPORT &GetInstance();
     Status API_EXPORT StartAsyncDataRetrieval(const GetDataParams &params);
     Status API_EXPORT Cancel(std::string businessUdKey);
+    Status CancelOnSingleTask();
 private:
     UdmfAsyncClient();
     ~UdmfAsyncClient() = default;

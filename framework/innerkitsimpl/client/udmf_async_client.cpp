@@ -86,6 +86,22 @@ Status UdmfAsyncClient::Cancel(std::string businessUdKey)
     return E_OK;
 }
 
+Status UdmfAsyncClient::CancelOnSingleTask()
+{
+    std::lock_guard<std::mutex> lockMap(mutex_);
+    if (asyncHelperMap_.empty()) {
+        LOG_ERROR(UDMF_CLIENT, "No task can cancel");
+        return E_ERROR;
+    }
+    if (asyncHelperMap_.size() > 1) {
+        LOG_ERROR(UDMF_CLIENT, "Multiple tasks exist");
+        return E_ERROR;
+    }
+    LOG_INFO(UDMF_CLIENT, "Cancel task key=%{public}s", asyncHelperMap_.begin()->first.c_str());
+    asyncHelperMap_.begin()->second->progressQueue.Cancel();
+    return E_OK;
+}
+
 Status UdmfAsyncClient::ProgressTask(const std::string &businessUdKey)
 {
     auto &asyncHelper = asyncHelperMap_.at(businessUdKey);
