@@ -23,7 +23,8 @@
 
 namespace OHOS {
 namespace UDMF {
-int32_t PasteboardSignalStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int32_t PasteboardSignalStub::OnRemoteRequest(uint32_t code,
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     std::u16string myDescriptor = PasteboardSignalStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
