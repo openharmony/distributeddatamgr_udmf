@@ -297,9 +297,9 @@ int32_t UdmfServiceClient::ClearAsynProcessByKey(const std::string &businessUdKe
     return udmfProxy_->ClearAsynProcessByKey(businessUdKey);
 }
 
-int32_t UdmfServiceClient::InvokeHap(const std::string &progressKey, const std::string &cancelKey)
+int32_t UdmfServiceClient::InvokeHap(const std::string &progressKey, const sptr<IRemoteObject> &observer)
 {
-    return udmfProxy_->InvokeHap(progressKey, cancelKey);
+    return udmfProxy_->InvokeHap(progressKey, observer);
 }
 } // namespace UDMF
 } // namespace OHOS

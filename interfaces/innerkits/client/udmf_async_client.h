@@ -48,8 +48,6 @@ private:
     Status Clear(const std::string &businessUdKey);
     Status ProcessUnifiedData(std::unique_ptr<AsyncHelper> &asyncHelper);
     bool IsParamValid(const GetDataParams &params);
-    Status GetCancelStatus(const std::string &cancelKey, std::string &value);
-    void HandleCancelStatus(std::unique_ptr<AsyncHelper> &asyncHelper);
 
     ExecutorPool executor_;
     std::unordered_map<std::string, std::unique_ptr<AsyncHelper>> asyncHelperMap_;

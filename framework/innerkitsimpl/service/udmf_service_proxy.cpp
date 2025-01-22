@@ -262,10 +262,10 @@ int32_t UdmfServiceProxy::ClearAsynProcessByKey(const std::string &businessUdKey
     return E_OK;
 }
 
-int32_t UdmfServiceProxy::InvokeHap(const std::string &progressKey, const std::string &cancelKey)
+int32_t UdmfServiceProxy::InvokeHap(const std::string &progressKey, const sptr<IRemoteObject> &observer)
 {
     MessageParcel reply;
-    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::INVOKEN_HAP, reply, progressKey, cancelKey);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::INVOKEN_HAP, reply, progressKey, observer);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x", status);
         return status;
