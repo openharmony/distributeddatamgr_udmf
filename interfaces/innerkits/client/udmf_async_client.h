@@ -25,6 +25,7 @@ public:
     static UdmfAsyncClient API_EXPORT &GetInstance();
     Status API_EXPORT StartAsyncDataRetrieval(const GetDataParams &params);
     Status API_EXPORT Cancel(std::string businessUdKey);
+    Status CancelOnSingleTask();
 private:
     UdmfAsyncClient();
     ~UdmfAsyncClient() = default;
@@ -48,8 +49,6 @@ private:
     Status Clear(const std::string &businessUdKey);
     Status ProcessUnifiedData(std::unique_ptr<AsyncHelper> &asyncHelper);
     bool IsParamValid(const GetDataParams &params);
-    Status GetCancelStatus(const std::string &cancelKey, std::string &value);
-    void HandleCancelStatus(std::unique_ptr<AsyncHelper> &asyncHelper);
 
     ExecutorPool executor_;
     std::unordered_map<std::string, std::unique_ptr<AsyncHelper>> asyncHelperMap_;
