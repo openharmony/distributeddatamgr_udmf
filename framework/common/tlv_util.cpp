@@ -145,7 +145,6 @@ template <> size_t CountBufferSize(const Object &input, TLVObject &data)
 
 template <> bool Writing(const Object &input, TLVObject &data, TAG tag)
 {
-    LOG_INFO(UDMF_FRAMEWORK, "Writing Object");
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
