@@ -23,10 +23,10 @@
 
 namespace OHOS {
 namespace UDMF {
-int32_t PasteboardSignalStub::OnRemoteRequest(uint32_t code,
+int32_t ProgressSignalStub::OnRemoteRequest(uint32_t code,
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    std::u16string myDescriptor = PasteboardSignalStub::GetDescriptor();
+    std::u16string myDescriptor = ProgressSignalStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (myDescriptor != remoteDescriptor) {
         LOG_ERROR(UDMF_SERVICE, "Descriptor checked fail");
@@ -34,13 +34,12 @@ int32_t PasteboardSignalStub::OnRemoteRequest(uint32_t code,
     }
     pid_t pid = IPCSkeleton::GetCallingPid();
     pid_t uid = IPCSkeleton::GetCallingUid();
-
     LOG_INFO(UDMF_SERVICE, "CallingPid=%{public}d, CallingUid=%{public}d, code=%{public}u", pid, uid, code);
     HandleProgressSignalValue(data);
     return E_OK;
 }
 
-void PasteboardSignalCallback::HandleProgressSignalValue(MessageParcel &data)
+void ProgressSignalCallback::HandleProgressSignalValue(MessageParcel &data)
 {
     int32_t cancelStatus = 0;
     std::string signalValue = data.ReadString();

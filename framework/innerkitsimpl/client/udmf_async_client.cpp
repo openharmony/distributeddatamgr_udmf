@@ -155,7 +155,7 @@ Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
         Clear(businessUdKey);
         return E_ERROR;
     }
-    sptr<IRemoteObject> callback = new PasteboardSignalCallback();
+    sptr<IRemoteObject> callback = new ProgressSignalCallback();
     auto status = UdmfServiceClient::GetInstance()->InvokeHap(asyncHelper->processKey, callback);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Invoke hap failed, status=%{public}d", status);

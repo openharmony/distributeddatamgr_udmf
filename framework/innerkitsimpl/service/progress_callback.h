@@ -21,30 +21,19 @@
 
 namespace OHOS {
 namespace UDMF {
-
-class IPasteboardSignal : public IRemoteBroker {
+class IProgressSignal : public IRemoteBroker {
 public:
-    IPasteboardSignal() = default;
-    virtual ~IPasteboardSignal() override = default;
-
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.miscservices.dialog.callback");
     virtual void HandleProgressSignalValue(MessageParcel &data) = 0;
 };
 
-class PasteboardSignalStub : public IRemoteStub<IPasteboardSignal> {
+class ProgressSignalStub : public IRemoteStub<IProgressSignal> {
 public:
-    PasteboardSignalStub() = default;
-    virtual ~PasteboardSignalStub() override = default;
-
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
-private:
 };
 
-class PasteboardSignalCallback : public PasteboardSignalStub {
+class ProgressSignalCallback : public ProgressSignalStub {
 public:
-    PasteboardSignalCallback() = default;
-    virtual ~PasteboardSignalCallback() override = default;
-
     void HandleProgressSignalValue(MessageParcel &data) override;
 };
 } // namespace UDMF
