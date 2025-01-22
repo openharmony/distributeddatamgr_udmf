@@ -115,10 +115,7 @@ ohos_shared_library("udmf_client") {
 
   part_name = "udmf"
   use_exceptions = true
-  cflags_cc = [
-    "-fvisibility=hidden",
-    "-O2",
-  ]
+  cflags_cc = [ "-fvisibility=hidden" ]
 }
 
 config("utd_client_config") {
@@ -171,15 +168,9 @@ ohos_shared_library("utd_client") {
   subsystem_name = "distributeddatamgr"
 
   part_name = "udmf"
-  cflags_cc = [
-    "-fvisibility=hidden",
-    "-O2",
-  ]
+  cflags_cc = [ "-fvisibility=hidden" ]
   if (build_selinux) {
-    cflags = [
-      "-DWITH_SELINUX",
-      "-O2",
-    ]
+    cflags = [ "-DWITH_SELINUX" ]
     external_deps += [ "selinux_adapter:librestorecon" ]
   }
 }
