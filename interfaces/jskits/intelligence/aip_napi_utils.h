@@ -35,6 +35,7 @@ public:
     static bool TransJsToStr(napi_env env, napi_value value, std::string &str);
     static bool TransJsToStrUnlimited(napi_env env, napi_value value, std::string &str);
     static bool TransJsToInt32(napi_env env, napi_value value, int32_t &res);
+    static bool TransJsToDouble(napi_env env, napi_value value, double &res);
     static bool TransJsToBool(napi_env env, napi_value value, bool &res);
     static void CreateStringData(napi_env env, napi_value aipServiceValue, napi_value result, const std::string name,
         std::string &content);

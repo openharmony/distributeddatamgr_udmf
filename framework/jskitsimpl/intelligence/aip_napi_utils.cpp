@@ -192,6 +192,16 @@ bool AipNapiUtils::TransJsToInt32(napi_env env, napi_value value, int32_t &res)
     return true;
 }
 
+bool AipNapiUtils::TransJsToDouble(napi_env env, napi_value value, double &res)
+{
+    napi_status status = napi_get_value_double(env, value, &res);
+    if (status != napi_ok) {
+        AIP_HILOGE("napi_get_value_double failed");
+        return false;
+    }
+    return true;
+}
+
 bool AipNapiUtils::TransJsToBool(napi_env env, napi_value value, bool &res)
 {
     napi_status status = napi_get_value_bool(env, value, &res);

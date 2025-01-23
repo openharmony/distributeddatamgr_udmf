@@ -53,7 +53,7 @@ private:
     static bool GetEmbeddingStringAsyncExecution(napi_env env, napi_deferred deferred, std::string str);
     static bool GetEmbeddingArrayAsyncExecution(napi_env env, napi_deferred deferred, std::vector<std::string> text);
     static bool SplitTextAsyncExecution(napi_env env, napi_deferred deferred, std::string strArg, int32_t configSize,
-        int32_t configOverlap);
+        double configOverlap);
     static napi_value StringType(napi_env env, napi_value args, napi_value promise, napi_deferred deferred);
     static napi_value ArrayType(napi_env env, napi_value args, napi_value promise, napi_deferred deferred);
     static bool ValidateAndDealArrayArgs(napi_env env, napi_value args, std::vector<std::string> &strArr);

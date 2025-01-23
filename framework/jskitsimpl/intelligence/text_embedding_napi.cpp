@@ -79,7 +79,7 @@ struct SplitTextCallbackData {
     napi_deferred deferred;
     std::string strArg;
     int32_t configSize;
-    int32_t configOverlap;
+    double configOverlap;
     int32_t dataRet;
     std::vector<std::string> ret;
 };
@@ -420,11 +420,11 @@ napi_value TextEmbeddingNapi::SplitText(napi_env env, napi_callback_info info)
         return nullptr;
     }
     int32_t configSize;
-    int32_t configOverlap;
+    double configOverlap;
     AipNapiUtils::TransJsToInt32(env, cfgSize, configSize);
-    AipNapiUtils::TransJsToInt32(env, cfgOverlap, configOverlap);
+    AipNapiUtils::TransJsToDouble(env, cfgOverlap, configOverlap);
     AIP_HILOGI("string strArg: %{public}d", configSize);
-    AIP_HILOGI("string strArg: %{public}d", configOverlap);
+    AIP_HILOGI("string strArg: %{public}f", configOverlap);
 
     napi_value promise = nullptr;
     napi_deferred deferred = nullptr;
@@ -443,7 +443,7 @@ napi_value TextEmbeddingNapi::SplitText(napi_env env, napi_callback_info info)
 }
 
 bool TextEmbeddingNapi::SplitTextAsyncExecution(napi_env env, napi_deferred deferred, std::string strArg,
-    int32_t configSize, int32_t configOverlap)
+    int32_t configSize, double configOverlap)
 {
     AIP_HILOGD("Enter");
     auto splitTextCallbackData = new SplitTextCallbackData{
@@ -486,7 +486,7 @@ void TextEmbeddingNapi::SplitTextExecuteCB(napi_env env, void *data)
     SplitTextCallbackData *splitTextCallbackData = static_cast<SplitTextCallbackData *>(data);
     std::string strArg = splitTextCallbackData->strArg;
     int32_t configSize = splitTextCallbackData->configSize;
-    int32_t configOverlap = splitTextCallbackData->configOverlap;
+    double configOverlap = splitTextCallbackData->configOverlap;
     std::vector<std::string> result;
     int32_t ret = textAipCoreManager_->SplitText(strArg, configSize, static_cast<float>(configOverlap), result);
     if (ret != ERR_OK) {
