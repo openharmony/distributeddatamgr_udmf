@@ -574,6 +574,32 @@ template <> bool Reading(std::shared_ptr<OHOS::Media::PixelMap> &output, TLVObje
     return true;
 }
 
+template <> size_t CountBufferSize(const std::shared_ptr<std::map<std::string, ValueType>> &input, TLVObject &data)
+{
+    if (input == nullptr) {
+        return data.CountHead();
+    }
+    return CountBufferSize(*input, data);
+}
+
+template <> bool Writing(const std::shared_ptr<std::map<std::string, ValueType>> &input, TLVObject &data, TAG tag)
+{
+    if (input == nullptr) {
+        return false;
+    }
+    InitWhenFirst(input, data);
+    return Writing(*input, data, tag);
+}
+
+template <> bool Reading(std::shared_ptr<std::map<std::string, ValueType>> &output,
+    TLVObject &data, const TLVHead &head)
+{
+    if (output == nullptr) {
+        output = std::make_shared<std::map<std::string, ValueType>>();
+    }
+    return Reading(*output, data, head);
+}
+
 template <> size_t CountBufferSize(const std::shared_ptr<OHOS::AAFwk::Want> &input, TLVObject &data)
 {
     Parcel parcel;
