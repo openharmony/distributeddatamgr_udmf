@@ -214,7 +214,7 @@ napi_value ImageEmbeddingNapi::GetImageEmbeddingModel(napi_env env, napi_callbac
     }
 
     ModelConfigData imgModelConfig;
-    if (!ParseModelConfig(env, args, &imgModelConfig)) {
+    if (!ParseModelConfig(env, args, argc, &imgModelConfig)) {
         AIP_HILOGE("ParseModelConfig failed");
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "wrong params type.");
         return nullptr;
@@ -245,7 +245,7 @@ napi_value ImageEmbeddingNapi::GetImageEmbeddingModel(napi_env env, napi_callbac
     return promise;
 }
 
-bool ImageEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, ModelConfigData *modelConfig)
+bool ImageEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *modelConfig)
 {
     AIP_HILOGI("Enter");
     napi_value version, isNPUAvailable, cachePath;

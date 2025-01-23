@@ -41,7 +41,7 @@ public:
     virtual int32_t LoadImageModel() = 0;
     virtual int32_t ReleaseImageModel() = 0;
     virtual int32_t GetImageEmbedding(std::string uri, std::vector<float> &results) = 0;
-    virtual int32_t SplitText(std::string text, int32_t size, int32_t overlap, std::vector<std::string> &results) = 0;
+    virtual int32_t SplitText(std::string text, int32_t size, float overlap, std::vector<std::string> &results) = 0;
 };
 
 struct AipCoreManagerHandle {

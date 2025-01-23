@@ -53,7 +53,7 @@ private:
     static bool CreateAsyncImgModelExecution(napi_env env, AsyncGetImageEmbeddingModelData *asyncModelData);
     static void GetImgEmbeddingModelExecutionCB(napi_env env, void *data);
     static void GetImgEmbeddingModelCompleteCB(napi_env env, napi_status status, void *data);
-    static bool ParseModelConfig(napi_env env, napi_value *args, ModelConfigData *textModelConfig);
+    static bool ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *textModelConfig);
     static void LoadExecuteCB(napi_env env, void *data);
     static void LoadCompleteCB(napi_env env, napi_status status, void *data);
     static void ReleaseExecuteCB(napi_env env, void *data);

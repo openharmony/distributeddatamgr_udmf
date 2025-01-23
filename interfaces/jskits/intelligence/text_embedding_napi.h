@@ -71,7 +71,7 @@ private:
     static bool CreateAsyncTextModelExecution(napi_env env, AsyncGetTextEmbeddingModelData *asyncModelData);
     static void GetTextEmbeddingModelExecutionCB(napi_env env, void *data);
     static void GetTextEmbeddingModelCompleteCB(napi_env env, napi_status status, void *data);
-    static bool ParseModelConfig(napi_env env, napi_value *args, ModelConfigData *textModelConfig);
+    static bool ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *textModelConfig);
 
     static thread_local napi_ref sConstructor_;
     static AipCoreManagerHandle textAipCoreMgrHandle_;

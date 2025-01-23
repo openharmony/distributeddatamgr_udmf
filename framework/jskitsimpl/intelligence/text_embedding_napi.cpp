@@ -234,7 +234,7 @@ napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_
     }
 
     ModelConfigData textModelConfig;
-    if (!ParseModelConfig(env, args, &textModelConfig)) {
+    if (!ParseModelConfig(env, args, argc, &textModelConfig)) {
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "ParseModelConfig failed");
         return nullptr;
     }
@@ -262,7 +262,7 @@ napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_
     return promise;
 }
 
-bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, ModelConfigData *textModelConfig)
+bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *textModelConfig)
 {
     AIP_HILOGI("Enter");
     napi_value version, isNPUAvailable, cachePath;
@@ -488,7 +488,7 @@ void TextEmbeddingNapi::SplitTextExecuteCB(napi_env env, void *data)
     int32_t configSize = splitTextCallbackData->configSize;
     int32_t configOverlap = splitTextCallbackData->configOverlap;
     std::vector<std::string> result;
-    int32_t ret = textAipCoreManager_->SplitText(strArg, configSize, configOverlap, result);
+    int32_t ret = textAipCoreManager_->SplitText(strArg, configSize, static_cast<float>(configOverlap), result);
     if (ret != ERR_OK) {
         AIP_HILOGE("SplitText failed");
         result = {};
