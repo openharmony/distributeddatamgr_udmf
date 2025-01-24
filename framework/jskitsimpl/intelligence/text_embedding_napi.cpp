@@ -309,7 +309,6 @@ bool TextEmbeddingNapi::CreateAsyncTextModelExecution(napi_env env, AsyncGetText
     napi_status status = napi_create_string_utf8(env, "GetTextEmbeddingModel", NAPI_AUTO_LENGTH, &resourceName);
     if (status != napi_ok) {
         AIP_HILOGE(" napi_create_string_utf8 failed");
-        delete asyncModelData;
         return false;
     }
 
