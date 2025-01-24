@@ -53,7 +53,7 @@ private:
     static bool GetEmbeddingStringAsyncExecution(napi_env env, napi_deferred deferred, std::string str);
     static bool GetEmbeddingArrayAsyncExecution(napi_env env, napi_deferred deferred, std::vector<std::string> text);
     static bool SplitTextAsyncExecution(napi_env env, napi_deferred deferred, std::string strArg, int32_t configSize,
-        int32_t configOverlap);
+        double configOverlap);
     static napi_value StringType(napi_env env, napi_value args, napi_value promise, napi_deferred deferred);
     static napi_value ArrayType(napi_env env, napi_value args, napi_value promise, napi_deferred deferred);
     static bool ValidateAndDealArrayArgs(napi_env env, napi_value args, std::vector<std::string> &strArr);
@@ -71,7 +71,7 @@ private:
     static bool CreateAsyncTextModelExecution(napi_env env, AsyncGetTextEmbeddingModelData *asyncModelData);
     static void GetTextEmbeddingModelExecutionCB(napi_env env, void *data);
     static void GetTextEmbeddingModelCompleteCB(napi_env env, napi_status status, void *data);
-    static bool ParseModelConfig(napi_env env, napi_value *args, ModelConfigData *textModelConfig);
+    static bool ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *textModelConfig);
 
     static thread_local napi_ref sConstructor_;
     static AipCoreManagerHandle textAipCoreMgrHandle_;

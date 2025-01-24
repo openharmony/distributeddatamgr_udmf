@@ -36,7 +36,7 @@ public:
     int32_t LoadImageModel() override;
     int32_t ReleaseImageModel() override;
     int32_t GetImageEmbedding(std::string uri, std::vector<float> &results) override;
-    int32_t SplitText(std::string text, int32_t size, int32_t overlap, std::vector<std::string> &results) override;
+    int32_t SplitText(std::string text, int32_t size, float overlap, std::vector<std::string> &results) override;
 };
 } // namespace DataIntelligence
 } // namespace OHOS

@@ -68,7 +68,7 @@ int32_t IAipCoreManagerImpl::GetImageEmbedding(std::string uri, std::vector<floa
     return DEVICE_EXCEPTION;
 }
 
-int32_t IAipCoreManagerImpl::SplitText(std::string text, int32_t size, int32_t overlap,
+int32_t IAipCoreManagerImpl::SplitText(std::string text, int32_t size, float overlap,
     std::vector<std::string> &results)
 {
     return DEVICE_EXCEPTION;
