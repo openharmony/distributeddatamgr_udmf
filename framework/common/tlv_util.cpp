@@ -603,6 +603,7 @@ template <> bool Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &
     auto err = memcpy_s(buffer, val.size(), val.data(), val.size());
     if (err != EOK) {
         LOG_ERROR(UDMF_FRAMEWORK, "memcpy_s error in tlv read want. tag=%{public}hu", head.tag);
+        free(buffer);
         return false;
     }
     if (!parcel->ParseFrom((uintptr_t)buffer, head.len)) {
