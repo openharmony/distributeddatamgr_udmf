@@ -1805,7 +1805,7 @@ describe('UdmfJSTest', function () {
         'key1': 'value1',
         'key2': 'value2',
       }
-    }
+    };
     let record1 = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plainText);
     record1.addEntry(UTD.UniformDataType.HYPERLINK, hyperLink);
     record1.addEntry('openharmony.app-item', systemDefined);
@@ -1827,7 +1827,6 @@ describe('UdmfJSTest', function () {
     expect(value1.details.key1).assertEqual(plainText.details.key1);
     expect(value1.details.key2).assertEqual(plainText.details.key2);
     expect(hyperlink1.url).assertEqual('www.xxx');
-    // expect(pixelMapUds1.pixelMap).assertEqual(pixelMap);
     pixelMapUds1.pixelMap.getImageInfo().then((imageInfo)=>{
       expect(imageInfo.size.height).assertEqual(opt.size.height);
       expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
@@ -1847,7 +1846,6 @@ describe('UdmfJSTest', function () {
     expect(entries['general.hyperlink'].details.key1).assertEqual('value1');
     expect(entries['general.plain-text'].textContent).assertEqual('This is plainText textContent example');
     expect(entries['general.plain-text'].details.key1).assertEqual('value1');
-    // expect(entries['openharmony.pixel-map'].pixelMap).assertEqual(pixelMap);
     entries['openharmony.pixel-map'].pixelMap.getImageInfo().then((imageInfo)=>{
       expect(imageInfo.size.height).assertEqual(opt.size.height);
       expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
@@ -1890,7 +1888,6 @@ describe('UdmfJSTest', function () {
           expect(entriesQuery['general.hyperlink'].details.key1).assertEqual('value1');
           expect(entriesQuery['general.plain-text'].textContent).assertEqual('This is plainText textContent example');
           expect(entriesQuery['general.plain-text'].details.key1).assertEqual('value1');
-          // expect(entriesQuery['openharmony.pixel-map'].pixelMap).assertEqual(pixelMap);
           entriesQuery['openharmony.pixel-map'].pixelMap.getImageInfo().then((imageInfo)=>{
             expect(imageInfo.size.height).assertEqual(opt.size.height);
             expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
@@ -2145,7 +2142,7 @@ describe('UdmfJSTest', function () {
         'key1': 'value1',
         'key2': 'value2',
       }
-    }
+    };
     let record = new UDC.UnifiedRecord('openharmony.pixel-map', pixelMapUds);
     let unifiedData = new UDC.UnifiedData(record);
 
@@ -2161,7 +2158,6 @@ describe('UdmfJSTest', function () {
           expect(records.length).assertEqual(1);
           const valueQuery = records[0].getValue();
           expect(valueQuery.uniformDataType).assertEqual('openharmony.pixel-map');
-          // expect(valueQuery.pixelMap).assertEqual(pixelMap);
           valueQuery.pixelMap.getImageInfo().then((imageInfo)=>{
             expect(imageInfo.size.height).assertEqual(opt.size.height);
             expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
