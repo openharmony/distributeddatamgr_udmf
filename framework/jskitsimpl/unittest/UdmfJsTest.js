@@ -1788,10 +1788,28 @@ describe('UdmfJSTest', function () {
       abstract: 'this is abstract',
       details: plainTextDetails
     };
+
+    const buffer = new ArrayBuffer(128);
+    const opt = {
+      size: { height: 5, width: 5 },
+      pixelFormat: 3,
+      editable: true,
+      alphaType: 1,
+      scaleMode: 1,
+    };
+    const pixelMap = await image.createPixelMap(buffer, opt);
+    let pixelMapUds = {
+      uniformDataType: 'openharmony.pixel-map',
+      pixelMap: pixelMap,
+      details: {
+        'key1': 'value1',
+        'key2': 'value2',
+      }
+    };
     let record1 = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plainText);
     record1.addEntry(UTD.UniformDataType.HYPERLINK, hyperLink);
     record1.addEntry('openharmony.app-item', systemDefined);
-
+    record1.addEntry('openharmony.pixel-map', pixelMapUds);
     let entries = record1.getEntries();
     
     let unifiedData = new UDC.UnifiedData(record1);
@@ -1801,6 +1819,7 @@ describe('UdmfJSTest', function () {
     let types = records[0].getTypes();
     let systemDefined1 = records[0].getEntry('openharmony.app-item');
     let hyperlink1 = records[0].getEntry(UTD.UniformDataType.HYPERLINK);
+    let pixelMapUds1 = records[0].getEntry('openharmony.pixel-map');
     
     expect(value1.uniformDataType).assertEqual(plainText.uniformDataType);
     expect(value1.textContent).assertEqual(plainText.textContent);
@@ -1808,12 +1827,18 @@ describe('UdmfJSTest', function () {
     expect(value1.details.key1).assertEqual(plainText.details.key1);
     expect(value1.details.key2).assertEqual(plainText.details.key2);
     expect(hyperlink1.url).assertEqual('www.xxx');
+    pixelMapUds1.pixelMap.getImageInfo().then((imageInfo)=>{
+      expect(imageInfo.size.height).assertEqual(opt.size.height);
+      expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
+    });
+    expect(pixelMapUds1.details.key1).assertEqual('value1');
     expect(hyperlink1.details.key1).assertEqual('value1');
     expect(systemDefined1.appId).assertEqual('app-itemAppId');
     expect(systemDefined1.details.key1).assertEqual('value1');
-    expect(types.length).assertEqual(3);
+    expect(types.length).assertEqual(4);
     expect(types.includes(UTD.UniformDataType.PLAIN_TEXT)).assertTrue();
     expect(types.includes(UTD.UniformDataType.HYPERLINK)).assertTrue();
+    expect(types.includes('openharmony.pixel-map')).assertTrue();
     expect(types.includes('openharmony.app-item')).assertTrue();
     expect(entries['openharmony.app-item'].appIconId).assertEqual('app-itemAppIconId');
     expect(entries['openharmony.app-item'].details.key1).assertEqual('value1');
@@ -1821,6 +1846,11 @@ describe('UdmfJSTest', function () {
     expect(entries['general.hyperlink'].details.key1).assertEqual('value1');
     expect(entries['general.plain-text'].textContent).assertEqual('This is plainText textContent example');
     expect(entries['general.plain-text'].details.key1).assertEqual('value1');
+    entries['openharmony.pixel-map'].pixelMap.getImageInfo().then((imageInfo)=>{
+      expect(imageInfo.size.height).assertEqual(opt.size.height);
+      expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
+    });
+    expect(entries['openharmony.pixel-map'].details.key1).assertEqual('value1');
 
     try {
       UDC.insertData(optionsValid, unifiedData).then((data) => {
@@ -1846,9 +1876,10 @@ describe('UdmfJSTest', function () {
           expect(hyperlinkQuery.details.key1).assertEqual('value1');
           expect(systemDefinedQuery.appId).assertEqual('app-itemAppId');
           expect(systemDefinedQuery.details.key1).assertEqual('value1');
-          expect(types1.length).assertEqual(3);
+          expect(types1.length).assertEqual(4);
           expect(types1.includes(UTD.UniformDataType.PLAIN_TEXT)).assertTrue();
           expect(types1.includes(UTD.UniformDataType.HYPERLINK)).assertTrue();
+          expect(types1.includes('openharmony.pixel-map')).assertTrue();
           expect(types1.includes('openharmony.app-item')).assertTrue();
 
           expect(entriesQuery['openharmony.app-item'].appIconId).assertEqual('app-itemAppIconId');
@@ -1857,6 +1888,11 @@ describe('UdmfJSTest', function () {
           expect(entriesQuery['general.hyperlink'].details.key1).assertEqual('value1');
           expect(entriesQuery['general.plain-text'].textContent).assertEqual('This is plainText textContent example');
           expect(entriesQuery['general.plain-text'].details.key1).assertEqual('value1');
+          entriesQuery['openharmony.pixel-map'].pixelMap.getImageInfo().then((imageInfo)=>{
+            expect(imageInfo.size.height).assertEqual(opt.size.height);
+            expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
+          });
+          expect(entriesQuery['openharmony.pixel-map'].details.key1).assertEqual('value1');
 
           UDC.deleteData(options).then((data) => {
             console.info(TAG, 'delete success.');
@@ -2080,4 +2116,138 @@ describe('UdmfJSTest', function () {
       done();
     }
   });
+
+  /**
+   * @tc.name MultiEntryTest004
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('MultiEntryTest004', 0, async function (done) {
+    const TAG = 'MultiEntryTest004';
+    console.info(TAG, 'start');
+    const buffer = new ArrayBuffer(128);
+    const opt = {
+      size: { height: 5, width: 5 },
+      pixelFormat: 3,
+      editable: true,
+      alphaType: 1,
+      scaleMode: 1,
+    };
+    const pixelMap = await image.createPixelMap(buffer, opt);
+    let pixelMapUds = {
+      uniformDataType: 'openharmony.pixel-map',
+      pixelMap: pixelMap,
+      details: {
+        'key1': 'value1',
+        'key2': 'value2',
+      }
+    };
+    let record = new UDC.UnifiedRecord('openharmony.pixel-map', pixelMapUds);
+    let unifiedData = new UDC.UnifiedData(record);
+
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          expect(records.length).assertEqual(1);
+          const valueQuery = records[0].getValue();
+          expect(valueQuery.uniformDataType).assertEqual('openharmony.pixel-map');
+          valueQuery.pixelMap.getImageInfo().then((imageInfo)=>{
+            expect(imageInfo.size.height).assertEqual(opt.size.height);
+            expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
+          });
+          expect(valueQuery.details.key1).assertEqual('value1');
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
+
+    /**
+   * @tc.name MultiEntryTest005
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+    it('MultiEntryTest005', 0, async function () {
+      const TAG = 'MultiEntryTest005';
+      console.info(TAG, 'start');
+      try {
+        let plaintextValue = 'plaintextValue';
+        let systemDefinedValue = 'systemDefinedValue';
+        let record = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+        record.addEntry(undefined, systemDefinedValue);
+      } catch (e) {
+        console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+        expect(e.code === ERROR_PARAMETER).assertTrue();
+      }
+      try {
+        let plaintextValue = 'plaintextValue';
+        let systemDefinedValue = 'systemDefinedValue';
+        let record = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+        record.addEntry(null, systemDefinedValue);
+      } catch (e) {
+        console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+        expect(e.code === ERROR_PARAMETER).assertTrue();
+      }
+      console.info(TAG, 'end');
+    });
+  
+    /**
+     * @tc.name MultiEntryTest006
+     * @tc.desc
+     * @tc.type: FUNC
+     * @tc.require:
+     */
+    it('MultiEntryTest006', 0, async function () {
+      const TAG = 'MultiEntryTest006';
+      console.info(TAG, 'start');
+      try {
+        let plaintextValue = 'plaintextValue';
+        let systemDefinedValue = 'systemDefinedValue';
+        let record = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+        record.addEntry('openharmony.app-item', systemDefinedValue);
+        record.getEntry(undefined);
+      } catch (e) {
+        console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+        expect(e.code === ERROR_PARAMETER).assertTrue();
+      }
+      try {
+        let plaintextValue = 'plaintextValue';
+        let systemDefinedValue = 'systemDefinedValue';
+        let record = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+        record.addEntry('openharmony.app-item', systemDefinedValue);
+        record.getEntry(null);
+      } catch (e) {
+        console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+        expect(e.code === ERROR_PARAMETER).assertTrue();
+      }
+      console.info(TAG, 'end');
+    });
 });

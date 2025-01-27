@@ -140,13 +140,7 @@ void UnifiedRecordNapi::GetNativeValue(napi_env env, std::string type, napi_valu
     ASSERT_ERR_VOID(env, status == napi_ok,
         Status::E_INVALID_PARAMETERS, "Parameter error: parameter value type must be ValueType");
     if (valueType == napi_object) {
-        if (type == "openharmony.pixel-map") {
-            value = std::shared_ptr<OHOS::Media::PixelMap>(nullptr);
-        } else if (type == "openharmony.want") {
-            value = std::shared_ptr<OHOS::AAFwk::Want>(nullptr);
-        } else {
-            value = std::make_shared<Object>();
-        }
+        ProcessNapiObject(env, type, valueNapi, value);
     } else if (valueType == napi_string) {
         value = std::string();
     } else if (valueType == napi_number) {
@@ -160,6 +154,31 @@ void UnifiedRecordNapi::GetNativeValue(napi_env env, std::string type, napi_valu
     }
     std::visit([&](auto &value) { status = NapiDataUtils::GetValue(env, valueNapi, value); }, value);
     ASSERT_ERR_VOID(env, status == napi_ok, Status::E_ERROR, "get unifiedRecord failed");
+}
+
+void UnifiedRecordNapi::ProcessNapiObject(napi_env env, std::string type, napi_value valueNapi, ValueType &value)
+{
+    if (type == "openharmony.pixel-map") {
+        napi_value attrName = nullptr;
+        napi_value attrVal = nullptr;
+        const std::string uniformDataType = "uniformDataType";
+        napi_status status = NapiDataUtils::SetValue(env, uniformDataType, attrName);
+        ASSERT_ERR_VOID(env, status == napi_ok, Status::E_ERROR, "set attrName failed");
+        status = napi_get_property(env, valueNapi, attrName, &attrVal);
+        if (status == napi_ok) {
+            std::string proVal;
+            status = NapiDataUtils::GetValue(env, attrVal, proVal);
+            if (status == napi_ok && proVal == "openharmony.pixel-map") {
+                value = std::make_shared<Object>();
+            } else {
+                value = std::shared_ptr<OHOS::Media::PixelMap>(nullptr);
+            }
+        }
+    } else if (type == "openharmony.want") {
+        value = std::shared_ptr<OHOS::AAFwk::Want>(nullptr);
+    } else {
+        value = std::make_shared<Object>();
+    }
 }
 
 void UnifiedRecordNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi_value &out)
