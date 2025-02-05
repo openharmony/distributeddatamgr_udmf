@@ -56,8 +56,8 @@ Html::Html(UDType type, ValueType value) : Text(type, value)
 
 int64_t Html::GetSize()
 {
-    return UnifiedDataUtils::GetDetailsSize(this->details_) + this->htmlContent_.size() + this->plainContent_.size() +
-        GetInnerEntriesSize();
+    return static_cast<int64_t>(UnifiedDataUtils::GetDetailsSize(this->details_) + this->htmlContent_.size() +
+        this->plainContent_.size()) + GetInnerEntriesSize();
 }
 
 std::string Html::GetHtmlContent() const

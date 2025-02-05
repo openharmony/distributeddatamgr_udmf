@@ -144,14 +144,14 @@ std::string UdmfCopyFile::ConstructDestUri(const std::string &destUri, const std
 
 int64_t UdmfCopyFile::GetTotalSize(const std::vector<std::string> &uris)
 {
-    int64_t totalSize = 0;
+    size_t totalSize = 0;
     std::string srcUri;
     for (const auto &srcUri : uris) {
         if (IsFile(srcUri, true)) {
             totalSize += GetFileSize(srcUri, true);
         }
     }
-    return totalSize;
+    return static_cast<int64_t>(totalSize);
 }
 
 bool UdmfCopyFile::IsDirectory(const std::string &uri, bool isSource)
@@ -174,7 +174,7 @@ std::string UdmfCopyFile::GetFileName(const std::string &path)
 {
     std::string realSrc = path;
     if (IsRemote(path)) {
-        int index = path.rfind("?", 0);
+        size_t index = path.rfind("?", 0);
         realSrc = path.substr(0, index);
     }
     std::filesystem::path filePath(realSrc);
