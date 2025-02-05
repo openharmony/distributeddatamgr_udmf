@@ -145,6 +145,7 @@ ohos_unittest("UtdClientTest") {
     "${udmf_framework_path}/common/custom_utd_store.cpp",
     "${udmf_framework_path}/common/graph.cpp",
     "${udmf_framework_path}/common/utd_graph.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
     "custom_utd_json_parser_test.cpp",
     "custom_utd_store_test.cpp",
     "graph_test.cpp",

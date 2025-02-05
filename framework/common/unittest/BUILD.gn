@@ -94,6 +94,7 @@ ohos_unittest("UdmfTypesUtilAbnormalTest") {
     "${udmf_framework_path}/common/tlv_object.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
     "${udmf_framework_path}/common/unittest/mock/tlv_util_mock.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/getter_system.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
     "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",

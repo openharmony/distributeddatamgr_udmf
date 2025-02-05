@@ -20,7 +20,7 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT PresetTypeDescriptors {
+class PresetTypeDescriptors {
 public:
     static PresetTypeDescriptors &GetInstance();
     std::vector<TypeDescriptorCfg> &GetPresetTypes();

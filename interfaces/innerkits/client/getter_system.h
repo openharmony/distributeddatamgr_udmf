@@ -22,9 +22,9 @@
 
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT GetterSystem {
+class GetterSystem {
 public:
-    class API_EXPORT GeneralGetter {
+    class GeneralGetter {
     public:
         virtual ~GeneralGetter();
         virtual ValueType GetValueByType(uint32_t dataId, uint32_t recordId, const std::string &utdId);
