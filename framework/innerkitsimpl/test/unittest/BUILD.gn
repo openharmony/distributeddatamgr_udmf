@@ -141,6 +141,8 @@ ohos_unittest("UtdClientTest") {
   module_out_path = module_output_path
 
   sources = [
+    "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
+    "${udmf_framework_path}/common/custom_utd_store.cpp",
     "${udmf_framework_path}/common/graph.cpp",
     "${udmf_framework_path}/common/utd_graph.cpp",
     "custom_utd_json_parser_test.cpp",
