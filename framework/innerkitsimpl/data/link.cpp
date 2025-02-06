@@ -54,8 +54,8 @@ Link::Link(const std::string &url, const std::string &description)
 
 int64_t Link::GetSize()
 {
-    return UnifiedDataUtils::GetDetailsSize(this->details_) + this->url_.size() + this->description_.size() +
-        GetInnerEntriesSize();
+    return static_cast<int64_t>(UnifiedDataUtils::GetDetailsSize(this->details_) + this->url_.size() +
+        this->description_.size()) + GetInnerEntriesSize();
 }
 
 std::string Link::GetUrl() const

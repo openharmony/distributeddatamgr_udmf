@@ -61,7 +61,8 @@ SystemDefinedPixelMap::SystemDefinedPixelMap(UDType type, ValueType value) : Sys
 
 int64_t SystemDefinedPixelMap::GetSize()
 {
-    return UnifiedDataUtils::GetDetailsSize(this->details_) + rawData_.size() + GetInnerEntriesSize();
+    return static_cast<int64_t>(UnifiedDataUtils::GetDetailsSize(this->details_) + rawData_.size()) +
+        GetInnerEntriesSize();
 }
 
 std::vector<uint8_t> SystemDefinedPixelMap::GetRawData() const

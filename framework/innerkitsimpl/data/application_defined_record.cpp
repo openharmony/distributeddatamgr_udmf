@@ -55,7 +55,7 @@ ApplicationDefinedRecord::ApplicationDefinedRecord(UDType type, ValueType value)
 
 int64_t ApplicationDefinedRecord::GetSize()
 {
-    return rawData_.size() + GetInnerEntriesSize();
+    return static_cast<int64_t>(rawData_.size()) + GetInnerEntriesSize();
 }
 
 std::string ApplicationDefinedRecord::GetApplicationDefinedType() const

@@ -43,9 +43,9 @@ SystemDefinedAppItem::SystemDefinedAppItem(UDType type, ValueType value) : Syste
 
 int64_t SystemDefinedAppItem::GetSize()
 {
-    return UnifiedDataUtils::GetDetailsSize(this->details_) + this->appId_.size() + this->appName_.size() +
-        this->appIconId_.size() + this->appLabelId_.size() + this->bundleName_.size() + this->abilityName_.size() +
-        GetInnerEntriesSize();
+    return static_cast<int64_t>(UnifiedDataUtils::GetDetailsSize(this->details_) + this->appId_.size() +
+        this->appName_.size() + this->appIconId_.size() + this->appLabelId_.size() + this->bundleName_.size() +
+        this->abilityName_.size()) + GetInnerEntriesSize();
 }
 
 std::string SystemDefinedAppItem::GetAppId() const
