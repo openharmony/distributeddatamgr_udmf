@@ -130,6 +130,7 @@ ohos_unittest("TlvUtilTest") {
   module_out_path = module_output_path
 
   sources = [
+    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
     "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
     "tlv_util_test.cpp",
   ]

@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace UDMF {
 
-class API_EXPORT GetDataParamsNapi {
+class GetDataParamsNapi {
 public:
     static bool Convert2NativeValue(napi_env env, napi_value in, GetDataParams &getDataParams, const std::string &key);
 
