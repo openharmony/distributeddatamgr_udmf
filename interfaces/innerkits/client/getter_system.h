@@ -24,16 +24,16 @@ namespace OHOS {
 namespace UDMF {
 class GetterSystem {
 public:
-    class GeneralGetter {
+    class API_EXPORT GeneralGetter {
     public:
         virtual ~GeneralGetter();
         virtual ValueType GetValueByType(uint32_t dataId, uint32_t recordId, const std::string &utdId);
     };
     using Creator = std::function<std::shared_ptr<GeneralGetter>()>;
     using Getter = std::shared_ptr<GeneralGetter>;
-    static GetterSystem &GetInstance();
-    void RegisterCreator(const std::string& name, Creator creator);
-    Getter GetGetter(const std::string& name);
+    static API_EXPORT GetterSystem &GetInstance();
+    void API_EXPORT RegisterCreator(const std::string& name, Creator creator);
+    Getter API_EXPORT GetGetter(const std::string& name);
 private:
     GetterSystem() = default;
     GetterSystem(const GetterSystem &) = delete;

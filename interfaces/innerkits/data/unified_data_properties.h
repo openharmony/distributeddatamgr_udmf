@@ -20,7 +20,7 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT UnifiedDataProperties {
+class UnifiedDataProperties {
 public:
     std::string tag;
     AAFwk::WantParams extras;
