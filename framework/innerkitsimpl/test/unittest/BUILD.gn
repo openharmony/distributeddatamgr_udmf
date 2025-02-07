@@ -434,6 +434,7 @@ ohos_unittest("SystemDefinedPixelMapTest") {
 
   sources = [
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "system_defined_pixelmap_test.cpp",
   ]
