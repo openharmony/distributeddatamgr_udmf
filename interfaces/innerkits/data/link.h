@@ -21,19 +21,19 @@
 
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT Link : public Text {
+class Link : public Text {
 public:
-    Link();
-    explicit Link(const std::string &url);
-    explicit Link(const std::string &url, const std::string &description);
-    Link(UDType type, ValueType value);
+    API_EXPORT Link();
+    explicit API_EXPORT Link(const std::string &url);
+    explicit API_EXPORT Link(const std::string &url, const std::string &description);
+    API_EXPORT Link(UDType type, ValueType value);
 
-    int64_t GetSize() override;
+    int64_t API_EXPORT GetSize() override;
 
-    std::string GetUrl() const;
-    void SetUrl(const std::string &url);
-    std::string GetDescription() const;
-    void SetDescription(const std::string &description);
+    std::string API_EXPORT GetUrl() const;
+    void API_EXPORT SetUrl(const std::string &url);
+    std::string API_EXPORT GetDescription() const;
+    void API_EXPORT SetDescription(const std::string &description);
     void InitObject() override;
 
     static bool CheckValue(const ValueType &value);

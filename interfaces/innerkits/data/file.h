@@ -20,21 +20,21 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT File : public UnifiedRecord {
+class File : public UnifiedRecord {
 public:
-    File();
-    explicit File(const std::string &uri);
-    File(UDType type, ValueType value);
-    int64_t GetSize() override;
+    API_EXPORT File();
+    explicit API_EXPORT File(const std::string &uri);
+    API_EXPORT File(UDType type, ValueType value);
+    int64_t API_EXPORT GetSize() override;
 
-    std::string GetUri() const;
-    void SetUri(const std::string &uri);
+    std::string API_EXPORT GetUri() const;
+    void API_EXPORT SetUri(const std::string &uri);
 
-    std::string GetRemoteUri() const;
-    void SetRemoteUri(const std::string &uri);
+    std::string API_EXPORT GetRemoteUri() const;
+    void API_EXPORT SetRemoteUri(const std::string &uri);
 
-    void SetDetails(UDDetails &variantMap);
-    UDDetails GetDetails() const;
+    void API_EXPORT SetDetails(UDDetails &variantMap);
+    UDDetails API_EXPORT GetDetails() const;
     void InitObject() override;
 
 protected:

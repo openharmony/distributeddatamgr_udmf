@@ -20,11 +20,11 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT Folder : public File {
+class Folder : public File {
 public:
-    Folder();
-    explicit Folder(const std::string &uri);
-    Folder(UDType type, ValueType value);
+    API_EXPORT Folder();
+    explicit API_EXPORT Folder(const std::string &uri);
+    API_EXPORT Folder(UDType type, ValueType value);
 };
 } // namespace UDMF
 } // namespace OHOS

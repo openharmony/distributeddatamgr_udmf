@@ -20,16 +20,16 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT SystemDefinedPixelMap : public SystemDefinedRecord {
+class SystemDefinedPixelMap : public SystemDefinedRecord {
 public:
-    SystemDefinedPixelMap();
-    explicit SystemDefinedPixelMap(std::vector<uint8_t> &data);
-    SystemDefinedPixelMap(UDType type, ValueType value);
+    API_EXPORT SystemDefinedPixelMap();
+    explicit API_EXPORT SystemDefinedPixelMap(std::vector<uint8_t> &data);
+    API_EXPORT SystemDefinedPixelMap(UDType type, ValueType value);
 
-    int64_t GetSize() override;
+    int64_t API_EXPORT GetSize() override;
 
-    std::vector<uint8_t> GetRawData() const;
-    void SetRawData(const std::vector<uint8_t> &rawData);
+    std::vector<uint8_t> API_EXPORT GetRawData() const;
+    void API_EXPORT SetRawData(const std::vector<uint8_t> &rawData);
 
     void InitObject() override;
 private:

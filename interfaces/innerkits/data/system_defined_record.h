@@ -20,17 +20,17 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT SystemDefinedRecord : public UnifiedRecord {
+class SystemDefinedRecord : public UnifiedRecord {
 public:
-    explicit SystemDefinedRecord();
-    SystemDefinedRecord(UDType type, ValueType value);
+    explicit API_EXPORT SystemDefinedRecord();
+    API_EXPORT SystemDefinedRecord(UDType type, ValueType value);
 
-    int64_t GetSize() override;
+    int64_t API_EXPORT GetSize() override;
 
-    void AddProperty(const std::string &property, UDVariant &value);
-    UDVariant GetPropertyByName(const std::string &property) const;
-    void SetDetails(UDDetails &details);
-    UDDetails GetDetails() const;
+    void API_EXPORT AddProperty(const std::string &property, UDVariant &value);
+    UDVariant API_EXPORT GetPropertyByName(const std::string &property) const;
+    void API_EXPORT SetDetails(UDDetails &details);
+    UDDetails API_EXPORT GetDetails() const;
 
     void InitObject() override;
 

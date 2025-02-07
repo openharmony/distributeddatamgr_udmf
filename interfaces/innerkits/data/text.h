@@ -21,16 +21,16 @@
 namespace OHOS {
 namespace UDMF {
 constexpr int MAX_TEXT_LEN = 20 * 1024 * 1024;
-class API_EXPORT Text : public UnifiedRecord {
+class Text : public UnifiedRecord {
 public:
-    Text();
-    explicit Text(UDDetails &variantMap);
-    Text(UDType type, ValueType value);
+    API_EXPORT Text();
+    explicit API_EXPORT Text(UDDetails &variantMap);
+    API_EXPORT Text(UDType type, ValueType value);
 
-    int64_t GetSize() override;
+    int64_t API_EXPORT GetSize() override;
 
-    void SetDetails(UDDetails &variantMap);
-    UDDetails GetDetails() const;
+    void API_EXPORT SetDetails(UDDetails &variantMap);
+    UDDetails API_EXPORT GetDetails() const;
 
     void InitObject() override;
 

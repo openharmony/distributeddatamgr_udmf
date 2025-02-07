@@ -65,7 +65,9 @@ ohos_unittest("UdmfClientTest") {
   module_out_path = module_output_path
 
   sources = [
+    "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/common/graph.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
@@ -80,8 +82,10 @@ ohos_unittest("UdmfClientTest") {
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
     "udmf_client_test.cpp",
   ]
 
@@ -156,9 +160,11 @@ ohos_unittest("UtdClientTest") {
   sources = [
     "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
     "${udmf_framework_path}/common/custom_utd_store.cpp",
+    "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
     "${udmf_framework_path}/common/graph.cpp",
     "${udmf_framework_path}/common/utd_graph.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/utd_client.cpp",
     "custom_utd_json_parser_test.cpp",
     "custom_utd_store_test.cpp",
     "graph_test.cpp",
@@ -170,6 +176,7 @@ ohos_unittest("UtdClientTest") {
   deps = [ "${udmf_interfaces_path}/innerkits:utd_client" ]
 
   external_deps = common_external_deps
+  external_deps += [ "os_account:os_account_innerkits"]
 
   defines = [
     "private=public",
@@ -193,20 +200,7 @@ ohos_unittest("ApplicationDefineRecordTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "application_defined_record_test.cpp",
   ]
@@ -227,20 +221,8 @@ ohos_unittest("AudioTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "audio_test.cpp",
   ]
@@ -261,20 +243,7 @@ ohos_unittest("FileDataTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "file_test.cpp",
   ]
@@ -310,20 +279,8 @@ ohos_unittest("FolderTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "folder_test.cpp",
   ]
@@ -344,19 +301,7 @@ ohos_unittest("HtmlTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "html_test.cpp",
@@ -378,20 +323,8 @@ ohos_unittest("ImageTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "image_test.cpp",
   ]
@@ -412,20 +345,8 @@ ohos_unittest("LinkTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "link_test.cpp",
   ]
@@ -446,19 +367,7 @@ ohos_unittest("PlainTextTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "plain_text_test.cpp",
@@ -480,20 +389,7 @@ ohos_unittest("SystemDefinedAppitemTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "system_defined_appitem_test.cpp",
   ]
@@ -514,20 +410,7 @@ ohos_unittest("SystemDefinedFormTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "system_defined_form_test.cpp",
   ]
@@ -548,20 +431,7 @@ ohos_unittest("SystemDefinedPixelMapTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "system_defined_pixelmap_test.cpp",
   ]
@@ -582,20 +452,7 @@ ohos_unittest("SystemDefinedRecordTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "system_defined_record_test.cpp",
   ]
@@ -616,19 +473,6 @@ ohos_unittest("TextTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "text_test.cpp",
@@ -650,21 +494,8 @@ ohos_unittest("UnifiedDataTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "unified_data_test.cpp",
   ]
 
@@ -699,20 +530,6 @@ ohos_unittest("UnifiedRecordTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "unified_record_test.cpp",
   ]
@@ -733,20 +550,6 @@ ohos_unittest("VideoTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "video_test.cpp",
   ]

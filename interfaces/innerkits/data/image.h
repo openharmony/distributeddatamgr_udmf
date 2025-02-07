@@ -21,11 +21,11 @@
 
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT Image : public File {
+class Image : public File {
 public:
-    Image();
-    explicit Image(const std::string &uri);
-    Image(UDType type, ValueType value);
+    API_EXPORT Image();
+    explicit API_EXPORT Image(const std::string &uri);
+    API_EXPORT Image(UDType type, ValueType value);
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -60,7 +60,8 @@ public:
     void SetInnerEntries(std::shared_ptr<std::map<std::string, ValueType>> entries);
     int64_t GetInnerEntriesSize() const;
 	
-    void API_EXPORT SetEntryGetter(const std::vector<std::string> &utdIds, const std::shared_ptr<EntryGetter> &entryGetter);
+    void API_EXPORT SetEntryGetter(const std::vector<std::string> &utdIds,
+        const std::shared_ptr<EntryGetter> &entryGetter);
     std::shared_ptr<EntryGetter> API_EXPORT GetEntryGetter();
     void API_EXPORT SetDataId(uint32_t dataId);
     uint32_t API_EXPORT GetDataId() const;

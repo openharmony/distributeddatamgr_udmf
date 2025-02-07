@@ -20,11 +20,11 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT Audio : public File {
+class Audio : public File {
 public:
-    Audio();
-    explicit Audio(const std::string &uri);
-    Audio(UDType type, ValueType value);
+    API_EXPORT Audio();
+    explicit API_EXPORT Audio(const std::string &uri);
+    API_EXPORT Audio(UDType type, ValueType value);
 };
 } // namespace UDMF
 } // namespace OHOS
