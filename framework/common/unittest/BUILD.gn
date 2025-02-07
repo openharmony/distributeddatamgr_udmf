@@ -132,6 +132,7 @@ ohos_unittest("TlvUtilTest") {
   sources = [
     "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
     "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "tlv_util_test.cpp",
   ]
 
