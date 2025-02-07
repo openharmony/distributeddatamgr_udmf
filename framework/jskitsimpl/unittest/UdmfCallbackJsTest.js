@@ -251,7 +251,7 @@ describe('UdmfCallbackJSTest', function () {
         console.info(TAG, 'delete success.');
         UDC.queryData(optionsValid, (err, data) => {
           console.info(TAG, 'query has no data.');
-          expect(data).assertUndefined();
+          expect(err).assertUndefined();
           UDC.insertData(optionsValid, unifiedData01, (err, data) => {
             expect(err).assertUndefined();
             console.info(TAG, `insert success. The key: ${data}`);
@@ -328,7 +328,7 @@ describe('UdmfCallbackJSTest', function () {
             expect(records[0].getType()).assertEqual(UTD.UniformDataType.PLAIN_TEXT);
             expect(records[0].textContent).assertEqual(TEXT_CONTEXT_01);
             UDC.queryData(options, (err, data) => {
-              expect(data).assertUndefined();
+              expect(err).assertUndefined();
               console.info(TAG, 'query has no data.');
               done();
             });
