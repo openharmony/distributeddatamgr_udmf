@@ -390,6 +390,7 @@ ohos_unittest("SystemDefinedAppitemTest") {
 
   sources = [
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "system_defined_appitem_test.cpp",
   ]
@@ -411,6 +412,7 @@ ohos_unittest("SystemDefinedFormTest") {
 
   sources = [
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "system_defined_form_test.cpp",
   ]
