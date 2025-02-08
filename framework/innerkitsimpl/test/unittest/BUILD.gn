@@ -553,6 +553,7 @@ ohos_unittest("VideoTest") {
   module_out_path = module_output_path
 
   sources = [
+    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "video_test.cpp",
   ]
