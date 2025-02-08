@@ -49,7 +49,6 @@ private:
     std::string bundleName_;
     std::string abilityName_;
     std::string module_;
-
 };
 } // namespace UDMF
 } // namespace OHOS
