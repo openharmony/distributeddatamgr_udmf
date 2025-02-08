@@ -65,8 +65,8 @@ ohos_unittest("UdmfClientTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/common/graph.cpp",
+    "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
@@ -84,8 +84,8 @@ ohos_unittest("UdmfClientTest") {
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
     "udmf_client_test.cpp",
   ]
 
@@ -158,13 +158,17 @@ ohos_unittest("UtdClientTest") {
   module_out_path = module_output_path
 
   sources = [
+    "${udmf_framework_path}/common/base32_utils.cpp",
     "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
     "${udmf_framework_path}/common/custom_utd_store.cpp",
-    "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
     "${udmf_framework_path}/common/graph.cpp",
+    "${udmf_framework_path}/common/udmf_utils.cpp",
+    "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
     "${udmf_framework_path}/common/utd_graph.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/utd_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/flexible_type.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/type_descriptor.cpp",
     "custom_utd_json_parser_test.cpp",
     "custom_utd_store_test.cpp",
     "graph_test.cpp",
@@ -173,10 +177,11 @@ ohos_unittest("UtdClientTest") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [ "${udmf_interfaces_path}/innerkits:utd_client" ]
-
   external_deps = common_external_deps
-  external_deps += [ "os_account:os_account_innerkits"]
+  external_deps += [
+    "cJSON:cjson",
+    "os_account:os_account_innerkits",
+  ]
 
   defines = [
     "private=public",
@@ -345,8 +350,8 @@ ohos_unittest("LinkTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "link_test.cpp",
   ]
@@ -497,8 +502,8 @@ ohos_unittest("UnifiedDataTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "unified_data_test.cpp",
   ]
 
