@@ -20,7 +20,9 @@
 #include <mutex>
 #include <string>
 
+#ifndef IOS_PLATFORM
 #include "executor_pool.h"
+#endif
 #include "progress_queue.h"
 #include "unified_types.h"
 #include "unified_data.h"

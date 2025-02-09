@@ -71,7 +71,7 @@ config("arkui_x_udmf_config") {
     "${third_party_path}/skia",
   ]
 
-  defines = [ "CROSS_PLATFORM" ]
+  defines += [ "CROSS_PLATFORM" ]
 }
 
 arkui_x_public_source = [
@@ -166,6 +166,9 @@ config("arkui_x_udmf_napi_config") {
     "${arkui_x_graphic_2d_path}/rosen/modules/platform/ipc_core",
     "${third_party_path}/skia",
   ]
+  if (current_os == "ios") {
+    defines += [ "IOS_PLATFORM" ]
+  }
 }
 
 ohos_source_set("arkui_x_uniformtypedescriptor") {
