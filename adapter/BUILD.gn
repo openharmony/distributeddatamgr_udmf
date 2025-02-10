@@ -71,7 +71,7 @@ config("arkui_x_udmf_config") {
     "${third_party_path}/skia",
   ]
 
-  defines += [ "CROSS_PLATFORM" ]
+  defines = [ "CROSS_PLATFORM" ]
 }
 
 arkui_x_public_source = [
@@ -167,7 +167,7 @@ config("arkui_x_udmf_napi_config") {
     "${third_party_path}/skia",
   ]
   if (current_os == "ios") {
-    defines += [ "IOS_PLATFORM" ]
+    defines = [ "IOS_PLATFORM" ]
   }
 }
 
