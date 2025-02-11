@@ -1994,7 +1994,6 @@ HWTEST_F(UDMFTest, FileUriTest001, TestSize.Level1)
 }
 
 /**
-/**
  * @tc.name: FileUriTest007
  * @tc.desc: test fileUri between js and capi
  * @tc.type: FUNC
@@ -2050,6 +2049,7 @@ HWTEST_F(UDMFTest, FileUriTest007, TestSize.Level1)
         }
     }
 }
+
 /**
  * @tc.name: OH_Udmf_SetAndGetUnifiedData006
  * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with content form
