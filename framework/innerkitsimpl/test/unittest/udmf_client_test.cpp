@@ -2653,7 +2653,7 @@ HWTEST_F(UdmfClientTest, GetSummary004, TestSize.Level1)
     auto readPixelMap = std::get<std::shared_ptr<Object>>(entries->at("openharmony.pixel-map"));
     EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readPixelMap->value_[PIXEL_MAP]).size());
     auto readDefinedRecord = std::get<std::shared_ptr<Object>>(entries->at("my.type"));
-    EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readDefinedRecord->value_[ARRAY_BUFFER]).size());
+    EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readDefinedRecord->value_[RAW_DATA]).size());
     auto value = std::get<std::shared_ptr<Object>>(readRecord->GetValue());
     EXPECT_EQ("abcdefg", std::get<std::string>(value->value_[FILE_TYPE]));
     LOG_INFO(UDMF_TEST, "GetSummary004 end.");
@@ -2765,9 +2765,9 @@ HWTEST_F(UdmfClientTest, GetSummary005, TestSize.Level1)
     auto readFolder = std::get<std::shared_ptr<Object>>(entries->at("general.folder"));
     EXPECT_EQ("uri", std::get<std::string>(readFolder->value_[ORI_URI]));
     auto readDefinedRecord = std::get<std::shared_ptr<Object>>(entries->at("your.type"));
-    EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readDefinedRecord->value_[ARRAY_BUFFER]).size());
+    EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readDefinedRecord->value_[RAW_DATA]).size());
     auto readDefinedRecord2 = std::get<std::shared_ptr<Object>>(entries->at("my.type"));
-    EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readDefinedRecord2->value_[ARRAY_BUFFER]).size());
+    EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readDefinedRecord2->value_[RAW_DATA]).size());
     auto readForm = std::get<std::shared_ptr<Object>>(entries->at("openharmony.form"));
     EXPECT_EQ("module", std::get<std::string>(readForm->value_[MODULE]));
     auto readCotentForm = std::get<std::shared_ptr<Object>>(entries->at("general.content-form"));
