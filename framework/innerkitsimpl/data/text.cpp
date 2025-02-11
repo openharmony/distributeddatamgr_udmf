@@ -41,7 +41,7 @@ Text::Text(UDType type, ValueType value) : UnifiedRecord(type, value)
 
 int64_t Text::GetSize()
 {
-    return UnifiedDataUtils::GetDetailsSize(this->details_);
+    return static_cast<int64_t>(UnifiedDataUtils::GetDetailsSize(this->details_)) + GetInnerEntriesSize();
 }
 
 void Text::SetDetails(UDDetails &variantMap)
@@ -64,7 +64,7 @@ void Text::InitObject()
         value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_["VALUE_TYPE"] = value;
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 } // namespace UDMF

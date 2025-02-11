@@ -19,6 +19,7 @@ namespace OHOS {
 namespace UDMF {
 PlainText::PlainText() : PlainText("", "")
 {
+    SetType(PLAIN_TEXT);
 }
 
 PlainText::PlainText(const std::string &content, const std::string &abstract)
@@ -38,7 +39,7 @@ PlainText::PlainText(UDType type, ValueType value) : Text(type, value)
         content_ = std::get<std::string>(value);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
-        object->GetValue(TEXT_CONTENT, content_);
+        object->GetValue(CONTENT, content_);
         object->GetValue(ABSTRACT, abstract_);
         std::shared_ptr<Object> detailObj = nullptr;
         if (object->GetValue(DETAILS, detailObj)) {
@@ -50,7 +51,8 @@ PlainText::PlainText(UDType type, ValueType value) : Text(type, value)
 
 int64_t PlainText::GetSize()
 {
-    return UnifiedDataUtils::GetDetailsSize(this->details_) + this->content_.size() + this->abstract_.size();
+    return static_cast<int64_t>(UnifiedDataUtils::GetDetailsSize(this->details_) + this->content_.size() +
+        this->abstract_.size()) + GetInnerEntriesSize();
 }
 
 std::string PlainText::GetContent() const
@@ -66,7 +68,7 @@ void PlainText::SetContent(const std::string &text)
     this->content_ = text;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[TEXT_CONTENT] = content_;
+        object->value_[CONTENT] = content_;
     }
 }
 
@@ -94,10 +96,10 @@ void PlainText::InitObject()
         value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
-        object->value_[TEXT_CONTENT] = content_;
+        object->value_[CONTENT] = content_;
         object->value_[ABSTRACT] = abstract_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_["VALUE_TYPE"] = value;
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 } // namespace UDMF

@@ -28,6 +28,10 @@ napi_value AudioNapi::Constructor(napi_env env)
         /* Audio extends UnifiedRecord */
         DECLARE_NAPI_FUNCTION("getType", UnifiedRecordNapi::GetType),
         DECLARE_NAPI_FUNCTION("getValue", UnifiedRecordNapi::GetValue),
+        DECLARE_NAPI_FUNCTION("addEntry", UnifiedRecordNapi::AddEntry),
+        DECLARE_NAPI_FUNCTION("getEntry", UnifiedRecordNapi::GetEntry),
+        DECLARE_NAPI_FUNCTION("getEntries", UnifiedRecordNapi::GetEntries),
+        DECLARE_NAPI_FUNCTION("getTypes", UnifiedRecordNapi::GetTypes),
         /* Audio extends File */
         DECLARE_NAPI_GETTER_SETTER("details", FileNapi::GetDetails, FileNapi::SetDetails),
         DECLARE_NAPI_GETTER_SETTER("uri", FileNapi::GetUri, FileNapi::SetUri),

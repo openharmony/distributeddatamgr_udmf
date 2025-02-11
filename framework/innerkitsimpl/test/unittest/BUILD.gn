@@ -58,6 +58,8 @@ ohos_unittest("UdmfClientTest") {
 
   sources = [
     "${udmf_framework_path}/common/graph.cpp",
+    "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
     "udmf_client_test.cpp",
   ]
 
@@ -95,6 +97,26 @@ ohos_unittest("UdmfClientHapPermissionTest") {
     "${udmf_framework_path}/innerkitsimpl/client/",
     "${udmf_framework_path}/innerkitsimpl/test/unittest/mock/include",
   ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+}
+
+ohos_unittest("UdmfClientSaInvokeTest") {
+  module_out_path = module_output_path
+
+  sources = [ "udmf_client_sa_invoke_test.cpp" ]
+
+  deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
+
+  external_deps = common_external_deps
+}
+
+ohos_unittest("UdmfAsyncClientTest") {
+  module_out_path = module_output_path
+
+  sources = [ "udmf_async_client_test.cpp" ]
 
   deps = common_deps
 
@@ -383,6 +405,7 @@ group("unittest") {
     ":SystemDefinedRecordTest",
     ":TextTest",
     ":UdmfClientHapPermissionTest",
+    ":UdmfClientSaInvokeTest",
     ":UdmfClientSystemHapTest",
     ":UdmfClientTest",
     ":UnifiedDataTest",

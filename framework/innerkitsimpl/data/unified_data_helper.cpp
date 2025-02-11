@@ -19,16 +19,20 @@
 #include "directory_ex.h"
 #include "file_ex.h"
 #include "file_uri.h"
+#include "error_code.h"
 #include "logger.h"
 #include "tlv_util.h"
 #include "udmf_conversion.h"
+#include "udmf_utils.h"
 #include "file.h"
 
 namespace OHOS {
 namespace UDMF {
 constexpr mode_t MODE = 0700;
-static constexpr int64_t MAX_KV_RECORD_SIZE = 2 * 1024 * 1024;
-static constexpr int64_t MAX_KV_DATA_SIZE = 4 * 1024 * 1024;
+static constexpr int64_t MAX_HAP_RECORD_SIZE = 2 * 1024 * 1024;
+static constexpr int64_t MAX_HAP_DATA_SIZE = 4 * 1024 * 1024;
+static constexpr int64_t MAX_IPC_RAW_DATA_SIZE = 128 * 1024 * 1024;
+static constexpr int64_t MAX_SA_DRAG_RECORD_SIZE  = 15 * 1024 * 1024 + 512 * 1024;
 
 constexpr const char *TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/udata";
 constexpr const char *TEMP_UNIFIED_DATA_SUFFIX = ".ud";
@@ -43,16 +47,18 @@ void UnifiedDataHelper::SetRootPath(const std::string &rootPath)
 
 bool UnifiedDataHelper::ExceedKVSizeLimit(UnifiedData &data)
 {
-    int64_t totalSize = data.GetSize();
-    if (data.GetSize() > MAX_KV_DATA_SIZE) {
-        LOG_DEBUG(UDMF_FRAMEWORK, "Exceeded KV data limit, totalSize:%{public}" PRId64 " !", totalSize);
-        return true;
-    }
+    int64_t totalSize = 0;
     for (const auto &record : data.GetRecords()) {
-        if (record->GetSize() > MAX_KV_RECORD_SIZE) {
-            LOG_DEBUG(UDMF_FRAMEWORK, "Exceeded KV record limit, recordSize:%{public}" PRId64 "!", record->GetSize());
+        auto recordSize = record->GetSize();
+        if (recordSize > MAX_HAP_RECORD_SIZE) {
+            LOG_INFO(UDMF_FRAMEWORK, "Exceeded 2M record limit, recordSize:%{public}" PRId64 "!", recordSize);
             return true;
         }
+        totalSize += recordSize;
+    }
+    if (totalSize > MAX_HAP_DATA_SIZE) {
+        LOG_INFO(UDMF_FRAMEWORK, "Exceeded 4M data limit, totalSize:%{public}" PRId64 " !", totalSize);
+        return true;
     }
     return false;
 }
@@ -100,20 +106,14 @@ void UnifiedDataHelper::CreateDirIfNotExist(const std::string& dirPath, const mo
 void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
 {
     for (const auto &record : data.GetRecords()) {
-        int64_t recordSize = record->GetSize();
-        auto udType = UtdUtils::GetUtdIdFromUtdEnum(record->GetType());
-        auto it = summary.summary.find(udType);
-        if (it == summary.summary.end()) {
-            summary.summary[udType] = recordSize;
-        } else {
-            summary.summary[udType] += recordSize;
-        }
-        summary.totalSize += recordSize;
+        CalRecordSummary(*record->GetEntries(), summary);
     }
 }
 
 bool UnifiedDataHelper::Pack(UnifiedData &data)
 {
+    UdmfConversion::InitValueObject(data);
+
     Summary summary;
     GetSummary(data, summary);
 
@@ -214,5 +214,53 @@ std::string UnifiedDataHelper::GetRootPath()
     }
     return rootPath_;
 }
+
+int32_t UnifiedDataHelper::ProcessBigData(UnifiedData &data, Intention intention, bool isSaInvoke)
+{
+    if (!isSaInvoke) {
+        return UnifiedDataHelper::Pack(data) ? E_OK : E_FS_ERROR;
+    }
+    if (intention != Intention::UD_INTENTION_DRAG) {
+        LOG_ERROR(UDMF_SERVICE, "Non-Drag cannot be used to process big data when SA initiates a request");
+        return E_INVALID_PARAMETERS;
+    }
+    int64_t dataSize = 0;
+    for (const auto &record : data.GetRecords()) {
+        auto recordSize = record->GetSize();
+        if (recordSize > MAX_SA_DRAG_RECORD_SIZE) {
+            LOG_ERROR(UDMF_FRAMEWORK, "Exceeded KV record limit, recordSize:%{public}" PRId64 "!", recordSize);
+            return E_INVALID_PARAMETERS;
+        }
+        dataSize += recordSize;
+    }
+    if (dataSize > MAX_IPC_RAW_DATA_SIZE) {
+        LOG_ERROR(UDMF_SERVICE, "Exceeded ipc-send data limit, totalSize:%{public}" PRId64 " !", dataSize);
+        return E_INVALID_PARAMETERS;
+    }
+    LOG_DEBUG(UDMF_SERVICE, "Processing udmf data in memory");
+    return E_OK;
+}
+
+void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry, Summary &summary)
+{
+    for (const auto &[utdId, value] : entry) {
+        auto typeId = utdId;
+        auto valueSize = ObjectUtils::GetValueSize(value, false);
+        if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+            auto object = std::get<std::shared_ptr<Object>>(value);
+            if (object->value_.find(APPLICATION_DEFINED_RECORD_MARK) != object->value_.end()) {
+                typeId = UtdUtils::GetUtdIdFromUtdEnum(APPLICATION_DEFINED_RECORD);
+            }
+        }
+        auto it = summary.summary.find(typeId);
+        if (it == summary.summary.end()) {
+            summary.summary[typeId] = valueSize;
+        } else {
+            summary.summary[typeId] += valueSize;
+        }
+        summary.totalSize += valueSize;
+    }
+}
+
 } // namespace UDMF
 } // namespace OHOS

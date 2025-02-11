@@ -62,9 +62,8 @@ enum StageRes : int32_t {
 };
 
 enum BizState : int32_t {
-    DFX_BEGIN = 0,
-    DFX_NORMAL_END = 1,
-    DFX_ABNORMAL_END = 2
+    DFX_BEGIN = 1,
+    DFX_END = 2
 };
 const constexpr char DOMAIN[] = "DISTDATAMGR";
 const constexpr char EVENT_NAME[] = "DISTRIBUTED_UDMF_BEHAVIOR";
@@ -73,10 +72,11 @@ const constexpr char ORG_PKG[] = "distributeddata";
 
 class API_EXPORT RadarReporterAdapter {
 public:
-    static  void ReportNormal(const std::string &func, int32_t scene, int32_t stage, int32_t stageRes, int32_t state);
-    static  void ReportFail(
-        const std::string &func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state);
-    static  void ReportFail(const std::string &func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode);
+    static void ReportNormal(std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t state);
+    static void ReportNormal(std::string func, int32_t scene, int32_t stage, int32_t stageRes);
+    static void ReportFail(
+        std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state);
+    static void ReportFail(std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode);
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -19,12 +19,12 @@ namespace OHOS {
 namespace UDMF {
 SystemDefinedForm::SystemDefinedForm()
 {
-    this->dataType_ = SYSTEM_DEFINED_FORM;
+    SetType(SYSTEM_DEFINED_FORM);
 }
 
 SystemDefinedForm::SystemDefinedForm(UDType type, ValueType value) : SystemDefinedRecord(type, value)
 {
-    this->dataType_ = SYSTEM_DEFINED_FORM;
+    SetType(SYSTEM_DEFINED_FORM);
     if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
         object->GetValue(FORMID, formId_);
@@ -42,8 +42,9 @@ SystemDefinedForm::SystemDefinedForm(UDType type, ValueType value) : SystemDefin
 
 int64_t SystemDefinedForm::GetSize()
 {
-    return UnifiedDataUtils::GetDetailsSize(this->details_) + sizeof(formId_) + this->formName_.size()
-           + this->bundleName_.size() + this->abilityName_.size() + this->module_.size();
+    return static_cast<int64_t>(UnifiedDataUtils::GetDetailsSize(this->details_) + sizeof(formId_) +
+        this->formName_.size() + this->bundleName_.size() + this->abilityName_.size() + this->module_.size()) +
+        GetInnerEntriesSize();
 }
 
 int32_t SystemDefinedForm::GetFormId() const
@@ -165,7 +166,7 @@ void SystemDefinedForm::InitObject()
         object->value_[ABILITY_NAME] = abilityName_;
         object->value_[MODULE] = module_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_[VALUE_TYPE] = value;
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 

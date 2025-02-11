@@ -56,6 +56,8 @@ void UdmfConversion::ConvertRecordToSubclass(std::shared_ptr<UnifiedRecord> &rec
     auto type = record->GetType();
     auto value = record->GetOriginValue();
     auto uid = record->GetUid();
+    auto entries = record->GetInnerEntries();
+    auto utdId = record->GetUtdId();
     switch (type) {
         case UDType::TEXT: {
             record = std::make_shared<Text>(type, value);
@@ -118,6 +120,8 @@ void UdmfConversion::ConvertRecordToSubclass(std::shared_ptr<UnifiedRecord> &rec
         }
     }
     record->SetUid(uid);
+    record->SetUtdId(utdId);
+    record->SetInnerEntries(entries);
     SetValueWhenNotUds(record);
 }
 

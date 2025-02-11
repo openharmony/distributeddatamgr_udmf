@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
 namespace UTILS {
@@ -29,6 +30,8 @@ std::string GenerateId();
 std::string GetSdkVersionByToken(uint32_t tokenId);
 
 std::string GetCurrentSdkVersion();
+
+bool API_EXPORT IsTokenNative();
 
 } // namespace UTILS
 } // namespace UDMF

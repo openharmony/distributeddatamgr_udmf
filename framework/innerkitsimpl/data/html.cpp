@@ -40,7 +40,7 @@ Html::Html(UDType type, ValueType value) : Text(type, value)
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
         object->GetValue(HTML_CONTENT, htmlContent_);
-        object->GetValue(PLAINT_CONTENT, plainContent_);
+        object->GetValue(PLAIN_CONTENT, plainContent_);
         std::shared_ptr<Object> detailObj = nullptr;
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
@@ -51,7 +51,8 @@ Html::Html(UDType type, ValueType value) : Text(type, value)
 
 int64_t Html::GetSize()
 {
-    return UnifiedDataUtils::GetDetailsSize(this->details_) + this->htmlContent_.size() + this->plainContent_.size();
+    return static_cast<int64_t>(UnifiedDataUtils::GetDetailsSize(this->details_) + this->htmlContent_.size() +
+        this->plainContent_.size()) + GetInnerEntriesSize();
 }
 
 std::string Html::GetHtmlContent() const
@@ -83,7 +84,7 @@ void Html::SetPlainContent(const std::string &plainContent)
     this->plainContent_ = plainContent;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[PLAINT_CONTENT] = plainContent_;
+        object->value_[PLAIN_CONTENT] = plainContent_;
     }
 }
 
@@ -95,9 +96,9 @@ void Html::InitObject()
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[HTML_CONTENT] = htmlContent_;
-        object->value_[PLAINT_CONTENT] = plainContent_;
+        object->value_[PLAIN_CONTENT] = plainContent_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_["VALUE_TYPE"] = value;
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 } // namespace UDMF

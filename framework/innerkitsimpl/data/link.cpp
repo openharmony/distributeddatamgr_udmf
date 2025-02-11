@@ -54,7 +54,8 @@ Link::Link(const std::string &url, const std::string &description)
 
 int64_t Link::GetSize()
 {
-    return UnifiedDataUtils::GetDetailsSize(this->details_) + this->url_.size() + this->description_.size();
+    return static_cast<int64_t>(UnifiedDataUtils::GetDetailsSize(this->details_) + this->url_.size() +
+        this->description_.size()) + GetInnerEntriesSize();
 }
 
 std::string Link::GetUrl() const
@@ -99,7 +100,7 @@ void Link::InitObject()
         object->value_[URL] = url_;
         object->value_[DESCRIPTION] = description_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_["VALUE_TYPE"] = value;
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 } // namespace UDMF

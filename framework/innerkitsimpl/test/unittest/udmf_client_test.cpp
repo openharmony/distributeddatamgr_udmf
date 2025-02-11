@@ -1232,7 +1232,16 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     applicationDefinedRecord.SetRawData(rawData);
     std::shared_ptr<UnifiedRecord> record7 = std::make_shared<ApplicationDefinedRecord>(applicationDefinedRecord);
     data.AddRecord(record7);
+	
+	std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "http://demo.com";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record8 = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record8);
 
+    auto record9 = std::make_shared<UnifiedRecord>(PNG, "http://demo.com");
+    data.AddRecord(record9);
     auto status = UdmfClient::GetInstance().SetData(option1, data, key);
     ASSERT_EQ(status, E_OK);
 
@@ -1247,16 +1256,20 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     size += record5->GetSize();
     size += record6->GetSize();
     size += record7->GetSize();
+	size += record8->GetSize();
+    size += record9->GetSize();
 
-    ASSERT_EQ(status, E_OK);
-    ASSERT_EQ(summary.totalSize, size);
-    ASSERT_EQ(summary.summary["general.text"], record1->GetSize());
-    ASSERT_EQ(summary.summary["general.plain-text"], record2->GetSize());
-    ASSERT_EQ(summary.summary["general.file"], record3->GetSize());
-    ASSERT_EQ(summary.summary["general.image"], record4->GetSize());
-    ASSERT_EQ(summary.summary["SystemDefinedType"], record5->GetSize());
-    ASSERT_EQ(summary.summary["openharmony.form"], record6->GetSize());
-    ASSERT_EQ(summary.summary["ApplicationDefinedType"], record7->GetSize());
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(summary.totalSize, size);
+    EXPECT_EQ(summary.summary["general.text"], record1->GetSize());
+    EXPECT_EQ(summary.summary["general.plain-text"], record2->GetSize());
+    EXPECT_EQ(summary.summary["general.file"], record3->GetSize());
+    EXPECT_EQ(summary.summary["general.image"], record4->GetSize());
+    EXPECT_EQ(summary.summary["SystemDefinedType"], record5->GetSize());
+    EXPECT_EQ(summary.summary["openharmony.form"], record6->GetSize());
+    EXPECT_EQ(summary.summary["ApplicationDefinedType"], record7->GetSize());
+    EXPECT_EQ(summary.summary["general.file-uri"], record8->GetSize());
+    EXPECT_EQ(summary.summary["general.png"], record9->GetSize());
 
     LOG_INFO(UDMF_TEST, "GetSummary001 end.");
 }
@@ -2558,4 +2571,208 @@ HWTEST_F(UdmfClientTest, QueryUDSData005, TestSize.Level1)
     ASSERT_EQ(std::get<int32_t>(obj2->value_["detail2"]), 1234);
     LOG_INFO(UDMF_TEST, "QueryUDSData005 end.");
 }
+
+/**
+* @tc.name: GetSummary004
+* @tc.desc: Get summary data for entries
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetSummary004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary004 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "http://demo.com";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    auto size0 = record->GetSize();
+
+    auto plainText = PlainText("content", "abstract");
+    auto size1 = plainText.GetSize();
+    plainText.InitObject();
+    record->AddEntry(plainText.GetUtdId(), plainText.GetOriginValue());
+
+    auto image = Image("uri");
+    image.SetDetails(details);
+    auto size2 = image.GetSize();
+    image.InitObject();
+    record->AddEntry(image.GetUtdId(), image.GetOriginValue());
+
+    std::vector<uint8_t> raw = {1, 2, 3, 4, 5};
+    SystemDefinedPixelMap pixelMap = SystemDefinedPixelMap(raw);
+    pixelMap.SetDetails(details);
+    auto size3 = pixelMap.GetSize();
+    pixelMap.InitObject();
+    record->AddEntry(pixelMap.GetUtdId(), pixelMap.GetOriginValue());
+
+    raw = {1, 2, 3, 4, 5};
+    auto applicationDefinedRecord = ApplicationDefinedRecord("my.type", raw);
+    auto size4 = applicationDefinedRecord.GetSize();
+    applicationDefinedRecord.InitObject();
+    record->AddEntry(applicationDefinedRecord.GetUtdId(), applicationDefinedRecord.GetOriginValue());
+    
+    data.AddRecord(record);
+
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+
+    ASSERT_EQ(status, E_OK);
+    EXPECT_EQ(summary.summary["general.file-uri"], size0);
+    EXPECT_EQ(summary.summary["general.plain-text"], size1);
+    EXPECT_EQ(summary.summary["general.image"], size2);
+    EXPECT_EQ(summary.summary["openharmony.pixel-map"], size3);
+    EXPECT_EQ(summary.summary["ApplicationDefinedType"], size4);
+
+    EXPECT_EQ(summary.totalSize, record->GetSize());
+
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    ASSERT_EQ(5, entries->size());
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("abcdefg", std::get<std::string>(readFileUri->value_[FILE_TYPE]));
+    auto readPlainText = std::get<std::shared_ptr<Object>>(entries->at("general.plain-text"));
+    EXPECT_EQ("abstract", std::get<std::string>(readPlainText->value_[ABSTRACT]));
+    auto readImage = std::get<std::shared_ptr<Object>>(entries->at("general.image"));
+    EXPECT_EQ("uri", std::get<std::string>(readImage->value_[ORI_URI]));
+    auto readPixelMap = std::get<std::shared_ptr<Object>>(entries->at("openharmony.pixel-map"));
+    EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readPixelMap->value_[PIXEL_MAP]).size());
+    auto readDefinedRecord = std::get<std::shared_ptr<Object>>(entries->at("my.type"));
+    EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readDefinedRecord->value_[ARRAY_BUFFER]).size());
+    auto value = std::get<std::shared_ptr<Object>>(readRecord->GetValue());
+    EXPECT_EQ("abcdefg", std::get<std::string>(value->value_[FILE_TYPE]));
+    LOG_INFO(UDMF_TEST, "GetSummary004 end.");
+}
+
+/**
+* @tc.name: GetSummary005
+* @tc.desc: Get summary data for entries
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetSummary005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary005 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+
+    auto record = std::make_shared<Html>("content1", "content2");
+    auto size0 = record->GetSize();
+
+    auto link = Link("url", "descritpion");
+    auto size1 = link.GetSize();
+    link.InitObject();
+    record->AddEntry(link.GetUtdId(), link.GetOriginValue());
+
+    auto folder = Folder("uri");
+    folder.SetDetails(details);
+    auto size2 = folder.GetSize();
+    folder.InitObject();
+    record->AddEntry(folder.GetUtdId(), folder.GetOriginValue());
+
+    std::vector<uint8_t> raw = {1, 2, 3, 4, 5};
+    auto applicationDefinedRecord1 = ApplicationDefinedRecord("your.type", raw);
+    auto size3 = applicationDefinedRecord1.GetSize();
+    applicationDefinedRecord1.InitObject();
+    record->AddEntry(applicationDefinedRecord1.GetUtdId(), applicationDefinedRecord1.GetOriginValue());
+
+    raw = {1, 2, 3, 4, 5};
+    auto applicationDefinedRecord2 = ApplicationDefinedRecord("my.type", raw);
+    auto size4 = applicationDefinedRecord2.GetSize();
+    applicationDefinedRecord2.InitObject();
+    record->AddEntry(applicationDefinedRecord2.GetUtdId(), applicationDefinedRecord2.GetOriginValue());
+
+    auto form = SystemDefinedForm();
+    form.SetDetails(details);
+    form.SetDetails(details);
+    form.SetFormId(123);
+    form.SetFormName("formName");
+    form.SetModule("module");
+    form.SetAbilityName("abilityName");
+    form.SetBundleName("bundleName");
+    auto size5 = form.GetSize();
+    form.InitObject();
+    record->AddEntry(form.GetUtdId(), form.GetOriginValue());
+
+    raw = {1, 2, 3, 4, 5};
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.content-form";
+    obj->value_[THUMB_DATA] = raw;
+    obj->value_[THUMB_DATA_LENGTH] = 5;
+    obj->value_[DESCRIPTION] = "descritpion";
+    obj->value_[TITLE] = "title";
+    obj->value_[APP_ICON] = raw;
+    obj->value_[APP_ICON_LENGTH] = 5;
+    obj->value_[APP_NAME] = "appName";
+    obj->value_[LINK_URL] = "linkUri";
+    auto contentForm = UnifiedRecord(CONTENT_FORM, obj);
+    auto size6 = contentForm.GetSize();
+    record->AddEntry(contentForm.GetUtdId(), contentForm.GetOriginValue());
+
+    data.AddRecord(record);
+
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+
+    LOG_INFO(UDMF_TEST, "GetSummary005 GetSummary.");
+
+    ASSERT_EQ(status, E_OK);
+    EXPECT_EQ(summary.summary["general.html"], size0);
+    EXPECT_EQ(summary.summary["general.hyperlink"], size1);
+    EXPECT_EQ(summary.summary["general.folder"], size2);
+    EXPECT_EQ(summary.summary["ApplicationDefinedType"], size3 + size4);
+    EXPECT_EQ(summary.summary["openharmony.form"], size5);
+    EXPECT_EQ(summary.summary["general.content-form"], size6);
+
+    EXPECT_EQ(summary.totalSize, record->GetSize());
+
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    LOG_INFO(UDMF_TEST, "GetSummary005 GetSummary1.");
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    ValueType recordVal = readRecord->GetValue();
+    auto entries = readRecord->GetEntries();
+    ASSERT_EQ(7, entries->size());
+    auto readHtml = std::get<std::shared_ptr<Object>>(entries->at("general.html"));
+    EXPECT_EQ("content1", std::get<std::string>(readHtml->value_[HTML_CONTENT]));
+    auto readHyperlink = std::get<std::shared_ptr<Object>>(entries->at("general.hyperlink"));
+    EXPECT_EQ("descritpion", std::get<std::string>(readHyperlink->value_[DESCRIPTION]));
+    auto readFolder = std::get<std::shared_ptr<Object>>(entries->at("general.folder"));
+    EXPECT_EQ("uri", std::get<std::string>(readFolder->value_[ORI_URI]));
+    auto readDefinedRecord = std::get<std::shared_ptr<Object>>(entries->at("your.type"));
+    EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readDefinedRecord->value_[ARRAY_BUFFER]).size());
+    auto readDefinedRecord2 = std::get<std::shared_ptr<Object>>(entries->at("my.type"));
+    EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readDefinedRecord2->value_[ARRAY_BUFFER]).size());
+    auto readForm = std::get<std::shared_ptr<Object>>(entries->at("openharmony.form"));
+    EXPECT_EQ("module", std::get<std::string>(readForm->value_[MODULE]));
+    auto readCotentForm = std::get<std::shared_ptr<Object>>(entries->at("general.content-form"));
+    EXPECT_EQ("title", std::get<std::string>(readCotentForm->value_[TITLE]));
+    LOG_INFO(UDMF_TEST, "GetSummary005 end.");
+}
+
 } // OHOS::Test

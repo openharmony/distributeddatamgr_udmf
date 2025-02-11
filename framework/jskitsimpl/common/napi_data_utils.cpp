@@ -447,7 +447,11 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
         NAPI_CALL_BASE(env, napi_typeof(env, attributeValueNapi, &valueType), napi_invalid_arg);
         switch (valueType) {
             case napi_valuetype::napi_object:
-                object->value_[attributeName] = std::make_shared<Object>();
+                if (attributeName == PIXEL_MAP) {
+                    object->value_[attributeName] = std::shared_ptr<OHOS::Media::PixelMap>();
+                } else {
+                    object->value_[attributeName] = std::make_shared<Object>();
+                }
                 break;
             case napi_valuetype::napi_number:
                 object->value_[attributeName] = double();
