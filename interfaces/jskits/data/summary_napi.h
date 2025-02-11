@@ -26,7 +26,7 @@ namespace OHOS {
 namespace UDMF {
 struct ContextBase;
 struct Summary;
-class SummaryNapi {
+class API_EXPORT SummaryNapi {
 public:
     static napi_value Constructor(napi_env env);
     static void NewInstance(napi_env env, std::shared_ptr<Summary> in, napi_value &out);

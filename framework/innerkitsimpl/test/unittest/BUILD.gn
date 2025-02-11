@@ -177,6 +177,8 @@ ohos_unittest("UtdClientTest") {
 
   configs = [ ":module_private_config" ]
 
+  use_exceptions = true
+
   external_deps = common_external_deps
   external_deps += [
     "cJSON:cjson",

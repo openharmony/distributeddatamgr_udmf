@@ -22,7 +22,7 @@ namespace OHOS {
 namespace UDMF {
 class UnifiedData;
 class UnifiedRecord;
-class UnifiedDataNapi {
+class API_EXPORT UnifiedDataNapi {
 public:
     static napi_value Constructor(napi_env env);
     static napi_status NewInstance(napi_env env, std::shared_ptr<UnifiedData> in, napi_value &out);

@@ -20,7 +20,6 @@
 #include <set>
 #include <map>
 #include <cstdint>
-#include "visibility.h"
 #include "cJSON.h"
 #include "utd_common.h"
 namespace OHOS {

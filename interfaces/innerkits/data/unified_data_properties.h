@@ -17,7 +17,6 @@
 
 #include "want_params.h"
 #include "unified_meta.h"
-#include "visibility.h"
 namespace OHOS {
 namespace UDMF {
 class UnifiedDataProperties {
