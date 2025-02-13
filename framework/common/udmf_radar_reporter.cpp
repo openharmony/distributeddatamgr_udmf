@@ -19,8 +19,8 @@
 namespace OHOS {
 namespace UDMF {
 using namespace RadarReporter;
-void RadarReporterAdapter::ReportNormal(const std::string &func, int32_t scene,
-                                        int32_t stage, int32_t stageRes, int32_t state)
+void RadarReporterAdapter::ReportNormal(
+    std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t state)
 {
     struct HiSysEventParam params[] = {
         { .name = { "ORG_PKG" },
@@ -57,8 +57,41 @@ void RadarReporterAdapter::ReportNormal(const std::string &func, int32_t scene,
     );
 }
 
+void RadarReporterAdapter::ReportNormal(std::string func, int32_t scene, int32_t stage, int32_t stageRes)
+{
+    struct HiSysEventParam params[] = {
+        { .name = { "ORG_PKG" },
+            .t = HISYSEVENT_STRING,
+            .v = { .s = const_cast<char *>(ORG_PKG) },
+            .arraySize = 0 },
+        { .name = { "FUNC" },
+            .t = HISYSEVENT_STRING,
+            .v = { .s = const_cast<char *>(func.c_str()) },
+            .arraySize = 0 },
+        { .name = { "BIZ_SCENE" },
+            .t = HISYSEVENT_INT32,
+            .v = { .i32 = scene },
+            .arraySize = 0 },
+        { .name = { "BIZ_STAGE" },
+            .t = HISYSEVENT_INT32,
+            .v = { .i32 = stage },
+            .arraySize = 0 },
+        { .name = { "STAGE_RES" },
+            .t = HISYSEVENT_INT32,
+            .v = { .i32 = stageRes },
+            .arraySize = 0 }
+    };
+    OH_HiSysEvent_Write(
+        DOMAIN,
+        EVENT_NAME,
+        HISYSEVENT_BEHAVIOR,
+        params,
+        sizeof(params) / sizeof(params[0])
+    );
+}
+
 void RadarReporterAdapter::ReportFail(
-    const std::string &func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state)
+    std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state)
 {
     struct HiSysEventParam params[] = {
         { .name = { "ORG_PKG" },
@@ -83,7 +116,7 @@ void RadarReporterAdapter::ReportFail(
             .arraySize = 0 },
         { .name = { "ERROR_CODE" },
             .t = HISYSEVENT_INT32,
-            .v = { .i32 = stageRes },
+            .v = { .i32 = errorCode },
             .arraySize = 0 },
         { .name = { "BIZ_STATE" },
             .t = HISYSEVENT_INT32,
@@ -100,7 +133,7 @@ void RadarReporterAdapter::ReportFail(
 }
 
 void RadarReporterAdapter::ReportFail(
-    const std::string &func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode)
+    std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode)
 {
     struct HiSysEventParam params[] = {
         { .name = { "ORG_PKG" },

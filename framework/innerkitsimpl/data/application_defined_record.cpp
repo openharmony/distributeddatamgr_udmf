@@ -24,6 +24,7 @@ ApplicationDefinedRecord::ApplicationDefinedRecord() : UnifiedRecord(APPLICATION
 ApplicationDefinedRecord::ApplicationDefinedRecord(std::string type) : UnifiedRecord(APPLICATION_DEFINED_RECORD)
 {
     this->applicationDefinedType = std::move(type);
+    SetUtdId(this->applicationDefinedType);
 }
 
 ApplicationDefinedRecord::ApplicationDefinedRecord(std::string type, std::vector<uint8_t> &data)
@@ -31,6 +32,7 @@ ApplicationDefinedRecord::ApplicationDefinedRecord(std::string type, std::vector
 {
     this->applicationDefinedType = std::move(type);
     this->rawData_ = std::move(data);
+    SetUtdId(this->applicationDefinedType);
 }
 
 ApplicationDefinedRecord::ApplicationDefinedRecord(UDType type, ValueType value)
@@ -45,11 +47,15 @@ ApplicationDefinedRecord::ApplicationDefinedRecord(UDType type, ValueType value)
         object->GetValue(RAW_DATA, rawData_);
         hasObject_ = true;
     }
+    if (applicationDefinedType.empty()) {
+        applicationDefinedType = UtdUtils::GetUtdIdFromUtdEnum(type);
+    }
+    SetUtdId(this->applicationDefinedType);
 }
 
 int64_t ApplicationDefinedRecord::GetSize()
 {
-    return rawData_.size() + applicationDefinedType.size();
+    return static_cast<int64_t>(rawData_.size()) + GetInnerEntriesSize();
 }
 
 std::string ApplicationDefinedRecord::GetApplicationDefinedType() const
@@ -89,7 +95,8 @@ void ApplicationDefinedRecord::InitObject()
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[APPLICATION_DEFINED_TYPE] = applicationDefinedType;
         object->value_[RAW_DATA] = rawData_;
-        object->value_["VALUE_TYPE"] = value;
+        object->value_[APPLICATION_DEFINED_RECORD_MARK] = true;
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 

@@ -79,6 +79,7 @@ int32_t UdmfServiceProxy::GetData(const QueryOption &query, UnifiedData &unified
         LOG_ERROR(UDMF_SERVICE, "Unmarshal UnifiedData failed!");
         return E_READ_PARCEL_ERROR;
     }
+    UdmfConversion::ConvertRecordToSubclass(unifiedData);
     return status;
 }
 
@@ -95,6 +96,7 @@ int32_t UdmfServiceProxy::GetBatchData(const QueryOption &query, std::vector<Uni
         LOG_ERROR(UDMF_SERVICE, "Unmarshal unifiedDataSet failed!");
         return E_READ_PARCEL_ERROR;
     }
+    UdmfConversion::ConvertRecordToSubclass(unifiedDataSet);
     return status;
 }
 
@@ -123,6 +125,7 @@ int32_t UdmfServiceProxy::DeleteData(const QueryOption &query, std::vector<Unifi
         LOG_ERROR(UDMF_SERVICE, "Unmarshal unifiedDataSet failed!");
         return E_READ_PARCEL_ERROR;
     }
+    UdmfConversion::ConvertRecordToSubclass(unifiedDataSet);
     LOG_DEBUG(UDMF_SERVICE, "end.");
     return status;
 }

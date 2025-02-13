@@ -64,6 +64,7 @@ constexpr const char *TITLE = "title";
 constexpr const char* APP_ICON = "appIcon";
 constexpr const char* APP_ICON_LENGTH = "appIconLen";
 constexpr const char* LINK_URL = "linkUrl";
+constexpr const char* APPLICATION_DEFINED_RECORD_MARK = "applicationDefinedRecordMark";
 
 enum UDType : int32_t {
     ENTITY = 0,
@@ -630,8 +631,12 @@ struct API_EXPORT Object {
 };
 
 namespace ObjectUtils {
-    std::shared_ptr<Object> ConvertToObject(UDDetails &details);
-    UDDetails ConvertToUDDetails(std::shared_ptr<Object> object);
+    std::shared_ptr<Object> API_EXPORT ConvertToObject(UDDetails &details);
+    UDDetails API_EXPORT ConvertToUDDetails(std::shared_ptr<Object> object);
+
+    int64_t GetValueSize(const ValueType &value, bool isCalValueType);
+    int64_t GetObjectValueSize(const std::shared_ptr<Object> object, bool isCalValueType);
+    int64_t GetAllObjectSize(const std::shared_ptr<Object> object);
 
     template<typename T, typename... Types>
     bool ConvertVariant(T &&input, std::variant<Types...> &output)

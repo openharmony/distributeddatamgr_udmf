@@ -16,6 +16,7 @@
 #include "udmf_client.h"
 
 #include "dds_trace.h"
+#include "udmf_conversion.h"
 #include "udmf_radar_reporter.h"
 
 #include "logger.h"
@@ -46,14 +47,17 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         RadarReporterAdapter::ReportFail(std::string(__FUNCTION__),
-            BizScene::SET_DATA, SetDataStage::SET_DATA_BEGIN, StageRes::FAILED, E_IPC, BizState::DFX_ABNORMAL_END);
+            BizScene::SET_DATA, SetDataStage::SET_DATA_BEGIN, StageRes::FAILED, E_IPC, BizState::DFX_END);
         return E_IPC;
     }
-
+    RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
+        BizScene::SET_DATA, SetDataStage::SET_DATA_BEGIN, StageRes::SUCCESS);
     if (option.intention == UD_INTENTION_DRAG) {
         ShareOptions shareOption = SHARE_OPTIONS_BUTT;
         auto status = GetAppShareOption(UD_INTENTION_MAP.at(option.intention), shareOption);
         if (status != E_NOT_FOUND && status != E_OK) {
+            RadarReporterAdapter::ReportFail(std::string(__FUNCTION__),
+                BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::FAILED, status, BizState::DFX_END);
             LOG_ERROR(UDMF_CLIENT, "get appShareOption fail, intention:%{public}s",
                       UD_INTENTION_MAP.at(option.intention).c_str());
             return static_cast<Status>(status);
@@ -66,19 +70,20 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
             dataCache_.Insert(key, unifiedData);
             LOG_INFO(UDMF_CLIENT, "SetData in app success, bundleName:%{public}s.", bundleName.c_str());
             RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
-                BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::SUCCESS, BizState::DFX_NORMAL_END);
+                BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::SUCCESS, BizState::DFX_END);
             return E_OK;
         }
     }
     int32_t ret = service->SetData(option, unifiedData, key);
     if (ret != E_OK) {
         RadarReporterAdapter::ReportFail(std::string(__FUNCTION__),
-            BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::FAILED, ret, BizState::DFX_ABNORMAL_END);
+            BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::FAILED, ret, BizState::DFX_END);
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
+        return static_cast<Status>(ret);
     }
     RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
-        BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::SUCCESS, BizState::DFX_NORMAL_END);
-    return static_cast<Status>(ret);
+        BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::SUCCESS, BizState::DFX_END);
+    return E_OK;
 }
 
 Status UdmfClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
@@ -91,27 +96,30 @@ Status UdmfClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         RadarReporterAdapter::ReportFail(std::string(__FUNCTION__),
-            BizScene::GET_DATA, GetDataStage::GET_DATA_BEGIN, StageRes::FAILED, E_IPC, BizState::DFX_ABNORMAL_END);
+            BizScene::GET_DATA, GetDataStage::GET_DATA_BEGIN, StageRes::FAILED, E_IPC, BizState::DFX_END);
         return E_IPC;
     }
+    RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
+        BizScene::GET_DATA, GetDataStage::GET_DATA_BEGIN, StageRes::SUCCESS);
     auto it = dataCache_.Find(query.key);
     if (it.first) {
         unifiedData = it.second;
         dataCache_.Erase(query.key);
         RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
-            BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::SUCCESS, BizState::DFX_NORMAL_END);
+            BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::SUCCESS, BizState::DFX_END);
         return E_OK;
     }
     LOG_WARN(UDMF_CLIENT, "query data from cache failed! key = %{public}s", query.key.c_str());
     int32_t ret = service->GetData(query, unifiedData);
     if (ret != E_OK) {
         RadarReporterAdapter::ReportFail(std::string(__FUNCTION__),
-            BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::FAILED, ret, BizState::DFX_ABNORMAL_END);
+            BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::FAILED, ret, BizState::DFX_END);
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
+        return static_cast<Status>(ret);
     }
     RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
-        BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::SUCCESS, BizState::DFX_NORMAL_END);
-    return static_cast<Status>(ret);
+        BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::SUCCESS, BizState::DFX_END);
+    return E_OK;
 }
 
 Status UdmfClient::GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
@@ -173,6 +181,7 @@ Status UdmfClient::GetSummary(const QueryOption &query, Summary &summary)
     }
     auto it = dataCache_.Find(query.key);
     if (it.first) {
+        UdmfConversion::InitValueObject(it.second);
         UnifiedDataHelper::GetSummary(it.second, summary);
         LOG_INFO(UDMF_CLIENT, "GetSummary in cache! key = %{public}s", query.key.c_str());
         return E_OK;

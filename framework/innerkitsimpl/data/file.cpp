@@ -45,7 +45,8 @@ File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
 
 int64_t File::GetSize()
 {
-    return this->oriUri_.size() + this->remoteUri_.size();
+    return static_cast<int64_t>(this->oriUri_.size() + this->remoteUri_.size() +
+        UnifiedDataUtils::GetDetailsSize(this->details_)) + GetInnerEntriesSize();
 }
 
 std::string File::GetUri() const
@@ -100,7 +101,7 @@ void File::InitObject()
         object->value_[ORI_URI] = oriUri_;
         object->value_[REMOTE_URI] = remoteUri_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_["VALUE_TYPE"] = value;
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 

@@ -18,6 +18,7 @@
 #include "iservice_registry.h"
 #include "datamgr_service_proxy.h"
 #include "system_ability_definition.h"
+#include "udmf_utils.h"
 #include "unified_data_helper.h"
 
 #include "logger.h"
@@ -113,10 +114,16 @@ int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedDat
         LOG_ERROR(UDMF_SERVICE, "UnifiedData is invalid.");
         return E_INVALID_PARAMETERS;
     }
+    bool isSaInvoke = UTILS::IsTokenNative();
+    if (isSaInvoke && unifiedData.HasFileType()) {
+        LOG_ERROR(UDMF_SERVICE, "The setting data initiated by the SA cannot contain the file type");
+        return E_INVALID_PARAMETERS;
+    }
     if (UnifiedDataHelper::ExceedKVSizeLimit(unifiedData)) {
-        if (!UnifiedDataHelper::Pack(unifiedData)) {
-            LOG_ERROR(UDMF_SERVICE, "Failed to pack unified data.");
-            return E_FS_ERROR;
+        auto status = UnifiedDataHelper::ProcessBigData(unifiedData, option.intention, isSaInvoke);
+        if (status != E_OK) {
+            LOG_ERROR(UDMF_SERVICE, "Process big data error, status = %{public}d", status);
+            return status;
         }
     }
     return udmfProxy_->SetData(option, unifiedData, key);

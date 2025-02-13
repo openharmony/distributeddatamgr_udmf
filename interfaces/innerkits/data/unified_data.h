@@ -38,7 +38,6 @@ public:
     void SetRecords(std::vector<std::shared_ptr<UnifiedRecord>> records);
     std::vector<std::shared_ptr<UnifiedRecord>> GetRecords() const;
 
-    std::string GetTypes();
     std::vector<std::string> GetTypesLabels() const;
     bool HasType(const std::string &type) const;
     std::vector<std::string> GetEntriesTypes() const;
@@ -47,6 +46,7 @@ public:
     bool IsEmpty() const;
     bool IsValid();
     bool IsComplete();
+    bool HasFileType() const;
 
     void SetProperties(std::shared_ptr<UnifiedDataProperties> properties);
     std::shared_ptr<UnifiedDataProperties> GetProperties() const;
@@ -58,6 +58,8 @@ public:
     static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;
 
 private:
+    std::set<std::string> GetTypIds() const;
+
     uint32_t dataId_ = 0;
     uint32_t recordId_ = 0;
     std::string channelName_;

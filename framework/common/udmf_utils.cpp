@@ -12,11 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#define LOG_TAG "UdmfUtils"
+
 #include "udmf_utils.h"
 #include <random>
 #include <sstream>
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
+#include "logger.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -81,6 +84,18 @@ std::string GetCurrentSdkVersion()
 {
     return GetSdkVersionByToken(IPCSkeleton::GetSelfTokenID());
 }
+
+bool IsTokenNative()
+{
+    uint32_t tokenId = IPCSkeleton::GetSelfTokenID();
+    if (tokenId == 0) {
+        return false;
+    }
+    auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    LOG_DEBUG(UDMF_FRAMEWORK, "tokenId=%{public}u, tokenType=%{public}d", tokenId, tokenType);
+    return tokenType == Security::AccessToken::TypeATokenTypeEnum::TOKEN_NATIVE;
+}
+
 } // namespace UTILS
 } // namespace UDMF
 } // namespace OHOS

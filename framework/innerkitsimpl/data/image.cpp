@@ -19,16 +19,17 @@ namespace OHOS {
 namespace UDMF {
 Image::Image() : Image("")
 {
+    SetType(IMAGE);
 }
 
 Image::Image(const std::string &uri) : File(uri)
 {
-    this->dataType_ = IMAGE;
+    SetType(IMAGE);
 }
 
 Image::Image(UDType type, ValueType value) : File(type, value)
 {
-    this->dataType_ = IMAGE;
+    SetType(IMAGE);
 }
 } // namespace UDMF
 } // namespace OHOS
