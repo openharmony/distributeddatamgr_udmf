@@ -99,7 +99,7 @@ Status UdmfClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
             BizScene::GET_DATA, GetDataStage::GET_DATA_BEGIN, StageRes::FAILED, E_IPC, BizState::DFX_END);
         return E_IPC;
     }
-	RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
+    RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
         BizScene::GET_DATA, GetDataStage::GET_DATA_BEGIN, StageRes::SUCCESS);
     auto it = dataCache_.Find(query.key);
     if (it.first) {
