@@ -229,8 +229,9 @@ export struct ContentFormCard {
   @Styles
   thumbStyle() {
     .width('100%')
-    //.borderRadius({ topLeft: this.formStyle.cardRadius, topRight: this.formStyle.cardRadius })
+    .borderRadius({ topLeft: this.formStyle.cardRadius, topRight: this.formStyle.cardRadius })
     .layoutWeight(1)
+    .clip(true)
   }
 
   @Builder
@@ -249,8 +250,6 @@ export struct ContentFormCard {
     }
     .thumbStyle()
     .backgroundColor(this.thumbImage ? CARD_BACKGROUND: DEFAULT_THUMB_BACKGROUND)
-    .borderRadius({topLeft: this.formStyle.cardRadius, topRight: this.formStyle.cardRadius})
-    .clip(true)
   }
 
   @Builder
