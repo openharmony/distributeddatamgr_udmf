@@ -270,7 +270,12 @@ ohos_unittest("FileDataTest") {
 ohos_unittest("FlexibleTypeTest") {
   module_out_path = module_output_path
 
-  sources = [ "flexible_type_test.cpp" ]
+  sources = [
+    "${udmf_framework_path}/common/base32_utils.cpp",
+    "${udmf_framework_path}/common/udmf_utils.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/flexible_type.cpp",
+    "flexible_type_test.cpp",
+  ]
 
   deps = common_deps
 

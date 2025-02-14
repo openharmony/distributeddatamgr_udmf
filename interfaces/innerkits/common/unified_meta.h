@@ -597,25 +597,25 @@ namespace ShareOptionsUtil {
     std::string API_EXPORT GetEnumStr(int32_t shareOption);
 } // namespace ShareOptionsUtil
 
-class API_EXPORT UnifiedDataUtils {
+class UnifiedDataUtils {
 public:
-    static bool IsValidType(int32_t value);
-    static bool IsValidIntention(int32_t value);
+    static bool API_EXPORT IsValidType(int32_t value);
+    static bool API_EXPORT IsValidIntention(int32_t value);
     static size_t GetVariantSize(UDVariant &variant);
     static size_t GetDetailsSize(UDDetails &details);
-    static bool IsPersist(const Intention &intention);
-    static bool IsPersist(const std::string &intention);
-    static Intention GetIntentionByString(const std::string &intention);
-    static bool IsValidOptions(const std::string &key, std::string &intention);
+    static bool API_EXPORT IsPersist(const Intention &intention);
+    static bool API_EXPORT IsPersist(const std::string &intention);
+    static Intention API_EXPORT GetIntentionByString(const std::string &intention);
+    static bool API_EXPORT IsValidOptions(const std::string &key, std::string &intention);
 };
 
 struct Object;
 using ValueType = std::variant<std::monostate, int32_t, int64_t, double, bool, std::string, std::vector<uint8_t>,
     std::shared_ptr<OHOS::AAFwk::Want>, std::shared_ptr<OHOS::Media::PixelMap>, std::shared_ptr<Object>, nullptr_t>;
 
-struct API_EXPORT Object {
+struct Object {
     template<typename T>
-    bool GetValue(const std::string &key, T &value)
+    bool API_EXPORT GetValue(const std::string &key, T &value)
     {
         auto it = value_.find(key);
         if (it != value_.end() && std::holds_alternative<T>(it->second)) {
