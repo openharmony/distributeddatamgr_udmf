@@ -23,6 +23,8 @@
 #include "udmf_copy_file.h"
 #include "udmf_service_client.h"
 
+#include "dataobs_mgr_client.h"
+
 namespace OHOS::UDMF {
 static constexpr size_t MAX_THREADS = 10;
 static constexpr size_t MIN_THREADS = 0;
@@ -162,7 +164,11 @@ Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
         return E_ERROR;
     }
     sptr<IRemoteObject> callback = new ProgressSignalCallback();
-    auto status = UdmfServiceClient::GetInstance()->InvokeHap(asyncHelper->processKey, callback);
+    // auto status = UdmfServiceClient::GetInstance()->InvokeHap(asyncHelper->processKey, callback);
+
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    auto status = obsMgrClient->NotifyProcessDialog(asyncHelper->processKey, callback);
+
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Invoke hap failed, status=%{public}d", status);
         Clear(businessUdKey);
