@@ -215,11 +215,11 @@ export struct ContentFormCard {
     this.cardWidth = defaultWidth * resultScale;
     this.formHeight = defaultHeight * resultScale;
     this.cardScale = resultScale;
-    console.info(`${TAG}, ss1 widthScale:${this.cardScale}, cardScale: ${this.cardScale}, cardWidth: ${this.cardWidth}, formHeight: ${this.formHeight}`);
+    console.info(`${TAG},widthScale:${this.cardScale}, cardScale: ${this.cardScale}, cardWidth: ${this.cardWidth}, formHeight: ${this.formHeight}`);
   }
 
   initCardStyle(): void {
-    console.info(`${TAG}, ss0 cardScale: ${this.cardScale}, formType: ${this.formType},formWidth: ${this.formWidth}, formHeight: ${this.formHeight}`);
+    console.info(`${TAG},cardScale: ${this.cardScale}, formType: ${this.formType},formWidth: ${this.formWidth}, formHeight: ${this.formHeight}`);
     let widthScale = 1;
     switch (this.formType) {
       case FormType.TYPE_BIG:
