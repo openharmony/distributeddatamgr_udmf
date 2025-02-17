@@ -16,6 +16,7 @@
 
 #include "udmf_async_client.h"
 
+#include "dataobs_mgr_client.h"
 #include "logger.h"
 #include "plain_text.h"
 #include "progress_callback.h"
@@ -164,13 +165,16 @@ Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
         return E_ERROR;
     }
     sptr<IRemoteObject> callback = new ProgressSignalCallback();
-    // auto status = UdmfServiceClient::GetInstance()->InvokeHap(asyncHelper->processKey, callback);
-
     auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
-    auto status = obsMgrClient->NotifyProcessDialog(asyncHelper->processKey, callback);
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Get DataObsMgrClient failed");
+        Clear(businessUdKey);
+        return E_ERROR;
+    }
 
-    if (status != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "Invoke hap failed, status=%{public}d", status);
+    auto status = obsMgrClient->NotifyProcessObserver(asyncHelper->processKey, callback);
+    if (status != AAFwk::SUCCESS) {
+        LOG_ERROR(UDMF_CLIENT, "Notify process dialog failed, status=%{public}d", status);
         Clear(businessUdKey);
         return E_ERROR;
     }
