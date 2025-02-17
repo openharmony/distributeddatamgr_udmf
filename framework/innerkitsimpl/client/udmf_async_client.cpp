@@ -165,7 +165,7 @@ Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
         return E_ERROR;
     }
     sptr<IRemoteObject> callback = new ProgressSignalCallback();
-    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    auto obsMgrClient = AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Get DataObsMgrClient failed");
         Clear(businessUdKey);
