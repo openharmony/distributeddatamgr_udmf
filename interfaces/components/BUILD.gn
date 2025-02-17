@@ -45,7 +45,7 @@ ohos_shared_library("udmfcomponents") {
 
   external_deps = [ "napi:ace_napi" ]
 
-  relative_install_dir = "module"
+  relative_install_dir = "module/data"
   subsystem_name = "distributeddatamgr"
   part_name = "udmf"
 }
