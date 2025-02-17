@@ -25,48 +25,49 @@
 
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT UnifiedRecord {
+class UnifiedRecord {
 public:
-    UnifiedRecord();
-    explicit UnifiedRecord(UDType type);
-    UnifiedRecord(UDType type, ValueType value);
+    API_EXPORT UnifiedRecord();
+    explicit API_EXPORT UnifiedRecord(UDType type);
+    API_EXPORT UnifiedRecord(UDType type, ValueType value);
     virtual ~UnifiedRecord() = default;
 
-    UnifiedRecord(const UnifiedRecord& other) = delete;
-    UnifiedRecord& operator=(const UnifiedRecord& other) = delete;
-    UnifiedRecord(UnifiedRecord &&other) = delete;
-    UnifiedRecord& operator=(UnifiedRecord &&other) = delete;
+    API_EXPORT UnifiedRecord(const UnifiedRecord& other) = delete;
+    API_EXPORT UnifiedRecord& operator=(const UnifiedRecord& other) = delete;
+    API_EXPORT UnifiedRecord(UnifiedRecord &&other) = delete;
+    API_EXPORT UnifiedRecord& operator=(UnifiedRecord &&other) = delete;
 
-    UDType GetType() const;
-    std::vector<std::string> GetTypes() const;
-    void SetType(const UDType &type);
-    virtual int64_t GetSize();
+    UDType API_EXPORT GetType() const;
+    std::vector<std::string> API_EXPORT GetTypes() const;
+    void API_EXPORT SetType(const UDType &type);
+    virtual int64_t API_EXPORT GetSize();
 
-    std::string GetUid() const;
-    void SetUid(const std::string &id);
-    ValueType GetValue();
+    std::string API_EXPORT GetUid() const;
+    void API_EXPORT SetUid(const std::string &id);
+    ValueType API_EXPORT GetValue();
     void SetValue(const ValueType &value);
-    ValueType GetOriginValue() const;
+    ValueType API_EXPORT GetOriginValue() const;
 
-    void SetUtdId(const std::string &utdId);
-    std::set<std::string> GetUtdIds() const;
-    std::string GetUtdId() const;
+    void API_EXPORT SetUtdId(const std::string &utdId);
+    std::set<std::string> API_EXPORT GetUtdIds() const;
+    std::string API_EXPORT GetUtdId() const;
 
-    bool HasType(const std::string &utdId) const;
-    void AddEntry(const std::string &utdId, ValueType &&value);
-    ValueType GetEntry(const std::string &utdId);
-    std::shared_ptr<std::map<std::string, ValueType>> GetEntries();
-    std::shared_ptr<std::map<std::string, ValueType>> GetInnerEntries() const;
+    bool API_EXPORT HasType(const std::string &utdId) const;
+    void API_EXPORT AddEntry(const std::string &utdId, ValueType &&value);
+    ValueType API_EXPORT GetEntry(const std::string &utdId);
+    std::shared_ptr<std::map<std::string, ValueType>> API_EXPORT GetEntries();
+    std::shared_ptr<std::map<std::string, ValueType>> API_EXPORT GetInnerEntries() const;
     void SetInnerEntries(std::shared_ptr<std::map<std::string, ValueType>> entries);
     int64_t GetInnerEntriesSize() const;
 	
-    void SetEntryGetter(const std::vector<std::string> &utdIds, const std::shared_ptr<EntryGetter> &entryGetter);
-    std::shared_ptr<EntryGetter> GetEntryGetter();
-    void SetDataId(uint32_t dataId);
-    uint32_t GetDataId() const;
-    void SetRecordId(uint32_t recordId);
-    uint32_t GetRecordId() const;
-    void SetChannelName(const std::string &channelName);
+    void API_EXPORT SetEntryGetter(const std::vector<std::string> &utdIds,
+        const std::shared_ptr<EntryGetter> &entryGetter);
+    std::shared_ptr<EntryGetter> API_EXPORT GetEntryGetter();
+    void API_EXPORT SetDataId(uint32_t dataId);
+    uint32_t API_EXPORT GetDataId() const;
+    void API_EXPORT SetRecordId(uint32_t recordId);
+    uint32_t API_EXPORT GetRecordId() const;
+    void API_EXPORT SetChannelName(const std::string &channelName);
 
     virtual void InitObject();
     bool HasObject();

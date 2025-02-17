@@ -20,20 +20,20 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT ApplicationDefinedRecord : public UnifiedRecord {
+class ApplicationDefinedRecord : public UnifiedRecord {
 public:
-    ApplicationDefinedRecord();
-    explicit ApplicationDefinedRecord(std::string type);
-    explicit ApplicationDefinedRecord(std::string type, std::vector<uint8_t> &data);
-    ApplicationDefinedRecord(UDType type, ValueType value);
+    API_EXPORT ApplicationDefinedRecord();
+    explicit API_EXPORT ApplicationDefinedRecord(std::string type);
+    explicit API_EXPORT ApplicationDefinedRecord(std::string type, std::vector<uint8_t> &data);
+    API_EXPORT ApplicationDefinedRecord(UDType type, ValueType value);
 
-    int64_t GetSize() override;
+    int64_t API_EXPORT GetSize() override;
 
-    std::string GetApplicationDefinedType() const;
-    void SetApplicationDefinedType(const std::string &type);
+    std::string API_EXPORT GetApplicationDefinedType() const;
+    void API_EXPORT SetApplicationDefinedType(const std::string &type);
 
-    std::vector<uint8_t> GetRawData() const;
-    void SetRawData(const std::vector<uint8_t> &rawData);
+    std::vector<uint8_t> API_EXPORT GetRawData() const;
+    void API_EXPORT SetRawData(const std::vector<uint8_t> &rawData);
 
     void InitObject() override;
 protected:

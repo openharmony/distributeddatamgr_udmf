@@ -20,26 +20,26 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT SystemDefinedForm : public SystemDefinedRecord {
+class SystemDefinedForm : public SystemDefinedRecord {
 public:
-    SystemDefinedForm();
-    SystemDefinedForm(UDType type, ValueType value);
+    API_EXPORT SystemDefinedForm();
+    API_EXPORT SystemDefinedForm(UDType type, ValueType value);
 
-    int64_t GetSize() override;
+    int64_t API_EXPORT GetSize() override;
 
-    int32_t GetFormId() const;
-    void SetFormId(const int32_t &formId);
-    std::string GetFormName() const;
-    void SetFormName(const std::string &formName);
-    std::string GetBundleName() const;
-    void SetBundleName(const std::string &bundleName);
-    std::string GetAbilityName() const;
-    void SetAbilityName(const std::string &abilityName);
-    std::string GetModule() const;
-    void SetModule(const std::string &module);
+    int32_t API_EXPORT GetFormId() const;
+    void API_EXPORT SetFormId(const int32_t &formId);
+    std::string API_EXPORT GetFormName() const;
+    void API_EXPORT SetFormName(const std::string &formName);
+    std::string API_EXPORT GetBundleName() const;
+    void API_EXPORT SetBundleName(const std::string &bundleName);
+    std::string API_EXPORT GetAbilityName() const;
+    void API_EXPORT SetAbilityName(const std::string &abilityName);
+    std::string API_EXPORT GetModule() const;
+    void API_EXPORT SetModule(const std::string &module);
 
-    void SetItems(UDDetails &details);
-    UDDetails GetItems();
+    void API_EXPORT SetItems(UDDetails &details);
+    UDDetails API_EXPORT GetItems();
 
     void InitObject() override;
 
@@ -49,7 +49,6 @@ private:
     std::string bundleName_;
     std::string abilityName_;
     std::string module_;
-
 };
 } // namespace UDMF
 } // namespace OHOS

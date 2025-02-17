@@ -20,12 +20,11 @@
 #include <set>
 #include <map>
 #include <cstdint>
-#include "visibility.h"
 #include "utd_common.h"
 #include "custom_utd_json_parser.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT CustomUtdStore {
+class CustomUtdStore {
 public:
     static CustomUtdStore &GetInstance();
     std::vector<TypeDescriptorCfg> GetTypeCfgs(int32_t userId);

@@ -32,19 +32,19 @@ namespace OHOS {
 namespace UDMF {
 class TypeDescriptor;
 class UtdChangeSubscriber;
-class API_EXPORT UtdClient {
+class UtdClient {
 public:
-    static UtdClient &GetInstance();
-    Status GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
-    Status GetUniformDataTypeByFilenameExtension(const std::string &fileExtension, std::string &typeId,
+    static UtdClient API_EXPORT &GetInstance();
+    Status API_EXPORT GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
+    Status API_EXPORT GetUniformDataTypeByFilenameExtension(const std::string &fileExtension, std::string &typeId,
                                                  std::string belongsTo = DEFAULT_TYPE_ID);
-    Status GetUniformDataTypesByFilenameExtension(const std::string &fileExtension,
+    Status API_EXPORT GetUniformDataTypesByFilenameExtension(const std::string &fileExtension,
                     std::vector<std::string> &typeIds, const std::string &belongsTo = DEFAULT_TYPE_ID);
-    Status GetUniformDataTypeByMIMEType(const std::string &mimeType, std::string &typeId,
+    Status API_EXPORT GetUniformDataTypeByMIMEType(const std::string &mimeType, std::string &typeId,
                                         std::string belongsTo = DEFAULT_TYPE_ID);
-    Status GetUniformDataTypesByMIMEType(const std::string &mimeType, std::vector<std::string> &typeIds,
+    Status API_EXPORT GetUniformDataTypesByMIMEType(const std::string &mimeType, std::vector<std::string> &typeIds,
                                         const std::string &belongsTo = DEFAULT_TYPE_ID);
-    Status IsUtd(std::string typeId, bool &result);
+    Status API_EXPORT IsUtd(std::string typeId, bool &result);
 
 private:
     UtdClient();

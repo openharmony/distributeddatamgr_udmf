@@ -25,25 +25,25 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT TypeDescriptor {
+class TypeDescriptor {
 public:
-    TypeDescriptor(const std::string &typeId, const std::vector<std::string> &belongingToTypes,
+    API_EXPORT TypeDescriptor(const std::string &typeId, const std::vector<std::string> &belongingToTypes,
                    const std::vector<std::string> &filenameExtensions, const std::vector<std::string> &mimeTypes,
                    const std::string &description, const std::string &referenceURL, const std::string &iconFile);
-    TypeDescriptor(const TypeDescriptorCfg& typeDescriptorCfg);
-    ~TypeDescriptor();
-    Status BelongsTo(const std::string &typeId, bool &checkResult);
-    Status IsLowerLevelType(const std::string &typeId, bool &checkResult);
-    Status IsHigherLevelType(const std::string &typeId, bool &checkResult);
+    API_EXPORT TypeDescriptor(const TypeDescriptorCfg& typeDescriptorCfg);
+    API_EXPORT ~TypeDescriptor();
+    Status API_EXPORT BelongsTo(const std::string &typeId, bool &checkResult);
+    Status API_EXPORT IsLowerLevelType(const std::string &typeId, bool &checkResult);
+    Status API_EXPORT IsHigherLevelType(const std::string &typeId, bool &checkResult);
 
-    bool Equals(std::shared_ptr<TypeDescriptor> descriptor);
-    const std::string& GetTypeId() const;
-    std::vector<std::string> GetBelongingToTypes();
-    std::string GetIconFile();
-    std::string GetDescription();
-    std::string GetReferenceURL();
-    std::vector<std::string> GetFilenameExtensions();
-    std::vector<std::string> GetMimeTypes();
+    bool API_EXPORT Equals(std::shared_ptr<TypeDescriptor> descriptor);
+    const std::string& API_EXPORT GetTypeId() const;
+    std::vector<std::string> API_EXPORT GetBelongingToTypes();
+    std::string API_EXPORT GetIconFile();
+    std::string API_EXPORT GetDescription();
+    std::string API_EXPORT GetReferenceURL();
+    std::vector<std::string> API_EXPORT GetFilenameExtensions();
+    std::vector<std::string> API_EXPORT GetMimeTypes();
 
 private:
     bool CmpFlexibleTypeLevel(const std::string higherLevelTypeId, bool isFlexibleType);

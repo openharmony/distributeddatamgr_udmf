@@ -21,18 +21,18 @@
 
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT Html : public Text {
+class Html : public Text {
 public:
-    Html();
-    explicit Html(const std::string &htmlContent, const std::string &plainContent);
-    Html(UDType type, ValueType value);
+    API_EXPORT Html();
+    explicit API_EXPORT Html(const std::string &htmlContent, const std::string &plainContent);
+    API_EXPORT Html(UDType type, ValueType value);
 
-    int64_t GetSize() override;
+    int64_t API_EXPORT GetSize() override;
 
-    std::string GetHtmlContent() const;
-    void SetHtmlContent(const std::string &htmlContent);
-    std::string GetPlainContent() const;
-    void SetPlainContent(const std::string &htmlContent);
+    std::string API_EXPORT GetHtmlContent() const;
+    void API_EXPORT SetHtmlContent(const std::string &htmlContent);
+    std::string API_EXPORT GetPlainContent() const;
+    void API_EXPORT SetPlainContent(const std::string &htmlContent);
     void InitObject() override;
 
     static bool CheckValue(const ValueType &value);

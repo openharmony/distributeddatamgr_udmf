@@ -20,12 +20,11 @@
 #include <set>
 #include <map>
 #include <cstdint>
-#include "visibility.h"
 #include "cJSON.h"
 #include "utd_common.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT CustomUtdJsonParser {
+class CustomUtdJsonParser {
 public:
     using json = cJSON;
     CustomUtdJsonParser();

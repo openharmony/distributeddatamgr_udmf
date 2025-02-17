@@ -71,7 +71,23 @@ ohos_unittest("UdsTest") {
 ohos_unittest("UdmfTest") {
   module_out_path = module_output_path
 
-  sources = [ "udmf_test.cpp" ]
+  sources = [
+    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "udmf_test.cpp",
+  ]
 
   configs = [ ":module_private_config" ]
 

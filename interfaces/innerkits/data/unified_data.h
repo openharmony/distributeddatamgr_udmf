@@ -21,37 +21,37 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT UnifiedData {
+class UnifiedData {
 public:
-    UnifiedData();
-    explicit UnifiedData(std::shared_ptr<UnifiedDataProperties> properties);
+    API_EXPORT UnifiedData();
+    explicit API_EXPORT UnifiedData(std::shared_ptr<UnifiedDataProperties> properties);
 
-    int64_t GetSize();
+    int64_t API_EXPORT GetSize();
     std::string GetGroupId() const;
 
-    std::shared_ptr<Runtime> GetRuntime() const;
-    void SetRuntime(Runtime &runtime);
+    std::shared_ptr<Runtime> API_EXPORT GetRuntime() const;
+    void API_EXPORT SetRuntime(Runtime &runtime);
 
-    void AddRecord(const std::shared_ptr<UnifiedRecord> &record);
-    void AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>> &records);
-    std::shared_ptr<UnifiedRecord> GetRecordAt(std::size_t index) const;
-    void SetRecords(std::vector<std::shared_ptr<UnifiedRecord>> records);
-    std::vector<std::shared_ptr<UnifiedRecord>> GetRecords() const;
+    void API_EXPORT AddRecord(const std::shared_ptr<UnifiedRecord> &record);
+    void API_EXPORT AddRecords(const std::vector<std::shared_ptr<UnifiedRecord>> &records);
+    std::shared_ptr<UnifiedRecord> API_EXPORT GetRecordAt(std::size_t index) const;
+    void API_EXPORT SetRecords(std::vector<std::shared_ptr<UnifiedRecord>> records);
+    std::vector<std::shared_ptr<UnifiedRecord>> API_EXPORT GetRecords() const;
 
-    std::vector<std::string> GetTypesLabels() const;
-    bool HasType(const std::string &type) const;
-    std::vector<std::string> GetEntriesTypes() const;
-    bool HasTypeInEntries(const std::string &type) const;
+    std::vector<std::string> API_EXPORT GetTypesLabels() const;
+    bool API_EXPORT HasType(const std::string &type) const;
+    std::vector<std::string> API_EXPORT GetEntriesTypes() const;
+    bool API_EXPORT HasTypeInEntries(const std::string &type) const;
 
-    bool IsEmpty() const;
-    bool IsValid();
-    bool IsComplete();
+    bool API_EXPORT IsEmpty() const;
+    bool API_EXPORT IsValid();
+    bool API_EXPORT IsComplete();
     bool HasFileType() const;
 
-    void SetProperties(std::shared_ptr<UnifiedDataProperties> properties);
-    std::shared_ptr<UnifiedDataProperties> GetProperties() const;
+    void API_EXPORT SetProperties(std::shared_ptr<UnifiedDataProperties> properties);
+    std::shared_ptr<UnifiedDataProperties> API_EXPORT GetProperties() const;
 
-    void SetDataId(uint32_t dataId);
+    void API_EXPORT SetDataId(uint32_t dataId);
     uint32_t GetDataId() const;
     void SetChannelName(const std::string &name);
     std::vector<std::string> GetFileUris() const;

@@ -19,7 +19,7 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT UtdCfgsChecker {
+class UtdCfgsChecker {
 public:
     static UtdCfgsChecker &GetInstance();
     bool CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,

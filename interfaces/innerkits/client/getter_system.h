@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT GetterSystem {
+class GetterSystem {
 public:
     class API_EXPORT GeneralGetter {
     public:
@@ -31,9 +31,9 @@ public:
     };
     using Creator = std::function<std::shared_ptr<GeneralGetter>()>;
     using Getter = std::shared_ptr<GeneralGetter>;
-    static GetterSystem &GetInstance();
-    void RegisterCreator(const std::string& name, Creator creator);
-    Getter GetGetter(const std::string& name);
+    static API_EXPORT GetterSystem &GetInstance();
+    void API_EXPORT RegisterCreator(const std::string& name, Creator creator);
+    Getter API_EXPORT GetGetter(const std::string& name);
 private:
     GetterSystem() = default;
     GetterSystem(const GetterSystem &) = delete;

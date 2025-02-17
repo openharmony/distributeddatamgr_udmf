@@ -22,10 +22,10 @@
 #include "error_code.h"
 
 namespace OHOS::UDMF {
-    class API_EXPORT NdkDataConversion {
+    class NdkDataConversion {
     public:
-        static Status GetNativeUnifiedData(OH_UdmfData* ndkData, std::shared_ptr<UnifiedData>& data);
-        static Status GetNdkUnifiedData(std::shared_ptr<UnifiedData> data, OH_UdmfData* ndkData);
+        static Status API_EXPORT GetNativeUnifiedData(OH_UdmfData* ndkData, std::shared_ptr<UnifiedData>& data);
+        static Status API_EXPORT GetNdkUnifiedData(std::shared_ptr<UnifiedData> data, OH_UdmfData* ndkData);
     };
 }
 

@@ -20,18 +20,18 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT PlainText : public Text {
+class PlainText : public Text {
 public:
-    PlainText();
-    explicit PlainText(const std::string &content, const std::string &abstract);
-    PlainText(UDType type, ValueType value);
+    API_EXPORT PlainText();
+    explicit API_EXPORT PlainText(const std::string &content, const std::string &abstract);
+    API_EXPORT PlainText(UDType type, ValueType value);
 
-    int64_t GetSize() override;
+    int64_t API_EXPORT GetSize() override;
 
-    std::string GetContent() const;
-    void SetContent(const std::string &content);
-    std::string GetAbstract() const;
-    void SetAbstract(const std::string &abstract);
+    std::string API_EXPORT GetContent() const;
+    void API_EXPORT SetContent(const std::string &content);
+    std::string API_EXPORT GetAbstract() const;
+    void API_EXPORT SetAbstract(const std::string &abstract);
     void InitObject() override;
 
     static bool CheckValue(const ValueType &value);

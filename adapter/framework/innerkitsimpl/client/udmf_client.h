@@ -29,22 +29,22 @@
 #include "visibility.h"
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT UdmfClient {
+class UdmfClient {
 public:
-    static UdmfClient &GetInstance();
+    static UdmfClient API_EXPORT &GetInstance();
 
-    Status SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key);
-    Status GetData(const QueryOption &query, UnifiedData &unifiedData);
-    Status GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet);
-    Status UpdateData(const QueryOption &query, UnifiedData &unifiedData);
-    Status DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet);
-    Status GetSummary(const QueryOption &query, Summary& summary);
-    Status AddPrivilege(const QueryOption &query, Privilege &privilege);
-    Status Sync(const QueryOption &query, const std::vector<std::string> &devices);
-    Status IsRemoteData(const QueryOption &query, bool &result);
-    Status SetAppShareOption(const std::string &intention, enum ShareOptions shareOption);
-    Status RemoveAppShareOption(const std::string &intention);
-    Status GetAppShareOption(const std::string &intention, enum ShareOptions &shareOption);
+    Status API_EXPORT SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key);
+    Status API_EXPORT GetData(const QueryOption &query, UnifiedData &unifiedData);
+    Status API_EXPORT GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet);
+    Status API_EXPORT UpdateData(const QueryOption &query, UnifiedData &unifiedData);
+    Status API_EXPORT DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet);
+    Status API_EXPORT GetSummary(const QueryOption &query, Summary& summary);
+    Status API_EXPORT AddPrivilege(const QueryOption &query, Privilege &privilege);
+    Status API_EXPORT Sync(const QueryOption &query, const std::vector<std::string> &devices);
+    Status API_EXPORT IsRemoteData(const QueryOption &query, bool &result);
+    Status API_EXPORT SetAppShareOption(const std::string &intention, enum ShareOptions shareOption);
+    Status API_EXPORT RemoveAppShareOption(const std::string &intention);
+    Status API_EXPORT GetAppShareOption(const std::string &intention, enum ShareOptions &shareOption);
 
 private:
     UdmfClient() = default;

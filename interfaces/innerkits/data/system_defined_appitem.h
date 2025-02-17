@@ -21,27 +21,27 @@
 
 namespace OHOS {
 namespace UDMF {
-class API_EXPORT SystemDefinedAppItem : public SystemDefinedRecord {
+class SystemDefinedAppItem : public SystemDefinedRecord {
 public:
-    SystemDefinedAppItem();
-    SystemDefinedAppItem(UDType type, ValueType value);
+    API_EXPORT SystemDefinedAppItem();
+    API_EXPORT SystemDefinedAppItem(UDType type, ValueType value);
 
-    int64_t GetSize() override;
+    int64_t API_EXPORT GetSize() override;
 
-    std::string GetAppId() const;
-    void SetAppId(const std::string &appId);
-    std::string GetAppName() const;
-    void SetAppName(const std::string &appName);
-    std::string GetAppIconId() const;
-    void SetAppIconId(const std::string &appIconId);
-    std::string GetAppLabelId() const;
-    void SetAppLabelId(const std::string &appLabelId);
-    std::string GetBundleName() const;
-    void SetBundleName(const std::string &bundleName);
-    std::string GetAbilityName() const;
-    void SetAbilityName(const std::string &abilityName);
-    void SetItems(UDDetails &details);
-    UDDetails GetItems();
+    std::string API_EXPORT GetAppId() const;
+    void API_EXPORT SetAppId(const std::string &appId);
+    std::string API_EXPORT GetAppName() const;
+    void API_EXPORT SetAppName(const std::string &appName);
+    std::string API_EXPORT GetAppIconId() const;
+    void API_EXPORT SetAppIconId(const std::string &appIconId);
+    std::string API_EXPORT GetAppLabelId() const;
+    void API_EXPORT SetAppLabelId(const std::string &appLabelId);
+    std::string API_EXPORT GetBundleName() const;
+    void API_EXPORT SetBundleName(const std::string &bundleName);
+    std::string API_EXPORT GetAbilityName() const;
+    void API_EXPORT SetAbilityName(const std::string &abilityName);
+    void API_EXPORT SetItems(UDDetails &details);
+    UDDetails API_EXPORT GetItems();
     void InitObject() override;
 
     static bool CheckValue(const ValueType &value);
