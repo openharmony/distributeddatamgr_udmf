@@ -24,8 +24,6 @@
 #include "udmf_copy_file.h"
 #include "udmf_service_client.h"
 
-#include "dataobs_mgr_client.h"
-
 namespace OHOS::UDMF {
 static constexpr size_t MAX_THREADS = 10;
 static constexpr size_t MIN_THREADS = 0;
