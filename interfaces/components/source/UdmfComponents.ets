@@ -23,6 +23,12 @@ export enum FormType {
   TYPE_SMALL = 2
 }
 
+enum TextType {
+  TITLE = 0,
+  DESCRIPTION = 1,
+  APP_NAME = 2
+}
+
 const TAG: string = 'udmf.ContentFormCard';
 const defaultIcon: string =
   '82,73,70,70,60,3,0,0,87,69,66,80,86,80,56,32,48,3,0,0,144,67,0,157,1,42,36,2,76,1,62,145,72,161,76,37,164,163,34,3' +
@@ -53,11 +59,12 @@ const defaultIcon: string =
     ',73,141,205,245,214,23,231,110,132,188,27,13,88,8,43,145,225,60,68,0,42,15,95,85,238,25,204,75,166,163,127,0,0';
 const MAX_CARD_SCALE: number = 1.2;
 const MIN_CARD_SCALE: number = 0.8;
+const SMALL_MIN_CARD_SCALE: number = 0.6;
 const DEFAULT_BIG_CARD_SIZE: number = 200;
 const DEFAULT_MID_CARD_WIDTH: number = 200;
 const DEFAULT_MID_CARD_HEIGHT: number = 100;
-const DEFAULT_SMALL_CARD_WIDTH: number = 100;
-const DEFAULT_SMALL_CARD_HEIGHT: number = 60;
+const DEFAULT_SMALL_CARD_WIDTH: number = 137;
+const DEFAULT_SMALL_CARD_HEIGHT: number = 83;
 const DEFAULT_EMPTY_TITLE_WIDTH: number = 70;
 const DEFAULT_EMPTY_APPNAME_WIDTH: number = 40;
 const SMALL_EMPTY_TITLE_WIDTH: number = 50;
@@ -65,19 +72,17 @@ const SMALL_EMPTY_APPNAME_WIDTH: number = 30;
 const DEFAULT_EMPTY_TEXT_RADIUS: number = 2;
 const DEFAULT_EMPTY_DESCRIPTION_WIDTH: string = '100%';
 const CARD_BACKGROUND: string = '#E6FFFFFF';
-const CARD_DIVIDER_COLOR: string = '#1A999999';
-const APP_NAME_COLOR: string = '#66000000';
+const APP_NAME_COLOR: string = '#99182431';
 const DEFAULT_THUMB_BACKGROUND: string = '#CCCCCC';
 const DEFAULT_FONT_BACKGROUND: string = '#55CCCCCC';
-const TITLE_FONT_COLOR: string = '#E6000000';
-const DESCRIPTION_FONT_COLOR: string = '#66000000';
-const DEFAULT_BIG_IMAGE_HEIGHT: number = 120; // 4x4卡片，图片默认高度
-const DEFAULT_MID_IMAGE_HEIGHT: number = 71; // 4x2卡片，图片默认高度
-const DEFAULT_SMALL_IMAGE_HEIGHT: number = 42; // 2x1卡片，图片默认高度
+const TITLE_FONT_COLOR: string = '#ff182431';
+const DESCRIPTION_FONT_COLOR: string = '#99182431';
+const DEFAULT_MID_IMAGE_HEIGHT: number = 72; // 4x2卡片，图片默认高度
+const DEFAULT_SMALL_IMAGE_HEIGHT: number = 59; // 2x1卡片，图片默认高度
 
 interface CardStyle {
-  thumbWidth?: number,
-  thumbHeight?: number,
+  thumbWidth: number,
+  thumbHeight: number,
   thumbMarginLeft?: number,
   titleFontSize: number,
   titleFontLineHeight: number,
@@ -90,7 +95,7 @@ interface CardStyle {
   dividerMarginTop: number,
   appNameFontSize: number,
   appIconSize: number,
-  cardRadius: number,
+  cardRadius: number | Resource,
   appNameMarginLeft: number,
   appNameLineHeight: number,
   cardPadding: number,
@@ -142,20 +147,25 @@ const MID_CARD_STYLE: CardStyle = {
 }
 
 const SMALL_CARD_STYLE: CardStyle = {
-  titleFontSize: 10,
-  titleFontLineHeight: 12,
-  titleFontMarginTop: 8,
-  descriptionFontSize: 8,
-  descriptionLineHeight: 9,
+  thumbWidth: 24,
+  thumbHeight: 24,
+  thumbMarginLeft: 8,
+  titleFontSize: 12,
+  titleFontLineHeight: 14,
+  titleFontMarginTop: 9,
+  descriptionFontSize: 10,
+  descriptionLineHeight: 12,
+  maxDescriptionFontSize: 12,
+  maxDescriptionLineHeight: 14,
   descriptionMarginTop: 4,
   dividerMarginTop: 5,
-  appNameFontSize: 8,
-  appIconSize: 8,
-  cardRadius: 8,
+  appNameFontSize: 10,
+  appIconSize: 12,
+  cardRadius: $r('sys.float.corner_radius_level6'),
   appNameMarginLeft: 4,
-  appNameLineHeight: 10,
-  cardPadding: 10,
-  cardPaddingBottom: 5,
+  appNameLineHeight: 12,
+  cardPadding: 8,
+  cardPaddingBottom: 8,
   cardPaddingTop: 4
 }
 
@@ -206,20 +216,21 @@ export struct ContentFormCard {
   }
 
   initCardScale(widthScale: number, defaultWidth: number, defaultHeight: number): void {
-    let resultScale = widthScale;
+    let minScale = this.formType === FormType.TYPE_SMALL ? SMALL_MIN_CARD_SCALE : MIN_CARD_SCALE;
     if (widthScale > MAX_CARD_SCALE) {
-      resultScale = MAX_CARD_SCALE;
-    } else if (widthScale < MIN_CARD_SCALE) {
-      resultScale = MIN_CARD_SCALE;
+      this.cardScale = MAX_CARD_SCALE;
+    } else if (widthScale < minScale) {
+      this.cardScale = minScale;
+    } else {
+      this.cardScale = widthScale;
     }
-    this.cardWidth = defaultWidth * resultScale;
-    this.formHeight = defaultHeight * resultScale;
-    this.cardScale = resultScale;
-    console.info(`${TAG},widthScale:${this.cardScale}, cardScale: ${this.cardScale}, cardWidth: ${this.cardWidth}, formHeight: ${this.formHeight}`);
+    this.cardWidth = defaultWidth * this.cardScale;
+    this.formHeight = defaultHeight * this.cardScale;
+    console.info(`${TAG}, widthScale:${this.cardScale}, cardScale: ${this.cardScale}, ` +
+      `cardWidth: ${this.cardWidth}, formHeight: ${this.formHeight}`);
   }
 
   initCardStyle(): void {
-    console.info(`${TAG},cardScale: ${this.cardScale}, formType: ${this.formType},formWidth: ${this.formWidth}, formHeight: ${this.formHeight}`);
     let widthScale = 1;
     switch (this.formType) {
       case FormType.TYPE_BIG:
@@ -279,7 +290,7 @@ export struct ContentFormCard {
         .height(this.formStyle.appIconSize * this.cardScale)
         .objectFit(ImageFit.Fill)
         .alt($r('sys.media.ohos_app_icon'))
-        .borderRadius(2)
+        .borderRadius($r('sys.float.corner_radius_level1'))
       Text(this.contentFormData?.appName ? this.contentFormData?.appName : ' ')
         .fontSize(this.formStyle.appNameFontSize * this.cardScale)
         .fontColor(APP_NAME_COLOR)
@@ -287,7 +298,7 @@ export struct ContentFormCard {
         .lineHeight(this.formStyle.appNameLineHeight * this.cardScale)
         .margin({ left: this.formStyle.appNameMarginLeft * this.cardScale })
         .textOverflow({ overflow: TextOverflow.Ellipsis })
-        .constraintSize({ minWidth: this.getTextSize('appName', this.contentFormData?.appName) })
+        .constraintSize({ minWidth: this.getTextSize(TextType.APP_NAME, this.contentFormData?.appName) })
         .backgroundColor(this.getTextBackground(this.contentFormData?.appName))
         .fontWeight(FontWeight.Regular)
         .borderRadius(this.contentFormData?.title === '' ? 0 : DEFAULT_EMPTY_TEXT_RADIUS)
@@ -311,7 +322,7 @@ export struct ContentFormCard {
       .textOverflow({ overflow: TextOverflow.Ellipsis })
       .height(this.formStyle.titleFontLineHeight * this.cardScale)
       .margin({ top: this.formStyle.titleFontMarginTop * this.cardScale })
-      .constraintSize({ minWidth: this.getTextSize('title', this.contentFormData?.title) })
+      .constraintSize({ minWidth: this.getTextSize(TextType.TITLE, this.contentFormData?.title) })
       .backgroundColor(this.getTextBackground(this.contentFormData?.title))
       .borderRadius(this.contentFormData?.title === '' ? 0 : DEFAULT_EMPTY_TEXT_RADIUS)
   }
@@ -322,7 +333,7 @@ export struct ContentFormCard {
       Image(this.thumbImage ? this.thumbImage : this.defaultThumbImage)
         .objectFit(ImageFit.Cover)
         .width('100%')
-        .height(this.formStyle.thumbHeight ? this.formStyle.thumbHeight * this.cardScale : DEFAULT_BIG_IMAGE_HEIGHT)
+        .height(this.formStyle.thumbHeight * this.cardScale)
         .backgroundColor(this.thumbImage ? CARD_BACKGROUND : DEFAULT_THUMB_BACKGROUND)
       Column() {
         this.TitleText()
@@ -332,7 +343,7 @@ export struct ContentFormCard {
           .fontWeight(FontWeight.Regular)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .constraintSize({ minWidth: this.getTextSize('description', this.contentFormData?.description) })
+          .constraintSize({ minWidth: this.getTextSize(TextType.DESCRIPTION, this.contentFormData?.description) })
           .height(this.formStyle.descriptionLineHeight * this.cardScale)
           .margin({ top: this.formStyle.descriptionMarginTop * this.cardScale })
           .backgroundColor(this.getTextBackground(this.contentFormData?.description))
@@ -367,8 +378,9 @@ export struct ContentFormCard {
         this.formStyle.descriptionLineHeight) : this.formStyle.descriptionLineHeight) * this.cardScale)
       .fontSize((this.lineCount === 1 ? (this.formStyle.maxDescriptionFontSize ? this.formStyle.maxDescriptionFontSize :
       this.formStyle.descriptionFontSize) : this.formStyle.descriptionFontSize) * this.cardScale)
-      .constraintSize({ minWidth: this.getTextSize('description', this.contentFormData?.description) })
+      .constraintSize({ minWidth: this.getTextSize(TextType.DESCRIPTION, this.contentFormData?.description) })
       .backgroundColor(this.getTextBackground(this.contentFormData?.description))
+      .borderRadius(this.contentFormData?.description ? 0 : DEFAULT_EMPTY_TEXT_RADIUS)
       .onAreaChange(() => {
         let layoutManager: LayoutManager = this.controller.getLayoutManager();
         this.lineCount = layoutManager.getLineCount();
@@ -380,7 +392,7 @@ export struct ContentFormCard {
     Column() {
       if (this.contentFormData?.title === '') { // show the card only thumbData
         this.ThumbImage()
-      } else if (this.thumbImage) { // show the card has thumbData and title,description
+      } else { // show the card has thumbData and title,description
         Row() {
           Column({ space: this.formStyle.descriptionMarginTop * this.cardScale }) {
             this.TitleText()
@@ -389,31 +401,21 @@ export struct ContentFormCard {
           .layoutWeight(1)
           .alignItems(HorizontalAlign.Start)
 
-          Column() {
+          if (this.thumbImage) {
             Image(this.thumbImage)
-              .width('100%')
-              .layoutWeight(1)
-              .objectFit(ImageFit.Cover)
+              .width(this.formStyle.thumbWidth * this.cardScale)
+              .height(this.formStyle.thumbHeight * this.cardScale)
+              .objectFit(this.thumbImage ? ImageFit.Cover : ImageFit.Contain)
               .borderRadius(4)
+              .margin({
+                left: this.formStyle.thumbMarginLeft ? this.formStyle.thumbMarginLeft * this.cardScale : 0,
+                top: this.formStyle.titleFontMarginTop * this.cardScale
+              })
           }
-          .width(this.formStyle.thumbWidth ? this.formStyle.thumbWidth * this.cardScale : 0)
-          .height(this.formStyle.thumbHeight ? this.formStyle.thumbHeight * this.cardScale : 0)
-          .margin({
-            left: this.formStyle.thumbMarginLeft ? this.formStyle.thumbMarginLeft * this.cardScale : 0,
-            top: this.formStyle.titleFontMarginTop * this.cardScale
-          })
         }
         .thumbStyle()
         .margin({ bottom: this.formStyle.dividerMarginTop * this.cardScale })
         .alignItems(VerticalAlign.Top)
-      } else { // show the card title,description
-        Column({ space: this.formStyle.descriptionMarginTop * this.cardScale }) {
-          this.TitleText()
-          this.DescriptionView()
-        }
-        .thumbStyle()
-        .alignItems(HorizontalAlign.Start)
-        .margin({ bottom: this.formStyle.dividerMarginTop * this.cardScale })
       }
 
       this.CardDivider();
@@ -431,17 +433,26 @@ export struct ContentFormCard {
       } else {
         Column() {
           this.TitleText()
-          Text(this.contentFormData?.description)
-            .fontColor(DESCRIPTION_FONT_COLOR)
-            .fontWeight(FontWeight.Regular)
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .height(this.formStyle.descriptionLineHeight * this.cardScale)
-            .margin({ top: this.formStyle.descriptionMarginTop * this.cardScale })
-            .fontSize(this.formStyle.descriptionFontSize * this.cardScale)
-            .constraintSize({ minWidth: this.getTextSize('description', this.contentFormData?.description) })
-            .backgroundColor(this.getTextBackground(this.contentFormData?.description))
-            .fontWeight(FontWeight.Regular)
+          Row() {
+            Column() {
+              this.DescriptionView()
+            }
+            .layoutWeight(1)
+            .alignItems(HorizontalAlign.Start)
+
+            if (this.thumbImage) {
+              Image(this.thumbImage)
+                .objectFit(ImageFit.Cover)
+                .borderRadius($r('sys.float.corner_radius_level2'))
+                .width(this.formStyle.thumbWidth * this.cardScale)
+                .height(this.formStyle.thumbHeight * this.cardScale)
+                .margin({
+                  left: this.formStyle.thumbMarginLeft ? this.formStyle.thumbMarginLeft * this.cardScale : 0,
+                })
+            }
+          }
+          .margin({ top: this.formStyle.descriptionMarginTop * this.cardScale })
+          .layoutWeight(1)
         }
         .thumbStyle()
         .alignItems(HorizontalAlign.Start)
@@ -557,8 +568,8 @@ export struct ContentFormCard {
     return DEFAULT_FONT_BACKGROUND;
   }
 
-  getTextSize(textType: string, text: string | undefined): number | string {
-    if (textType === 'title') {
+  getTextSize(textType: TextType, text: string | undefined): number | string {
+    if (textType === TextType.TITLE) {
       if (text === '' || text === undefined || text === null) {
         if (this.formType === FormType.TYPE_SMALL) {
           return SMALL_EMPTY_TITLE_WIDTH;
@@ -567,7 +578,7 @@ export struct ContentFormCard {
       }
       return DEFAULT_EMPTY_DESCRIPTION_WIDTH;
     }
-    if (textType === 'appName') {
+    if (textType === TextType.APP_NAME) {
       if (text === '' || text === undefined || text === null) {
         if (this.formType === FormType.TYPE_SMALL) {
           return SMALL_EMPTY_APPNAME_WIDTH;
