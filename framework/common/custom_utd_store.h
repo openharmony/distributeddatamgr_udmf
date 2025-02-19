@@ -39,7 +39,7 @@ private:
     ~CustomUtdStore();
     int32_t SavaCfgFile(const std::string &jsonData, const std::string &cfgFilePath);
     bool CreateDirectory(const std::string &path) const;
-    void ProcessUtdForSave(const CustomUtdCfgs &utdTypes, std::vector<TypeDescriptorCfg> &customTyepCfgs,
+    static void ProcessUtdForSave(const CustomUtdCfgs &utdTypes, std::vector<TypeDescriptorCfg> &customTyepCfgs,
         const std::string &bundleName);
     CustomUtdJsonParser utdJsonParser_;
 };
