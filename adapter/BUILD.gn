@@ -166,7 +166,7 @@ config("arkui_x_udmf_napi_config") {
     "${arkui_x_graphic_2d_path}/rosen/modules/platform/ipc_core",
     "${third_party_path}/skia",
   ]
-  }
+}
 
 ohos_source_set("arkui_x_uniformtypedescriptor") {
   include_dirs = [
