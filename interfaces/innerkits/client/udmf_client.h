@@ -46,6 +46,7 @@ public:
     Status SetAppShareOption(const std::string &intention, enum ShareOptions shareOption);
     Status RemoveAppShareOption(const std::string &intention);
     Status GetAppShareOption(const std::string &intention, enum ShareOptions &shareOption);
+	Status GetDataFromCache(const QueryOption &query, UnifiedData &unifiedData);
 
 private:
     UdmfClient() = default;

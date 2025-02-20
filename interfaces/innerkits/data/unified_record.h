@@ -65,6 +65,8 @@ public:
 
     virtual void InitObject();
     bool HasObject();
+    bool HasFileType(std::string &fileUri) const;
+    void SetFileUri(const std::string &fileUri);
 protected:
     static constexpr const char *UNIFORM_DATA_TYPE = "uniformDataType";
     static constexpr const char *DETAILS = "details";

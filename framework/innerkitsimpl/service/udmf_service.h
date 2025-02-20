@@ -49,6 +49,9 @@ public:
     virtual int32_t SetAppShareOption(const std::string &intention, int32_t shareOption) = 0;
     virtual int32_t GetAppShareOption(const std::string &intention, int32_t &shareOption) = 0;
     virtual int32_t RemoveAppShareOption(const std::string &intention) = 0;
+    virtual int32_t ObtainAsynProcess(AsyncProcessInfo &processInfo) = 0;
+    virtual int32_t ClearAsynProcessByKey(const std::string &businessUdKey) = 0;
+    virtual int32_t InvokeHap(const std::string &progressKey, const sptr<IRemoteObject> &observer) = 0;
 };
 } // namespace UDMF
 } // namespace OHOS

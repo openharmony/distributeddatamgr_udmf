@@ -530,6 +530,21 @@ napi_status NapiDataUtils::SetValue(napi_env env, const nullptr_t &in, napi_valu
     return napi_get_null(env, &out);
 }
 
+napi_status NapiDataUtils::SetValue(napi_env env, const ProgressInfo &in, napi_value &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value <- ProgressInfo");
+    napi_create_object(env, &out);
+
+    napi_value jsPercentage = nullptr;
+    SetValue(env, in.progress, jsPercentage);
+    napi_set_named_property(env, out, "percentage", jsPercentage);
+
+    napi_value jsListenerStatus = nullptr;
+    SetValue(env, in.progressStatus, jsListenerStatus);
+    napi_set_named_property(env, out, "status", jsListenerStatus);
+    return napi_ok;
+}
+
 bool NapiDataUtils::IsTypeForNapiValue(napi_env env, napi_value param, napi_valuetype expectType)
 {
     napi_valuetype valueType = napi_undefined;

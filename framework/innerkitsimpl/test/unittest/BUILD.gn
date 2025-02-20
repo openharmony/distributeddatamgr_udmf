@@ -404,6 +404,7 @@ group("unittest") {
     ":SystemDefinedPixelMapTest",
     ":SystemDefinedRecordTest",
     ":TextTest",
+    ":UdmfAsyncClientTest",
     ":UdmfClientHapPermissionTest",
     ":UdmfClientSaInvokeTest",
     ":UdmfClientSystemHapTest",

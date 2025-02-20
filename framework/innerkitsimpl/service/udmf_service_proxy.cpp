@@ -200,7 +200,7 @@ int32_t UdmfServiceProxy::GetAppShareOption(const std::string &intention, int32_
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::GET_APP_SHARE_OPTION, reply, intention);
     if (status != E_OK) {
-        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x!", status);
+        LOG_WARN(UDMF_SERVICE, "status:0x%{public}x!", status);
         return status;
     }
 
@@ -234,6 +234,43 @@ int32_t UdmfServiceProxy::SendRequest(UdmfServiceInterfaceCode code, MessageParc
     int err = remote->SendRequest(static_cast<uint32_t>(code), data, reply, option);
     LOG_DEBUG(UDMF_SERVICE, "err: %{public}d", err);
     return err;
+}
+
+int32_t UdmfServiceProxy::ObtainAsynProcess(AsyncProcessInfo &processInfo)
+{
+    MessageParcel reply;
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::OBTAIN_ASYN_PROCESS, reply, processInfo);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x", status);
+        return status;
+    }
+    if (!ITypesUtil::Unmarshal(reply, processInfo)) {
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal AsyncProcessInfo failed!");
+        return E_READ_PARCEL_ERROR;
+    }
+    return E_OK;
+}
+
+int32_t UdmfServiceProxy::ClearAsynProcessByKey(const std::string &businessUdKey)
+{
+    MessageParcel reply;
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::CLEAR_ASYN_PROCESS_BY_KEY, reply, businessUdKey);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x", status);
+        return status;
+    }
+    return E_OK;
+}
+
+int32_t UdmfServiceProxy::InvokeHap(const std::string &progressKey, const sptr<IRemoteObject> &observer)
+{
+    MessageParcel reply;
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::INVOKEN_HAP, reply, progressKey, observer);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x", status);
+        return status;
+    }
+    return E_OK;
 }
 } // namespace UDMF
 } // namespace OHOS
