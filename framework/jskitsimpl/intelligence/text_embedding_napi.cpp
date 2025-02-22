@@ -175,7 +175,7 @@ napi_value TextEmbeddingNapi::Init(napi_env env, napi_value exports)
     napi_value modelVersion;
     napi_status status = napi_create_object(env, &modelVersion);
     if (status != napi_ok) {
-        FI_HILOGE("Failed create object");
+        AIP_HILOGE("Failed create object");
         return nullptr;
     }
 
