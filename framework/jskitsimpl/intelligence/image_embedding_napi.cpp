@@ -250,6 +250,10 @@ napi_value ImageEmbeddingNapi::GetImageEmbeddingModel(napi_env env, napi_callbac
 bool ImageEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *modelConfig)
 {
     AIP_HILOGI("Enter");
+    if (modelConfig == nullptr) {
+        AIP_HILOGE("The modelConfig is null");
+        return false;
+    }
     uint32_t length;
     if (!AipNapiUtils::CheckModelConfig(env, args[ARG_0], length)) {
         AIP_HILOGE("The modelConfig is failed");
