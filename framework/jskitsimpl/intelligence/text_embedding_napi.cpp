@@ -278,6 +278,10 @@ napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_
 bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *textModelConfig)
 {
     AIP_HILOGI("Enter");
+    if (textModelConfig == nullptr) {
+        AIP_HILOGE("The modelConfig is null");
+        return false;
+    }
     uint32_t length;
     if (!AipNapiUtils::CheckModelConfig(env, args[ARG_0], length)) {
         AIP_HILOGE("The modelConfig is failed");
