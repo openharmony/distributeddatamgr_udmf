@@ -35,6 +35,9 @@ static constexpr uint8_t ARG_2 = 2;
 
 static constexpr uint8_t NUM_0 = 0;
 static constexpr uint8_t NUM_1 = 1;
+static constexpr uint8_t BASIC_MODEL = 0;
+static constexpr uint8_t LENGTH_1 = 2;
+static constexpr uint8_t LENGTH_2 = 3;
 static constexpr uint32_t MAX_STR_PARAM_LEN = 512;
 static const std::string CLASS_NAME = "TextEmbedding";
 const std::vector<std::string> EXPECTED_SPLITTEXT_ARG_TYPES = { "string", "object" };
@@ -169,6 +172,16 @@ napi_value TextEmbeddingNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("splitText", SplitText),
     };
 
+    napi_value modelVersion;
+    napi_status status = napi_create_object(env, &modelVersion);
+    if (status != napi_ok) {
+        FI_HILOGE("Failed create object");
+        return nullptr;
+    }
+
+    AipNapiUtils::SetInt32Property(env, modelVersion, BASIC_MODEL, "BASIC_MODEL");
+    AipNapiUtils::SetPropertyName(env, exports, "ModelVersion", modelVersion);
+
     struct TextEmbeddingConstructorInfo info = {
         .className = CLASS_NAME,
         .classRef = &sConstructor_,
@@ -265,11 +278,26 @@ napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_
 bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *textModelConfig)
 {
     AIP_HILOGI("Enter");
-    napi_value version, isNPUAvailable, cachePath;
+    uint32_t length;
+    if (!AipNapiUtils::CheckModelConfig(env, args[ARG_0], length)) {
+        AIP_HILOGE("The modelConfig is failed");
+        return false;
+    }
 
+    if (length != LENGTH_1 && length != LENGTH_2) {
+        AIP_HILOGE("The modelConfig length is failed");
+        return false;
+    }
+
+    napi_value version, isNPUAvailable, cachePath;
     napi_status status = napi_get_named_property(env, args[ARG_0], "version", &version);
     if (status != napi_ok) {
         AIP_HILOGE("napi get version property failed");
+        return false;
+    }
+
+    if (!AipNapiUtils::TransJsToInt32(env, version, textModelConfig->versionValue)) {
+        AIP_HILOGE("Trans version failed");
         return false;
     }
 
@@ -279,25 +307,24 @@ bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t 
         return false;
     }
 
-    status = napi_get_named_property(env, args[ARG_0], "cachePath", &cachePath);
-    if (status != napi_ok) {
-        AIP_HILOGE("napi get cachePath property failed");
-        return false;
-    }
-
-    if (!AipNapiUtils::TransJsToInt32(env, version, textModelConfig->versionValue)) {
-        AIP_HILOGE("Trans version failed");
-        return false;
-    }
-
     if (!AipNapiUtils::TransJsToBool(env, isNPUAvailable, textModelConfig->isNPUAvailableValue)) {
         AIP_HILOGE("Trans isNPUAvailable failed");
         return false;
     }
 
-    if (!AipNapiUtils::TransJsToStr(env, cachePath, textModelConfig->cachePathValue)) {
-        AIP_HILOGE("Trans cachePath failed");
-        return false;
+    if (textModelConfig->isNPUAvailableValue) {
+        status = napi_get_named_property(env, args[ARG_0], "cachePath", &cachePath);
+        if (status != napi_ok) {
+            AIP_HILOGE("napi get cachePath property failed");
+            return false;
+        }
+
+        if (!AipNapiUtils::TransJsToStr(env, cachePath, textModelConfig->cachePathValue)) {
+            AIP_HILOGE("Trans cachePath failed");
+            return false;
+        }
+    } else {
+        textModelConfig->cachePathValue = "";
     }
     return true;
 }

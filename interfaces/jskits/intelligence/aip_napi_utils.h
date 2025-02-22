@@ -42,6 +42,9 @@ public:
     static void CreateInt32Data(napi_env env, napi_value aipServiceValue, napi_value result, const std::string name,
         int32_t value);
     static void CreateDoubleData(napi_env env, double value, napi_value *result);
+    static void SetInt32Property(napi_env env, napi_value targetObj, int32_t value, const char *propName);
+    static void SetPropertyName(napi_env env, napi_value targetObj, const char *propName, napi_value propValue);
+    static bool CheckModelConfig(napi_env env, napi_value value, uint32_t &length);
 };
 } // namespace DataIntelligence
 } // namespace OHOS
