@@ -249,5 +249,49 @@ void AipNapiUtils::CreateDoubleData(napi_env env, double value, napi_value *resu
         return;
     }
 }
+
+void AipNapiUtils::SetInt32Property(napi_env env, napi_value targetObj, int32_t value, const char *propName)
+{
+    napi_value prop = nullptr;
+    napi_status ret = napi_create_int32(env, value, &prop);
+    if (ret != napi_ok) {
+        AIP_HILOGE("napi_create_int32 failed");
+        return;
+    }
+    SetPropertyName(env, targetObj, propName, prop);
+}
+
+void AipNapiUtils::SetPropertyName(napi_env env, napi_value targetObj, const char *propName, napi_value propValue)
+{
+    napi_status status = napi_set_named_property(env, targetObj, propName, propValue);
+    if (status != napi_ok) {
+        AIP_HILOGE("napi_set_named_property failed");
+        return;
+    }
+}
+
+bool AipNapiUtils::CheckModelConfig(napi_env env, napi_value value, uint32_t &length)
+{
+    napi_valuetype valuetype;
+    napi_status status = napi_typeof(env, value, &valuetype);
+    if (status != napi_ok || valuetype != napi_object) {
+        AIP_HILOGE("ModelConfig is not object");
+        return false;
+    }
+
+    napi_value KeysArray;
+    status = napi_get_property_names(env, value, &KeysArray);
+    if (status != napi_ok) {
+        AIP_HILOGE("Failed to get property names");
+        return false;
+    }
+
+    status = napi_get_array_length(env, KeysArray, &length);
+    if (status != napi_ok) {
+        AIP_HILOGE("Failed to get array length");
+        return false;
+    }
+    return true;
+}
 } // namespace DataIntelligence
 } // namespace OHOS
