@@ -1244,7 +1244,7 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     EXPECT_EQ(summary.summary["SystemDefinedType"], systemDefinedRecord->GetSize());
     EXPECT_EQ(summary.summary["openharmony.form"], systemDefinedForm->GetSize());
     EXPECT_EQ(summary.summary["ApplicationDefinedType"], applicationDefinedRecord->GetSize());
-    EXPECT_EQ(summary.summary["general.file-uri"], record8->GetSize());
+    EXPECT_EQ(summary.summary["abcdefg"], record8->GetSize());
     EXPECT_EQ(summary.summary["general.png"], record9->GetSize());
 
     LOG_INFO(UDMF_TEST, "GetSummary001 end.");
@@ -2594,7 +2594,7 @@ HWTEST_F(UdmfClientTest, GetSummary004, TestSize.Level1)
     status = UdmfClient::GetInstance().GetSummary(option2, summary);
 
     ASSERT_EQ(status, E_OK);
-    EXPECT_EQ(summary.summary["general.file-uri"], size0);
+    EXPECT_EQ(summary.summary["abcdefg"], size0);
     EXPECT_EQ(summary.summary["general.plain-text"], size1);
     EXPECT_EQ(summary.summary["general.image"], size2);
     EXPECT_EQ(summary.summary["openharmony.pixel-map"], size3);

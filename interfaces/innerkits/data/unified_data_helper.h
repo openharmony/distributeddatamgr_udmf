@@ -35,6 +35,7 @@ private:
     static bool SaveUDataToFile(const std::string &dataFile, UnifiedData &data);
     static bool LoadUDataFromFile(const std::string &dataFile, UnifiedData &data);
     static void CalRecordSummary(std::map<std::string, ValueType> &entries, Summary &summary);
+    static void ProcessTypeId(const ValueType &value, std::string &typeId);
     static std::string GetRootPath();
 
 private:
