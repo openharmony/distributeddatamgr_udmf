@@ -453,8 +453,12 @@ napi_value TextEmbeddingNapi::SplitText(napi_env env, napi_callback_info info)
     double configOverlap;
     AipNapiUtils::TransJsToInt32(env, cfgSize, configSize);
     AipNapiUtils::TransJsToDouble(env, cfgOverlap, configOverlap);
-    AIP_HILOGI("string strArg: %{public}d", configSize);
-    AIP_HILOGI("string strArg: %{public}f", configOverlap);
+    AIP_HILOGD("string strArg: %{public}d", configSize);
+    AIP_HILOGD("string strArg: %{public}f", configOverlap);
+    if (configSize <= NUM_0 || configOverlap < NUM_0 || configOverlap >= NUM_1) {
+        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "The parameter value range is incorrect");
+        return nullptr;
+    }
 
     napi_value promise = nullptr;
     napi_deferred deferred = nullptr;
