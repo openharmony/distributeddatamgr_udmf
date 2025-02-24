@@ -440,7 +440,6 @@ napi_value TextEmbeddingNapi::SplitText(napi_env env, napi_callback_info info)
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "TransJsToStrUnlimited failed");
         return nullptr;
     }
-    AIP_HILOGI("string strArg: %{public}s", strArg.c_str());
 
     napi_value cfgSize;
     napi_value cfgOverlap;
