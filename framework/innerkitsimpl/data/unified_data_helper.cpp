@@ -18,13 +18,14 @@
 #include "common_func.h"
 #include "directory_ex.h"
 #include "file_ex.h"
+#include "file.h"
 #include "file_uri.h"
 #include "error_code.h"
 #include "logger.h"
 #include "tlv_util.h"
 #include "udmf_conversion.h"
+#include "udmf_meta.h"
 #include "udmf_utils.h"
-#include "file.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -243,17 +244,26 @@ int32_t UnifiedDataHelper::ProcessBigData(UnifiedData &data, Intention intention
     return E_OK;
 }
 
+void UnifiedDataHelper::ProcessTypeId(const ValueType &value, std::string &typeId)
+{
+    if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        auto object = std::get<std::shared_ptr<Object>>(value);
+        if (object->value_.find(UNIFORM_DATA_TYPE) != object->value_.end()
+            && std::get<std::string>(object->value_[UNIFORM_DATA_TYPE]) == UDMF_META_GENERAL_FILE_URI
+            && object->value_.find(FILE_TYPE) != object->value_.end()) {
+            typeId = std::get<std::string>(object->value_[FILE_TYPE]);
+        } else if (object->value_.find(APPLICATION_DEFINED_RECORD_MARK) != object->value_.end()) {
+            typeId = UtdUtils::GetUtdIdFromUtdEnum(APPLICATION_DEFINED_RECORD);
+        }
+    }
+}
+
 void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry, Summary &summary)
 {
     for (const auto &[utdId, value] : entry) {
         auto typeId = utdId;
         auto valueSize = ObjectUtils::GetValueSize(value, false);
-        if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
-            auto object = std::get<std::shared_ptr<Object>>(value);
-            if (object->value_.find(APPLICATION_DEFINED_RECORD_MARK) != object->value_.end()) {
-                typeId = UtdUtils::GetUtdIdFromUtdEnum(APPLICATION_DEFINED_RECORD);
-            }
-        }
+        ProcessTypeId(value, typeId);
         auto it = summary.summary.find(typeId);
         if (it == summary.summary.end()) {
             summary.summary[typeId] = valueSize;
