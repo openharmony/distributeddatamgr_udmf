@@ -27,9 +27,11 @@ ohos_shared_library("libudmf") {
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_interfaces_path}/innerkits/data",
     "${udmf_framework_path}/common",
+    "${udmf_framework_path}/innerkitsimpl/convert",
   ]
   sources = [
     "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
+    "${udmf_framework_path}/innerkitsimpl/convert/data_params_conversion.cpp",
     "${udmf_framework_path}/ndkimpl/data/data_provider_impl.cpp",
     "${udmf_framework_path}/ndkimpl/data/udmf.cpp",
     "${udmf_framework_path}/ndkimpl/data/uds.cpp",

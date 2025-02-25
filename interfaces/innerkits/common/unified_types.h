@@ -19,6 +19,7 @@
 #include <map>
 #include <string>
 
+#include "error_code.h"
 #include "unified_key.h"
 #include "unified_meta.h"
 
@@ -80,6 +81,33 @@ struct QueryOption {
     Intention intention {};
     uint32_t  tokenId {};
 };
+
+enum AsyncTaskStatus : uint32_t {
+    ASYNC_IDLE = 0,
+    ASYNC_RUNNING,
+    ASYNC_SUCCESS,
+    ASYNC_FAILURE,
+};
+
+struct AsyncProcessInfo {
+    AsyncTaskStatus syncStatus { ASYNC_IDLE };
+    AsyncTaskStatus permStatus { ASYNC_IDLE };
+    std::string srcDevName;
+    uint32_t syncFinished = 0;
+    uint32_t syncTotal = 0;
+    uint32_t syncId = 0;
+    uint32_t permFnished = 0;
+    uint32_t permTotal = 0;
+    std::string businessUdKey;
+};
+
+struct ProgressInfo {
+    int32_t progress = 0;
+    int32_t progressStatus;
+    Status errorCode;
+    std::string srcDevName;
+};
+
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_UNIFIED_TYPES_H

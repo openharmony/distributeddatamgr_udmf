@@ -42,6 +42,9 @@ private:
     static napi_value RemoveAppShareOptions(napi_env env, napi_callback_info info);
     static napi_status ConvertUnifiedDataSetToNapi(
         napi_env env, const std::vector<UnifiedData> &dataSet, napi_value &output);
+    static napi_value CreateFileConflictOptions(napi_env env, napi_callback_info info);
+    static napi_value CreateProgressIndicator(napi_env env, napi_callback_info info);
+    static napi_value CreateListenerStatus(napi_env env, napi_callback_info info);
 };
 } // namespace UDMF
 } // namespace OHOS

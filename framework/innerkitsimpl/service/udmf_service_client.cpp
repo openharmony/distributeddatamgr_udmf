@@ -286,5 +286,20 @@ int32_t UdmfServiceClient::RemoveAppShareOption(const std::string &intention)
     }
     return udmfProxy_->RemoveAppShareOption(intention);
 }
+
+int32_t UdmfServiceClient::ObtainAsynProcess(AsyncProcessInfo& processInfo)
+{
+    return udmfProxy_->ObtainAsynProcess(processInfo);
+}
+
+int32_t UdmfServiceClient::ClearAsynProcessByKey(const std::string &businessUdKey)
+{
+    return udmfProxy_->ClearAsynProcessByKey(businessUdKey);
+}
+
+int32_t UdmfServiceClient::InvokeHap(const std::string &progressKey, const sptr<IRemoteObject> &observer)
+{
+    return udmfProxy_->InvokeHap(progressKey, observer);
+}
 } // namespace UDMF
 } // namespace OHOS

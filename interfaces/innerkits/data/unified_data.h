@@ -54,6 +54,7 @@ public:
     void SetDataId(uint32_t dataId);
     uint32_t GetDataId() const;
     void SetChannelName(const std::string &name);
+    std::vector<std::string> GetFileUris() const;
 
     static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;
 

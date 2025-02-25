@@ -18,6 +18,7 @@
 
 #include "unified_record.h"
 #include "unified_data.h"
+#include "udmf.h"
 #include <mutex>
 #include <cstdint>
 
@@ -114,6 +115,19 @@ struct OH_UdmfProperty {
     std::shared_ptr<OHOS::UDMF::UnifiedDataProperties> properties_;
     std::mutex mutex;
     std::string extraStr;
+};
+
+struct OH_Udmf_ProgressInfo {
+    int progress;
+    int status;
+};
+
+
+struct OH_UdmfGetDataParams {
+    std::string destUri;
+    Udmf_FileConflictOptions fileConflictOptions;
+    Udmf_ProgressIndicator progressIndicator;
+    OH_Udmf_DataProgressListener dataProgressListener;
 };
 
 bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid);
