@@ -743,6 +743,7 @@ export class ContentFormCard extends ViewPU {
         try {
             h2 = image.createImageSource(g2.buffer);
             let i2 = await h2?.createPixelMap();
+            h2?.release();
             callback(i2);
         } catch (err) {
             let error = err;
