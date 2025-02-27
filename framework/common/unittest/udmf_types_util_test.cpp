@@ -69,7 +69,6 @@ void UdmfTypesUtilTest::TearDown()
 HWTEST_F(UdmfTypesUtilTest, Unmarshalling001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Unmarshalling001 begin.");
-
     UnifiedData input;
     std::vector<std::shared_ptr<UnifiedRecord>> inputRecords = {
         std::make_shared<Text>(),
