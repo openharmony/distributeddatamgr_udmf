@@ -502,6 +502,7 @@ export struct ContentFormCard {
     try {
       imageResource = image.createImageSource(uint.buffer);
       let pixelMapData = await imageResource?.createPixelMap();
+      imageResource?.release();
       callback(pixelMapData);
     } catch (err) {
       let error = err as BusinessError;
