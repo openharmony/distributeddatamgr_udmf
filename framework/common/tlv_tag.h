@@ -76,6 +76,11 @@ enum class TAG : uint16_t {
     TAG_RECORD_UTD_ID,
     TAG_RECORD_ENTRIES,
     TAG_INNER_ENTRIES,
+    TAG_URI_ORI,
+    TAG_URI_DFS,
+    TAG_URI_AUTH,
+    TAG_URI_POS,
+    TAG_RECORD_URIS,
 };
 }
 #endif //UDMF_TLV_TAG_H

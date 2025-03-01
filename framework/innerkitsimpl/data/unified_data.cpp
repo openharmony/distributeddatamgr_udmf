@@ -190,6 +190,23 @@ bool UnifiedData::HasFileType() const
     return !intersection.empty();
 }
 
+bool UnifiedData::HasUriInfo() const
+{
+    for (auto record : records_) {
+        if (!record->GetUris().empty()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void UnifiedData::ClearUriInfo() const
+{
+    for (auto record : records_) {
+        record->ClearUris();
+    }
+}
+
 void UnifiedData::SetProperties(std::shared_ptr<UnifiedDataProperties> properties)
 {
     if (!properties) {

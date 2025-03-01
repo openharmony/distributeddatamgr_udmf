@@ -314,5 +314,28 @@ void UnifiedRecord::SetFileUri(const std::string &fileUri)
     }
 }
 
+std::vector<UriInfo> UnifiedRecord::GetUris() const
+{
+    return uris_;
+}
+
+void UnifiedRecord::SetUris(std::vector<UriInfo> uris)
+{
+    uris_ = std::move(uris);
+}
+
+void UnifiedRecord::ClearUris()
+{
+    uris_.clear();
+}
+
+void UnifiedRecord::ComputeUris(const std::function<bool(UriInfo &)> &action)
+{
+    for (auto &uri : uris_) {
+        if (!action(uri)) {
+            break;
+        }
+    }
+}
 } // namespace UDMF
 } // namespace OHOS

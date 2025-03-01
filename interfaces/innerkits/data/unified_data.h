@@ -47,6 +47,8 @@ public:
     bool API_EXPORT IsValid();
     bool API_EXPORT IsComplete();
     bool HasFileType() const;
+    bool HasUriInfo() const;
+    void ClearUriInfo() const;
 
     void API_EXPORT SetProperties(std::shared_ptr<UnifiedDataProperties> properties);
     std::shared_ptr<UnifiedDataProperties> API_EXPORT GetProperties() const;

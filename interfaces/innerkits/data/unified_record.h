@@ -73,6 +73,11 @@ public:
     bool HasObject();
     bool HasFileType(std::string &fileUri) const;
     void SetFileUri(const std::string &fileUri);
+
+    std::vector<UriInfo> GetUris() const;
+    void SetUris(std::vector<UriInfo> uris);
+    void API_EXPORT ClearUris();
+    void API_EXPORT ComputeUris(const std::function<bool(UriInfo &)> &action);
 protected:
     UDType dataType_;
     ValueType value_;
@@ -81,6 +86,7 @@ private:
     std::string uid_; // unique identifier
     std::string utdId_;
     std::shared_ptr<std::map<std::string, ValueType>> entries_ = std::make_shared<std::map<std::string, ValueType>>();
+    std::vector<UriInfo> uris_;
     uint32_t dataId_ = 0;
     uint32_t recordId_ = 0;
     std::string channelName_;
