@@ -280,7 +280,7 @@ template <> size_t CountBufferSize(const UnifiedRecord &input, TLVObject &data)
     std::string version = UTILS::GetCurrentSdkVersion();
     return data.CountHead() + data.Count(version) + data.CountBasic(static_cast<int32_t>(input.GetType())) +
         data.Count(input.GetUid()) + CountBufferSize(input.GetOriginValue(), data) + data.Count(input.GetUtdId()) +
-        CountBufferSize(input.GetInnerEntries(), data);
+        CountBufferSize(input.GetInnerEntries(), data) + CountBufferSize(input.GetUris(), data);
 }
 
 template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
@@ -307,6 +307,9 @@ template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
     if (!TLVUtil::Writing(input.GetInnerEntries(), data, TAG::TAG_RECORD_ENTRIES)) {
         return false;
     }
+    if (!TLVUtil::Writing(input.GetUris(), data, TAG::TAG_RECORD_URIS)) {
+        return false;
+    }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
 }
 
@@ -323,6 +326,7 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
         }
         std::string utdId;
         std::shared_ptr<std::map<std::string, ValueType>> entries;
+        std::vector<UriInfo> uriInfos;
         switch (headItem.tag) {
             case static_cast<uint16_t>(TAG::TAG_VERSION):
                 data.Skip(headItem);
@@ -356,6 +360,12 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
                     return false;
                 }
                 output.SetInnerEntries(entries);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_RECORD_URIS):
+                if (!TLVUtil::Reading(uriInfos, data, headItem)) {
+                    return false;
+                }
+                output.SetUris(std::move(uriInfos));
                 break;
             default:
                 data.Skip(headItem);
@@ -533,6 +543,64 @@ template <> bool Reading(Privilege &output, TLVObject &data, const TLVHead &head
                 break;
             default:
                 data.Skip(headItem);
+        }
+    }
+    return true;
+}
+
+template <> size_t CountBufferSize(const UriInfo &input, TLVObject &data)
+{
+    return data.CountHead() + data.CountBasic(input.position) + data.Count(input.oriUri) +
+        data.Count(input.dfsUri) + data.Count(input.authUri);
+}
+
+template <> bool Writing(const UriInfo &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    auto tagCursor = data.GetCursor();
+    data.OffsetHead();
+    if (!TLVUtil::Writing(input.oriUri, data, TAG::TAG_URI_ORI)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.dfsUri, data, TAG::TAG_URI_DFS)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.authUri, data, TAG::TAG_URI_AUTH)) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_URI_POS, input.position)) {
+        return false;
+    }
+    return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
+}
+
+template <> bool Reading(UriInfo &output, TLVObject &data, const TLVHead &head)
+{
+    auto endCursor = data.GetCursor() + head.len;
+    while (data.GetCursor() < endCursor) {
+        TLVHead headItem{};
+        if (!data.ReadHead(headItem)) {
+            return false;
+        }
+        bool result = true;
+        switch (headItem.tag) {
+            case static_cast<uint16_t>(TAG::TAG_URI_ORI):
+                result = TLVUtil::Reading(output.oriUri, data, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_URI_DFS):
+                result = TLVUtil::Reading(output.dfsUri, data, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_URI_AUTH):
+                result = TLVUtil::Reading(output.authUri, data, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_URI_POS):
+                result = data.ReadBasic(output.position, headItem);
+                break;
+            default:
+                result = data.Skip(headItem);
+        }
+        if (!result) {
+            return false;
         }
     }
     return true;

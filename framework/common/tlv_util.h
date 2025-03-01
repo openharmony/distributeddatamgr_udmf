@@ -100,6 +100,10 @@ template <> size_t API_EXPORT CountBufferSize(const Privilege &input, TLVObject 
 template <> bool API_EXPORT Writing(const Privilege &input, TLVObject &data, TAG tag);
 template <> bool API_EXPORT Reading(Privilege &output, TLVObject &data, const TLVHead &head);
 
+template <> size_t API_EXPORT CountBufferSize(const UriInfo &input, TLVObject &data);
+template <> bool API_EXPORT Writing(const UriInfo &input, TLVObject &data, TAG tag);
+template <> bool API_EXPORT Reading(UriInfo &output, TLVObject &data, const TLVHead &head);
+
 template <> size_t API_EXPORT CountBufferSize(const std::shared_ptr<OHOS::Media::PixelMap> &input, TLVObject &data);
 template <> bool API_EXPORT Writing(const std::shared_ptr<OHOS::Media::PixelMap> &input, TLVObject &data, TAG tag);
 template <>

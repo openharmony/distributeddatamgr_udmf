@@ -108,6 +108,12 @@ struct ProgressInfo {
     std::string srcDevName;
 };
 
+struct UriInfo {
+    std::string oriUri;
+    std::string authUri;
+    std::string dfsUri;
+    uint32_t position;
+};
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_UNIFIED_TYPES_H

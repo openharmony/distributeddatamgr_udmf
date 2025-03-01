@@ -24,6 +24,7 @@
 #include "file_uri.h"
 #include "logger.h"
 #include "udmf_async_client.h"
+#include "unified_html_record_process.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -59,9 +60,59 @@ Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
         }
     }
 
+    HandleUris(context);
     context.asyncHelper->data = context.processedData;
     LOG_INFO(UDMF_CLIENT, "Copy end.");
     return context.status;
+}
+
+void UdmfCopyFile::HandleUris(CopyContext &context)
+{
+    for (const auto &record : context.asyncHelper->data->GetRecords()) {
+        if (record == nullptr) {
+            continue;
+        }
+        if (!record->HasType(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML))) {
+            context.processedData->AddRecord(record);
+            continue;
+        }
+        for (auto &uri : record->GetUris()) {
+            std::string srcUri = uri.dfsUri.empty() ? uri.authUri : uri.dfsUri;
+            if (IsDirectory(srcUri, true)) {
+                LOG_ERROR(UDMF_CLIENT, "Source cannot be directory.");
+                context.status = E_COPY_FILE_FAILED;
+                continue;
+            }
+            std::string destUri = ConstructDestUri(context.asyncHelper->destUri, srcUri);
+            if (context.asyncHelper->fileConflictOptions == FileConflictOptions::SKIP && IsFile(destUri, false)) {
+                LOG_INFO(UDMF_CLIENT, "File has existed, skip.");
+                continue;
+            }
+            if (!CopyFile(srcUri, destUri, record, context)) {
+                LOG_ERROR(UDMF_CLIENT, "copy cancel");
+                return;
+            }
+            UpdateUriInfo(destUri, record, uri);
+        }
+    }
+    UnifiedHtmlRecordProcess::RebuildHtmlRecord(*(context.asyncHelper->data));
+}
+
+void UdmfCopyFile::UpdateUriInfo(const std::string destUri, const std::shared_ptr<UnifiedRecord> &record,
+    UriInfo uri)
+{
+    record->ComputeUris([&destUri, &uri] (UriInfo &uriInfo) {
+        if (uri.dfsUri.empty()) {
+            if (uri.authUri == uriInfo.authUri) {
+                uriInfo.dfsUri = destUri;
+            }
+        } else {
+            if (uri.dfsUri == uriInfo.dfsUri) {
+                uriInfo.dfsUri = destUri;
+            }
+        }
+        return true;
+    });
 }
 
 bool UdmfCopyFile::HandleRecord(const std::shared_ptr<UnifiedRecord> &record, CopyContext &context)

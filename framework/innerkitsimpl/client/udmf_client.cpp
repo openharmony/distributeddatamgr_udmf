@@ -25,6 +25,7 @@
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
 #include "unified_data_helper.h"
+#include "unified_html_record_process.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -73,6 +74,9 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
                 BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::SUCCESS, BizState::DFX_END);
             return E_OK;
         }
+        if (unifiedData.HasType(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML))) {
+            UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(unifiedData);
+        }
     }
     int32_t ret = service->SetData(option, unifiedData, key);
     if (ret != E_OK) {
@@ -114,6 +118,9 @@ Status UdmfClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
         return static_cast<Status>(ret);
     }
+    if (unifiedData.HasType(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML))) {
+        UnifiedHtmlRecordProcess::RebuildHtmlRecord(unifiedData);
+    }
     RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
         BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::SUCCESS, BizState::DFX_END);
     return E_OK;
@@ -131,6 +138,9 @@ Status UdmfClient::GetBatchData(const QueryOption &query, std::vector<UnifiedDat
     int32_t ret = service->GetBatchData(query, unifiedDataSet);
     if (ret != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
+    }
+    for (auto &data : unifiedDataSet) {
+        data.ClearUriInfo();
     }
     return static_cast<Status>(ret);
 }

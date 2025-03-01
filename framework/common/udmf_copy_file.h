@@ -48,6 +48,9 @@ private:
     ~UdmfCopyFile() = default;
 
     bool HandleRecord(const std::shared_ptr<UnifiedRecord> &record, CopyContext &context);
+    void HandleUris(CopyContext &context);
+    void UpdateUriInfo(const std::string destUri, const std::shared_ptr<UnifiedRecord> &record,
+        UriInfo uri);
     bool CopyFile(const std::string &srcUri, const std::string &destFileUri,
         const std::shared_ptr<UnifiedRecord> &record, CopyContext &context);
     void HandleProgress(const std::string &srcUri, const std::string &destFileUri,

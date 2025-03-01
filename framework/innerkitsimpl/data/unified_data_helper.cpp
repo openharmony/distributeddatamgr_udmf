@@ -30,9 +30,7 @@
 namespace OHOS {
 namespace UDMF {
 constexpr mode_t MODE = 0700;
-static constexpr int64_t MAX_HAP_RECORD_SIZE = 2 * 1024 * 1024;
-static constexpr int64_t MAX_HAP_DATA_SIZE = 4 * 1024 * 1024;
-static constexpr int64_t MAX_IPC_RAW_DATA_SIZE = 128 * 1024 * 1024;
+static constexpr int64_t MAX_IPC_RAW_DATA_SIZE = 127 * 1024 * 1024;
 static constexpr int64_t MAX_SA_DRAG_RECORD_SIZE  = 15 * 1024 * 1024 + 512 * 1024;
 
 constexpr const char *TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/udata";
@@ -51,14 +49,14 @@ bool UnifiedDataHelper::ExceedKVSizeLimit(UnifiedData &data)
     int64_t totalSize = 0;
     for (const auto &record : data.GetRecords()) {
         auto recordSize = record->GetSize();
-        if (recordSize > MAX_HAP_RECORD_SIZE) {
-            LOG_INFO(UDMF_FRAMEWORK, "Exceeded 2M record limit, recordSize:%{public}" PRId64 "!", recordSize);
+        if (recordSize > MAX_SA_DRAG_RECORD_SIZE) {
+            LOG_INFO(UDMF_FRAMEWORK, "Exceeded 15.5M record limit, recordSize:%{public}" PRId64 "!", recordSize);
             return true;
         }
         totalSize += recordSize;
     }
-    if (totalSize > MAX_HAP_DATA_SIZE) {
-        LOG_INFO(UDMF_FRAMEWORK, "Exceeded 4M data limit, totalSize:%{public}" PRId64 " !", totalSize);
+    if (totalSize > MAX_IPC_RAW_DATA_SIZE) {
+        LOG_INFO(UDMF_FRAMEWORK, "Exceeded 127M data limit, totalSize:%{public}" PRId64 " !", totalSize);
         return true;
     }
     return false;

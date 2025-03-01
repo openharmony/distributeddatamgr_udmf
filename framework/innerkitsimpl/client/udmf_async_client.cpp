@@ -377,7 +377,7 @@ Status UdmfAsyncClient::Clear(const std::string &businessUdKey)
 
 Status UdmfAsyncClient::ProcessUnifiedData(std::unique_ptr<AsyncHelper> &asyncHelper)
 {
-    if (!asyncHelper->data->HasFileType()) {
+    if (!asyncHelper->data->HasFileType() && !asyncHelper->data->HasUriInfo()) {
         ProgressInfo progressInfo = {
             .progress = PROGRESS_ALL_FINISHED,
             .errorCode = E_OK
