@@ -185,7 +185,8 @@ export struct ContentFormCard {
   @State thumbImage: image.PixelMap | undefined = undefined;
   @State appImage: image.PixelMap | undefined = undefined;
   @State lineCount: number = 1;
-
+  private handleOnClick: () => void = () => {
+  };
 
   aboutToAppear(): void {
     this.initCardStyle();
@@ -227,9 +228,10 @@ export struct ContentFormCard {
       this.cardScale = widthScale;
     }
     this.cardWidth = defaultWidth * this.cardScale;
-    this.formHeight = defaultHeight * this.cardScale;
+    this.cardHeight =
+      (this.contentFormData?.title === '' && this.formHeight > 0) ? this.formHeight : defaultHeight * this.cardScale;
     console.info(`${TAG}, widthScale:${this.cardScale}, cardScale: ${this.cardScale}, ` +
-      `cardWidth: ${this.cardWidth}, formHeight: ${this.formHeight}`);
+      `cardWidth: ${this.cardWidth}, cardHeight: ${this.cardHeight}`);
   }
 
   initCardStyle(): void {
@@ -265,12 +267,22 @@ export struct ContentFormCard {
 
   @Builder
   ThumbImage() {
-    if (this.thumbImage) {
-      Image(this.thumbImage)
-        .objectFit(ImageFit.Contain)
-        .width('100%')
-        .aspectRatio(this.getAspectRatio())
+    Column() {
+      if (this.formHeight > 0) {
+        Image(this.thumbImage ? this.thumbImage : this.defaultThumbImage)
+          .objectFit(ImageFit.Contain)
+          .width('100%')
+          .layoutWeight(1)
+      } else {
+        Image(this.thumbImage ? this.thumbImage : this.defaultThumbImage)
+          .objectFit(ImageFit.Contain)
+          .width('100%')
+          .aspectRatio(this.getAspectRatio())
+      }
     }
+    .size({ width: '100%' })
+    .layoutWeight(this.formHeight > 0 ? 1 : 0)
+    .backgroundColor(this.thumbImage ? CARD_BACKGROUND : DEFAULT_THUMB_BACKGROUND)
   }
 
   @Builder
@@ -364,7 +376,7 @@ export struct ContentFormCard {
       this.CardDivider()
       this.AppView()
     }
-    .size({ width: '100%', height: this.formHeight })
+    .size({ width: '100%', height: this.cardHeight })
   }
 
   @Builder
@@ -489,6 +501,7 @@ export struct ContentFormCard {
         console.warn(`${TAG}, linkUri is null`);
         return;
       }
+      this.handleOnClick();
       try {
         let context = getContext(this) as common.UIAbilityContext;
         context.openLink(this.contentFormData?.linkUri, { appLinkingOnly: false, parameters: {} });
@@ -504,8 +517,8 @@ export struct ContentFormCard {
     try {
       imageResource = image.createImageSource(uint.buffer);
       let pixelMapData = await imageResource?.createPixelMap();
-      imageResource?.release();
       callback(pixelMapData);
+      imageResource.release();
     } catch (err) {
       let error = err as BusinessError;
       console.info(`${TAG}, Failed to create pixelMap, code is ${error.code}, message is ${error.message}`);
@@ -552,7 +565,7 @@ export struct ContentFormCard {
     let defaultCardWidth = this.formType === FormType.TYPE_MID ? DEFAULT_MID_CARD_WIDTH : DEFAULT_SMALL_CARD_WIDTH;
     let defaultImageHeight =
       this.formType === FormType.TYPE_MID ? DEFAULT_MID_IMAGE_HEIGHT : DEFAULT_SMALL_IMAGE_HEIGHT;
-    if (iamgeSize) {
+    if (iamgeSize && this.thumbImage) {
       if ((iamgeSize.width / iamgeSize.height) > (defaultCardWidth / (defaultImageHeight * MIN_CARD_SCALE))) {
         return defaultCardWidth / (defaultImageHeight * MIN_CARD_SCALE);
       }
@@ -561,7 +574,7 @@ export struct ContentFormCard {
       }
       return iamgeSize.width / iamgeSize.height;
     }
-    return 1;
+    return defaultCardWidth / defaultImageHeight;
   }
 
   getTextBackground(text: string | undefined): string {
@@ -595,11 +608,17 @@ export struct ContentFormCard {
 
   getThumbViewConstraintSize(): ConstraintSizeOptions {
     if (this.contentFormData?.title !== '') {
-      return { maxHeight: this.formHeight, minHeight: this.formHeight };
+      return { maxHeight: this.cardHeight, minHeight: this.cardHeight };
     } else {
+      if (this.formHeight > 0) {
+        return {
+          maxHeight: this.formHeight,
+          minHeight: this.formHeight
+        };
+      }
       return {
-        maxHeight: this.formHeight * MAX_CARD_SCALE,
-        minHeight: this.formHeight * MIN_CARD_SCALE
+        maxHeight: this.cardHeight * MAX_CARD_SCALE,
+        minHeight: this.cardHeight * MIN_CARD_SCALE
       };
     }
   }
