@@ -170,7 +170,8 @@ export class ContentFormCard extends ViewPU {
         this.h3 = new ObservedPropertySimplePU(1, this, "lineCount");
         this.setInitiallyProvidedValue(params);
         this.declareWatch("formType", this.formTypeChange);
-        this.declareWatch("formWidth", this.formWidthChange);
+        this.declareWatch("formWidth", this.formSizeChange);
+        this.declareWatch("formHeight", this.formSizeChange);
         this.finalizeConstruction();
     }
 

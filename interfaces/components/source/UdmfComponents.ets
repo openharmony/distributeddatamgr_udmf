@@ -177,13 +177,15 @@ export struct ContentFormCard {
   private formStyle: CardStyle = MID_CARD_STYLE;
   private controller: TextController = new TextController();
   @State cardScale: number = 1;
-  @Prop @Watch('formWidthChange') formWidth: number = 0;
+  @Prop @Watch('formSizeChange') formWidth: number = 0;
+  @Prop @Watch('formSizeChange') formHeight: number = 0;
   @State cardWidth: number = 0;
-  @State formHeight: number = 0;
+  @State cardHeight: number = 0;
   @State defaultThumbImage: image.PixelMap | undefined = undefined;
   @State thumbImage: image.PixelMap | undefined = undefined;
   @State appImage: image.PixelMap | undefined = undefined;
   @State lineCount: number = 1;
+
 
   aboutToAppear(): void {
     this.initCardStyle();
@@ -211,7 +213,7 @@ export struct ContentFormCard {
     this.initCardStyle();
   }
 
-  formWidthChange(): void {
+  formSizeChange(): void {
     this.initCardStyle();
   }
 
