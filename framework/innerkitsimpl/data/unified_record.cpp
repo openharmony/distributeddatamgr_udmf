@@ -112,6 +112,7 @@ bool UnifiedRecord::HasType(const std::string &utdId) const
 
 void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (utdId == utdId_ || utdId_.empty()) {
         utdId_ = utdId;
         value_ = std::move(value);
@@ -128,6 +129,7 @@ void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
 
 ValueType UnifiedRecord::GetEntry(const std::string &utdId)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (utdId_ == utdId && !(std::holds_alternative<std::monostate>(value_))) {
         return value_;
     }

@@ -20,9 +20,7 @@
 #include <mutex>
 #include <string>
 
-#ifndef IOS_PLATFORM
 #include "executor_pool.h"
-#endif
 #include "progress_queue.h"
 #include "unified_types.h"
 #include "unified_data.h"
@@ -53,11 +51,9 @@ struct AsyncHelper {
     uint32_t sycnRetryTime = 0;
     int32_t lastProgress = 0;
     ProgressIndicator progressIndicator;
-#ifndef IOS_PLATFORM
     ExecutorPool::TaskId invokeHapTask = ExecutorPool::INVALID_TASK_ID;
     ExecutorPool::TaskId getDataTask = ExecutorPool::INVALID_TASK_ID;
     ExecutorPool::TaskId progressTask = ExecutorPool::INVALID_TASK_ID;
-#endif
     ProgressListener progressListener;
     FileConflictOptions fileConflictOptions;
     std::string businessUdKey;

@@ -86,6 +86,7 @@ private:
     uint32_t recordId_ = 0;
     std::string channelName_;
     std::shared_ptr<EntryGetter> entryGetter_;
+    mutable std::recursive_mutex mutex_;
 };
 } // namespace UDMF
 } // namespace OHOS

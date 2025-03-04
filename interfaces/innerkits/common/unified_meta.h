@@ -52,18 +52,21 @@ constexpr const char* ARRAY_BUFFER_LENGTH = "arrayBufferLen";
 constexpr const char *FORMID = "formId";
 constexpr const char *FORMNAME = "formName";
 constexpr const char *MODULE = "module";
+constexpr const char* BUNDLENAME = "bundleName";
+constexpr const char* ABILITYNAME = "abilityName";
 constexpr const char *ORI_URI = "oriUri";
 constexpr const char *REMOTE_URI = "remoteUri";
-constexpr const char *APPLICATION_DEFINED_TYPE = "applicationDefinedType";
-constexpr const char *RAW_DATA = "rawData";
 constexpr const char *DETAILS = "details";
 constexpr const char *VALUE_TYPE = "VALUE_TYPE";
+constexpr const char *APPLICATION_DEFINED_TYPE = "applicationDefinedType";
+constexpr const char *RAW_DATA = "rawData";
 constexpr const char *THUMB_DATA = "thumbData";
 constexpr const char *THUMB_DATA_LENGTH = "thumbDataLen";
 constexpr const char *TITLE = "title";
 constexpr const char* APP_ICON = "appIcon";
 constexpr const char* APP_ICON_LENGTH = "appIconLen";
 constexpr const char* LINK_URL = "linkUrl";
+constexpr const char *APPLICATION_DEFINED_RECORD_MARK = "applicationDefinedrecordMark";
 
 enum UDType : int32_t {
     ENTITY = 0,
@@ -529,8 +532,6 @@ enum UDType : int32_t {
     CONTENT_FORM,
     M4P_AUDIO,
     AC3_AUDIO,
-    OPENHARMONY_HSP,
-    OPENHARMONY_HAR,
     OPENHARMONY_GOPAINT,
     OPENHARMONY_GOBRUSH,
     OPENHARMONY_GOBRUSHES,
@@ -614,16 +615,28 @@ struct Object;
 using ValueType = std::variant<std::monostate, int32_t, int64_t, double, bool, std::string, std::vector<uint8_t>,
     std::shared_ptr<OHOS::AAFwk::Want>, std::shared_ptr<OHOS::Media::PixelMap>, std::shared_ptr<Object>, nullptr_t>;
 
-struct Object {
-    bool GetValue(const std::string &key, std::string &value);
-    bool GetValue(const std::string &key, std::shared_ptr<Object> &value);
+struct API_EXPORT Object {
+    template<typename T>
+    bool GetValue(const std::string &key, T &value)
+    {
+        auto it = value_.find(key);
+        if(it != value_.end() && std::holds_alternative(it->second)) {
+            value = std::get<T>(it->second);
+            return true;
+        }
+        return false;
+    }
 
     std::map<std::string, ValueType> value_;
 };
 
 namespace ObjectUtils {
-    std::shared_ptr<Object> ConvertToObject(UDDetails &details);
-    UDDetails ConvertToUDDetails(std::shared_ptr<Object> object);
+    std::shared_ptr<Object> API_EXPORT ConvertToObject(UDDetails &details);
+    UDDetails API_EXPORT ConvertToUDDetails(std::shared_ptr<Object> object);
+
+    int64_t GetValueSize(const ValueType &value, bool isCalValueType);
+    int64_t GetObjectValueSize(const std::shared_ptr<object> object, bool isCalValueType);
+    int64_t GetAllObjectSize(const std::shared_ptr<Object> object);
 
     template<typename T, typename... Types>
     bool ConvertVariant(T &&input, std::variant<Types...> &output)

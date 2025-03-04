@@ -50,9 +50,7 @@ private:
     Status ProcessUnifiedData(std::unique_ptr<AsyncHelper> &asyncHelper);
     bool IsParamValid(const GetDataParams &params);
 
-#ifndef IOS_PLATFORM
     ExecutorPool executor_;
-#endif
     std::unordered_map<std::string, std::unique_ptr<AsyncHelper>> asyncHelperMap_;
     std::mutex mutex_;
 };

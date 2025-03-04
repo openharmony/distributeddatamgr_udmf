@@ -537,7 +537,7 @@ napi_status NapiDataUtils::SetValue(napi_env env, const ProgressInfo &in, napi_v
 
     napi_value jsPercentage = nullptr;
     SetValue(env, in.progress, jsPercentage);
-    napi_set_named_property(env, out, "percentage", jsPercentage);
+    napi_set_named_property(env, out, "progress", jsPercentage);
 
     napi_value jsListenerStatus = nullptr;
     SetValue(env, in.progressStatus, jsListenerStatus);

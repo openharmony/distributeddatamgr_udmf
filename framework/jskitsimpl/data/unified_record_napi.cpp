@@ -57,7 +57,7 @@ napi_value UnifiedRecordNapi::New(napi_env env, napi_callback_info info)
         if (argc >= 2) {
             ctxt->status = NapiDataUtils::GetValue(env, argv[0], type);
             ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && !type.empty(),
-                Status::E_INVALID_PARAMETERS, "Parameter error: parameter type type must be string");
+                Status::E_INVALID_PARAMETERS, "Parameter error: parameter type must be string");
             value = argv[1];
         }
     };

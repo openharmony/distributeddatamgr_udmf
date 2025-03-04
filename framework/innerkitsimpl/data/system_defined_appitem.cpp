@@ -109,7 +109,7 @@ void SystemDefinedAppItem::SetBundleName(const std::string &bundleName)
 {
     this->bundleName_ = bundleName;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[BUNDLE_NAME] = bundleName_;
+        std::get<std::shared_ptr<Object>>(value_)->value_[BUNDLENAME] = bundleName_;
     }
 }
 
@@ -122,7 +122,7 @@ void SystemDefinedAppItem::SetAbilityName(const std::string &abilityName)
 {
     this->abilityName_ = abilityName;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[ABILITY_NAME] = abilityName_;
+        std::get<std::shared_ptr<Object>>(value_)->value_[ABILITYNAME] = abilityName_;
     }
 }
 
@@ -133,22 +133,22 @@ void SystemDefinedAppItem::SetItems(UDDetails &details)
         if (value == nullptr) {
             continue;
         }
-        if (item.first == APP_ID) {
+        if (item.first == APPID) {
             SetAppId(*value);
         }
-        if (item.first == APP_NAME) {
+        if (item.first == APPNAME) {
             SetAppName(*value);
         }
-        if (item.first == APP_ICON_ID) {
+        if (item.first == APPICONID) {
             SetAppIconId(*value);
         }
-        if (item.first == APP_LABEL_ID) {
+        if (item.first == APPLABELID) {
             SetAppLabelId(*value);
         }
-        if (item.first == BUNDLE_NAME) {
+        if (item.first == BUNDLENAME) {
             SetBundleName(*value);
         }
-        if (item.first == ABILITY_NAME) {
+        if (item.first == ABILITYNAME) {
             SetAbilityName(*value);
         }
     }
@@ -157,12 +157,12 @@ void SystemDefinedAppItem::SetItems(UDDetails &details)
 UDDetails SystemDefinedAppItem::GetItems()
 {
     UDDetails items;
-    items[APP_ID] = GetAppId();
-    items[APP_NAME] = GetAppName();
-    items[APP_ICON_ID] = GetAppIconId();
-    items[APP_LABEL_ID] = GetAppLabelId();
-    items[BUNDLE_NAME] = GetBundleName();
-    items[ABILITY_NAME] = GetAbilityName();
+    items[APPID] = GetAppId();
+    items[APPNAME] = GetAppName();
+    items[APPICONID] = GetAppIconId();
+    items[APPLABELID] = GetAppLabelId();
+    items[BUNDLENAME] = GetBundleName();
+    items[ABILITYNAME] = GetAbilityName();
     return items;
 }
 
@@ -173,12 +173,12 @@ void SystemDefinedAppItem::InitObject()
         value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
-        object->value_[APP_ID] = appId_;
-        object->value_[APP_NAME] = appName_;
-        object->value_[APP_ICON_ID] = appIconId_;
-        object->value_[APP_LABEL_ID] = appLabelId_;
-        object->value_[BUNDLE_NAME] = bundleName_;
-        object->value_[ABILITY_NAME] = abilityName_;
+        object->value_[APPID] = appId_;
+        object->value_[APPNAME] = appName_;
+        object->value_[APPICONID] = appIconId_;
+        object->value_[APPLABELID] = appLabelId_;
+        object->value_[BUNDLENAME] = bundleName_;
+        object->value_[ABILITYNAME] = abilityName_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
         object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }

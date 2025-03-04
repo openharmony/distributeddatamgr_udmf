@@ -426,6 +426,7 @@ void OH_UdmfRecord_Destroy(OH_UdmfRecord* record)
         delete[] record->recordData;
         record->recordData = nullptr;
     }
+    DestroyStringArray(record->typesArray, record->typesCount);
     delete record;
 }
 
