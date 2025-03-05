@@ -55,7 +55,7 @@ static int GetUdsUint8Value(UdsObject* pThis, const char* paramName, const char*
         length = *lengthPtr;
     }
     if (length < 0 || length > MAX_GENERAL_ENTRY_SIZE) {
-        LOG_ERROR(UDMF_CAPI, "length invalid!  length'size = %{public}d", length);
+        LOG_ERROR(UDMF_CAPI, "length invalid! length'size = %{public}d", length);
         return UDMF_ERR;
     }
     *data = value->data();

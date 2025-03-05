@@ -296,6 +296,5 @@ int32_t UdmfServiceClient::ClearAsynProcessByKey(const std::string &businessUdKe
 {
     return udmfProxy_->ClearAsynProcessByKey(businessUdKey);
 }
-
 } // namespace UDMF
 } // namespace OHOS

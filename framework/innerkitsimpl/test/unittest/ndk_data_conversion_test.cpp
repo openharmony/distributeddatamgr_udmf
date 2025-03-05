@@ -42,10 +42,11 @@ namespace OHOS::Test {
         void SetUp();
 
         void TearDown();
-
     };
 
 void NdkDataConversionTest::SetUpTestCase(void) {}
+
+void NdkDataConversionTest::TearDownTestCase(void) {}
 
 void NdkDataConversionTest::SetUp(void) {}
 

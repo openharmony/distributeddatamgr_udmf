@@ -620,7 +620,7 @@ struct API_EXPORT Object {
     bool GetValue(const std::string &key, T &value)
     {
         auto it = value_.find(key);
-        if(it != value_.end() && std::holds_alternative<T>(it->second)) {
+        if (it != value_.end() && std::holds_alternative<T>(it->second)) {
             value = std::get<T>(it->second);
             return true;
         }

@@ -265,7 +265,9 @@ napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_
 bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *textModelConfig)
 {
     AIP_HILOGI("Enter");
-    napi_value version, isNPUAvailable, cachePath;
+    napi_value version;
+    napi_value isNPUAvailable;
+    napi_value cachePath;
 
     napi_status status = napi_get_named_property(env, args[ARG_0], "version", &version);
     if (status != napi_ok) {

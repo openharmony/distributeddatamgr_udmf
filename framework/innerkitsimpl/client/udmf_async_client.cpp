@@ -16,7 +16,6 @@
 
 #include "udmf_async_client.h"
 
-#include "dataobs_mgr_client.h"
 #include "logger.h"
 #include "plain_text.h"
 #include "progress_callback.h"
@@ -46,7 +45,12 @@ static constexpr int32_t PROGRESS_INIT = 0;
 static constexpr int32_t PROGRESS_SYNC_FINSHED = 10;
 static constexpr int32_t PROGRESS_GET_DATA_FINISHED = 20;
 static constexpr int32_t PROGRESS_ALL_FINISHED = 100;
+
+#ifdef IOS_PLATFORM
+UdmfAsyncClient::UdmfAsyncClient() {}
+#else
 UdmfAsyncClient::UdmfAsyncClient() : executor_(MAX_THREADS, MIN_THREADS) {}
+#endif
 
 UdmfAsyncClient &UdmfAsyncClient::GetInstance()
 {
@@ -56,6 +60,7 @@ UdmfAsyncClient &UdmfAsyncClient::GetInstance()
 
 Status UdmfAsyncClient::StartAsyncDataRetrieval(const GetDataParams &params)
 {
+#ifndef IOS_PLATFORM
     if (!IsParamValid(params)) {
         return E_INVALID_PARAMETERS;
     }
@@ -71,6 +76,7 @@ Status UdmfAsyncClient::StartAsyncDataRetrieval(const GetDataParams &params)
     }
     asyncHelper->getDataTask = executor_.Execute(std::bind(&UdmfAsyncClient::GetDataTask, this, params.query));
     asyncHelper->progressTask = executor_.Execute(std::bind(&UdmfAsyncClient::ProgressTask, this, params.query.key));
+#endif
     return E_OK;
 }
 
@@ -155,20 +161,6 @@ Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
         Clear(businessUdKey);
         return E_ERROR;
     }
-    sptr<IRemoteObject> callback = new ProgressSignalCallback();
-    auto obsMgrClient = AAFwk::DataObsMgrClient::GetInstance();
-    if (obsMgrClient == nullptr) {
-        LOG_ERROR(UDMF_CLIENT, "Get DataObsMgrClient failed");
-        Clear(businessUdKey);
-        return E_ERROR;
-    }
-
-    auto status = obsMgrClient->NotifyProcessObserver(asyncHelper->processKey, callback);
-    if (status != AAFwk::SUCCESS) {
-        LOG_ERROR(UDMF_CLIENT, "Notify process dialog failed, status=%{public}d", status);
-        Clear(businessUdKey);
-        return E_ERROR;
-    }
     Clear(businessUdKey);
     return E_OK;
 }
@@ -192,6 +184,7 @@ Status UdmfAsyncClient::RegisterAsyncHelper(const GetDataParams &params)
 
 Status UdmfAsyncClient::CheckSync(std::unique_ptr<AsyncHelper> &asyncHelper, const QueryOption &query)
 {
+#ifndef IOS_PLATFORM
     AsyncProcessInfo processInfo = {
         .businessUdKey = query.key
     };
@@ -227,6 +220,7 @@ Status UdmfAsyncClient::CheckSync(std::unique_ptr<AsyncHelper> &asyncHelper, con
     (asyncHelper->sycnRetryTime)++;
     asyncHelper->getDataTask = executor_.Schedule(std::chrono::milliseconds(SYNC_INTERVAL),
         std::bind(&UdmfAsyncClient::GetDataTask, this, query));
+#endif
     return E_OK;
 }
 
@@ -344,6 +338,7 @@ void UdmfAsyncClient::CallProgress(std::unique_ptr<AsyncHelper> &asyncHelper, Pr
 
 Status UdmfAsyncClient::Clear(const std::string &businessUdKey)
 {
+#ifndef IOS_PLATFORM
     std::lock_guard<std::mutex> lockMap(mutex_);
     if (asyncHelperMap_.find(businessUdKey) == asyncHelperMap_.end()) {
         LOG_ERROR(UDMF_CLIENT, "No task can Clear, key=%{public}s", businessUdKey.c_str());
@@ -361,6 +356,7 @@ Status UdmfAsyncClient::Clear(const std::string &businessUdKey)
     asyncHelperMap_.erase(businessUdKey);
     UdmfServiceClient::GetInstance()->ClearAsynProcessByKey(businessUdKey);
     LOG_INFO(UDMF_CLIENT, "Clear task success, key = %{public}s", businessUdKey.c_str());
+#endif
     return E_OK;
 }
 
