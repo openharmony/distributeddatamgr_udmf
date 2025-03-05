@@ -36,7 +36,7 @@ ValueType DataProviderImpl::GetValueByType(const std::string &utdId)
         return std::monostate();
     }
     if (innerProvider_ == nullptr) {
-        LOG_ERROR(UDMF_CAPI, innerProvider_ is null!);
+        LOG_ERROR(UDMF_CAPI, innerprovider_ is null!);
         return std::monostate();
     }
     auto value = (innerProvider_->callback)(innerProvider_->context, utdId.c_str());

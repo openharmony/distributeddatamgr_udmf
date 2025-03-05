@@ -140,6 +140,10 @@ ValueType UnifiedRecord::GetEntry(const std::string &utdId)
     auto getter = GetterSystem::GetInstance().GetGetter(channelName_);
     if (getter != nullptr && (utdId_ == utdId || it != entries_->end())) {
         auto value = getter->GetValueByType(dataId_, recordId_, utdId);
+        if (std::holds_alternative<std::monostate>(value)) {
+            LOG_ERROR(UDMF_FRAMEWORK, "get value failed, utdId: %{public}s", utdId.c_str());
+            return std::monostate();
+        }
         AddEntry(utdId, ValueType(value));
         return value;
     }

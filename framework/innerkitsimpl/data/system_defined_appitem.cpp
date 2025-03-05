@@ -27,12 +27,12 @@ SystemDefinedAppItem::SystemDefinedAppItem(UDType type, ValueType value) : Syste
     SetType(SYSTEM_DEFINED_APP_ITEM);
     if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
-        object->GetValue(APP_ID, appId_);
-        object->GetValue(APP_NAME, appName_);
-        object->GetValue(APP_ICON_ID, appIconId_);
-        object->GetValue(APP_LABEL_ID, appLabelId_);
-        object->GetValue(BUNDLE_NAME, bundleName_);
-        object->GetValue(ABILITY_NAME, abilityName_);
+        object->GetValue(APPID, appId_);
+        object->GetValue(APPNAME, appName_);
+        object->GetValue(APPICONID, appIconId_);
+        object->GetValue(APPLABELID, appLabelId_);
+        object->GetValue(BUNDLENAME, bundleName_);
+        object->GetValue(ABILITYNAME, abilityName_);
         std::shared_ptr<Object> detailObj = nullptr;
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
@@ -57,7 +57,7 @@ void SystemDefinedAppItem::SetAppId(const std::string &appId)
 {
     this->appId_ = appId;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[APP_ID] = appId_;
+        std::get<std::shared_ptr<Object>>(value_)->value_[APPID] = appId_;
     }
 }
 
@@ -70,7 +70,7 @@ void SystemDefinedAppItem::SetAppName(const std::string &appName)
 {
     this->appName_ = appName;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[APP_NAME] = appName_;
+        std::get<std::shared_ptr<Object>>(value_)->value_[APPNAME] = appName_;
     }
 }
 
@@ -83,7 +83,7 @@ void SystemDefinedAppItem::SetAppIconId(const std::string &appIconId)
 {
     this->appIconId_ = appIconId;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[APP_ICON_ID] = appIconId_;
+        std::get<std::shared_ptr<Object>>(value_)->value_[APPICONID] = appIconId_;
     }
 }
 
@@ -96,7 +96,7 @@ void SystemDefinedAppItem::SetAppLabelId(const std::string &appLabelId)
 {
     this->appLabelId_ = appLabelId;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[APP_LABEL_ID] = appLabelId_;
+        std::get<std::shared_ptr<Object>>(value_)->value_[APPLABELID] = appLabelId_;
     }
 }
 

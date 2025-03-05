@@ -46,12 +46,7 @@ static constexpr int32_t PROGRESS_INIT = 0;
 static constexpr int32_t PROGRESS_SYNC_FINSHED = 10;
 static constexpr int32_t PROGRESS_GET_DATA_FINISHED = 20;
 static constexpr int32_t PROGRESS_ALL_FINISHED = 100;
-
-#ifdef IOS_PLATFORM
-UdmfAsyncClient::UdmfAsyncClient() {}
-#else
 UdmfAsyncClient::UdmfAsyncClient() : executor_(MAX_THREADS, MIN_THREADS) {}
-#endif
 
 UdmfAsyncClient &UdmfAsyncClient::GetInstance()
 {
