@@ -38,7 +38,7 @@ static constexpr uint8_t LENGTH_2 = 3;
 static const std::string CLASS_NAME = "ImageEmbedding";
 const std::vector<std::string> EXPECTED_GET_ARG_TYPES = { "string" };
 const std::vector<std::string> EXPECTED_GET_IMG_MODEL_ARG_TYPES = { "object" };
-const std::string AIP_MANAGER_PATH = "/system/lib64/platformsdk/libaip_core.z.so";
+const std::string AIP_MANAGER_PATH = "libaip_core.z.so";
 } // namespace
 
 AipCoreManagerHandle ImageEmbeddingNapi::imgAipCoreMgrHandle_{};
@@ -124,7 +124,7 @@ static napi_value StartInit(napi_env env, napi_value exports, struct ImageEmbedd
 napi_value ImageEmbeddingNapi::Init(napi_env env, napi_value exports)
 {
     AIP_HILOGD("Enter");
-    if (!AipNapiUtils::LoadAlgoLibrary(AIP_MANAGER_PATH, imgAipCoreMgrHandle_)) {
+    if (!AipNapiUtils::LoadAlgoLibrary(AIP_MANAGER_PATH, imgAipCoreMgrHandle_, true)) {
         AIP_HILOGE("LoadAlgoLibrary failed");
     }
 

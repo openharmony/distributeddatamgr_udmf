@@ -27,6 +27,8 @@ class IAipCoreManagerImpl : public IAipCoreManager {
 public:
     IAipCoreManagerImpl() = default;
     ~IAipCoreManagerImpl() = default;
+    int32_t InitRetriever(const RetrievalConfigStruct& retrievalConfig) override;
+    int32_t Retrieve(const RetrievalConditionStruct &condition, RetrievalResponseStruct &retrievalResponse) override;
     int32_t InitTextModel(const ModelConfigData &config) override;
     int32_t InitImageModel(const ModelConfigData &config) override;
     int32_t LoadTextModel() override;
