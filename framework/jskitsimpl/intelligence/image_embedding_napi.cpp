@@ -253,7 +253,7 @@ bool ImageEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t
         AIP_HILOGE("The modelConfig is null");
         return false;
     }
-    if (!AipNapiUtils::CheckModelConfig(env, args[ARG_0], length)) {
+    if (!AipNapiUtils::CheckModelConfig(env, args[ARG_0])) {
         AIP_HILOGE("The modelConfig is failed");
         return false;
     }
