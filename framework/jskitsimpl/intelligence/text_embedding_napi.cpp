@@ -305,6 +305,11 @@ bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t 
         return false;
     }
 
+    if (textModelConfig->versionValue != BASIC_MODEL) {
+        AIP_HILOGE("The version value is invalid");
+        return false;
+    }
+
     status = napi_get_named_property(env, args[ARG_0], "isNpuAvailable", &isNPUAvailable);
     if (status != napi_ok) {
         AIP_HILOGE("napi get isNpuAvailable property failed");

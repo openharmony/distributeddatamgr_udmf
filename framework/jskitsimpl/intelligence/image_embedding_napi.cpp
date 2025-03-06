@@ -35,6 +35,7 @@ static constexpr uint8_t NUM_0 = 0;
 static constexpr uint8_t NUM_1 = 1;
 static constexpr uint8_t LENGTH_1 = 2;
 static constexpr uint8_t LENGTH_2 = 3;
+static constexpr uint8_t BASIC_MODEL = 0;
 static const std::string CLASS_NAME = "ImageEmbedding";
 const std::vector<std::string> EXPECTED_GET_ARG_TYPES = { "string" };
 const std::vector<std::string> EXPECTED_GET_IMG_MODEL_ARG_TYPES = { "object" };
@@ -274,6 +275,11 @@ bool ImageEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t
 
     if (!AipNapiUtils::TransJsToInt32(env, version, modelConfig->versionValue)) {
         AIP_HILOGE("Trans version failed");
+        return false;
+    }
+
+    if (modelConfig->versionValue != BASIC_MODEL) {
+        AIP_HILOGE("The version value is invalid");
         return false;
     }
 
