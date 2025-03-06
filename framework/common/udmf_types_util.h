@@ -31,7 +31,6 @@ using CustomOption = UDMF::CustomOption;
 using QueryOption = UDMF::QueryOption;
 using UDType = UDMF::UDType;
 using Intention = UDMF::Intention;
-using AsyncProcessInfo = UDMF::AsyncProcessInfo;
 
 template<>
 bool API_EXPORT Marshalling(const UnifiedData &input, MessageParcel &parcel);
@@ -73,10 +72,6 @@ bool API_EXPORT Marshalling(const Intention &input, MessageParcel &parcel);
 template<>
 bool API_EXPORT Unmarshalling(Intention &output, MessageParcel &parcel);
 
-template<>
-bool API_EXPORT Marshalling(const AsyncProcessInfo &input, MessageParcel &parcel);
-template<>
-bool API_EXPORT Unmarshalling(AsyncProcessInfo &output, MessageParcel &parcel);
 } // namespace ITypesUtil
 } // namespace OHOS
 #endif // UDMF_TYPES_UTIL_H

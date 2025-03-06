@@ -196,7 +196,7 @@ bool Unmarshalling(Intention &output, MessageParcel &parcel)
 }
 
 template<>
-bool Marshalling(const AsyncProcessInfo &input, MessageParcel &parcel)
+bool API_EXPORT Marshalling(const AsyncProcessInfo &input, MessageParcel &parcel)
 {
     uint32_t syncStatus = input.syncStatus;
     uint32_t permStatus = input.permStatus;
@@ -205,7 +205,7 @@ bool Marshalling(const AsyncProcessInfo &input, MessageParcel &parcel)
 }
 
 template<>
-bool Unmarshalling(AsyncProcessInfo &output, MessageParcel &parcel)
+bool API_EXPORT Unmarshalling(AsyncProcessInfo &output, MessageParcel &parcel)
 {
     uint32_t syncStatus;
     uint32_t permStatus;

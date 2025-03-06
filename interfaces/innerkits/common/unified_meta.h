@@ -52,19 +52,21 @@ constexpr const char* ARRAY_BUFFER_LENGTH = "arrayBufferLen";
 constexpr const char *FORMID = "formId";
 constexpr const char *FORMNAME = "formName";
 constexpr const char *MODULE = "module";
+constexpr const char* BUNDLENAME = "bundleName";
+constexpr const char* ABILITYNAME = "abilityName";
 constexpr const char *ORI_URI = "oriUri";
 constexpr const char *REMOTE_URI = "remoteUri";
-constexpr const char *APPLICATION_DEFINED_TYPE = "applicationDefinedType";
-constexpr const char *RAW_DATA = "rawData";
 constexpr const char *DETAILS = "details";
 constexpr const char *VALUE_TYPE = "VALUE_TYPE";
+constexpr const char *APPLICATION_DEFINED_TYPE = "applicationDefinedType";
+constexpr const char *RAW_DATA = "rawData";
 constexpr const char *THUMB_DATA = "thumbData";
 constexpr const char *THUMB_DATA_LENGTH = "thumbDataLen";
 constexpr const char *TITLE = "title";
 constexpr const char* APP_ICON = "appIcon";
 constexpr const char* APP_ICON_LENGTH = "appIconLen";
 constexpr const char* LINK_URL = "linkUrl";
-constexpr const char* APPLICATION_DEFINED_RECORD_MARK = "applicationDefinedRecordMark";
+constexpr const char *APPLICATION_DEFINED_RECORD_MARK = "applicationDefinedRecordMark";
 
 enum UDType : int32_t {
     ENTITY = 0,
@@ -530,8 +532,6 @@ enum UDType : int32_t {
     CONTENT_FORM,
     M4P_AUDIO,
     AC3_AUDIO,
-    OPENHARMONY_HSP,
-    OPENHARMONY_HAR,
     OPENHARMONY_GOPAINT,
     OPENHARMONY_GOBRUSH,
     OPENHARMONY_GOBRUSHES,

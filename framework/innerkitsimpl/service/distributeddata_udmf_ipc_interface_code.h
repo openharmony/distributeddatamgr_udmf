@@ -34,7 +34,6 @@ enum class UdmfServiceInterfaceCode : uint32_t {
     REMOVE_APP_SHARE_OPTION,
     OBTAIN_ASYN_PROCESS,
     CLEAR_ASYN_PROCESS_BY_KEY,
-    INVOKEN_HAP,
     CODE_BUTT
 };
 } // namespace OHOS::UDMF

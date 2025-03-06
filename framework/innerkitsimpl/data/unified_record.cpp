@@ -112,6 +112,7 @@ bool UnifiedRecord::HasType(const std::string &utdId) const
 
 void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (utdId == utdId_ || utdId_.empty()) {
         utdId_ = utdId;
         value_ = std::move(value);
@@ -128,6 +129,7 @@ void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
 
 ValueType UnifiedRecord::GetEntry(const std::string &utdId)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (utdId_ == utdId && !(std::holds_alternative<std::monostate>(value_))) {
         return value_;
     }
@@ -138,6 +140,10 @@ ValueType UnifiedRecord::GetEntry(const std::string &utdId)
     auto getter = GetterSystem::GetInstance().GetGetter(channelName_);
     if (getter != nullptr && (utdId_ == utdId || it != entries_->end())) {
         auto value = getter->GetValueByType(dataId_, recordId_, utdId);
+        if (std::holds_alternative<std::monostate>(value)) {
+            LOG_ERROR(UDMF_FRAMEWORK, "get value failed, utdId: %{public}s", utdId.c_str());
+            return std::monostate();
+        }
         AddEntry(utdId, ValueType(value));
         return value;
     }

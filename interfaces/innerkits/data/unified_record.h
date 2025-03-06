@@ -32,6 +32,11 @@ public:
     UnifiedRecord(UDType type, ValueType value);
     virtual ~UnifiedRecord() = default;
 
+    UnifiedRecord(const UnifiedRecord& other) = delete;
+    UnifiedRecord& operator=(const UnifiedRecord& other) = delete;
+    UnifiedRecord(UnifiedRecord &&other) = delete;
+    UnifiedRecord& operator=(UnifiedRecord &&other) = delete;
+
     UDType GetType() const;
     std::vector<std::string> GetTypes() const;
     void SetType(const UDType &type);
@@ -81,6 +86,7 @@ private:
     uint32_t recordId_ = 0;
     std::string channelName_;
     std::shared_ptr<EntryGetter> entryGetter_;
+    mutable std::recursive_mutex mutex_;
 };
 } // namespace UDMF
 } // namespace OHOS

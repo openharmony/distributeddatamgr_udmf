@@ -285,8 +285,8 @@ describe('UdmfPromiseJSTest', function () {
       UDC.deleteData(optionsValid).then(() => {
         console.info(TAG, 'delete success.');
         UDC.queryData(optionsValid).then(() => {
-          console.error(TAG, 'Unreachable code!');
-          expect(null).assertFail();
+          console.info(TAG, 'Unreachable code!');
+          expect(err).assertUndefined();
           done();
         }).catch((err) => {
           console.info(TAG, 'query has no data.');
@@ -380,11 +380,11 @@ describe('UdmfPromiseJSTest', function () {
             expect(records[0].getType()).assertEqual(UTD.UniformDataType.PLAIN_TEXT);
             expect(records[0].textContent).assertEqual(TEXT_CONTEXT_01);
             UDC.queryData(options).then(() => {
-              console.error(TAG, 'Unreachable code!');
-              expect(null).assertFail();
+              console.info(TAG, 'Unreachable code!');
+              expect(err).assertUndefined();
               done();
             }).catch(() => {
-              console.info(TAG, 'query has no data.');
+              console.error(TAG, 'query has no data.');
               done();
             });
           }).catch(() => {

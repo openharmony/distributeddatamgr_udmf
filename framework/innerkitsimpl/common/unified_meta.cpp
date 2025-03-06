@@ -501,8 +501,6 @@ static constexpr UtdType UTD_TYPES[] = {
     { CONTENT_FORM, "CONTENT_FORM", "general.content-form" },
     { M4P_AUDIO, "M4P_AUDIO", "com.apple.m4p-audio" },
     { AC3_AUDIO, "AC3_AUDIO", "general.ac3-audio" },
-    { OPENHARMONY_HSP, "OPENHARMONY_HSP", "openharmony.hsp" },
-    { OPENHARMONY_HAR, "OPENHARMONY_HAR", "openharmony.har" },
     { OPENHARMONY_GOPAINT, "OPENHARMONY_GOPAINT", "openharmony.gopaint" },
     { OPENHARMONY_GOBRUSH, "OPENHARMONY_GOBRUSH", "openharmony.gobrush" },
     { OPENHARMONY_GOBRUSHES, "OPENHARMONY_GOBRUSHES", "openharmony.gobrushes" },
@@ -683,6 +681,9 @@ std::shared_ptr<Object> ObjectUtils::ConvertToObject(UDDetails &details)
 UDDetails ObjectUtils::ConvertToUDDetails(std::shared_ptr<Object> object)
 {
     UDDetails details;
+    if (object == nullptr) {
+        return details;
+    }
     for (auto [key, value] : object->value_) {
         if (!ConvertVariant(std::move(value), details[key])) {
             LOG_ERROR(UnifiedRecord, "object convert to UDDetails failed, object key is %{public}s", key.c_str());

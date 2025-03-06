@@ -46,6 +46,12 @@ public:
 
     static bool CheckValue(const ValueType &value);
 private:
+    constexpr static const char *APPID = "appId";
+    constexpr static const char *APPNAME = "appName";
+    constexpr static const char *APPICONID = "appIconId";
+    constexpr static const char *APPLABELID = "appLabelId";
+    constexpr static const char *BUNDLENAME = "bundleName";
+    constexpr static const char *ABILITYNAME = "abilityName";
     std::string appId_;
     std::string appName_;
     std::string appIconId_;

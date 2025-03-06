@@ -136,7 +136,7 @@ template <typename T> bool ReadTlv(T &output, TLVObject &data, TAG tag)
     return true;
 }
 
-template <typename T> void InitWhenFirst(const T &input, TLVObject &data)
+template <typename T> void InitWhenFirst(T &input, TLVObject &data)
 {
     if (data.GetCursor() == data.GetTotal()) {
         CountBufferSize(input, data);
