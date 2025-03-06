@@ -72,10 +72,6 @@ void UdmfCopyFile::HandleUris(CopyContext &context)
         if (record == nullptr) {
             continue;
         }
-        if (!record->HasType(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML))) {
-            context.processedData->AddRecord(record);
-            continue;
-        }
         for (auto &uri : record->GetUris()) {
             std::string srcUri = uri.dfsUri.empty() ? uri.authUri : uri.dfsUri;
             if (IsDirectory(srcUri, true)) {
@@ -98,7 +94,7 @@ void UdmfCopyFile::HandleUris(CopyContext &context)
     UnifiedHtmlRecordProcess::RebuildHtmlRecord(*(context.asyncHelper->data));
 }
 
-void UdmfCopyFile::UpdateUriInfo(const std::string destUri, const std::shared_ptr<UnifiedRecord> &record,
+void UdmfCopyFile::UpdateUriInfo(const std::string &destUri, const std::shared_ptr<UnifiedRecord> &record,
     UriInfo uri)
 {
     record->ComputeUris([&destUri, &uri] (UriInfo &uriInfo) {
@@ -118,7 +114,7 @@ void UdmfCopyFile::UpdateUriInfo(const std::string destUri, const std::shared_pt
 bool UdmfCopyFile::HandleRecord(const std::shared_ptr<UnifiedRecord> &record, CopyContext &context)
 {
     std::string srcUri;
-    if (!record->HasFileType(srcUri)) {
+    if (!record->HasFileType(srcUri) && !record->HasType(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML))) {
         context.processedData->AddRecord(record);
         return true;
     }
