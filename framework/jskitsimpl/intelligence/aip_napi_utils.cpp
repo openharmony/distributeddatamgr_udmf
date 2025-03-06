@@ -25,6 +25,8 @@
 namespace OHOS {
 namespace DataIntelligence {
 namespace {
+static constexpr uint8_t CONFIG_LENGTH_1 = 2;
+static constexpr uint8_t CONFIG_LENGTH_2 = 3;
 static constexpr uint32_t MAX_STR_PARAM_LEN = 512;
 } // namespace
 bool AipNapiUtils::LoadAlgoLibrary(const std::string &algoPath, AipCoreManagerHandle &aipMgrHandler)
@@ -270,7 +272,7 @@ void AipNapiUtils::SetPropertyName(napi_env env, napi_value targetObj, const cha
     }
 }
 
-bool AipNapiUtils::CheckModelConfig(napi_env env, napi_value value, uint32_t &length)
+bool AipNapiUtils::CheckModelConfig(napi_env env, napi_value value)
 {
     napi_valuetype valuetype;
     napi_status status = napi_typeof(env, value, &valuetype);
@@ -286,9 +288,15 @@ bool AipNapiUtils::CheckModelConfig(napi_env env, napi_value value, uint32_t &le
         return false;
     }
 
+    uint32_t length;
     status = napi_get_array_length(env, KeysArray, &length);
     if (status != napi_ok) {
         AIP_HILOGE("Failed to get array length");
+        return false;
+    }
+
+    if (length != CONFIG_LENGTH_1 && length != CONFIG_LENGTH_2) {
+        AIP_HILOGE("The modelConfig length is failed");
         return false;
     }
     return true;
