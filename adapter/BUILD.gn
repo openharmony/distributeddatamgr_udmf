@@ -77,7 +77,6 @@ config("arkui_x_udmf_config") {
 arkui_x_public_source = [
   "${udmf_framework_path}/innerkitsimpl/client/getter_system.cpp",
   "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
-  "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
@@ -97,6 +96,7 @@ arkui_x_public_source = [
   "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/video.cpp",
+  "${udmf_root_path}/adapter/framework/innerkitsimpl/common/unified_meta.cpp",
 ]
 
 ohos_source_set("arkui_x_udmf_data") {
