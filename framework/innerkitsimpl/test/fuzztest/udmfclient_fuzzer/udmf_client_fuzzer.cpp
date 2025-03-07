@@ -41,6 +41,8 @@ using namespace OHOS::Security::AccessToken;
 using namespace OHOS::UDMF;
 
 namespace OHOS {
+static constexpr int END_INTERVAL = 3;
+
 void AllocHapToken()
 {
     HapInfoParams info = {
@@ -86,7 +88,7 @@ void SetUpTestCase()
 
 void TearDown()
 {
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(std::chrono::seconds(END_INTERVAL));
 }
 
 void SetNativeToken()
