@@ -40,7 +40,7 @@ static constexpr uint32_t MAX_STR_PARAM_LEN = 512;
 static const std::string CLASS_NAME = "TextEmbedding";
 const std::vector<std::string> EXPECTED_SPLITTEXT_ARG_TYPES = { "string", "object" };
 const std::vector<std::string> EXPECTED_GET_TEXT_MODEL_ARG_TYPES = { "object" };
-const std::string AIP_MANAGER_PATH = "libaip_core.z.so";
+constexpr const char *AIP_MANAGER_PATH = "libaip_core.z.so";
 } // namespace
 AipCoreManagerHandle TextEmbeddingNapi::textAipCoreMgrHandle_{};
 thread_local napi_ref TextEmbeddingNapi::sConstructor_ = nullptr;

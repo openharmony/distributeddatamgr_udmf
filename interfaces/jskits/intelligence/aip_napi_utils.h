@@ -16,10 +16,11 @@
 #ifndef AIP_NAPI_UTILS_H
 #define AIP_NAPI_UTILS_H
 
+#include <type_traits>
+
 #include "i_aip_core_manager.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include <type_traits>
 
 namespace OHOS {
 namespace DataIntelligence {
@@ -56,12 +57,11 @@ public:
     static napi_status Convert2Value(napi_env env, napi_value in, std::string &out);
     static napi_status Convert2Value(napi_env env, napi_value in, std::vector<float> &out);
 
-    // 辅助模板类，判断 T 是否为 std::shared_ptr
     template <typename T>
     struct is_shared_ptr : std::false_type {};
     template <typename U>
     struct is_shared_ptr<std::shared_ptr<U>> : std::true_type {};
-    // 非shared_ptr
+
     template<typename T>
     static typename std::enable_if<!is_shared_ptr<T>::value, napi_status>::type
         Convert2Value(napi_env env, napi_value in, T &out);
