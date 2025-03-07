@@ -152,7 +152,7 @@ Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
 {
     LOG_INFO(UDMF_CLIENT, "InvokeHap start!");
     auto &asyncHelper = asyncHelperMap_.at(businessUdKey);
-    if (asyncHelper->progressQueue.IsCancel()) {
+    if (asyncHelper->progressQueue.IsCancel() || asyncHelper->progressQueue.IsClear()) {
         LOG_INFO(UDMF_CLIENT, "Finished, not invoke hap.");
         Clear(businessUdKey);
         return E_OK;

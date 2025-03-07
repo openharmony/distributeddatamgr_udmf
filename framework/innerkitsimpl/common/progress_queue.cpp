@@ -59,4 +59,10 @@ bool ProgressQueue::Clear()
     return oldClearableFlag;
 }
 
+bool ProgressQueue::IsClear() const
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return clearableFlag_;
+}
+
 } // namespace OHOS::UDMF
