@@ -20,6 +20,15 @@ namespace UDMF {
 constexpr int32_t STR_MAX_LENGTH = 4096;
 constexpr size_t STR_TAIL_LENGTH = 1;
 
+static const std::map<napi_valuetype, ValueType> objectValueTypeMap = {
+    {napi_valuetype::napi_number, double()},
+    {napi_valuetype::napi_string, std::string()},
+    {napi_valuetype::napi_boolean, bool()},
+    {napi_valuetype::napi_undefined, std::monostate()},
+    {napi_valuetype::napi_null, nullptr}
+};
+
+static const std::set<std::string> udsAttributeKeySet = {"details", "thumbData", "appicon"};
 /* napi_value <-> bool */
 napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, bool &out)
 {
@@ -166,18 +175,26 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::vector<uin
 {
     out.clear();
     LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> std::vector<uint8_t> ");
+
+    bool isTypedArray = false;
+    auto status = napi_is_typedarray(env, in, &isTypedArray);
+    if (status != napi_ok || !isTypedArray) {
+        return napi_invalid_arg;
+    }
+
     napi_typedarray_type type = napi_biguint64_array;
     size_t length = 0;
     napi_value buffer = nullptr;
     size_t offset = 0;
     void *data = nullptr;
-    napi_status status = napi_get_typedarray_info(env, in, &type, &length, &data, &buffer, &offset);
+    status = napi_get_typedarray_info(env, in, &type, &length, &data, &buffer, &offset);
     LOG_DEBUG(UDMF_KITS_NAPI, "array type=%{public}d length=%{public}d offset=%{public}d  status=%{public}d",
         (int)type, (int)length, (int)offset, status);
     LOG_ERROR_RETURN(status == napi_ok, "napi_get_typedarray_info failed!", napi_invalid_arg);
     LOG_ERROR_RETURN(type == napi_uint8_array, "is not Uint8Array!", napi_invalid_arg);
-    LOG_ERROR_RETURN((length > 0) && (data != nullptr), "invalid data!", napi_invalid_arg);
-    out.assign(reinterpret_cast<uint8_t *>(data), reinterpret_cast<uint8_t *>(data) + length);
+    if (length > 0) {
+        out.assign(static_cast<uint8_t *>(data), static_cast<uint8_t *>(data) + length);
+    }
     return status;
 }
 
@@ -445,33 +462,20 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
         }
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL_BASE(env, napi_typeof(env, attributeValueNapi, &valueType), napi_invalid_arg);
-        switch (valueType) {
-            case napi_valuetype::napi_object:
-                if (attributeName == PIXEL_MAP) {
-                    object->value_[attributeName] = std::shared_ptr<OHOS::Media::PixelMap>();
-                } else {
-                    object->value_[attributeName] = std::make_shared<Object>();
-                }
-                break;
-            case napi_valuetype::napi_number:
-                object->value_[attributeName] = double();
-                break;
-            case napi_valuetype::napi_string:
-                object->value_[attributeName] = std::string();
-                break;
-            case napi_valuetype::napi_boolean:
-                object->value_[attributeName] = bool();
-                break;
-            case napi_valuetype::napi_undefined:
-                object->value_[attributeName] = std::monostate();
-                break;
-            case napi_valuetype::napi_null:
-                object->value_[attributeName] = nullptr;
-                break;
-            default:
-                return napi_invalid_arg;
-        }
         napi_status status = napi_ok;
+        if (valueType == napi_valuetype::napi_object) {
+            status = ProcessNapiObject(env, in, attributeName, attributeValueNapi, object);
+            if (status != napi_ok) {
+                return status;
+            }
+        } else {
+            auto it = objectValueTypeMap.find(valueType);
+            if (it != objectValueTypeMap.end()) {
+                object->value_[attributeName] = it->second;
+            } else {
+                return napi_invalid_arg;
+            }
+        }
         std::visit([&](auto &value) {status = NapiDataUtils::GetValue(env, attributeValueNapi, value);},
             object->value_[attributeName]);
         if (status != napi_ok) {
@@ -481,13 +485,46 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
     return napi_ok;
 }
 
+napi_status NapiDataUtils::ProcessNapiObject(napi_env env, napi_value in, std::string &attributeName,
+    napi_value attributeValueNapi, std::shared_ptr<Object> object)
+{
+    if (attributeName == PIXEL_MAP) {
+        object->value_[attributeName] = std::shared_ptr<OHOS::Media::PixelMap>();
+        return napi_ok;
+    }
+    bool isUint8Array = false;
+    napi_value constructor = nullptr;
+    NAPI_CALL_BASE(env, napi_get_named_property(env, attributeValueNapi, "constructor", &constructor),
+        napi_invalid_arg);
+    napi_value global = nullptr;
+    NAPI_CALL_BASE(env, napi_get_global(env, &global), napi_invalid_arg);
+    napi_value uint8ArrayConstructor = nullptr;
+    NAPI_CALL_BASE(env, napi_get_named_property(env, global, "Uint8Array", &uint8ArrayConstructor), napi_invalid_arg);
+    NAPI_CALL_BASE(env, napi_strict_equals(env, constructor, uint8ArrayConstructor, &isUint8Array), napi_invalid_arg);
+    if (isUint8Array && (udsAttributeKeySet.find(attributeName) != udsAttributeKeySet.end())) {
+        napi_value jsProValue = nullptr;
+        NAPI_CALL_BASE(env, napi_get_named_property(env, in, attributeName.c_str(), &jsProValue), napi_invalid_arg);
+        std::vector<uint8_t> array;
+        auto status = GetValue(env, jsProValue, array);
+        if (status != napi_ok) {
+            LOG_ERROR(UDMF_KITS_NAPI, "Get Uint8Array error: %{public}d", status);
+            return status;
+        }
+        object->value_[attributeName] = array;
+        return napi_ok;
+    }
+    object->value_[attributeName] = std::make_shared<Object>();
+    return napi_ok;
+}
+
 napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<Object> &object, napi_value &out)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> std::GetValue Object");
     napi_create_object(env, &out);
     for (auto &[key, value] : object->value_) {
         napi_value valueNapi = nullptr;
-        if (std::holds_alternative<std::vector<uint8_t>>(value)) {
+        if (std::holds_alternative<std::vector<uint8_t>>(value) &&
+            (udsAttributeKeySet.find(key) == udsAttributeKeySet.end())) {
             auto array = std::get<std::vector<uint8_t>>(value);
             void *data = nullptr;
             size_t len = array.size();
@@ -496,6 +533,18 @@ napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<Object> 
                 LOG_ERROR(UDMF_KITS_NAPI, "memcpy_s failed");
                 return napi_generic_failure;
             }
+        } else if (std::holds_alternative<std::vector<uint8_t>>(value) &&
+            (udsAttributeKeySet.find(key) != udsAttributeKeySet.end())) {
+                auto array = std::get<std::vector<uint8_t>>(value);
+                void *data = nullptr;
+                napi_value buffer = nullptr;
+                NAPI_CALL_BASE(env, napi_create_arraybuffer(env, array.size(), &data, &buffer), napi_generic_failure);
+                if (!array.empty() && memcpy_s(data, array.size(), array.data(), array.size()) != 0) {
+                    LOG_ERROR(UDMF_KITS_NAPI, "memcpy_s failed");
+                    return napi_generic_failure;
+                }
+                NAPI_CALL_BASE(env, napi_create_typedarray(env, napi_uint8_array, array.size(), buffer, 0, &valueNapi),
+                    napi_generic_failure);
         } else {
             std::visit([&](const auto &value) {NapiDataUtils::SetValue(env, value, valueNapi);}, value);
         }

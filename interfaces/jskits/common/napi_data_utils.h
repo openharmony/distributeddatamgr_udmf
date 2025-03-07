@@ -131,6 +131,9 @@ private:
         TUPLE_SIZE
     };
     static constexpr int32_t STR_MAX_SIZE = 256;
+
+    static napi_status ProcessNapiObject(napi_env env, napi_value in, std::string &attributeName,
+        napi_value attributeValueNapi, std::shared_ptr<Object> object);
 };
 
 #define LOG_ERROR_RETURN(condition, message, retVal)                             \
