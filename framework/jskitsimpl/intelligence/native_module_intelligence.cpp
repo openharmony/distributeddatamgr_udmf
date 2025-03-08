@@ -27,6 +27,7 @@ static napi_value Export(napi_env env, napi_value exports)
     AIP_HILOGD("NativeModuleIntelligence call");
     TextEmbeddingNapi::Init(env, exports);
     ImageEmbeddingNapi::Init(env, exports);
+    RetrievalNapi::Init(env, exports);
     return exports;
 }
 
