@@ -35,6 +35,7 @@ static constexpr uint8_t ARG_2 = 2;
 
 static constexpr uint8_t NUM_0 = 0;
 static constexpr uint8_t NUM_1 = 1;
+static constexpr uint8_t BASIC_MODEL = 0;
 static constexpr uint32_t MAX_STR_PARAM_LEN = 512;
 static const std::string CLASS_NAME = "TextEmbedding";
 const std::vector<std::string> EXPECTED_SPLITTEXT_ARG_TYPES = { "string", "object" };
@@ -169,6 +170,16 @@ napi_value TextEmbeddingNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("splitText", SplitText),
     };
 
+    napi_value modelVersion;
+    napi_status status = napi_create_object(env, &modelVersion);
+    if (status != napi_ok) {
+        AIP_HILOGE("Failed create object");
+        return nullptr;
+    }
+
+    AipNapiUtils::SetInt32Property(env, modelVersion, BASIC_MODEL, "BASIC_MODEL");
+    AipNapiUtils::SetPropertyName(env, exports, "ModelVersion", modelVersion);
+
     struct TextEmbeddingConstructorInfo info = {
         .className = CLASS_NAME,
         .classRef = &sConstructor_,
@@ -265,13 +276,29 @@ napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_
 bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *textModelConfig)
 {
     AIP_HILOGI("Enter");
-    napi_value version;
-    napi_value isNPUAvailable;
-    napi_value cachePath;
+    if (textModelConfig == nullptr) {
+        AIP_HILOGE("The modelConfig is null");
+        return false;
+    }
+    if (!AipNapiUtils::CheckModelConfig(env, args[ARG_0])) {
+        AIP_HILOGE("The modelConfig is failed");
+        return false;
+    }
 
+    napi_value version, isNPUAvailable, cachePath;
     napi_status status = napi_get_named_property(env, args[ARG_0], "version", &version);
     if (status != napi_ok) {
         AIP_HILOGE("napi get version property failed");
+        return false;
+    }
+
+    if (!AipNapiUtils::TransJsToInt32(env, version, textModelConfig->versionValue)) {
+        AIP_HILOGE("Trans version failed");
+        return false;
+    }
+
+    if (textModelConfig->versionValue != BASIC_MODEL) {
+        AIP_HILOGE("The version value is invalid");
         return false;
     }
 
@@ -281,25 +308,24 @@ bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t 
         return false;
     }
 
-    status = napi_get_named_property(env, args[ARG_0], "cachePath", &cachePath);
-    if (status != napi_ok) {
-        AIP_HILOGE("napi get cachePath property failed");
-        return false;
-    }
-
-    if (!AipNapiUtils::TransJsToInt32(env, version, textModelConfig->versionValue)) {
-        AIP_HILOGE("Trans version failed");
-        return false;
-    }
-
     if (!AipNapiUtils::TransJsToBool(env, isNPUAvailable, textModelConfig->isNPUAvailableValue)) {
         AIP_HILOGE("Trans isNPUAvailable failed");
         return false;
     }
 
-    if (!AipNapiUtils::TransJsToStr(env, cachePath, textModelConfig->cachePathValue)) {
-        AIP_HILOGE("Trans cachePath failed");
-        return false;
+    if (textModelConfig->isNPUAvailableValue) {
+        status = napi_get_named_property(env, args[ARG_0], "cachePath", &cachePath);
+        if (status != napi_ok) {
+            AIP_HILOGE("napi get cachePath property failed");
+            return false;
+        }
+
+        if (!AipNapiUtils::TransJsToStr(env, cachePath, textModelConfig->cachePathValue)) {
+            AIP_HILOGE("Trans cachePath failed");
+            return false;
+        }
+    } else {
+        textModelConfig->cachePathValue = "";
     }
     return true;
 }
@@ -411,7 +437,6 @@ napi_value TextEmbeddingNapi::SplitText(napi_env env, napi_callback_info info)
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "TransJsToStrUnlimited failed");
         return nullptr;
     }
-    AIP_HILOGI("string strArg: %{public}s", strArg.c_str());
 
     napi_value cfgSize;
     napi_value cfgOverlap;
@@ -424,8 +449,12 @@ napi_value TextEmbeddingNapi::SplitText(napi_env env, napi_callback_info info)
     double configOverlap;
     AipNapiUtils::TransJsToInt32(env, cfgSize, configSize);
     AipNapiUtils::TransJsToDouble(env, cfgOverlap, configOverlap);
-    AIP_HILOGI("string strArg: %{public}d", configSize);
-    AIP_HILOGI("string strArg: %{public}f", configOverlap);
+    AIP_HILOGD("string strArg: %{public}d", configSize);
+    AIP_HILOGD("string strArg: %{public}f", configOverlap);
+    if (configSize <= NUM_0 || configOverlap < NUM_0 || configOverlap >= NUM_1) {
+        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "The parameter value range is incorrect");
+        return nullptr;
+    }
 
     napi_value promise = nullptr;
     napi_deferred deferred = nullptr;

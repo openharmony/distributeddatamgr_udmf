@@ -33,6 +33,7 @@ static constexpr uint8_t ARG_0 = 0;
 static constexpr uint8_t ARG_1 = 1;
 static constexpr uint8_t NUM_0 = 0;
 static constexpr uint8_t NUM_1 = 1;
+static constexpr uint8_t BASIC_MODEL = 0;
 static const std::string CLASS_NAME = "ImageEmbedding";
 const std::vector<std::string> EXPECTED_GET_ARG_TYPES = { "string" };
 const std::vector<std::string> EXPECTED_GET_IMG_MODEL_ARG_TYPES = { "object" };
@@ -248,13 +249,29 @@ napi_value ImageEmbeddingNapi::GetImageEmbeddingModel(napi_env env, napi_callbac
 bool ImageEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *modelConfig)
 {
     AIP_HILOGI("Enter");
-    napi_value version;
-    napi_value isNPUAvailable;
-    napi_value cachePath;
+    if (modelConfig == nullptr) {
+        AIP_HILOGE("The modelConfig is null");
+        return false;
+    }
+    if (!AipNapiUtils::CheckModelConfig(env, args[ARG_0])) {
+        AIP_HILOGE("The modelConfig is failed");
+        return false;
+    }
 
+    napi_value version, isNPUAvailable, cachePath;
     napi_status status = napi_get_named_property(env, args[ARG_0], "version", &version);
     if (status != napi_ok) {
         AIP_HILOGE("napi get version property failed");
+        return false;
+    }
+
+    if (!AipNapiUtils::TransJsToInt32(env, version, modelConfig->versionValue)) {
+        AIP_HILOGE("Trans version failed");
+        return false;
+    }
+
+    if (modelConfig->versionValue != BASIC_MODEL) {
+        AIP_HILOGE("The version value is invalid");
         return false;
     }
 
@@ -264,25 +281,24 @@ bool ImageEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t
         return false;
     }
 
-    status = napi_get_named_property(env, args[ARG_0], "cachePath", &cachePath);
-    if (status != napi_ok) {
-        AIP_HILOGE("napi get cachePath property failed");
-        return false;
-    }
-
-    if (!AipNapiUtils::TransJsToInt32(env, version, modelConfig->versionValue)) {
-        AIP_HILOGE("Trans version failed");
-        return false;
-    }
-
     if (!AipNapiUtils::TransJsToBool(env, isNPUAvailable, modelConfig->isNPUAvailableValue)) {
         AIP_HILOGE("Trans isNPUAvailable failed");
         return false;
     }
 
-    if (!AipNapiUtils::TransJsToStr(env, cachePath, modelConfig->cachePathValue)) {
-        AIP_HILOGE("Trans cachePath failed");
-        return false;
+    if (modelConfig->isNPUAvailableValue) {
+        status = napi_get_named_property(env, args[ARG_0], "cachePath", &cachePath);
+        if (status != napi_ok) {
+            AIP_HILOGE("napi get cachePath property failed");
+            return false;
+        }
+
+        if (!AipNapiUtils::TransJsToStr(env, cachePath, modelConfig->cachePathValue)) {
+            AIP_HILOGE("Trans cachePath failed");
+            return false;
+        }
+    } else {
+        modelConfig->cachePathValue = "";
     }
     return true;
 }
