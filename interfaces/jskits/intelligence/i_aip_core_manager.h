@@ -28,13 +28,51 @@ struct ModelConfigData {
     std::string cachePathValue;
 };
 
+struct CryptoParam {
+    mutable int32_t iterNum = 0;
+    int32_t encryptAlgo = 0;
+    int32_t hmacAlgo = 1;
+    int32_t kdfAlgo = 1;
+    uint32_t cryptoPageSize = 1024;
+    mutable std::vector<uint8_t> encryptKey_{};
+};
+
+struct RdbConfig {
+    bool isEncrypt = false;
+    bool isSearchable = false;
+    bool isAutoClean = true;
+    bool vector = false;
+    bool allowRebuild = false;
+    bool isReadOnly = false;
+    int32_t securityLevel = 5;
+    int32_t tokenizer = 0;
+    std::string dataGroupId;
+    std::string name;
+    std::string customDir;
+    std::string rootDir;
+    std::string path;
+    std::vector<std::string> pluginLibs = {};
+    int32_t haMode = 0;
+    CryptoParam cryptoParam;
+};
+
+struct ContextParam {
+    std::string bundleName;
+    std::string moduleName;
+    std::string baseDir;
+    int32_t area;
+    bool isSystemApp = false;
+    bool isStageMode = true;
+};
+
 using Blob = std::vector<uint8_t>;
 using Bigint = std::vector<uint64_t>;
 using FloatVector = std::vector<float>;
 using FieldType = std::variant<int64_t, int32_t, double, std::string, bool, Blob, Bigint, FloatVector>;
 struct ChannelConfigStruct {
     int32_t channelType;
-    std::string channelUri;
+    RdbConfig dbConfig;
+    ContextParam context;
 };
 
 enum TsChannelType {
