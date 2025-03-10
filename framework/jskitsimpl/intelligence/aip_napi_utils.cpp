@@ -35,6 +35,10 @@ static constexpr uint8_t CONFIG_LENGTH_2 = 3;
 static constexpr uint32_t MAX_STR_PARAM_LEN = 512;
 static constexpr int32_t MIN_SECURITY_LEVEL = 1;
 static constexpr int32_t MAX_SECURITY_LEVEL = 4;
+static constexpr uint32_t MAX_STR_CUSTOMDIR_LEN = 128;
+static constexpr uint32_t MAX_STR_REAL_PATH_LEN = 1024;
+constexpr int E_OK = 0;
+constexpr const char *PATH_SPLIT = "/";
 struct OperatorInfo {
     const char *operatorStr;
     int32_t operatorEnum;
@@ -374,7 +378,7 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, std::vector
     }
 
     out = (tmp != nullptr ? std::vector<uint8_t>(static_cast<uint8_t *>(tmp), static_cast<uint8_t *>(tmp) + length)
-                             : std::vector<uint8_t>());
+        : std::vector<uint8_t>());
     return status;
 }
 
@@ -470,6 +474,57 @@ std::pair<napi_status, napi_value> AipNapiUtils::GetInnerValue(
     return std::make_pair(napi_ok, inner);
 }
 
+std::string GetCustomDatabasePath(
+    const std::string &rootDir, const std::string &name, const std::string &customDir)
+{
+    std::string databasePath;
+    databasePath.append(rootDir).append(PATH_SPLIT).append(customDir).append(PATH_SPLIT).append(name);
+    return databasePath;
+}
+
+std::string GetDefaultDatabasePath(
+    const std::string &baseDir, const std::string &name, const std::string &customDir)
+{
+    std::string databaseDir;
+    databaseDir.append(baseDir).append("/rdb/").append(customDir).append(PATH_SPLIT).append(name);
+    return databaseDir;
+}
+
+napi_status GetRealPath(
+    napi_env env, napi_value jsValue, RdbConfig &rdbConfig, ContextParam &param)
+{
+    LOG_ERROR_RETURN(rdbConfig.name.find(PATH_SPLIT) == std::string::npos,
+        "rdbConfig.name must not contain '/'", napi_invalid_arg);
+    if (!rdbConfig.customDir.empty()) {
+        LOG_ERROR_RETURN(rdbConfig.customDir.find_first_of(PATH_SPLIT) != 0,
+            "rdbConfig.customDir must a relative directory.", napi_invalid_arg);
+        LOG_ERROR_RETURN(rdbConfig.customDir.length() <= MAX_STR_CUSTOMDIR_LEN,
+            "rdbConfig.customDir must less than or equal to 128 bytes.", napi_invalid_arg);
+    }
+    std::string baseDir = param.baseDir;
+    if (!rdbConfig.dataGroupId.empty()) {
+        LOG_ERROR_RETURN(param.isStageMode,
+            "The operation is supported in the stage model only.", napi_invalid_arg);
+        auto stageContext = JSAbility::GetStageModeContext(env, jsValue);
+        LOG_ERROR_RETURN(stageContext != nullptr, "Illegal context.", napi_invalid_arg);
+        std::string groupDir;
+        int errCode = stageContext->GetSystemDatabaseDir(rdbConfig.dataGroupId, groupDir);
+        LOG_ERROR_RETURN(errCode == E_OK || !groupDir.empty(), "Invalid data group ID.", napi_invalid_arg);
+        baseDir = groupDir;
+    }
+    if (!rdbConfig.rootDir.empty()) {
+        LOG_ERROR_RETURN(rdbConfig.rootDir.find_first_of(PATH_SPLIT) == 0, "rdbConfig.rootDir must start with '/'",
+            napi_invalid_arg);
+        auto realPath = GetCustomDatabasePath(rdbConfig.rootDir, rdbConfig.name, rdbConfig.customDir);
+        rdbConfig.path = realPath;
+        return napi_ok;
+    }
+    auto realPath = GetDefaultDatabasePath(baseDir, rdbConfig.name, rdbConfig.customDir);
+    LOG_ERROR_RETURN(realPath.length() <= MAX_STR_REAL_PATH_LEN, "database path is a valid path.", napi_invalid_arg);
+    rdbConfig.path = realPath;
+    return napi_ok;
+}
+
 napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, RetrievalConfigStruct &out)
 {
     napi_value channelConfigsNapi;
@@ -496,6 +551,8 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, RetrievalCo
         napi_get_named_property(env, channelConfigNapi, "context", &contextNapi);
         status = Convert2Value(env, contextNapi, channelConfig.context);
         LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field context.", napi_invalid_arg);
+        status = GetRealPath(env, contextNapi, channelConfig.dbConfig, channelConfig.context);
+        LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the realPath.", napi_invalid_arg);
         channelConfigs.push_back(channelConfig);
     }
     out.channelConfigs = channelConfigs;
@@ -1081,7 +1138,7 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, Cryp
     return napi_ok;
 }
 
-napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, napi_value &out)
+napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, napi_value &out)
 {
     out = in;
     return napi_ok;
