@@ -80,11 +80,11 @@ public:
     void API_EXPORT ComputeUris(const std::function<bool(UriInfo &)> &action);
 protected:
     UDType dataType_;
+    std::string utdId_;
     ValueType value_;
     bool hasObject_ = false;
 private:
     std::string uid_; // unique identifier
-    std::string utdId_;
     std::shared_ptr<std::map<std::string, ValueType>> entries_ = std::make_shared<std::map<std::string, ValueType>>();
     std::vector<UriInfo> uris_;
     uint32_t dataId_ = 0;

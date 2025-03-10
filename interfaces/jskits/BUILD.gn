@@ -80,6 +80,7 @@ ohos_shared_library("unifieddatachannel_napi") {
   deps = [
     "${third_party_path}/bounds_checking_function:libsec_shared",
     "../innerkits:udmf_client",
+    "../innerkits:utd_client",
     "../jskits:udmf_js_common",
   ]
 
@@ -187,6 +188,7 @@ ohos_shared_library("udmf_data_napi") {
   deps = [
     "${third_party_path}/bounds_checking_function:libsec_shared",
     "../innerkits:udmf_client",
+    "../innerkits:utd_client",
     "../jskits:udmf_js_common",
   ]
 

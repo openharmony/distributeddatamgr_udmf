@@ -40,7 +40,7 @@ public:
 
     std::vector<std::string> API_EXPORT GetTypesLabels() const;
     bool API_EXPORT HasType(const std::string &type) const;
-    bool HasHigherType(const std::string &type) const;
+    bool API_EXPORT HasHigherType(const std::string &type) const;
     std::vector<std::string> API_EXPORT GetEntriesTypes() const;
     bool API_EXPORT HasTypeInEntries(const std::string &type) const;
 
