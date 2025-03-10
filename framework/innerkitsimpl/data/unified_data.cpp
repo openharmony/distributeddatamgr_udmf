@@ -21,7 +21,8 @@ namespace OHOS {
 namespace UDMF {
 static const std::set<std::string> FILE_TYPES = {
     "general.file", "general.image", "general.video", "general.audio", "general.folder", "general.file-uri" };
-static const std::set<std::string> FILE_SUB_TYPES = {"general.image", "general.video", "general.audio", "general.folder"};
+static const std::set<std::string> FILE_SUB_TYPES =
+    {"general.image", "general.video", "general.audio", "general.folder"};
 UnifiedData::UnifiedData()
 {
     properties_ = std::make_shared<UnifiedDataProperties>();

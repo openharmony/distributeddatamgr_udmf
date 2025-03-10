@@ -24,7 +24,7 @@ namespace OHOS {
 namespace UDMF {
 static constexpr UDType FILE_TYPES[] = {FILE, AUDIO, FOLDER, IMAGE, VIDEO};
 static constexpr const char *FILE_SCHEME = "file";
-static const std::set<std::string> FILE_HIGHER_TYPES = {"general.image", "general.video", "general.audio", "general.folder"};
+static const std::set<std::string> FILE_SUB_TYPES = {"general.image", "general.video", "general.audio", "general.folder"};
 
 UnifiedRecord::UnifiedRecord()
 {
@@ -122,7 +122,7 @@ void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
         UtdClient::GetInstance().GetTypeDescriptor(utdId_, descriptor);
         bool isFileType = false;
         auto udType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(utdId_));
-        for (auto higherType : FILE_HIGHER_TYPES) {
+        for (auto higherType : FILE_SUB_TYPES) {
             descriptor->BelongsTo(higherType, isFileType);
             if (isFileType) {
                 udType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(higherType));

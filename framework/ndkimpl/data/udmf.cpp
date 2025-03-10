@@ -49,7 +49,8 @@ static const std::map<std::string, UDType> FILE_TYPES = {
     { UDMF_META_IMAGE, UDType::IMAGE },
     { UDMF_META_VIDEO, UDType::VIDEO }
 };
-static const std::set<std::string> FILE_SUB_TYPES = {"general.image", "general.video", "general.audio", "general.folder"};
+static const std::set<std::string> FILE_SUB_TYPES =
+    {"general.image", "general.video", "general.audio", "general.folder"};
 
 static void DestroyStringArray(char**& bufArray, unsigned int& count)
 {
