@@ -44,6 +44,49 @@ RetrievalNapi::~RetrievalNapi()
     AipNapiUtils::UnLoadAlgoLibrary(retrievalAipCoreMgrHandle_);
 }
 
+napi_status InitEnum(napi_env env, napi_value exports)
+{
+    napi_value channelTypeEnum;
+    napi_status status = napi_create_object(env, &channelTypeEnum);
+    LOG_ERROR_RETURN(status == napi_ok, "create napi object fail.", napi_invalid_arg);
+    AipNapiUtils::SetInt32Property(env, channelTypeEnum, TsChannelType::VECTOR_DATABASE, "VECTOR_DATABASE");
+    AipNapiUtils::SetInt32Property(env, channelTypeEnum, TsChannelType::INVERTED_INDEX_DATABASE,
+        "INVERTED_INDEX_DATABASE");
+    AipNapiUtils::SetPropertyName(env, exports, "ChannelType", channelTypeEnum);
+
+    napi_value operatorEnum;
+    status = napi_create_object(env, &operatorEnum);
+    LOG_ERROR_RETURN(status == napi_ok, "create napi object fail.", napi_invalid_arg);
+    AipNapiUtils::SetStringProperty(env, operatorEnum, "=", "OP_EQ");
+    AipNapiUtils::SetStringProperty(env, operatorEnum, "!=", "OP_NE");
+    AipNapiUtils::SetStringProperty(env, operatorEnum, "<", "OP_LT");
+    AipNapiUtils::SetStringProperty(env, operatorEnum, "<=", "OP_LE");
+    AipNapiUtils::SetStringProperty(env, operatorEnum, ">", "OP_GT");
+    AipNapiUtils::SetStringProperty(env, operatorEnum, ">=", "OP_GE");
+    AipNapiUtils::SetStringProperty(env, operatorEnum, "IN", "OP_IN");
+    AipNapiUtils::SetStringProperty(env, operatorEnum, "NOT_IN", "OP_NOT_IN");
+    AipNapiUtils::SetStringProperty(env, operatorEnum, "BETWEEN", "OP_BETWEEN");
+    AipNapiUtils::SetStringProperty(env, operatorEnum, "LIKE", "OP_LIKE");
+    AipNapiUtils::SetStringProperty(env, operatorEnum, "NOT_LIKE", "OP_NOT_LIKE");
+    AipNapiUtils::SetPropertyName(env, exports, "Operator", operatorEnum);
+
+    napi_value rerankTypeEnum;
+    status = napi_create_object(env, &rerankTypeEnum);
+    LOG_ERROR_RETURN(status == napi_ok, "create napi object fail.", napi_invalid_arg);
+    AipNapiUtils::SetInt32Property(env, rerankTypeEnum, TsRerankType::RRF, "RRF");
+    AipNapiUtils::SetInt32Property(env, rerankTypeEnum, TsRerankType::FUSION_SCORE, "FUSION_SCORE");
+    AipNapiUtils::SetPropertyName(env, exports, "RerankType", rerankTypeEnum);
+
+    napi_value similarityLevelEnum;
+    status = napi_create_object(env, &similarityLevelEnum);
+    LOG_ERROR_RETURN(status == napi_ok, "create napi object fail.", napi_invalid_arg);
+    AipNapiUtils::SetInt32Property(env, similarityLevelEnum, TsSimilarityLevel::LOW, "LOW");
+    AipNapiUtils::SetInt32Property(env, similarityLevelEnum, TsSimilarityLevel::MEDIUM, "MEDIUM");
+    AipNapiUtils::SetInt32Property(env, similarityLevelEnum, TsSimilarityLevel::HIGH, "HIGH");
+    AipNapiUtils::SetPropertyName(env, exports, "SimilarityLevel", similarityLevelEnum);
+    return napi_ok;
+}
+
 napi_value RetrievalNapi::Init(napi_env env, napi_value exports)
 {
     AIP_HILOGI("Init retrieval start.");
@@ -55,6 +98,8 @@ napi_value RetrievalNapi::Init(napi_env env, napi_value exports)
         AIP_HILOGE("define properties fail, status = %{public}d", status);
         return nullptr;
     }
+    status = InitEnum(env, exports);
+    LOG_ERROR_RETURN(status == napi_ok, "InitEnum fail.", nullptr);
     return exports;
 }
 

@@ -305,6 +305,17 @@ void AipNapiUtils::SetInt32Property(napi_env env, napi_value targetObj, int32_t 
     SetPropertyName(env, targetObj, propName, prop);
 }
 
+void AipNapiUtils::SetStringProperty(napi_env env, napi_value targetObj, std::string value, const char *propName)
+{
+    napi_value prop = nullptr;
+    napi_status ret = napi_create_string_utf8(env, value.c_str(), value.size(), &prop);
+    if (ret != napi_ok) {
+        AIP_HILOGE("napi_create_int32 failed");
+        return;
+    }
+    SetPropertyName(env, targetObj, propName, prop);
+}
+
 void AipNapiUtils::SetPropertyName(napi_env env, napi_value targetObj, const char *propName, napi_value propValue)
 {
     napi_status status = napi_set_named_property(env, targetObj, propName, propValue);

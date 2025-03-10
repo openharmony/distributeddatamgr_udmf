@@ -46,6 +46,7 @@ public:
         int32_t value);
     static void CreateDoubleData(napi_env env, double value, napi_value *result);
     static void SetInt32Property(napi_env env, napi_value targetObj, int32_t value, const char *propName);
+    static void SetStringProperty(napi_env env, napi_value targetObj, std::string value, const char *propName);
     static void SetPropertyName(napi_env env, napi_value targetObj, const char *propName, napi_value propValue);
     static bool CheckModelConfig(napi_env env, napi_value value);
 
