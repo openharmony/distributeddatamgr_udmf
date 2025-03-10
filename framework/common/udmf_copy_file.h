@@ -56,7 +56,7 @@ private:
     void HandleProgress(const std::string &srcUri, const std::string &destFileUri,
         CopyContext &context, uint64_t processSize);
     std::string ConstructDestUri(const std::string &destUri, const std::string &srcUri);
-    int64_t GetTotalSize(const std::vector<std::string> &uris);
+    uint64_t GetTotalSize(const std::vector<std::string> &uris);
     bool IsDirectory(const std::string &uri, bool isSource);
     std::string GetFileName(const std::string &path);
     bool IsRemote(const std::string &uri);

@@ -152,7 +152,7 @@ Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
 {
     LOG_INFO(UDMF_CLIENT, "InvokeHap start!");
     auto &asyncHelper = asyncHelperMap_.at(businessUdKey);
-    if (asyncHelper->progressQueue.IsCancel()) {
+    if (asyncHelper->progressQueue.IsCancel() || asyncHelper->progressQueue.IsClear()) {
         LOG_INFO(UDMF_CLIENT, "Finished, not invoke hap.");
         Clear(businessUdKey);
         return E_OK;
@@ -316,11 +316,12 @@ Status UdmfAsyncClient::UpdateProgressData(const std::string &progressUdKey, con
 
 Status UdmfAsyncClient::CopyFile(std::unique_ptr<AsyncHelper> &asyncHelper)
 {
+    auto status = E_OK;
     if (asyncHelper->destUri.empty()) {
         LOG_INFO(UDMF_CLIENT, "No dest path, no copy.");
-        return E_OK;
+    } else {
+        status = UdmfCopyFile::GetInstance().Copy(asyncHelper);
     }
-    auto status = UdmfCopyFile::GetInstance().Copy(asyncHelper);
     ProgressInfo progressInfo = {
         .progress = PROGRESS_ALL_FINISHED,
         .errorCode = status

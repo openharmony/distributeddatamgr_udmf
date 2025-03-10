@@ -28,6 +28,7 @@ public:
     void Cancel();
     void SetClearable(const bool clearableFlag);
     bool Clear();
+    bool IsClear() const;
 
     ProgressQueue() = default;
     ~ProgressQueue() = default;

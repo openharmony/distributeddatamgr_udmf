@@ -41,6 +41,8 @@ using namespace OHOS::Security::AccessToken;
 using namespace OHOS::UDMF;
 
 namespace OHOS {
+static constexpr int END_INTERVAL = 3;
+
 void AllocHapToken()
 {
     HapInfoParams info = {
@@ -86,6 +88,7 @@ void SetUpTestCase()
 
 void TearDown()
 {
+    std::this_thread::sleep_for(std::chrono::seconds(END_INTERVAL));
 }
 
 void SetNativeToken()
@@ -622,7 +625,6 @@ void StartAsyncDataRetrievalFuzz(const uint8_t *data, size_t size)
     params.progressIndicator = ProgressIndicator::DEFAULT;
     params.progressListener = [](ProgressInfo progressInfo, std::shared_ptr<UnifiedData> data) {};
     UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 void CancelAsyncDataRetrievalFuzz(const uint8_t *data, size_t size)
@@ -644,7 +646,6 @@ void CancelAsyncDataRetrievalFuzz(const uint8_t *data, size_t size)
     };
     UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
     UdmfAsyncClient::GetInstance().Cancel(key);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 }
 

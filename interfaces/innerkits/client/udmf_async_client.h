@@ -53,7 +53,7 @@ private:
 #ifndef IOS_PLATFORM
     ExecutorPool executor_;
 #endif
-    std::unordered_map<std::string, std::unique_ptr<AsyncHelper>> asyncHelperMap_;
+    std::map<std::string, std::unique_ptr<AsyncHelper>> asyncHelperMap_;
     std::mutex mutex_;
 };
 } // namespace
