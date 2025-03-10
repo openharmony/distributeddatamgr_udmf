@@ -242,6 +242,13 @@ struct RetrievalResponseStruct {
     std::vector<ItemInfoStruct> retrievalResults;
 };
 
+enum TsSimilarityLevel {
+    NONE = 0,
+    LOW,
+    MEDIUM,
+    HIGH
+};
+
 class IAipCoreManager {
 public:
     IAipCoreManager() = default;
