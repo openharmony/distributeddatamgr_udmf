@@ -79,6 +79,7 @@ const TITLE_FONT_COLOR: string = '#ff182431';
 const DESCRIPTION_FONT_COLOR: string = '#99182431';
 const DEFAULT_MID_IMAGE_HEIGHT: number = 72; // 4x2卡片，图片默认高度
 const DEFAULT_SMALL_IMAGE_HEIGHT: number = 59; // 2x1卡片，图片默认高度
+const DEFAULT_DENSITY： number = 3.25;
 
 interface CardStyle {
   thumbWidth: number,

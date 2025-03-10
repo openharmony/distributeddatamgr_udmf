@@ -17,6 +17,7 @@ if (!("finalizeConstruction" in ViewPU.prototype)) {
     Reflect.set(ViewPU.prototype, "finalizeConstruction", () => { });
 }
 let image = requireNapi('multimedia.image');
+let i18n = requireNapi('multimedia.i18n');
 
 export var FormType;
 (function (FormType) {
@@ -486,12 +487,15 @@ export class ContentFormCard extends ViewPU {
             Text.fontColor(m1);
             Text.maxLines(1);
             Text.lineHeight(this.formStyle.l2 * this.cardScale);
-            Text.margin({ left: this.formStyle.o2 * this.cardScale });
+            Text.margin(this.isMirrotLanguageType ? { right: this.formStyle.o2 * this.cardScale } :
+                { left: this.formStyle.o2 * this.cardScale });
             Text.textOverflow({ overflow: TextOverflow.Ellipsis });
             Text.constraintSize({ minWidth: this.getTextSize(TextType.APP_NAME, this.contentFormData?.appName) });
             Text.backgroundColor(this.getTextBackground(this.contentFormData?.appName));
             Text.fontWeight(FontWeight.Regular);
             Text.borderRadius(this.contentFormData?.title === '' ? 0 : i1);
+            Text.direction(this.isMirrotLanguageType ? Direction.Rtl : Direction.Ltr);
+            Text.maxFontScale(1);
         }, Text);
         Text.pop();
         Row.pop();
@@ -510,6 +514,8 @@ export class ContentFormCard extends ViewPU {
             Text.constraintSize({ minWidth: this.getTextSize(TextType.TITLE, this.contentFormData?.title) });
             Text.backgroundColor(this.getTextBackground(this.contentFormData?.title));
             Text.borderRadius(this.contentFormData?.title === '' ? 0 : i1);
+            Text.direction(this.isMirrotLanguageType ? Direction.Rtl : Direction.Ltr);
+            Text.maxFontScale(1);
         }, Text);
         Text.pop();
     }
@@ -553,6 +559,8 @@ export class ContentFormCard extends ViewPU {
             Text.backgroundColor(this.getTextBackground(this.contentFormData?.description));
             Text.fontWeight(FontWeight.Regular);
             Text.borderRadius(this.contentFormData?.description ? 0 : i1);
+            Text.direction(this.isMirrotLanguageType ? Direction.Rtl : Direction.Ltr);
+            Text.maxFontScale(1);
         }, Text);
         Text.pop();
         Column.pop();
@@ -584,6 +592,8 @@ export class ContentFormCard extends ViewPU {
                 let j2 = this.controller.getLayoutManager();
                 this.lineCount = j2.getLineCount();
             });
+            Text.direction(this.isMirrotLanguageType ? Direction.Rtl : Direction.Ltr);
+            Text.maxFontScale(1);
         }, Text);
         Text.pop();
     }
@@ -631,7 +641,10 @@ export class ContentFormCard extends ViewPU {
                                     Image.height(this.formStyle.b2 * this.cardScale);
                                     Image.objectFit(this.thumbImage ? ImageFit.Cover : ImageFit.Contain);
                                     Image.borderRadius(4);
-                                    Image.margin({
+                                    Image.margin(this.isMirrorLanguageType ? {
+                                        right: this.formStyle.u2 ? this.formStyle.u2 * this.cardScale : 0,
+                                        top: this.formStyle.e2 * this.cardScale
+                                    } : {
                                         left: this.formStyle.u2 ? this.formStyle.u2 * this.cardScale : 0,
                                         top: this.formStyle.e2 * this.cardScale
                                     });
@@ -707,7 +720,9 @@ export class ContentFormCard extends ViewPU {
                                     });
                                     Image.width(this.formStyle.a2 * this.cardScale);
                                     Image.height(this.formStyle.b2 * this.cardScale);
-                                    Image.margin({
+                                    Image.margin(this.isMirrorLanguageType ? {
+                                        right: this.formStyle.u2 ? this.formStyle.u2 * this.cardScale : 0,
+                                    } : {
                                         left: this.formStyle.u2 ? this.formStyle.u2 * this.cardScale : 0,
                                     });
                                 }, Image);
@@ -881,6 +896,10 @@ export class ContentFormCard extends ViewPU {
                 minHeight: this.cardHeight * o
             };
         }
+    }
+
+    isMirrorLanguage() {
+        return i18n.isRTL(i18n.System.getSystemLanguage());
     }
 
     rerender() {
