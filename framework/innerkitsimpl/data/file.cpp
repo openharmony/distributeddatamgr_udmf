@@ -35,6 +35,12 @@ File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
         auto object = std::get<std::shared_ptr<Object>>(value);
         object->GetValue(ORI_URI, oriUri_);
         object->GetValue(REMOTE_URI, remoteUri_);
+        object->GetValue(FILE_TYPE, fileType_);
+        std::string uniformDataType;
+        if (object->GetValue(UNIFORM_DATA_TYPE, uniformDataType) && uniformDataType == "general.file-uri") {
+            utdId_ = std::move(uniformDataType);
+            isFromFileUriUds_ = true;
+        }
         std::shared_ptr<Object> detailObj = nullptr;
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
@@ -97,9 +103,10 @@ void File::InitObject()
         auto value = value_;
         value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
+        object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(UDType::FILE_URI);
         object->value_[ORI_URI] = oriUri_;
         object->value_[REMOTE_URI] = remoteUri_;
+        object->value_[FILE_TYPE] = fileType_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
         object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }

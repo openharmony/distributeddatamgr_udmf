@@ -13,13 +13,15 @@
  * limitations under the License.
  */
 #define LOG_TAG "UnifiedData"
-#include "unified_data.h"
 #include "logger.h"
+#include "unified_data.h"
+#include "utd_client.h"
 
 namespace OHOS {
 namespace UDMF {
-static std::set<std::string> FILE_TYPES = {
+static const std::set<std::string> FILE_TYPES = {
     "general.file", "general.image", "general.video", "general.audio", "general.folder", "general.file-uri" };
+static const std::set<std::string> FILE_SUB_TYPES = {"general.image", "general.video", "general.audio", "general.folder"};
 UnifiedData::UnifiedData()
 {
     properties_ = std::make_shared<UnifiedDataProperties>();
@@ -118,6 +120,30 @@ bool UnifiedData::HasType(const std::string &type) const
         std::vector<std::string> recordTypes = record->GetTypes();
         if (std::find(recordTypes.begin(), recordTypes.end(), type) != recordTypes.end()) {
             return true;
+        }
+    }
+    return false;
+}
+
+bool UnifiedData::HasHigherType(const std::string &type) const
+{
+    std::set<std::string> types = GetTypIds();
+    auto subTypesIter = types.find(type);
+    for (auto it = types.begin(); it != types.end(); ++it) {
+        if (*it == type) {
+            return true;
+        }
+        if (subTypesIter != FILE_SUB_TYPES.end()) {
+            std::shared_ptr<TypeDescriptor> descriptor;
+            UtdClient::GetInstance().GetTypeDescriptor(*it, descriptor);
+            if (descriptor == nullptr) {
+                continue;
+            }
+            bool isFileType = false;
+            descriptor->BelongsTo(type, isFileType);
+            if (isFileType) {
+                return true;
+            }
         }
     }
     return false;

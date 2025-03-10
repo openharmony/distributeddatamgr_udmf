@@ -254,7 +254,7 @@ napi_value UnifiedDataNapi::HasType(napi_env env, napi_callback_info info)
     auto *uData = static_cast<UnifiedDataNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (uData != nullptr && uData->value_ != nullptr), Status::E_ERROR, "invalid object!");
-    bool ret = uData->value_->HasType(type);
+    bool ret = uData->value_->HasHigherType(type);
     napi_value result = nullptr;
     napi_get_boolean(env, ret, &result);
     return result;

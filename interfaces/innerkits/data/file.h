@@ -41,6 +41,8 @@ protected:
     std::string oriUri_;
     std::string remoteUri_;
     UDDetails details_;
+    std::string fileType_;
+    bool isFromFileUriUds_ = false;
 };
 } // namespace UDMF
 } // namespace OHOS
