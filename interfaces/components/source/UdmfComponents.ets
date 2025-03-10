@@ -225,7 +225,7 @@ export struct ContentFormCard {
 
   initCardScale(widthScale: number, defaultWidth: number, defaultHeight: number): void {
     let minScale = this.formType === FormType.TYPE_SMALL ? SMALL_MIN_CARD_SCALE : MIN_CARD_SCALE;
-    let densityScale = DEFAULT_DENSITY / display.getDefaultDisplaySync().densityPixels;
+    let densityScale = DEFAULT_DENSITY / display.getPrimaryDisplaySync().densityPixels;
     let maxScale = MAX_CARD_SCALE * densityScale;
     minScale = minScale * densityScale;
     if (widthScale > maxScale) {
@@ -503,38 +503,36 @@ export struct ContentFormCard {
   }
 
   build() {
-    if (this.initSystemLanguage()) {
-      Column() {
-        if (this.formType === FormType.TYPE_BIG) {
-          this.Card4x4();
-        } else if (this.formType === FormType.TYPE_MID) {
-          this.Card4x2();
-        } else {
-          this.Card2x1();
-        }
+    Column() {
+      if (this.initSystemLanguage() && this.formType === FormType.TYPE_BIG) {
+        this.Card4x4();
+      } else if (this.formType === FormType.TYPE_MID) {
+        this.Card4x2();
+      } else {
+        this.Card2x1();
       }
-      .borderRadius(this.formStyle.cardRadius)
-      .clip(true)
-      .backgroundColor(CARD_BACKGROUND)
-      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK,
-        { colorMode: ThemeColorMode.LIGHT, adaptiveColor: AdaptiveColor.DEFAULT, scale: 1.0 })
-      .shadow(ShadowStyle.OUTER_DEFAULT_SM)
-      .width(this.cardWidth)
-      .onClick(() => {
-        if (!this.contentFormData?.linkUri) {
-          console.warn(`${TAG}, linkUri is null`);
-          return;
-        }
-        this.handleOnClick();
-        try {
-          let context = getContext(this) as common.UIAbilityContext;
-          context.openLink(this.contentFormData?.linkUri, { appLinkingOnly: false, parameters: {} });
-        } catch (err) {
-          let error = err as BusinessError;
-          console.error(`${TAG}, Failed to openLink, code is ${error.code}, message is ${error.message}`);
-        }
-      })
     }
+    .borderRadius(this.formStyle.cardRadius)
+    .clip(true)
+    .backgroundColor(CARD_BACKGROUND)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK,
+      { colorMode: ThemeColorMode.LIGHT, adaptiveColor: AdaptiveColor.DEFAULT, scale: 1.0 })
+    .shadow(ShadowStyle.OUTER_DEFAULT_SM)
+    .width(this.cardWidth)
+    .onClick(() => {
+      if (!this.contentFormData?.linkUri) {
+        console.warn(`${TAG}, linkUri is null`);
+        return;
+      }
+      this.handleOnClick();
+      try {
+        let context = getContext(this) as common.UIAbilityContext;
+        context.openLink(this.contentFormData?.linkUri, { appLinkingOnly: false, parameters: {} });
+      } catch (err) {
+        let error = err as BusinessError;
+        console.error(`${TAG}, Failed to openLink, code is ${error.code}, message is ${error.message}`);
+      }
+    })
   }
 
   initSystemLanguage(): boolean {
