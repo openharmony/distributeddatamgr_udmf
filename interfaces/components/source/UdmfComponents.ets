@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 import common from '@ohos.app.ability.common';
+import I18n from '@ohos.i18n';
 import image from '@ohos.multimedia.image';
 import uniformDataStruct from '@ohos.data.uniformDataStruct';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { display } from '@kit.ArkUI';
 
 export enum FormType {
   TYPE_BIG = 0,
@@ -79,7 +81,7 @@ const TITLE_FONT_COLOR: string = '#ff182431';
 const DESCRIPTION_FONT_COLOR: string = '#99182431';
 const DEFAULT_MID_IMAGE_HEIGHT: number = 72; // 4x2卡片，图片默认高度
 const DEFAULT_SMALL_IMAGE_HEIGHT: number = 59; // 2x1卡片，图片默认高度
-const DEFAULT_DENSITY： number = 3.25;
+const DEFAULT_DENSITY: number = 3.25;
 
 interface CardStyle {
   thumbWidth: number,
@@ -186,10 +188,12 @@ export struct ContentFormCard {
   @State thumbImage: image.PixelMap | undefined = undefined;
   @State appImage: image.PixelMap | undefined = undefined;
   @State lineCount: number = 1;
+  @State isMirrorLanguageType: boolean = false;
   private handleOnClick: () => void = () => {
   };
 
   aboutToAppear(): void {
+    this.initSystemLanguage();
     this.initCardStyle();
     this.createPixelMap();
   }
@@ -221,8 +225,11 @@ export struct ContentFormCard {
 
   initCardScale(widthScale: number, defaultWidth: number, defaultHeight: number): void {
     let minScale = this.formType === FormType.TYPE_SMALL ? SMALL_MIN_CARD_SCALE : MIN_CARD_SCALE;
-    if (widthScale > MAX_CARD_SCALE) {
-      this.cardScale = MAX_CARD_SCALE;
+    let densityScale = DEFAULT_DENSITY / display.getDefaultDisplaySync().densityPixels;
+    let maxScale = MAX_CARD_SCALE * densityScale;
+    minScale = minScale * densityScale;
+    if (widthScale > maxScale) {
+      this.cardScale = maxScale;
     } else if (widthScale < minScale) {
       this.cardScale = minScale;
     } else {
@@ -274,11 +281,13 @@ export struct ContentFormCard {
           .objectFit(ImageFit.Contain)
           .width('100%')
           .layoutWeight(1)
+          .draggable(false)
       } else {
         Image(this.thumbImage ? this.thumbImage : this.defaultThumbImage)
           .objectFit(ImageFit.Contain)
           .width('100%')
           .aspectRatio(this.getAspectRatio())
+          .draggable(false)
       }
     }
     .size({ width: '100%' })
@@ -299,26 +308,29 @@ export struct ContentFormCard {
 
   @Builder
   AppView() {
-    Row() {
+    Row({ space: this.formStyle.appNameMarginLeft * this.cardScale }) {
       Image(this.appImage)
         .width(this.formStyle.appIconSize * this.cardScale)
         .height(this.formStyle.appIconSize * this.cardScale)
         .objectFit(ImageFit.Fill)
         .alt($r('sys.media.ohos_app_icon'))
         .borderRadius($r('sys.float.corner_radius_level1'))
+        .draggable(false)
       Text(this.contentFormData?.appName ? this.contentFormData?.appName : ' ')
         .fontSize(this.formStyle.appNameFontSize * this.cardScale)
         .fontColor(APP_NAME_COLOR)
         .maxLines(1)
         .lineHeight(this.formStyle.appNameLineHeight * this.cardScale)
-        .margin({ left: this.formStyle.appNameMarginLeft * this.cardScale })
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .constraintSize({ minWidth: this.getTextSize(TextType.APP_NAME, this.contentFormData?.appName) })
         .backgroundColor(this.getTextBackground(this.contentFormData?.appName))
         .fontWeight(FontWeight.Regular)
         .borderRadius(this.contentFormData?.title === '' ? 0 : DEFAULT_EMPTY_TEXT_RADIUS)
+        .direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr)
+        .maxFontScale(1)
+        .layoutWeight(1)
+
     }
-    .width('100%')
     .padding({
       left: this.formStyle.cardPadding * this.cardScale,
       right: this.formStyle.cardPadding * this.cardScale,
@@ -340,6 +352,8 @@ export struct ContentFormCard {
       .constraintSize({ minWidth: this.getTextSize(TextType.TITLE, this.contentFormData?.title) })
       .backgroundColor(this.getTextBackground(this.contentFormData?.title))
       .borderRadius(this.contentFormData?.title === '' ? 0 : DEFAULT_EMPTY_TEXT_RADIUS)
+      .direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr)
+      .maxFontScale(1)
   }
 
   @Builder
@@ -350,6 +364,7 @@ export struct ContentFormCard {
         .width('100%')
         .height(this.formStyle.thumbHeight * this.cardScale)
         .backgroundColor(this.thumbImage ? CARD_BACKGROUND : DEFAULT_THUMB_BACKGROUND)
+        .draggable(false)
       Column() {
         this.TitleText()
         Text(this.contentFormData?.description)
@@ -364,6 +379,8 @@ export struct ContentFormCard {
           .backgroundColor(this.getTextBackground(this.contentFormData?.description))
           .fontWeight(FontWeight.Regular)
           .borderRadius(this.contentFormData?.description ? 0 : DEFAULT_EMPTY_TEXT_RADIUS)
+          .direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr)
+          .maxFontScale(1)
       }
       .alignItems(HorizontalAlign.Start)
       .width('100%')
@@ -391,8 +408,7 @@ export struct ContentFormCard {
       .lineHeight((this.lineCount === 1 ?
         (this.formStyle.maxDescriptionLineHeight ? this.formStyle.maxDescriptionLineHeight :
         this.formStyle.descriptionLineHeight) : this.formStyle.descriptionLineHeight) * this.cardScale)
-      .fontSize((this.lineCount === 1 ? (this.formStyle.maxDescriptionFontSize ? this.formStyle.maxDescriptionFontSize :
-      this.formStyle.descriptionFontSize) : this.formStyle.descriptionFontSize) * this.cardScale)
+      .fontSize(this.getDescriptionFontSize())
       .constraintSize({ minWidth: this.getTextSize(TextType.DESCRIPTION, this.contentFormData?.description) })
       .backgroundColor(this.getTextBackground(this.contentFormData?.description))
       .borderRadius(this.contentFormData?.description ? 0 : DEFAULT_EMPTY_TEXT_RADIUS)
@@ -400,6 +416,8 @@ export struct ContentFormCard {
         let layoutManager: LayoutManager = this.controller.getLayoutManager();
         this.lineCount = layoutManager.getLineCount();
       })
+      .direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr)
+      .maxFontScale(1)
   }
 
   @Builder
@@ -422,8 +440,10 @@ export struct ContentFormCard {
               .height(this.formStyle.thumbHeight * this.cardScale)
               .objectFit(this.thumbImage ? ImageFit.Cover : ImageFit.Contain)
               .borderRadius(4)
+              .draggable(false)
               .margin({
-                left: this.formStyle.thumbMarginLeft ? this.formStyle.thumbMarginLeft * this.cardScale : 0,
+                right: this.isMirrorLanguageType ? (this.formStyle.thumbMarginLeft as number * this.cardScale) : 0,
+                left: this.isMirrorLanguageType ? 0 : (this.formStyle.thumbMarginLeft as number * this.cardScale),
                 top: this.formStyle.titleFontMarginTop * this.cardScale
               })
           }
@@ -461,8 +481,10 @@ export struct ContentFormCard {
                 .borderRadius($r('sys.float.corner_radius_level2'))
                 .width(this.formStyle.thumbWidth * this.cardScale)
                 .height(this.formStyle.thumbHeight * this.cardScale)
+                .draggable(false)
                 .margin({
-                  left: this.formStyle.thumbMarginLeft ? this.formStyle.thumbMarginLeft * this.cardScale : 0,
+                  left: this.isMirrorLanguageType ? 0 : (this.formStyle.thumbMarginLeft as number * this.cardScale),
+                  right: this.isMirrorLanguageType ? (this.formStyle.thumbMarginLeft as number * this.cardScale) : 0
                 })
             }
           }
@@ -481,36 +503,48 @@ export struct ContentFormCard {
   }
 
   build() {
-    Column() {
-      if (this.formType === FormType.TYPE_BIG) {
-        this.Card4x4();
-      } else if (this.formType === FormType.TYPE_MID) {
-        this.Card4x2();
-      } else {
-        this.Card2x1();
+    if (this.initSystemLanguage()) {
+      Column() {
+        if (this.formType === FormType.TYPE_BIG) {
+          this.Card4x4();
+        } else if (this.formType === FormType.TYPE_MID) {
+          this.Card4x2();
+        } else {
+          this.Card2x1();
+        }
       }
+      .borderRadius(this.formStyle.cardRadius)
+      .clip(true)
+      .backgroundColor(CARD_BACKGROUND)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK,
+        { colorMode: ThemeColorMode.LIGHT, adaptiveColor: AdaptiveColor.DEFAULT, scale: 1.0 })
+      .shadow(ShadowStyle.OUTER_DEFAULT_SM)
+      .width(this.cardWidth)
+      .onClick(() => {
+        if (!this.contentFormData?.linkUri) {
+          console.warn(`${TAG}, linkUri is null`);
+          return;
+        }
+        this.handleOnClick();
+        try {
+          let context = getContext(this) as common.UIAbilityContext;
+          context.openLink(this.contentFormData?.linkUri, { appLinkingOnly: false, parameters: {} });
+        } catch (err) {
+          let error = err as BusinessError;
+          console.error(`${TAG}, Failed to openLink, code is ${error.code}, message is ${error.message}`);
+        }
+      })
     }
-    .borderRadius(this.formStyle.cardRadius)
-    .clip(true)
-    .backgroundColor(CARD_BACKGROUND)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK,
-      { colorMode: ThemeColorMode.LIGHT, adaptiveColor: AdaptiveColor.DEFAULT, scale: 1.0 })
-    .shadow(ShadowStyle.OUTER_DEFAULT_SM)
-    .width(this.cardWidth)
-    .onClick(() => {
-      if (!this.contentFormData?.linkUri) {
-        console.warn(`${TAG}, linkUri is null`);
-        return;
-      }
-      this.handleOnClick();
-      try {
-        let context = getContext(this) as common.UIAbilityContext;
-        context.openLink(this.contentFormData?.linkUri, { appLinkingOnly: false, parameters: {} });
-      } catch (err) {
-        let error = err as BusinessError;
-        console.error(`${TAG}, Failed to openLink, code is ${error.code}, message is ${error.message}`);
-      }
-    })
+  }
+
+  initSystemLanguage(): boolean {
+    try {
+      this.isMirrorLanguageType = I18n.isRTL(I18n.System.getSystemLanguage());
+    } catch (err) {
+      let error = err as BusinessError;
+      console.error(`${TAG}, Failed to init system language, code is ${error.code}, message is ${error.message}`);
+    }
+    return true;
   }
 
   async getPixelMap(uint: Uint8Array, callback: Function): Promise<void> {
@@ -522,7 +556,7 @@ export struct ContentFormCard {
       imageResource.release();
     } catch (err) {
       let error = err as BusinessError;
-      console.info(`${TAG}, Failed to create pixelMap, code is ${error.code}, message is ${error.message}`);
+      console.error(`${TAG}, Failed to create pixelMap, code is ${error.code}, message is ${error.message}`);
     }
   }
 
@@ -622,5 +656,10 @@ export struct ContentFormCard {
         minHeight: this.cardHeight * MIN_CARD_SCALE
       };
     }
+  }
+
+  getDescriptionFontSize(): number {
+    return this.lineCount === 1 ? (this.formStyle.maxDescriptionFontSize ? this.formStyle.maxDescriptionFontSize :
+    this.formStyle.descriptionFontSize) : (this.formStyle.descriptionFontSize * this.cardScale);
   }
 }
