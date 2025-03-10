@@ -14,8 +14,7 @@
  */
 
 if (!("finalizeConstruction" in ViewPU.prototype)) {
-    Reflect.set(ViewPU.prototype, "finalizeConstruction", () => {
-    });
+    Reflect.set(ViewPU.prototype, "finalizeConstruction", () => { });
 }
 
 let image = requireNapi('multimedia.image');
@@ -768,59 +767,49 @@ export class ContentFormCard extends ViewPU {
 
     initialRender() {
         this.observeComponentCreation2((elmtId, isInitialRender) => {
+            Column.create();
+            Column.borderRadius(this.formStyle.q2);
+            Column.clip(true);
+            Column.backgroundColor(n1);
+            Column.backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK, { colorMode: ThemeColorMode.LIGHT, adaptiveColor: AdaptiveColor.DEFAULT, scale: 1.0 });
+            Column.shadow(ShadowStyle.OUTER_DEFAULT_SM);
+            Column.width(this.cardWidth);
+            Column.onClick(() => {
+                if (!this.contentFormData?.linkUri) {
+                    console.warn(`${m}, linkUri is null`);
+                    return;
+                }
+                this.handleOnClick();
+                try {
+                    let context = getContext(this);
+                    context.openLink(this.contentFormData?.linkUri, { appLinkingOnly: false, parameters: {} });
+                }
+                catch (err) {
+                    let error = err;
+                    console.error(`${m}, Failed to openLink, code is ${error.code}, message is ${error.message}`);
+                }
+            });
+        }, Column);
+        this.observeComponentCreation2((elmtId, isInitialRender) => {
             If.create();
-            if (this.initSystemLanguage()) {
+            if (this.initSystemLanguage() && this.formType === FormType.TYPE_BIG) {
                 this.ifElseBranchUpdateFunction(0, () => {
-                    this.observeComponentCreation2((elmtId, isInitialRender) => {
-                        Column.create();
-                        Column.borderRadius(this.formStyle.q2);
-                        Column.clip(true);
-                        Column.backgroundColor(n1);
-                        Column.backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK,
-                            { colorMode: ThemeColorMode.LIGHT, adaptiveColor: AdaptiveColor.DEFAULT, scale: 1.0 });
-                        Column.shadow(ShadowStyle.OUTER_DEFAULT_SM);
-                        Column.width(this.cardWidth);
-                        Column.onClick(() => {
-                            if (!this.contentFormData?.linkUri) {
-                                console.warn(`${m}, linkUri is null`);
-                                return;
-                            }
-                            this.handleOnClick();
-                            try {
-                                let context = getContext(this);
-                                context.openLink(this.contentFormData?.linkUri,
-                                    { appLinkingOnly: false, parameters: {} });
-                            } catch (err) {
-                                let error = err;
-                                console.error(`${m}, Failed to openLink, code is ${error.code}, message is ${error.message}`);
-                            }
-                        });
-                    }, Column);
-                    this.observeComponentCreation2((elmtId, isInitialRender) => {
-                        If.create();
-                        if (this.formType === FormType.TYPE_BIG) {
-                            this.ifElseBranchUpdateFunction(0, () => {
-                                this.Card4x4.bind(this)();
-                            });
-                        } else if (this.formType === FormType.TYPE_MID) {
-                            this.ifElseBranchUpdateFunction(1, () => {
-                                this.Card4x2.bind(this)();
-                            });
-                        } else {
-                            this.ifElseBranchUpdateFunction(2, () => {
-                                this.Card2x1.bind(this)();
-                            });
-                        }
-                    }, If);
-                    If.pop();
-                    Column.pop();
+                    this.Card4x4.bind(this)();
                 });
-            } else {
+            }
+            else if (this.formType === FormType.TYPE_MID) {
                 this.ifElseBranchUpdateFunction(1, () => {
+                    this.Card4x2.bind(this)();
+                });
+            }
+            else {
+                this.ifElseBranchUpdateFunction(2, () => {
+                    this.Card2x1.bind(this)();
                 });
             }
         }, If);
         If.pop();
+        Column.pop();
     }
 
     initSystemLanguage() {
