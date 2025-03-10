@@ -586,11 +586,11 @@ napi_status NapiDataUtils::SetValue(napi_env env, const ProgressInfo &in, napi_v
 
     napi_value jsPercentage = nullptr;
     SetValue(env, in.progress, jsPercentage);
-    napi_set_named_property(env, out, "progress", jsPercentage);
+    NAPI_CALL_BASE(env, napi_set_named_property(env, out, "progress", jsPercentage), napi_invalid_arg);
 
     napi_value jsListenerStatus = nullptr;
     SetValue(env, in.progressStatus, jsListenerStatus);
-    napi_set_named_property(env, out, "status", jsListenerStatus);
+    NAPI_CALL_BASE(env, napi_set_named_property(env, out, "status", jsListenerStatus), napi_invalid_arg);
     return napi_ok;
 }
 
