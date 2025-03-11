@@ -25,7 +25,7 @@ public:
     API_EXPORT File();
     explicit API_EXPORT File(const std::string &uri);
     API_EXPORT File(UDType type, ValueType value);
-    void API_EXPORT SetType(const UDType &type);
+    void SetType(const UDType &type);
     int64_t API_EXPORT GetSize() override;
 
     std::string API_EXPORT GetUri() const;
