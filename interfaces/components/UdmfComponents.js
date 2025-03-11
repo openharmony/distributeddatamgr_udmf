@@ -23,15 +23,15 @@ let display = requireNapi('display');
 
 export var FormType;
 (function (FormType) {
-    FormType[FormType['TYPE_BIG'] = 0] = 'TYPE_BIG';
-    FormType[FormType['TYPE_MID'] = 1] = 'TYPE_MID';
-    FormType[FormType['TYPE_SMALL'] = 2] = 'TYPE_SMALL';
+    FormType[FormType["TYPE_BIG"] = 0] = "TYPE_BIG";
+    FormType[FormType["TYPE_MID"] = 1] = "TYPE_MID";
+    FormType[FormType["TYPE_SMALL"] = 2] = "TYPE_SMALL";
 })(FormType || (FormType = {}));
 var TextType;
 (function (TextType) {
-    TextType[TextType['TITLE'] = 0] = 'TITLE';
-    TextType[TextType['DESCRIPTION'] = 1] = 'DESCRIPTION';
-    TextType[TextType['APP_NAME'] = 2] = 'APP_NAME';
+    TextType[TextType["TITLE"] = 0] = "TITLE";
+    TextType[TextType["DESCRIPTION"] = 1] = "DESCRIPTION";
+    TextType[TextType["APP_NAME"] = 2] = "APP_NAME";
 })(TextType || (TextType = {}));
 const m = 'udmf.ContentFormCard';
 const o =
@@ -140,13 +140,7 @@ const b2 = {
     l2: 5,
     m2: 10,
     o2: 12,
-    q2: {
-        'id': -1,
-        'type': 10002,
-        params: ['sys.float.corner_radius_level6'],
-        'bundleName': '__harDefaultBundleName__',
-        'moduleName': '__harDefaultModuleName__'
-    },
+    q2: 12,
     s2: 4,
     n2: 12,
     t2: 8,
@@ -768,7 +762,7 @@ export class ContentFormCard extends ViewPU {
     initialRender() {
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             Column.create();
-            Column.borderRadius(this.formStyle.q2);
+            Column.borderRadius(this.formStyle.q2 * this.cardScale);
             Column.clip(true);
             Column.backgroundColor(n1);
             Column.backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK, { colorMode: ThemeColorMode.LIGHT, adaptiveColor: AdaptiveColor.DEFAULT, scale: 1.0 });
