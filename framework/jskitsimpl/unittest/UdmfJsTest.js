@@ -2255,7 +2255,7 @@ describe('UdmfJSTest', function () {
    * @tc.name FileUriTest001
    * @tc.desc
    * @tc.type: FUNC
-   * @tc.require:
+   * @tc.require: test constructor UnifiedRecord(UDType type, ValueType value) and sub image
    */
   it('FileUriTest001', 0, async function (done) {
     const TAG = 'FileUriTest001';
@@ -2368,7 +2368,7 @@ describe('UdmfJSTest', function () {
    * @tc.name FileUriTest002
    * @tc.desc
    * @tc.type: FUNC
-   * @tc.require:
+   * @tc.require: test constructor UnifiedRecord(UDType type, ValueType value)
    */
   it('FileUriTest002', 0, async function (done) {
     const TAG = 'FileUriTest002';
@@ -2459,7 +2459,7 @@ describe('UdmfJSTest', function () {
    * @tc.name FileUriTest003
    * @tc.desc
    * @tc.type: FUNC
-   * @tc.require:
+   * @tc.require: test constructor UDC
    */
     it('FileUriTest003', 0, async function (done) {
       const TAG = 'FileUriTest003';
@@ -2579,7 +2579,7 @@ describe('UdmfJSTest', function () {
    * @tc.name FileUriTest004
    * @tc.desc
    * @tc.type: FUNC
-   * @tc.require:
+   * @tc.require: test constructor no parameter
    */
     it('FileUriTest004', 0, async function (done) {
       const TAG = 'FileUriTest004';

@@ -30,8 +30,6 @@
 
 namespace OHOS {
 namespace UDMF {
-static const std::set<std::string> FILE_SUB_TYPES = {
-    "general.image", "general.video", "general.audio", "general.folder" };
 napi_value UnifiedRecordNapi::Constructor(napi_env env)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
@@ -112,7 +110,7 @@ std::shared_ptr<UnifiedRecord> UnifiedRecordNapi::GenerateNativeRecord(napi_env 
             [](UDType type, ValueType value) { return std::make_shared<ApplicationDefinedRecord>(type, value); }},
     };
     if (utdType == FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value)) {
-        ProcessFileUriType(type, utdType, value);
+        ObjectUtils::ProcessFileUriType(utdType, value);
     }
     auto constructor = constructors.find(utdType);
     if (constructor == constructors.end()) {
@@ -183,29 +181,6 @@ void UnifiedRecordNapi::ProcessNapiObject(napi_env env, std::string type, napi_v
         value = std::shared_ptr<OHOS::AAFwk::Want>(nullptr);
     } else {
         value = std::make_shared<Object>();
-    }
-}
-
-void UnifiedRecordNapi::ProcessFileUriType(std::string &type, UDType &utdType, ValueType& value)
-{
-    auto fileUri = std::get<std::shared_ptr<Object>>(value);
-    std::string uniformDataType;
-    if (!fileUri->GetValue(UNIFORM_DATA_TYPE, uniformDataType) || uniformDataType != "general.file-uri") {
-        return;
-    }
-    utdType = FILE;
-    std::string fileType;
-    if (fileUri->GetValue(FILE_TYPE, fileType)) {
-        std::shared_ptr<TypeDescriptor> descriptor;
-        UtdClient::GetInstance().GetTypeDescriptor(fileType, descriptor);
-        bool isFileType = false;
-        for (const auto &fileSub : FILE_SUB_TYPES) {
-            descriptor->BelongsTo(fileSub, isFileType);
-            if (isFileType) {
-                utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileSub));
-                break;
-            }
-        }
     }
 }
 

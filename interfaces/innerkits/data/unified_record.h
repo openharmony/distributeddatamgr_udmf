@@ -84,7 +84,6 @@ protected:
     ValueType value_;
     bool hasObject_ = false;
 private:
-    void ProcessFileUriType(UDType &utdType, const ValueType &value);
     std::string uid_; // unique identifier
     std::shared_ptr<std::map<std::string, ValueType>> entries_ = std::make_shared<std::map<std::string, ValueType>>();
     std::vector<UriInfo> uris_;

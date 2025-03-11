@@ -18,6 +18,7 @@
 
 #include "logger.h"
 #include "unified_key.h"
+#include "utd_client.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -512,6 +513,8 @@ static constexpr UtdType UTD_TYPES[] = {
 static constexpr std::initializer_list<std::string_view> NOT_NEED_COUNT_VALUE_LIST = {
     UNIFORM_DATA_TYPE, ARRAY_BUFFER_LENGTH, THUMB_DATA_LENGTH, APP_ICON_LENGTH
 };
+static const std::set<std::string> FILE_SUB_TYPES = {
+    "general.image", "general.video", "general.audio", "general.folder" };
 
 namespace UtdUtils {
 bool IsValidUtdId(const std::string &utdId)
@@ -757,6 +760,34 @@ int64_t ObjectUtils::GetAllObjectSize(const std::shared_ptr<Object> object)
         size += key.size() + GetValueSize(value, false);
     }
     return size;
+}
+
+void ObjectUtils::ProcessFileUriType(UDType &utdType, ValueType &value)
+{
+    auto fileUri = std::get<std::shared_ptr<Object>>(value);
+    std::string uniformDataType;
+    if (!fileUri->GetValue(UNIFORM_DATA_TYPE, uniformDataType) || uniformDataType != "general.file-uri") {
+        LOG_INFO(UDMF_FRAMEWORK, "Attribute uniformDataType not equals to 'general.file-uri'!");
+        return;
+    }
+    utdType = FILE;
+    std::string fileType;
+    if (fileUri->GetValue(FILE_TYPE, fileType)) {
+        std::shared_ptr<TypeDescriptor> descriptor;
+        UtdClient::GetInstance().GetTypeDescriptor(fileType, descriptor);
+        if (descriptor == nullptr) {
+            return;
+        }
+        bool isFileType = false;
+        for (const auto &fileSub : FILE_SUB_TYPES) {
+            descriptor->BelongsTo(fileSub, isFileType);
+            if (isFileType) {
+                utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileSub));
+                LOG_INFO(UDMF_FRAMEWORK, "Change dataType_ to %{public}s", fileSub.c_str());
+                return;
+            }
+        }
+    }
 }
 } // namespace UDMF
 } // namespace OHOS

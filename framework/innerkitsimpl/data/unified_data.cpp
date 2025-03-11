@@ -129,22 +129,23 @@ bool UnifiedData::HasType(const std::string &type) const
 bool UnifiedData::HasHigherType(const std::string &type) const
 {
     std::set<std::string> types = GetTypIds();
-    auto subTypesIter = types.find(type);
+    if (types.find(type) != types.end()) {
+        return true;
+    }
+    auto subTypesIter = FILE_SUB_TYPES.find(type);
+    if (subTypesIter == FILE_SUB_TYPES.end()) {
+        return false;
+    }
     for (auto it = types.begin(); it != types.end(); ++it) {
-        if (*it == type) {
-            return true;
+        std::shared_ptr<TypeDescriptor> descriptor;
+        UtdClient::GetInstance().GetTypeDescriptor(*it, descriptor);
+        if (descriptor == nullptr) {
+            continue;
         }
-        if (subTypesIter != FILE_SUB_TYPES.end()) {
-            std::shared_ptr<TypeDescriptor> descriptor;
-            UtdClient::GetInstance().GetTypeDescriptor(*it, descriptor);
-            if (descriptor == nullptr) {
-                continue;
-            }
-            bool isFileType = false;
-            descriptor->BelongsTo(type, isFileType);
-            if (isFileType) {
-                return true;
-            }
+        bool isFileType = false;
+        descriptor->BelongsTo(type, isFileType);
+        if (isFileType) {
+            return true;
         }
     }
     return false;
