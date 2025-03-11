@@ -87,9 +87,7 @@ ohos_shared_library("udmf_client") {
 
   public_configs = [ ":udmf_client_config" ]
 
-  deps = [
-    "../innerkits:utd_client",
-  ]
+  deps = [ "../innerkits:utd_client" ]
 
   external_deps = [
     "ability_base:zuri",

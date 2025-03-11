@@ -30,7 +30,7 @@ config("module_private_config") {
 
 common_deps = [
   "${udmf_interfaces_path}/innerkits:udmf_client",
-  "${udmf_interfaces_path}/innerkits:utd_client"
+  "${udmf_interfaces_path}/innerkits:utd_client",
 ]
 
 common_external_deps = [

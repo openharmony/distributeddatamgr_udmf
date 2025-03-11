@@ -49,8 +49,8 @@ static const std::map<std::string, UDType> FILE_TYPES = {
     { UDMF_META_IMAGE, UDType::IMAGE },
     { UDMF_META_VIDEO, UDType::VIDEO }
 };
-static const std::set<std::string> FILE_SUB_TYPES =
-    {"general.image", "general.video", "general.audio", "general.folder"};
+static const std::set<std::string> FILE_SUB_TYPES = {
+    "general.image", "general.video", "general.audio", "general.folder" };
 
 static void DestroyStringArray(char**& bufArray, unsigned int& count)
 {
@@ -592,15 +592,17 @@ int OH_UdmfRecord_AddFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
     int32_t utdId = UDType::FILE;
     std::shared_ptr<TypeDescriptor> descriptor;
     UtdClient::GetInstance().GetTypeDescriptor(*fileType, descriptor);
-    bool isFileType = false;
-    for (const auto &fileSub : FILE_SUB_TYPES) {
-        descriptor->BelongsTo(fileSub, isFileType);
-        if (isFileType) {
-            utdId = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(*fileType));
-            break;
+    if (descriptor != nullptr) {
+        bool isFileType = false;
+        for (const auto &fileSub : FILE_SUB_TYPES) {
+            descriptor->BelongsTo(fileSub, isFileType);
+            if (isFileType) {
+                utdId = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(*fileType));
+                break;
+            }
         }
     }
-    addFileUriFuncs[static_cast<UDType>(utdId)](record, fileUri); 
+    addFileUriFuncs[static_cast<UDType>(utdId)](record, fileUri);
     return UDMF_E_OK;
 }
 

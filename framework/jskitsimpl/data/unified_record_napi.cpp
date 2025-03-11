@@ -30,8 +30,8 @@
 
 namespace OHOS {
 namespace UDMF {
-static const std::set<std::string> FILE_SUB_TYPES =
-    {"general.image", "general.video", "general.audio", "general.folder"};
+static const std::set<std::string> FILE_SUB_TYPES = {
+    "general.image", "general.video", "general.audio", "general.folder" };
 napi_value UnifiedRecordNapi::Constructor(napi_env env)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");

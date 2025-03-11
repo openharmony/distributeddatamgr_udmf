@@ -24,7 +24,8 @@ namespace OHOS {
 namespace UDMF {
 static constexpr UDType FILE_TYPES[] = {FILE, AUDIO, FOLDER, IMAGE, VIDEO};
 static constexpr const char *FILE_SCHEME = "file";
-static const std::set<std::string> FILE_SUB_TYPES = {"general.image", "general.video", "general.audio", "general.folder"};
+static const std::set<std::string> FILE_SUB_TYPES = {
+    "general.image", "general.video", "general.audio", "general.folder" };
 
 UnifiedRecord::UnifiedRecord()
 {
@@ -118,10 +119,14 @@ void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
     if (utdId == utdId_ || utdId_.empty()) {
         utdId_ = utdId;
         value_ = std::move(value);
+        auto udType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(utdId_));
+        if (udType == UD_BUTT) {
+            dataType_ = APPLICATION_DEFINED_RECORD;
+            return;
+        }
         std::shared_ptr<TypeDescriptor> descriptor;
         UtdClient::GetInstance().GetTypeDescriptor(utdId_, descriptor);
         bool isFileType = false;
-        auto udType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(utdId_));
         for (auto higherType : FILE_SUB_TYPES) {
             descriptor->BelongsTo(higherType, isFileType);
             if (isFileType) {
@@ -129,11 +134,7 @@ void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
                 break;
             }
         }
-        if (udType != UD_BUTT) {
-            dataType_ = udType;
-        } else {
-            dataType_ = APPLICATION_DEFINED_RECORD;
-        }
+        dataType_ = udType;
     } else {
         entries_->insert_or_assign(utdId, std::move(value));
     }
