@@ -20,11 +20,13 @@ namespace UDMF {
 Folder::Folder() : Folder("")
 {
     SetType(FOLDER);
+    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(FOLDER);
 }
 
 Folder::Folder(const std::string &uri) : File(uri)
 {
     SetType(FOLDER);
+    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(FOLDER);
 }
 
 Folder::Folder(UDType type, ValueType value) : File(type, value)

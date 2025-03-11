@@ -20,11 +20,13 @@ namespace UDMF {
 Audio::Audio() : Audio("")
 {
     SetType(AUDIO);
+    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(AUDIO);
 }
 
 Audio::Audio(const std::string &uri) : File(uri)
 {
     SetType(AUDIO);
+    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(AUDIO);
 }
 
 Audio::Audio(UDType type, ValueType value) : File(type, value)
