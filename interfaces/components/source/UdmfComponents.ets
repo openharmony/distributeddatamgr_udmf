@@ -98,7 +98,7 @@ interface CardStyle {
   dividerMarginTop: number,
   appNameFontSize: number,
   appIconSize: number,
-  cardRadius: number | Resource,
+  cardRadius: number,
   appNameMarginLeft: number,
   appNameLineHeight: number,
   cardPadding: number,
@@ -164,7 +164,7 @@ const SMALL_CARD_STYLE: CardStyle = {
   dividerMarginTop: 5,
   appNameFontSize: 10,
   appIconSize: 12,
-  cardRadius: $r('sys.float.corner_radius_level6'),
+  cardRadius: 12,
   appNameMarginLeft: 4,
   appNameLineHeight: 12,
   cardPadding: 8,
@@ -512,7 +512,7 @@ export struct ContentFormCard {
         this.Card2x1();
       }
     }
-    .borderRadius(this.formStyle.cardRadius)
+    .borderRadius(this.formStyle.cardRadius * this.cardScale)
     .clip(true)
     .backgroundColor(CARD_BACKGROUND)
     .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK,
