@@ -124,19 +124,38 @@ void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
             dataType_ = APPLICATION_DEFINED_RECORD;
             return;
         }
-        std::shared_ptr<TypeDescriptor> descriptor;
-        UtdClient::GetInstance().GetTypeDescriptor(utdId_, descriptor);
-        bool isFileType = false;
-        for (auto higherType : FILE_SUB_TYPES) {
-            descriptor->BelongsTo(higherType, isFileType);
-            if (isFileType) {
-                udType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(higherType));
-                break;
-            }
+        if (utdId == "general.file-uri" && std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+            ProcessFileUriType(udType, value_);
         }
         dataType_ = udType;
     } else {
         entries_->insert_or_assign(utdId, std::move(value));
+    }
+}
+
+void UnifiedRecord::ProcessFileUriType(UDType &utdType, const ValueType &value)
+{
+    auto fileUri = std::get<std::shared_ptr<Object>>(value);
+    std::string uniformDataType;
+    if (!fileUri->GetValue(UNIFORM_DATA_TYPE, uniformDataType) || uniformDataType != "general.file-uri") {
+        return;
+    }
+    utdType = FILE;
+    std::string fileType;
+    if (fileUri->GetValue(FILE_TYPE, fileType)) {
+        std::shared_ptr<TypeDescriptor> descriptor;
+        UtdClient::GetInstance().GetTypeDescriptor(fileType, descriptor);
+        if (descriptor == nullptr) {
+            return;
+        }
+        bool isFileType = false;
+        for (const auto &fileSub : FILE_SUB_TYPES) {
+            descriptor->BelongsTo(fileSub, isFileType);
+            if (isFileType) {
+                utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileSub));
+                return;
+            }
+        }
     }
 }
 

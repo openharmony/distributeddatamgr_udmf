@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "file.h"
 
 namespace OHOS {
@@ -39,7 +38,6 @@ File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
         std::string uniformDataType;
         if (object->GetValue(UNIFORM_DATA_TYPE, uniformDataType) && uniformDataType == "general.file-uri") {
             utdId_ = std::move(uniformDataType);
-            isFromFileUriUds_ = true;
         }
         std::shared_ptr<Object> detailObj = nullptr;
         if (object->GetValue(DETAILS, detailObj)) {
@@ -47,6 +45,11 @@ File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
         }
         hasObject_ = true;
     }
+}
+
+void File::SetType(const UDType &type)
+{
+    this->dataType_ = type;
 }
 
 int64_t File::GetSize()

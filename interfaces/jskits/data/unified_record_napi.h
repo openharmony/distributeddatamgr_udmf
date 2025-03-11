@@ -48,7 +48,7 @@ private:
         napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt);
     static void GetNativeValue(napi_env env, std::string type, napi_value valueNapi, ValueType &value);
     static void ProcessNapiObject(napi_env env, std::string type, napi_value valueNapi, ValueType &value);
-    static void ProcessFileUriType(std::string &type, UDType utdType, ValueType& value);
+    static void ProcessFileUriType(std::string &type, UDType &utdType, ValueType& value);
 };
 } // namespace UDMF
 } // namespace OHOS

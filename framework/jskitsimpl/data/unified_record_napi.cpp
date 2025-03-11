@@ -186,11 +186,11 @@ void UnifiedRecordNapi::ProcessNapiObject(napi_env env, std::string type, napi_v
     }
 }
 
-void UnifiedRecordNapi::ProcessFileUriType(std::string &type, UDType utdType, ValueType& value)
+void UnifiedRecordNapi::ProcessFileUriType(std::string &type, UDType &utdType, ValueType& value)
 {
     auto fileUri = std::get<std::shared_ptr<Object>>(value);
     std::string uniformDataType;
-    if (fileUri->GetValue(UNIFORM_DATA_TYPE, uniformDataType) && uniformDataType == "general.file-uri") {
+    if (!fileUri->GetValue(UNIFORM_DATA_TYPE, uniformDataType) || uniformDataType != "general.file-uri") {
         return;
     }
     utdType = FILE;
@@ -202,7 +202,7 @@ void UnifiedRecordNapi::ProcessFileUriType(std::string &type, UDType utdType, Va
         for (const auto &fileSub : FILE_SUB_TYPES) {
             descriptor->BelongsTo(fileSub, isFileType);
             if (isFileType) {
-                utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileType));
+                utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileSub));
                 break;
             }
         }
