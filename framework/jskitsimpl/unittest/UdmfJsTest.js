@@ -2425,7 +2425,7 @@ describe('UdmfJSTest', function () {
             }
           }
           let getValue = records[0].getValue();
-          expect(getValue.uniformDataType).assertEqual('general.file-uri')
+          expect(getValue.uniformDataType).assertEqual('general.file-uri');
           expect(getValue.oriUri).assertEqual('www.xx.com');
           expect(getValue.fileType).assertEqual('general.image');
           expect(getValue.details.fileUriKey1).assertEqual(123);
