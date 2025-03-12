@@ -723,6 +723,7 @@ template <> bool Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &
     }
     if (!parcel->ParseFrom((uintptr_t)buffer, head.len)) {
         LOG_ERROR(UDMF_FRAMEWORK, "ParseFrom error in tlv read want. tag=%{public}hu", head.tag);
+        free(buffer);
         return false;
     }
     auto want = AAFwk::Want::Unmarshalling(*parcel);
