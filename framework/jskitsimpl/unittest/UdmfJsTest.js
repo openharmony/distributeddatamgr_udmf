@@ -2295,6 +2295,9 @@ describe('UdmfJSTest', function () {
     let rawDataTypes = unifiedData.getTypes();
     expect(rawDataTypes.includes('general.file-uri')).assertTrue();
     expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(unifiedData.hasType('general.file-uri')).assertTrue();
+    expect(unifiedData.hasType('general.image')).assertTrue();
+    expect(unifiedData.hasType('general.jpeg')).assertTrue();
     try {
       UDC.insertData(optionsValid, unifiedData).then((data) => {
         console.info(TAG, `insert success. The key: ${data}`);
@@ -2337,6 +2340,9 @@ describe('UdmfJSTest', function () {
           });
           expect(getEntryPixelMap.details.pixelMapKey1).assertEqual(123);
           expect(getEntryPixelMap.details.pixelMapKey2).assertEqual('pixelMapValue');
+          expect(data[0].hasType('general.file-uri')).assertTrue();
+          expect(data[0].hasType('general.image')).assertTrue();
+          expect(data[0].hasType('general.jpeg')).assertTrue();
 
           UDC.deleteData(options).then((data) => {
             console.info(TAG, 'delete success.');
@@ -2394,6 +2400,8 @@ describe('UdmfJSTest', function () {
     let unifiedData = new UDC.UnifiedData(record);
     let rawDataTypes = unifiedData.getTypes();
     expect(rawDataTypes.includes('general.file-uri')).assertTrue();
+    expect(unifiedData.hasType('general.file-uri')).assertTrue();
+    expect(unifiedData.hasType('general.image')).assertTrue();
     try {
       UDC.insertData(optionsValid, unifiedData).then((data) => {
         console.info(TAG, `insert success. The key: ${data}`);
@@ -2428,6 +2436,8 @@ describe('UdmfJSTest', function () {
           expect(getEntry.oriUri).assertEqual('www.xx.com');
           expect(getEntry.fileType).assertEqual('general.image');
           expect(getEntry.details.fileUriKey1).assertEqual(123);
+          expect(data[0].hasType('general.file-uri')).assertTrue();
+          expect(data[0].hasType('general.image')).assertTrue();
 
           UDC.deleteData(options).then((data) => {
             console.info(TAG, 'delete success.');
@@ -2507,6 +2517,9 @@ describe('UdmfJSTest', function () {
       expect(rawDataTypes.includes('general.file')).assertTrue();
       expect(rawDataTypes.includes('general.file-uri')).assertTrue();
       expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+      expect(unifiedData.hasType('general.file-uri')).assertTrue();
+      expect(unifiedData.hasType('general.image')).assertTrue();
+      expect(unifiedData.hasType('general.jpeg')).assertTrue();
       try {
         UDC.insertData(optionsValid, unifiedData).then((data) => {
           console.info(TAG, `insert success. The key: ${data}`);
@@ -2548,6 +2561,9 @@ describe('UdmfJSTest', function () {
             });
             expect(getEntryPixelMap.details.pixelMapKey1).assertEqual(123);
             expect(getEntryPixelMap.details.pixelMapKey2).assertEqual('pixelMapValue');
+            expect(data[0].hasType('general.file-uri')).assertTrue();
+            expect(data[0].hasType('general.image')).assertTrue();
+            expect(data[0].hasType('general.jpeg')).assertTrue();
   
             UDC.deleteData(options).then((data) => {
               console.info(TAG, 'delete success.');
@@ -2622,6 +2638,9 @@ describe('UdmfJSTest', function () {
       console.info(TAG, `rawDataTypes is ${rawDataTypes}`);
       expect(rawDataTypes.includes('general.file-uri')).assertTrue();
       expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+      expect(unifiedData.hasType('general.file-uri')).assertTrue();
+      expect(unifiedData.hasType('general.video')).assertTrue();
+      expect(unifiedData.hasType('general.vob')).assertTrue();
       try {
         UDC.insertData(optionsValid, unifiedData).then((data) => {
           console.info(TAG, `insert success. The key: ${data}`);
@@ -2668,6 +2687,9 @@ describe('UdmfJSTest', function () {
             });
             expect(getEntryPixelMap.details.pixelMapKey1).assertEqual(123);
             expect(getEntryPixelMap.details.pixelMapKey2).assertEqual('pixelMapValue');
+            expect(data[0].hasType('general.file-uri')).assertTrue();
+            expect(data[0].hasType('general.video')).assertTrue();
+            expect(data[0].hasType('general.vob')).assertTrue();
   
             UDC.deleteData(options).then((data) => {
               console.info(TAG, 'delete success.');

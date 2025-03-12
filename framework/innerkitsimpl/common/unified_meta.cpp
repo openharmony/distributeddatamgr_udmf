@@ -791,7 +791,7 @@ void ObjectUtils::ProcessFileUriType(UDType &utdType, ValueType &value)
             descriptor->BelongsTo(fileSub, isFileType);
             if (isFileType) {
                 utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileSub));
-                LOG_INFO(UDMF_FRAMEWORK, "Change dataType_ to %{public}s", fileSub.c_str());
+                LOG_INFO(UDMF_FRAMEWORK, "Change type to %{public}s", fileSub.c_str());
                 return;
             }
         }
