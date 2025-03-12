@@ -20,11 +20,13 @@ namespace UDMF {
 Video::Video() : Video("")
 {
     SetType(VIDEO);
+    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(VIDEO);
 }
 
 Video::Video(const std::string &uri) : File(uri)
 {
     SetType(VIDEO);
+    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(VIDEO);
 }
 
 Video::Video(UDType type, ValueType value) : File(type, value)

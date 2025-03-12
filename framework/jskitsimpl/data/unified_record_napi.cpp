@@ -26,6 +26,7 @@
 #include "system_defined_form.h"
 #include "system_defined_pixelmap.h"
 #include "application_defined_record.h"
+#include "utd_client.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -108,7 +109,9 @@ std::shared_ptr<UnifiedRecord> UnifiedRecordNapi::GenerateNativeRecord(napi_env 
         {APPLICATION_DEFINED_RECORD,
             [](UDType type, ValueType value) { return std::make_shared<ApplicationDefinedRecord>(type, value); }},
     };
-
+    if (utdType == FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        ObjectUtils::ProcessFileUriType(utdType, value);
+    }
     auto constructor = constructors.find(utdType);
     if (constructor == constructors.end()) {
         return std::make_shared<UnifiedRecord>(utdType, value);

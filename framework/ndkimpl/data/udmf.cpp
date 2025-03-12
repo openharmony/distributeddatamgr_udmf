@@ -35,6 +35,8 @@
 #include "folder.h"
 #include "image.h"
 #include "video.h"
+#include "utd.h"
+#include "utd_client.h"
 
 using namespace OHOS::UDMF;
 
@@ -47,6 +49,8 @@ static const std::map<std::string, UDType> FILE_TYPES = {
     { UDMF_META_IMAGE, UDType::IMAGE },
     { UDMF_META_VIDEO, UDType::VIDEO }
 };
+static const std::set<std::string> FILE_SUB_TYPES = {
+    "general.image", "general.video", "general.audio", "general.folder" };
 
 static void DestroyStringArray(char**& bufArray, unsigned int& count)
 {
@@ -573,26 +577,32 @@ int OH_UdmfRecord_AddFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
     if (fileType == nullptr) {
         return UDMF_ERR;
     }
-    int32_t utdId = UtdUtils::GetUtdEnumFromUtdId(*fileType);
-    switch (utdId) {
-        case UDType::FILE:
-            AddUds<File>(record, fileUri, UDType::FILE);
-            break;
-        case UDType::AUDIO:
-            AddUds<Audio>(record, fileUri, UDType::AUDIO);
-            break;
-        case UDType::FOLDER:
-            AddUds<Folder>(record, fileUri, UDType::FOLDER);
-            break;
-        case UDType::IMAGE:
-            AddUds<Image>(record, fileUri, UDType::IMAGE);
-            break;
-        case UDType::VIDEO:
-            AddUds<Video>(record, fileUri, UDType::VIDEO);
-            break;
-        default:
-            AddUds<UnifiedRecord>(record, fileUri, UDType::FILE_URI);
+    std::map<UDType, std::function<void(OH_UdmfRecord*, OH_UdsFileUri*)>> addFileUriFuncs = {
+        {UDType::FILE, [](OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
+            { AddUds<File>(record, fileUri, UDType::FILE); }},
+        {UDType::IMAGE, [](OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
+            { AddUds<Image>(record, fileUri, UDType::IMAGE); }},
+        {UDType::VIDEO, [](OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
+            {  AddUds<Video>(record, fileUri, UDType::VIDEO); }},
+        {UDType::AUDIO, [](OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
+            {  AddUds<Audio>(record, fileUri, UDType::AUDIO); }},
+        {UDType::FOLDER, [](OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
+            {  AddUds<Folder>(record, fileUri, UDType::FOLDER); }},
+    };
+    int32_t utdId = UDType::FILE;
+    std::shared_ptr<TypeDescriptor> descriptor;
+    UtdClient::GetInstance().GetTypeDescriptor(*fileType, descriptor);
+    if (descriptor != nullptr) {
+        bool isFileType = false;
+        for (const auto &fileSub : FILE_SUB_TYPES) {
+            descriptor->BelongsTo(fileSub, isFileType);
+            if (isFileType) {
+                utdId = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(*fileType));
+                break;
+            }
+        }
     }
+    addFileUriFuncs[static_cast<UDType>(utdId)](record, fileUri);
     return UDMF_E_OK;
 }
 

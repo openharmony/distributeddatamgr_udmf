@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 #include "entry_getter.h"
+#include "unified_meta.h"
 #include "visibility.h"
 #include "unified_types.h"
 
@@ -80,11 +81,13 @@ public:
     void API_EXPORT ComputeUris(const std::function<bool(UriInfo &)> &action);
 protected:
     UDType dataType_;
+    std::string utdId_;
     ValueType value_;
     bool hasObject_ = false;
 private:
+    void AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri) const;
+    
     std::string uid_; // unique identifier
-    std::string utdId_;
     std::shared_ptr<std::map<std::string, ValueType>> entries_ = std::make_shared<std::map<std::string, ValueType>>();
     std::vector<UriInfo> uris_;
     uint32_t dataId_ = 0;

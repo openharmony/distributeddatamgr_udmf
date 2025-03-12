@@ -244,14 +244,20 @@ int32_t UnifiedDataHelper::ProcessBigData(UnifiedData &data, Intention intention
 
 void UnifiedDataHelper::ProcessTypeId(const ValueType &value, std::string &typeId)
 {
-    if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
-        auto object = std::get<std::shared_ptr<Object>>(value);
-        if (object->value_.find(UNIFORM_DATA_TYPE) != object->value_.end()
-            && std::get<std::string>(object->value_[UNIFORM_DATA_TYPE]) == UDMF_META_GENERAL_FILE_URI
-            && object->value_.find(FILE_TYPE) != object->value_.end()) {
-            typeId = std::get<std::string>(object->value_[FILE_TYPE]);
-        } else if (object->value_.find(APPLICATION_DEFINED_RECORD_MARK) != object->value_.end()) {
-            typeId = UtdUtils::GetUtdIdFromUtdEnum(APPLICATION_DEFINED_RECORD);
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        return;
+    }
+    auto object = std::get<std::shared_ptr<Object>>(value);
+    if (object->value_.find(UNIFORM_DATA_TYPE) == object->value_.end()) {
+        return;
+    }
+    if (object->value_.find(APPLICATION_DEFINED_RECORD_MARK) != object->value_.end()) {
+        typeId = UtdUtils::GetUtdIdFromUtdEnum(APPLICATION_DEFINED_RECORD);
+    } else if (std::get<std::string>(object->value_[UNIFORM_DATA_TYPE]) == GENERAL_FILE_URI &&
+        object->value_.find(FILE_TYPE) != object->value_.end()) {
+        std::string fileType = std::get<std::string>(object->value_[FILE_TYPE]);
+        if (!fileType.empty()) {
+            typeId = fileType;
         }
     }
 }

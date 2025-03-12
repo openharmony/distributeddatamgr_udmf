@@ -20,11 +20,13 @@ namespace UDMF {
 Image::Image() : Image("")
 {
     SetType(IMAGE);
+    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(IMAGE);
 }
 
 Image::Image(const std::string &uri) : File(uri)
 {
     SetType(IMAGE);
+    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(IMAGE);
 }
 
 Image::Image(UDType type, ValueType value) : File(type, value)

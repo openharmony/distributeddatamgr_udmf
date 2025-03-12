@@ -2250,4 +2250,706 @@ describe('UdmfJSTest', function () {
       }
       console.info(TAG, 'end');
     });
+
+  /**
+   * @tc.name FileUriTest001
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require: test constructor UnifiedRecord(UDType type, ValueType value) and sub image
+   */
+  it('FileUriTest001', 0, async function (done) {
+    const TAG = 'FileUriTest001';
+    console.info(TAG, 'start');
+    let fileUriDetails = {
+      'fileUriKey1': 123,
+      'fileUriKey2': 'fileUriValue',
+    };
+    let fileUri = {
+      uniformDataType : 'general.file-uri',
+      oriUri : 'www.xx.com',
+      fileType : 'general.jpeg',
+      details : fileUriDetails
+    };
+    let u8Array = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    let arrayBuffer = new ArrayBuffer(4 * 200 * 200);
+    let opt = { editable: true, pixelFormat: 3, size: { height: 200, width: 200 }, alphaType: 3 };
+    let pixelMapDetails = {
+      'pixelMapKey1': 123,
+      'pixelMapKey2': 'pixelMapValue',
+      'pixelMapKey3': u8Array,
+    };
+    let pixelMap = {
+      uniformDataType : 'openharmony.pixel-map',
+      pixelMap : image.createPixelMapSync(arrayBuffer, opt),
+      details : pixelMapDetails
+    };
+    let record = new UDC.UnifiedRecord('general.file-uri', fileUri);
+    record.addEntry('openharmony.pixel-map', pixelMap);
+    let rawType = record.getType();
+    expect(rawType).assertEqual('general.image');
+    let rawRecordTypes = record.getTypes();
+    expect(rawRecordTypes.includes('general.file-uri')).assertTrue();
+    expect(rawRecordTypes.includes('openharmony.pixel-map')).assertTrue();
+
+    let unifiedData = new UDC.UnifiedData(record);
+    let rawDataTypes = unifiedData.getTypes();
+    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
+    expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(unifiedData.hasType('general.file-uri')).assertTrue();
+    expect(unifiedData.hasType('general.image')).assertTrue();
+    expect(unifiedData.hasType('general.jpeg')).assertTrue();
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          let records = data[0].getRecords();
+          let rawType = records[0].getType();
+          expect(rawType).assertEqual('general.image');
+          let getRecordTypes = records[0].getTypes();
+          expect(getRecordTypes.includes('general.file-uri')).assertTrue();
+          expect(getRecordTypes.includes('openharmony.pixel-map')).assertTrue();
+
+          let getDataTypes = data[0].getTypes();
+          expect(getDataTypes.includes('general.file-uri')).assertTrue();
+          for (let i = 0; i < records.length; i++) {
+            if (records[i].getType() === 'general.image') {
+              let getImageUri = records[i].imageUri;
+              expect(getImageUri).assertEqual('www.xx.com');
+            }
+          }
+          let getValue = records[0].getValue();
+          expect(getValue.uniformDataType).assertEqual('general.file-uri');
+          expect(getValue.oriUri).assertEqual('www.xx.com');
+          expect(getValue.fileType).assertEqual('general.jpeg');
+          expect(getValue.details.fileUriKey1).assertEqual(123);
+          expect(getValue.details.fileUriKey2).assertEqual('fileUriValue');
+
+          let getEntryFileUri = records[0].getEntry('general.file-uri');
+          expect(getEntryFileUri.uniformDataType).assertEqual('general.file-uri');
+          expect(getEntryFileUri.oriUri).assertEqual('www.xx.com');
+          expect(getEntryFileUri.fileType).assertEqual('general.jpeg');
+          expect(getEntryFileUri.details.fileUriKey1).assertEqual(123);
+
+          let getEntryPixelMap = records[0].getEntry('openharmony.pixel-map');
+          expect(getEntryPixelMap.uniformDataType).assertEqual('openharmony.pixel-map');
+          getEntryPixelMap.pixelMap.getImageInfo().then((imageInfo)=>{
+            expect(imageInfo.size.height).assertEqual(opt.size.height);
+            expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
+          });
+          expect(getEntryPixelMap.details.pixelMapKey1).assertEqual(123);
+          expect(getEntryPixelMap.details.pixelMapKey2).assertEqual('pixelMapValue');
+          expect(data[0].hasType('general.file-uri')).assertTrue();
+          expect(data[0].hasType('general.image')).assertTrue();
+          expect(data[0].hasType('general.jpeg')).assertTrue();
+
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
+
+  /**
+   * @tc.name FileUriTest002
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require: test constructor UnifiedRecord(UDType type, ValueType value)
+   */
+  it('FileUriTest002', 0, async function (done) {
+    const TAG = 'FileUriTest002';
+    console.info(TAG, 'start');
+    let u8Array = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    let fileUriDetails = {
+      'fileUriKey1': 123,
+      'fileUriKey2': 'fileUriValue',
+      'fileUriKey3': u8Array,
+    };
+    let fileUri = {
+      uniformDataType : 'general.file-uri',
+      oriUri : 'www.xx.com',
+      fileType : 'general.image',
+      details : fileUriDetails
+    };
+    let record = new UDC.UnifiedRecord('general.file-uri', fileUri);
+    let rawType = record.getType();
+    expect(rawType).assertEqual('general.image');
+    let rawRecordTypes = record.getTypes();
+    expect(rawRecordTypes.includes('general.file-uri')).assertTrue();
+
+    let unifiedData = new UDC.UnifiedData(record);
+    let rawDataTypes = unifiedData.getTypes();
+    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
+    expect(unifiedData.hasType('general.file-uri')).assertTrue();
+    expect(unifiedData.hasType('general.image')).assertTrue();
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          expect(records.length).assertEqual(1);
+          let rawType = records[0].getType();
+          expect(rawType).assertEqual('general.image');
+          let rawRecordTypes = records[0].getTypes();
+          expect(rawRecordTypes.includes('general.file-uri')).assertTrue();
+
+          let rawDataTypes = data[0].getTypes();
+          expect(rawDataTypes.includes('general.file-uri')).assertTrue();
+          for (let i = 0; i < records.length; i++) {
+            if (records[i].getType() === 'general.image') {
+              let getImageUri = records[i].imageUri;
+              expect(getImageUri).assertEqual('www.xx.com');
+            }
+          }
+          let getValue = records[0].getValue();
+          expect(getValue.uniformDataType).assertEqual('general.file-uri');
+          expect(getValue.oriUri).assertEqual('www.xx.com');
+          expect(getValue.fileType).assertEqual('general.image');
+          expect(getValue.details.fileUriKey1).assertEqual(123);
+          expect(getValue.details.fileUriKey2).assertEqual('fileUriValue');
+
+          let getEntry = records[0].getEntry('general.file-uri');
+          expect(getEntry.uniformDataType).assertEqual('general.file-uri');
+          expect(getEntry.oriUri).assertEqual('www.xx.com');
+          expect(getEntry.fileType).assertEqual('general.image');
+          expect(getEntry.details.fileUriKey1).assertEqual(123);
+          expect(data[0].hasType('general.file-uri')).assertTrue();
+          expect(data[0].hasType('general.image')).assertTrue();
+
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
+
+  /**
+   * @tc.name FileUriTest003
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require: test constructor UDC
+   */
+  it('FileUriTest003', 0, async function (done) {
+    const TAG = 'FileUriTest003';
+    console.info(TAG, 'start');
+    let fileUriDetails = {
+      'fileUriKey1': 123,
+      'fileUriKey2': 'fileUriValue',
+    };
+    let fileUri = {
+      uniformDataType : 'general.file-uri',
+      oriUri : 'www.xx.com',
+      fileType : 'general.jpeg',
+      details : fileUriDetails
+    };
+    let u8Array = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    let arrayBuffer = new ArrayBuffer(4 * 200 * 200);
+    let opt = { editable: true, pixelFormat: 3, size: { height: 200, width: 200 }, alphaType: 3 };
+    let pixelMapDetails = {
+      'pixelMapKey1': 123,
+      'pixelMapKey2': 'pixelMapValue',
+      'pixelMapKey3': u8Array,
+    };
+    let pixelMap = {
+      uniformDataType : 'openharmony.pixel-map',
+      pixelMap : image.createPixelMapSync(arrayBuffer, opt),
+      details : pixelMapDetails
+    };
+    let record = new UDC.File();
+    record.details = {
+      name: 'test',
+      type: 'txt',
+    };
+    record.uri = 'schema://com.samples.test/files/test.txt';
+    record.addEntry('openharmony.pixel-map', pixelMap);
+    record.addEntry('general.file-uri', fileUri);
+    let rawType = record.getType();
+    expect(rawType).assertEqual('general.file');
+    let rawRecordTypes = record.getTypes();
+    expect(rawRecordTypes.includes('general.file')).assertTrue();
+    expect(rawRecordTypes.includes('general.file-uri')).assertTrue();
+    expect(rawRecordTypes.includes('openharmony.pixel-map')).assertTrue();
+
+    let unifiedData = new UDC.UnifiedData(record);
+    let rawDataTypes = unifiedData.getTypes();
+    expect(rawDataTypes.includes('general.file')).assertTrue();
+    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
+    expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(unifiedData.hasType('general.file-uri')).assertTrue();
+    expect(unifiedData.hasType('general.image')).assertTrue();
+    expect(unifiedData.hasType('general.jpeg')).assertTrue();
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          let records = data[0].getRecords();
+          let rawType = records[0].getType();
+          expect(rawType).assertEqual('general.file');
+          let getRecordTypes = records[0].getTypes();
+          expect(getRecordTypes.includes('general.file')).assertTrue();
+          expect(getRecordTypes.includes('general.file-uri')).assertTrue();
+          expect(getRecordTypes.includes('openharmony.pixel-map')).assertTrue();
+
+          let getDataTypes = data[0].getTypes();
+          expect(rawDataTypes.includes('general.file')).assertTrue();
+          expect(getDataTypes.includes('general.file-uri')).assertTrue();
+          expect(getDataTypes.includes('openharmony.pixel-map')).assertTrue();
+          for (let i = 0; i < records.length; i++) {
+            if (records[i].getType() === 'general.file') {
+              let getUri = records[i].uri;
+              expect(getUri).assertEqual('schema://com.samples.test/files/test.txt');
+            }
+          }
+          let getValue = records[0].getValue();
+          expect(getValue).assertEqual(undefined);
+
+          let getEntryFileUri = records[0].getEntry('general.file-uri');
+          expect(getEntryFileUri.uniformDataType).assertEqual('general.file-uri');
+          expect(getEntryFileUri.oriUri).assertEqual('www.xx.com');
+          expect(getEntryFileUri.fileType).assertEqual('general.jpeg');
+          expect(getEntryFileUri.details.fileUriKey1).assertEqual(123);
+
+          let getEntryPixelMap = records[0].getEntry('openharmony.pixel-map');
+          expect(getEntryPixelMap.uniformDataType).assertEqual('openharmony.pixel-map');
+          getEntryPixelMap.pixelMap.getImageInfo().then((imageInfo)=>{
+            expect(imageInfo.size.height).assertEqual(opt.size.height);
+            expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
+          });
+          expect(getEntryPixelMap.details.pixelMapKey1).assertEqual(123);
+          expect(getEntryPixelMap.details.pixelMapKey2).assertEqual('pixelMapValue');
+          expect(data[0].hasType('general.file-uri')).assertTrue();
+          expect(data[0].hasType('general.image')).assertTrue();
+          expect(data[0].hasType('general.jpeg')).assertTrue();
+
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
+
+  /**
+   * @tc.name FileUriTest004
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require: test constructor no parameter
+   */
+  it('FileUriTest004', 0, async function (done) {
+    const TAG = 'FileUriTest004';
+    console.info(TAG, 'start');
+    let fileUriDetails = {
+      'fileUriKey1': 123,
+      'fileUriKey2': 'fileUriValue',
+    };
+    let fileUri = {
+      uniformDataType : 'general.file-uri',
+      oriUri : 'www.xx.com',
+      fileType : 'general.vob',
+      details : fileUriDetails
+    };
+    let u8Array = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    let arrayBuffer = new ArrayBuffer(4 * 200 * 200);
+    let opt = { editable: true, pixelFormat: 3, size: { height: 200, width: 200 }, alphaType: 3 };
+    let pixelMapDetails = {
+      'pixelMapKey1': 123,
+      'pixelMapKey2': 'pixelMapValue',
+      'pixelMapKey3': u8Array,
+    };
+    let pixelMap = {
+      uniformDataType : 'openharmony.pixel-map',
+      pixelMap : image.createPixelMapSync(arrayBuffer, opt),
+      details : pixelMapDetails
+    };
+    let record = new UDC.UnifiedRecord();
+    record.addEntry('general.file-uri', fileUri);
+    record.addEntry('openharmony.pixel-map', pixelMap);
+    let rawType = record.getType();
+    expect(rawType).assertEqual('general.video');
+    let rawRecordTypes = record.getTypes();
+    expect(rawRecordTypes.includes('general.file-uri')).assertTrue();
+    expect(rawRecordTypes.includes('openharmony.pixel-map')).assertTrue();
+    let unifiedData = new UDC.UnifiedData(record);
+    let rawDataTypes = unifiedData.getTypes();
+    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
+    expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(unifiedData.hasType('general.file-uri')).assertTrue();
+    expect(unifiedData.hasType('general.video')).assertTrue();
+    expect(unifiedData.hasType('general.vob')).assertTrue();
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          let records = data[0].getRecords();
+          let rawType = records[0].getType();
+          expect(rawType).assertEqual('general.video');
+          let getRecordTypes = records[0].getTypes();
+          expect(getRecordTypes.includes('general.file-uri')).assertTrue();
+          expect(getRecordTypes.includes('openharmony.pixel-map')).assertTrue();
+
+          let getDataTypes = data[0].getTypes();
+          expect(getDataTypes.includes('general.file-uri')).assertTrue();
+          expect(getDataTypes.includes('openharmony.pixel-map')).assertTrue();
+          for (let i = 0; i < records.length; i++) {
+            if (records[i].getType() === 'general.video') {
+              let getUri = records[i].videoUri;
+              expect(getUri).assertEqual('www.xx.com');
+            }
+          }
+          let getValue = records[0].getValue();
+          expect(getValue.uniformDataType).assertEqual('general.file-uri');
+          expect(getValue.oriUri).assertEqual('www.xx.com');
+          expect(getValue.fileType).assertEqual('general.vob');
+          expect(getValue.details.fileUriKey1).assertEqual(123);
+          expect(getValue.details.fileUriKey2).assertEqual('fileUriValue');
+
+          let getEntryFileUri = records[0].getEntry('general.file-uri');
+          expect(getEntryFileUri.uniformDataType).assertEqual('general.file-uri');
+          expect(getEntryFileUri.oriUri).assertEqual('www.xx.com');
+          expect(getEntryFileUri.fileType).assertEqual('general.vob');
+          expect(getEntryFileUri.details.fileUriKey1).assertEqual(123);
+
+          let getEntryPixelMap = records[0].getEntry('openharmony.pixel-map');
+          expect(getEntryPixelMap.uniformDataType).assertEqual('openharmony.pixel-map');
+          getEntryPixelMap.pixelMap.getImageInfo().then((imageInfo)=>{
+            expect(imageInfo.size.height).assertEqual(opt.size.height);
+            expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
+          });
+          expect(getEntryPixelMap.details.pixelMapKey1).assertEqual(123);
+          expect(getEntryPixelMap.details.pixelMapKey2).assertEqual('pixelMapValue');
+          expect(data[0].hasType('general.file-uri')).assertTrue();
+          expect(data[0].hasType('general.video')).assertTrue();
+          expect(data[0].hasType('general.vob')).assertTrue();
+
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
+
+  /**
+   * @tc.name FileUriTest005
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require: test constructor no parameter
+   */
+  it('FileUriTest005', 0, async function (done) {
+    const TAG = 'FileUriTest005';
+    console.info(TAG, 'start');
+    let fileUriDetails = {
+      'fileUriKey1': 123,
+      'fileUriKey2': 'fileUriValue',
+    };
+    let fileUri = {
+      uniformDataType : 'general.file-uri',
+      oriUri : 'www.xx.com',
+      fileType : 'general.vob',
+      details : fileUriDetails
+    };
+    let u8Array = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    let arrayBuffer = new ArrayBuffer(4 * 200 * 200);
+    let opt = { editable: true, pixelFormat: 3, size: { height: 200, width: 200 }, alphaType: 3 };
+    let pixelMapDetails = {
+      'pixelMapKey1': 123,
+      'pixelMapKey2': 'pixelMapValue',
+      'pixelMapKey3': u8Array,
+    };
+    let pixelMap = {
+      uniformDataType : 'openharmony.pixel-map',
+      pixelMap : image.createPixelMapSync(arrayBuffer, opt),
+      details : pixelMapDetails
+    };
+    let record = new UDC.UnifiedRecord('general.vob', fileUri);
+    record.addEntry('openharmony.pixel-map', pixelMap);
+    let rawType = record.getType();
+    expect(rawType).assertEqual('general.vob');
+    let rawRecordTypes = record.getTypes();
+    expect(rawRecordTypes.includes('general.vob')).assertTrue();
+    expect(rawRecordTypes.includes('general.file-uri')).assertFalse();
+    expect(rawRecordTypes.includes('openharmony.pixel-map')).assertTrue();
+    let unifiedData = new UDC.UnifiedData(record);
+    let rawDataTypes = unifiedData.getTypes();
+    expect(rawDataTypes.includes('general.file-uri')).assertFalse();
+    expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(unifiedData.hasType('general.file-uri')).assertFalse();
+    expect(unifiedData.hasType('general.video')).assertTrue();
+    expect(unifiedData.hasType('general.vob')).assertTrue();
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          let records = data[0].getRecords();
+          let rawType = records[0].getType();
+          expect(rawType).assertEqual('general.vob');
+          let getRecordTypes = records[0].getTypes();
+          expect(getRecordTypes.includes('general.vob')).assertTrue();
+          expect(getRecordTypes.includes('general.file-uri')).assertFalse();
+          expect(getRecordTypes.includes('openharmony.pixel-map')).assertTrue();
+
+          let getDataTypes = data[0].getTypes();
+          expect(getDataTypes.includes('general.vob')).assertTrue();
+          expect(getDataTypes.includes('general.file-uri')).assertFalse();
+          expect(getDataTypes.includes('openharmony.pixel-map')).assertTrue();
+
+          let getValue = records[0].getValue();
+          expect(getValue.uniformDataType).assertEqual('general.file-uri');
+          expect(getValue.oriUri).assertEqual('www.xx.com');
+          expect(getValue.fileType).assertEqual('general.vob');
+          expect(getValue.details.fileUriKey1).assertEqual(123);
+          expect(getValue.details.fileUriKey2).assertEqual('fileUriValue');
+
+          let getEntryFileUri = records[0].getEntry('general.file-uri');
+          expect(getEntryFileUri).assertEqual(undefined)
+
+          let getEntryVob = records[0].getEntry('general.vob');
+          expect(getEntryVob.uniformDataType).assertEqual('general.file-uri');
+          expect(getEntryVob.oriUri).assertEqual('www.xx.com');
+          expect(getEntryVob.fileType).assertEqual('general.vob');
+          expect(getEntryVob.details.fileUriKey1).assertEqual(123);
+
+          let getEntryPixelMap = records[0].getEntry('openharmony.pixel-map');
+          expect(getEntryPixelMap.uniformDataType).assertEqual('openharmony.pixel-map');
+          getEntryPixelMap.pixelMap.getImageInfo().then((imageInfo)=>{
+            expect(imageInfo.size.height).assertEqual(opt.size.height);
+            expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
+          });
+          expect(getEntryPixelMap.details.pixelMapKey1).assertEqual(123);
+          expect(getEntryPixelMap.details.pixelMapKey2).assertEqual('pixelMapValue');
+          expect(data[0].hasType('general.file-uri')).assertFalse();
+          expect(data[0].hasType('general.video')).assertTrue();
+          expect(data[0].hasType('general.vob')).assertTrue();
+
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
+
+  /**
+   * @tc.name FileUriTest006
+   * @tc.desc
+   * @tc.type: FUNC
+   * @tc.require: test constructor no parameter
+   */
+  it('FileUriTest006', 0, async function (done) {
+    const TAG = 'FileUriTest006';
+    console.info(TAG, 'start');
+    let fileUriDetails = {
+      'fileUriKey1': 123,
+      'fileUriKey2': 'fileUriValue',
+    };
+    let fileUri = {
+      uniformDataType : 'general.file-uri',
+      oriUri : 'www.xx.com',
+      fileType : 'general.vob',
+      details : fileUriDetails
+    };
+    let u8Array = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    let arrayBuffer = new ArrayBuffer(4 * 200 * 200);
+    let opt = { editable: true, pixelFormat: 3, size: { height: 200, width: 200 }, alphaType: 3 };
+    let pixelMapDetails = {
+      'pixelMapKey1': 123,
+      'pixelMapKey2': 'pixelMapValue',
+      'pixelMapKey3': u8Array,
+    };
+    let pixelMap = {
+      uniformDataType : 'openharmony.pixel-map',
+      pixelMap : image.createPixelMapSync(arrayBuffer, opt),
+      details : pixelMapDetails
+    };
+    let record = new UDC.UnifiedRecord('openharmony.pixel-map', pixelMap);
+    record.addEntry('general.file-uri', fileUri);
+    let rawType = record.getType();
+    expect(rawType).assertEqual('openharmony.pixel-map');
+    let rawRecordTypes = record.getTypes();
+    expect(rawRecordTypes.includes('general.vob')).assertFalse();
+    expect(rawRecordTypes.includes('general.file-uri')).assertTrue();
+    expect(rawRecordTypes.includes('openharmony.pixel-map')).assertTrue();
+    let unifiedData = new UDC.UnifiedData(record);
+    let rawDataTypes = unifiedData.getTypes();
+    expect(rawDataTypes.includes('general.vob')).assertFalse();
+    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
+    expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(unifiedData.hasType('general.file-uri')).assertTrue();
+    expect(unifiedData.hasType('general.video')).assertTrue();
+    expect(unifiedData.hasType('general.vob')).assertTrue();
+    expect(unifiedData.hasType('openharmony.pixel-map')).assertTrue();
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          let records = data[0].getRecords();
+          let rawType = records[0].getType();
+          expect(rawType).assertEqual('openharmony.pixel-map');
+          let getRecordTypes = records[0].getTypes();
+          expect(getRecordTypes.includes('general.vob')).assertFalse();
+          expect(getRecordTypes.includes('general.file-uri')).assertTrue();
+          expect(getRecordTypes.includes('openharmony.pixel-map')).assertTrue();
+
+          let getDataTypes = data[0].getTypes();
+          expect(getDataTypes.includes('general.vob')).assertFalse();
+          expect(getDataTypes.includes('general.file-uri')).assertTrue();
+          expect(getDataTypes.includes('openharmony.pixel-map')).assertTrue();
+
+          let getValue = records[0].getValue();
+          expect(getValue.uniformDataType).assertEqual('openharmony.pixel-map');
+          getValue.pixelMap.getImageInfo().then((imageInfo)=>{
+            expect(imageInfo.size.height).assertEqual(opt.size.height);
+            expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
+          });
+          expect(getValue.details.pixelMapKey1).assertEqual(123);
+          expect(getValue.details.pixelMapKey2).assertEqual('pixelMapValue');
+
+          let getEntryFileUri = records[0].getEntry('general.file-uri');
+          expect(getEntryFileUri.uniformDataType).assertEqual('general.file-uri');
+          expect(getEntryFileUri.oriUri).assertEqual('www.xx.com');
+          expect(getEntryFileUri.fileType).assertEqual('general.vob');
+          expect(getEntryFileUri.details.fileUriKey1).assertEqual(123);
+
+          let getEntryPixelMap = records[0].getEntry('openharmony.pixel-map');
+          expect(getEntryPixelMap.uniformDataType).assertEqual('openharmony.pixel-map');
+          getEntryPixelMap.pixelMap.getImageInfo().then((imageInfo)=>{
+            expect(imageInfo.size.height).assertEqual(opt.size.height);
+            expect(imageInfo.pixelFormat).assertEqual(opt.pixelFormat);
+          });
+          expect(getEntryPixelMap.details.pixelMapKey1).assertEqual(123);
+          expect(getEntryPixelMap.details.pixelMapKey2).assertEqual('pixelMapValue');
+          expect(data[0].hasType('general.file-uri')).assertTrue();
+          expect(data[0].hasType('general.video')).assertTrue();
+          expect(data[0].hasType('general.vob')).assertTrue();
+          expect(data[0].hasType('openharmony.pixel-map')).assertTrue();
+
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
 });

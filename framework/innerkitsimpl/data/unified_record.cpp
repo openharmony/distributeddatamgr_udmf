@@ -18,11 +18,14 @@
 #include "file.h"
 #include "getter_system.h"
 #include "logger.h"
+#include "utd_client.h"
 
 namespace OHOS {
 namespace UDMF {
 static constexpr UDType FILE_TYPES[] = {FILE, AUDIO, FOLDER, IMAGE, VIDEO};
 static constexpr const char *FILE_SCHEME = "file";
+static const std::set<std::string> FILE_SUB_TYPES = {
+    "general.image", "general.video", "general.audio", "general.folder" };
 
 UnifiedRecord::UnifiedRecord()
 {
@@ -117,11 +120,14 @@ void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
         utdId_ = utdId;
         value_ = std::move(value);
         auto udType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(utdId_));
-        if (udType != UD_BUTT) {
-            dataType_ = udType;
-        } else {
+        if (udType == UD_BUTT) {
             dataType_ = APPLICATION_DEFINED_RECORD;
+            return;
         }
+        if (utdId == GENERAL_FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+            ObjectUtils::ProcessFileUriType(udType, value_);
+        }
+        dataType_ = udType;
     } else {
         entries_->insert_or_assign(utdId, std::move(value));
     }
@@ -194,9 +200,17 @@ std::set<std::string> UnifiedRecord::GetUtdIds() const
     std::set<std::string> utdIds;
     if (!utdId_.empty()) {
         utdIds.emplace(utdId_);
+        if (utdId_ == GENERAL_FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+            auto fileUri = std::get<std::shared_ptr<Object>>(value_);
+            AddFileUriType(utdIds, fileUri);
+        }
     }
     for (const auto& [key, value] : *entries_) {
         utdIds.emplace(key);
+        if (key == GENERAL_FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value)) {
+            auto fileUri = std::get<std::shared_ptr<Object>>(value);
+            AddFileUriType(utdIds, fileUri);
+        }
     }
     return utdIds;
 }
@@ -334,6 +348,20 @@ void UnifiedRecord::ComputeUris(const std::function<bool(UriInfo &)> &action)
     for (auto &uri : uris_) {
         if (!action(uri)) {
             break;
+        }
+    }
+}
+
+void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri) const
+{
+    if (fileUri == nullptr) {
+        return;
+    }
+    std::string uniformDataType;
+    if (fileUri->GetValue(UNIFORM_DATA_TYPE, uniformDataType) && uniformDataType == GENERAL_FILE_URI) {
+        std::string fileType;
+        if (fileUri->GetValue(FILE_TYPE, fileType) && !fileType.empty()) {
+            utdIds.emplace(fileType);
         }
     }
 }
