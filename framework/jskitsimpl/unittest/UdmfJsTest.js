@@ -2263,26 +2263,26 @@ describe('UdmfJSTest', function () {
     let fileUriDetails = {
       'fileUriKey1': 123,
       'fileUriKey2': 'fileUriValue',
-    }
+    };
     let fileUri = {
       uniformDataType : 'general.file-uri',
       oriUri : 'www.xx.com',
       fileType : 'general.jpeg',
       details : fileUriDetails
-    }
+    };
     let u8Array = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-    let arrayBuffer = new ArrayBuffer(4*200*200);
+    let arrayBuffer = new ArrayBuffer(4 * 200 * 200);
     let opt = { editable: true, pixelFormat: 3, size: { height: 200, width: 200 }, alphaType: 3 };
     let pixelMapDetails = {
       'pixelMapKey1': 123,
       'pixelMapKey2': 'pixelMapValue',
       'pixelMapKey3': u8Array,
-    }
+    };
     let pixelMap = {
       uniformDataType : 'openharmony.pixel-map',
       pixelMap : image.createPixelMapSync(arrayBuffer, opt),
       details : pixelMapDetails
-    }
+    };
     let record = new UDC.UnifiedRecord('general.file-uri', fileUri);
     record.addEntry('openharmony.pixel-map', pixelMap);
     let rawType = record.getType();
@@ -2326,13 +2326,13 @@ describe('UdmfJSTest', function () {
           expect(getValue.details.fileUriKey1).assertEqual(123);
           expect(getValue.details.fileUriKey2).assertEqual('fileUriValue');
 
-          let getEntryFileUri = records[0].getEntry("general.file-uri");
+          let getEntryFileUri = records[0].getEntry('general.file-uri');
           expect(getEntryFileUri.uniformDataType).assertEqual('general.file-uri');
           expect(getEntryFileUri.oriUri).assertEqual('www.xx.com');
           expect(getEntryFileUri.fileType).assertEqual('general.jpeg');
           expect(getEntryFileUri.details.fileUriKey1).assertEqual(123);
 
-          let getEntryPixelMap = records[0].getEntry("openharmony.pixel-map");
+          let getEntryPixelMap = records[0].getEntry('openharmony.pixel-map');
           expect(getEntryPixelMap.uniformDataType).assertEqual('openharmony.pixel-map');
           getEntryPixelMap.pixelMap.getImageInfo().then((imageInfo)=>{
             expect(imageInfo.size.height).assertEqual(opt.size.height);
@@ -2384,13 +2384,13 @@ describe('UdmfJSTest', function () {
       'fileUriKey1': 123,
       'fileUriKey2': 'fileUriValue',
       'fileUriKey3': u8Array,
-    }
+    };
     let fileUri = {
       uniformDataType : 'general.file-uri',
       oriUri : 'www.xx.com',
       fileType : 'general.image',
       details : fileUriDetails
-    }
+    };
     let record = new UDC.UnifiedRecord('general.file-uri', fileUri);
     let rawType = record.getType();
     expect(rawType).assertEqual('general.image');
@@ -2431,7 +2431,7 @@ describe('UdmfJSTest', function () {
           expect(getValue.details.fileUriKey1).assertEqual(123);
           expect(getValue.details.fileUriKey2).assertEqual('fileUriValue');
 
-          let getEntry = records[0].getEntry("general.file-uri");
+          let getEntry = records[0].getEntry('general.file-uri');
           expect(getEntry.uniformDataType).assertEqual('general.file-uri');
           expect(getEntry.oriUri).assertEqual('www.xx.com');
           expect(getEntry.fileType).assertEqual('general.image');
@@ -2477,26 +2477,26 @@ describe('UdmfJSTest', function () {
       let fileUriDetails = {
         'fileUriKey1': 123,
         'fileUriKey2': 'fileUriValue',
-      }
+      };
       let fileUri = {
         uniformDataType : 'general.file-uri',
         oriUri : 'www.xx.com',
         fileType : 'general.jpeg',
         details : fileUriDetails
-      }
+      };
       let u8Array = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-      let arrayBuffer = new ArrayBuffer(4*200*200);
+      let arrayBuffer = new ArrayBuffer(4 * 200 * 200);
       let opt = { editable: true, pixelFormat: 3, size: { height: 200, width: 200 }, alphaType: 3 };
       let pixelMapDetails = {
         'pixelMapKey1': 123,
         'pixelMapKey2': 'pixelMapValue',
         'pixelMapKey3': u8Array,
-      }
+      };
       let pixelMap = {
         uniformDataType : 'openharmony.pixel-map',
         pixelMap : image.createPixelMapSync(arrayBuffer, opt),
         details : pixelMapDetails
-      }
+      };
       let record = new UDC.File();
       record.details = {
         name: 'test',
@@ -2547,13 +2547,13 @@ describe('UdmfJSTest', function () {
             let getValue = records[0].getValue();
             expect(getValue).assertEqual(undefined);
   
-            let getEntryFileUri = records[0].getEntry("general.file-uri");
+            let getEntryFileUri = records[0].getEntry('general.file-uri');
             expect(getEntryFileUri.uniformDataType).assertEqual('general.file-uri');
             expect(getEntryFileUri.oriUri).assertEqual('www.xx.com');
             expect(getEntryFileUri.fileType).assertEqual('general.jpeg');
             expect(getEntryFileUri.details.fileUriKey1).assertEqual(123);
   
-            let getEntryPixelMap = records[0].getEntry("openharmony.pixel-map");
+            let getEntryPixelMap = records[0].getEntry('openharmony.pixel-map');
             expect(getEntryPixelMap.uniformDataType).assertEqual('openharmony.pixel-map');
             getEntryPixelMap.pixelMap.getImageInfo().then((imageInfo)=>{
               expect(imageInfo.size.height).assertEqual(opt.size.height);
@@ -2603,26 +2603,26 @@ describe('UdmfJSTest', function () {
       let fileUriDetails = {
         'fileUriKey1': 123,
         'fileUriKey2': 'fileUriValue',
-      }
+      };
       let fileUri = {
         uniformDataType : 'general.file-uri',
         oriUri : 'www.xx.com',
         fileType : 'general.vob',
         details : fileUriDetails
-      }
+      };
       let u8Array = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-      let arrayBuffer = new ArrayBuffer(4*200*200);
+      let arrayBuffer = new ArrayBuffer(4 * 200 * 200);
       let opt = { editable: true, pixelFormat: 3, size: { height: 200, width: 200 }, alphaType: 3 };
       let pixelMapDetails = {
         'pixelMapKey1': 123,
         'pixelMapKey2': 'pixelMapValue',
         'pixelMapKey3': u8Array,
-      }
+      };
       let pixelMap = {
         uniformDataType : 'openharmony.pixel-map',
         pixelMap : image.createPixelMapSync(arrayBuffer, opt),
         details : pixelMapDetails
-      }
+      };
       let record = new UDC.UnifiedRecord();
       record.addEntry('general.file-uri', fileUri);
       record.addEntry('openharmony.pixel-map', pixelMap);
@@ -2673,13 +2673,13 @@ describe('UdmfJSTest', function () {
             expect(getValue.details.fileUriKey1).assertEqual(123);
             expect(getValue.details.fileUriKey2).assertEqual('fileUriValue');
   
-            let getEntryFileUri = records[0].getEntry("general.file-uri");
+            let getEntryFileUri = records[0].getEntry('general.file-uri');
             expect(getEntryFileUri.uniformDataType).assertEqual('general.file-uri');
             expect(getEntryFileUri.oriUri).assertEqual('www.xx.com');
             expect(getEntryFileUri.fileType).assertEqual('general.vob');
             expect(getEntryFileUri.details.fileUriKey1).assertEqual(123);
   
-            let getEntryPixelMap = records[0].getEntry("openharmony.pixel-map");
+            let getEntryPixelMap = records[0].getEntry('openharmony.pixel-map');
             expect(getEntryPixelMap.uniformDataType).assertEqual('openharmony.pixel-map');
             getEntryPixelMap.pixelMap.getImageInfo().then((imageInfo)=>{
               expect(imageInfo.size.height).assertEqual(opt.size.height);
