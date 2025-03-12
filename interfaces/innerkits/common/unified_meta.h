@@ -635,7 +635,7 @@ namespace ObjectUtils {
     int64_t GetValueSize(const ValueType &value, bool isCalValueType);
     int64_t GetObjectValueSize(const std::shared_ptr<Object> object, bool isCalValueType);
     int64_t GetAllObjectSize(const std::shared_ptr<Object> object);
-    void ProcessFileUriType(UDType &utdType, ValueType &value);
+    void API_EXPORT ProcessFileUriType(UDType &utdType, ValueType &value);
 
     template<typename T, typename... Types>
     bool ConvertVariant(T &&input, std::variant<Types...> &output)
