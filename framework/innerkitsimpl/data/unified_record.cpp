@@ -124,7 +124,7 @@ void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
             dataType_ = APPLICATION_DEFINED_RECORD;
             return;
         }
-        if (utdId == "general.file-uri" && std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        if (utdId == GENERAL_FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value_)) {
             ObjectUtils::ProcessFileUriType(udType, value_);
         }
         dataType_ = udType;
@@ -200,14 +200,14 @@ std::set<std::string> UnifiedRecord::GetUtdIds() const
     std::set<std::string> utdIds;
     if (!utdId_.empty()) {
         utdIds.emplace(utdId_);
-        if (utdId_ == "general.file-uri" && std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        if (utdId_ == GENERAL_FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value_)) {
             auto fileUri = std::get<std::shared_ptr<Object>>(value_);
             AddFileUriType(utdIds, fileUri);
         }
     }
     for (const auto& [key, value] : *entries_) {
         utdIds.emplace(key);
-        if (key == "general.file-uri" && std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        if (key == GENERAL_FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value)) {
             auto fileUri = std::get<std::shared_ptr<Object>>(value);
             AddFileUriType(utdIds, fileUri);
         }
@@ -358,7 +358,7 @@ void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds, const std::sha
         return;
     }
     std::string uniformDataType;
-    if (fileUri->GetValue(UNIFORM_DATA_TYPE, uniformDataType) && uniformDataType == "general.file-uri") {
+    if (fileUri->GetValue(UNIFORM_DATA_TYPE, uniformDataType) && uniformDataType == GENERAL_FILE_URI) {
         std::string fileType;
         if (fileUri->GetValue(FILE_TYPE, fileType) && !fileType.empty()) {
             utdIds.emplace(fileType);

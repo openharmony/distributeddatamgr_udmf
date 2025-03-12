@@ -774,7 +774,7 @@ void ObjectUtils::ProcessFileUriType(UDType &utdType, ValueType &value)
 {
     auto fileUri = std::get<std::shared_ptr<Object>>(value);
     std::string uniformDataType;
-    if (!fileUri->GetValue(UNIFORM_DATA_TYPE, uniformDataType) || uniformDataType != "general.file-uri") {
+    if (!fileUri->GetValue(UNIFORM_DATA_TYPE, uniformDataType) || uniformDataType != GENERAL_FILE_URI) {
         LOG_INFO(UDMF_FRAMEWORK, "Attribute uniformDataType not equals to 'general.file-uri'!");
         return;
     }

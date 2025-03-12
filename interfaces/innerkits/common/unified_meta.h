@@ -63,6 +63,7 @@ constexpr const char* APP_ICON = "appIcon";
 constexpr const char* APP_ICON_LENGTH = "appIconLen";
 constexpr const char* LINK_URL = "linkUrl";
 constexpr const char* APPLICATION_DEFINED_RECORD_MARK = "applicationDefinedRecordMark";
+constexpr const char* GENERAL_FILE_URI = "general.file-uri";
 
 enum UDType : int32_t {
     ENTITY = 0,

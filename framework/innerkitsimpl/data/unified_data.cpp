@@ -126,7 +126,7 @@ bool UnifiedData::HasType(const std::string &type) const
     return false;
 }
 
-bool UnifiedData::HasHigherType(const std::string &type) const
+bool UnifiedData::HasHigherFileType(const std::string &type) const
 {
     std::set<std::string> types = GetTypIds();
     if (types.find(type) != types.end()) {

@@ -253,7 +253,7 @@ void UnifiedDataHelper::ProcessTypeId(const ValueType &value, std::string &typeI
     }
     if (object->value_.find(APPLICATION_DEFINED_RECORD_MARK) != object->value_.end()) {
         typeId = UtdUtils::GetUtdIdFromUtdEnum(APPLICATION_DEFINED_RECORD);
-    } else if (std::get<std::string>(object->value_[UNIFORM_DATA_TYPE]) == "general.file-uri" &&
+    } else if (std::get<std::string>(object->value_[UNIFORM_DATA_TYPE]) == GENERAL_FILE_URI &&
         object->value_.find(FILE_TYPE) != object->value_.end()) {
         std::string fileType = std::get<std::string>(object->value_[FILE_TYPE]);
         if (!fileType.empty()) {
