@@ -43,6 +43,7 @@ config("udmf_napi_config") {
     "${udmf_interfaces_path}/jskits/data",
 
     "${udmf_framework_path}/common",
+    "${udmf_framework_path}/innerkitsimpl/data",
     "${udmf_framework_path}/innerkits/service",
 
     "${third_party_path}/libuv/include",
@@ -96,7 +97,10 @@ arkui_x_public_source = [
   "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/video.cpp",
+  "${udmf_framework_path}/common/utd_graph.cpp",
+  "${udmf_framework_path}/common/graph.cpp",
   "${udmf_root_path}/adapter/framework/innerkitsimpl/common/unified_meta.cpp",
+  "${udmf_root_path}/adapter/framework/innerkitsimpl/client/utd_client.cpp",
 ]
 
 ohos_source_set("arkui_x_udmf_data") {
@@ -104,9 +108,7 @@ ohos_source_set("arkui_x_udmf_data") {
     "${udmf_framework_path}/common/base32_utils.cpp",
     "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
     "${udmf_framework_path}/common/custom_utd_store.cpp",
-    "${udmf_framework_path}/common/graph.cpp",
     "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
-    "${udmf_framework_path}/common/utd_graph.cpp",
     "${udmf_root_path}/adapter/framework/common/udmf_utils.cpp",
   ]
 
@@ -186,7 +188,6 @@ ohos_source_set("arkui_x_uniformtypedescriptor") {
     "${udmf_framework_path}/jskitsimpl/data/uniform_type_descriptor_napi.cpp",
     "${udmf_interfaces_path}/jskits/module/uniform_type_descriptor_napi_module.cpp",
     "${udmf_root_path}/adapter/framework/innerkitsimpl/client/udmf_client.cpp",
-    "${udmf_root_path}/adapter/framework/innerkitsimpl/client/utd_client.cpp",
   ]
   deps = [
     ":arkui_x_udmf_data",
