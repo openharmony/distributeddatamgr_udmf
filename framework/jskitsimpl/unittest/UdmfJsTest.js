@@ -2785,7 +2785,7 @@ describe('UdmfJSTest', function () {
           expect(getValue.details.fileUriKey2).assertEqual('fileUriValue');
 
           let getEntryFileUri = records[0].getEntry('general.file-uri');
-          expect(getEntryFileUri).assertEqual(undefined)
+          expect(getEntryFileUri).assertEqual(undefined);
 
           let getEntryVob = records[0].getEntry('general.vob');
           expect(getEntryVob.uniformDataType).assertEqual('general.file-uri');
