@@ -734,5 +734,50 @@ template <> bool Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &
     output = std::shared_ptr<OHOS::AAFwk::Want>(want);
     return true;
 }
+
+template <> size_t CountBufferSize(const Summary &input, TLVObject &data)
+{
+    return data.CountHead() + CountBufferSize(input.summary, data) + data.CountBasic(input.totalSize);
+}
+
+template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    auto tagCursor = data.GetCursor();
+    data.OffsetHead();
+    if (!TLVUtil::Writing(input.summary, data, TAG::TAG_SUMMARY_MAP)) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_SUMMARY_SIZE, input.totalSize)) {
+        return false;
+    }
+    return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
+}
+
+template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
+{
+    auto endCursor = data.GetCursor() + head.len;
+    while (data.GetCursor() < endCursor) {
+        TLVHead headItem{};
+        if (!data.ReadHead(headItem)) {
+            return false;
+        }
+        switch (headItem.tag) {
+            case static_cast<uint16_t>(TAG::TAG_SUMMARY_MAP):
+                if (!TLVUtil::Reading(output.summary, data, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_SUMMARY_SIZE):
+                if (!data.ReadBasic(output.totalSize, headItem)) {
+                    return false;
+                }
+                break;
+            default:
+                data.Skip(headItem);
+        }
+    }
+    return true;
+}
 } // namespace TLVUtil
 } // namespace OHOS

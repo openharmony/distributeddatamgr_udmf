@@ -121,6 +121,10 @@ template <> size_t API_EXPORT CountBufferSize(const std::shared_ptr<OHOS::AAFwk:
 template <> bool API_EXPORT Writing(const std::shared_ptr<OHOS::AAFwk::Want> &input, TLVObject &data, TAG tag);
 template <> bool API_EXPORT Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &data, const TLVHead &head);
 
+template <> size_t API_EXPORT CountBufferSize(const Summary &input, TLVObject &data);
+template <> bool API_EXPORT Writing(const Summary &input, TLVObject &data, TAG tag);
+template <> bool API_EXPORT Reading(Summary &output, TLVObject &data, const TLVHead &head);
+
 template <typename T> bool ReadTlv(T &output, TLVObject &data, TAG tag)
 {
     while (data.GetCursor() < data.GetTotal()) {
