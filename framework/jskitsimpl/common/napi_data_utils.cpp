@@ -28,7 +28,7 @@ static const std::map<napi_valuetype, ValueType> objectValueTypeMap = {
     {napi_valuetype::napi_null, nullptr}
 };
 
-static const std::set<std::string> udsAttributeKeySet = {"details", "thumbData", "appicon"};
+static const std::set<std::string> udsAttributeKeySet = {"details", "thumbData", "appIcon"};
 /* napi_value <-> bool */
 napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, bool &out)
 {
