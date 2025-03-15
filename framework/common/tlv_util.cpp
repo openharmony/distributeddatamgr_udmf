@@ -325,9 +325,6 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
         std::shared_ptr<std::map<std::string, ValueType>> entries;
         std::vector<UriInfo> uriInfos;
         switch (headItem.tag) {
-            case static_cast<uint16_t>(TAG::TAG_VERSION):
-                data.Skip(headItem);
-                break;
             case static_cast<uint16_t>(TAG::TAG_UD_TYPE):
                 if (!TLVUtil::Reading(dataType, data, headItem)) {
                     return false;
@@ -379,7 +376,7 @@ template <> size_t CountBufferSize(const Runtime &input, TLVObject &data)
         data.CountBasic(static_cast<int64_t>(input.lastModifiedTime)) +
         data.CountBasic(static_cast<int32_t>(input.dataStatus)) + data.Count(input.sourcePackage) +
         data.Count(input.createPackage) + data.Count(input.deviceId) + TLVUtil::CountBufferSize(input.key, data) +
-        TLVUtil::CountBufferSize(input.privileges, data);
+        data.Count(input.sdkVersion) + TLVUtil::CountBufferSize(input.privileges, data);
 }
 
 template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
@@ -421,6 +418,9 @@ template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
         return false;
     }
     if (!data.WriteBasic(TAG::TAG_TOKEN_ID, input.tokenId)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.sdkVersion, data, TAG::TAG_VERSION)) {
         return false;
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
@@ -475,6 +475,9 @@ template <> bool Reading(Runtime &output, TLVObject &data, const TLVHead &head)
                 break;
             case static_cast<uint16_t>(TAG::TAG_TOKEN_ID):
                 result = data.ReadBasic(output.tokenId, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_VERSION):
+                result = data.Read(output.sdkVersion, headItem);
                 break;
             default:
                 result = data.Skip(headItem);

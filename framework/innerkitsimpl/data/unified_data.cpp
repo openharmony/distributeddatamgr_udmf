@@ -66,6 +66,7 @@ std::shared_ptr<Runtime> UnifiedData::GetRuntime() const
 void UnifiedData::SetRuntime(Runtime &runtime)
 {
     this->runtime_ = std::make_shared<Runtime>(runtime);
+    this->SetSdkVersion(runtime.sdkVersion);
 }
 
 void UnifiedData::AddRecord(const std::shared_ptr<UnifiedRecord> &record)
