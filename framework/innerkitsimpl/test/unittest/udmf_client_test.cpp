@@ -2661,6 +2661,147 @@ HWTEST_F(UdmfClientTest, SetData036, TestSize.Level1)
 }
 
 /**
+* @tc.name: SetData037
+* @tc.desc: test html record process
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData037, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData037 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data1;
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<UnifiedRecord>();
+    data1.AddRecord(record);
+    std::string key;
+    UnifiedHtmlRecordProcess::RebuildHtmlRecord(data1);
+    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(data1);
+    UnifiedData data;
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetContent("plainContent");
+    data.AddRecord(plainText);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "this is a content");
+    record1->ClearUris();
+    data.AddRecord(record1);
+    auto file = std::make_shared<File>();
+    file->SetRemoteUri("remoteUri");
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    file->SetDetails(details);
+    data.AddRecord(file);
+    UnifiedHtmlRecordProcess::RebuildHtmlRecord(data);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+
+    LOG_INFO(UDMF_TEST, "SetData037 end.");
+}
+
+/**
+* @tc.name: SetData038
+* @tc.desc: test html record process
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData038, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData038 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    std::shared_ptr<Object> fileObj = std::make_shared<Object>();
+    fileObj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    fileObj->value_[FILE_URI_PARAM] = "http://demo.com";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, fileObj);
+    std::string html = "<img data-ohos='clipboard' src='file:///data/storage/el2/distributedfiles/103.png'>";
+    auto htmlRecord = Html(html, "abstract");
+    htmlRecord.InitObject();
+    record->AddEntry(htmlRecord.GetUtdId(), htmlRecord.GetOriginValue());
+    data.AddRecord(record);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+
+    std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
+    ASSERT_NE(readRecord, nullptr);
+    std::shared_ptr<std::map<std::string, ValueType>> entries = std::make_shared<std::map<std::string, ValueType>>();
+    std::string utd = "general.html";
+    ValueType value = "htmlContent";
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[HTML_CONTENT] = 10;
+    std::shared_ptr<Object> obj1 = std::make_shared<Object>();
+    obj1->value_[HTML_CONTENT] = "file:///data/storage/el2/distributedfiles/103.png";
+    readRecord->SetInnerEntries(entries);
+    readRecord->SetType(UDType::HTML);
+    entries->insert_or_assign(std::move(utd), std::move(value));
+    UnifiedHtmlRecordProcess::RebuildHtmlRecord(readData);
+    entries->insert_or_assign(std::move(utd), std::move(obj));
+    UnifiedHtmlRecordProcess::RebuildHtmlRecord(readData);
+    entries->insert_or_assign(std::move(utd), std::move(obj1));
+    UnifiedHtmlRecordProcess::RebuildHtmlRecord(readData);
+
+    LOG_INFO(UDMF_TEST, "SetData038 end.");
+}
+
+/**
+* @tc.name: SetData039
+* @tc.desc: test html record process
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData039, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData039 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    auto text = std::make_shared<Text>();
+    data.AddRecord(text);
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetContent("plainContent");
+    data.AddRecord(plainText);
+    auto html = std::make_shared<Html>();
+    html->SetPlainContent("htmlContent");
+    data.AddRecord(html);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    UnifiedData data1;
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[PLAIN_CONTENT] = "http://demo.com";
+    obj->value_[HTML_CONTENT] = 10;
+    plainText->AddEntry("general.html", obj);
+    data1.AddRecord(plainText);
+    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(data1);
+    UnifiedHtmlRecordProcess::RebuildHtmlRecord(data1);
+    UnifiedData data2;
+    text->AddEntry("general.html", "");
+    data2.AddRecord(text);
+    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(data2);
+    UnifiedHtmlRecordProcess::RebuildHtmlRecord(data2);
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+
+    LOG_INFO(UDMF_TEST, "SetData039 end.");
+}
+
+/**
 * @tc.name: GetSummary003
 * @tc.desc: Get summary data
 * @tc.type: FUNC
