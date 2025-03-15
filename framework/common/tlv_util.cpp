@@ -231,8 +231,7 @@ template <> bool Reading(UnifiedKey &output, TLVObject &data, const TLVHead &hea
 
 template <> size_t CountBufferSize(const UnifiedData &input, TLVObject &data)
 {
-    std::string version = UTILS::GetCurrentSdkVersion();
-    return data.CountHead() + data.Count(version) + TLVUtil::CountBufferSize(input.GetRecords(), data);
+    return data.CountHead() + data.Count(input.GetSdkVersion()) + TLVUtil::CountBufferSize(input.GetRecords(), data);
 }
 
 template <> bool Writing(const UnifiedData &input, TLVObject &data, TAG tag)
@@ -240,8 +239,7 @@ template <> bool Writing(const UnifiedData &input, TLVObject &data, TAG tag)
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
-    std::string version = UTILS::GetCurrentSdkVersion();
-    if (!data.Write(TAG::TAG_VERSION, version)) {
+    if (!data.Write(TAG::TAG_VERSION, input.GetSdkVersion())) {
         return false;
     }
     if (!TLVUtil::Writing(input.GetRecords(), data, TAG::TAG_UNIFIED_RECORD)) {
@@ -259,7 +257,11 @@ template <> bool Reading(UnifiedData &output, TLVObject &data, const TLVHead &he
             return false;
         }
         if (headItem.tag == static_cast<uint16_t>(TAG::TAG_VERSION)) {
-            data.Skip(headItem);
+            std::string version;
+            if (!Reading(version, data, headItem)) {
+                return false;
+            }
+            output.SetSdkVersion(version);
             continue;
         }
         if (headItem.tag == static_cast<uint16_t>(TAG::TAG_UNIFIED_RECORD)) {
@@ -277,8 +279,7 @@ template <> bool Reading(UnifiedData &output, TLVObject &data, const TLVHead &he
 
 template <> size_t CountBufferSize(const UnifiedRecord &input, TLVObject &data)
 {
-    std::string version = UTILS::GetCurrentSdkVersion();
-    return data.CountHead() + data.Count(version) + data.CountBasic(static_cast<int32_t>(input.GetType())) +
+    return data.CountHead() + data.CountBasic(static_cast<int32_t>(input.GetType())) +
         data.Count(input.GetUid()) + CountBufferSize(input.GetOriginValue(), data) + data.Count(input.GetUtdId()) +
         CountBufferSize(input.GetInnerEntries(), data) + CountBufferSize(input.GetUris(), data);
 }
@@ -288,10 +289,6 @@ template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
-    std::string version = UTILS::GetCurrentSdkVersion();
-    if (!data.Write(TAG::TAG_VERSION, version)) {
-        return false;
-    }
     if (!data.WriteBasic(TAG::TAG_UD_TYPE, static_cast<int32_t>(input.GetType()))) {
         return false;
     }
@@ -376,14 +373,13 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
 
 template <> size_t CountBufferSize(const Runtime &input, TLVObject &data)
 {
-    std::string version = UTILS::GetCurrentSdkVersion();
     return data.CountHead() + data.CountBasic(input.isPrivate) + data.CountBasic(input.dataVersion) +
         data.CountBasic(input.recordTotalNum) + data.CountBasic(input.tokenId) +
         data.CountBasic(static_cast<int64_t>(input.createTime)) +
         data.CountBasic(static_cast<int64_t>(input.lastModifiedTime)) +
         data.CountBasic(static_cast<int32_t>(input.dataStatus)) + data.Count(input.sourcePackage) +
         data.Count(input.createPackage) + data.Count(input.deviceId) + TLVUtil::CountBufferSize(input.key, data) +
-        data.Count(version) + TLVUtil::CountBufferSize(input.privileges, data);
+        TLVUtil::CountBufferSize(input.privileges, data);
 }
 
 template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
@@ -391,10 +387,6 @@ template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
-    std::string version = UTILS::GetCurrentSdkVersion();
-    if (!TLVUtil::Writing(version, data, TAG::TAG_VERSION)) {
-        return false;
-    }
     if (!TLVUtil::Writing(input.key, data, TAG::TAG_KEY)) {
         return false;
     }
