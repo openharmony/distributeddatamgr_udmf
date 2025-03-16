@@ -26,6 +26,8 @@ static constexpr const char *UNIFIED_KEY_SCHEMA = "udmf://";
 static constexpr const char *ALPHA_AGGREGATE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static constexpr const char *DIGIT_AGGREGATE = "0123456789";
 static constexpr const char *SYMBOL_AGGREGATE = ":;<=>?@[\\]_`";
+static constexpr uint32_t PREFIX_LEN = 24;
+static constexpr uint32_t SUFIX_LEN = 8;
 UnifiedKey::UnifiedKey(std::string key)
 {
     this->key = std::move(key);
@@ -49,6 +51,20 @@ std::string UnifiedKey::GetUnifiedKey()
     // Uri-compliant structure, example: udmf://drag/com.ohos.test/012345679abc
     this->key = UNIFIED_KEY_SCHEMA + this->intention + "/" + this->bundleName + "/" + this->groupId;
     return this->key;
+}
+
+std::string UnifiedKey::GetPropertyKey() const
+{
+    if (this->key.size() > SUFIX_LEN + PREFIX_LEN) {
+        return this->key.substr(0, key.size() - SUFIX_LEN);
+    }
+    if (this->intention.empty() || this->groupId.size() < SUFIX_LEN + PREFIX_LEN) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Empty property key.intention:%{public}s, groupId:%{public}s",
+            intention.c_str(), groupId.c_str());
+        return "";
+    }
+    return UNIFIED_KEY_SCHEMA + this->intention + "/" + this->bundleName + "/" +
+        this->groupId.substr(0, PREFIX_LEN);
 }
 
 bool UnifiedKey::IsValid()
