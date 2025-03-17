@@ -55,7 +55,8 @@ std::string UnifiedKey::GetUnifiedKey()
     std::ostringstream oss;
     oss << UNIFIED_KEY_SCHEMA << this->intention << SEPARATOR <<
         this->bundleName << SEPARATOR << this->groupId;
-    return oss.str();
+    this->key = oss.str();
+    return this->key;
 }
 
 std::string UnifiedKey::GetPropertyKey() const
