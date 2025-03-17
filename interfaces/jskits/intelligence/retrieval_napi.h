@@ -38,6 +38,7 @@ struct AsyncGetRetriever {
 struct AsyncRetrieve {
     napi_async_work asyncWork;
     napi_deferred deferred;
+    std::string query;
     RetrievalConditionStruct retrievalCondition;
     IAipCoreManager* retrievalAipCoreManagerPtr;
     RetrievalResponseStruct retrievalResponse;

@@ -218,7 +218,6 @@ struct RerankParamsStruct {
 };
 
 struct RetrievalConditionStruct {
-    std::string query;
     std::vector<std::shared_ptr<RecallConditionStruct>> recallConditions;
     RerankParamsStruct rerankParameter;
     int topN = 500;
@@ -255,7 +254,8 @@ public:
     virtual ~IAipCoreManager() = default;
 
     virtual int32_t InitRetriever(const RetrievalConfigStruct& retrievalConfig) = 0;
-    virtual int32_t Retrieve(const RetrievalConditionStruct &condition, RetrievalResponseStruct &retrievalResponse) = 0;
+    virtual int32_t Retrieve(const std::string query, const RetrievalConditionStruct &condition,
+        RetrievalResponseStruct &retrievalResponse) = 0;
     virtual int32_t InitTextModel(const ModelConfigData &config) = 0;
     virtual int32_t InitImageModel(const ModelConfigData &config) = 0;
     virtual int32_t LoadTextModel() = 0;
