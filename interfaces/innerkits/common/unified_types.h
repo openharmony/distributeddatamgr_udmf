@@ -63,6 +63,7 @@ struct Runtime {
     std::string deviceId;
     std::uint32_t recordTotalNum {};
     uint32_t tokenId;
+    std::string sdkVersion;
 };
 
 /*

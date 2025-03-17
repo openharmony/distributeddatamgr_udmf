@@ -20,6 +20,7 @@
 
 #include "logger.h"
 #include "udmf_capi_common.h"
+#include "udmf_utils.h"
 #include "unified_data.h"
 
 using namespace testing::ext;

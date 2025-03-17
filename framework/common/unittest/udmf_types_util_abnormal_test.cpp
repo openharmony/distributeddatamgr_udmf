@@ -31,6 +31,7 @@
 #include "application_defined_record.h"
 #include "unified_types.h"
 #include "udmf_client.h"
+#include "udmf_utils.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
