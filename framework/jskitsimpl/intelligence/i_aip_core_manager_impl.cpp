@@ -27,7 +27,7 @@ int32_t IAipCoreManagerImpl::InitRetriever(const RetrievalConfigStruct &retrieva
     return DEVICE_EXCEPTION;
 }
 
-int32_t IAipCoreManagerImpl::Retrieve(const RetrievalConditionStruct &condition,
+int32_t IAipCoreManagerImpl::Retrieve(const std::string query, const RetrievalConditionStruct &condition,
     RetrievalResponseStruct &retrievalResponse)
 {
     return DEVICE_EXCEPTION;

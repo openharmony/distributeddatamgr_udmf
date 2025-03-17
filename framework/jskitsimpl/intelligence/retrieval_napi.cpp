@@ -278,9 +278,10 @@ void RetrievalNapi::RetrieveExecutionCB(napi_env env, void *data)
     AIP_HILOGD("Enter");
     AsyncRetrieve *asyncRetrieve = static_cast<AsyncRetrieve *>(data);
     auto retrievalCondition = asyncRetrieve->retrievalCondition;
+    auto query = asyncRetrieve->query;
     auto retrievalAipCoreManagerPtr = asyncRetrieve->retrievalAipCoreManagerPtr;
     RetrievalResponseStruct retrievalResponse;
-    int32_t result = retrievalAipCoreManagerPtr->Retrieve(retrievalCondition, retrievalResponse);
+    int32_t result = retrievalAipCoreManagerPtr->Retrieve(query, retrievalCondition, retrievalResponse);
     AIP_HILOGI("execute retrieve.");
     asyncRetrieve->ret = result;
     asyncRetrieve->retrievalResponse = retrievalResponse;
@@ -320,16 +321,24 @@ void RetrievalNapi::RetrieveCompleteCB(napi_env env, napi_status status, void *d
 napi_value RetrievalNapi::Retrieve(napi_env env, napi_callback_info info)
 {
     AIP_HILOGI("Retrieve being call.");
-    napi_value args[1] = { nullptr };
-    size_t argc = 1;
+    napi_value args[2] = { nullptr };
+    size_t argc = 2;
     napi_value jsThis = nullptr;
     napi_status status = napi_get_cb_info(env, info, &argc, args, &jsThis, nullptr);
     if (status != napi_ok) {
         ThrowIntelligenceErr(env, INNER_ERROR, "napi_get_cb_info failed.");
         return nullptr;
     }
+    std::string query;
+    napi_value queryNapi;
+    napi_get_named_property(env, args[0], "query", &queryNapi);
+    status = AipNapiUtils::Convert2Value(env, queryNapi, query);
+    if (status != napi_ok) {
+        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "Failed to convert the field query.");
+        return nullptr;
+    }
     RetrievalConditionStruct retrievalCondition;
-    status = AipNapiUtils::Convert2Value(env, args[0], retrievalCondition);
+    status = AipNapiUtils::Convert2Value(env, args[1], retrievalCondition);
     if (status != napi_ok) {
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "Parse RetrievalCondition failed.");
         return nullptr;
@@ -349,6 +358,7 @@ napi_value RetrievalNapi::Retrieve(napi_env env, napi_callback_info info)
     auto asyncRetrieve = new AsyncRetrieve{
         .asyncWork = nullptr,
         .deferred = deferred,
+        .query = query,
         .retrievalCondition = retrievalCondition,
         .retrievalAipCoreManagerPtr = retrievalAipCoreManagerPtr
     };

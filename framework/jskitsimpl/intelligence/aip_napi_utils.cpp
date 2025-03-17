@@ -543,6 +543,7 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, RetrievalCo
     std::vector<ChannelConfigStruct> channelConfigs;
     uint32_t arrayLength;
     napi_get_array_length(env, channelConfigsNapi, &arrayLength);
+    LOG_ERROR_RETURN(arrayLength > 0, "channelConfigs is empty.", napi_invalid_arg);
     for (uint32_t i = 0; i < arrayLength; ++i) {
         napi_value channelConfigNapi;
         napi_get_element(env, channelConfigsNapi, i, &channelConfigNapi);
@@ -957,9 +958,9 @@ static napi_status ConvertRecallConditionSubClass(napi_env env, const napi_value
     napi_value recallConditionNapi;
     napi_get_element(env, in, index, &recallConditionNapi);
     bool isFtsTableNamePresent = false;
-    bool isQueryPresent = false;
+    bool isVectorQueryPresent = false;
     napi_has_named_property(env, recallConditionNapi, "ftsTableName", &isFtsTableNamePresent);
-    napi_has_named_property(env, recallConditionNapi, "query", &isQueryPresent);
+    napi_has_named_property(env, recallConditionNapi, "vectorQuery", &isVectorQueryPresent);
     napi_status status;
     if (isFtsTableNamePresent) {
         std::shared_ptr<InvertedIndexRecallConditionStruct> recallConditionPtr =
@@ -967,15 +968,14 @@ static napi_status ConvertRecallConditionSubClass(napi_env env, const napi_value
         status = AipNapiUtils::Convert2Value(env, recallConditionNapi, recallConditionPtr);
         LOG_ERROR_RETURN(status == napi_ok, "Failed to convert InvertedIndexRecallCondition.", napi_invalid_arg);
         out = recallConditionPtr;
-    } else if (isQueryPresent) {
+    } else if (isVectorQueryPresent) {
         std::shared_ptr<VectorRecallConditionStruct> recallConditionPtr =
             std::make_shared<VectorRecallConditionStruct>();
         napi_value vecotrQueryNapi;
-        napi_get_named_property(env, recallConditionNapi, "query", &vecotrQueryNapi);
+        napi_get_named_property(env, recallConditionNapi, "vectorQuery", &vecotrQueryNapi);
         VectorQueryStruct vecotrQuery;
-        status = AipNapiUtils::Convert2Value(env, vecotrQueryNapi, vecotrQuery);
+        status = AipNapiUtils::Convert2Value(env, vecotrQueryNapi, recallConditionPtr->vectorQuery);
         LOG_ERROR_RETURN(status == napi_ok, "Failed to convert field vectorQuery.", napi_invalid_arg);
-        recallConditionPtr->vectorQuery = vecotrQuery;
         out = recallConditionPtr;
     }
     status = AipNapiUtils::Convert2Value(env, recallConditionNapi, out);
@@ -985,11 +985,7 @@ static napi_status ConvertRecallConditionSubClass(napi_env env, const napi_value
 
 napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, RetrievalConditionStruct &out)
 {
-    napi_value queryNapi;
-    napi_get_named_property(env, in, "query", &queryNapi);
-    napi_status status = Convert2Value(env, queryNapi, out.query);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field query.", napi_invalid_arg);
-
+    napi_status status;
     bool isResultCountPresent = false;
     napi_has_named_property(env, in, "resultCount", &isResultCountPresent);
     if (isResultCountPresent) {
