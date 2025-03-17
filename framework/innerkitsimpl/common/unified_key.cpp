@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #define LOG_TAG "UnifiedKey"
+#include <sstream>
 #include "unified_key.h"
 
 #include "logger.h"
@@ -26,8 +27,10 @@ static constexpr const char *UNIFIED_KEY_SCHEMA = "udmf://";
 static constexpr const char *ALPHA_AGGREGATE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static constexpr const char *DIGIT_AGGREGATE = "0123456789";
 static constexpr const char *SYMBOL_AGGREGATE = ":;<=>?@[\\]_`";
+static constexpr const char SEPARATOR = '/';
 static constexpr uint32_t PREFIX_LEN = 24;
 static constexpr uint32_t SUFIX_LEN = 8;
+static constexpr uint32_t INDEX_LEN = 32;
 UnifiedKey::UnifiedKey(std::string key)
 {
     this->key = std::move(key);
@@ -49,22 +52,26 @@ std::string UnifiedKey::GetUnifiedKey()
         return "";
     }
     // Uri-compliant structure, example: udmf://drag/com.ohos.test/012345679abc
-    this->key = UNIFIED_KEY_SCHEMA + this->intention + "/" + this->bundleName + "/" + this->groupId;
-    return this->key;
+    std::ostringstream oss;
+    oss << UNIFIED_KEY_SCHEMA << this->intention << SEPARATOR <<
+        this->bundleName << SEPARATOR << this->groupId;
+    return oss.str();
 }
 
 std::string UnifiedKey::GetPropertyKey() const
 {
-    if (this->key.size() > SUFIX_LEN + PREFIX_LEN) {
+    if (this->key.size() > INDEX_LEN) {
         return this->key.substr(0, key.size() - SUFIX_LEN);
     }
-    if (this->intention.empty() || this->groupId.size() < SUFIX_LEN + PREFIX_LEN) {
+    if (this->intention.empty() || this->groupId.size() < INDEX_LEN) {
         LOG_ERROR(UDMF_FRAMEWORK, "Empty property key.intention:%{public}s, groupId:%{public}s",
             intention.c_str(), groupId.c_str());
         return "";
     }
-    return UNIFIED_KEY_SCHEMA + this->intention + "/" + this->bundleName + "/" +
-        this->groupId.substr(0, PREFIX_LEN);
+    std::ostringstream oss;
+    oss << UNIFIED_KEY_SCHEMA << this->intention << SEPARATOR <<
+        this->bundleName << SEPARATOR << this->groupId.substr(0, PREFIX_LEN);
+    return oss.str();
 }
 
 bool UnifiedKey::IsValid()
