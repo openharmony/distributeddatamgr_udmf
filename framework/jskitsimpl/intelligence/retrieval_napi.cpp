@@ -330,9 +330,7 @@ napi_value RetrievalNapi::Retrieve(napi_env env, napi_callback_info info)
         return nullptr;
     }
     std::string query;
-    napi_value queryNapi;
-    napi_get_named_property(env, args[0], "query", &queryNapi);
-    status = AipNapiUtils::Convert2Value(env, queryNapi, query);
+    status = AipNapiUtils::Convert2Value(env, args[0], query);
     if (status != napi_ok) {
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "Failed to convert the field query.");
         return nullptr;
