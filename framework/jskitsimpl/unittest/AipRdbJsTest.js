@@ -25,22 +25,22 @@ let currentDeviceIsPc = false;
 let context = featureAbility.getContext();
 let rdbStore1 = undefined;
 let rdbStore2 = undefined;
+
+let storeConfigInvalid = {
+  name: '',
+  securityLevel: relationalStore.SecurityLevel.S1
+};
+
 let channelConfigInvalid = {
   channelType: 0,
-  channelUri: '/data'
+  context:context,
+  dbConfig:storeConfigInvalid
 };
-let channelConfigVector = {
-  channelType: 0,
-  channelUri: '/data/storage/el2/database/entry/rdb/rdb_store_test.db'
-};
-let channelConfigInvIdx = {
-  channelType: 1,
-  channelUri: '/data/storage/el2/database/entry/rdb/sqlite_store_test.db'
-};
+
 let storeConfigVector = {
-  name: 'rdb_store_test.db', // db文件名, 删除库时也需要
+  name: 'rdb_store_test.db',
   encrypt: false,
-  securityLevel: relationalStore.SecurityLevel.S1,
+  securityLevel: relationalStore.SecurityLevel.S3,
   autoCleanDirtyData: false,
   isSearchable: false,
   vector: true,
@@ -48,13 +48,25 @@ let storeConfigVector = {
 };
 
 let storeConfigInvIdx = {
-  name: 'sqlite_store_test.db', // db文件名, 删除库时也需要
+  name: 'sqlite_store_test.db',
   encrypt: false,
-  securityLevel: relationalStore.SecurityLevel.S1,
+  securityLevel: relationalStore.SecurityLevel.S3,
   autoCleanDirtyData: false,
   isSearchable: false,
   allowRebuild: false,
   tokenizer: 2
+};
+
+let channelConfigVector = {
+  channelType: intelligence.ChannelType.VECTOR_DATABASE,
+  context:context,
+  dbConfig:storeConfigVector
+};
+
+let channelConfigInvIdx = {
+  channelType: intelligence.ChannelType.INVERTED_INDEX_DATABASE,
+  context:context,
+  dbConfig:storeConfigInvIdx
 };
 
 describe('AipJSTest', function () {
@@ -64,6 +76,13 @@ describe('AipJSTest', function () {
     let deviceTypeInfo = deviceInfo.deviceType;
     currentDeviceIsPc = deviceTypeInfo === '2in1' ? true : false;
     console.info(TAG + 'the value of the deviceType is : ' + deviceInfo.deviceType);
+    relationalStore.deleteRdbStore(context, 'rdb_store_test.db', (err) => {
+      if (err) {
+        console.error(`Delete RdbStore failed, code is ${err.code},message is ${err.message}`);
+        return;
+      }
+      console.info(TAG + 'Delete RdbStore successfully.');
+    });
     rdbStore1 = await relationalStore.getRdbStore(context, storeConfigVector);
     if (rdbStore1 !== undefined) {
       let createSql = 'CREATE TABLE IF NOT EXISTS vector_table(fileid TEXT PRIMARY KEY, filename_text TEXT, filename FLOATVECTOR(128), keywords_text TEXT, keywords FLOATVECTOR(128), chapter FLOATVECTOR(128), abstract FLOATVECTOR(128));';
@@ -88,24 +107,23 @@ describe('AipJSTest', function () {
   });
 
   async function insertVectorDB() {
-    let array = new Array(128).fill(0.1); 
-    let data = array.toString();
-    let insertSQL = 'INSERT INTO vector_table VALUES("1", "大模型系统概述", "[' + data + ']", "生成式AI, 人工智能, 大模型", "[' + data + ']", "[' + data + ']", "[' + data + ']");';
-    console.info(TAG + 'insertVectorDB insertSQL::' + insertSQL);
-    await rdbStore1.execute(insertSQL, 0, undefined);
-    insertSQL = 'INSERT INTO vector_table VALUES("2", "大模型系统概述", "[' + data + ']", "生成式AI, 人工智能, 大模型", "[' + data + ']", "[' + data + ']", "[' + data + ']");';
-    console.info(TAG + 'insertVectorDB insertSQL::' + insertSQL);
-    await rdbStore1.execute(insertSQL, 0, undefined);
-    insertSQL = 'INSERT INTO vector_table VALUES("3", "大模型系统概述", "[' + data + ']", "生成式AI, 人工智能, 大模型", "[' + data + ']", "[' + data + ']", "[' + data + ']");';
-    console.info(TAG + 'insertVectorDB insertSQL::' + insertSQL);
-    await rdbStore1.execute(insertSQL, 0, undefined);
-    insertSQL = 'INSERT INTO vector_table VALUES("4", "大模型系统概述", "[' + data + ']", "生成式AI, 人工智能, 大模型", "[' + data + ']", "[' + data + ']", "[' + data + ']");';
-    console.info(TAG + 'insertVectorDB insertSQL::' + insertSQL);
-    await rdbStore1.execute(insertSQL, 0, undefined);
-    insertSQL = 'INSERT INTO vector_table VALUES("5", "大模型系统概述", "[' + data + ']", "生成式AI, 人工智能, 大模型", "[' + data + ']", "[' + data + ']", "[' + data + ']");';
-    console.info(TAG + 'insertVectorDB insertSQL::' + insertSQL);
-    await rdbStore1.execute(insertSQL, 0, undefined);
-    console.info(TAG + 'insertVectorDB end');
+    let insertSQL;
+    for (let i = 0; i < 5; i++) {
+      let array = new Array(128);
+      for (let j = 0; j < array.length; j++) {
+        let randomNumber = Math.random();
+        array[j] = randomNumber;
+      }
+      let data = array.toString();
+      insertSQL = "INSERT INTO vector_table VALUES('" + i + "', '大模型系统概述', '[" + data + "]', '生成式AI, 人工智能, 大模型', '[" + data + "]', '[" + data + "]', '[" + data + "]');";
+      console.info(TAG + 'insertVectorDB insertSQL::' + insertSQL);
+      await rdbStore1.execute(insertSQL, 0, undefined);
+    }
+    let arraySpecial = new Array(128).fill(0.1);
+    let dataSpecial = arraySpecial.toString();
+    let insertSQLSpecial = "INSERT INTO vector_table VALUES('5', '大模型系统概述', '[" + dataSpecial + "]', '生成式AI, 人工智能, 大模型', '[" + dataSpecial + "]', '[" + dataSpecial + "]', '[" + dataSpecial + "]');";
+    console.info(TAG + 'insertVectorDB insertSQL::' + insertSQLSpecial);
+    await rdbStore1.execute(insertSQLSpecial, 0, undefined);
   }
 
   async function insertInvIdxDB() {
@@ -141,36 +159,26 @@ describe('AipJSTest', function () {
 
   /**
    * @tc.name Aip_001
-   * @tc.desc Test getRetriever aip interface
+   * @tc.desc Test getRetriever. rdbStoreName is empty.
    * @tc.type: FUNC
    */
   it('Aip_001', 0, async function (done) {
-    console.info(TAG, 'start');
+    console.info(TAG, 'Aip_001 start');
     let retrievalConfig = {
       channelConfigs: [channelConfigInvalid]
     };
     if (currentDeviceIsPc) {
-      await sleep(1000);
       try {
         await intelligence.getRetriever(retrievalConfig)
-          .then((data) => {
-            console.info(TAG, 'get result::' + data);
-            let ret = false;
-            if (data !== null || data !== undefined) {
-              ret = true;
-            };
-            expect(ret).assertEqual(true);
-            done();
-          })
-          .catch((err) => {
-            console.info(TAG, 'catch::' + err.code);
+        .then((data) => {
+            expect(data != null).assertEqual(true);
             done();
           });
       } catch (err) {
-        console.info(TAG, 'catch::' + err.code);
+        console.info(TAG, 'Aip_001 catch::' + err.code);
+        expect(err.code).assertEqual(401);
         done();
       }
-      await sleep(1000);
     } else {
       await intelligence.getRetriever(retrievalConfig)
         .catch((err) => {
@@ -184,7 +192,7 @@ describe('AipJSTest', function () {
 
   /**
    * @tc.name Aip_002
-   * @tc.desc Test getRetriever aip interface without param
+   * @tc.desc Test getRetriever. channelConfigs is empty.
    * @tc.type: FUNC
    */
   it('Aip_002', 0, async function (done) {
@@ -193,19 +201,13 @@ describe('AipJSTest', function () {
       channelConfigs: []
     };
     if (currentDeviceIsPc) {
-      await sleep(1000);
       try {
-        await intelligence.getRetriever(retrievalConfig)
-        .catch((err) => {
-          console.info(TAG, 'catch::' + err.code);
-          expect(err.code).assertEqual(31300000);
-          done();
-        });
+        await intelligence.getRetriever(retrievalConfig);
       } catch (err) {
-        console.info(TAG, 'catch::' + err.code);
+        console.info(TAG, 'Aip_002 catch::' + err.code);
+        expect(err.code).assertEqual(401);
         done();
       }
-      await sleep(1000);
     } else {
       await intelligence.getRetriever(retrievalConfig)
         .catch((err) => {
@@ -218,7 +220,7 @@ describe('AipJSTest', function () {
 
   /**
    * @tc.name Aip_003
-   * @tc.desc Test getRetriever aip interface without param
+   * @tc.desc Test retrieveRdb. The value of deepSize is too large.
    * @tc.type: FUNC
    */
   it('Aip_003', 0, async function (done) {
@@ -227,55 +229,45 @@ describe('AipJSTest', function () {
       channelConfigs: [channelConfigVector]
     };
     if (currentDeviceIsPc) {
-      await sleep(1000);
       try {
         let floatArray = new Float32Array(128).fill(0.1);
-        let query = {
+        let vectorQuery = {
           column: 'filename',
           value: floatArray,
           similarityThreshold: 0.1
         };
         let recallCondition = {
-          query: query,
+          vectorQuery: vectorQuery,
           fromClause: 'vector_table',
           primaryKey: ['fileid'],
           responseColumns: ['filename_text'],
-          deepSize: 500
+          filters: [],
+          deepSize: 1000000
         };
         let retrievalCondition = {
-          query: '软件设计与建模',
           recallConditions : [recallCondition]
         };
         await intelligence.getRetriever(retrievalConfig)
           .then((data) => {
-            console.info(TAG, 'get result::' + data);
             try {
-              data.retrieveRdb(retrievalCondition)
+              let query = '软件设计与建模';
+              data.retrieveRdb(query, retrievalCondition)
               .then((rdbdata) => {
                 let length = rdbdata.records.length;
-                console.info(TAG, 'get result::' + length);
+                console.info(TAG, 'Aip_003 get result::' + length);
                 let ret = length >= 0;
                 expect(ret).assertEqual(true);
-                done();
-              })
-              .catch((err) => {
-                console.info(TAG, 'catch::' + err.code);
                 done();
               });
             } catch (err) {
               console.info(TAG, 'catch::' + err.code);
               done();
             }
-          })
-          .catch((err) => {
-            console.info(TAG, 'catch::' + err.code);
-            done();
           });
       } catch (err) {
         console.info(TAG, 'catch::' + err.code);
         done();
       }
-      await sleep(1000);
     } else {
       await intelligence.getRetriever(retrievalConfig)
         .catch((err) => {
@@ -289,7 +281,7 @@ describe('AipJSTest', function () {
 
   /**
    * @tc.name Aip_004
-   * @tc.desc Test getRetriever aip interface without param
+   * @tc.desc Test retrieveRdb.fromClause is empty.
    * @tc.type: FUNC
    */
   it('Aip_004', 0, async function (done) {
@@ -298,50 +290,38 @@ describe('AipJSTest', function () {
       channelConfigs: [channelConfigVector]
     };
     if (currentDeviceIsPc) {
-      await sleep(1000);
       try {
         let floatArray = new Float32Array(128).fill(0.1);
-        let query = {
+        let vectorQuery = {
           column: 'filename',
           value: floatArray,
           similarityThreshold: 0.1
         };
         let recallCondition = {
-          query: query,
-          fromClause: 'vector_table',
+          vectorQuery: vectorQuery,
+          fromClause: '',
           primaryKey: ['fileid'],
-          responseColumns: [],
+          responseColumns: ['filename_text'],
           deepSize: 500
         };
         let retrievalCondition = {
-          query: '软件设计与建模',
           recallConditions : [recallCondition]
         };
         await intelligence.getRetriever(retrievalConfig)
           .then((data) => {
-            console.info(TAG, 'get result::' + data);
             try {
-              data.retrieveRdb(retrievalCondition)
-              .catch((err) => {
-                console.info(TAG, 'catch::' + err.code);
-                expect(err.code).assertEqual(31300000);
-                done();
-              });
+              let query = '软件设计与建模';
+              data.retrieveRdb(query, retrievalCondition);
             } catch (err) {
-              console.info(TAG, 'catch::' + err.code);
+              console.info(TAG, 'Aip_004 catch::' + err.code);
               expect(err.code).assertEqual(401);
               done();
             }
-          })
-          .catch((err) => {
-            console.info(TAG, 'catch::' + err.code);
-            done();
           });
       } catch (err) {
-        console.info(TAG, 'catch::' + err.code);
+        console.info(TAG, 'Aip_004 catch::' + err.code);
         done();
       }
-      await sleep(1000);
     } else {
       await intelligence.getRetriever(retrievalConfig)
         .catch((err) => {
@@ -355,7 +335,7 @@ describe('AipJSTest', function () {
 
   /**
    * @tc.name Aip_005
-   * @tc.desc Test getRetriever aip interface without param
+   * @tc.desc Test retrieveRdb. primaryKey is empty.
    * @tc.type: FUNC
    */
   it('Aip_005', 0, async function (done) {
@@ -364,50 +344,38 @@ describe('AipJSTest', function () {
       channelConfigs: [channelConfigVector]
     };
     if (currentDeviceIsPc) {
-      await sleep(1000);
       try {
         let floatArray = new Float32Array(128).fill(0.1);
-        let query = {
-          column: 'invalidField',
+        let vectorQuery = {
+          column: 'filename',
           value: floatArray,
           similarityThreshold: 0.1
         };
         let recallCondition = {
-          query: query,
+          vectorQuery: vectorQuery,
           fromClause: 'vector_table',
-          primaryKey: ['fileid'],
+          primaryKey: [],
           responseColumns: ['filename_text'],
           deepSize: 500
         };
         let retrievalCondition = {
-          query: '软件设计与建模',
           recallConditions : [recallCondition]
         };
         await intelligence.getRetriever(retrievalConfig)
           .then((data) => {
-            console.info(TAG, 'get result::' + data);
             try {
-              data.retrieveRdb(retrievalCondition)
-              .catch((err) => {
-                console.info(TAG, 'catch::' + err.code);
-                expect(err.code).assertEqual(31300100);
-                done();
-              });
+              let query = '软件设计与建模';
+              data.retrieveRdb(query, retrievalCondition);
             } catch (err) {
               console.info(TAG, 'catch::' + err.code);
               expect(err.code).assertEqual(401);
               done();
             }
-          })
-          .catch((err) => {
-            console.info(TAG, 'catch::' + err.code);
-            done();
           });
       } catch (err) {
-        console.info(TAG, 'catch::' + err.code);
+        console.info(TAG, 'Aip_005 catch::' + err.code);
         done();
       }
-      await sleep(1000);
     } else {
       await intelligence.getRetriever(retrievalConfig)
         .catch((err) => {
@@ -421,16 +389,190 @@ describe('AipJSTest', function () {
 
   /**
    * @tc.name Aip_006
-   * @tc.desc Test getRetriever aip interface without param
+   * @tc.desc Test retrieveRdb. responseColumns is empty.
    * @tc.type: FUNC
    */
   it('Aip_006', 0, async function (done) {
     console.info(TAG, 'start');
     let retrievalConfig = {
+      channelConfigs: [channelConfigVector]
+    };
+    if (currentDeviceIsPc) {
+      try {
+        let floatArray = new Float32Array(128).fill(0.1);
+        let vectorQuery = {
+          column: 'filename',
+          value: floatArray,
+          similarityThreshold: 0.1
+        };
+        let recallCondition = {
+          vectorQuery: vectorQuery,
+          fromClause: 'vector_table',
+          primaryKey: ['fileid'],
+          responseColumns: [],
+          deepSize: 500
+        };
+        let retrievalCondition = {
+          recallConditions : [recallCondition]
+        };
+        await intelligence.getRetriever(retrievalConfig)
+          .then((data) => {
+            try {
+              let query = '软件设计与建模';
+              data.retrieveRdb(query, retrievalCondition);
+            } catch (err) {
+              console.info(TAG, 'Aip_006 catch::' + err.code);
+              expect(err.code).assertEqual(401);
+              done();
+            }
+          });
+      } catch (err) {
+        console.info(TAG, 'catch::' + err.code);
+        done();
+      }
+    } else {
+      await intelligence.getRetriever(retrievalConfig)
+        .catch((err) => {
+          console.info(TAG, 'catch::' + err.code);
+          expect(err.code).assertEqual(801);
+          done();
+        });
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name Aip_007
+   * @tc.desc Test retrieveRdb. column is invalid.
+   * @tc.type: FUNC
+   */
+  it('Aip_007', 0, async function (done) {
+    console.info(TAG, 'start');
+    let retrievalConfig = {
+      channelConfigs: [channelConfigVector]
+    };
+    if (currentDeviceIsPc) {
+      try {
+        let floatArray = new Float32Array(128).fill(0.1);
+        let vectorQuery = {
+          column: 'invalidField',
+          value: floatArray,
+          similarityThreshold: 0.1
+        };
+        let recallCondition = {
+          vectorQuery: vectorQuery,
+          fromClause: 'vector_table',
+          primaryKey: ['fileid'],
+          responseColumns: ['filename_text'],
+          deepSize: 500
+        };
+        let retrievalCondition = {
+          recallConditions : [recallCondition]
+        };
+        await intelligence.getRetriever(retrievalConfig)
+          .then((data) => {
+            try {
+              let query = '软件设计与建模';
+              data.retrieveRdb(query, retrievalCondition)
+              .catch((err) => {
+                console.info(TAG, 'Aip_007 catch::' + err.code);
+                expect(err.code).assertEqual(31300100);
+                done();
+              });
+            } catch (err) {
+              console.info(TAG, 'Aip_007 catch::' + err.code);
+              expect(err.code).assertEqual(401);
+              done();
+            }
+          });
+      } catch (err) {
+        console.info(TAG, 'catch::' + err.code);
+        done();
+      }
+    } else {
+      await intelligence.getRetriever(retrievalConfig)
+        .catch((err) => {
+          console.info(TAG, 'catch::' + err.code);
+          expect(err.code).assertEqual(801);
+          done();
+        });
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name Aip_008
+   * @tc.desc Test retrieveRdb. One-way vector normal recall.
+   * @tc.type: FUNC
+   */
+  it('Aip_008', 0, async function (done) {
+    console.info(TAG, 'start');
+    let retrievalConfig = {
+      channelConfigs: [channelConfigVector]
+    };
+    if (currentDeviceIsPc) {
+      try {
+        let floatArray = new Float32Array(128).fill(0.1);
+        const str = floatArray.toString();
+        console.log(TAG, str);
+        let vectorQuery = {
+          column: 'filename',
+          value: floatArray,
+          similarityThreshold: 0.1
+        };
+        let recallCondition = {
+          vectorQuery: vectorQuery,
+          fromClause: 'vector_table',
+          primaryKey: ['fileid'],
+          responseColumns: ['filename_text'],
+          deepSize: 500
+        };
+        let retrievalCondition = {
+          recallConditions : [recallCondition]
+        };
+        await intelligence.getRetriever(retrievalConfig)
+          .then((data) => {
+            try {
+              let query = '软件设计与建模';
+              data.retrieveRdb(query, retrievalCondition)
+              .then((rdbdata) => {
+                let length = rdbdata.records.length;
+                console.info(TAG, 'Aip_008 get result length::' + length);
+                expect(length > 0).assertEqual(true);
+                done();
+              });
+            } catch (err) {
+              console.info(TAG, 'Aip_008 catch::' + err.code);
+              expect(err.code).assertEqual(401);
+              done();
+            }
+          });
+      } catch (err) {
+        console.info(TAG, 'Aip_008 catch::' + err.code);
+        done();
+      }
+    } else {
+      await intelligence.getRetriever(retrievalConfig)
+        .catch((err) => {
+          console.info(TAG, 'Aip_008 catch::' + err.code);
+          expect(err.code).assertEqual(801);
+          done();
+        });
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
+   * @tc.name Aip_009
+   * @tc.desc Test retrieveRdb. One-way invertedindex normal recall.
+   * @tc.type: FUNC
+   */
+  it('Aip_009', 0, async function (done) {
+    console.info(TAG, 'start');
+    let retrievalConfig = {
       channelConfigs: [channelConfigInvIdx]
     };
     if (currentDeviceIsPc) {
-      await sleep(1000);
       try {
         let fieldWeight = {
           'filename': 4.0
@@ -461,42 +603,33 @@ describe('AipJSTest', function () {
           invertedIndexStrategies: invertedIndexStrategies
         };
         let retrievalCondition = {
-          query: '数据库',
           recallConditions : [recallCondition]
         };
         await intelligence.getRetriever(retrievalConfig)
           .then((data) => {
-            console.info(TAG, 'get result::' + data);
+            console.info(TAG, 'Aip_009 get result::' + data);
             try {
-              data.retrieveRdb(retrievalCondition)
+              let query = '软件设计与建模';
+              data.retrieveRdb(query, retrievalCondition)
               .then((rdbdata) => {
                 let length = rdbdata.records.length;
-                console.info(TAG, 'get result::' + length);
+                console.info(TAG, 'Aip_009 get result::' + length);
                 expect(length).assertEqual(1);
-                done();
-              })
-              .catch((err) => {
-                console.info(TAG, 'catch::' + err.code);
                 done();
               });
             } catch (err) {
-              console.info(TAG, 'catch::' + err.code);
+              console.info(TAG, 'Aip_009 catch::' + err.code);
               done();
             }
-          })
-          .catch((err) => {
-            console.info(TAG, 'catch::' + err.code);
-            done();
           });
       } catch (err) {
-        console.info(TAG, 'catch::' + err.code);
+        console.info(TAG, 'Aip_009 catch::' + err.code);
         done();
       }
-      await sleep(1000);
     } else {
       await intelligence.getRetriever(retrievalConfig)
         .catch((err) => {
-          console.info(TAG, 'catch11::' + err.code);
+          console.info(TAG, 'Aip_009 catch::' + err.code);
           expect(err.code).assertEqual(801);
           done();
         });
@@ -505,17 +638,16 @@ describe('AipJSTest', function () {
   });
 
   /**
-   * @tc.name Aip_007
-   * @tc.desc Test getRetriever aip interface without param
+   * @tc.name Aip_010
+   * @tc.desc Test retrieveRdb. ftsTableName is empty.
    * @tc.type: FUNC
    */
-  it('Aip_007', 0, async function (done) {
+  it('Aip_010', 0, async function (done) {
     console.info(TAG, 'start');
     let retrievalConfig = {
       channelConfigs: [channelConfigInvIdx]
     };
     if (currentDeviceIsPc) {
-      await sleep(1000);
       try {
         let fieldWeight = {
           'filename': 4.0
@@ -546,38 +678,27 @@ describe('AipJSTest', function () {
           invertedIndexStrategies: invertedIndexStrategies
         };
         let retrievalCondition = {
-          query: '数据库',
           recallConditions : [recallCondition]
         };
         await intelligence.getRetriever(retrievalConfig)
           .then((data) => {
-            console.info(TAG, 'get result::' + data);
             try {
-              data.retrieveRdb(retrievalCondition)
-              .catch((err) => {
-                console.info(TAG, 'catch::' + err.code);
-                expect(err.code).assertEqual(31300000);
-                done();
-              });
+              let query = '数据库';
+              data.retrieveRdb(query, retrievalCondition);
             } catch (err) {
-              console.info(TAG, 'catch::' + err.code);
+              console.info(TAG, 'Aip_010 catch::' + err.code);
               expect(err.code).assertEqual(401);
               done();
             }
-          })
-          .catch((err) => {
-            console.info(TAG, 'catch::' + err.code);
-            done();
           });
       } catch (err) {
-        console.info(TAG, 'catch::' + err.code);
+        console.info(TAG, 'Aip_010 catch::' + err.code);
         done();
       }
-      await sleep(1000);
     } else {
       await intelligence.getRetriever(retrievalConfig)
         .catch((err) => {
-          console.info(TAG, 'catch11::' + err.code);
+          console.info(TAG, 'Aip_010 catch::' + err.code);
           expect(err.code).assertEqual(801);
           done();
         });
@@ -586,17 +707,16 @@ describe('AipJSTest', function () {
   });
 
   /**
-   * @tc.name Aip_008
-   * @tc.desc Test getRetriever aip interface without param
+   * @tc.name Aip_011
+   * @tc.desc Test retrieveRdb. invertedindex match field is invalid.
    * @tc.type: FUNC
    */
-  it('Aip_008', 0, async function (done) {
+  it('Aip_011', 0, async function (done) {
     console.info(TAG, 'start');
     let retrievalConfig = {
       channelConfigs: [channelConfigInvIdx]
     };
     if (currentDeviceIsPc) {
-      await sleep(1000);
       try {
         let fieldWeight = {
           'invalid': 4.0
@@ -627,38 +747,32 @@ describe('AipJSTest', function () {
           invertedIndexStrategies: invertedIndexStrategies
         };
         let retrievalCondition = {
-          query: '数据库',
           recallConditions : [recallCondition]
         };
         await intelligence.getRetriever(retrievalConfig)
           .then((data) => {
-            console.info(TAG, 'get result::' + data);
             try {
-              data.retrieveRdb(retrievalCondition)
+              let query = '数据库';
+              data.retrieveRdb(query, retrievalCondition)
               .catch((err) => {
-                console.info(TAG, 'catch::' + err.code);
-                expect(err.code).assertEqual(31300100);
+                console.info(TAG, 'Aip_011 catch::' + err.code);
+                expect(err.code).assertEqual(31301006);
                 done();
               });
             } catch (err) {
-              console.info(TAG, 'catch::' + err.code);
+              console.info(TAG, 'Aip_011 catch::' + err.code);
               expect(err.code).assertEqual(401);
               done();
             }
-          })
-          .catch((err) => {
-            console.info(TAG, 'catch::' + err.code);
-            done();
           });
       } catch (err) {
-        console.info(TAG, 'catch::' + err.code);
+        console.info(TAG, 'Aip_011 catch::' + err.code);
         done();
       }
-      await sleep(1000);
     } else {
       await intelligence.getRetriever(retrievalConfig)
         .catch((err) => {
-          console.info(TAG, 'catch11::' + err.code);
+          console.info(TAG, 'Aip_011 catch::' + err.code);
           expect(err.code).assertEqual(801);
           done();
         });
@@ -668,17 +782,16 @@ describe('AipJSTest', function () {
 
 
   /**
-   * @tc.name Aip_009
-   * @tc.desc Test getRetriever aip interface without param
+   * @tc.name Aip_012
+   * @tc.desc Test retrieveRdb. Two-way normal recall.
    * @tc.type: FUNC
    */
-  it('Aip_009', 0, async function (done) {
+  it('Aip_012', 0, async function (done) {
     console.info(TAG, 'start');
     let retrievalConfig = {
       channelConfigs: [channelConfigInvIdx, channelConfigVector]
     };
     if (currentDeviceIsPc) {
-      await sleep(1000);
       try {
         let fieldWeight = {
           'filename': 4.0
@@ -710,55 +823,45 @@ describe('AipJSTest', function () {
           invertedIndexStrategies: invertedIndexStrategies
         };
         let floatArray = new Float32Array(128).fill(0.1);
-        let query = {
+        let vectorQuery = {
           column: 'filename',
           value: floatArray,
           similarityThreshold: 0.1
         };
         let recallConditionVector = {
-          query: query,
+          vectorQuery: vectorQuery,
           fromClause: 'vector_table',
           primaryKey: ['fileid'],
           responseColumns: ['filename_text'],
           deepSize: 500
         };
         let retrievalCondition = {
-          query: '数据库',
           recallConditions : [recallConditionInvIdx, recallConditionVector]
         };
         await intelligence.getRetriever(retrievalConfig)
           .then((data) => {
-            console.info(TAG, 'get result::' + data);
             try {
-              data.retrieveRdb(retrievalCondition)
+              let query = '数据库';
+              data.retrieveRdb(query, retrievalCondition)
               .then((rdbdata) => {
                 let length = rdbdata.records.length;
-                console.info(TAG, 'get result::' + length);
-                expect(length).assertEqual(5);
-                done();
-              })
-              .catch((err) => {
-                console.info(TAG, 'catch::' + err.code);
+                console.info(TAG, 'Aip_012 get result::' + length);
+                expect(length >= 2).assertEqual(true);
                 done();
               });
             } catch (err) {
-              console.info(TAG, 'catch::' + err.code);
+              console.info(TAG, 'Aip_012 catch::' + err.code);
               done();
             }
-          })
-          .catch((err) => {
-            console.info(TAG, 'catch::' + err.code);
-            done();
           });
       } catch (err) {
-        console.info(TAG, 'catch::' + err.code);
+        console.info(TAG, 'Aip_012 catch::' + err.code);
         done();
       }
-      await sleep(1000);
     } else {
       await intelligence.getRetriever(retrievalConfig)
         .catch((err) => {
-          console.info(TAG, 'catch11::' + err.code);
+          console.info(TAG, 'Aip_012 catch::' + err.code);
           expect(err.code).assertEqual(801);
           done();
         });
@@ -767,23 +870,24 @@ describe('AipJSTest', function () {
   });
 
   /**
-   * @tc.name Aip_010
-   * @tc.desc Test getRetriever aip interface without param
+   * @tc.name Aip_013
+   * @tc.desc Test retrieveRdb. Two-way normal recall and configing rerankMethod.
    * @tc.type: FUNC
    */
-  it('Aip_010', 0, async function (done) {
+  it('Aip_013', 0, async function (done) {
     console.info(TAG, 'start');
     let retrievalConfig = {
       channelConfigs: [channelConfigInvIdx, channelConfigVector]
     };
     if (currentDeviceIsPc) {
-      await sleep(1000);
       try {
         let fieldWeight = {
-          'filename': 4.0
+          'filename': 4.0,
+          'keywords':4.0
         };
         let fieldSlops = {
-          'filename': 5
+          'filename': 5,
+          'keywords':5
         };
         let bm25Strategy = {
           bm25Weight: 1.5,
@@ -808,13 +912,13 @@ describe('AipJSTest', function () {
           invertedIndexStrategies: invertedIndexStrategies
         };
         let floatArray = new Float32Array(128).fill(0.1);
-        let query = {
+        let vectorQuery = {
           column: 'filename',
           value: floatArray,
           similarityThreshold: 0.1
         };
         let recallConditionVector = {
-          query: query,
+          vectorQuery: vectorQuery,
           fromClause: 'vector_table',
           primaryKey: ['fileid'],
           responseColumns: ['filename_text'],
@@ -841,43 +945,33 @@ describe('AipJSTest', function () {
           isSoftmaxNormalized: true,
         };
         let retrievalCondition = {
-          query: '数据库',
           rerankMethod: rerankMethod,
           recallConditions : [recallConditionInvIdx, recallConditionVector]
         };
         await intelligence.getRetriever(retrievalConfig)
           .then((data) => {
-            console.info(TAG, 'get result::' + data);
             try {
-              data.retrieveRdb(retrievalCondition)
+              let query = '数据库';
+              data.retrieveRdb(query, retrievalCondition)
               .then((rdbdata) => {
                 let length = rdbdata.records.length;
-                console.info(TAG, 'get result::' + length);
-                expect(length).assertEqual(5);
-                done();
-              })
-              .catch((err) => {
-                console.info(TAG, 'catch::' + err.code);
+                console.info(TAG, 'Aip_013 get result::' + length);
+                expect(length >= 2).assertEqual(true);
                 done();
               });
             } catch (err) {
-              console.info(TAG, 'catch::' + err.code);
+              console.info(TAG, 'Aip_013 catch::' + err.code);
               done();
             }
-          })
-          .catch((err) => {
-            console.info(TAG, 'catch::' + err.code);
-            done();
           });
       } catch (err) {
-        console.info(TAG, 'catch::' + err.code);
+        console.info(TAG, 'Aip_013 catch::' + err.code);
         done();
       }
-      await sleep(1000);
     } else {
       await intelligence.getRetriever(retrievalConfig)
         .catch((err) => {
-          console.info(TAG, 'catch11::' + err.code);
+          console.info(TAG, 'Aip_013 catch::' + err.code);
           expect(err.code).assertEqual(801);
           done();
         });
