@@ -2983,7 +2983,7 @@ describe('UdmfJSTest', function () {
     recordAppDefined.applicationDefinedType = 'ApplicationDefinedType';
     recordAppDefined.rawData = u8Array;
 
-    let recordAny = new UDC.UnifiedRecord("test.utd-id", "test.utd-value");
+    let recordAny = new UDC.UnifiedRecord('test.utd-id', 'test.utd-value');
     recordAny.addEntry(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
     recordAny.addEntry(UTD.UniformDataType.HYPERLINK, hyperlinkValue);
 
