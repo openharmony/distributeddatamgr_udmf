@@ -609,7 +609,7 @@ describe('AipJSTest', function () {
           .then((data) => {
             console.info(TAG, 'Aip_009 get result::' + data);
             try {
-              let query = '软件设计与建模';
+              let query = '数据库';
               data.retrieveRdb(query, retrievalCondition)
               .then((rdbdata) => {
                 let length = rdbdata.records.length;
@@ -756,7 +756,7 @@ describe('AipJSTest', function () {
               data.retrieveRdb(query, retrievalCondition)
               .catch((err) => {
                 console.info(TAG, 'Aip_011 catch::' + err.code);
-                expect(err.code).assertEqual(31301006);
+                expect(err.code).assertEqual(31301010);
                 done();
               });
             } catch (err) {
