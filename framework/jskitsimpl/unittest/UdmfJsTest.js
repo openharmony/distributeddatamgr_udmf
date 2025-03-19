@@ -2638,6 +2638,8 @@ describe('UdmfJSTest', function () {
     expect(unifiedData.hasType('general.file-uri')).assertTrue();
     expect(unifiedData.hasType('general.video')).assertTrue();
     expect(unifiedData.hasType('general.vob')).assertTrue();
+    let records = unifiedData.getRecords();
+    expect(records.length).assertEqual(1);
     try {
       UDC.insertData(optionsValid, unifiedData).then((data) => {
         console.info(TAG, `insert success. The key: ${data}`);
@@ -2926,6 +2928,82 @@ describe('UdmfJSTest', function () {
           expect(data[0].hasType('general.video')).assertTrue();
           expect(data[0].hasType('general.vob')).assertTrue();
           expect(data[0].hasType('openharmony.pixel-map')).assertTrue();
+
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
+  
+  /**
+   * @tc.name MultiEntryTest007
+   * @tc.desc Build a record with no params, then add entries. test if UnifiedData::getRecords() function works well.
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('MultiEntryTest007', 0, async function (done) {
+    const TAG = 'MultiEntryTest007';
+    console.info(TAG, 'start');
+
+    let plaintextValue = 'plaintextValue';
+    let systemDefinedValue = 'systemDefinedValue';
+    let hyperlinkValue = 'hyperlinkValue';
+    let record = new UDC.UnifiedRecord();
+    record.addEntry(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+    record.addEntry(UTD.UniformDataType.HYPERLINK, hyperlinkValue);
+    record.addEntry('openharmony.app-item', systemDefinedValue);
+
+    let recordFile = new UDC.File();
+    recordFile.uri = 'schema://com.samples.test/files/test.txt';
+    recordFile.addEntry(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+    recordFile.addEntry(UTD.UniformDataType.HYPERLINK, hyperlinkValue);
+
+    let recordAppDefined = new UDC.ApplicationDefinedRecord();
+    let u8Array = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    recordAppDefined.applicationDefinedType = 'ApplicationDefinedType';
+    recordAppDefined.rawData = u8Array;
+
+    let recordAny = new UDC.UnifiedRecord('test.utd-id', 'test.utd-value');
+    recordAny.addEntry(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+    recordAny.addEntry(UTD.UniformDataType.HYPERLINK, hyperlinkValue);
+
+    let unifiedData = new UDC.UnifiedData(record);
+    unifiedData.addRecord(recordFile);
+    unifiedData.addRecord(recordAppDefined);
+    unifiedData.addRecord(recordAny);
+    let records = unifiedData.getRecords();
+    expect(records.length).assertEqual(4);
+
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          expect(records.length).assertEqual(4);
 
           UDC.deleteData(options).then((data) => {
             console.info(TAG, 'delete success.');
