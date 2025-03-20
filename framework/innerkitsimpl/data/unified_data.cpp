@@ -24,7 +24,7 @@ static const std::set<std::string> FILE_TYPES = {
     "general.file", "general.image", "general.video", "general.audio", "general.folder", "general.file-uri" };
 static const std::set<std::string> FILE_SUB_TYPES = {
     "general.image", "general.video", "general.audio", "general.folder" };
-static constexpr const char *ARK_WEB_TAG = "records_to_entries_data_format";
+static constexpr const char *RECORDS_TANSFER_TAG = "records_to_entries_data_format";
 UnifiedData::UnifiedData()
 {
     properties_ = std::make_shared<UnifiedDataProperties>();
@@ -305,7 +305,7 @@ bool UnifiedData::IsNeedTransferToEntries() const
     if (properties_ == nullptr) {
         return false;
     }
-    return properties_->tag == ARK_WEB_TAG;
+    return properties_->tag == RECORDS_TANSFER_TAG;
 }
 
 void UnifiedData::TransferToEntries(UnifiedData &data)
