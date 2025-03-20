@@ -66,6 +66,7 @@ public:
     void AddPrivilege1(QueryOption &option);
     void CompareDetails(const UDDetails &details);
     void GetEmptyData(QueryOption &option);
+    void GetFileUriUnifiedData(UnifiedData &data);
 
     static constexpr int USER_ID = 100;
     static constexpr int INST_INDEX = 0;
@@ -232,6 +233,30 @@ void UdmfClientTest::GetEmptyData(QueryOption &option)
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
     auto status = UdmfClient::GetInstance().GetData(option, data);
     EXPECT_EQ(status, E_NOT_FOUND);
+}
+
+void UdmfClientTest::GetFileUriUnifiedData(UnifiedData &data)
+{
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "http://demo.com";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+
+    std::shared_ptr<Object> obj1 = std::make_shared<Object>();
+    obj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj1->value_[FILE_URI_PARAM] = "http://demo.com";
+    obj1->value_[FILE_TYPE] = "general.image";
+    auto record1 = std::make_shared<UnifiedRecord>(FILE_URI, obj1);
+
+    std::shared_ptr<Object> obj2 = std::make_shared<Object>();
+    obj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj2->value_[FILE_URI_PARAM] = "http://demo.com";
+    obj2->value_[FILE_TYPE] = "general.audio";
+    auto record2 = std::make_shared<UnifiedRecord>(FILE_URI, obj2);
+    data.AddRecord(record);
+    data.AddRecord(record1);
+    data.AddRecord(record2);
 }
 
 /**
@@ -3439,5 +3464,43 @@ HWTEST_F(UdmfClientTest, GetSummary005, TestSize.Level1)
     auto readCotentForm = std::get<std::shared_ptr<Object>>(entries->at("general.content-form"));
     EXPECT_EQ("title", std::get<std::string>(readCotentForm->value_[TITLE]));
     LOG_INFO(UDMF_TEST, "GetSummary005 end.");
+}
+
+
+/**
+* @tc.name: FileUriCastTest001
+* @tc.desc: Cast file uri type record to verify works well
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, FileUriCastTest001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FileUriCastTest001 begin.");
+    UnifiedData data;
+    GetFileUriUnifiedData(data);
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    auto record0 = readData.GetRecordAt(0);
+    auto fileValue = record0->GetValue();
+    std::shared_ptr<Object> fileObj = std::get<std::shared_ptr<Object>>(fileValue);
+    EXPECT_EQ(std::get<std::string>(fileObj->value_[FILE_URI_PARAM]), "http://demo.com");
+    EXPECT_EQ(std::get<std::string>(fileObj->value_[FILE_TYPE]), "abcdefg");
+    File *file = reinterpret_cast<File *>(record0.get());
+    EXPECT_EQ(file->GetUri(), "http://demo.com");
+    auto record1 = readData.GetRecordAt(1);
+    auto imageValue = record1->GetValue();
+    std::shared_ptr<Object> imageObj = std::get<std::shared_ptr<Object>>(imageValue);
+    EXPECT_EQ(std::get<std::string>(imageObj->value_[FILE_URI_PARAM]), "http://demo.com");
+    EXPECT_EQ(std::get<std::string>(imageObj->value_[FILE_TYPE]), "general.image");
+    File *image = reinterpret_cast<Image *>(record1.get());
+    EXPECT_EQ(image->GetUri(), "http://demo.com");
+    auto record2 = readData.GetRecordAt(2);
+    File *audio = reinterpret_cast<Audio *>(record2.get());
+    EXPECT_EQ(audio->GetUri(), "http://demo.com");
+    LOG_INFO(UDMF_TEST, "FileUriCastTest001 end.");
 }
 } // OHOS::Test
