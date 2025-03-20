@@ -30,6 +30,7 @@ public:
 
     std::vector<uint8_t> API_EXPORT GetRawData() const;
     void API_EXPORT SetRawData(const std::vector<uint8_t> &rawData);
+    void SetPixelMapDetails(const std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
 
     void InitObject() override;
 private:

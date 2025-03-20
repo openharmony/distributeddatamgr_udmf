@@ -67,6 +67,7 @@ public:
     void CompareDetails(const UDDetails &details);
     void GetEmptyData(QueryOption &option);
     void GetFileUriUnifiedData(UnifiedData &data);
+    void ComparePixelMap(const UDDetails details, std::shared_ptr<OHOS::Media::PixelMap> pixelMapIn);
 
     static constexpr int USER_ID = 100;
     static constexpr int INST_INDEX = 0;
@@ -224,6 +225,30 @@ void UdmfClientTest::CompareDetails(const UDDetails &details)
         auto value = detail.second;
         auto str = std::get<std::string>(value);
         EXPECT_EQ(str, "udmf_value");
+    }
+}
+
+void UdmfClientTest::ComparePixelMap(const UDDetails details, std::shared_ptr<OHOS::Media::PixelMap> pixelMapIn)
+{
+    auto width = details.find("width");
+    if (width != details.end()) {
+        EXPECT_EQ(std::get<int32_t>(width->second), pixelMapIn->GetWidth());
+    }
+    auto height = details.find("height");
+    if (height != details.end()) {
+        EXPECT_EQ(std::get<int32_t>(height->second), pixelMapIn->GetHeight());
+    }
+    auto pixel_format = details.find("pixel-format");
+    if (pixel_format != details.end()) {
+        EXPECT_EQ(std::get<int32_t>(pixel_format->second), static_cast<int32_t>(pixelMapIn->GetPixelFormat()));
+    }
+    auto alpha_type = details.find("alpha-type");
+    if (alpha_type != details.end()) {
+        EXPECT_EQ(std::get<int32_t>(alpha_type->second), static_cast<int32_t>(pixelMapIn->GetAlphaType()));
+    }
+    auto udmf_key = details.find("udmf_key");
+    if (udmf_key != details.end()) {
+        EXPECT_EQ(std::get<std::string>(udmf_key->second), "udmf_value");
     }
 }
 
@@ -902,7 +927,7 @@ HWTEST_F(UdmfClientTest, SetData014, TestSize.Level1)
 
     auto systemDefinedRecord2 = static_cast<SystemDefinedRecord *>(record2.get());
     ASSERT_NE(systemDefinedRecord2, nullptr);
-    CompareDetails(systemDefinedRecord2->GetDetails());
+    ComparePixelMap(systemDefinedRecord2->GetDetails(), pixelMapIn);
 
     auto systemDefinedPixelMap2 = static_cast<SystemDefinedPixelMap *>(record2.get());
     ASSERT_NE(systemDefinedPixelMap2, nullptr);
