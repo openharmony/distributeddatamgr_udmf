@@ -136,10 +136,10 @@ describe('AipJSTest', function () {
     insertSQL = 'INSERT INTO invidx_table VALUES("3", "社会发展报告", "旅游, 民生, 交通", "社会发展", "这是一篇关于社会发展的综述文章", "这是一篇关于社会发展的综述文章");';
     console.info(TAG + 'insertInvIdxDB insertSQL::' + insertSQL);
     await rdbStore2.executeSql(insertSQL);
-    insertSQL = 'INSERT INTO invidx_table VALUES("4", "纯血鸿蒙", "鸿蒙, 生态, 遥遥领先", "鸿蒙系统", "这是一篇关于鸿蒙系统的综述文章", "这是一篇关于鸿蒙系统的综述文章");';
+    insertSQL = 'INSERT INTO invidx_table VALUES("4", "鸿蒙", "鸿蒙, 生态, 遥遥领先", "鸿蒙系统", "这是一篇关于鸿蒙系统的综述文章", "这是一篇关于鸿蒙系统的综述文章");';
     console.info(TAG + 'insertInvIdxDB insertSQL::' + insertSQL);
     await rdbStore2.executeSql(insertSQL);
-    insertSQL = 'INSERT INTO invidx_table VALUES("5", "原生AI", "鸿蒙, 生态, 大模型", "原生AI系统", "这是一篇关于原生AI系统的综述文章", "这是一篇关于原生AI系统的综述文章");';
+    insertSQL = 'INSERT INTO invidx_table VALUES("5", "AI系统", "鸿蒙, 生态, 大模型", "AI系统", "这是一篇关于AI系统的综述文章", "这是一篇关于AI系统的综述文章");';
     console.info(TAG + 'insertInvIdxDB insertSQL::' + insertSQL);
     await rdbStore2.executeSql(insertSQL);
     console.info(TAG + 'insertInvIdxDB end');
