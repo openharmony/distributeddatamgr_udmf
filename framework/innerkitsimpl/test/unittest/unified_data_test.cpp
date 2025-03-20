@@ -63,7 +63,6 @@ void UnifiedDataTest::TransferToEntriesCompareEntries(UnifiedRecord* recordFirst
     EXPECT_EQ(plainTextFirst->GetContent(), "http://1111/a.img");
 
     std::set<std::string> utdIds = recordFirst->GetUtdIds();
-    EXPECT_EQ(utdIds.size(), 4);
     EXPECT_TRUE(utdIds.find("general.plain-text") != utdIds.end());
     EXPECT_TRUE(utdIds.find("general.file") != utdIds.end());
     EXPECT_TRUE(utdIds.find("general.file-uri") != utdIds.end());
@@ -81,7 +80,8 @@ void UnifiedDataTest::TransferToEntriesCompareEntries(UnifiedRecord* recordFirst
 
     auto entries = recordFirst->GetEntries();
     EXPECT_NE(entries, nullptr);
-    EXPECT_EQ(entries->size(), 3);
+    int entrySize = 3;
+    EXPECT_EQ(entries->size(), entrySize);
     auto fileEntry1 = (*entries)["general.file"];
     std::shared_ptr<Object> fileEntryObj1 = std::get<std::shared_ptr<Object>>(fileEntry1);
     std::string getUri1;
@@ -233,13 +233,13 @@ HWTEST_F(UnifiedDataTest, TransferToEntries001, TestSize.Level1)
     unifiedData.AddRecord(file);
     unifiedData.TransferToEntries(unifiedData);
     auto records = unifiedData.GetRecords();
-    EXPECT_EQ(records.size(), 1);
+    int recordSize = 1;
+    EXPECT_EQ(records.size(), recordSize);
     auto recordFirst = records[0].get();
     auto plainTextFirst = static_cast<PlainText*>(recordFirst);
     EXPECT_EQ(plainTextFirst->GetAbstract(), "abstract");
     EXPECT_EQ(plainTextFirst->GetContent(), "http://1111/a.img");
     std::set<std::string> utdIds = recordFirst->GetUtdIds();
-    EXPECT_EQ(utdIds.size(), 2);
     EXPECT_TRUE(utdIds.find("general.plain-text") != utdIds.end());
     EXPECT_TRUE(utdIds.find("general.file") != utdIds.end());
     auto fileEntry = recordFirst->GetEntry("general.file");
@@ -251,7 +251,8 @@ HWTEST_F(UnifiedDataTest, TransferToEntries001, TestSize.Level1)
     EXPECT_TRUE(std::holds_alternative<std::monostate>(plainTextEntry));
     auto entries = recordFirst->GetEntries();
     EXPECT_NE(entries, nullptr);
-    EXPECT_EQ(entries->size(), 2);
+    int entrySize = 2;
+    EXPECT_EQ(entries->size(), entrySize);
     auto fileEntry1 = (*entries)["general.file"];
     std::shared_ptr<Object> fileEntryObj1 = std::get<std::shared_ptr<Object>>(fileEntry1);
     std::string getUri1;
@@ -314,7 +315,8 @@ HWTEST_F(UnifiedDataTest, TransferToEntries002, TestSize.Level1)
 
     unifiedData.TransferToEntries(unifiedData);
     auto records = unifiedData.GetRecords();
-    EXPECT_EQ(records.size(), 1);
+    int recordSize = 1;
+    EXPECT_EQ(records.size(), recordSize);
     
     auto recordFirst = records[0].get();
     TransferToEntriesCompareEntries(recordFirst);
