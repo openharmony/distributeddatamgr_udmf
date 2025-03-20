@@ -481,6 +481,10 @@ void OH_UdsPixelMap_GetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelm
     if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_PIXEL_MAP_STRUCT_ID)) {
         return;
     }
+    if (pixelmapNative == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "pixelmapNative is nullptr.");
+        return;
+    }
     auto pixelMap = pThis->GetUdsValue<std::shared_ptr<OHOS::Media::PixelMap>>(PIXEL_MAP);
     if (pixelMap == nullptr) {
         LOG_ERROR(UDMF_CAPI, "Get pixelMap value is null.");
