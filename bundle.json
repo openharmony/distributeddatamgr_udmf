@@ -50,8 +50,6 @@
     "build": {
       "sub_component": [
         "//foundation/distributeddatamgr/udmf:udmf_packages",
-        "//foundation/distributeddatamgr/udmf/interfaces/cj:cj_unified_data_channel_ffi",
-        "//foundation/distributeddatamgr/udmf/interfaces/cj:cj_uniform_type_descriptor_ffi",
         "//foundation/distributeddatamgr/udmf/interfaces/components:udmfcomponents"
       ],
       "inner_kits": [
@@ -172,6 +170,20 @@
               "i_aip_core_manager.h"
             ],
             "header_base":"//foundation/distributeddatamgr/udmf/interfaces/jskits/intelligence"
+          }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/cj:cj_unified_data_channel_ffi",
+          "header": {
+            "header_files": [],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/cj/include"
+          }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/cj:cj_uniform_type_descriptor_ffi",
+          "header": {
+            "header_files": [],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/cj/include"
           }
         }
       ],
