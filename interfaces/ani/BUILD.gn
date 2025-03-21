@@ -49,6 +49,7 @@ ohos_shared_library("unifieddatachannel_ani") {
   external_deps = [
     "ability_base:want",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:ani_common",
     "ability_runtime:appkit_native",
     "ability_runtime:napi_common",
     "c_utils:utils",
