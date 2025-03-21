@@ -15,7 +15,7 @@
 #define LOG_TAG "unifiedDataChannelANI"
 #include "ani_utils.h"
 #include "udmf_log.h"
-#include "ani_common/ani_common_want.h"
+#include "ani_common_want.h"
 #include "image_ani_utils.h"
 
 #include "unified_data.h"
