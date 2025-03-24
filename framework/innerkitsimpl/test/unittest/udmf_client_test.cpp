@@ -92,6 +92,7 @@ void UdmfClientTest::TearDownTestCase()
 void UdmfClientTest::SetUp()
 {
     SetHapToken1();
+    SetHapToken2();
 }
 
 void UdmfClientTest::TearDown()
