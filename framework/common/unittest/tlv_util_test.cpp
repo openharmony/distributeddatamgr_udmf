@@ -717,6 +717,6 @@ HWTEST_F(TlvUtilTest, WritingAndReadingVersion_001, TestSize.Level1)
     TLVUtil::ReadTlv(datas2, tlvObject, TAG::TAG_UNIFIED_DATA);
     EXPECT_EQ(datas2.size(), 1);
     EXPECT_EQ(datas2[0].GetSdkVersion(), version);
-    LOG_INFO(UDMF_TEST, "WritingAndReadingVersion_001 end."); 
+    LOG_INFO(UDMF_TEST, "WritingAndReadingVersion_001 end.");
 }
 }
