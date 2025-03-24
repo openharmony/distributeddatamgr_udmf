@@ -357,6 +357,7 @@ napi_status UnifiedDataChannelNapi::ConvertUnifiedDataSetToNapi(
     for (const UnifiedData &data : dataSet) {
         std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
         unifiedData->SetRecords(data.GetRecords());
+        unifiedData->SetProperties(data.GetProperties());
         napi_value dataNapi = nullptr;
         UnifiedDataNapi::NewInstance(env, unifiedData, dataNapi);
         status = napi_set_element(env, output, index++, dataNapi);
