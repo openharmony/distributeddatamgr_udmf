@@ -3030,4 +3030,76 @@ describe('UdmfJSTest', function () {
       done();
     }
   });
+
+  /**
+   * @tc.name MultiEntryTest008
+   * @tc.desc UDC to get first entry works well test
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('MultiEntryTest008', 0, async function (done) {
+    const TAG = 'MultiEntryTest008';
+    console.info(TAG, 'start');
+    let plaintextValue = 'plaintextValue';
+    let record = new UDC.UnifiedRecord();
+    record.addEntry(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+    let recordFile = new UDC.File();
+    recordFile.uri = 'schema://com.samples.test/files/test.txt';
+    let recordAppDefined = new UDC.ApplicationDefinedRecord();
+    let u8Array = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    recordAppDefined.applicationDefinedType = 'ApplicationDefinedType';
+    recordAppDefined.rawData = u8Array;
+    let recordAny = new UDC.UnifiedRecord('general.log', 'test.utd-value');
+    let recordHyperlink = new UDC.UnifiedRecord('general.hyperlink', 'test.hyperlink');
+    let unifiedData = new UDC.UnifiedData(record);
+    unifiedData.addRecord(recordFile);
+    unifiedData.addRecord(recordAppDefined);
+    unifiedData.addRecord(recordAny);
+    unifiedData.addRecord(recordHyperlink);
+    let records = unifiedData.getRecords();
+    expect(records.length).assertEqual(5);
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          let firstEntry1 = records[0].getEntry(UTD.UniformDataType.PLAIN_TEXT);
+          expect(firstEntry1.textContent).assertEqual('plaintextValue');
+          let firstEntry2 = records[1].getEntry(UTD.UniformDataType.FILE);
+          expect(firstEntry2.oriUri).assertEqual('schema://com.samples.test/files/test.txt');
+          let firstEntry3 = records[2].getEntry('ApplicationDefinedType');
+          expect(firstEntry3.arrayBuffer.length).assertEqual(u8Array.length);
+          let firstEntry4 = records[3].getEntry('general.log');
+          expect(firstEntry4).assertEqual('test.utd-value');
+          let firstEntry5 = records[4].getEntry('general.hyperlink');
+          expect(firstEntry5.url).assertEqual('test.hyperlink');
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
 });
