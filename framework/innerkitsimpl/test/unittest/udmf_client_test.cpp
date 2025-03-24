@@ -49,6 +49,9 @@ using namespace OHOS::UDMF;
 using namespace OHOS;
 namespace OHOS::Test {
 constexpr int SLEEP_TIME = 50;   // 50 ms
+constexpr int BATCH_SIZE_2K = 2000;
+constexpr int BATCH_SIZE_5K = 5000;
+constexpr double BASE_CONVERSION = 1000.0;
 class UdmfClientTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -3502,5 +3505,127 @@ HWTEST_F(UdmfClientTest, FileUriCastTest001, TestSize.Level1)
     File *audio = reinterpret_cast<Audio *>(record2.get());
     EXPECT_EQ(audio->GetUri(), "http://demo.com");
     LOG_INFO(UDMF_TEST, "FileUriCastTest001 end.");
+}
+
+/**
+* @tc.name: SetBatchData001
+* @tc.desc: Set 2k record and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetBatchData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetBatchData001 begin.");
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data1;
+    std::string key;
+    for (int32_t i = 0; i < BATCH_SIZE_2K; ++i) {
+        auto file1 = std::make_shared<File>();
+        file1->SetRemoteUri("remoteUri");
+        UDDetails details1;
+        details1.insert({ "udmf_key", "udmf_value" });
+        file1->SetDetails(details1);
+        data1.AddRecord(file1);
+    }
+    auto start = std::chrono::high_resolution_clock::now();
+    auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
+    ASSERT_EQ(status, E_OK);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> du = end - start;
+    double duration = BASE_CONVERSION * du.count();
+    LOG_INFO(UDMF_TEST, "setDataDuration = %{public}.1f ms.", duration);
+
+    QueryOption option2 = { .key = key };
+    Summary summary;
+    start = std::chrono::high_resolution_clock::now();
+    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+    end = std::chrono::high_resolution_clock::now();
+    du = end - start;
+    duration = BASE_CONVERSION * du.count();
+    LOG_INFO(UDMF_TEST, "getSummaryDuration = %{public}.1f ms.", duration);
+
+    start = std::chrono::high_resolution_clock::now();
+    AddPrivilege(option2);
+    end = std::chrono::high_resolution_clock::now();
+    du = end - start;
+    duration = BASE_CONVERSION * du.count();
+    LOG_INFO(UDMF_TEST, "addPrivilegeDuration = %{public}.1f ms.", duration);
+
+    SetHapToken2();
+    UnifiedData data2;
+    start = std::chrono::high_resolution_clock::now();
+    status = UdmfClient::GetInstance().GetData(option2, data2);
+    ASSERT_EQ(status, E_OK);
+    end = std::chrono::high_resolution_clock::now();
+    du = end - start;
+    duration = BASE_CONVERSION * du.count();
+    LOG_INFO(UDMF_TEST, "getDataDuration = %{public}.1f ms.", duration);
+
+    ASSERT_EQ(data2.GetRecords().size(), BATCH_SIZE_2K);
+    for (auto record : data2.GetRecords()) {
+        ASSERT_NE(record, nullptr);
+        EXPECT_EQ(record->GetType(), UDType::FILE);
+    }
+    LOG_INFO(UDMF_TEST, "SetBatchData001 end.");
+}
+
+/**
+* @tc.name: SetBatchData002
+* @tc.desc: Set 5k record and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetBatchData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetBatchData002 begin.");
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data1;
+    std::string key;
+    for (int32_t i = 0; i < BATCH_SIZE_5K; ++i) {
+        auto file1 = std::make_shared<File>();
+        file1->SetRemoteUri("remoteUri");
+        UDDetails details1;
+        details1.insert({ "udmf_key", "udmf_value" });
+        file1->SetDetails(details1);
+        data1.AddRecord(file1);
+    }
+    auto start = std::chrono::high_resolution_clock::now();
+    auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
+    ASSERT_EQ(status, E_OK);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> du = end - start;
+    double duration = BASE_CONVERSION * du.count();
+    LOG_INFO(UDMF_TEST, "setDataDuration = %{public}.1f ms.", duration);
+
+    QueryOption option2 = { .key = key };
+    Summary summary;
+    start = std::chrono::high_resolution_clock::now();
+    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+    end = std::chrono::high_resolution_clock::now();
+    du = end - start;
+    duration = BASE_CONVERSION * du.count();
+    LOG_INFO(UDMF_TEST, "getSummaryDuration = %{public}.1f ms.", duration);
+
+    start = std::chrono::high_resolution_clock::now();
+    AddPrivilege(option2);
+    end = std::chrono::high_resolution_clock::now();
+    du = end - start;
+    duration = BASE_CONVERSION * du.count();
+    LOG_INFO(UDMF_TEST, "addPrivilegeDuration = %{public}.1f ms.", duration);
+
+    SetHapToken2();
+    UnifiedData data2;
+    start = std::chrono::high_resolution_clock::now();
+    status = UdmfClient::GetInstance().GetData(option2, data2);
+    ASSERT_EQ(status, E_OK);
+    end = std::chrono::high_resolution_clock::now();
+    du = end - start;
+    duration = BASE_CONVERSION * du.count();
+    LOG_INFO(UDMF_TEST, "getDataDuration = %{public}.1f ms.", duration);
+
+    ASSERT_EQ(data2.GetRecords().size(), BATCH_SIZE_5K);
+    for (auto record : data2.GetRecords()) {
+        ASSERT_NE(record, nullptr);
+        EXPECT_EQ(record->GetType(), UDType::FILE);
+    }
+    LOG_INFO(UDMF_TEST, "SetBatchData002 end.");
 }
 } // OHOS::Test

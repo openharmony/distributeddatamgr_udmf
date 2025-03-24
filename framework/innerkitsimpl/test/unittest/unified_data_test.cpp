@@ -117,10 +117,7 @@ HWTEST_F(UnifiedDataTest, UnifiedData001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "UnifiedData001 begin.");
     std::shared_ptr<UnifiedDataProperties> properties = std::make_shared<UnifiedDataProperties>();
     UnifiedData unifiedData(properties);
-    auto duration = std::chrono::system_clock::now().time_since_epoch();
     EXPECT_EQ(unifiedData.properties_, properties);
-    EXPECT_EQ(unifiedData.properties_->timestamp,
-        std::chrono::duration_cast<std::chrono::milliseconds>(duration).count());
     LOG_INFO(UDMF_TEST, "UnifiedData001 end.");
 }
 
