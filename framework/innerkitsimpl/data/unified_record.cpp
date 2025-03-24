@@ -26,6 +26,9 @@ static constexpr UDType FILE_TYPES[] = {FILE, AUDIO, FOLDER, IMAGE, VIDEO};
 static constexpr const char *FILE_SCHEME = "file";
 static const std::set<std::string> FILE_SUB_TYPES = {
     "general.image", "general.video", "general.audio", "general.folder" };
+static constexpr UDType UDC_RECORDS[] = {APPLICATION_DEFINED_RECORD, AUDIO, FILE, FOLDER, HTML, IMAGE, HYPERLINK,
+    PLAIN_TEXT, SYSTEM_DEFINED_APP_ITEM, SYSTEM_DEFINED_FORM, SYSTEM_DEFINED_PIXEL_MAP, SYSTEM_DEFINED_RECORD,
+    TEXT, VIDEO};
 
 UnifiedRecord::UnifiedRecord()
 {
@@ -140,6 +143,10 @@ ValueType UnifiedRecord::GetEntry(const std::string &utdId)
 {
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (utdId_ == utdId && !(std::holds_alternative<std::monostate>(value_))) {
+        if (!std::holds_alternative<std::shared_ptr<Object>>(value_)
+            && std::find(std::begin(UDC_RECORDS), std::end(UDC_RECORDS), dataType_) != std::end(UDC_RECORDS)) {
+            InitObject();
+        }
         return value_;
     }
     auto it = entries_->find(utdId);
@@ -155,6 +162,16 @@ ValueType UnifiedRecord::GetEntry(const std::string &utdId)
         }
         AddEntry(utdId, ValueType(value));
         return value;
+    }
+    if (utdId_ == utdId && std::holds_alternative<std::monostate>(value_)) {
+        InitObject();
+        auto obj = std::get<std::shared_ptr<Object>>(value_);
+        if (obj->value_.size() == 1) { // value_ size equals 1 means there are no datas
+            value_ = obj->value_[VALUE_TYPE];
+            return std::monostate();
+        } else {
+            return value_;
+        }
     }
     return std::monostate();
 }
