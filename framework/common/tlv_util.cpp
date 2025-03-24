@@ -231,7 +231,8 @@ template <> bool Reading(UnifiedKey &output, TLVObject &data, const TLVHead &hea
 
 template <> size_t CountBufferSize(const UnifiedData &input, TLVObject &data)
 {
-    return data.CountHead() + data.Count(input.GetSdkVersion()) + TLVUtil::CountBufferSize(input.GetRecords(), data);
+    return data.CountHead() + data.Count(input.GetSdkVersion()) + TLVUtil::CountBufferSize(input.GetRecords(), data) +
+        TLVUtil::CountBufferSize(input.GetProperties(), data);
 }
 
 template <> bool Writing(const UnifiedData &input, TLVObject &data, TAG tag)
@@ -243,6 +244,9 @@ template <> bool Writing(const UnifiedData &input, TLVObject &data, TAG tag)
         return false;
     }
     if (!TLVUtil::Writing(input.GetRecords(), data, TAG::TAG_UNIFIED_RECORD)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.GetProperties(), data, TAG::TAG_UNIFIED_PROPERTIES)) {
         return false;
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
@@ -272,8 +276,154 @@ template <> bool Reading(UnifiedData &output, TLVObject &data, const TLVHead &he
             output.SetRecords(records);
             continue;
         }
+        if (headItem.tag == static_cast<uint16_t>(TAG::TAG_UNIFIED_PROPERTIES)) {
+            auto properties = output.GetProperties();
+            if (!Reading(properties, data, headItem)) {
+                return false;
+            }
+            output.SetProperties(std::move(properties));
+            continue;
+        }
         data.Skip(headItem);
     }
+    return true;
+}
+
+template <> size_t CountBufferSize(const UnifiedDataProperties &input, TLVObject &data)
+{
+    return data.CountHead() + data.Count(input.tag) + data.CountBasic(input.timestamp) +
+        data.CountBasic(static_cast<int32_t>(input.shareOptions))  + TLVUtil::CountBufferSize(input.extras, data);
+}
+
+template <> bool Writing(const UnifiedDataProperties &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    auto tagCursor = data.GetCursor();
+    data.OffsetHead();
+    if (!data.Write(TAG::TAG_PROPERTIES_TAG, input.tag)) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_PROPERTIES_TIMESTAMP, input.timestamp)) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_PROPERTIES_SHARE_OPTIONS, static_cast<int32_t>(input.shareOptions))) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.extras, data, TAG::TAG_PROPERTIES_EXTRAS)) {
+        return false;
+    }
+    return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
+}
+
+template <> bool Reading(UnifiedDataProperties &output, TLVObject &data, const TLVHead &head)
+{
+    auto endCursor = data.GetCursor() + head.len;
+    while (data.GetCursor() < endCursor) {
+        TLVHead headItem{};
+        if (!data.ReadHead(headItem)) {
+            return false;
+        }
+        bool result = true;
+        switch (headItem.tag) {
+            case static_cast<uint16_t>(TAG::TAG_PROPERTIES_TAG):
+                result = data.Read(output.tag, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_PROPERTIES_TIMESTAMP):
+                result = data.ReadBasic(output.timestamp, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_PROPERTIES_SHARE_OPTIONS):
+                result = TLVUtil::Reading(output.shareOptions, data, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_PROPERTIES_EXTRAS):
+                result = TLVUtil::Reading(output.extras, data, headItem);
+                break;
+            default:
+                result = data.Skip(headItem);
+        }
+        if (!result) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <> bool Reading(ShareOptions &output, TLVObject &data, const TLVHead &head)
+{
+    int32_t shareOptions;
+    if (!Reading(shareOptions, data, head)) {
+        return false;
+    }
+    if (shareOptions < ShareOptions::IN_APP || shareOptions >= ShareOptions::SHARE_OPTIONS_BUTT) {
+        return false;
+    }
+    output = static_cast<ShareOptions>(shareOptions);
+    return true;
+}
+
+template <> size_t CountBufferSize(const OHOS::AAFwk::WantParams &input, TLVObject &data)
+{
+    Parcel parcel;
+    if (!input.Marshalling(parcel)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Marshalling want error when Count");
+        return 0;
+    }
+    auto size = parcel.GetDataSize();
+    std::vector<std::uint8_t> val(size);
+    return CountBufferSize(val, data);
+}
+
+template <> bool Writing(const OHOS::AAFwk::WantParams &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    Parcel parcel;
+    if (!input.Marshalling(parcel)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Marshalling wantParams error in tlv write. tag=%{public}hu", tag);
+        return false;
+    }
+    auto size = parcel.GetDataSize();
+    auto buffer = parcel.GetData();
+    std::vector<std::uint8_t> val(size);
+    if (size != 0) {
+        auto err = memcpy_s(val.data(), size, reinterpret_cast<const void *>(buffer), size);
+        if (err != EOK) {
+            LOG_ERROR(UDMF_FRAMEWORK, "memcpy error in tlv write wantParams. tag=%{public}hu", tag);
+            return false;
+        }
+    }
+    return data.Write(tag, val);
+}
+
+template <> bool Reading(OHOS::AAFwk::WantParams &output, TLVObject &data, const TLVHead &head)
+{
+    std::vector<std::uint8_t> val;
+    if (!data.Read(val, head)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Reading u8 vector error.");
+        return false;
+    }
+
+    std::shared_ptr<Parcel> parcel = std::make_shared<Parcel>();
+    auto buffer = malloc(val.size());
+    if (buffer == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "malloc error in tlv read. tag=%{public}hu", head.tag);
+        return false;
+    }
+    auto err = memcpy_s(buffer, val.size(), val.data(), val.size());
+    if (err != EOK) {
+        LOG_ERROR(UDMF_FRAMEWORK, "memcpy_s error in tlv read wantParams. tag=%{public}hu", head.tag);
+        free(buffer);
+        return false;
+    }
+    if (!parcel->ParseFrom((uintptr_t)buffer, head.len)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "ParseFrom error in tlv read wantParams. tag=%{public}hu", head.tag);
+        free(buffer);
+        return false;
+    }
+    auto wantParams = AAFwk::WantParams::Unmarshalling(*parcel);
+    if (wantParams == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshalling wantParams error in tlv read. tag=%{public}hu", head.tag);
+        return false;
+    }
+    output = *wantParams;
     return true;
 }
 

@@ -145,6 +145,7 @@ ohos_unittest("TlvUtilTest") {
   deps = common_deps
 
   external_deps = [
+    "ability_base:base",
     "ability_base:want",
     "c_utils:utils",
     "hilog:libhilog",

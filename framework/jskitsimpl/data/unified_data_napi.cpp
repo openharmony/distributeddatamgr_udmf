@@ -287,6 +287,7 @@ napi_value UnifiedDataNapi::GetProperties(napi_env env, napi_callback_info info)
     napi_value value;
     auto uData = GetUnifiedData(env, info);
     ASSERT_ERR(env, (uData != nullptr && uData->value_ != nullptr), Status::E_ERROR, "invalid object!");
+    ASSERT_ERR(env, (uData != nullptr && uData->propertyRef_ != nullptr), Status::E_ERROR, "invalid properties!");
     NAPI_CALL(env, napi_get_reference_value(env, uData->propertyRef_, &value));
     return value;
 }

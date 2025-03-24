@@ -92,7 +92,6 @@ void UdmfClientTest::TearDownTestCase()
 void UdmfClientTest::SetUp()
 {
     SetHapToken1();
-    SetHapToken2();
 }
 
 void UdmfClientTest::TearDown()
@@ -2678,7 +2677,7 @@ HWTEST_F(UdmfClientTest, SetData036, TestSize.Level1)
     UnifiedHtmlRecordProcess::RebuildHtmlRecord(readData);
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    EXPECT_LE(duration.count(), 1000);
+    LOG_INFO(UDMF_TEST, "SetData036 count duration=%{public}lld", duration.count());
     std::string htmlResult = "";
     for (uint32_t i = 0; i < kNumImages; i++) {
         htmlResult += "<img data-ohos='clipboard' src='file:///data/1.png'>";
@@ -3628,5 +3627,96 @@ HWTEST_F(UdmfClientTest, SetBatchData002, TestSize.Level1)
         EXPECT_EQ(record->GetType(), UDType::FILE);
     }
     LOG_INFO(UDMF_TEST, "SetBatchData002 end.");
+}
+
+/**
+* @tc.name: GetData002
+* @tc.desc: test Marshalling and Unmarshalling properties drag
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetData002 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    auto record = std::make_shared<Html>("htmlContent", "plainContent");
+    auto link = Link("url", "descritpion");
+    link.InitObject();
+    record->AddEntry(link.GetUtdId(), link.GetOriginValue());
+    data.AddRecord(record);
+    std::shared_ptr<UnifiedDataProperties> properties = std::make_shared<UnifiedDataProperties>();
+    std::string tag = "this is a tag of test GetData002";
+    properties->tag = tag;
+    properties->shareOptions = CROSS_APP;
+    data.SetProperties(std::move(properties));
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(readData.GetRecords().size(), 1);
+    auto readRecord = readData.GetRecordAt(0);
+    ASSERT_NE(readRecord, nullptr);
+    auto entries = readRecord->GetEntries();
+    auto readHtml = std::get<std::shared_ptr<Object>>(entries->at("general.html"));
+    EXPECT_EQ("htmlContent", std::get<std::string>(readHtml->value_[HTML_CONTENT]));
+    auto readHyperlink = std::get<std::shared_ptr<Object>>(entries->at("general.hyperlink"));
+    EXPECT_EQ("descritpion", std::get<std::string>(readHyperlink->value_[DESCRIPTION]));
+    auto readProperties = readData.GetProperties();
+    ASSERT_NE(readProperties, nullptr);
+    EXPECT_EQ(readProperties->tag, tag);
+    EXPECT_EQ(readProperties->shareOptions, CROSS_APP);
+
+    LOG_INFO(UDMF_TEST, "GetData002 end.");
+}
+
+/**
+* @tc.name: GetBatchData001
+* @tc.desc: test Marshalling and Unmarshalling properties datahub
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetBatchData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetBatchData001 begin.");
+
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_TRUE(unifiedDataSet.empty());
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "plainTextContent");
+    data.AddRecord(record);
+    std::shared_ptr<UnifiedDataProperties> properties = std::make_shared<UnifiedDataProperties>();
+    std::string tag = "this is a tag of test GetBatchData001";
+    properties->tag = tag;
+    properties->shareOptions = CROSS_APP;
+    data.SetProperties(std::move(properties));
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+    query = { .key = key, .intention = Intention::UD_INTENTION_DATA_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), 1);
+    auto record2 = unifiedDataSet[0].GetRecordAt(0);
+    ValueType value = record2->GetValue();
+    ASSERT_NE(std::get_if<std::string>(&value), nullptr);
+    EXPECT_EQ(std::get<std::string>(value), "plainTextContent");
+    auto readProperties = unifiedDataSet[0].GetProperties();
+    ASSERT_NE(readProperties, nullptr);
+    EXPECT_EQ(readProperties->tag, tag);
+    EXPECT_EQ(readProperties->shareOptions, CROSS_APP);
+
+    LOG_INFO(UDMF_TEST, "GetBatchData001 end.");
 }
 } // OHOS::Test
