@@ -24,6 +24,7 @@ static const std::set<std::string> FILE_TYPES = {
     "general.file", "general.image", "general.video", "general.audio", "general.folder", "general.file-uri" };
 static const std::set<std::string> FILE_SUB_TYPES = {
     "general.image", "general.video", "general.audio", "general.folder" };
+static constexpr const char *RECORDS_TANSFER_TAG = "records_to_entries_data_format";
 UnifiedData::UnifiedData()
 {
     properties_ = std::make_shared<UnifiedDataProperties>();
@@ -294,6 +295,38 @@ std::vector<std::string> UnifiedData::GetFileUris() const
         uris.push_back(oriUri);
     }
     return uris;
+}
+
+bool UnifiedData::IsNeedTransferToEntries() const
+{
+    if (records_.size() <= 1) {
+        return false;
+    }
+    if (properties_ == nullptr) {
+        return false;
+    }
+    return properties_->tag == RECORDS_TANSFER_TAG;
+}
+
+void UnifiedData::TransferToEntries(UnifiedData &data)
+{
+    if (records_.size() <= 1) {
+        return;
+    }
+    std::shared_ptr<UnifiedRecord> recordFirst = records_[0];
+    if (recordFirst == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "First record is null");
+        return;
+    }
+    for (size_t i = 1; i < records_.size(); i++) {
+        auto record = records_[i];
+        if (record == nullptr) {
+            continue;
+        }
+        record->InitObject();
+        recordFirst->AddEntry(record->GetUtdId(), record->GetValue());
+    }
+    records_.erase(records_.begin() + 1, records_.end());
 }
 
 std::string UnifiedData::GetSdkVersion() const
