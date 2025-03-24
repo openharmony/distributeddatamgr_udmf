@@ -685,7 +685,7 @@ HWTEST_F(TlvUtilTest, WritingAndReadingSummary_001, TestSize.Level1)
     TLVUtil::ReadTlv(summary2, tlvObject, TAG::TAG_SUMMARY);
     EXPECT_EQ(summary.totalSize, summary2.totalSize);
     EXPECT_EQ(summary.summary.size(), summary2.summary.size());
-    for (const auto &[key, val  ] : summary.summary) {
+    for (const auto &[key, val] : summary.summary) {
         ASSERT_TRUE(summary2.summary.find(key) != summary2.summary.end());
         EXPECT_EQ(summary.summary[key], summary2.summary[key]);
     }
