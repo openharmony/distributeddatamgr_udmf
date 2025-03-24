@@ -45,6 +45,9 @@ UnifiedRecord::UnifiedRecord(UDType type, ValueType value)
     value_ = value;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         hasObject_ = true;
+        if (utdId_ == GENERAL_FILE_URI) {
+            ObjectUtils::ProcessFileUriType(dataType_, value_);
+        }
     }
 }
 
