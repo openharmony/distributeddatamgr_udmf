@@ -40,7 +40,9 @@ SystemDefinedPixelMap::SystemDefinedPixelMap(UDType type, ValueType value) : Sys
         auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value);
         if (!pixelMap->EncodeTlv(rawData_)) {
             LOG_ERROR(UDMF_KITS_INNER, "pixelMap encode fail!");
+            return;
         }
+        SetPixelMapDetails(pixelMap);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
         auto it = object->value_.find(PIXEL_MAP);
@@ -52,11 +54,21 @@ SystemDefinedPixelMap::SystemDefinedPixelMap(UDType type, ValueType value) : Sys
             auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(it->second);
             if (!pixelMap->EncodeTlv(rawData_)) {
                 LOG_ERROR(UDMF_KITS_INNER, "pixelMap encode fail!");
+                return;
             }
+            SetPixelMapDetails(pixelMap);
         } else if (std::holds_alternative<std::vector<uint8_t>>(it->second)) {
             rawData_ = std::get<std::vector<uint8_t>>(it->second);
         }
     }
+}
+
+void SystemDefinedPixelMap::SetPixelMapDetails(const std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
+{
+    details_["width"] = pixelMap->GetWidth();
+    details_["heigth"] = pixelMap->GetHeight();
+    details_["pixel-format"] = static_cast<int32_t>(pixelMap->GetPixelFormat());
+    details_["alpha-type"] = static_cast<int32_t>(pixelMap->GetAlphaType());
 }
 
 int64_t SystemDefinedPixelMap::GetSize()
