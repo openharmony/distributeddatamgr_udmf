@@ -211,7 +211,6 @@ HWTEST_F(UnifiedDataTest, GetRecordAt001, TestSize.Level1)
 */
 HWTEST_F(UnifiedDataTest, TransferToEntries001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "TransferToEntries001 begin.");
     UnifiedData unifiedData;
     std::shared_ptr<PlainText> plainText = std::make_shared<PlainText>();
     plainText->SetContent("http://1111/a.img");
@@ -259,7 +258,6 @@ HWTEST_F(UnifiedDataTest, TransferToEntries001, TestSize.Level1)
     std::string abstract;
     plainTextEntryObj1->GetValue(ABSTRACT, abstract);
     EXPECT_EQ(abstract, "abstract");
-    LOG_INFO(UDMF_TEST, "TransferToEntries001 end.");
 }
 
 /**
