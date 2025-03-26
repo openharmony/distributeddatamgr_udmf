@@ -278,7 +278,7 @@ std::set<std::string> UnifiedData::GetTypIds() const
 {
     std::set<std::string> types;
     for (const auto &record : records_) {
-        std::set<std::string> recordTypes = record->GetUtdIds();
+        std::set<std::string> recordTypes = record->GetUtdIdsWithAddFileType();
         types.insert(recordTypes.begin(), recordTypes.end());
     }
     return types;

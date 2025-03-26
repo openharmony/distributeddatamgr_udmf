@@ -26,6 +26,7 @@ public:
     API_EXPORT Image();
     explicit API_EXPORT Image(const std::string &uri);
     API_EXPORT Image(UDType type, ValueType value);
+    void InitObject() override;
 };
 } // namespace UDMF
 } // namespace OHOS

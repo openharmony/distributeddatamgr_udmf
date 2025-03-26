@@ -20,18 +20,35 @@ namespace UDMF {
 Video::Video() : Video("")
 {
     SetType(VIDEO);
-    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(VIDEO);
 }
 
 Video::Video(const std::string &uri) : File(uri)
 {
     SetType(VIDEO);
-    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(VIDEO);
 }
 
 Video::Video(UDType type, ValueType value) : File(type, value)
 {
     SetType(VIDEO);
+}
+
+void Video::InitObject()
+{
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto value = value_;
+        value_ = std::make_shared<Object>();
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        object->value_[UNIFORM_DATA_TYPE] = GENERAL_FILE_URI;
+        object->value_[ORI_URI] = oriUri_;
+        object->value_[REMOTE_URI] = remoteUri_;
+        if (!fileType_.empty()) {
+            object->value_[FILE_TYPE] = fileType_;
+        } else {
+            object->value_[FILE_TYPE] = "general.video";
+        }
+        object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
+    }
 }
 } // namespace UDMF
 } // namespace OHOS
