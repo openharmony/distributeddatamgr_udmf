@@ -107,10 +107,16 @@ napi_status UnifiedDataNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedDa
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     ASSERT_CALL_STATUS(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *unifiedData = new (std::nothrow) UnifiedDataNapi();
-    ASSERT_ERR_STATUS(env, unifiedData != nullptr, Status::E_ERROR, "no memory for unified data!");
+
+    UnifiedDataNapi* unifiedData = nullptr;
+    napi_unwrap(env, out, reinterpret_cast<void **>(&unifiedData));
     unifiedData->value_ = in;
-    ASSERT_CALL_DELETE_STATUS(env, napi_wrap(env, out, unifiedData, Destructor, nullptr, nullptr), unifiedData);
+
+    napi_value value;
+    napi_get_reference_value(env, unifiedData->propertyRef_, &value);
+    UnifiedDataPropertiesNapi* propertiesNapi = nullptr;
+    napi_unwrap(env, value, reinterpret_cast<void **>(&propertiesNapi));
+    propertiesNapi->value_ = in->GetProperties();
     return napi_ok;
 }
 
