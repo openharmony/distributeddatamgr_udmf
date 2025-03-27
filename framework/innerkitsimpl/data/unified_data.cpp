@@ -323,10 +323,10 @@ void UnifiedData::TransferToEntries()
         if (record == nullptr) {
             continue;
         }
-        record->InitObject();
         if (record->GetUtdId() == recordFirst->GetUtdId()) {
             continue;
         }
+        record->InitObject();
         recordFirst->AddEntry(record->GetUtdId(), record->GetValue());
     }
     records_.erase(records_.begin() + 1, records_.end());
