@@ -45,7 +45,6 @@ ApplicationDefinedRecord::ApplicationDefinedRecord(UDType type, ValueType value)
         auto object = std::get<std::shared_ptr<Object>>(value);
         object->GetValue(UNIFORM_DATA_TYPE, applicationDefinedType);
         object->GetValue(ARRAY_BUFFER, rawData_);
-        hasObject_ = true;
     }
     if (applicationDefinedType.empty()) {
         applicationDefinedType = UtdUtils::GetUtdIdFromUtdEnum(type);

@@ -3299,82 +3299,66 @@ HWTEST_F(UdmfClientTest, GetSelfBundleName001, TestSize.Level1)
 HWTEST_F(UdmfClientTest, GetSummary004, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetSummary004 begin.");
-
     CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
     UnifiedData data;
     std::string key;
-
     UDDetails details;
     details.insert({ "udmf_key", "udmf_value" });
-
     std::shared_ptr<Object> obj = std::make_shared<Object>();
     obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
     obj->value_[FILE_URI_PARAM] = "http://demo.com";
     obj->value_[FILE_TYPE] = "abcdefg";
     auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
-    auto size0 = record->GetSize();
-
     auto plainText = PlainText("content", "abstract");
     auto size1 = plainText.GetSize();
     plainText.InitObject();
     record->AddEntry(plainText.GetUtdId(), plainText.GetOriginValue());
-
     auto image = Image("uri");
     image.SetDetails(details);
     auto size2 = image.GetSize();
     image.InitObject();
     record->AddEntry(image.GetUtdId(), image.GetOriginValue());
-
     std::vector<uint8_t> raw = {1, 2, 3, 4, 5};
     SystemDefinedPixelMap pixelMap = SystemDefinedPixelMap(raw);
     pixelMap.SetDetails(details);
     auto size3 = pixelMap.GetSize();
     pixelMap.InitObject();
     record->AddEntry(pixelMap.GetUtdId(), pixelMap.GetOriginValue());
-
     raw = {1, 2, 3, 4, 5};
     auto applicationDefinedRecord = ApplicationDefinedRecord("my.type", raw);
     auto size4 = applicationDefinedRecord.GetSize();
     applicationDefinedRecord.InitObject();
     record->AddEntry(applicationDefinedRecord.GetUtdId(), applicationDefinedRecord.GetOriginValue());
-    
     data.AddRecord(record);
-
     auto status = UdmfClient::GetInstance().SetData(option1, data, key);
     ASSERT_EQ(status, E_OK);
-
     QueryOption option2 = { .key = key };
     Summary summary;
     status = UdmfClient::GetInstance().GetSummary(option2, summary);
-
     ASSERT_EQ(status, E_OK);
-    EXPECT_EQ(summary.summary["abcdefg"], size0);
     EXPECT_EQ(summary.summary["general.plain-text"], size1);
     EXPECT_EQ(summary.summary["general.image"], size2);
     EXPECT_EQ(summary.summary["openharmony.pixel-map"], size3);
     EXPECT_EQ(summary.summary["ApplicationDefinedType"], size4);
-
     EXPECT_EQ(summary.totalSize, record->GetSize());
-
     UnifiedData readData;
     status = UdmfClient::GetInstance().GetData(option2, readData);
     ASSERT_EQ(E_OK, status);
     ASSERT_EQ(1, readData.GetRecords().size());
     auto readRecord = readData.GetRecordAt(0);
     auto entries = readRecord->GetEntries();
-    ASSERT_EQ(5, entries->size());
+    ASSERT_EQ(4, entries->size());
     auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
-    EXPECT_EQ("abcdefg", std::get<std::string>(readFileUri->value_[FILE_TYPE]));
+    EXPECT_EQ("general.image", std::get<std::string>(readFileUri->value_[FILE_TYPE]));
+    EXPECT_EQ("uri", std::get<std::string>(readFileUri->value_[ORI_URI]));
     auto readPlainText = std::get<std::shared_ptr<Object>>(entries->at("general.plain-text"));
     EXPECT_EQ("abstract", std::get<std::string>(readPlainText->value_[ABSTRACT]));
-    auto readImage = std::get<std::shared_ptr<Object>>(entries->at("general.image"));
-    EXPECT_EQ("uri", std::get<std::string>(readImage->value_[ORI_URI]));
     auto readPixelMap = std::get<std::shared_ptr<Object>>(entries->at("openharmony.pixel-map"));
     EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readPixelMap->value_[PIXEL_MAP]).size());
     auto readDefinedRecord = std::get<std::shared_ptr<Object>>(entries->at("my.type"));
     EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readDefinedRecord->value_[ARRAY_BUFFER]).size());
-    auto value = std::get<std::shared_ptr<Object>>(readRecord->GetValue());
-    EXPECT_EQ("abcdefg", std::get<std::string>(value->value_[FILE_TYPE]));
+    auto valueType = readRecord->GetValue();
+    EXPECT_TRUE(std::holds_alternative<std::monostate>(readRecord->GetValue()));
     LOG_INFO(UDMF_TEST, "GetSummary004 end.");
 }
 
@@ -3481,7 +3465,7 @@ HWTEST_F(UdmfClientTest, GetSummary005, TestSize.Level1)
     EXPECT_EQ("content1", std::get<std::string>(readHtml->value_[HTML_CONTENT]));
     auto readHyperlink = std::get<std::shared_ptr<Object>>(entries->at("general.hyperlink"));
     EXPECT_EQ("descritpion", std::get<std::string>(readHyperlink->value_[DESCRIPTION]));
-    auto readFolder = std::get<std::shared_ptr<Object>>(entries->at("general.folder"));
+    auto readFolder = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
     EXPECT_EQ("uri", std::get<std::string>(readFolder->value_[ORI_URI]));
     auto readDefinedRecord = std::get<std::shared_ptr<Object>>(entries->at("your.type"));
     EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readDefinedRecord->value_[ARRAY_BUFFER]).size());

@@ -61,33 +61,26 @@ void UnifiedDataTest::TransferToEntriesCompareEntries(UnifiedRecord* recordFirst
     auto plainTextFirst = static_cast<PlainText*>(recordFirst);
     EXPECT_EQ(plainTextFirst->GetAbstract(), "abstract");
     EXPECT_EQ(plainTextFirst->GetContent(), "http://1111/a.img");
-
     std::set<std::string> utdIds = recordFirst->GetUtdIds();
     EXPECT_TRUE(utdIds.find("general.plain-text") != utdIds.end());
-    EXPECT_TRUE(utdIds.find("general.file") != utdIds.end());
     EXPECT_TRUE(utdIds.find("general.file-uri") != utdIds.end());
-    EXPECT_TRUE(utdIds.find("general.img") == utdIds.end());
-    EXPECT_TRUE(utdIds.find("general.media") != utdIds.end());
-
-    auto fileEntry = recordFirst->GetEntry("general.file");
+    auto fileEntry = recordFirst->GetEntry("general.file-uri");
     std::shared_ptr<Object> fileEntryObj = std::get<std::shared_ptr<Object>>(fileEntry);
     std::string getUri;
     fileEntryObj->GetValue(ORI_URI, getUri);
-    EXPECT_EQ(getUri, "http://1111/a.img");
-
+    EXPECT_EQ(getUri, "http://1111/a.mp4");
     auto plainTextEntry = recordFirst->GetEntry("general.plain-text");
-    EXPECT_TRUE(std::holds_alternative<std::monostate>(plainTextEntry));
-
+    std::shared_ptr<Object> plainTextEntryObj = std::get<std::shared_ptr<Object>>(plainTextEntry);
+    std::string getContent;
+    plainTextEntryObj->GetValue(CONTENT, getContent);
+    EXPECT_EQ(getContent, "http://1111/a.img");
+    std::string getAbstract;
+    plainTextEntryObj->GetValue(ABSTRACT, getAbstract);
+    EXPECT_EQ(getAbstract, "abstract");
     auto entries = recordFirst->GetEntries();
     EXPECT_NE(entries, nullptr);
-    int entrySize = 3;
+    int entrySize = 2;
     EXPECT_EQ(entries->size(), entrySize);
-    auto fileEntry1 = (*entries)["general.file"];
-    std::shared_ptr<Object> fileEntryObj1 = std::get<std::shared_ptr<Object>>(fileEntry1);
-    std::string getUri1;
-    fileEntryObj1->GetValue(ORI_URI, getUri1);
-    EXPECT_EQ(getUri1, "http://1111/a.img");
-
     auto plainTextEntry1 = (*entries)["general.plain-text"];
     std::shared_ptr<Object> plainTextEntryObj1 = std::get<std::shared_ptr<Object>>(plainTextEntry1);
     std::string content;
@@ -96,12 +89,11 @@ void UnifiedDataTest::TransferToEntriesCompareEntries(UnifiedRecord* recordFirst
     std::string abstract;
     plainTextEntryObj1->GetValue(ABSTRACT, abstract);
     EXPECT_EQ(abstract, "abstract");
-
     auto fileUriEntry1 = (*entries)["general.file-uri"];
     std::shared_ptr<Object> fileUriEntryObj1 = std::get<std::shared_ptr<Object>>(fileUriEntry1);
     std::string oriUri;
     fileUriEntryObj1->GetValue(FILE_URI_PARAM, oriUri);
-    EXPECT_EQ(oriUri, "http://1111/a.img");
+    EXPECT_EQ(oriUri, "http://1111/a.mp4");
     std::string fileType;
     fileUriEntryObj1->GetValue(FILE_TYPE, fileType);
     EXPECT_EQ(fileType, "general.media");
@@ -219,7 +211,6 @@ HWTEST_F(UnifiedDataTest, GetRecordAt001, TestSize.Level1)
 */
 HWTEST_F(UnifiedDataTest, TransferToEntries001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "TransferToEntries001 begin.");
     UnifiedData unifiedData;
     std::shared_ptr<PlainText> plainText = std::make_shared<PlainText>();
     plainText->SetContent("http://1111/a.img");
@@ -238,19 +229,23 @@ HWTEST_F(UnifiedDataTest, TransferToEntries001, TestSize.Level1)
     EXPECT_EQ(plainTextFirst->GetContent(), "http://1111/a.img");
     std::set<std::string> utdIds = recordFirst->GetUtdIds();
     EXPECT_TRUE(utdIds.find("general.plain-text") != utdIds.end());
-    EXPECT_TRUE(utdIds.find("general.file") != utdIds.end());
-    auto fileEntry = recordFirst->GetEntry("general.file");
+    EXPECT_TRUE(utdIds.find("general.file-uri") != utdIds.end());
+    auto fileEntry = recordFirst->GetEntry("general.file-uri");
     std::shared_ptr<Object> fileEntryObj = std::get<std::shared_ptr<Object>>(fileEntry);
     std::string getUri;
     fileEntryObj->GetValue(ORI_URI, getUri);
     EXPECT_EQ(getUri, "http://1111/a.img");
     auto plainTextEntry = recordFirst->GetEntry("general.plain-text");
-    EXPECT_TRUE(std::holds_alternative<std::monostate>(plainTextEntry));
+    EXPECT_FALSE(std::holds_alternative<std::monostate>(plainTextEntry));
+    std::shared_ptr<Object> plainTextEntryObj = std::get<std::shared_ptr<Object>>(plainTextEntry);
+    std::string getContent;
+    plainTextEntryObj->GetValue(CONTENT, getContent);
+    EXPECT_EQ(getContent, "http://1111/a.img");
     auto entries = recordFirst->GetEntries();
     EXPECT_NE(entries, nullptr);
     int entrySize = 2;
     EXPECT_EQ(entries->size(), entrySize);
-    auto fileEntry1 = (*entries)["general.file"];
+    auto fileEntry1 = (*entries)["general.file-uri"];
     std::shared_ptr<Object> fileEntryObj1 = std::get<std::shared_ptr<Object>>(fileEntry1);
     std::string getUri1;
     fileEntryObj1->GetValue(ORI_URI, getUri1);
@@ -263,7 +258,6 @@ HWTEST_F(UnifiedDataTest, TransferToEntries001, TestSize.Level1)
     std::string abstract;
     plainTextEntryObj1->GetValue(ABSTRACT, abstract);
     EXPECT_EQ(abstract, "abstract");
-    LOG_INFO(UDMF_TEST, "TransferToEntries001 end.");
 }
 
 /**
@@ -278,22 +272,18 @@ HWTEST_F(UnifiedDataTest, TransferToEntries002, TestSize.Level1)
     std::shared_ptr<PlainText> plainText = std::make_shared<PlainText>();
     plainText->SetContent("http://1111/a.img");
     plainText->SetAbstract("abstract");
-
     std::shared_ptr<File> file = std::make_shared<File>();
-    file->SetUri("http://1111/a.img");
-
+    file->SetUri("http://1111/a.txt");
     std::shared_ptr<Object> fileUriObj = std::make_shared<Object>();
     fileUriObj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
     fileUriObj->value_[FILE_URI_PARAM] = "http://1111/a.img";
     fileUriObj->value_[FILE_TYPE] = "general.img";
     std::shared_ptr<UnifiedRecord> fileUri = std::make_shared<UnifiedRecord>(FILE_URI, fileUriObj);
-
     std::shared_ptr<Object> fileUriObj1 = std::make_shared<Object>();
     fileUriObj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
-    fileUriObj1->value_[FILE_URI_PARAM] = "http://1111/a.img";
+    fileUriObj1->value_[FILE_URI_PARAM] = "http://1111/a.mp4";
     fileUriObj1->value_[FILE_TYPE] = "general.media";
     std::shared_ptr<UnifiedRecord> fileUri1 = std::make_shared<UnifiedRecord>(FILE_URI, fileUriObj1);
-
     bool isNeed = unifiedData.IsNeedTransferToEntries();
     EXPECT_FALSE(isNeed);
     unifiedData.AddRecord(plainText);
@@ -309,12 +299,10 @@ HWTEST_F(UnifiedDataTest, TransferToEntries002, TestSize.Level1)
     unifiedData.SetProperties(properties);
     isNeed = unifiedData.IsNeedTransferToEntries();
     EXPECT_TRUE(isNeed);
-
     unifiedData.TransferToEntries(unifiedData);
     auto records = unifiedData.GetRecords();
     int recordSize = 1;
     EXPECT_EQ(records.size(), recordSize);
-    
     auto recordFirst = records[0].get();
     TransferToEntriesCompareEntries(recordFirst);
     LOG_INFO(UDMF_TEST, "TransferToEntries001 end.");

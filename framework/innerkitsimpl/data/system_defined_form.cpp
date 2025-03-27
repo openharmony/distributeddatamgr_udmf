@@ -36,7 +36,6 @@ SystemDefinedForm::SystemDefinedForm(UDType type, ValueType value) : SystemDefin
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
         }
-        hasObject_ = true;
     }
 }
 

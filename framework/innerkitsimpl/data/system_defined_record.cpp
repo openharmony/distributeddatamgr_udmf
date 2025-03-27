@@ -35,7 +35,6 @@ SystemDefinedRecord::SystemDefinedRecord(UDType type, ValueType value) : Unified
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
         }
-        hasObject_ = true;
     }
 }
 

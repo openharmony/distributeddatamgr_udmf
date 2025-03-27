@@ -50,7 +50,6 @@ Html::Html(UDType type, ValueType value) : Text(type, value)
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
         }
-        hasObject_ = true;
     }
 }
 

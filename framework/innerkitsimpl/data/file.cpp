@@ -18,16 +18,18 @@ namespace OHOS {
 namespace UDMF {
 File::File() : UnifiedRecord(FILE)
 {
+    SetType(FILE);
 }
 
 File::File(const std::string &uri) : UnifiedRecord(FILE)
 {
+    SetType(FILE);
     this->oriUri_ = uri;
 }
 
 File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
 {
-    this->dataType_ = FILE;
+    SetType(FILE);
     if (std::holds_alternative<std::string>(value)) {
         oriUri_ = std::get<std::string>(value);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
@@ -35,21 +37,17 @@ File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
         object->GetValue(ORI_URI, oriUri_);
         object->GetValue(REMOTE_URI, remoteUri_);
         object->GetValue(FILE_TYPE, fileType_);
-        std::string uniformDataType;
-        if (object->GetValue(UNIFORM_DATA_TYPE, uniformDataType) && uniformDataType == GENERAL_FILE_URI) {
-            utdId_ = std::move(uniformDataType);
-        }
         std::shared_ptr<Object> detailObj = nullptr;
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
         }
-        hasObject_ = true;
     }
 }
 
 void File::SetType(const UDType &type)
 {
     this->dataType_ = type;
+    utdId_ = GENERAL_FILE_URI;
 }
 
 int64_t File::GetSize()
@@ -109,7 +107,11 @@ void File::InitObject()
         object->value_[UNIFORM_DATA_TYPE] = GENERAL_FILE_URI;
         object->value_[ORI_URI] = oriUri_;
         object->value_[REMOTE_URI] = remoteUri_;
-        object->value_[FILE_TYPE] = fileType_;
+        if (!fileType_.empty()) {
+            object->value_[FILE_TYPE] = fileType_;
+        } else {
+            object->value_[FILE_TYPE] = "general.file";
+        }
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
         object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }

@@ -25,6 +25,7 @@ public:
     API_EXPORT Folder();
     explicit API_EXPORT Folder(const std::string &uri);
     API_EXPORT Folder(UDType type, ValueType value);
+    void InitObject() override;
 };
 } // namespace UDMF
 } // namespace OHOS
