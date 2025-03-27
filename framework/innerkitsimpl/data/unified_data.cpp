@@ -310,7 +310,7 @@ bool UnifiedData::IsNeedTransferToEntries() const
 
 void UnifiedData::TransferToEntries()
 {
-    if (records_.size() <= 1) {
+    if (!IsNeedTransferToEntries()) {
         return;
     }
     std::shared_ptr<UnifiedRecord> recordFirst = records_[0];

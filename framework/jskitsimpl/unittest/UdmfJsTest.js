@@ -3292,4 +3292,44 @@ describe('UdmfJSTest', function () {
     expect(entries['general.file']).assertEqual(undefined);
     done();
    });
+
+   /**
+   * @tc.name toEntriesTest004
+   * @tc.desc test toEntries function with invalid data
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('toEntriesTest004', 0, async function (done) {
+    const TAG = 'toEntriesTest004';
+    console.info(TAG, 'start');
+    let recordFile = new UDC.UnifiedRecord('general.file', 'schema://com.samples.test/files/test.txt');
+    let recordVideo = new UDC.UnifiedRecord('general.video', 'schema://com.samples.test/files/test.mp4');
+    let recordPlainText = new UDC.UnifiedRecord('general.plain-text', 'this is textContent');
+    let unifiedData = new UDC.UnifiedData();
+    unifiedData.addRecord(recordFile);
+    unifiedData.addRecord(recordVideo);
+    unifiedData.addRecord(recordPlainText);
+    expect(unifiedData.getRecords().length).assertEqual(3);
+    UDC.convertRecordsToEntries();
+    expect(unifiedData.getRecords().length).assertEqual(1);
+    let records = unifiedData.getRecords();
+    let recordEntries = records[0];
+    expect(recordEntries.uri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(recordEntries.getType()).assertEqual('general.file');
+    expect(recordEntries.getValue()).assertEqual('schema://com.samples.test/files/test.txt');
+    let videoEntry = recordEntries.getEntry('general.file-uri');
+    expect(videoEntry.oriUri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(videoEntry.fileType).assertEqual('general.file');
+    let plainTextEntry = recordEntries.getEntry('general.plain-text');
+    expect(plainTextEntry.textContent).assertEqual('this is textContent');
+    let entries = recordEntries.getEntries();
+    expect(entries['general.file-uri'].uniformDataType).assertEqual('general.file-uri');
+    expect(entries['general.file-uri'].oriUri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(entries['general.file-uri'].fileType).assertEqual('general.file');
+    expect(entries['general.plain-text'].uniformDataType).assertEqual('general.plain-text');
+    expect(entries['general.plain-text'].textContent).assertEqual('this is textContent');
+    expect(entries['general.video']).assertEqual(undefined);
+    expect(entries['general.file']).assertEqual(undefined);
+    done();
+   });
 });
