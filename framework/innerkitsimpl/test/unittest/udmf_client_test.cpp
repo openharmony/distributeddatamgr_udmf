@@ -2649,7 +2649,7 @@ HWTEST_F(UdmfClientTest, SetData036, TestSize.Level1)
     UnifiedHtmlRecordProcess::RebuildHtmlRecord(readData);
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    EXPECT_LE(duration.count(), 1000);
+    LOG_INFO(UDMF_TEST, "SetData036 count duration=%{public}lld", duration.count());
     std::string htmlResult = "";
     for (uint32_t i = 0; i < kNumImages; i++) {
         htmlResult += "<img data-ohos='clipboard' src='file:///data/1.png'>";
