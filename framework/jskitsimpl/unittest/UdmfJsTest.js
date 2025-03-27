@@ -3208,9 +3208,9 @@ describe('UdmfJSTest', function () {
     expect(entries['openharmony.form'].details.formKey2).assertEqual('formValue');
     expect(entries['openharmony.form'].details.formKey3.toString).assertEqual(U8_ARRAY.toString);
     for (let i = 0; i < U8_ARRAY.length; i++) {
-      expect(entries['ApplicationDefinedType'].arrayBuffer[i]).assertEqual(U8_ARRAY[i]);
+      expect(entries.ApplicationDefinedType.arrayBuffer[i]).assertEqual(U8_ARRAY[i]);
     }
-    expect(entries['ApplicationDefinedType'].uniformDataType).assertEqual('ApplicationDefinedType');
+    expect(entries.ApplicationDefinedType.uniformDataType).assertEqual('ApplicationDefinedType');
     done();
   });
 
@@ -3229,7 +3229,7 @@ describe('UdmfJSTest', function () {
     plainText.textContent = 'this is textContent';
     plainText.abstract = 'this is abstract';
     let video = new UDC.Video();
-    video.uri ='schema://com.samples.test/files/test.mp4';
+    video.uri = 'schema://com.samples.test/files/test.mp4';
     let unifiedData = new UDC.UnifiedData();
     unifiedData.addRecord(image);
     unifiedData.addRecord(plainText);
