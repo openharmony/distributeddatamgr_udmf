@@ -14,7 +14,7 @@
  */
 #define LOG_TAG "unifiedDataChannelANI"
 #include "ani_utils.h"
-#include "udmf_log.h"
+#include "logger.h"
 #include "ani_common_want.h"
 #include "image_ani_utils.h"
 
@@ -68,7 +68,7 @@ static UDMF::ValueType ParseANIRecordValueType(ani_env *env, const std::string t
     }
 
     if (!unionAccessor.IsInstanceOf("Lstd/core/Object;")) {
-        LOGD("ParseANIRecordValueType default std::monostate");
+        LOG_DEBUG(UDMF_KITS_NAPI, "ParseANIRecordValueType default std::monostate");
         return std::monostate();
     }
 
@@ -155,7 +155,7 @@ public:
 
         ~UnifiedRecordHolder()
         {
-            LOGD("[ANI] enter UnifiedRecordHolder dtor ");
+            LOG_DEBUG(UDMF_KITS_NAPI, "[ANI] enter UnifiedRecordHolder dtor ");
         }
 
     private:
@@ -189,7 +189,7 @@ public:
 
         ~UnifiedDataHolder()
         {
-            LOGD("[ANI] enter UnifiedDataHolder dtor ");
+            LOG_DEBUG(UDMF_KITS_NAPI, "[ANI] enter UnifiedDataHolder dtor ");
         }
 
     private:
@@ -200,7 +200,7 @@ public:
 static void UnifiedRecodeValueTypeConstructor([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
     ani_string descriptor, ani_object unionValue)
 {
-    LOGD("[ANI] enter UnifiedRecodeValueTypeConstructor");
+    LOG_DEBUG(UDMF_KITS_NAPI, "[ANI] enter UnifiedRecodeValueTypeConstructor");
 
     ani_ref saveRemote = nullptr;
     env->GlobalReference_Create(reinterpret_cast<ani_ref>(object), &saveRemote);
@@ -214,7 +214,7 @@ static void UnifiedRecodeValueTypeConstructor([[maybe_unused]] ani_env *env, [[m
 static void UnifiedDataConstructor([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
     ani_object recordObj)
 {
-    LOGD("[ANI] enter UnifiedDataConstructor ");
+    LOG_DEBUG(UDMF_KITS_NAPI, "[ANI] enter UnifiedDataConstructor ");
     auto recoderHolder = AniObjectUtils::Unwrap<UnifiedRecordHolder>(env, recordObj);
 
     ani_ref saveRemote = nullptr;
@@ -232,25 +232,25 @@ static ani_object UnifiedRecordToObject(ani_env *env, std::shared_ptr<UnifiedRec
     static const char *nameSpaceName = "L@ohos/data/unifiedDataChannel/unifiedDataChannel;";
     ani_namespace ns;
     if (ANI_OK != env->FindNamespace(nameSpaceName, &ns)) {
-        LOGE("Not found namespace %{public}s", nameSpaceName);
+        LOG_ERROR(UDMF_KITS_NAPI, "Not found namespace %{public}s", nameSpaceName);
         return aniObject;
     }
 
     static const char *recordclsName = "LUnifiedRecord;";
     ani_class aniClass;
     if (ANI_OK != env->Namespace_FindClass(ns, recordclsName, &aniClass)) {
-        LOGE("Not found class %{public}s", recordclsName);
+        LOG_ERROR(UDMF_KITS_NAPI, "Not found class %{public}s", recordclsName);
         return aniObject;
     }
 
     ani_method personInfoCtor;
     if (ANI_OK != env->Class_FindMethod(aniClass, "setNativePtr", nullptr, &personInfoCtor)) {
-        LOGE("Not found func setNativePtr");
+        LOG_ERROR(UDMF_KITS_NAPI, "Not found func setNativePtr");
         return aniObject;
     }
 
     if (ANI_OK != env->Object_New(aniClass, personInfoCtor, &aniObject, reinterpret_cast<ani_long>(record.get()))) {
-        LOGE("Object_New Failed");
+        LOG_ERROR(UDMF_KITS_NAPI, "Object_New Failed");
         return aniObject;
     }
     return aniObject;
@@ -261,31 +261,31 @@ static ani_object GetRecords([[maybe_unused]] ani_env *env, [[maybe_unused]] ani
     ani_object arrayObj = nullptr;
     ani_class arrayCls = nullptr;
     if (ANI_OK != env->FindClass("Lescompat/Array;", &arrayCls)) {
-        LOGE("FindClass Lescompat/Array; Failed");
+        LOG_ERROR(UDMF_KITS_NAPI, "FindClass Lescompat/Array; Failed");
         return arrayObj;
     }
 
     ani_method arrayCtor;
     if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", "I:V", &arrayCtor)) {
-        LOGE("Class_FindMethod <ctor> Failed");
+        LOG_ERROR(UDMF_KITS_NAPI, "Class_FindMethod <ctor> Failed");
         return arrayObj;
     }
 
     auto dataHolder = AniObjectUtils::Unwrap<UnifiedDataHolder>(env, obj);
     if (dataHolder == nullptr) {
-        LOGE("UnifiedData unwrapp failed");
+        LOG_ERROR(UDMF_KITS_NAPI, "UnifiedData unwrapp failed");
         return arrayObj;
     }
 
     auto dataObj = dataHolder->Get();
     if (dataObj == nullptr) {
-        LOGE("dataHolder get empty...");
+        LOG_ERROR(UDMF_KITS_NAPI, "dataHolder get empty...");
         return arrayObj;
     }
 
     std::vector<std::shared_ptr<UnifiedRecord>> records = dataObj->GetRecords();
     if (ANI_OK != env->Object_New(arrayCls, arrayCtor, &arrayObj, records.size())) {
-        LOGE("Object_New Array Faild");
+        LOG_ERROR(UDMF_KITS_NAPI, "Object_New Array Faild");
         return arrayObj;
     }
 
@@ -293,37 +293,37 @@ static ani_object GetRecords([[maybe_unused]] ani_env *env, [[maybe_unused]] ani
     for (const std::shared_ptr<UnifiedRecord> &recordPtr : records) {
         auto aniRecord = UnifiedRecordToObject(env, recordPtr);
         if (ANI_OK != env->Object_CallMethodByName_Void(arrayObj, "$_set", "ILstd/core/Object;:V", index, aniRecord)) {
-            LOGE("Object_CallMethodByName_Void  $_set Faild");
+            LOG_ERROR(UDMF_KITS_NAPI, "Object_CallMethodByName_Void  $_set Faild");
             break;
         }
         index++;
     }
 
-    LOGD("getRecords index:%{public}u", static_cast<uint32_t>(index));
+    LOG_DEBUG(UDMF_KITS_NAPI, "getRecords index:%{public}u", static_cast<uint32_t>(index));
     return arrayObj;
 }
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
-    LOGD("ANI_Constructor start...");
+    LOG_DEBUG(UDMF_KITS_NAPI, "ANI_Constructor start...");
 
     ani_env *env;
     if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
-        LOGE("[ANI] Unsupported ANI_VERSION_1");
+        LOG_ERROR(UDMF_KITS_NAPI, "[ANI] Unsupported ANI_VERSION_1");
         return ANI_ERROR;
     }
 
     static const char *nameSpaceName = "L@ohos/data/unifiedDataChannel/unifiedDataChannel;";
     ani_namespace ns;
     if (ANI_OK != env->FindNamespace(nameSpaceName, &ns)) {
-        LOGE("Not found namespace %{public}s", nameSpaceName);
+        LOG_ERROR(UDMF_KITS_NAPI, "Not found namespace %{public}s", nameSpaceName);
         return ANI_NOT_FOUND;
     }
 
     static const char *recordclsName = "LUnifiedRecord;";
     ani_class unifiedRecordClass;
     if (ANI_OK != env->Namespace_FindClass(ns, recordclsName, &unifiedRecordClass)) {
-        LOGE("Not found class %{public}s", recordclsName);
+        LOG_ERROR(UDMF_KITS_NAPI, "Not found class %{public}s", recordclsName);
         return ANI_NOT_FOUND;
     }
 
@@ -332,14 +332,14 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(unifiedRecordClass, methods.data(), methods.size())) {
-        LOGE("Cannot bind native methods to %{public}s", recordclsName);
+        LOG_ERROR(UDMF_KITS_NAPI, "Cannot bind native methods to %{public}s", recordclsName);
         return ANI_ERROR;
     }
 
     static const char *dataclsName = "LUnifiedData;";
     ani_class unifiedDataClass;
     if (ANI_OK != env->Namespace_FindClass(ns, dataclsName, &unifiedDataClass)) {
-        LOGE("Cannot find class %{public}s", dataclsName);
+        LOG_ERROR(UDMF_KITS_NAPI, "Cannot find class %{public}s", dataclsName);
         return ANI_NOT_FOUND;
     }
 
@@ -349,11 +349,16 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(unifiedDataClass, datamethods.data(), datamethods.size())) {
-        LOGE("Cannot bind native methods to %{public}s", dataclsName);
+        LOG_ERROR(UDMF_KITS_NAPI, "Cannot bind native methods to %{public}s", dataclsName);
+        return ANI_ERROR;
+    }
+
+    if (result == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "param result is null");
         return ANI_ERROR;
     }
 
     *result = ANI_VERSION_1;
-    LOGD("ANI_Constructor end...");
+    LOG_DEBUG(UDMF_KITS_NAPI, "ANI_Constructor end...");
     return ANI_OK;
 }
