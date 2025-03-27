@@ -308,7 +308,7 @@ bool UnifiedData::IsNeedTransferToEntries() const
     return properties_->tag == RECORDS_TANSFER_TAG;
 }
 
-void UnifiedData::TransferToEntries(UnifiedData &data)
+void UnifiedData::TransferToEntries()
 {
     if (records_.size() <= 1) {
         return;
@@ -324,6 +324,9 @@ void UnifiedData::TransferToEntries(UnifiedData &data)
             continue;
         }
         record->InitObject();
+        if (record->GetUtdId() == recordFirst->GetUtdId()) {
+            continue;
+        }
         recordFirst->AddEntry(record->GetUtdId(), record->GetValue());
     }
     records_.erase(records_.begin() + 1, records_.end());

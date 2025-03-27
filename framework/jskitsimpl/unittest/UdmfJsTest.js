@@ -3105,4 +3105,191 @@ describe('UdmfJSTest', function () {
       done();
     }
   });
+
+  /**
+   * @tc.name toEntriesTest001
+   * @tc.desc test toEntries function normal
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('toEntriesTest001', 0, async function (done) {
+    const TAG = 'toEntriesTest001';
+    console.info(TAG, 'start');
+    let file = new UDC.File();
+    file.uri = 'schema://com.samples.test/files/test.txt';
+    let plainText = new UDC.PlainText();
+    plainText.textContent = 'this is textContent';
+    plainText.abstract = 'this is abstract';
+    let link = new UDC.Hyperlink();
+    link.url = 'www.XXX.com';
+    link.description = 'this is description';
+    let html = new UDC.HTML();
+    html.htmlContent = '<div><p>标题</p></div>';
+    html.plainContent = 'this is plainContent';
+    let form = new UDC.SystemDefinedForm();
+    form.formId = 123456;
+    form.formName = 'MyFormName';
+    form.bundleName = 'MyBundleName';
+    form.abilityName = 'MyAbilityName';
+    form.module = 'MyModule';
+    form.details = {
+      'formKey1': 123,
+      'formKey2': 'formValue',
+      'formKey3': U8_ARRAY,
+    };
+    let applicationDefinedRecord = new UDC.ApplicationDefinedRecord();
+    applicationDefinedRecord.applicationDefinedType = 'ApplicationDefinedType';
+    applicationDefinedRecord.rawData = U8_ARRAY;
+    let unifiedData = new UDC.UnifiedData();
+    unifiedData.addRecord(file);
+    unifiedData.addRecord(plainText);
+    unifiedData.addRecord(link);
+    unifiedData.addRecord(html);
+    unifiedData.addRecord(form);
+    unifiedData.addRecord(applicationDefinedRecord);
+    expect(unifiedData.getRecords().length).assertEqual(6);
+    UDC.convertRecordsToEntries(unifiedData);
+    expect(unifiedData.getRecords().length).assertEqual(1);
+    let records = unifiedData.getRecords();
+    let recordEntries = records[0];
+    expect(recordEntries.uri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(recordEntries.getType()).assertEqual('general.file');
+    expect(recordEntries.getValue()).assertEqual(undefined);
+    let fileEntry = recordEntries.getEntry('general.file-uri');
+    expect(fileEntry.uniformDataType).assertEqual('general.file-uri');
+    expect(fileEntry.oriUri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(fileEntry.fileType).assertEqual('general.file');
+    let plainTextEntry = recordEntries.getEntry('general.plain-text');
+    expect(plainTextEntry.textContent).assertEqual('this is textContent');
+    expect(plainTextEntry.abstract).assertEqual('this is abstract');
+    let linkEntry = recordEntries.getEntry('general.hyperlink');
+    expect(linkEntry.url).assertEqual('www.XXX.com');
+    expect(linkEntry.description).assertEqual('this is description');
+    let htmlEntry = recordEntries.getEntry('general.html');
+    expect(htmlEntry.htmlContent).assertEqual('<div><p>标题</p></div>');
+    expect(htmlEntry.plainContent).assertEqual('this is plainContent');
+    let formEntry = recordEntries.getEntry('openharmony.form');
+    expect(formEntry.formId).assertEqual(123456);
+    expect(formEntry.formName).assertEqual('MyFormName');
+    expect(formEntry.bundleName).assertEqual('MyBundleName');
+    expect(formEntry.abilityName).assertEqual('MyAbilityName');
+    expect(formEntry.module).assertEqual('MyModule');
+    expect(formEntry.details.formKey1).assertEqual(123);
+    expect(formEntry.details.formKey2).assertEqual('formValue');
+    for (let i = 0; i < U8_ARRAY.length; i++) {
+      expect(formEntry.details.formKey3[i]).assertEqual(U8_ARRAY[i]);
+    }
+    expect(formEntry.details.formKey3.toString).assertEqual(U8_ARRAY.toString);
+    let applicationDefinedEntry = recordEntries.getEntry('ApplicationDefinedType');
+    for (let i = 0; i < U8_ARRAY.length; i++) {
+      expect(applicationDefinedEntry.arrayBuffer[i]).assertEqual(U8_ARRAY[i]);
+    }
+    expect(applicationDefinedEntry.uniformDataType).assertEqual('ApplicationDefinedType');
+    let entries = recordEntries.getEntries();
+    expect(entries['general.file-uri'].uniformDataType).assertEqual('general.file-uri');
+    expect(entries['general.file-uri'].oriUri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(entries['general.file-uri'].fileType).assertEqual('general.file');
+    expect(entries['general.plain-text'].uniformDataType).assertEqual('general.plain-text');
+    expect(entries['general.plain-text'].textContent).assertEqual('this is textContent');
+    expect(entries['general.plain-text'].abstract).assertEqual('this is abstract');
+    expect(entries['general.hyperlink'].uniformDataType).assertEqual('general.hyperlink');
+    expect(entries['general.hyperlink'].url).assertEqual('www.XXX.com');
+    expect(entries['general.hyperlink'].description).assertEqual('this is description');
+    expect(entries['general.html'].uniformDataType).assertEqual('general.html');
+    expect(entries['general.html'].htmlContent).assertEqual('<div><p>标题</p></div>');
+    expect(entries['general.html'].plainContent).assertEqual('this is plainContent');
+    expect(entries['openharmony.form'].uniformDataType).assertEqual('openharmony.form');
+    expect(entries['openharmony.form'].formId).assertEqual(123456);
+    expect(entries['openharmony.form'].formName).assertEqual('MyFormName');
+    expect(entries['openharmony.form'].bundleName).assertEqual('MyBundleName');
+    expect(entries['openharmony.form'].abilityName).assertEqual('MyAbilityName');
+    expect(entries['openharmony.form'].module).assertEqual('MyModule');
+    expect(entries['openharmony.form'].details.formKey1).assertEqual(123);
+    expect(entries['openharmony.form'].details.formKey2).assertEqual('formValue');
+    expect(entries['openharmony.form'].details.formKey3.toString).assertEqual(U8_ARRAY.toString);
+    for (let i = 0; i < U8_ARRAY.length; i++) {
+      expect(entries['ApplicationDefinedType'].arrayBuffer[i]).assertEqual(U8_ARRAY[i]);
+    }
+    expect(entries['ApplicationDefinedType'].uniformDataType).assertEqual('ApplicationDefinedType');
+    done();
+  });
+
+  /**
+   * @tc.name toEntriesTest002
+   * @tc.desc test toEntries function with duplicate type
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('toEntriesTest002', 0, async function (done) {
+    const TAG = 'toEntriesTest002';
+    console.info(TAG, 'start');
+    let image = new UDC.Image();
+    image.uri ='schema://com.samples.test/files/test.jpg';
+    let plainText = new UDC.PlainText();
+    plainText.textContent = 'this is textContent';
+    plainText.abstract = 'this is abstract';
+    let video = new UDC.Video();
+    video.uri ='schema://com.samples.test/files/test.mp4';
+    let unifiedData = new UDC.UnifiedData();
+    unifiedData.addRecord(image);
+    unifiedData.addRecord(plainText);
+    unifiedData.addRecord(video);
+    expect(unifiedData.getRecords().length).assertEqual(3);
+    UDC.convertRecordsToEntries(unifiedData);
+    expect(unifiedData.getRecords().length).assertEqual(1);
+    let records = unifiedData.getRecords();
+    let recordEntries = records[0];
+    expect(recordEntries.uri).assertEqual('schema://com.samples.test/files/test.jpg');
+    expect(recordEntries.getType()).assertEqual('general.image');
+    expect(recordEntries.getValue()).assertEqual(undefined);
+    let entries = recordEntries.getEntries();
+    expect(entries['general.file-uri'].uniformDataType).assertEqual('general.file-uri');
+    expect(entries['general.file-uri'].oriUri).assertEqual('schema://com.samples.test/files/test.jpg');
+    expect(entries['general.file-uri'].fileType).assertEqual('general.image');
+    expect(entries['general.plain-text'].uniformDataType).assertEqual('general.plain-text');
+    expect(entries['general.plain-text'].textContent).assertEqual('this is textContent');
+    expect(entries['general.plain-text'].abstract).assertEqual('this is abstract');
+    expect(entries['general.video']).assertEqual(undefined);
+    done();
+  });
+
+  /**
+   * @tc.name toEntriesTest003
+   * @tc.desc test toEntries function with duplicate type
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('toEntriesTest003', 0, async function (done) {
+    const TAG = 'toEntriesTest003';
+    console.info(TAG, 'start');
+    let recordFile = new UDC.UnifiedRecord('general.file', 'schema://com.samples.test/files/test.txt');
+    let recordVideo = new UDC.UnifiedRecord('general.video', 'schema://com.samples.test/files/test.mp4');
+    let recordPlainText = new UDC.UnifiedRecord('general.plain-text', 'this is textContent');
+    let unifiedData = new UDC.UnifiedData();
+    unifiedData.addRecord(recordFile);
+    unifiedData.addRecord(recordVideo);
+    unifiedData.addRecord(recordPlainText);
+    expect(unifiedData.getRecords().length).assertEqual(3);
+    UDC.convertRecordsToEntries(unifiedData);
+    expect(unifiedData.getRecords().length).assertEqual(1);
+    let records = unifiedData.getRecords();
+    let recordEntries = records[0];
+    expect(recordEntries.uri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(recordEntries.getType()).assertEqual('general.file');
+    expect(recordEntries.getValue()).assertEqual('schema://com.samples.test/files/test.txt');
+    let videoEntry = recordEntries.getEntry('general.file-uri');
+    expect(videoEntry.oriUri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(videoEntry.fileType).assertEqual('general.file');
+    let plainTextEntry = recordEntries.getEntry('general.plain-text');
+    expect(plainTextEntry.textContent).assertEqual('this is textContent');
+    let entries = recordEntries.getEntries();
+    expect(entries['general.file-uri'].uniformDataType).assertEqual('general.file-uri');
+    expect(entries['general.file-uri'].oriUri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(entries['general.file-uri'].fileType).assertEqual('general.file');
+    expect(entries['general.plain-text'].uniformDataType).assertEqual('general.plain-text');
+    expect(entries['general.plain-text'].textContent).assertEqual('this is textContent');
+    expect(entries['general.video']).assertEqual(undefined);
+    expect(entries['general.file']).assertEqual(undefined);
+    done();
+   });
 });

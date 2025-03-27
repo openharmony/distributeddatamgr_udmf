@@ -219,7 +219,7 @@ HWTEST_F(UnifiedDataTest, TransferToEntries001, TestSize.Level1)
     file->SetUri("http://1111/a.img");
     unifiedData.AddRecord(plainText);
     unifiedData.AddRecord(file);
-    unifiedData.TransferToEntries(unifiedData);
+    unifiedData.TransferToEntries();
     auto records = unifiedData.GetRecords();
     int recordSize = 1;
     EXPECT_EQ(records.size(), recordSize);
@@ -299,7 +299,7 @@ HWTEST_F(UnifiedDataTest, TransferToEntries002, TestSize.Level1)
     unifiedData.SetProperties(properties);
     isNeed = unifiedData.IsNeedTransferToEntries();
     EXPECT_TRUE(isNeed);
-    unifiedData.TransferToEntries(unifiedData);
+    unifiedData.TransferToEntries();
     auto records = unifiedData.GetRecords();
     int recordSize = 1;
     EXPECT_EQ(records.size(), recordSize);
