@@ -3147,6 +3147,7 @@ describe('UdmfJSTest', function () {
     unifiedData.addRecord(html);
     unifiedData.addRecord(form);
     unifiedData.addRecord(applicationDefinedRecord);
+    unifiedData.properties.tag = 'records_to_entries_data_format';
     expect(unifiedData.getRecords().length).assertEqual(6);
     UDC.convertRecordsToEntries(unifiedData);
     expect(unifiedData.getRecords().length).assertEqual(1);
@@ -3234,6 +3235,7 @@ describe('UdmfJSTest', function () {
     unifiedData.addRecord(image);
     unifiedData.addRecord(plainText);
     unifiedData.addRecord(video);
+    unifiedData.properties.tag = 'records_to_entries_data_format';
     expect(unifiedData.getRecords().length).assertEqual(3);
     UDC.convertRecordsToEntries(unifiedData);
     expect(unifiedData.getRecords().length).assertEqual(1);
@@ -3269,6 +3271,7 @@ describe('UdmfJSTest', function () {
     unifiedData.addRecord(recordFile);
     unifiedData.addRecord(recordVideo);
     unifiedData.addRecord(recordPlainText);
+    unifiedData.properties.tag = 'records_to_entries_data_format';
     expect(unifiedData.getRecords().length).assertEqual(3);
     UDC.convertRecordsToEntries(unifiedData);
     expect(unifiedData.getRecords().length).assertEqual(1);
@@ -3299,16 +3302,18 @@ describe('UdmfJSTest', function () {
    * @tc.type: FUNC
    * @tc.require:
    */
-  it('toEntriesTest004', 0, async function (done) {
-    const TAG = 'toEntriesTest004';
+  it('toEntriesTest004', 0, function () {
+    const TAG = 'toEntriesTest00114';
     console.info(TAG, 'start');
     try {
       UDC.convertRecordsToEntries();
-    } catch (e) {
       console.error(TAG, 'Unreachable code!');
       expect(null).assertFail();
-      done();
+    } catch (e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
     }
+    console.info(TAG, 'end');
    });
 
    /**
@@ -3317,15 +3322,17 @@ describe('UdmfJSTest', function () {
    * @tc.type: FUNC
    * @tc.require:
    */
-  it('toEntriesTest005', 0, async function (done) {
-    const TAG = 'toEntriesTest005';
+  it('toEntriesTest005', 0, function () {
+    const TAG = 'toEntriesTest00115';
     console.info(TAG, 'start');
     try {
       UDC.convertRecordsToEntries(1);
-    } catch (e) {
       console.error(TAG, 'Unreachable code!');
       expect(null).assertFail();
-      done();
+    } catch (e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
     }
+    console.info(TAG, 'end');
    });
 });
