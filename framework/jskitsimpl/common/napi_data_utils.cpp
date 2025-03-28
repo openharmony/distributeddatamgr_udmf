@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "unified_meta.h"
 #define LOG_TAG "NapiDataUtils"
 #include "napi_data_utils.h"
 
@@ -545,7 +546,7 @@ napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<Object> 
                 }
                 NAPI_CALL_BASE(env, napi_create_typedarray(env, napi_uint8_array, array.size(), buffer, 0, &valueNapi),
                     napi_generic_failure);
-        } else if (key == "details" && std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        } else if (key == DETAILS && std::holds_alternative<std::shared_ptr<Object>>(value)) {
             auto detailObj = std::get<std::shared_ptr<Object>>(value);
             auto details = ObjectUtils::ConvertToUDDetails(detailObj);
             NapiDataUtils::SetValue(env, details, valueNapi);

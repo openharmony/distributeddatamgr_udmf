@@ -308,7 +308,7 @@ bool UnifiedData::IsNeedTransferToEntries() const
     return properties_->tag == RECORDS_TANSFER_TAG;
 }
 
-void UnifiedData::TransferToEntries()
+void UnifiedData::ConvertRecordsToEntries()
 {
     if (!IsNeedTransferToEntries()) {
         return;

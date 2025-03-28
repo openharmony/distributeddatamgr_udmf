@@ -32,7 +32,7 @@ napi_value UnifiedDataChannelNapi::UnifiedDataChannelInit(napi_env env, napi_val
         DECLARE_NAPI_FUNCTION("updateData", UpdateData),
         DECLARE_NAPI_FUNCTION("queryData", QueryData),
         DECLARE_NAPI_FUNCTION("deleteData", DeleteData),
-        DECLARE_NAPI_FUNCTION("convertRecordsToEntries", TransferToMultiEntries),
+        DECLARE_NAPI_FUNCTION("convertRecordsToEntries", ConvertRecordsToEntries),
         DECLARE_NAPI_GETTER("ShareOptions", CreateShareOptions),
         DECLARE_NAPI_FUNCTION("setAppShareOptions", SetAppShareOptions),
         DECLARE_NAPI_FUNCTION("removeAppShareOptions", RemoveAppShareOptions),
@@ -240,14 +240,14 @@ napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info i
     return NapiQueue::AsyncWork(env, ctxt, std::string(__FUNCTION__), execute, output);
 }
 
-napi_value UnifiedDataChannelNapi::TransferToMultiEntries(napi_env env, napi_callback_info info)
+napi_value UnifiedDataChannelNapi::ConvertRecordsToEntries(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "TransferToMultiEntries is called!");
-    struct InsertContext : public ContextBase {
+    struct ConvertContext : public ContextBase {
         std::shared_ptr<UnifiedData> unifiedData;
     };
     UnifiedDataNapi *unifiedDataNapi = nullptr;
-    auto ctxt = std::make_shared<InsertContext>();
+    auto ctxt = std::make_shared<ConvertContext>();
     auto input = [env, ctxt, &unifiedDataNapi](size_t argc, napi_value *argv) {
         ASSERT_BUSINESS_ERR(ctxt, argc == 1,
             E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
@@ -258,7 +258,7 @@ napi_value UnifiedDataChannelNapi::TransferToMultiEntries(napi_env env, napi_cal
     ctxt->GetCbInfo(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "TransferToMultiEntries Exit");
     ctxt->unifiedData = unifiedDataNapi->value_;
-    ctxt->unifiedData->TransferToEntries();
+    ctxt->unifiedData->ConvertRecordsToEntries();
     return nullptr;
 }
 
