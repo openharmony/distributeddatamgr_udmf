@@ -52,6 +52,7 @@ constexpr OperatorInfo OPERATOR_INFO [] = {
 
 int32_t AipNapiUtils::FindOperaotrEnum(std::string operatorStr)
 {
+    // 二分查找
     int left = 0;
     int right = sizeof(OPERATOR_INFO) / sizeof(OPERATOR_INFO[0]) - 1;
     while (left <= right) {
@@ -469,25 +470,6 @@ static napi_status ConvertFilterValue(napi_env env, const napi_value &in, std::s
     return napi_ok;
 }
 
-napi_status ConvertFilterRange(napi_env env, const napi_value &in, FilterInfoStruct &out)
-{
-    napi_value filterRangeNapi;
-    napi_get_named_property(env, in, "filterRange", &filterRangeNapi);
-    napi_value filterRangeMin;
-    napi_get_named_property(env, filterRangeNapi, "min", &filterRangeMin);
-    double min;
-    napi_status status = AipNapiUtils::Convert2Value(env, filterRangeMin, min);
-    out.range.first = std::to_string(min);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field min in FilterRange.", napi_invalid_arg);
-    napi_value filterRangeMax;
-    napi_get_named_property(env, filterRangeNapi, "max", &filterRangeMax);
-    double max;
-    status = AipNapiUtils::Convert2Value(env, filterRangeMax, max);
-    out.range.second = std::to_string(max);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field max in FilterRange.", napi_invalid_arg);
-    return napi_ok;
-}
-
 napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, FilterInfoStruct &out)
 {
     napi_value columnsNapi;
@@ -500,21 +482,17 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, Filt
     } else {
         out.fields = columns;
     }
-    bool isOperatorPresent = false;
-    napi_has_named_property(env, in, "operator", &isOperatorPresent);
-    if (isOperatorPresent) {
-        napi_value operatorNapi;
-        napi_get_named_property(env, in, "operator", &operatorNapi);
-        std::string operatorStr;
-        status = Convert2Value(env, operatorNapi, operatorStr);
-        LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field operator.", napi_invalid_arg);
-        auto operatorNum = FindOperaotrEnum(operatorStr);
-        if (operatorNum != TsOperator::BUTT) {
-            out.op = static_cast<TsOperator>(operatorNum);
-        } else {
-            AIP_HILOGE("Failed to convert the operator to an enum, operator: %{public}s", operatorStr.c_str());
-            return napi_invalid_arg;
-        }
+    napi_value operatorNapi;
+    napi_get_named_property(env, in, "operator", &operatorNapi);
+    std::string operatorStr;
+    status = Convert2Value(env, operatorNapi, operatorStr);
+    LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field operator.", napi_invalid_arg);
+    auto operatorNum = FindOperaotrEnum(operatorStr);
+    if (operatorNum != TsOperator::BUTT) {
+        out.op = static_cast<TsOperator>(operatorNum);
+    } else {
+        AIP_HILOGE("Failed to convert the operator to an enum, operator: %{public}s", operatorStr.c_str());
+        return napi_invalid_arg;
     }
     bool isFilterValuePresent = false;
     napi_has_named_property(env, in, "filterValue", &isFilterValuePresent);
@@ -527,8 +505,16 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, Filt
     bool isFilterRangePresent = false;
     napi_has_named_property(env, in, "filterRange", &isFilterRangePresent);
     if (isFilterRangePresent) {
-        status = ConvertFilterRange(env, in, out);
-        LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field filterRange.", napi_invalid_arg);
+        napi_value filterRangeNapi;
+        napi_get_named_property(env, in, "filterRange", &filterRangeNapi);
+        napi_value filterRangeMin;
+        napi_get_named_property(env, filterRangeNapi, "min", &filterRangeMin);
+        napi_status status = Convert2Value(env, filterRangeMin, out.range.first);
+        LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field min in FilterRange.", napi_invalid_arg);
+        napi_value filterRangeMax;
+        napi_get_named_property(env, in, "max", &filterRangeMax);
+        status = Convert2Value(env, filterRangeMax, out.range.second);
+        LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field max in FilterRange.", napi_invalid_arg);
     }
     return napi_ok;
 }
@@ -740,10 +726,8 @@ static napi_status ConvertRerankChannelParams(napi_env env, const napi_value &in
     for (uint32_t i = 0; i < keysLength; ++i) {
         napi_value keyNapi;
         napi_get_element(env, keysNapi, i, &keyNapi);
-        std::string keyStr;
-        status = AipNapiUtils::Convert2Value(env, keyNapi, keyStr);
-        LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the channelType in parameters.", napi_invalid_arg);
-        int32_t keyInt = std::stoi(keyStr);
+        int32_t keyInt;
+        AipNapiUtils::Convert2Value(env, keyNapi, keyInt);
         LOG_ERROR_RETURN(keyInt >= TsChannelType::VECTOR_DATABASE && keyInt <= TsChannelType::INVERTED_INDEX_DATABASE,
             "channelType is ileagl.", napi_invalid_arg);
         napi_value valueNapi;
@@ -755,13 +739,13 @@ static napi_status ConvertRerankChannelParams(napi_env env, const napi_value &in
             std::shared_ptr<VectorChannelRerankParamsStruct> vectorRerankParam =
                 std::make_shared<VectorChannelRerankParamsStruct>();
             status = AipNapiUtils::Convert2Value(env, valueNapi, vectorRerankParam);
-            LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the VectorChannelRerankParams.", status);
+            LOG_ERROR_RETURN(status != napi_ok, "Failed to convert the VectorChannelRerankParams.", status);
             channelParameters[keyInt] = vectorRerankParam;
         } else {
             std::shared_ptr<InvertedIndexRerankParamsStruct> invIdxRerankParam =
                 std::make_shared<InvertedIndexRerankParamsStruct>();
             status = AipNapiUtils::Convert2Value(env, valueNapi, invIdxRerankParam);
-            LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the InvertedIndexRerankParams.", status);
+            LOG_ERROR_RETURN(status != napi_ok, "Failed to convert the InvertedIndexRerankParams.", status);
             channelParameters[keyInt] = invIdxRerankParam;
         }
     }
@@ -855,6 +839,7 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, Retr
     napi_get_named_property(env, in, "query", &queryNapi);
     napi_status status = Convert2Value(env, queryNapi, out.query);
     LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field query.", napi_invalid_arg);
+    LOG_ERROR_RETURN(!out.query.empty(), "Field query cannot be empty.", napi_invalid_arg);
 
     bool isResultCountPresent = false;
     napi_has_named_property(env, in, "resultCount", &isResultCountPresent);

@@ -37,7 +37,7 @@ static constexpr uint8_t BASIC_MODEL = 0;
 static const std::string CLASS_NAME = "ImageEmbedding";
 const std::vector<std::string> EXPECTED_GET_ARG_TYPES = { "string" };
 const std::vector<std::string> EXPECTED_GET_IMG_MODEL_ARG_TYPES = { "object" };
-constexpr const char *AIP_MANAGER_PATH = "libaip_core.z.so";
+const std::string AIP_MANAGER_PATH = "libaip_core.z.so";
 } // namespace
 
 AipCoreManagerHandle ImageEmbeddingNapi::imgAipCoreMgrHandle_{};

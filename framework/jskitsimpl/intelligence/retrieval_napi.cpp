@@ -32,7 +32,7 @@ namespace OHOS {
 namespace DataIntelligence {
 namespace {
 const int32_t ERR_OK = 0;
-constexpr const char *AIP_MANAGER_PATH = "libaip_core.z.so";
+const std::string AIP_MANAGER_PATH = "libaip_core.z.so";
 } // namespace
 
 AipCoreManagerHandle RetrievalNapi::retrievalAipCoreMgrHandle_{};
@@ -196,6 +196,7 @@ void RetrievalNapi::GetRetrieverCompleteCB(napi_env env, napi_status status, voi
             AIP_HILOGE(" napi_resolve_deferred failed");
         }
     }
+    // todo 释放动态申请的RetrievalConfigStruct的内存
     status = napi_delete_async_work(env, asyncGetRetrieverdata->asyncWork);
     if (status != napi_ok) {
         AIP_HILOGE("napi_delete_async_work failed");
@@ -252,6 +253,7 @@ void RetrievalNapi::RetrieveCompleteCB(napi_env env, napi_status status, void *d
             ThrowIntelligenceErrByPromise(env, DEVICE_EXCEPTION, "GetRetrieverCompleteCB failed", result);
         } else {
             int32_t errCode = ConvertErrCodeNative2Ts(ret);
+            // todo 这里不能只返回INNER_ERROR,应该返回返回具体的错误码
             ThrowIntelligenceErrByPromise(env, errCode, "GetRetrieverCompleteCB failed", result);
         }
         napi_reject_deferred(env, asyncRetrieve->deferred, result);
@@ -308,6 +310,7 @@ napi_value RetrievalNapi::Retrieve(napi_env env, napi_callback_info info)
         .retrievalAipCoreManagerPtr = retrievalAipCoreManagerPtr
     };
     if (!CreateAsyncRetrieveExecution(env, asyncRetrieve)) {
+        // napi函数错误为INNER_ERROR
         ThrowIntelligenceErr(env, INNER_ERROR, "CreateAsyncRetrieveExecution failed");
         delete asyncRetrieve;
     }

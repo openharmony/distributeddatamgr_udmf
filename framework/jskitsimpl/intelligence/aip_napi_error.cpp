@@ -89,6 +89,7 @@ constexpr ErrMessage ERROR_MESSAGES [] = {
 
 int32_t ConvertErrCodeNative2Ts(int32_t nativeErrCode)
 {
+    // 二分查找
     int left = 0;
     int right = sizeof(NATIVE_ERR_CODE2TS_ERR_CODE) / sizeof(NATIVE_ERR_CODE2TS_ERR_CODE[0]) - 1;
     while (left <= right) {
