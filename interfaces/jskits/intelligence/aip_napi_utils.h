@@ -50,9 +50,7 @@ public:
     static bool CheckModelConfig(napi_env env, napi_value value);
 
     static napi_status Convert2Value(napi_env env, napi_value in, bool &out);
-    static napi_status Convert2Value(napi_env env, napi_value in, std::vector<uint8_t> &out);
     static napi_status Convert2Value(napi_env env, napi_value in, int32_t &out);
-    static napi_status Convert2Value(napi_env env, napi_value in, uint32_t &out);
     static napi_status Convert2Value(napi_env env, napi_value in, int64_t &out);
     static napi_status Convert2Value(napi_env env, napi_value in, float &out);
     static napi_status Convert2Value(napi_env env, napi_value in, double &out);
@@ -74,22 +72,6 @@ public:
     {
         return Convert2Value(env, in, *out);
     }
-
-    static bool IsNull(napi_env env, napi_value value);
-
-    static std::pair<napi_status, napi_value> GetInnerValue(napi_env env, napi_value in, const std::string &prop,
-        bool optional);
-
-    template<typename T>
-    static inline napi_status GetNamedProperty(
-        napi_env env, napi_value in, const std::string &prop, T &value, bool optional = false)
-    {
-        auto [status, jsValue] = GetInnerValue(env, in, prop, optional);
-        if (jsValue == nullptr) {
-            return status;
-        }
-        return Convert2Value(env, jsValue, value);
-    };
 
     template<typename T>
     static napi_status Convert2Value(napi_env env, napi_value in, std::vector<T> &out);
@@ -114,10 +96,6 @@ public:
     static napi_status Convert2Value(napi_env env, const napi_value &in, RetrievalConditionStruct &out);
     static napi_status Convert2Value(napi_env env, const napi_value &in, VectorChannelRerankParamsStruct &out);
     static napi_status Convert2Value(napi_env env, const napi_value &in, InvertedIndexRerankParamsStruct &out);
-    static napi_status Convert2Value(napi_env env, const napi_value &in, RdbConfig &out);
-    static napi_status Convert2Value(napi_env env, const napi_value &in, CryptoParam &cryptoParam);
-    static napi_status Convert2Value(napi_env env, const napi_value &in, ContextParam &context);
-    static napi_status Convert2Value(napi_env env, napi_value in, napi_value &out);
 
     static napi_status Convert2JSValue(napi_env env, const std::vector<uint8_t> &in, napi_value &out);
     static napi_status Convert2JSValue(napi_env env, const std::vector<float> &in, napi_value &out);

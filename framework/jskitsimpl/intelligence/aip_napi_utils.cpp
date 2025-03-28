@@ -17,7 +17,6 @@
 
 #include <dlfcn.h>
 
-#include "js_ability.h"
 #include "aip_log.h"
 #include "hilog/log_c.h"
 #include "js_native_api_types.h"
@@ -28,13 +27,10 @@
 namespace OHOS {
 namespace DataIntelligence {
 namespace {
-using namespace OHOS::AppDataMgrJsKit;
 static constexpr uint32_t MAX_VALUE_LENGTH = 1024 * 1024 * 8; // the max length of all kand of out string value
 static constexpr uint8_t CONFIG_LENGTH_1 = 2;
 static constexpr uint8_t CONFIG_LENGTH_2 = 3;
 static constexpr uint32_t MAX_STR_PARAM_LEN = 512;
-static constexpr int32_t MIN_SECURITY_LEVEL = 1;
-static constexpr int32_t MAX_SECURITY_LEVEL = 4;
 struct OperatorInfo {
     const char *operatorStr;
     int32_t operatorEnum;
@@ -350,34 +346,6 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, int32_t &ou
     return napi_get_value_int32(env, in, &out);
 }
 
-napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, uint32_t &out)
-{
-    return napi_get_value_uint32(env, in, &out);
-}
-
-napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, std::vector<uint8_t> &out)
-{
-    bool isTypedArray = false;
-    napi_is_typedarray(env, in, &isTypedArray);
-    if (!isTypedArray) {
-        return napi_invalid_arg;
-    }
-
-    napi_typedarray_type type;
-    napi_value input_buffer = nullptr;
-    size_t byte_offset = 0;
-    size_t length = 0;
-    void *tmp = nullptr;
-    auto status = napi_get_typedarray_info(env, in, &type, &length, &tmp, &input_buffer, &byte_offset);
-    if (status != napi_ok || type != napi_uint8_array) {
-        return napi_invalid_arg;
-    }
-
-    out = (tmp != nullptr ? std::vector<uint8_t>(static_cast<uint8_t *>(tmp), static_cast<uint8_t *>(tmp) + length)
-                             : std::vector<uint8_t>());
-    return status;
-}
-
 napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, int64_t &out)
 {
     return napi_get_value_int64(env, in, &out);
@@ -440,36 +408,6 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, double &out
     return napi_get_value_double(env, in, &out);
 }
 
-bool AipNapiUtils::IsNull(napi_env env, napi_value value)
-{
-    napi_valuetype type = napi_undefined;
-    napi_status status = napi_typeof(env, value, &type);
-    return status == napi_ok && (type == napi_undefined || type == napi_null);
-}
-
-std::pair<napi_status, napi_value> AipNapiUtils::GetInnerValue(
-    napi_env env, napi_value in, const std::string &prop, bool optional)
-{
-    bool hasProp = false;
-    napi_status status = napi_has_named_property(env, in, prop.c_str(), &hasProp);
-    if (status != napi_ok) {
-        return std::make_pair(napi_generic_failure, nullptr);
-    }
-    if (!hasProp) {
-        status = optional ? napi_ok : napi_generic_failure;
-        return std::make_pair(status, nullptr);
-    }
-    napi_value inner = nullptr;
-    status = napi_get_named_property(env, in, prop.c_str(), &inner);
-    if (status != napi_ok || inner == nullptr) {
-        return std::make_pair(napi_generic_failure, nullptr);
-    }
-    if (optional && AipNapiUtils::IsNull(env, inner)) {
-        return std::make_pair(napi_ok, nullptr);
-    }
-    return std::make_pair(napi_ok, inner);
-}
-
 napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, RetrievalConfigStruct &out)
 {
     napi_value channelConfigsNapi;
@@ -488,14 +426,10 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, RetrievalCo
         LOG_ERROR_RETURN(channelConfig.channelType >= TsChannelType::VECTOR_DATABASE &&
             channelConfig.channelType <= TsChannelType::INVERTED_INDEX_DATABASE,
             "Field channelType illegal.", napi_invalid_arg);
-        napi_value dbConfigNapi;
-        napi_get_named_property(env, channelConfigNapi, "dbConfig", &dbConfigNapi);
-        status = Convert2Value(env, dbConfigNapi, channelConfig.dbConfig);
-        LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field dbConfig.", napi_invalid_arg);
-        napi_value contextNapi;
-        napi_get_named_property(env, channelConfigNapi, "context", &contextNapi);
-        status = Convert2Value(env, contextNapi, channelConfig.context);
-        LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field context.", napi_invalid_arg);
+        napi_value channelUriNapi;
+        napi_get_named_property(env, channelConfigNapi, "channelUri", &channelUriNapi);
+        status = Convert2Value(env, channelUriNapi, channelConfig.channelUri);
+        LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field channelUri.", napi_invalid_arg);
         channelConfigs.push_back(channelConfig);
     }
     out.channelConfigs = channelConfigs;
@@ -958,134 +892,6 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, Retr
     return napi_ok;
 }
 
-napi_status GetCurrentAbilityParam(napi_env env, napi_value in, ContextParam &param)
-{
-    std::shared_ptr<Context> context = JSAbility::GetCurrentAbility(env, in);
-    if (context == nullptr) {
-        return napi_invalid_arg;
-    }
-    param.baseDir = context->GetDatabaseDir();
-    param.moduleName = context->GetModuleName();
-    param.area = context->GetArea();
-    param.bundleName = context->GetBundleName();
-    param.isSystemApp = context->IsSystemAppCalled();
-    return napi_ok;
-}
-
-napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, ContextParam &context)
-{
-    if (in == nullptr) {
-        AIP_HILOGI("hasProp is false -> fa stage");
-        context.isStageMode = false;
-        return GetCurrentAbilityParam(env, in, context);
-    }
-
-    int32_t status = GetNamedProperty(env, in, "stageMode", context.isStageMode);
-    LOG_ERROR_RETURN(status == napi_ok, "get stageMode param failed", napi_invalid_arg);
-    if (!context.isStageMode) {
-        AIP_HILOGW("isStageMode is false -> fa stage");
-        return GetCurrentAbilityParam(env, in, context);
-    }
-    AIP_HILOGD("Stage mode branch");
-    status = GetNamedProperty(env, in, "databaseDir", context.baseDir);
-    LOG_ERROR_RETURN(status == napi_ok, "get databaseDir failed.", napi_invalid_arg);
-    status = GetNamedProperty(env, in, "area", context.area, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get area failed.", napi_invalid_arg);
-
-    napi_value hapInfo = nullptr;
-    GetNamedProperty(env, in, "currentHapModuleInfo", hapInfo);
-    if (hapInfo != nullptr) {
-        status = GetNamedProperty(env, hapInfo, "name", context.moduleName);
-        LOG_ERROR_RETURN(status == napi_ok, "get currentHapModuleInfo.name failed.", napi_invalid_arg);
-    }
-
-    napi_value appInfo = nullptr;
-    GetNamedProperty(env, in, "applicationInfo", appInfo);
-    if (appInfo != nullptr) {
-        status = GetNamedProperty(env, appInfo, "name", context.bundleName);
-        LOG_ERROR_RETURN(status == napi_ok, "get applicationInfo.name failed.", napi_invalid_arg);
-        status = GetNamedProperty(env, appInfo, "systemApp", context.isSystemApp, true);
-        LOG_ERROR_RETURN(status == napi_ok, "get applicationInfo.systemApp failed.", napi_invalid_arg);
-    }
-    return napi_ok;
-}
-
-napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, RdbConfig &out)
-{
-    int32_t status = GetNamedProperty(env, in, "encrypt", out.isEncrypt, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get encrypt failed.", napi_invalid_arg);
-
-    status = GetNamedProperty(env, in, "securityLevel", out.securityLevel);
-    LOG_ERROR_RETURN(status == napi_ok, "get securityLevel failed.", napi_invalid_arg);
-    LOG_ERROR_RETURN(out.securityLevel > MIN_SECURITY_LEVEL && out.securityLevel < MAX_SECURITY_LEVEL,
-        "securityLevel is invalid.", napi_invalid_arg);
-
-    status = GetNamedProperty(env, in, "dataGroupId", out.dataGroupId, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get dataGroupId failed.", napi_invalid_arg);
-
-    status = GetNamedProperty(env, in, "autoCleanDirtyData", out.isAutoClean, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get autoCleanDirtyData failed.", napi_invalid_arg);
-
-    status = GetNamedProperty(env, in, "name", out.name);
-    LOG_ERROR_RETURN(status == napi_ok, "get name failed.", napi_invalid_arg);
-
-    status = GetNamedProperty(env, in, "customDir", out.customDir, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get customDir failed.", napi_invalid_arg);
-
-    status = GetNamedProperty(env, in, "rootDir", out.rootDir, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get rootDir failed.", napi_invalid_arg);
-
-    GetNamedProperty(env, in, "isSearchable", out.isSearchable, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get isSearchable failed.", napi_invalid_arg);
-
-    GetNamedProperty(env, in, "vector", out.vector, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get vector failed.", napi_invalid_arg);
-
-    GetNamedProperty(env, in, "allowRebuild", out.allowRebuild, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get allowRebuild failed.", napi_invalid_arg);
-
-    GetNamedProperty(env, in, "isReadOnly", out.isReadOnly, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get isReadOnly failed.", napi_invalid_arg);
-
-    GetNamedProperty(env, in, "pluginLibs", out.pluginLibs, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get pluginLibs failed.", napi_invalid_arg);
-
-    status = GetNamedProperty(env, in, "haMode", out.haMode, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get haMode failed.", napi_invalid_arg);
-
-    status = GetNamedProperty(env, in, "cryptoParam", out.cryptoParam, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get cryptoParam failed.", napi_invalid_arg);
-
-    status = GetNamedProperty(env, in, "tokenizer", out.tokenizer, true);
-    LOG_ERROR_RETURN(status == napi_ok, "get tokenizer failed.", napi_invalid_arg);
-    return napi_ok;
-}
-
-napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, CryptoParam &cryptoParam)
-{
-    napi_valuetype type = napi_undefined;
-    napi_status status = napi_typeof(env, in, &type);
-    LOG_ERROR_RETURN(status == napi_ok && type == napi_object, "napi_typeof failed.", napi_invalid_arg);
-    status = GetNamedProperty(env, in, "encryptionKey", cryptoParam.encryptKey_);
-    LOG_ERROR_RETURN(status == napi_ok, "get encryptionKey failed.", napi_invalid_arg);
-    status = GetNamedProperty(env, in, "iterationCount", cryptoParam.iterNum);
-    LOG_ERROR_RETURN(status == napi_ok, "get iterationCount failed.", napi_invalid_arg);
-    status = GetNamedProperty(env, in, "encryptionAlgo", cryptoParam.encryptAlgo);
-    LOG_ERROR_RETURN(status == napi_ok, "get encryptionAlgo failed.", napi_invalid_arg);
-    status = GetNamedProperty(env, in, "hmacAlgo", cryptoParam.hmacAlgo);
-    LOG_ERROR_RETURN(status == napi_ok, "get hmacAlgo failed.", napi_invalid_arg);
-    status = GetNamedProperty(env, in, "kdfAlgo", cryptoParam.kdfAlgo);
-    LOG_ERROR_RETURN(status == napi_ok, "get kdfAlgo failed.", napi_invalid_arg);
-    status = GetNamedProperty(env, in, "cryptoPageSize", cryptoParam.cryptoPageSize);
-    LOG_ERROR_RETURN(status == napi_ok, "get cryptoPageSize failed.", napi_invalid_arg);
-    return napi_ok;
-}
-
-napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, napi_value &out)
-{
-    out = in;
-    return napi_ok;
-}
 
 napi_status AipNapiUtils::Convert2JSValue(napi_env env, const std::vector<uint8_t> &in, napi_value &out)
 {
