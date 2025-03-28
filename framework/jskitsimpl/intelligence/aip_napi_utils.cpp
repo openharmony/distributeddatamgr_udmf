@@ -1085,7 +1085,7 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, RdbC
 
     status = GetNamedProperty(env, in, "securityLevel", out.securityLevel);
     LOG_ERROR_RETURN(status == napi_ok, "get securityLevel failed.", napi_invalid_arg);
-    LOG_ERROR_RETURN(out.securityLevel >= MIN_SECURITY_LEVEL && out.securityLevel <= MAX_SECURITY_LEVEL,
+    LOG_ERROR_RETURN(out.securityLevel > MIN_SECURITY_LEVEL && out.securityLevel < MAX_SECURITY_LEVEL,
         "securityLevel is invalid.", napi_invalid_arg);
 
     status = GetNamedProperty(env, in, "dataGroupId", out.dataGroupId, true);
