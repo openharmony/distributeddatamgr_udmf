@@ -22,17 +22,6 @@
 
 namespace OHOS {
 namespace DataIntelligence {
-int32_t IAipCoreManagerImpl::InitRetriever(const RetrievalConfigStruct &retrievalConfig)
-{
-    return DEVICE_EXCEPTION;
-}
-
-int32_t IAipCoreManagerImpl::Retrieve(const RetrievalConditionStruct &condition,
-    RetrievalResponseStruct &retrievalResponse)
-{
-    return DEVICE_EXCEPTION;
-}
-
 int32_t IAipCoreManagerImpl::InitTextModel(const ModelConfigData &config)
 {
     return DEVICE_EXCEPTION;
