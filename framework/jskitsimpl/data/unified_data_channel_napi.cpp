@@ -32,6 +32,7 @@ napi_value UnifiedDataChannelNapi::UnifiedDataChannelInit(napi_env env, napi_val
         DECLARE_NAPI_FUNCTION("updateData", UpdateData),
         DECLARE_NAPI_FUNCTION("queryData", QueryData),
         DECLARE_NAPI_FUNCTION("deleteData", DeleteData),
+        DECLARE_NAPI_FUNCTION("convertRecordsToEntries", ConvertRecordsToEntries),
         DECLARE_NAPI_GETTER("ShareOptions", CreateShareOptions),
         DECLARE_NAPI_FUNCTION("setAppShareOptions", SetAppShareOptions),
         DECLARE_NAPI_FUNCTION("removeAppShareOptions", RemoveAppShareOptions),
@@ -237,6 +238,28 @@ napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info i
         ASSERT_WITH_ERRCODE(ctxt, ctxt->status == napi_ok, E_ERROR, "ConvertUnifiedDataSetToNapi failed!");
     };
     return NapiQueue::AsyncWork(env, ctxt, std::string(__FUNCTION__), execute, output);
+}
+
+napi_value UnifiedDataChannelNapi::ConvertRecordsToEntries(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "ConvertRecordsToEntries is called!");
+    struct ConvertContext : public ContextBase {
+        std::shared_ptr<UnifiedData> unifiedData;
+    };
+    UnifiedDataNapi *unifiedDataNapi = nullptr;
+    auto ctxt = std::make_shared<ConvertContext>();
+    auto input = [env, ctxt, &unifiedDataNapi](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc == 1,
+            E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ctxt->status = napi_unwrap(env, argv[0], reinterpret_cast<void **>(&unifiedDataNapi));
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "Parameter error: parameter data type must be UnifiedData");
+    };
+    ctxt->GetCbInfo(env, info, input);
+    ASSERT_NULL(!ctxt->isThrowError, "ConvertRecordsToEntries Exit");
+    ctxt->unifiedData = unifiedDataNapi->value_;
+    ctxt->unifiedData->ConvertRecordsToEntries();
+    return nullptr;
 }
 
 napi_status UnifiedDataChannelNapi::GetNamedProperty(napi_env env, napi_value &obj, const std::string &key,

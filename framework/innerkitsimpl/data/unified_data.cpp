@@ -308,9 +308,9 @@ bool UnifiedData::IsNeedTransferToEntries() const
     return properties_->tag == RECORDS_TANSFER_TAG;
 }
 
-void UnifiedData::TransferToEntries(UnifiedData &data)
+void UnifiedData::ConvertRecordsToEntries()
 {
-    if (records_.size() <= 1) {
+    if (!IsNeedTransferToEntries()) {
         return;
     }
     std::shared_ptr<UnifiedRecord> recordFirst = records_[0];
@@ -321,6 +321,9 @@ void UnifiedData::TransferToEntries(UnifiedData &data)
     for (size_t i = 1; i < records_.size(); i++) {
         auto record = records_[i];
         if (record == nullptr) {
+            continue;
+        }
+        if (record->GetUtdId() == recordFirst->GetUtdId()) {
             continue;
         }
         record->InitObject();
