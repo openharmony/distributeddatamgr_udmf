@@ -117,7 +117,7 @@ public:
     static napi_status Convert2Value(napi_env env, const napi_value &in, RdbConfig &out);
     static napi_status Convert2Value(napi_env env, const napi_value &in, CryptoParam &cryptoParam);
     static napi_status Convert2Value(napi_env env, const napi_value &in, ContextParam &context);
-    static napi_status Convert2Value(napi_env env, const napi_value &in, napi_value &out);
+    static napi_status Convert2Value(napi_env env, napi_value in, napi_value &out);
 
     static napi_status Convert2JSValue(napi_env env, const std::vector<uint8_t> &in, napi_value &out);
     static napi_status Convert2JSValue(napi_env env, const std::vector<float> &in, napi_value &out);

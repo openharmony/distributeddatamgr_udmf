@@ -46,13 +46,13 @@ struct RdbConfig {
     bool isReadOnly = false;
     int32_t securityLevel = 5;
     int32_t tokenizer = 0;
-    int32_t haMode = 0;
     std::string dataGroupId;
     std::string name;
     std::string customDir;
     std::string rootDir;
     std::string path;
     std::vector<std::string> pluginLibs = {};
+    int32_t haMode = 0;
     CryptoParam cryptoParam;
 };
 
