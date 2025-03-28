@@ -242,7 +242,7 @@ napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info i
 
 napi_value UnifiedDataChannelNapi::ConvertRecordsToEntries(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "TransferToMultiEntries is called!");
+    LOG_DEBUG(UDMF_KITS_NAPI, "ConvertRecordsToEntries is called!");
     struct ConvertContext : public ContextBase {
         std::shared_ptr<UnifiedData> unifiedData;
     };
@@ -256,7 +256,7 @@ napi_value UnifiedDataChannelNapi::ConvertRecordsToEntries(napi_env env, napi_ca
             "Parameter error: parameter data type must be UnifiedData");
     };
     ctxt->GetCbInfo(env, info, input);
-    ASSERT_NULL(!ctxt->isThrowError, "TransferToMultiEntries Exit");
+    ASSERT_NULL(!ctxt->isThrowError, "ConvertRecordsToEntries Exit");
     ctxt->unifiedData = unifiedDataNapi->value_;
     ctxt->unifiedData->ConvertRecordsToEntries();
     return nullptr;

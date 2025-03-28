@@ -212,6 +212,9 @@ HWTEST_F(UnifiedDataTest, GetRecordAt001, TestSize.Level1)
 HWTEST_F(UnifiedDataTest, TransferToEntries001, TestSize.Level1)
 {
     UnifiedData unifiedData;
+    std::shared_ptr<UnifiedDataProperties> properties = std::make_shared<UnifiedDataProperties>();
+    properties->tag = "records_to_entries_data_format";
+    unifiedData.SetProperties(properties);
     std::shared_ptr<PlainText> plainText = std::make_shared<PlainText>();
     plainText->SetContent("http://1111/a.img");
     plainText->SetAbstract("abstract");

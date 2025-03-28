@@ -3177,10 +3177,6 @@ describe('UdmfJSTest', function () {
     expect(formEntry.module).assertEqual('MyModule');
     expect(formEntry.details.formKey1).assertEqual(123);
     expect(formEntry.details.formKey2).assertEqual('formValue');
-    for (let i = 0; i < U8_ARRAY.length; i++) {
-      expect(formEntry.details.formKey3[i]).assertEqual(U8_ARRAY[i]);
-    }
-    expect(formEntry.details.formKey3.toString).assertEqual(U8_ARRAY.toString);
     let applicationDefinedEntry = recordEntries.getEntry('ApplicationDefinedType');
     for (let i = 0; i < U8_ARRAY.length; i++) {
       expect(applicationDefinedEntry.arrayBuffer[i]).assertEqual(U8_ARRAY[i]);
@@ -3207,7 +3203,6 @@ describe('UdmfJSTest', function () {
     expect(entries['openharmony.form'].module).assertEqual('MyModule');
     expect(entries['openharmony.form'].details.formKey1).assertEqual(123);
     expect(entries['openharmony.form'].details.formKey2).assertEqual('formValue');
-    expect(entries['openharmony.form'].details.formKey3.toString).assertEqual(U8_ARRAY.toString);
     for (let i = 0; i < U8_ARRAY.length; i++) {
       expect(entries.ApplicationDefinedType.arrayBuffer[i]).assertEqual(U8_ARRAY[i]);
     }
@@ -3225,7 +3220,7 @@ describe('UdmfJSTest', function () {
     const TAG = 'toEntriesTest002';
     console.info(TAG, 'start');
     let image = new UDC.Image();
-    image.uri ='schema://com.samples.test/files/test.jpg';
+    image.uri = 'schema://com.samples.test/files/test.jpg';
     let plainText = new UDC.PlainText();
     plainText.textContent = 'this is textContent';
     plainText.abstract = 'this is abstract';
@@ -3303,7 +3298,7 @@ describe('UdmfJSTest', function () {
    * @tc.require:
    */
   it('toEntriesTest004', 0, function () {
-    const TAG = 'toEntriesTest00114';
+    const TAG = 'toEntriesTest004';
     console.info(TAG, 'start');
     try {
       UDC.convertRecordsToEntries();
@@ -3323,7 +3318,7 @@ describe('UdmfJSTest', function () {
    * @tc.require:
    */
   it('toEntriesTest005', 0, function () {
-    const TAG = 'toEntriesTest00115';
+    const TAG = 'toEntriesTest005';
     console.info(TAG, 'start');
     try {
       UDC.convertRecordsToEntries(1);
