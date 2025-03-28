@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("//foundation/distributeddatamgr/udmf/udmf.gni")
 
-module_output_path = "udmf/jskitsimpl"
+module_output_path = "udmf/udmf/jskitsimpl"
 
 ohos_js_unittest("UDMFJsTest") {
   module_out_path = module_output_path
