@@ -14,7 +14,6 @@
  */
 #define LOG_TAG "UnifiedData"
 #include "logger.h"
-#include "udmf_utils.h"
 #include "unified_data.h"
 #include "utd_client.h"
 
