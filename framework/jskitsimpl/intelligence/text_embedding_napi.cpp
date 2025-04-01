@@ -285,7 +285,9 @@ bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t 
         return false;
     }
 
-    napi_value version, isNPUAvailable, cachePath;
+    napi_value version;
+    napi_value isNPUAvailable;
+    napi_value cachePath;
     napi_status status = napi_get_named_property(env, args[ARG_0], "version", &version);
     if (status != napi_ok) {
         AIP_HILOGE("napi get version property failed");
@@ -608,6 +610,10 @@ napi_value TextEmbeddingNapi::GetEmbedding(napi_env env, napi_callback_info info
     status = napi_create_promise(env, &deferred, &promise);
     if (status != napi_ok) {
         ThrowIntelligenceErr(env, INNER_ERROR, "napi_get_cb_info failed");
+        return nullptr;
+    }
+    if (valueType == napi_undefined || valueType == napi_null) {
+        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "param is error");
         return nullptr;
     }
     if (valueType == napi_string) {
