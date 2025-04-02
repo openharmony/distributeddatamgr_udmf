@@ -30,7 +30,9 @@ UnifiedData::UnifiedData()
     properties_ = std::make_shared<UnifiedDataProperties>();
     auto duration = std::chrono::system_clock::now().time_since_epoch();
     properties_->timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+#ifndef CROSS_PLATFORM
     sdkVersion_ = UTILS::GetCurrentSdkVersion();
+#endif
 }
 
 UnifiedData::UnifiedData(std::shared_ptr<UnifiedDataProperties> properties)
@@ -42,7 +44,9 @@ UnifiedData::UnifiedData(std::shared_ptr<UnifiedDataProperties> properties)
     properties_ = properties;
     auto duration = std::chrono::system_clock::now().time_since_epoch();
     properties_->timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+#ifndef CROSS_PLATFORM
     sdkVersion_ = UTILS::GetCurrentSdkVersion();
+#endif
 }
 
 int64_t UnifiedData::GetSize()
