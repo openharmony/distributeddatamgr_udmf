@@ -431,7 +431,8 @@ template <> size_t CountBufferSize(const UnifiedRecord &input, TLVObject &data)
 {
     return data.CountHead() + data.CountBasic(static_cast<int32_t>(input.GetType())) +
         data.Count(input.GetUid()) + CountBufferSize(input.GetOriginValue(), data) + data.Count(input.GetUtdId()) +
-        CountBufferSize(input.GetInnerEntries(), data) + CountBufferSize(input.GetUris(), data);
+        data.Count(input.GetUtdId2()) + CountBufferSize(input.GetInnerEntries(), data) +
+        CountBufferSize(input.GetUris(), data);
 }
 
 template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
@@ -449,6 +450,9 @@ template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
         return false;
     }
     if (!data.Write(TAG::TAG_RECORD_UTD_ID, input.GetUtdId())) {
+        return false;
+    }
+    if (!data.Write(TAG::TAG_RECORD_UTD_ID2, input.GetUtdId2())) {
         return false;
     }
     if (!TLVUtil::Writing(input.GetInnerEntries(), data, TAG::TAG_RECORD_ENTRIES)) {
@@ -472,6 +476,7 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
             return false;
         }
         std::string utdId;
+        std::string utdId2;
         std::shared_ptr<std::map<std::string, ValueType>> entries;
         std::vector<UriInfo> uriInfos;
         switch (headItem.tag) {
@@ -498,6 +503,12 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
                     return false;
                 }
                 output.SetUtdId(std::move(utdId));
+                break;
+            case static_cast<uint16_t>(TAG::TAG_RECORD_UTD_ID2):
+                if (!data.Read(utdId2, headItem)) {
+                    return false;
+                }
+                output.SetUtdId2(std::move(utdId2));
                 break;
             case static_cast<uint16_t>(TAG::TAG_RECORD_ENTRIES):
                 if (!TLVUtil::Reading(entries, data, headItem)) {

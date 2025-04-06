@@ -53,6 +53,8 @@ public:
     std::set<std::string> API_EXPORT GetUtdIds() const;
     std::set<std::string> API_EXPORT GetUtdIdsWithAddFileType() const;
     std::string API_EXPORT GetUtdId() const;
+    void API_EXPORT SetUtdId2(const std::string &utdId);
+    std::string API_EXPORT GetUtdId2() const;
 
     bool API_EXPORT HasType(const std::string &utdId) const;
     void API_EXPORT AddEntry(const std::string &utdId, ValueType &&value);
@@ -82,6 +84,7 @@ public:
 protected:
     UDType dataType_;
     std::string utdId_;
+    std::string utdId2_;
     ValueType value_;
 private:
     void AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri) const;

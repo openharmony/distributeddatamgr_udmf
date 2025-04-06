@@ -3312,23 +3312,23 @@ HWTEST_F(UdmfClientTest, GetSummary004, TestSize.Level1)
     auto plainText = PlainText("content", "abstract");
     auto size1 = plainText.GetSize();
     plainText.InitObject();
-    record->AddEntry(plainText.GetUtdId(), plainText.GetOriginValue());
+    record->AddEntry(plainText.GetUtdId2(), plainText.GetOriginValue());
     auto image = Image("uri");
     image.SetDetails(details);
     auto size2 = image.GetSize();
     image.InitObject();
-    record->AddEntry(image.GetUtdId(), image.GetOriginValue());
+    record->AddEntry(image.GetUtdId2(), image.GetOriginValue());
     std::vector<uint8_t> raw = {1, 2, 3, 4, 5};
     SystemDefinedPixelMap pixelMap = SystemDefinedPixelMap(raw);
     pixelMap.SetDetails(details);
     auto size3 = pixelMap.GetSize();
     pixelMap.InitObject();
-    record->AddEntry(pixelMap.GetUtdId(), pixelMap.GetOriginValue());
+    record->AddEntry(pixelMap.GetUtdId2(), pixelMap.GetOriginValue());
     raw = {1, 2, 3, 4, 5};
     auto applicationDefinedRecord = ApplicationDefinedRecord("my.type", raw);
     auto size4 = applicationDefinedRecord.GetSize();
     applicationDefinedRecord.InitObject();
-    record->AddEntry(applicationDefinedRecord.GetUtdId(), applicationDefinedRecord.GetOriginValue());
+    record->AddEntry(applicationDefinedRecord.GetUtdId2(), applicationDefinedRecord.GetOriginValue());
     data.AddRecord(record);
     auto status = UdmfClient::GetInstance().SetData(option1, data, key);
     ASSERT_EQ(status, E_OK);
@@ -3384,25 +3384,25 @@ HWTEST_F(UdmfClientTest, GetSummary005, TestSize.Level1)
     auto link = Link("url", "descritpion");
     auto size1 = link.GetSize();
     link.InitObject();
-    record->AddEntry(link.GetUtdId(), link.GetOriginValue());
+    record->AddEntry(link.GetUtdId2(), link.GetOriginValue());
 
     auto folder = Folder("uri");
     folder.SetDetails(details);
     auto size2 = folder.GetSize();
     folder.InitObject();
-    record->AddEntry(folder.GetUtdId(), folder.GetOriginValue());
+    record->AddEntry(folder.GetUtdId2(), folder.GetOriginValue());
 
     std::vector<uint8_t> raw = {1, 2, 3, 4, 5};
     auto applicationDefinedRecord1 = ApplicationDefinedRecord("your.type", raw);
     auto size3 = applicationDefinedRecord1.GetSize();
     applicationDefinedRecord1.InitObject();
-    record->AddEntry(applicationDefinedRecord1.GetUtdId(), applicationDefinedRecord1.GetOriginValue());
+    record->AddEntry(applicationDefinedRecord1.GetUtdId2(), applicationDefinedRecord1.GetOriginValue());
 
     raw = {1, 2, 3, 4, 5};
     auto applicationDefinedRecord2 = ApplicationDefinedRecord("my.type", raw);
     auto size4 = applicationDefinedRecord2.GetSize();
     applicationDefinedRecord2.InitObject();
-    record->AddEntry(applicationDefinedRecord2.GetUtdId(), applicationDefinedRecord2.GetOriginValue());
+    record->AddEntry(applicationDefinedRecord2.GetUtdId2(), applicationDefinedRecord2.GetOriginValue());
 
     auto form = SystemDefinedForm();
     form.SetDetails(details);
@@ -3414,7 +3414,7 @@ HWTEST_F(UdmfClientTest, GetSummary005, TestSize.Level1)
     form.SetBundleName("bundleName");
     auto size5 = form.GetSize();
     form.InitObject();
-    record->AddEntry(form.GetUtdId(), form.GetOriginValue());
+    record->AddEntry(form.GetUtdId2(), form.GetOriginValue());
 
     raw = {1, 2, 3, 4, 5};
     std::shared_ptr<Object> obj = std::make_shared<Object>();

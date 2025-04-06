@@ -20,34 +20,29 @@ namespace UDMF {
 Image::Image() : Image("")
 {
     SetType(IMAGE);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Image::Image(const std::string &uri) : File(uri)
 {
     SetType(IMAGE);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Image::Image(UDType type, ValueType value) : File(type, value)
 {
     SetType(IMAGE);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 void Image::InitObject()
 {
-    if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        auto value = value_;
-        value_ = std::make_shared<Object>();
-        auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[UNIFORM_DATA_TYPE] = GENERAL_FILE_URI;
-        object->value_[ORI_URI] = oriUri_;
-        object->value_[REMOTE_URI] = remoteUri_;
-        if (!fileType_.empty()) {
-            object->value_[FILE_TYPE] = fileType_;
-        } else {
-            object->value_[FILE_TYPE] = "general.image";
-        }
-        object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
+    File::InitObject();
+    auto object = std::get<std::shared_ptr<Object>>(value_);
+    if (!fileType_.empty()) {
+        object->value_[FILE_TYPE] = fileType_;
+    } else {
+        object->value_[FILE_TYPE] = "general.image";
     }
 }
 } // namespace UDMF

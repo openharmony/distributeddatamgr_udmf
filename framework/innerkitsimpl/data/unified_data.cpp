@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "unified_meta.h"
 #define LOG_TAG "UnifiedData"
 #include "logger.h"
 #include "unified_data.h"
@@ -110,9 +111,7 @@ std::vector<std::string> UnifiedData::GetTypesLabels() const
 {
     std::vector<std::string> types;
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
-        std::vector<std::string> recordTypes = record->GetTypes();
-        types.insert(types.end(),
-            std::make_move_iterator(recordTypes.begin()), std::make_move_iterator(recordTypes.end()));
+        types.push_back(UtdUtils::GetUtdIdFromUtdEnum(record->GetType()));
     }
     return types;
 }
@@ -320,13 +319,14 @@ void UnifiedData::ConvertRecordsToEntries()
         if (record == nullptr) {
             continue;
         }
-        if (record->GetUtdId() == recordFirst->GetUtdId()) {
+        if (record->GetUtdId2() == recordFirst->GetUtdId2()) {
             continue;
         }
         record->InitObject();
-        recordFirst->AddEntry(record->GetUtdId(), record->GetValue());
+        recordFirst->AddEntry(record->GetUtdId2(), record->GetValue());
     }
     records_.erase(records_.begin() + 1, records_.end());
+    LOG_INFO(UDMF_FRAMEWORK, "Convert records to entries finished");
 }
 
 std::string UnifiedData::GetSdkVersion() const
