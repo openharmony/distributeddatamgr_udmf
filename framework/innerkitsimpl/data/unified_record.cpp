@@ -258,6 +258,7 @@ std::set<std::string> UnifiedRecord::GetUtdIdsWithAddFileType() const
 void UnifiedRecord::SetUtdId(const std::string& utdId)
 {
     utdId_ = utdId;
+    utdId2_ = utdId;
 }
 
 std::string UnifiedRecord::GetUtdId() const
