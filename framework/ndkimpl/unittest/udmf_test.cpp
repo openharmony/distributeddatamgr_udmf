@@ -2203,7 +2203,7 @@ HWTEST_F(UDMFTest, FileUriTest005, TestSize.Level1)
 
     for (unsigned int idx = 0; idx < recordCount; ++idx) {
         unsigned int recordTypeCount;
-        char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount); 
+        char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount);
         EXPECT_EQ(recordTypeCount, 2);
         EXPECT_NE(recordTypes, nullptr);
         EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_FOLDER), 0);
