@@ -20,16 +20,19 @@ namespace UDMF {
 Folder::Folder() : Folder("")
 {
     SetType(FOLDER);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Folder::Folder(const std::string &uri) : File(uri)
 {
     SetType(FOLDER);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Folder::Folder(UDType type, ValueType value) : File(type, value)
 {
     SetType(FOLDER);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 void Folder::InitObject()

@@ -20,16 +20,19 @@ namespace UDMF {
 Video::Video() : Video("")
 {
     SetType(VIDEO);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Video::Video(const std::string &uri) : File(uri)
 {
     SetType(VIDEO);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Video::Video(UDType type, ValueType value) : File(type, value)
 {
     SetType(VIDEO);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 void Video::InitObject()

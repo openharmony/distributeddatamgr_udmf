@@ -320,11 +320,11 @@ void UnifiedData::ConvertRecordsToEntries()
         if (record == nullptr) {
             continue;
         }
-        if (record->GetUtdId() == recordFirst->GetUtdId()) {
+        if (record->GetUtdId2() == recordFirst->GetUtdId2()) {
             continue;
         }
         record->InitObject();
-        recordFirst->AddEntry(record->GetUtdId(), record->GetValue());
+        recordFirst->AddEntry(record->GetUtdId2(), record->GetValue());
     }
     records_.erase(records_.begin() + 1, records_.end());
 }

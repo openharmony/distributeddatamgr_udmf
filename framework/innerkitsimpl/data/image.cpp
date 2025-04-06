@@ -20,16 +20,19 @@ namespace UDMF {
 Image::Image() : Image("")
 {
     SetType(IMAGE);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Image::Image(const std::string &uri) : File(uri)
 {
     SetType(IMAGE);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Image::Image(UDType type, ValueType value) : File(type, value)
 {
     SetType(IMAGE);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 void Image::InitObject()
