@@ -327,6 +327,7 @@ void UnifiedData::ConvertRecordsToEntries()
         recordFirst->AddEntry(record->GetUtdId2(), record->GetValue());
     }
     records_.erase(records_.begin() + 1, records_.end());
+    LOG_INFO(UDMF_FRAMEWORK, "Convert records to entries finished");
 }
 
 std::string UnifiedData::GetSdkVersion() const
