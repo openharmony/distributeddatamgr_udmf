@@ -14,7 +14,6 @@
  */
 
 #include "audio.h"
-#include "unified_meta.h"
 
 namespace OHOS {
 namespace UDMF {
