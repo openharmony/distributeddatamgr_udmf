@@ -1106,10 +1106,10 @@ describe('UdmfJSTest', function () {
     expect(unifiedData.hasType(UTD.UniformDataType.HYPERLINK)).assertEqual(true);
     expect(unifiedData.hasType('openharmony.app-item')).assertEqual(true);
     let types = unifiedData.getTypes();
-    expect(types.length).assertEqual(3);
+    expect(types.length).assertEqual(1);
     expect(types.includes(textType)).assertTrue();
-    expect(types.includes(UTD.UniformDataType.HYPERLINK)).assertTrue();
-    expect(types.includes('openharmony.app-item')).assertTrue();
+    expect(types.includes(UTD.UniformDataType.HYPERLINK)).assertFalse();
+    expect(types.includes('openharmony.app-item')).assertFalse();
 
     let html = new UDC.HTML();
     unifiedData.addRecord(html);
@@ -1117,12 +1117,12 @@ describe('UdmfJSTest', function () {
     expect(unifiedData.hasType(htmlType)).assertEqual(true);
     expect(unifiedData.hasType(plaintextType)).assertEqual(false);
     types = unifiedData.getTypes();
-    expect(types.length).assertEqual(4);
+    expect(types.length).assertEqual(2);
     expect(types.includes(textType)).assertTrue();
     expect(types.includes(htmlType)).assertTrue();
     expect(types.includes(textType)).assertTrue();
-    expect(types.includes(UTD.UniformDataType.HYPERLINK)).assertTrue();
-    expect(types.includes('openharmony.app-item')).assertTrue();
+    expect(types.includes(UTD.UniformDataType.HYPERLINK)).assertFalse();
+    expect(types.includes('openharmony.app-item')).assertFalse();
   });
 
   /**
@@ -2293,8 +2293,8 @@ describe('UdmfJSTest', function () {
 
     let unifiedData = new UDC.UnifiedData(record);
     let rawDataTypes = unifiedData.getTypes();
-    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
-    expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(rawDataTypes.includes('general.image')).assertTrue();
+    expect(rawDataTypes.includes('openharmony.pixel-map')).assertFalse();
     expect(unifiedData.hasType('general.file-uri')).assertTrue();
     expect(unifiedData.hasType('general.image')).assertTrue();
     expect(unifiedData.hasType('general.jpeg')).assertTrue();
@@ -2312,7 +2312,7 @@ describe('UdmfJSTest', function () {
           expect(getRecordTypes.includes('openharmony.pixel-map')).assertTrue();
 
           let getDataTypes = data[0].getTypes();
-          expect(getDataTypes.includes('general.file-uri')).assertTrue();
+          expect(getDataTypes.includes('general.image')).assertTrue();
           for (let i = 0; i < records.length; i++) {
             if (records[i].getType() === 'general.image') {
               let getImageUri = records[i].imageUri;
@@ -2399,7 +2399,7 @@ describe('UdmfJSTest', function () {
 
     let unifiedData = new UDC.UnifiedData(record);
     let rawDataTypes = unifiedData.getTypes();
-    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
+    expect(rawDataTypes.includes('general.image')).assertTrue();
     expect(unifiedData.hasType('general.file-uri')).assertTrue();
     expect(unifiedData.hasType('general.image')).assertTrue();
     try {
@@ -2417,7 +2417,7 @@ describe('UdmfJSTest', function () {
           expect(rawRecordTypes.includes('general.file-uri')).assertTrue();
 
           let rawDataTypes = data[0].getTypes();
-          expect(rawDataTypes.includes('general.file-uri')).assertTrue();
+          expect(rawDataTypes.includes('general.image')).assertTrue();
           for (let i = 0; i < records.length; i++) {
             if (records[i].getType() === 'general.image') {
               let getImageUri = records[i].imageUri;
@@ -2514,9 +2514,9 @@ describe('UdmfJSTest', function () {
 
     let unifiedData = new UDC.UnifiedData(record);
     let rawDataTypes = unifiedData.getTypes();
-    expect(rawDataTypes.includes('general.file')).assertFalse();
-    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
-    expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(rawDataTypes.includes('general.image')).assertTrue();
+    expect(rawDataTypes.includes('general.file-uri')).assertFalse();
+    expect(rawDataTypes.includes('openharmony.pixel-map')).assertFalse();
     expect(unifiedData.hasType('general.file-uri')).assertTrue();
     expect(unifiedData.hasType('general.image')).assertTrue();
     expect(unifiedData.hasType('general.jpeg')).assertTrue();
@@ -2535,9 +2535,9 @@ describe('UdmfJSTest', function () {
           expect(getRecordTypes.includes('openharmony.pixel-map')).assertTrue();
 
           let getDataTypes = data[0].getTypes();
-          expect(getDataTypes.includes('general.file')).assertFalse();
-          expect(getDataTypes.includes('general.file-uri')).assertTrue();
-          expect(getDataTypes.includes('openharmony.pixel-map')).assertTrue();
+          expect(getDataTypes.includes('general.image')).assertTrue();
+          expect(getDataTypes.includes('general.file-uri')).assertFalse();
+          expect(getDataTypes.includes('openharmony.pixel-map')).assertFalse();
           for (let i = 0; i < records.length; i++) {
             if (records[i].getType() === 'general.file') {
               let getUri = records[i].uri;
@@ -2636,8 +2636,8 @@ describe('UdmfJSTest', function () {
     expect(rawRecordTypes.includes('openharmony.pixel-map')).assertTrue();
     let unifiedData = new UDC.UnifiedData(record);
     let rawDataTypes = unifiedData.getTypes();
-    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
-    expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(rawDataTypes.includes('general.video')).assertTrue();
+    expect(rawDataTypes.includes('openharmony.pixel-map')).assertFalse();
     expect(unifiedData.hasType('general.file-uri')).assertTrue();
     expect(unifiedData.hasType('general.video')).assertTrue();
     expect(unifiedData.hasType('general.vob')).assertTrue();
@@ -2657,8 +2657,8 @@ describe('UdmfJSTest', function () {
           expect(getRecordTypes.includes('openharmony.pixel-map')).assertTrue();
 
           let getDataTypes = data[0].getTypes();
-          expect(getDataTypes.includes('general.file-uri')).assertTrue();
-          expect(getDataTypes.includes('openharmony.pixel-map')).assertTrue();
+          expect(getDataTypes.includes('general.video')).assertTrue();
+          expect(getDataTypes.includes('openharmony.pixel-map')).assertFalse();
           for (let i = 0; i < records.length; i++) {
             if (records[i].getType() === 'general.video') {
               let getUri = records[i].videoUri;
@@ -2758,8 +2758,8 @@ describe('UdmfJSTest', function () {
     expect(rawRecordTypes.includes('openharmony.pixel-map')).assertTrue();
     let unifiedData = new UDC.UnifiedData(record);
     let rawDataTypes = unifiedData.getTypes();
-    expect(rawDataTypes.includes('general.file-uri')).assertFalse();
-    expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(rawDataTypes.includes('general.vob')).assertTrue();
+    expect(rawDataTypes.includes('openharmony.pixel-map')).assertFalse();
     expect(unifiedData.hasType('general.file-uri')).assertFalse();
     expect(unifiedData.hasType('general.video')).assertTrue();
     expect(unifiedData.hasType('general.vob')).assertTrue();
@@ -2780,7 +2780,7 @@ describe('UdmfJSTest', function () {
           let getDataTypes = data[0].getTypes();
           expect(getDataTypes.includes('general.vob')).assertTrue();
           expect(getDataTypes.includes('general.file-uri')).assertFalse();
-          expect(getDataTypes.includes('openharmony.pixel-map')).assertTrue();
+          expect(getDataTypes.includes('openharmony.pixel-map')).assertFalse();
 
           let getValue = records[0].getValue();
           expect(getValue.uniformDataType).assertEqual('general.file-uri');
@@ -2879,7 +2879,7 @@ describe('UdmfJSTest', function () {
     let unifiedData = new UDC.UnifiedData(record);
     let rawDataTypes = unifiedData.getTypes();
     expect(rawDataTypes.includes('general.vob')).assertFalse();
-    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
+    expect(rawDataTypes.includes('general.file-uri')).assertFalse();
     expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
     expect(unifiedData.hasType('general.file-uri')).assertTrue();
     expect(unifiedData.hasType('general.video')).assertTrue();
@@ -2901,7 +2901,7 @@ describe('UdmfJSTest', function () {
 
           let getDataTypes = data[0].getTypes();
           expect(getDataTypes.includes('general.vob')).assertFalse();
-          expect(getDataTypes.includes('general.file-uri')).assertTrue();
+          expect(getDataTypes.includes('general.file-uri')).assertFalse();
           expect(getDataTypes.includes('openharmony.pixel-map')).assertTrue();
 
           let getValue = records[0].getValue();
