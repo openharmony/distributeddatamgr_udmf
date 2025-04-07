@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "unified_meta.h"
 #define LOG_TAG "UnifiedData"
 #include "logger.h"
 #include "unified_data.h"
