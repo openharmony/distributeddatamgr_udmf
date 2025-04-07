@@ -200,21 +200,12 @@ describe('AipJSTest', function () {
     let retrievalConfig = {
       channelConfigs: []
     };
-    if (currentDeviceIsPc) {
-      try {
-        await intelligence.getRetriever(retrievalConfig);
-      } catch (err) {
-        console.info(TAG, 'Aip_002 catch::' + err.code);
-        expect(err.code).assertEqual(401);
-        done();
-      }
-    } else {
-      await intelligence.getRetriever(retrievalConfig)
-        .catch((err) => {
-          console.info(TAG, 'catch::' + err.code);
-          expect(err.code).assertEqual(801);
-          done();
-        });
+    try {
+      await intelligence.getRetriever(retrievalConfig);
+    } catch (err) {
+      console.info(TAG, 'Aip_002 catch::' + err.code);
+      expect(err.code).assertEqual(401);
+      done();
     }
   });
 
