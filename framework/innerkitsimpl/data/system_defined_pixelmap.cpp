@@ -38,11 +38,10 @@ SystemDefinedPixelMap::SystemDefinedPixelMap(UDType type, ValueType value) : Sys
         return;
     } else if (std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(value)) {
         auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value);
-        if (!pixelMap->EncodeTlv(rawData_)) {
-            LOG_ERROR(UDMF_KITS_INNER, "pixelMap encode fail!");
-            return;
-        }
         SetPixelMapDetails(pixelMap);
+        if (!SetRawDataFromPixels(pixelMap)) {
+            LOG_ERROR(UDMF_KITS_INNER, "Set rawData fail!");
+        }
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
         auto it = object->value_.find(PIXEL_MAP);
@@ -51,11 +50,10 @@ SystemDefinedPixelMap::SystemDefinedPixelMap(UDType type, ValueType value) : Sys
         }
         if (std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(it->second)) {
             auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(it->second);
-            if (!pixelMap->EncodeTlv(rawData_)) {
-                LOG_ERROR(UDMF_KITS_INNER, "pixelMap encode fail!");
-                return;
-            }
             SetPixelMapDetails(pixelMap);
+            if (!SetRawDataFromPixels(pixelMap)) {
+                LOG_ERROR(UDMF_KITS_INNER, "Set rawData fail!");
+            }
         } else if (std::holds_alternative<std::vector<uint8_t>>(it->second)) {
             rawData_ = std::get<std::vector<uint8_t>>(it->second);
         }
@@ -86,13 +84,13 @@ void SystemDefinedPixelMap::SetRawData(const std::vector<uint8_t> &rawData)
     this->rawData_ = rawData;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        auto pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(OHOS::Media::PixelMap::DecodeTlv(rawData_));
+        auto pixelMap = GetPixelMapFromRawData();
         if (pixelMap == nullptr) {
-            LOG_ERROR(UDMF_KITS_INNER, "pixelMap decode fail!");
+            LOG_ERROR(UDMF_KITS_INNER, "Get pixelMap from rawData fail!");
             object->value_[PIXEL_MAP] = rawData;
             return;
         }
-        object->value_[PIXEL_MAP] = pixelMap;
+        object->value_[PIXEL_MAP] = std::move(pixelMap);
     }
 }
 
@@ -102,17 +100,51 @@ void SystemDefinedPixelMap::InitObject()
         auto value = value_;
         value_ = std::make_shared<Object>();
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        auto pixelMap = std::shared_ptr<OHOS::Media::PixelMap>(OHOS::Media::PixelMap::DecodeTlv(rawData_));
+        auto pixelMap = GetPixelMapFromRawData();
         if (pixelMap == nullptr) {
-            LOG_ERROR(UDMF_KITS_INNER, "pixelMap decode fail!");
+            LOG_ERROR(UDMF_KITS_INNER, "Get pixelMap from rawData fail!");
             object->value_[PIXEL_MAP] = rawData_;
         } else {
-            object->value_[PIXEL_MAP] = pixelMap;
+            object->value_[PIXEL_MAP] = std::move(pixelMap);
         }
         object->value_[UNIFORM_DATA_TYPE] = UtdUtils::GetUtdIdFromUtdEnum(dataType_);
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
         object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
+}
+
+bool SystemDefinedPixelMap::SetRawDataFromPixels(const std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
+{
+    if (pixelMap == nullptr) {
+        return false;
+    }
+    rawData_.resize(pixelMap->GetByteCount());
+    auto status = pixelMap->ReadPixels(pixelMap->GetByteCount(), rawData_.data());
+    if (status != 0) {
+        LOG_ERROR(UDMF_KITS_INNER, "Get Pixels error, status = %{public}u", status);
+        rawData_.clear();
+        return false;
+    }
+    return true;
+}
+
+std::unique_ptr<Media::PixelMap> SystemDefinedPixelMap::GetPixelMapFromRawData()
+{
+    Media::InitializationOptions opts;
+    auto details = ObjectUtils::ConvertToObject(details_);
+    if (details->GetValue("width", opts.size.width) &&
+        details->GetValue("height", opts.size.height) &&
+        details->GetValue("pixel-format", opts.pixelFormat) &&
+        details->GetValue("alpha-type", opts.alphaType)) {
+        if (rawData_.size() % 4 != 0) {
+            LOG_ERROR(UDMF_KITS_INNER, "RawData size error, size = %{public}zu", rawData_.size());
+            return nullptr;
+        }
+        return Media::PixelMap::Create(
+            reinterpret_cast<uint32_t*>(rawData_.data()), rawData_.size() / 4, opts);
+    }
+    LOG_ERROR(UDMF_KITS_INNER, "PixelMap data incomplete, size = %{public}zu", rawData_.size());
+    return nullptr;
 }
 } // namespace UDMF
 } // namespace OHOS
