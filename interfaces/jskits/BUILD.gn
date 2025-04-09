@@ -36,6 +36,10 @@ config("udmf_napi_config") {
   ]
 }
 
+config("aip_core_napi_config") {
+  include_dirs = [ "${udmf_interfaces_path}/jskits/intelligence" ]
+}
+
 ohos_shared_library("unifieddatachannel_napi") {
   branch_protector_ret = "pac_ret"
   sanitize = {
@@ -264,9 +268,9 @@ ohos_shared_library("intelligence_napi") {
     "${udmf_framework_path}/jskitsimpl/intelligence/text_embedding_napi.cpp",
   ]
 
-  include_dirs = [ "${udmf_interfaces_path}/jskits/intelligence" ]
+  public_configs = [ ":aip_core_napi_config" ]
 
-  deps = [ "../innerkits/aipcore:aip_core_mgr_static" ]
+  deps = []
 
   external_deps = [
     "ability_runtime:abilitykit_native",

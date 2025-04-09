@@ -17,9 +17,11 @@
 
 #include "aip_napi_error.h"
 
+#undef LOG_TAG
+#define LOG_TAG "IAipCoreManagerImpl"
+
 namespace OHOS {
 namespace DataIntelligence {
-
 int32_t IAipCoreManagerImpl::InitRetriever(const RetrievalConfigStruct &retrievalConfig)
 {
     return DEVICE_EXCEPTION;
@@ -82,28 +84,5 @@ int32_t IAipCoreManagerImpl::SplitText(std::string text, int32_t size, float ove
 {
     return DEVICE_EXCEPTION;
 }
-
-int32_t IAipCoreManagerImpl::CreateRAGSession(const ContextParam &contex, const ConfigStruct &config)
-{
-    return DEVICE_EXCEPTION;
-}
-
-int32_t IAipCoreManagerImpl::RAGSessionStreamRun(const std::string &question, const OptionStruct &option,
-    std::function<void(const StreamStruct&, int32_t)> callback)
-{
-    return DEVICE_EXCEPTION;
-}
-
-int32_t IAipCoreManagerImpl::ReleaseRAGSession()
-{
-    return DEVICE_EXCEPTION;
-}
-
-int32_t IAipCoreManagerImpl::RAGSessionRun(const std::string &query, const OptionStruct &runOption,
-    AnswerStruct &answer)
-{
-    return DEVICE_EXCEPTION;
-}
-
 } // namespace DataIntelligence
 } // namespace OHOS
