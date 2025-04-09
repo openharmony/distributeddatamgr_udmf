@@ -418,12 +418,14 @@ template <> bool Reading(OHOS::AAFwk::WantParams &output, TLVObject &data, const
         free(buffer);
         return false;
     }
+    // The pointer returned by Unmarshalling needs to be manually deleted.
     auto wantParams = AAFwk::WantParams::Unmarshalling(*parcel);
     if (wantParams == nullptr) {
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshalling wantParams error in tlv read. tag=%{public}hu", head.tag);
         return false;
     }
     output = *wantParams;
+    delete wantParams;
     return true;
 }
 
