@@ -64,6 +64,10 @@ constexpr const char* APP_ICON_LENGTH = "appIconLen";
 constexpr const char* LINK_URL = "linkUrl";
 constexpr const char* APPLICATION_DEFINED_RECORD_MARK = "applicationDefinedRecordMark";
 constexpr const char* GENERAL_FILE_URI = "general.file-uri";
+constexpr const char* PIXEL_MAP_WIDTH = "width";
+constexpr const char* PIXEL_MAP_HEIGHT = "height";
+constexpr const char* PIXEL_MAP_FORMAT = "pixel-format";
+constexpr const char* PIXEL_MAP_ALPHA_TYPE = "alpha-type";
 
 enum UDType : int32_t {
     ENTITY = 0,

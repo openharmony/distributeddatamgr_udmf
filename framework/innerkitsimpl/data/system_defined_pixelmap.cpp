@@ -62,10 +62,10 @@ SystemDefinedPixelMap::SystemDefinedPixelMap(UDType type, ValueType value) : Sys
 
 void SystemDefinedPixelMap::SetPixelMapDetails(const std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
 {
-    details_["width"] = pixelMap->GetWidth();
-    details_["heigth"] = pixelMap->GetHeight();
-    details_["pixel-format"] = static_cast<int32_t>(pixelMap->GetPixelFormat());
-    details_["alpha-type"] = static_cast<int32_t>(pixelMap->GetAlphaType());
+    details_[PIXEL_MAP_WIDTH] = pixelMap->GetWidth();
+    details_[PIXEL_MAP_HEIGHT] = pixelMap->GetHeight();
+    details_[PIXEL_MAP_FORMAT] = static_cast<int32_t>(pixelMap->GetPixelFormat());
+    details_[PIXEL_MAP_ALPHA_TYPE] = static_cast<int32_t>(pixelMap->GetAlphaType());
 }
 
 int64_t SystemDefinedPixelMap::GetSize()
@@ -132,10 +132,15 @@ std::unique_ptr<Media::PixelMap> SystemDefinedPixelMap::GetPixelMapFromRawData()
 {
     Media::InitializationOptions opts;
     auto details = ObjectUtils::ConvertToObject(details_);
-    if (details->GetValue("width", opts.size.width) &&
-        details->GetValue("height", opts.size.height) &&
-        details->GetValue("pixel-format", opts.pixelFormat) &&
-        details->GetValue("alpha-type", opts.alphaType)) {
+    int32_t pixelFormat = 0;
+    int32_t alphaType = 0;
+    if (details->GetValue(PIXEL_MAP_WIDTH, opts.size.width) &&
+        details->GetValue(PIXEL_MAP_HEIGHT, opts.size.height) &&
+        details->GetValue(PIXEL_MAP_FORMAT, pixelFormat) &&
+        details->GetValue(PIXEL_MAP_ALPHA_TYPE, alphaType)) {
+        opts.pixelFormat = static_cast<Media::PixelFormat>(pixelFormat);
+        opts.alphaType = static_cast<Media::AlphaType>(alphaType);
+
         if (rawData_.size() % 4 != 0) {
             LOG_ERROR(UDMF_KITS_INNER, "RawData size error, size = %{public}zu", rawData_.size());
             return nullptr;
