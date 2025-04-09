@@ -19,6 +19,7 @@
 
 namespace OHOS {
 namespace UDMF {
+static constexpr size_t BYTES_PER_COLOR = sizeof(uint32_t);
 SystemDefinedPixelMap::SystemDefinedPixelMap()
 {
     SetType(SYSTEM_DEFINED_PIXEL_MAP);
@@ -141,12 +142,12 @@ std::unique_ptr<Media::PixelMap> SystemDefinedPixelMap::GetPixelMapFromRawData()
         opts.pixelFormat = static_cast<Media::PixelFormat>(pixelFormat);
         opts.alphaType = static_cast<Media::AlphaType>(alphaType);
 
-        if (rawData_.size() % 4 != 0) {
+        if (rawData_.size() % BYTES_PER_COLOR != 0) {
             LOG_ERROR(UDMF_KITS_INNER, "RawData size error, size = %{public}zu", rawData_.size());
             return nullptr;
         }
         return Media::PixelMap::Create(
-            reinterpret_cast<uint32_t*>(rawData_.data()), rawData_.size() / 4, opts);
+            reinterpret_cast<uint32_t*>(rawData_.data()), rawData_.size() / BYTES_PER_COLOR, opts);
     }
     LOG_ERROR(UDMF_KITS_INNER, "PixelMap data incomplete, size = %{public}zu", rawData_.size());
     return nullptr;
