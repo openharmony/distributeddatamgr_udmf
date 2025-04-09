@@ -15,13 +15,10 @@
 #ifndef I_AIP_CORE_MANAGER_H
 #define I_AIP_CORE_MANAGER_H
 
-#include <cstdint>
-#include <functional>
-#include <map>
-#include <memory>
+#include <stdint.h>
 #include <string>
-#include <variant>
 #include <vector>
+#include <map>
 
 namespace OHOS {
 namespace DataIntelligence {
@@ -63,7 +60,6 @@ struct ContextParam {
     std::string bundleName;
     std::string moduleName;
     std::string baseDir;
-    std::string cacheDir;
     int32_t area;
     bool isSystemApp = false;
     bool isStageMode = true;
@@ -252,47 +248,6 @@ enum TsSimilarityLevel {
     HIGH
 };
 
-struct OptionStruct {
-    bool answerWithRetrievalItem;
-};
-
-struct AnswerStruct {
-    std::string chunk;
-    std::vector<ItemInfoStruct> data;
-};
-
-struct StreamStruct {
-    bool isFinished;
-    AnswerStruct answer;
-};
-
-enum TsLLMRequestStatus {
-    LLM_SUCCESS = 0,
-    LLM_ERROR,
-    LLM_LOAD_FAILED,
-    LLM_TIMEOUT,
-    LLM_BUSY,
-};
-struct LLMStreamAnswer {
-    bool isFinished;
-    std::string chunk;
-};
-
-typedef std::function<void(const LLMStreamAnswer &)> LLMStreamCallback;
-
-class IChatLLM {
-public:
-    IChatLLM() = default;
-    virtual ~IChatLLM() = default;
-    virtual TsLLMRequestStatus StreamChat(const std::string &query, const LLMStreamCallback &streamCallback);
-};
-
-struct ConfigStruct {
-    std::shared_ptr<IChatLLM> chatLLM;
-    RetrievalConfigStruct retriever;
-    RetrievalConditionStruct condition;
-};
-
 class IAipCoreManager {
 public:
     IAipCoreManager() = default;
@@ -312,12 +267,6 @@ public:
     virtual int32_t ReleaseImageModel() = 0;
     virtual int32_t GetImageEmbedding(std::string uri, std::vector<float> &results) = 0;
     virtual int32_t SplitText(std::string text, int32_t size, float overlap, std::vector<std::string> &results) = 0;
-
-    virtual int32_t CreateRAGSession(const ContextParam &contex, const ConfigStruct &config) = 0;
-    virtual int32_t RAGSessionStreamRun(const std::string &question, const OptionStruct &option,
-        std::function<void(const StreamStruct&, int32_t)> callback) = 0;
-    virtual int32_t ReleaseRAGSession() = 0;
-    virtual int32_t RAGSessionRun(const std::string &query, const OptionStruct &runOption, AnswerStruct &answer) = 0;
 };
 
 struct AipCoreManagerHandle {
