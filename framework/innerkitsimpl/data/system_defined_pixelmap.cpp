@@ -117,6 +117,7 @@ void SystemDefinedPixelMap::InitObject()
 bool SystemDefinedPixelMap::SetRawDataFromPixels(const std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
 {
     if (pixelMap == nullptr) {
+        LOG_ERROR(UDMF_KITS_INNER, "PixelMap is null");
         return false;
     }
     rawData_.resize(pixelMap->GetByteCount());
