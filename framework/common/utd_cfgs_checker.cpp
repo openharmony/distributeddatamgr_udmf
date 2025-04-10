@@ -56,14 +56,26 @@ bool UtdCfgsChecker::CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::ve
 bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string &bundleName)
 {
     for (auto declarationType: typeCfgs.first) {
-        if (!std::regex_match(declarationType.typeId, std::regex(bundleName + TYPE_ID_REGEX))) {
+        bool decRes;
+        try {
+            decRes = std::regex_match(declarationType.typeId, std::regex(bundleName + TYPE_ID_REGEX));
+        } catch (std::regex_error) {
+            decRes = false;
+        }
+        if (!decRes) {
             LOG_ERROR(UDMF_CLIENT, "Declaration typeId check failed, id: %{public}s, bundleName: %{public}s.",
                 declarationType.typeId.c_str(), bundleName.c_str());
             return false;
         }
     }
     for (auto referenceTypes: typeCfgs.second) {
-        if (!std::regex_match(referenceTypes.typeId, std::regex(TYPE_ID_REGEX))) {
+        bool resRes;
+        try {
+            resRes = std::regex_match(referenceTypes.typeId, std::regex(TYPE_ID_REGEX));
+        } catch (std::regex_error) {
+            resRes = false;
+        }
+        if (!resRes) {
             LOG_ERROR(UDMF_CLIENT, "Reference typeId check failed, id: %{public}s, bundleName: %{public}s.",
                 referenceTypes.typeId.c_str(), bundleName.c_str());
             return false;
