@@ -20,10 +20,10 @@
 namespace OHOS {
 namespace UDMF {
 static constexpr size_t BYTES_PER_COLOR = sizeof(uint32_t);
-constexpr const char* PIXEL_MAP_WIDTH = "width";
-constexpr const char* PIXEL_MAP_HEIGHT = "height";
-constexpr const char* PIXEL_MAP_FORMAT = "pixel-format";
-constexpr const char* PIXEL_MAP_ALPHA_TYPE = "alpha-type";
+static constexpr const char* PIXEL_MAP_WIDTH = "width";
+static constexpr const char* PIXEL_MAP_HEIGHT = "height";
+static constexpr const char* PIXEL_MAP_FORMAT = "pixel-format";
+static constexpr const char* PIXEL_MAP_ALPHA_TYPE = "alpha-type";
 SystemDefinedPixelMap::SystemDefinedPixelMap()
 {
     SetType(SYSTEM_DEFINED_PIXEL_MAP);
