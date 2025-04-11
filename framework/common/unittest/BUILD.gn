@@ -69,7 +69,7 @@ ohos_unittest("UtdCfgsCheckerTest") {
   configs = [ ":module_private_config" ]
 
   deps = common_deps
-
+  use_exceptions = true
   external_deps = common_external_deps
 }
 
