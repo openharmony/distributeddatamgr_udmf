@@ -171,8 +171,9 @@ napi_value UnifiedDataChannelNapi::QueryData(napi_env env, napi_callback_info in
         intentionStatus = GetNamedProperty(env, options, "intention", intention);
         ASSERT_BUSINESS_ERR(ctxt, UnifiedDataUtils::GetIntentionByString(intention) != UD_INTENTION_DRAG,
             E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid");
+        UnifiedKey key(ctxt->key);
         ASSERT_BUSINESS_ERR(ctxt, (keyStatus == napi_ok || intentionStatus == napi_ok) &&
-            UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
+            UnifiedDataUtils::IsValidOptions(key, intention),
             E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
     };
     ctxt->GetCbInfo(env, info, input);
@@ -216,9 +217,10 @@ napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info i
         ASSERT_BUSINESS_ERR(ctxt, intention.empty() ||
             UnifiedDataUtils::GetIntentionByString(intention) == UD_INTENTION_DATA_HUB,
             E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid");
+        UnifiedKey key(ctxt->key);
         ASSERT_BUSINESS_ERR(ctxt,
             (keyStatus == napi_ok || intentionStatus == napi_ok) &&
-                UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
+                UnifiedDataUtils::IsValidOptions(key, intention),
             E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
     };
     ctxt->GetCbInfo(env, info, input);

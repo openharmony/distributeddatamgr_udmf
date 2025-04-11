@@ -28,6 +28,7 @@
 #include "pixel_map.h"
 #include "string_ex.h"
 #include "want.h"
+#include "unified_key.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -607,7 +608,9 @@ public:
     static bool API_EXPORT IsPersist(const Intention &intention);
     static bool API_EXPORT IsPersist(const std::string &intention);
     static Intention API_EXPORT GetIntentionByString(const std::string &intention);
-    static bool API_EXPORT IsValidOptions(const std::string &key, std::string &intention);
+    static bool API_EXPORT IsValidOptions(UnifiedKey &key, const std::string &intention);
+    static bool API_EXPORT IsValidOptions(UnifiedKey &key, const std::string &intention,
+        const std::string &validIntention);
 };
 
 struct Object;

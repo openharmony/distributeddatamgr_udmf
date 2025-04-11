@@ -658,21 +658,43 @@ Intention UnifiedDataUtils::GetIntentionByString(const std::string &intention)
     return UD_INTENTION_BUTT;
 }
 
-bool UnifiedDataUtils::IsValidOptions(const std::string &key, std::string &intention)
+bool UnifiedDataUtils::IsValidOptions(UnifiedKey &key, const std::string &intention,
+    const std::string &validIntention)
 {
-    UnifiedKey unifiedKey(key);
-    auto isValidKey = unifiedKey.IsValid();
-    if (key.empty() && IsPersist(intention)) {
-        return true;
+    if (key.key.empty() && intention.empty()) {
+        return false;
     }
-    if (intention.empty() && isValidKey && IsPersist(unifiedKey.intention)) {
-        return true;
+    bool isIntentionValid = intention.empty() || intention == validIntention;
+    if (!isIntentionValid) {
+        return false;
     }
-    if (isValidKey && unifiedKey.intention == intention && IsPersist(intention)) {
-        intention = "";
-        return true;
+    bool isValidKey = key.key.empty() || (key.IsValid() && key.intention == validIntention);
+    if (!isValidKey) {
+        return false;
     }
-    return false;
+    return true;
+}
+
+bool UnifiedDataUtils::IsValidOptions(UnifiedKey &key, const std::string &intention)
+{
+    if (key.key.empty() && intention.empty()) {
+        return false;
+    }
+
+    bool isIntentionValid = intention.empty() || IsPersist(intention);
+    if (!isIntentionValid) {
+        return false;
+    }
+
+    bool isValidKey = key.key.empty() || (key.IsValid() && IsPersist(key.intention));
+    if (!isValidKey) {
+        return false;
+    }
+
+    if (!key.key.empty() && !intention.empty()) {
+        return key.intention == intention;
+    }
+    return true;
 }
 
 std::shared_ptr<Object> ObjectUtils::ConvertToObject(UDDetails &details)
