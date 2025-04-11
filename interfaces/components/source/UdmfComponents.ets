@@ -225,11 +225,8 @@ export struct ContentFormCard {
 
   initCardScale(widthScale: number, defaultWidth: number, defaultHeight: number): void {
     let minScale = this.formType === FormType.TYPE_SMALL ? SMALL_MIN_CARD_SCALE : MIN_CARD_SCALE;
-    let densityScale = DEFAULT_DENSITY / display.getPrimaryDisplaySync().densityPixels;
-    let maxScale = MAX_CARD_SCALE * densityScale;
-    minScale = minScale * densityScale;
-    if (widthScale > maxScale) {
-      this.cardScale = maxScale;
+    if (widthScale > MAX_CARD_SCALE) {
+      this.cardScale = MAX_CARD_SCALE;
     } else if (widthScale < minScale) {
       this.cardScale = minScale;
     } else {
