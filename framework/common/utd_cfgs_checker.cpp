@@ -70,7 +70,7 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
                 return false;
             }
         }
-    } catch (const std::regex_error) {
+    } catch (const std::regex_error& e) {
         LOG_ERROR(UDMF_CLIENT, "catch regex_error, bundleName: %{public}s.", bundleName.c_str());
         return false;
     }
