@@ -65,7 +65,7 @@ SystemDefinedPixelMap::SystemDefinedPixelMap(UDType type, ValueType value) : Sys
 void SystemDefinedPixelMap::SetPixelMapDetails(const std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
 {
     details_["width"] = pixelMap->GetWidth();
-    details_["heigth"] = pixelMap->GetHeight();
+    details_["height"] = pixelMap->GetHeight();
     details_["pixel-format"] = static_cast<int32_t>(pixelMap->GetPixelFormat());
     details_["alpha-type"] = static_cast<int32_t>(pixelMap->GetAlphaType());
 }
