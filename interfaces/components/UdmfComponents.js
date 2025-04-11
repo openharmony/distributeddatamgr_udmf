@@ -382,11 +382,8 @@ export class ContentFormCard extends ViewPU {
 
     initCardScale(n2, o2, q2) {
         let r2 = this.formType === FormType.TYPE_SMALL ? a1 : u;
-        let r3 = q3 / display.getDefaultDisplaySync().densityPixels;
-        let s3 = t * r3;
-        r2 = r2 * r3;
-        if (n2 > s3) {
-            this.cardScale = s3;
+        if (n2 > t) {
+            this.cardScale = t;
         } else if (n2 < r2) {
             this.cardScale = r2;
         } else {
