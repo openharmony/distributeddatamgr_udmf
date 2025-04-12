@@ -14,6 +14,8 @@
  */
 #define LOG_TAG "JSAbility"
 
+#include <memory>
+
 #include "aip_log.h"
 #include "extension_context.h"
 #include "js_ability.h"
@@ -27,6 +29,7 @@ Context::Context(std::shared_ptr<AbilityRuntime::Context> stageContext)
     isStageMode_ = true;
     databaseDir_ = stageContext->GetDatabaseDir();
     bundleName_ = stageContext->GetBundleName();
+    cacheDir_ = stageContext->GetCacheDir();
     area_ = stageContext->GetArea();
     auto hapInfo = stageContext->GetHapModuleInfo();
     if (hapInfo != nullptr) {
@@ -57,6 +60,7 @@ Context::Context(std::shared_ptr<AbilityRuntime::Context> stageContext)
 Context::Context(std::shared_ptr<AbilityRuntime::AbilityContext> abilityContext)
 {
     databaseDir_ = abilityContext->GetDatabaseDir();
+    cacheDir_ = abilityContext->GetCacheDir();
     bundleName_ = abilityContext->GetBundleName();
     area_ = abilityContext->GetArea();
     auto abilityInfo = abilityContext->GetAbilityInfo();
@@ -68,6 +72,11 @@ Context::Context(std::shared_ptr<AbilityRuntime::AbilityContext> abilityContext)
 std::string Context::GetDatabaseDir()
 {
     return databaseDir_;
+}
+
+std::string Context::GetCacheDir()
+{
+    return cacheDir_;
 }
 
 int Context::GetSystemDatabaseDir(const std::string &dataGroupId, std::string &databaseDir)
