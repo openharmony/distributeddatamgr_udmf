@@ -15,6 +15,7 @@
 
 #include "aip_napi_utils.h"
 
+#include <charconv>
 #include <dlfcn.h>
 
 #include "js_ability.h"
@@ -878,9 +879,10 @@ static napi_status ConvertRerankChannelParams(napi_env env, const napi_value &in
         std::string keyStr;
         status = AipNapiUtils::Convert2Value(env, keyNapi, keyStr);
         LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the channelType in parameters.", napi_invalid_arg);
-        int32_t keyInt = std::stoi(keyStr);
-        LOG_ERROR_RETURN(keyInt >= TsChannelType::VECTOR_DATABASE && keyInt <= TsChannelType::INVERTED_INDEX_DATABASE,
-            "channelType is ileagl.", napi_invalid_arg);
+        int32_t keyInt;
+        auto result = std::from_chars(keyStr.data(), keyStr.data() + keyStr.size(), keyInt);
+        LOG_ERROR_RETURN(result.ec == std::errc() && keyInt >= TsChannelType::VECTOR_DATABASE &&
+            keyInt <= TsChannelType::INVERTED_INDEX_DATABASE, "channelType is ileagl.", napi_invalid_arg);
         napi_value valueNapi;
         napi_get_property(env, parametersNapi, keyNapi, &valueNapi);
         std::shared_ptr<ChannelRerankParamsStruct> channelParams;

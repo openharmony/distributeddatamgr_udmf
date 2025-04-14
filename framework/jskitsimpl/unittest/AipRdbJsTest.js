@@ -116,13 +116,11 @@ describe('AipJSTest', function () {
       }
       let data = array.toString();
       insertSQL = "INSERT INTO vector_table VALUES('" + i + "', '大模型系统概述', '[" + data + "]', '生成式AI, 人工智能, 大模型', '[" + data + "]', '[" + data + "]', '[" + data + "]');";
-      console.info(TAG + 'insertVectorDB insertSQL::' + insertSQL);
       await rdbStore1.execute(insertSQL, 0, undefined);
     }
     let arraySpecial = new Array(128).fill(0.1);
     let dataSpecial = arraySpecial.toString();
     let insertSQLSpecial = "INSERT INTO vector_table VALUES('5', '大模型系统概述', '[" + dataSpecial + "]', '生成式AI, 人工智能, 大模型', '[" + dataSpecial + "]', '[" + dataSpecial + "]', '[" + dataSpecial + "]');";
-    console.info(TAG + 'insertVectorDB insertSQL::' + insertSQLSpecial);
     await rdbStore1.execute(insertSQLSpecial, 0, undefined);
   }
 
