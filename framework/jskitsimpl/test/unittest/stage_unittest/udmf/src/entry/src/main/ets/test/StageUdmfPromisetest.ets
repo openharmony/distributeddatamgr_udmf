@@ -29,18 +29,16 @@ export default function stageUdmfPromiseJsTest() {
     afterAll(async function () {
       console.info('afterAll');
     })
-    console.log(TAG + "*************Unit Test End*************");
-  })
 
-  /**
-     * @tc.number    : SUB_DistributedData_UDMF_SDK_UnifiedDataPromiseJsAPITest_0100
-     * @tc.name      : unifiedDataChannel insertData promise interface test
-     * @tc.desc      : unifiedDataChannel insertData promise interface test.
-     * @tc.size      : MEDIUM
-     * @tc.type      : Function
-     * @tc.level     : Level 3
-     */
-    it('SUB_DistributedData_UDMF_SDK_UnifiedDataPromiseJsAPITest_0100', TestType.FUNCTION | Size.MEDIUMTEST | Level.LEVEL3, (done: Function) => {
+    /**
+      * @tc.number    : SUB_DistributedData_UDMF_SDK_UnifiedDataPromiseJsAPITest_0100
+      * @tc.name      : unifiedDataChannel insertData promise interface test
+      * @tc.desc      : unifiedDataChannel insertData promise interface test.
+      * @tc.size      : MEDIUM
+      * @tc.type      : Function
+      * @tc.level     : Level 3
+      */
+    it('SUB_DistributedData_UDMF_SDK_UnifiedDataPromiseJsAPITest_0100', 0, (done) => {
       let Options:unifiedDataChannel.Options = {}
       let plainText = new unifiedDataChannel.PlainText();
       plainText.textContent = 'this is textContent';
@@ -61,4 +59,6 @@ export default function stageUdmfPromiseJsTest() {
         done();
       }
     })
+    console.log(TAG + "*************Unit Test End*************");
+  })
 }
