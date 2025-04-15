@@ -39,13 +39,13 @@ export default function stageUdmfPromiseJsTest() {
       * @tc.level     : Level 3
       */
     it('SUB_DistributedData_UDMF_SDK_UnifiedDataPromiseJsAPITest_0100', 0, (done) => {
-      let Options:unifiedDataChannel.Options = {}
+      let options: unifiedDataChannel.Options = {}
       let plainText = new unifiedDataChannel.PlainText();
       plainText.textContent = 'this is textContent';
       let unifiedData = new unifiedDataChannel.UnifiedData(plainText);
       try {
-        unifiedDataChannel.insertData(Options, unifiedData).then((data) => {
-          console.info(TAG + `data = ${data}, options = ${Options}`);
+        unifiedDataChannel.insertData(options, unifiedData).then((data) => {
+          console.info(TAG + `data = ${data}, options = ${options}`);
           expect().assertFail();
           done();
         }).catch((err:BusinessError) => {

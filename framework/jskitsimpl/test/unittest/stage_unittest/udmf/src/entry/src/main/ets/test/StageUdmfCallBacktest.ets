@@ -39,14 +39,14 @@ export default function stageUdmfCallbackJsTest() {
      * @tc.level     : Level 3
      */
     it('SUB_DistributedData_UDMF_SDK_UnifiedDataCallbackJsAPITest_0100', 0, (done) => {
-      let Options:unifiedDataChannel.Options = {}
+      let options: unifiedDataChannel.Options = {}
       let plainText = new unifiedDataChannel.PlainText();
       plainText.textContent = 'this is textContent';
       let unifiedData = new unifiedDataChannel.UnifiedData(plainText);
       try {
-        unifiedDataChannel.insertData(Options, unifiedData, (err, data) => {
+        unifiedDataChannel.insertData(options, unifiedData, (err, data) => {
           if (err === undefined) {
-            console.info(TAG + `data = ${data}, options = ${Options}`);
+            console.info(TAG + `data = ${data}, options = ${options}`);
             expect(err === undefined).assertFail();
             done();
           } else {
