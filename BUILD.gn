@@ -36,6 +36,7 @@ group("unittest") {
   deps = [
     "framework/common/unittest:unittest",
     "framework/innerkitsimpl/test/unittest:unittest",
+    "framework/jskitsimpl/test:stage_unittest",
     "framework/jskitsimpl/unittest:unittest",
     "framework/ndkimpl/unittest:unittest",
   ]
