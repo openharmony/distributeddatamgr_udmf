@@ -511,6 +511,7 @@ ohos_unittest("UnifiedDataTest") {
   module_out_path = module_output_path
 
   sources = [
+    "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "unified_data_test.cpp",

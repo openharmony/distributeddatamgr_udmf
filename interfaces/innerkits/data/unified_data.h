@@ -58,6 +58,8 @@ public:
     uint32_t GetDataId() const;
     void SetChannelName(const std::string &name);
     std::vector<std::string> GetFileUris() const;
+    std::string API_EXPORT GetSdkVersion() const;
+    void API_EXPORT SetSdkVersion(const std::string &version);
 
     static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;
 
@@ -70,6 +72,7 @@ private:
     std::shared_ptr<Runtime> runtime_;
     std::vector<std::shared_ptr<UnifiedRecord>> records_;
     std::shared_ptr<UnifiedDataProperties> properties_;
+    std::string sdkVersion_;
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -96,6 +96,7 @@ ohos_unittest("UdmfTypesUtilAbnormalTest") {
   sources = [
     "${udmf_framework_path}/common/tlv_object.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
+    "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/common/unittest/mock/tlv_util_mock.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/getter_system.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",

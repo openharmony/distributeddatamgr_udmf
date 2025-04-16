@@ -231,8 +231,7 @@ template <> bool Reading(UnifiedKey &output, TLVObject &data, const TLVHead &hea
 
 template <> size_t CountBufferSize(const UnifiedData &input, TLVObject &data)
 {
-    std::string version = UTILS::GetCurrentSdkVersion();
-    return data.CountHead() + data.Count(version) + TLVUtil::CountBufferSize(input.GetRecords(), data);
+    return data.CountHead() + data.Count(input.GetSdkVersion()) + TLVUtil::CountBufferSize(input.GetRecords(), data);
 }
 
 template <> bool Writing(const UnifiedData &input, TLVObject &data, TAG tag)
@@ -240,8 +239,7 @@ template <> bool Writing(const UnifiedData &input, TLVObject &data, TAG tag)
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
-    std::string version = UTILS::GetCurrentSdkVersion();
-    if (!data.Write(TAG::TAG_VERSION, version)) {
+    if (!data.Write(TAG::TAG_VERSION, input.GetSdkVersion())) {
         return false;
     }
     if (!TLVUtil::Writing(input.GetRecords(), data, TAG::TAG_UNIFIED_RECORD)) {
@@ -259,7 +257,11 @@ template <> bool Reading(UnifiedData &output, TLVObject &data, const TLVHead &he
             return false;
         }
         if (headItem.tag == static_cast<uint16_t>(TAG::TAG_VERSION)) {
-            data.Skip(headItem);
+            std::string version;
+            if (!Reading(version, data, headItem)) {
+                return false;
+            }
+            output.SetSdkVersion(version);
             continue;
         }
         if (headItem.tag == static_cast<uint16_t>(TAG::TAG_UNIFIED_RECORD)) {
@@ -277,8 +279,7 @@ template <> bool Reading(UnifiedData &output, TLVObject &data, const TLVHead &he
 
 template <> size_t CountBufferSize(const UnifiedRecord &input, TLVObject &data)
 {
-    std::string version = UTILS::GetCurrentSdkVersion();
-    return data.CountHead() + data.Count(version) + data.CountBasic(static_cast<int32_t>(input.GetType())) +
+    return data.CountHead() + data.CountBasic(static_cast<int32_t>(input.GetType())) +
         data.Count(input.GetUid()) + CountBufferSize(input.GetOriginValue(), data) + data.Count(input.GetUtdId()) +
         CountBufferSize(input.GetInnerEntries(), data) + CountBufferSize(input.GetUris(), data);
 }
@@ -288,10 +289,6 @@ template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
-    std::string version = UTILS::GetCurrentSdkVersion();
-    if (!data.Write(TAG::TAG_VERSION, version)) {
-        return false;
-    }
     if (!data.WriteBasic(TAG::TAG_UD_TYPE, static_cast<int32_t>(input.GetType()))) {
         return false;
     }
@@ -328,9 +325,6 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
         std::shared_ptr<std::map<std::string, ValueType>> entries;
         std::vector<UriInfo> uriInfos;
         switch (headItem.tag) {
-            case static_cast<uint16_t>(TAG::TAG_VERSION):
-                data.Skip(headItem);
-                break;
             case static_cast<uint16_t>(TAG::TAG_UD_TYPE):
                 if (!TLVUtil::Reading(dataType, data, headItem)) {
                     return false;
@@ -376,14 +370,13 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
 
 template <> size_t CountBufferSize(const Runtime &input, TLVObject &data)
 {
-    std::string version = UTILS::GetCurrentSdkVersion();
     return data.CountHead() + data.CountBasic(input.isPrivate) + data.CountBasic(input.dataVersion) +
         data.CountBasic(input.recordTotalNum) + data.CountBasic(input.tokenId) +
         data.CountBasic(static_cast<int64_t>(input.createTime)) +
         data.CountBasic(static_cast<int64_t>(input.lastModifiedTime)) +
         data.CountBasic(static_cast<int32_t>(input.dataStatus)) + data.Count(input.sourcePackage) +
         data.Count(input.createPackage) + data.Count(input.deviceId) + TLVUtil::CountBufferSize(input.key, data) +
-        data.Count(version) + TLVUtil::CountBufferSize(input.privileges, data);
+        data.Count(input.sdkVersion) + TLVUtil::CountBufferSize(input.privileges, data);
 }
 
 template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
@@ -391,10 +384,6 @@ template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
-    std::string version = UTILS::GetCurrentSdkVersion();
-    if (!TLVUtil::Writing(version, data, TAG::TAG_VERSION)) {
-        return false;
-    }
     if (!TLVUtil::Writing(input.key, data, TAG::TAG_KEY)) {
         return false;
     }
@@ -429,6 +418,9 @@ template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
         return false;
     }
     if (!data.WriteBasic(TAG::TAG_TOKEN_ID, input.tokenId)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.sdkVersion, data, TAG::TAG_VERSION)) {
         return false;
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
@@ -483,6 +475,9 @@ template <> bool Reading(Runtime &output, TLVObject &data, const TLVHead &head)
                 break;
             case static_cast<uint16_t>(TAG::TAG_TOKEN_ID):
                 result = data.ReadBasic(output.tokenId, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_VERSION):
+                result = data.Read(output.sdkVersion, headItem);
                 break;
             default:
                 result = data.Skip(headItem);
@@ -732,6 +727,51 @@ template <> bool Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &
         return false;
     }
     output = std::shared_ptr<OHOS::AAFwk::Want>(want);
+    return true;
+}
+
+template <> size_t CountBufferSize(const Summary &input, TLVObject &data)
+{
+    return data.CountHead() + CountBufferSize(input.summary, data) + data.CountBasic(input.totalSize);
+}
+
+template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    auto tagCursor = data.GetCursor();
+    data.OffsetHead();
+    if (!TLVUtil::Writing(input.summary, data, TAG::TAG_SUMMARY_MAP)) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_SUMMARY_SIZE, input.totalSize)) {
+        return false;
+    }
+    return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
+}
+
+template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
+{
+    auto endCursor = data.GetCursor() + head.len;
+    while (data.GetCursor() < endCursor) {
+        TLVHead headItem{};
+        if (!data.ReadHead(headItem)) {
+            return false;
+        }
+        switch (headItem.tag) {
+            case static_cast<uint16_t>(TAG::TAG_SUMMARY_MAP):
+                if (!TLVUtil::Reading(output.summary, data, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_SUMMARY_SIZE):
+                if (!data.ReadBasic(output.totalSize, headItem)) {
+                    return false;
+                }
+                break;
+            default:
+                data.Skip(headItem);
+        }
+    }
     return true;
 }
 } // namespace TLVUtil
