@@ -82,7 +82,8 @@ std::string GetSdkVersionByToken(uint32_t tokenId)
 
 std::string GetCurrentSdkVersion()
 {
-    return GetSdkVersionByToken(IPCSkeleton::GetSelfTokenID());
+    static const std::string sdkVersion = GetSdkVersionByToken(IPCSkeleton::GetSelfTokenID());
+    return sdkVersion;
 }
 
 bool IsTokenNative()

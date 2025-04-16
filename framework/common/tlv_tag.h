@@ -81,6 +81,9 @@ enum class TAG : uint16_t {
     TAG_URI_AUTH,
     TAG_URI_POS,
     TAG_RECORD_URIS,
+    TAG_SUMMARY,
+    TAG_SUMMARY_MAP,
+    TAG_SUMMARY_SIZE,
 };
 }
 #endif //UDMF_TLV_TAG_H
