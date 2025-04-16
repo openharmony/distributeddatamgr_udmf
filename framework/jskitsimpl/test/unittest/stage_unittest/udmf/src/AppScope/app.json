@@ -5,7 +5,7 @@
         "versionCode":1000000,
         "versionName":"1.0.0",
         "debug":false,
-        "icon":"$media:icon",
+        "icon":"",
         "label":"$string:app_name",
         "description":"$string:description_application",
         "distributedNotificationEnabled":true,
