@@ -31,6 +31,7 @@
 #include "system_defined_pixelmap.h"
 #include "system_defined_record.h"
 #include "udmf_conversion.h"
+#include "unified_data_helper.h"
 #include "unified_meta.h"
 #include "unified_record.h"
 #include "unified_types.h"
