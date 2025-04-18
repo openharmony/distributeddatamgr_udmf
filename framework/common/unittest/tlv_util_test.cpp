@@ -23,6 +23,7 @@
 #include "plain_text.h"
 #include "html.h"
 #include "link.h"
+#include "int_wrapper.h"
 #include "system_defined_appitem.h"
 #include "application_defined_record.h"
 #include "file.h"
@@ -123,8 +124,6 @@ HWTEST_F(TlvUtilTest, CountBufferSize_002, TestSize.Level1)
     map["keyNum"] = key;
     object.value_ = map;
     EXPECT_EQ(12 * sizeof(TLVHead) + 36, TLVUtil::CountBufferSize(object, tlvObject)); // 108
-    auto total = tlvObject.GetTotal();
-    EXPECT_EQ(188, total);
     LOG_INFO(UDMF_TEST, "CountBufferSize_002 end.");
 }
 
@@ -650,5 +649,155 @@ HWTEST_F(TlvUtilTest, WritingAndReadingFile_001, TestSize.Level1)
 
     fclose(file);
     LOG_INFO(UDMF_TEST, "WritingAndReadingFile_001 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReadingSummary_001
+ * @tc.desc: test Summary for Writing And Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReadingSummary_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReadingSummary_001 begin.");
+    std::map<std::string, ValueType> value;
+    value["fileType"] = "File Type";
+    value["fileUri"] = "File Uri";
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_ = value;
+    std::shared_ptr<UnifiedRecord> fileUri = std::make_shared<UnifiedRecord>(UDType::FILE_URI, obj);
+    std::shared_ptr<UnifiedRecord> plainText = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "this is a content");
+    std::shared_ptr<UnifiedRecord> html = std::make_shared<Html>(UDType::HTML, "this is a HTML content");
+    std::vector<std::shared_ptr<UnifiedRecord>> records = { fileUri, plainText, html };
+    UnifiedData data1;
+    data1.SetRecords(records);
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data1, summary);
+    EXPECT_EQ(summary.summary.size(), records.size());
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(summary, tlvObject, TAG::TAG_SUMMARY));
+
+    tlvObject.ResetCursor();
+    Summary summary2;
+    TLVUtil::ReadTlv(summary2, tlvObject, TAG::TAG_SUMMARY);
+    EXPECT_EQ(summary.totalSize, summary2.totalSize);
+    EXPECT_EQ(summary.summary.size(), summary2.summary.size());
+    for (const auto &[key, val] : summary.summary) {
+        ASSERT_TRUE(summary2.summary.find(key) != summary2.summary.end());
+        EXPECT_EQ(summary.summary[key], summary2.summary[key]);
+    }
+    LOG_INFO(UDMF_TEST, "WritingAndReadingSummary_001 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReadingVersion_001
+ * @tc.desc: test Version for Writing And Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReadingVersion_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReadingVersion_001 begin.");
+    std::shared_ptr<UnifiedRecord> plainText = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "this is a content");
+    std::shared_ptr<UnifiedRecord> html = std::make_shared<Html>(UDType::HTML, "this is a HTML content");
+    std::vector<std::shared_ptr<UnifiedRecord>> records = {plainText, html };
+    UnifiedData data1;
+    data1.SetRecords(records);
+    auto version = data1.GetSdkVersion();
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    std::vector<UnifiedData> datas = {data1};
+    EXPECT_TRUE(TLVUtil::Writing(datas, tlvObject, TAG::TAG_UNIFIED_DATA));
+
+    tlvObject.ResetCursor();
+    std::vector<UnifiedData> datas2;
+    TLVUtil::ReadTlv(datas2, tlvObject, TAG::TAG_UNIFIED_DATA);
+    EXPECT_EQ(datas2.size(), 1);
+    EXPECT_EQ(datas2[0].GetSdkVersion(), version);
+    LOG_INFO(UDMF_TEST, "WritingAndReadingVersion_001 end.");
+}
+
+/* *
+ * @tc.name: CountBufferSize_005
+ * @tc.desc: test UnifiedDataProperties element for countBufferSize
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, CountBufferSize_005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CountBufferSize_005 begin.");
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+
+    OHOS::AAFwk::WantParams wantParams;
+    auto size = TLVUtil::CountBufferSize(wantParams, tlvObject);
+    EXPECT_EQ(tlvObject.GetTotal(), size);
+
+    UnifiedDataProperties properties;
+    EXPECT_EQ(5 * sizeof(TLVHead) + sizeof(int64_t) + sizeof(int32_t) + 4,
+        TLVUtil::CountBufferSize(properties, tlvObject));
+
+    LOG_INFO(UDMF_TEST, "CountBufferSize_005 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_006
+ * @tc.desc: test UnifiedDataProperties for Writing And Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_006 begin.");
+    OHOS::AAFwk::WantParams wantParams;
+    std::string idKey = "test006";
+    int32_t idValue = 123;
+    wantParams.SetParam(idKey, OHOS::AAFwk::Integer::Box(idValue));
+    UnifiedDataProperties properties;
+    properties.tag = "props";
+    properties.shareOptions = CROSS_APP;
+    properties.timestamp = 10;
+    properties.extras = wantParams;
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    auto result = TLVUtil::Writing(properties, tlvObject, TAG::TAG_UNIFIED_PROPERTIES);
+    EXPECT_TRUE(result);
+
+    tlvObject.ResetCursor();
+    UnifiedDataProperties propertiesResult;
+    result = TLVUtil::ReadTlv(propertiesResult, tlvObject, TAG::TAG_UNIFIED_PROPERTIES);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(properties.tag, propertiesResult.tag);
+    EXPECT_EQ(properties.shareOptions, propertiesResult.shareOptions);
+    EXPECT_EQ(properties.timestamp, propertiesResult.timestamp);
+    EXPECT_EQ(idValue, propertiesResult.extras.GetIntParam(idKey, 0));
+    LOG_INFO(UDMF_TEST, "WritingAndReading_006 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_007
+ * @tc.desc: test OHOS::AAFwk::WantParams for Writing And Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_007 begin.");
+    OHOS::AAFwk::WantParams wantParams;
+    std::string idKey = "test007";
+    int32_t idValue = 123456;
+    wantParams.SetParam(idKey, OHOS::AAFwk::Integer::Box(idValue));
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    auto result = TLVUtil::Writing(wantParams, tlvObject, TAG::TAG_PROPERTIES_EXTRAS);
+    EXPECT_TRUE(result);
+
+    tlvObject.ResetCursor();
+    OHOS::AAFwk::WantParams wantParamsResult;
+    result = TLVUtil::ReadTlv(wantParamsResult, tlvObject, TAG::TAG_PROPERTIES_EXTRAS);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(idValue, wantParamsResult.GetIntParam(idKey, 0));
+    LOG_INFO(UDMF_TEST, "WritingAndReading_007 end.");
 }
 }

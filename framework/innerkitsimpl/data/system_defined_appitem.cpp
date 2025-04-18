@@ -37,7 +37,6 @@ SystemDefinedAppItem::SystemDefinedAppItem(UDType type, ValueType value) : Syste
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
         }
-        hasObject_ = true;
     }
 }
 

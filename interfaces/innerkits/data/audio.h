@@ -25,6 +25,7 @@ public:
     API_EXPORT Audio();
     explicit API_EXPORT Audio(const std::string &uri);
     API_EXPORT Audio(UDType type, ValueType value);
+    void InitObject() override;
 };
 } // namespace UDMF
 } // namespace OHOS

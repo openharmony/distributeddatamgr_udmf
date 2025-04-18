@@ -23,6 +23,7 @@ static const std::set<std::string> FILE_TYPES = {
     "general.file", "general.image", "general.video", "general.audio", "general.folder", "general.file-uri" };
 static const std::set<std::string> FILE_SUB_TYPES = {
     "general.image", "general.video", "general.audio", "general.folder" };
+static constexpr const char *RECORDS_TANSFER_TAG = "records_to_entries_data_format";
 UnifiedData::UnifiedData()
 {
     properties_ = std::make_shared<UnifiedDataProperties>();
@@ -109,9 +110,7 @@ std::vector<std::string> UnifiedData::GetTypesLabels() const
 {
     std::vector<std::string> types;
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
-        std::vector<std::string> recordTypes = record->GetTypes();
-        types.insert(types.end(),
-            std::make_move_iterator(recordTypes.begin()), std::make_move_iterator(recordTypes.end()));
+        types.push_back(UtdUtils::GetUtdIdFromUtdEnum(record->GetType()));
     }
     return types;
 }
@@ -274,7 +273,7 @@ std::set<std::string> UnifiedData::GetTypIds() const
 {
     std::set<std::string> types;
     for (const auto &record : records_) {
-        std::set<std::string> recordTypes = record->GetUtdIds();
+        std::set<std::string> recordTypes = record->GetUtdIdsWithAddFileType();
         types.insert(recordTypes.begin(), recordTypes.end());
     }
     return types;
@@ -301,6 +300,42 @@ std::string UnifiedData::GetSdkVersion() const
 void UnifiedData::SetSdkVersion(const std::string &version)
 {
     sdkVersion_ = version;
+}
+
+bool UnifiedData::IsNeedTransferToEntries() const
+{
+    if (records_.size() <= 1) {
+        return false;
+    }
+    if (properties_ == nullptr) {
+        return false;
+    }
+    return properties_->tag == RECORDS_TANSFER_TAG;
+}
+
+void UnifiedData::ConvertRecordsToEntries()
+{
+    if (!IsNeedTransferToEntries()) {
+        return;
+    }
+    std::shared_ptr<UnifiedRecord> recordFirst = records_[0];
+    if (recordFirst == nullptr) {
+        LOG_ERROR(UDMF_FRAMEWORK, "First record is null");
+        return;
+    }
+    for (size_t i = 1; i < records_.size(); i++) {
+        auto record = records_[i];
+        if (record == nullptr) {
+            continue;
+        }
+        if (record->GetUtdId2() == recordFirst->GetUtdId2()) {
+            continue;
+        }
+        record->InitObject();
+        recordFirst->AddEntry(record->GetUtdId2(), record->GetValue());
+    }
+    records_.erase(records_.begin() + 1, records_.end());
+    LOG_INFO(UDMF_FRAMEWORK, "Convert records to entries finished");
 }
 } // namespace UDMF
 } // namespace OHOS

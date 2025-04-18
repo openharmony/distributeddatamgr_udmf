@@ -61,7 +61,7 @@ namespace UDMF {
 
         private:
             std::shared_ptr<UDMF::UnifiedRecord> unifiedRecord_;
-            int64_t pixelMapId_ = 0;
+            int64_t pixelMapId_;
     };
 
 }

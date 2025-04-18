@@ -32,6 +32,7 @@ napi_value UnifiedDataChannelNapi::UnifiedDataChannelInit(napi_env env, napi_val
         DECLARE_NAPI_FUNCTION("updateData", UpdateData),
         DECLARE_NAPI_FUNCTION("queryData", QueryData),
         DECLARE_NAPI_FUNCTION("deleteData", DeleteData),
+        DECLARE_NAPI_FUNCTION("convertRecordsToEntries", ConvertRecordsToEntries),
         DECLARE_NAPI_GETTER("ShareOptions", CreateShareOptions),
         DECLARE_NAPI_FUNCTION("setAppShareOptions", SetAppShareOptions),
         DECLARE_NAPI_FUNCTION("removeAppShareOptions", RemoveAppShareOptions),
@@ -170,8 +171,9 @@ napi_value UnifiedDataChannelNapi::QueryData(napi_env env, napi_callback_info in
         intentionStatus = GetNamedProperty(env, options, "intention", intention);
         ASSERT_BUSINESS_ERR(ctxt, UnifiedDataUtils::GetIntentionByString(intention) != UD_INTENTION_DRAG,
             E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid");
+        UnifiedKey key(ctxt->key);
         ASSERT_BUSINESS_ERR(ctxt, (keyStatus == napi_ok || intentionStatus == napi_ok) &&
-            UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
+            UnifiedDataUtils::IsValidOptions(key, intention),
             E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
     };
     ctxt->GetCbInfo(env, info, input);
@@ -215,9 +217,10 @@ napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info i
         ASSERT_BUSINESS_ERR(ctxt, intention.empty() ||
             UnifiedDataUtils::GetIntentionByString(intention) == UD_INTENTION_DATA_HUB,
             E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid");
+        UnifiedKey key(ctxt->key);
         ASSERT_BUSINESS_ERR(ctxt,
             (keyStatus == napi_ok || intentionStatus == napi_ok) &&
-                UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
+                UnifiedDataUtils::IsValidOptions(key, intention),
             E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
     };
     ctxt->GetCbInfo(env, info, input);
@@ -237,6 +240,28 @@ napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info i
         ASSERT_WITH_ERRCODE(ctxt, ctxt->status == napi_ok, E_ERROR, "ConvertUnifiedDataSetToNapi failed!");
     };
     return NapiQueue::AsyncWork(env, ctxt, std::string(__FUNCTION__), execute, output);
+}
+
+napi_value UnifiedDataChannelNapi::ConvertRecordsToEntries(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "ConvertRecordsToEntries is called!");
+    struct ConvertContext : public ContextBase {
+        std::shared_ptr<UnifiedData> unifiedData;
+    };
+    UnifiedDataNapi *unifiedDataNapi = nullptr;
+    auto ctxt = std::make_shared<ConvertContext>();
+    auto input = [env, ctxt, &unifiedDataNapi](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc == 1,
+            E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ctxt->status = napi_unwrap(env, argv[0], reinterpret_cast<void **>(&unifiedDataNapi));
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "Parameter error: parameter data type must be UnifiedData");
+    };
+    ctxt->GetCbInfo(env, info, input);
+    ASSERT_NULL(!ctxt->isThrowError, "ConvertRecordsToEntries Exit");
+    ctxt->unifiedData = unifiedDataNapi->value_;
+    ctxt->unifiedData->ConvertRecordsToEntries();
+    return nullptr;
 }
 
 napi_status UnifiedDataChannelNapi::GetNamedProperty(napi_env env, napi_value &obj, const std::string &key,
@@ -357,6 +382,7 @@ napi_status UnifiedDataChannelNapi::ConvertUnifiedDataSetToNapi(
     for (const UnifiedData &data : dataSet) {
         std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
         unifiedData->SetRecords(data.GetRecords());
+        unifiedData->SetProperties(data.GetProperties());
         napi_value dataNapi = nullptr;
         UnifiedDataNapi::NewInstance(env, unifiedData, dataNapi);
         status = napi_set_element(env, output, index++, dataNapi);

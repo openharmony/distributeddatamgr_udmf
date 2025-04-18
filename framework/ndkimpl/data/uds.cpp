@@ -16,7 +16,6 @@
 
 #include "uds.h"
 #include "logger.h"
-#include "securec.h"
 #include "unified_meta.h"
 #include "udmf_capi_common.h"
 #include "udmf_meta.h"

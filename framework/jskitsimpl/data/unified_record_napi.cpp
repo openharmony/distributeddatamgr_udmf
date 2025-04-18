@@ -276,9 +276,13 @@ napi_value UnifiedRecordNapi::AddEntry(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
     auto uRecord = static_cast<UnifiedRecordNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (uRecord != nullptr && uRecord->value_ != nullptr), Status::E_ERROR, "invalid object!");
-    ValueType value;
-    GetNativeValue(env, type, napiValue, value);
-    uRecord->value_->AddEntry(type, std::move(value));
+    if (uRecord->value_->GetType() == UD_BUTT) {
+        uRecord->value_ = GenerateNativeRecord(env, type, napiValue);
+    } else {
+        ValueType value;
+        GetNativeValue(env, type, napiValue, value);
+        uRecord->value_->AddEntry(type, std::move(value));
+    }
     return nullptr;
 }
 

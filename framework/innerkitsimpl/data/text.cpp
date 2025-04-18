@@ -35,7 +35,6 @@ Text::Text(UDType type, ValueType value) : UnifiedRecord(type, value)
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
         }
-        hasObject_ = true;
     }
 }
 

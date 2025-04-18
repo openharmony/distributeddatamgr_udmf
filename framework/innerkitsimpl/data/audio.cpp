@@ -20,18 +20,30 @@ namespace UDMF {
 Audio::Audio() : Audio("")
 {
     SetType(AUDIO);
-    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(AUDIO);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Audio::Audio(const std::string &uri) : File(uri)
 {
     SetType(AUDIO);
-    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(AUDIO);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Audio::Audio(UDType type, ValueType value) : File(type, value)
 {
     SetType(AUDIO);
+    utdId2_ = GENERAL_FILE_URI;
+}
+
+void Audio::InitObject()
+{
+    File::InitObject();
+    auto object = std::get<std::shared_ptr<Object>>(value_);
+    if (!fileType_.empty()) {
+        object->value_[FILE_TYPE] = fileType_;
+    } else {
+        object->value_[FILE_TYPE] = "general.audio";
+    }
 }
 } // namespace UDMF
 } // namespace OHOS

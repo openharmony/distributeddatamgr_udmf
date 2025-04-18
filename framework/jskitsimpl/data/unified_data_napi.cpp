@@ -107,10 +107,28 @@ napi_status UnifiedDataNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedDa
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataNapi");
     ASSERT_CALL_STATUS(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *unifiedData = new (std::nothrow) UnifiedDataNapi();
-    ASSERT_ERR_STATUS(env, unifiedData != nullptr, Status::E_ERROR, "no memory for unified data!");
+
+    UnifiedDataNapi* unifiedData = nullptr;
+    napi_status status = napi_unwrap(env, out, reinterpret_cast<void **>(&unifiedData));
+    if (status != napi_ok || unifiedData == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_unwrap unifiedData failed, status=%{public}d", status);
+        return status;
+    }
     unifiedData->value_ = in;
-    ASSERT_CALL_DELETE_STATUS(env, napi_wrap(env, out, unifiedData, Destructor, nullptr, nullptr), unifiedData);
+
+    napi_value value;
+    status = napi_get_reference_value(env, unifiedData->propertyRef_, &value);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_get_reference_value propertyRef failed, status=%{public}d", status);
+        return status;
+    }
+    UnifiedDataPropertiesNapi* propertiesNapi = nullptr;
+    status = napi_unwrap(env, value, reinterpret_cast<void **>(&propertiesNapi));
+    if (status != napi_ok || propertiesNapi == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_unwrap propertiesNapi failed, status=%{public}d", status);
+        return status;
+    }
+    propertiesNapi->value_ = in->GetProperties();
     return napi_ok;
 }
 
@@ -287,6 +305,7 @@ napi_value UnifiedDataNapi::GetProperties(napi_env env, napi_callback_info info)
     napi_value value;
     auto uData = GetUnifiedData(env, info);
     ASSERT_ERR(env, (uData != nullptr && uData->value_ != nullptr), Status::E_ERROR, "invalid object!");
+    ASSERT_ERR(env, (uData != nullptr && uData->propertyRef_ != nullptr), Status::E_ERROR, "invalid properties!");
     NAPI_CALL(env, napi_get_reference_value(env, uData->propertyRef_, &value));
     return value;
 }

@@ -26,6 +26,9 @@ static constexpr UDType FILE_TYPES[] = {FILE, AUDIO, FOLDER, IMAGE, VIDEO};
 static constexpr const char *FILE_SCHEME = "file";
 static const std::set<std::string> FILE_SUB_TYPES = {
     "general.image", "general.video", "general.audio", "general.folder" };
+static constexpr UDType UDC_RECORDS[] = {APPLICATION_DEFINED_RECORD, AUDIO, FILE, FOLDER, HTML, IMAGE, HYPERLINK,
+    PLAIN_TEXT, SYSTEM_DEFINED_APP_ITEM, SYSTEM_DEFINED_FORM, SYSTEM_DEFINED_PIXEL_MAP, SYSTEM_DEFINED_RECORD,
+    TEXT, VIDEO};
 
 UnifiedRecord::UnifiedRecord()
 {
@@ -36,15 +39,19 @@ UnifiedRecord::UnifiedRecord(UDType type)
 {
     dataType_ = type;
     utdId_ = UtdUtils::GetUtdIdFromUtdEnum(type);
+    utdId2_ = utdId_;
 }
 
 UnifiedRecord::UnifiedRecord(UDType type, ValueType value)
 {
     dataType_ = type;
     utdId_ = UtdUtils::GetUtdIdFromUtdEnum(type);
+    utdId2_ = utdId_;
     value_ = value;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        hasObject_ = true;
+        if (utdId_ == GENERAL_FILE_URI) {
+            ObjectUtils::ProcessFileUriType(dataType_, value_);
+        }
     }
 }
 
@@ -59,7 +66,7 @@ std::vector<std::string> UnifiedRecord::GetTypes() const
     for (auto it = entries_->begin(); it != entries_->end(); it++) {
         types.push_back(it->first);
     }
-    types.push_back(utdId_);
+    types.push_back(utdId2_);
     return types;
 }
 
@@ -67,6 +74,7 @@ void UnifiedRecord::SetType(const UDType &type)
 {
     dataType_ = type;
     utdId_ = UtdUtils::GetUtdIdFromUtdEnum(type);
+    utdId2_ = utdId_;
 }
 
 int64_t UnifiedRecord::GetSize()
@@ -110,16 +118,17 @@ bool UnifiedRecord::HasType(const std::string &utdId) const
     if (entries_->find(utdId) != entries_->end()) {
         return true;
     }
-    return utdId == utdId_;
+    return utdId == utdId2_;
 }
 
 void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
 {
     std::lock_guard<std::recursive_mutex> lock(mutex_);
-    if (utdId == utdId_ || utdId_.empty()) {
+    if (utdId == utdId2_ || utdId2_.empty()) {
         utdId_ = utdId;
+        utdId2_ = utdId_;
         value_ = std::move(value);
-        auto udType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(utdId_));
+        auto udType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(utdId2_));
         if (udType == UD_BUTT) {
             dataType_ = APPLICATION_DEFINED_RECORD;
             return;
@@ -136,15 +145,23 @@ void UnifiedRecord::AddEntry(const std::string &utdId, ValueType &&value)
 ValueType UnifiedRecord::GetEntry(const std::string &utdId)
 {
     std::lock_guard<std::recursive_mutex> lock(mutex_);
-    if (utdId_ == utdId && !(std::holds_alternative<std::monostate>(value_))) {
-        return value_;
+    if (utdId2_ == utdId && !(std::holds_alternative<std::monostate>(value_))) {
+        auto value = value_;
+        if (!std::holds_alternative<std::shared_ptr<Object>>(value_)
+            && std::find(std::begin(UDC_RECORDS), std::end(UDC_RECORDS), dataType_) != std::end(UDC_RECORDS)) {
+            InitObject();
+            value = value_;
+            auto obj = std::get<std::shared_ptr<Object>>(value_);
+            value_ = obj->value_[VALUE_TYPE];
+        }
+        return value;
     }
     auto it = entries_->find(utdId);
     if (it != entries_->end() && !(std::holds_alternative<std::monostate>(it->second))) {
         return it->second;
     }
     auto getter = GetterSystem::GetInstance().GetGetter(channelName_);
-    if (getter != nullptr && (utdId_ == utdId || it != entries_->end())) {
+    if (getter != nullptr && (utdId2_ == utdId || it != entries_->end())) {
         auto value = getter->GetValueByType(dataId_, recordId_, utdId);
         if (std::holds_alternative<std::monostate>(value)) {
             LOG_ERROR(UDMF_FRAMEWORK, "get value failed, utdId: %{public}s", utdId.c_str());
@@ -153,21 +170,32 @@ ValueType UnifiedRecord::GetEntry(const std::string &utdId)
         AddEntry(utdId, ValueType(value));
         return value;
     }
+    if (utdId2_ == utdId && std::holds_alternative<std::monostate>(value_)) {
+        InitObject();
+        auto value = value_;
+        auto obj = std::get<std::shared_ptr<Object>>(value_);
+        value_ = obj->value_[VALUE_TYPE];
+        if (obj->value_.size() == 1) { // value_ size equals 1 means there are no datas
+            return std::monostate();
+        } else {
+            return value;
+        }
+    }
     return std::monostate();
 }
 
 std::shared_ptr<std::map<std::string, ValueType>> UnifiedRecord::GetEntries()
 {
     auto res = std::make_shared<std::map<std::string, ValueType>>(*entries_);
-    if (!utdId_.empty()) {
+    if (!utdId2_.empty()) {
         if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
             InitObject();
             ValueType value = value_;
-            res->insert_or_assign(utdId_, std::move(value));
+            res->insert_or_assign(utdId2_, std::move(value));
             auto object = std::get<std::shared_ptr<Object>>(value_);
             value_ = object->value_[VALUE_TYPE];   // restore value_
         } else {
-            res->insert_or_assign(utdId_, value_);
+            res->insert_or_assign(utdId2_, value_);
         }
     }
     return res;
@@ -200,7 +228,19 @@ std::set<std::string> UnifiedRecord::GetUtdIds() const
     std::set<std::string> utdIds;
     if (!utdId_.empty()) {
         utdIds.emplace(utdId_);
-        if (utdId_ == GENERAL_FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+    }
+    for (const auto& [key, value] : *entries_) {
+        utdIds.emplace(key);
+    }
+    return utdIds;
+}
+
+std::set<std::string> UnifiedRecord::GetUtdIdsWithAddFileType() const
+{
+    std::set<std::string> utdIds;
+    if (!utdId2_.empty()) {
+        utdIds.emplace(utdId2_);
+        if (utdId2_ == GENERAL_FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value_)) {
             auto fileUri = std::get<std::shared_ptr<Object>>(value_);
             AddFileUriType(utdIds, fileUri);
         }
@@ -218,11 +258,22 @@ std::set<std::string> UnifiedRecord::GetUtdIds() const
 void UnifiedRecord::SetUtdId(const std::string& utdId)
 {
     utdId_ = utdId;
+    utdId2_ = utdId;
 }
 
 std::string UnifiedRecord::GetUtdId() const
 {
     return utdId_;
+}
+
+void UnifiedRecord::SetUtdId2(const std::string& utdId)
+{
+    utdId2_ = utdId;
+}
+
+std::string UnifiedRecord::GetUtdId2() const
+{
+    return utdId2_;
 }
 
 void UnifiedRecord::SetDataId(uint32_t dataId)
@@ -277,11 +328,6 @@ void UnifiedRecord::InitObject()
         auto object = std::get<std::shared_ptr<Object>>(value_);
         object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
-}
-
-bool UnifiedRecord::HasObject()
-{
-    return hasObject_;
 }
 
 bool UnifiedRecord::HasFileType(std::string &fileUri) const
