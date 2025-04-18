@@ -173,7 +173,7 @@ bool UnifiedDataHelper::SaveUDataToFile(const std::string &dataFile, UnifiedData
     UdmfConversion::InitValueObject(data);
     if (!TLVUtil::Writing(data, recordTlv, TAG::TAG_UNIFIED_DATA)) {
         LOG_ERROR(UDMF_FRAMEWORK, "TLV Writing failed!");
-		(void)fclose(file);
+        (void)fclose(file);
         return false;
     }
     (void)fclose(file);

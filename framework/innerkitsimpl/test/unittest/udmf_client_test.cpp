@@ -66,7 +66,7 @@ public:
     void AddPrivilege1(QueryOption &option);
     void CompareDetails(const UDDetails &details);
     void GetEmptyData(QueryOption &option);
-	void GetFileUriUnifiedData(UnifiedData &data);
+    void GetFileUriUnifiedData(UnifiedData &data);
 
     static constexpr int USER_ID = 100;
     static constexpr int INST_INDEX = 0;
