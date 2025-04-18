@@ -1106,10 +1106,10 @@ describe('UdmfJSTest', function () {
     expect(unifiedData.hasType(UTD.UniformDataType.HYPERLINK)).assertEqual(true);
     expect(unifiedData.hasType('openharmony.app-item')).assertEqual(true);
     let types = unifiedData.getTypes();
-    expect(types.length).assertEqual(3);
+    expect(types.length).assertEqual(1);
     expect(types.includes(textType)).assertTrue();
-    expect(types.includes(UTD.UniformDataType.HYPERLINK)).assertTrue();
-    expect(types.includes('openharmony.app-item')).assertTrue();
+    expect(types.includes(UTD.UniformDataType.HYPERLINK)).assertFalse();
+    expect(types.includes('openharmony.app-item')).assertFalse();
 
     let html = new UDC.HTML();
     unifiedData.addRecord(html);
@@ -1117,12 +1117,12 @@ describe('UdmfJSTest', function () {
     expect(unifiedData.hasType(htmlType)).assertEqual(true);
     expect(unifiedData.hasType(plaintextType)).assertEqual(false);
     types = unifiedData.getTypes();
-    expect(types.length).assertEqual(4);
+    expect(types.length).assertEqual(2);
     expect(types.includes(textType)).assertTrue();
     expect(types.includes(htmlType)).assertTrue();
     expect(types.includes(textType)).assertTrue();
-    expect(types.includes(UTD.UniformDataType.HYPERLINK)).assertTrue();
-    expect(types.includes('openharmony.app-item')).assertTrue();
+    expect(types.includes(UTD.UniformDataType.HYPERLINK)).assertFalse();
+    expect(types.includes('openharmony.app-item')).assertFalse();
   });
 
   /**
@@ -2293,8 +2293,8 @@ describe('UdmfJSTest', function () {
 
     let unifiedData = new UDC.UnifiedData(record);
     let rawDataTypes = unifiedData.getTypes();
-    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
-    expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(rawDataTypes.includes('general.image')).assertTrue();
+    expect(rawDataTypes.includes('openharmony.pixel-map')).assertFalse();
     expect(unifiedData.hasType('general.file-uri')).assertTrue();
     expect(unifiedData.hasType('general.image')).assertTrue();
     expect(unifiedData.hasType('general.jpeg')).assertTrue();
@@ -2312,7 +2312,7 @@ describe('UdmfJSTest', function () {
           expect(getRecordTypes.includes('openharmony.pixel-map')).assertTrue();
 
           let getDataTypes = data[0].getTypes();
-          expect(getDataTypes.includes('general.file-uri')).assertTrue();
+          expect(getDataTypes.includes('general.image')).assertTrue();
           for (let i = 0; i < records.length; i++) {
             if (records[i].getType() === 'general.image') {
               let getImageUri = records[i].imageUri;
@@ -2399,7 +2399,7 @@ describe('UdmfJSTest', function () {
 
     let unifiedData = new UDC.UnifiedData(record);
     let rawDataTypes = unifiedData.getTypes();
-    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
+    expect(rawDataTypes.includes('general.image')).assertTrue();
     expect(unifiedData.hasType('general.file-uri')).assertTrue();
     expect(unifiedData.hasType('general.image')).assertTrue();
     try {
@@ -2417,7 +2417,7 @@ describe('UdmfJSTest', function () {
           expect(rawRecordTypes.includes('general.file-uri')).assertTrue();
 
           let rawDataTypes = data[0].getTypes();
-          expect(rawDataTypes.includes('general.file-uri')).assertTrue();
+          expect(rawDataTypes.includes('general.image')).assertTrue();
           for (let i = 0; i < records.length; i++) {
             if (records[i].getType() === 'general.image') {
               let getImageUri = records[i].imageUri;
@@ -2506,17 +2506,17 @@ describe('UdmfJSTest', function () {
     record.addEntry('openharmony.pixel-map', pixelMap);
     record.addEntry('general.file-uri', fileUri);
     let rawType = record.getType();
-    expect(rawType).assertEqual('general.file');
+    expect(rawType).assertEqual('general.image');
     let rawRecordTypes = record.getTypes();
-    expect(rawRecordTypes.includes('general.file')).assertTrue();
+    expect(rawRecordTypes.includes('general.file')).assertFalse();
     expect(rawRecordTypes.includes('general.file-uri')).assertTrue();
     expect(rawRecordTypes.includes('openharmony.pixel-map')).assertTrue();
 
     let unifiedData = new UDC.UnifiedData(record);
     let rawDataTypes = unifiedData.getTypes();
-    expect(rawDataTypes.includes('general.file')).assertTrue();
-    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
-    expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(rawDataTypes.includes('general.image')).assertTrue();
+    expect(rawDataTypes.includes('general.file-uri')).assertFalse();
+    expect(rawDataTypes.includes('openharmony.pixel-map')).assertFalse();
     expect(unifiedData.hasType('general.file-uri')).assertTrue();
     expect(unifiedData.hasType('general.image')).assertTrue();
     expect(unifiedData.hasType('general.jpeg')).assertTrue();
@@ -2528,16 +2528,16 @@ describe('UdmfJSTest', function () {
           console.info(TAG, 'query success.');
           let records = data[0].getRecords();
           let rawType = records[0].getType();
-          expect(rawType).assertEqual('general.file');
+          expect(rawType).assertEqual('general.image');
           let getRecordTypes = records[0].getTypes();
-          expect(getRecordTypes.includes('general.file')).assertTrue();
+          expect(getRecordTypes.includes('general.file')).assertFalse();
           expect(getRecordTypes.includes('general.file-uri')).assertTrue();
           expect(getRecordTypes.includes('openharmony.pixel-map')).assertTrue();
 
           let getDataTypes = data[0].getTypes();
-          expect(rawDataTypes.includes('general.file')).assertTrue();
-          expect(getDataTypes.includes('general.file-uri')).assertTrue();
-          expect(getDataTypes.includes('openharmony.pixel-map')).assertTrue();
+          expect(getDataTypes.includes('general.image')).assertTrue();
+          expect(getDataTypes.includes('general.file-uri')).assertFalse();
+          expect(getDataTypes.includes('openharmony.pixel-map')).assertFalse();
           for (let i = 0; i < records.length; i++) {
             if (records[i].getType() === 'general.file') {
               let getUri = records[i].uri;
@@ -2545,7 +2545,10 @@ describe('UdmfJSTest', function () {
             }
           }
           let getValue = records[0].getValue();
-          expect(getValue).assertEqual(undefined);
+          expect(getValue.uniformDataType).assertEqual('general.file-uri');
+          expect(getValue.oriUri).assertEqual('www.xx.com');
+          expect(getValue.fileType).assertEqual('general.jpeg');
+          expect(getValue.details.fileUriKey1).assertEqual(123);
 
           let getEntryFileUri = records[0].getEntry('general.file-uri');
           expect(getEntryFileUri.uniformDataType).assertEqual('general.file-uri');
@@ -2633,11 +2636,13 @@ describe('UdmfJSTest', function () {
     expect(rawRecordTypes.includes('openharmony.pixel-map')).assertTrue();
     let unifiedData = new UDC.UnifiedData(record);
     let rawDataTypes = unifiedData.getTypes();
-    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
-    expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(rawDataTypes.includes('general.video')).assertTrue();
+    expect(rawDataTypes.includes('openharmony.pixel-map')).assertFalse();
     expect(unifiedData.hasType('general.file-uri')).assertTrue();
     expect(unifiedData.hasType('general.video')).assertTrue();
     expect(unifiedData.hasType('general.vob')).assertTrue();
+    let records = unifiedData.getRecords();
+    expect(records.length).assertEqual(1);
     try {
       UDC.insertData(optionsValid, unifiedData).then((data) => {
         console.info(TAG, `insert success. The key: ${data}`);
@@ -2652,8 +2657,8 @@ describe('UdmfJSTest', function () {
           expect(getRecordTypes.includes('openharmony.pixel-map')).assertTrue();
 
           let getDataTypes = data[0].getTypes();
-          expect(getDataTypes.includes('general.file-uri')).assertTrue();
-          expect(getDataTypes.includes('openharmony.pixel-map')).assertTrue();
+          expect(getDataTypes.includes('general.video')).assertTrue();
+          expect(getDataTypes.includes('openharmony.pixel-map')).assertFalse();
           for (let i = 0; i < records.length; i++) {
             if (records[i].getType() === 'general.video') {
               let getUri = records[i].videoUri;
@@ -2753,8 +2758,8 @@ describe('UdmfJSTest', function () {
     expect(rawRecordTypes.includes('openharmony.pixel-map')).assertTrue();
     let unifiedData = new UDC.UnifiedData(record);
     let rawDataTypes = unifiedData.getTypes();
-    expect(rawDataTypes.includes('general.file-uri')).assertFalse();
-    expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
+    expect(rawDataTypes.includes('general.vob')).assertTrue();
+    expect(rawDataTypes.includes('openharmony.pixel-map')).assertFalse();
     expect(unifiedData.hasType('general.file-uri')).assertFalse();
     expect(unifiedData.hasType('general.video')).assertTrue();
     expect(unifiedData.hasType('general.vob')).assertTrue();
@@ -2775,7 +2780,7 @@ describe('UdmfJSTest', function () {
           let getDataTypes = data[0].getTypes();
           expect(getDataTypes.includes('general.vob')).assertTrue();
           expect(getDataTypes.includes('general.file-uri')).assertFalse();
-          expect(getDataTypes.includes('openharmony.pixel-map')).assertTrue();
+          expect(getDataTypes.includes('openharmony.pixel-map')).assertFalse();
 
           let getValue = records[0].getValue();
           expect(getValue.uniformDataType).assertEqual('general.file-uri');
@@ -2874,7 +2879,7 @@ describe('UdmfJSTest', function () {
     let unifiedData = new UDC.UnifiedData(record);
     let rawDataTypes = unifiedData.getTypes();
     expect(rawDataTypes.includes('general.vob')).assertFalse();
-    expect(rawDataTypes.includes('general.file-uri')).assertTrue();
+    expect(rawDataTypes.includes('general.file-uri')).assertFalse();
     expect(rawDataTypes.includes('openharmony.pixel-map')).assertTrue();
     expect(unifiedData.hasType('general.file-uri')).assertTrue();
     expect(unifiedData.hasType('general.video')).assertTrue();
@@ -2896,7 +2901,7 @@ describe('UdmfJSTest', function () {
 
           let getDataTypes = data[0].getTypes();
           expect(getDataTypes.includes('general.vob')).assertFalse();
-          expect(getDataTypes.includes('general.file-uri')).assertTrue();
+          expect(getDataTypes.includes('general.file-uri')).assertFalse();
           expect(getDataTypes.includes('openharmony.pixel-map')).assertTrue();
 
           let getValue = records[0].getValue();
@@ -2952,4 +2957,377 @@ describe('UdmfJSTest', function () {
       done();
     }
   });
+  
+  /**
+   * @tc.name MultiEntryTest007
+   * @tc.desc Build a record with no params, then add entries. test if UnifiedData::getRecords() function works well.
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('MultiEntryTest007', 0, async function (done) {
+    const TAG = 'MultiEntryTest007';
+    console.info(TAG, 'start');
+
+    let plaintextValue = 'plaintextValue';
+    let systemDefinedValue = 'systemDefinedValue';
+    let hyperlinkValue = 'hyperlinkValue';
+    let record = new UDC.UnifiedRecord();
+    record.addEntry(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+    record.addEntry(UTD.UniformDataType.HYPERLINK, hyperlinkValue);
+    record.addEntry('openharmony.app-item', systemDefinedValue);
+
+    let recordFile = new UDC.File();
+    recordFile.uri = 'schema://com.samples.test/files/test.txt';
+    recordFile.addEntry(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+    recordFile.addEntry(UTD.UniformDataType.HYPERLINK, hyperlinkValue);
+
+    let recordAppDefined = new UDC.ApplicationDefinedRecord();
+    let u8Array = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    recordAppDefined.applicationDefinedType = 'ApplicationDefinedType';
+    recordAppDefined.rawData = u8Array;
+
+    let recordAny = new UDC.UnifiedRecord('test.utd-id', 'test.utd-value');
+    recordAny.addEntry(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+    recordAny.addEntry(UTD.UniformDataType.HYPERLINK, hyperlinkValue);
+
+    let unifiedData = new UDC.UnifiedData(record);
+    unifiedData.addRecord(recordFile);
+    unifiedData.addRecord(recordAppDefined);
+    unifiedData.addRecord(recordAny);
+    let records = unifiedData.getRecords();
+    expect(records.length).assertEqual(4);
+
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          expect(records.length).assertEqual(4);
+
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
+
+  /**
+   * @tc.name MultiEntryTest008
+   * @tc.desc UDC to get first entry works well test
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('MultiEntryTest008', 0, async function (done) {
+    const TAG = 'MultiEntryTest008';
+    console.info(TAG, 'start');
+    let plaintextValue = 'plaintextValue';
+    let record = new UDC.UnifiedRecord();
+    record.addEntry(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+    let recordFile = new UDC.File();
+    recordFile.uri = 'schema://com.samples.test/files/test.txt';
+    let recordAppDefined = new UDC.ApplicationDefinedRecord();
+    let u8Array = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    recordAppDefined.applicationDefinedType = 'ApplicationDefinedType';
+    recordAppDefined.rawData = u8Array;
+    let recordAny = new UDC.UnifiedRecord('general.log', 'test.utd-value');
+    let recordHyperlink = new UDC.UnifiedRecord('general.hyperlink', 'test.hyperlink');
+    let unifiedData = new UDC.UnifiedData(record);
+    unifiedData.addRecord(recordFile);
+    unifiedData.addRecord(recordAppDefined);
+    unifiedData.addRecord(recordAny);
+    unifiedData.addRecord(recordHyperlink);
+    let records = unifiedData.getRecords();
+    expect(records.length).assertEqual(5);
+    try {
+      UDC.insertData(optionsValid, unifiedData).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          expect(data.length).assertEqual(1);
+          let records = data[0].getRecords();
+          let firstEntry1 = records[0].getEntry(UTD.UniformDataType.PLAIN_TEXT);
+          expect(firstEntry1.textContent).assertEqual('plaintextValue');
+          let firstEntry2 = records[1].getEntry(UTD.UniformDataType.FILE_URI);
+          expect(firstEntry2.oriUri).assertEqual('schema://com.samples.test/files/test.txt');
+          let firstEntry3 = records[2].getEntry('ApplicationDefinedType');
+          expect(firstEntry3.arrayBuffer.length).assertEqual(u8Array.length);
+          let firstEntry4 = records[3].getEntry('general.log');
+          expect(firstEntry4).assertEqual('test.utd-value');
+          let firstEntry5 = records[4].getEntry('general.hyperlink');
+          expect(firstEntry5.url).assertEqual('test.hyperlink');
+          UDC.deleteData(options).then((data) => {
+            console.info(TAG, 'delete success.');
+            expect(data.length).assertEqual(1);
+            done();
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+  });
+
+  /**
+   * @tc.name toEntriesTest001
+   * @tc.desc test toEntries function normal
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('toEntriesTest001', 0, async function (done) {
+    const TAG = 'toEntriesTest001';
+    console.info(TAG, 'start');
+    let file = new UDC.File();
+    file.uri = 'schema://com.samples.test/files/test.txt';
+    let plainText = new UDC.PlainText();
+    plainText.textContent = 'this is textContent';
+    plainText.abstract = 'this is abstract';
+    let link = new UDC.Hyperlink();
+    link.url = 'www.XXX.com';
+    link.description = 'this is description';
+    let html = new UDC.HTML();
+    html.htmlContent = '<div><p>标题</p></div>';
+    html.plainContent = 'this is plainContent';
+    let form = new UDC.SystemDefinedForm();
+    form.formId = 123456;
+    form.formName = 'MyFormName';
+    form.bundleName = 'MyBundleName';
+    form.abilityName = 'MyAbilityName';
+    form.module = 'MyModule';
+    form.details = {
+      'formKey1': 123,
+      'formKey2': 'formValue',
+      'formKey3': U8_ARRAY,
+    };
+    let applicationDefinedRecord = new UDC.ApplicationDefinedRecord();
+    applicationDefinedRecord.applicationDefinedType = 'ApplicationDefinedType';
+    applicationDefinedRecord.rawData = U8_ARRAY;
+    let unifiedData = new UDC.UnifiedData();
+    unifiedData.addRecord(file);
+    unifiedData.addRecord(plainText);
+    unifiedData.addRecord(link);
+    unifiedData.addRecord(html);
+    unifiedData.addRecord(form);
+    unifiedData.addRecord(applicationDefinedRecord);
+    unifiedData.properties.tag = 'records_to_entries_data_format';
+    expect(unifiedData.getRecords().length).assertEqual(6);
+    UDC.convertRecordsToEntries(unifiedData);
+    expect(unifiedData.getRecords().length).assertEqual(1);
+    let records = unifiedData.getRecords();
+    let recordEntries = records[0];
+    expect(recordEntries.uri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(recordEntries.getType()).assertEqual('general.file');
+    expect(recordEntries.getValue()).assertEqual(undefined);
+    let fileEntry = recordEntries.getEntry('general.file-uri');
+    expect(fileEntry.uniformDataType).assertEqual('general.file-uri');
+    expect(fileEntry.oriUri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(fileEntry.fileType).assertEqual('general.file');
+    let plainTextEntry = recordEntries.getEntry('general.plain-text');
+    expect(plainTextEntry.textContent).assertEqual('this is textContent');
+    expect(plainTextEntry.abstract).assertEqual('this is abstract');
+    let linkEntry = recordEntries.getEntry('general.hyperlink');
+    expect(linkEntry.url).assertEqual('www.XXX.com');
+    expect(linkEntry.description).assertEqual('this is description');
+    let htmlEntry = recordEntries.getEntry('general.html');
+    expect(htmlEntry.htmlContent).assertEqual('<div><p>标题</p></div>');
+    expect(htmlEntry.plainContent).assertEqual('this is plainContent');
+    let formEntry = recordEntries.getEntry('openharmony.form');
+    expect(formEntry.formId).assertEqual(123456);
+    expect(formEntry.formName).assertEqual('MyFormName');
+    expect(formEntry.bundleName).assertEqual('MyBundleName');
+    expect(formEntry.abilityName).assertEqual('MyAbilityName');
+    expect(formEntry.module).assertEqual('MyModule');
+    expect(formEntry.details.formKey1).assertEqual(123);
+    expect(formEntry.details.formKey2).assertEqual('formValue');
+    let applicationDefinedEntry = recordEntries.getEntry('ApplicationDefinedType');
+    for (let i = 0; i < U8_ARRAY.length; i++) {
+      expect(applicationDefinedEntry.arrayBuffer[i]).assertEqual(U8_ARRAY[i]);
+    }
+    expect(applicationDefinedEntry.uniformDataType).assertEqual('ApplicationDefinedType');
+    let entries = recordEntries.getEntries();
+    expect(entries['general.file-uri'].uniformDataType).assertEqual('general.file-uri');
+    expect(entries['general.file-uri'].oriUri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(entries['general.file-uri'].fileType).assertEqual('general.file');
+    expect(entries['general.plain-text'].uniformDataType).assertEqual('general.plain-text');
+    expect(entries['general.plain-text'].textContent).assertEqual('this is textContent');
+    expect(entries['general.plain-text'].abstract).assertEqual('this is abstract');
+    expect(entries['general.hyperlink'].uniformDataType).assertEqual('general.hyperlink');
+    expect(entries['general.hyperlink'].url).assertEqual('www.XXX.com');
+    expect(entries['general.hyperlink'].description).assertEqual('this is description');
+    expect(entries['general.html'].uniformDataType).assertEqual('general.html');
+    expect(entries['general.html'].htmlContent).assertEqual('<div><p>标题</p></div>');
+    expect(entries['general.html'].plainContent).assertEqual('this is plainContent');
+    expect(entries['openharmony.form'].uniformDataType).assertEqual('openharmony.form');
+    expect(entries['openharmony.form'].formId).assertEqual(123456);
+    expect(entries['openharmony.form'].formName).assertEqual('MyFormName');
+    expect(entries['openharmony.form'].bundleName).assertEqual('MyBundleName');
+    expect(entries['openharmony.form'].abilityName).assertEqual('MyAbilityName');
+    expect(entries['openharmony.form'].module).assertEqual('MyModule');
+    expect(entries['openharmony.form'].details.formKey1).assertEqual(123);
+    expect(entries['openharmony.form'].details.formKey2).assertEqual('formValue');
+    for (let i = 0; i < U8_ARRAY.length; i++) {
+      expect(entries.ApplicationDefinedType.arrayBuffer[i]).assertEqual(U8_ARRAY[i]);
+    }
+    expect(entries.ApplicationDefinedType.uniformDataType).assertEqual('ApplicationDefinedType');
+    done();
+  });
+
+  /**
+   * @tc.name toEntriesTest002
+   * @tc.desc test toEntries function with duplicate type
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('toEntriesTest002', 0, async function (done) {
+    const TAG = 'toEntriesTest002';
+    console.info(TAG, 'start');
+    let image = new UDC.Image();
+    image.uri = 'schema://com.samples.test/files/test.jpg';
+    let plainText = new UDC.PlainText();
+    plainText.textContent = 'this is textContent';
+    plainText.abstract = 'this is abstract';
+    let video = new UDC.Video();
+    video.uri = 'schema://com.samples.test/files/test.mp4';
+    let unifiedData = new UDC.UnifiedData();
+    unifiedData.addRecord(image);
+    unifiedData.addRecord(plainText);
+    unifiedData.addRecord(video);
+    unifiedData.properties.tag = 'records_to_entries_data_format';
+    expect(unifiedData.getRecords().length).assertEqual(3);
+    UDC.convertRecordsToEntries(unifiedData);
+    expect(unifiedData.getRecords().length).assertEqual(1);
+    let records = unifiedData.getRecords();
+    let recordEntries = records[0];
+    expect(recordEntries.uri).assertEqual('schema://com.samples.test/files/test.jpg');
+    expect(recordEntries.getType()).assertEqual('general.image');
+    expect(recordEntries.getValue()).assertEqual(undefined);
+    let entries = recordEntries.getEntries();
+    expect(entries['general.file-uri'].uniformDataType).assertEqual('general.file-uri');
+    expect(entries['general.file-uri'].oriUri).assertEqual('schema://com.samples.test/files/test.jpg');
+    expect(entries['general.file-uri'].fileType).assertEqual('general.image');
+    expect(entries['general.plain-text'].uniformDataType).assertEqual('general.plain-text');
+    expect(entries['general.plain-text'].textContent).assertEqual('this is textContent');
+    expect(entries['general.plain-text'].abstract).assertEqual('this is abstract');
+    expect(entries['general.video']).assertEqual(undefined);
+    done();
+  });
+
+  /**
+   * @tc.name toEntriesTest003
+   * @tc.desc test toEntries function with duplicate type
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('toEntriesTest003', 0, async function (done) {
+    const TAG = 'toEntriesTest003';
+    console.info(TAG, 'start');
+    let recordFile = new UDC.UnifiedRecord('general.file', 'schema://com.samples.test/files/test.txt');
+    let recordVideo = new UDC.UnifiedRecord('general.video', 'schema://com.samples.test/files/test.mp4');
+    let recordPlainText = new UDC.UnifiedRecord('general.plain-text', 'this is textContent');
+    let unifiedData = new UDC.UnifiedData();
+    unifiedData.addRecord(recordFile);
+    unifiedData.addRecord(recordVideo);
+    unifiedData.addRecord(recordPlainText);
+    unifiedData.properties.tag = 'records_to_entries_data_format';
+    expect(unifiedData.getRecords().length).assertEqual(3);
+    UDC.convertRecordsToEntries(unifiedData);
+    expect(unifiedData.getRecords().length).assertEqual(1);
+    let records = unifiedData.getRecords();
+    let recordEntries = records[0];
+    expect(recordEntries.uri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(recordEntries.getType()).assertEqual('general.file');
+    expect(recordEntries.getValue()).assertEqual('schema://com.samples.test/files/test.txt');
+    let videoEntry = recordEntries.getEntry('general.file-uri');
+    expect(videoEntry.oriUri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(videoEntry.fileType).assertEqual('general.file');
+    let plainTextEntry = recordEntries.getEntry('general.plain-text');
+    expect(plainTextEntry.textContent).assertEqual('this is textContent');
+    let entries = recordEntries.getEntries();
+    expect(entries['general.file-uri'].uniformDataType).assertEqual('general.file-uri');
+    expect(entries['general.file-uri'].oriUri).assertEqual('schema://com.samples.test/files/test.txt');
+    expect(entries['general.file-uri'].fileType).assertEqual('general.file');
+    expect(entries['general.plain-text'].uniformDataType).assertEqual('general.plain-text');
+    expect(entries['general.plain-text'].textContent).assertEqual('this is textContent');
+    expect(entries['general.video']).assertEqual(undefined);
+    expect(entries['general.file']).assertEqual(undefined);
+    done();
+   });
+
+   /**
+   * @tc.name toEntriesTest004
+   * @tc.desc test toEntries function with invalid data
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('toEntriesTest004', 0, function () {
+    const TAG = 'toEntriesTest004';
+    console.info(TAG, 'start');
+    try {
+      UDC.convertRecordsToEntries();
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+    } catch (e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+   });
+
+   /**
+   * @tc.name toEntriesTest005
+   * @tc.desc test toEntries function with invalid data
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('toEntriesTest005', 0, function () {
+    const TAG = 'toEntriesTest005';
+    console.info(TAG, 'start');
+    try {
+      UDC.convertRecordsToEntries(1);
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+    } catch (e) {
+      console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code === ERROR_PARAMETER).assertTrue();
+    }
+    console.info(TAG, 'end');
+   });
 });

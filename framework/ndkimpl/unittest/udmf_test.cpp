@@ -1986,10 +1986,9 @@ HWTEST_F(UDMFTest, FileUriTest001, TestSize.Level1)
     for (unsigned int idx = 0; idx < recordCount; ++idx) {
         unsigned int recordTypeCount;
         char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount);
-        EXPECT_EQ(recordTypeCount, 2);
+        EXPECT_EQ(recordTypeCount, 1);
         EXPECT_NE(recordTypes, nullptr);
-        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_IMAGE), 0);
-        EXPECT_EQ(strcmp(recordTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_GENERAL_FILE_URI), 0);
         for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
             if (strcmp(recordTypes[recordIdx], UDMF_META_GENERAL_FILE_URI) == 0) {
                 OH_UdsFileUri* fileUri = OH_UdsFileUri_Create();
@@ -2041,34 +2040,24 @@ HWTEST_F(UDMFTest, FileUriTest002, TestSize.Level1)
     EXPECT_EQ(recordCount, 2);
     EXPECT_NE(records, nullptr);
 
-    for (unsigned int idx = 0; idx < recordCount; idx++) {
-        unsigned int recordTypeCount;
-        char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount);
-        EXPECT_NE(recordTypes, nullptr);
-        if (recordTypeCount == 1) {
-            EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_PLAIN_TEXT), 0);
-            for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
-                OH_UdsPlainText* text = OH_UdsPlainText_Create();
-                int getPlaintextRet = OH_UdmfRecord_GetPlainText(records[idx], text);
-                EXPECT_EQ(getPlaintextRet, UDMF_E_OK);
-                const char* getContent = OH_UdsPlainText_GetContent(text);
-                EXPECT_EQ(strcmp(getContent, content.c_str()), 0);
-            }
-        }
-        if (recordTypeCount == 2) {
-            EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_IMAGE), 0);
-            EXPECT_EQ(strcmp(recordTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
-            for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
-                if (strcmp(recordTypes[recordIdx], UDMF_META_GENERAL_FILE_URI) == 0) {
-                    OH_UdsFileUri* fileUri = OH_UdsFileUri_Create();
-                    int getFileUriRet = OH_UdmfRecord_GetFileUri(records[idx], fileUri);
-                    EXPECT_EQ(getFileUriRet, UDMF_E_OK);
-                    const char* getFileUri = OH_UdsFileUri_GetFileUri(fileUri);
-                    EXPECT_EQ(strcmp(getFileUri, uri.c_str()), 0);
-                }
-            }
-        }
-    }
+    unsigned int recordTypeCount;
+    char** recordTypes = OH_UdmfRecord_GetTypes(records[0], &recordTypeCount);
+    EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_GENERAL_FILE_URI), 0);
+    EXPECT_EQ(recordTypeCount, 1);
+    OH_UdsFileUri* fileUri = OH_UdsFileUri_Create();
+    int getFileUriRet = OH_UdmfRecord_GetFileUri(records[0], fileUri);
+    EXPECT_EQ(getFileUriRet, UDMF_E_OK);
+    const char* getFileUri = OH_UdsFileUri_GetFileUri(fileUri);
+    EXPECT_EQ(strcmp(getFileUri, uri.c_str()), 0);
+
+    recordTypes = OH_UdmfRecord_GetTypes(records[1], &recordTypeCount);
+    EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_PLAIN_TEXT), 0);
+    EXPECT_EQ(recordTypeCount, 1);
+    OH_UdsPlainText* text = OH_UdsPlainText_Create();
+    int getPlaintextRet = OH_UdmfRecord_GetPlainText(records[1], text);
+    EXPECT_EQ(getPlaintextRet, UDMF_E_OK);
+    const char* getContent = OH_UdsPlainText_GetContent(text);
+    EXPECT_EQ(strcmp(getContent, content.c_str()), 0);
 }
 
 /**
@@ -2108,10 +2097,9 @@ HWTEST_F(UDMFTest, FileUriTest003, TestSize.Level1)
     for (unsigned int idx = 0; idx < recordCount; ++idx) {
         unsigned int recordTypeCount;
         char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount);
-        EXPECT_EQ(recordTypeCount, 2);
+        EXPECT_EQ(recordTypeCount, 1);
         EXPECT_NE(recordTypes, nullptr);
-        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_AUDIO), 0);
-        EXPECT_EQ(strcmp(recordTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_GENERAL_FILE_URI), 0);
         for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
             if (strcmp(recordTypes[recordIdx], UDMF_META_GENERAL_FILE_URI) == 0) {
                 OH_UdsFileUri* fileUri = OH_UdsFileUri_Create();
@@ -2161,10 +2149,9 @@ HWTEST_F(UDMFTest, FileUriTest004, TestSize.Level1)
     for (unsigned int idx = 0; idx < recordCount; ++idx) {
         unsigned int recordTypeCount;
         char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount);
-        EXPECT_EQ(recordTypeCount, 2);
+        EXPECT_EQ(recordTypeCount, 1);
         EXPECT_NE(recordTypes, nullptr);
-        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_GENERAL_FILE), 0);
-        EXPECT_EQ(strcmp(recordTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_GENERAL_FILE_URI), 0);
         for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
             if (strcmp(recordTypes[recordIdx], UDMF_META_GENERAL_FILE_URI) == 0) {
                 OH_UdsFileUri* fileUri = OH_UdsFileUri_Create();
@@ -2270,10 +2257,9 @@ HWTEST_F(UDMFTest, FileUriTest006, TestSize.Level1)
     for (unsigned int idx = 0; idx < recordCount; ++idx) {
         unsigned int recordTypeCount;
         char** recordTypes = OH_UdmfRecord_GetTypes(records[idx], &recordTypeCount);
-        EXPECT_EQ(recordTypeCount, 2);
+        EXPECT_EQ(recordTypeCount, 1);
         EXPECT_NE(recordTypes, nullptr);
-        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_VIDEO), 0);
-        EXPECT_EQ(strcmp(recordTypes[1], UDMF_META_GENERAL_FILE_URI), 0);
+        EXPECT_EQ(strcmp(recordTypes[0], UDMF_META_GENERAL_FILE_URI), 0);
         for (unsigned int recordIdx = 0; recordIdx < recordTypeCount; ++recordIdx) {
             if (strcmp(recordTypes[recordIdx], UDMF_META_GENERAL_FILE_URI) == 0) {
                 OH_UdsFileUri* fileUri = OH_UdsFileUri_Create();

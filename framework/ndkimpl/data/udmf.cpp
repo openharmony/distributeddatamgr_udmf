@@ -158,6 +158,9 @@ static bool IsUnifiedPropertiesValid(OH_UdmfProperty* properties)
 
 static void AddFileUriTypeIfContains(std::vector<std::string>& types)
 {
+    if (std::find(types.begin(), types.end(), UDMF_META_GENERAL_FILE_URI) != types.end()) {
+        return;
+    }
     for (auto type : types) {
         if (FILE_TYPES.find(type) != FILE_TYPES.end()) {
             types.push_back(UDMF_META_GENERAL_FILE_URI);
@@ -231,7 +234,7 @@ char** OH_UdmfRecord_GetTypes(OH_UdmfRecord* record, unsigned int* count)
         *count = record->typesCount;
         return record->typesArray;
     }
-    auto types = record->record_->GetUtdIds();
+    auto types = record->record_->GetUtdIdsWithAddFileType();
     std::vector<std::string> typeLabels {types.begin(), types.end()};
     AddFileUriTypeIfContains(typeLabels);
     record->typesArray = StrVectorToTypesArray(typeLabels);

@@ -25,6 +25,7 @@ public:
     Video();
     explicit Video(const std::string &uri);
     Video(UDType type, ValueType value);
+    void InitObject() override;
 };
 } // namespace UDMF
 } // namespace OHOS

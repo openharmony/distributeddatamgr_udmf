@@ -155,7 +155,8 @@ int32_t UdmfServiceClient::GetBatchData(const QueryOption &query, std::vector<Un
     LOG_DEBUG(UDMF_SERVICE, "start, tag: intention = %{public}d, key = %{public}s", query.intention, query.key.c_str());
     auto find = UD_INTENTION_MAP.find(query.intention);
     std::string intention = find == UD_INTENTION_MAP.end() ? intention : find->second;
-    if (!UnifiedDataUtils::IsValidOptions(query.key, intention)) {
+    UnifiedKey key(query.key);
+    if (!UnifiedDataUtils::IsValidOptions(key, intention)) {
         LOG_ERROR(UDMF_SERVICE, "invalid option, query.key: %{public}s, intention: %{public}s", query.key.c_str(),
             intention.c_str());
         return E_INVALID_PARAMETERS;
@@ -204,7 +205,8 @@ int32_t UdmfServiceClient::DeleteData(const QueryOption &query, std::vector<Unif
     LOG_DEBUG(UDMF_SERVICE, "start, tag: intention = %{public}d, key = %{public}s", query.intention, query.key.c_str());
     auto find = UD_INTENTION_MAP.find(query.intention);
     std::string intention = find == UD_INTENTION_MAP.end() ? intention : find->second;
-    if (!UnifiedDataUtils::IsValidOptions(query.key, intention)) {
+    UnifiedKey key(query.key);
+    if (!UnifiedDataUtils::IsValidOptions(key, intention)) {
         LOG_ERROR(UDMF_SERVICE, "invalid option, query.key: %{public}s, intention: %{public}s", query.key.c_str(),
             intention.c_str());
         return E_INVALID_PARAMETERS;

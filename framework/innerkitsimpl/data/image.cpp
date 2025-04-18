@@ -20,18 +20,30 @@ namespace UDMF {
 Image::Image() : Image("")
 {
     SetType(IMAGE);
-    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(IMAGE);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Image::Image(const std::string &uri) : File(uri)
 {
     SetType(IMAGE);
-    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(IMAGE);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Image::Image(UDType type, ValueType value) : File(type, value)
 {
     SetType(IMAGE);
+    utdId2_ = GENERAL_FILE_URI;
+}
+
+void Image::InitObject()
+{
+    File::InitObject();
+    auto object = std::get<std::shared_ptr<Object>>(value_);
+    if (!fileType_.empty()) {
+        object->value_[FILE_TYPE] = fileType_;
+    } else {
+        object->value_[FILE_TYPE] = "general.image";
+    }
 }
 } // namespace UDMF
 } // namespace OHOS

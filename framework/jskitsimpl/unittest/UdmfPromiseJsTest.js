@@ -437,4 +437,55 @@ describe('UdmfPromiseJSTest', function () {
     }
     console.info(TAG, 'end');
   });
+
+  /**
+   * @tc.name UdmfPropertiesMarshallTest
+   * @tc.desc Test udmf properties Marshall successful
+   * @tc.type: FUNC
+   * @tc.require: issueNumber
+   */
+  it('UdmfPropertiesMarshallTest', 0, async function (done) {
+    const TAG = 'UdmfPropertiesMarshallTest:';
+    console.info(TAG, 'start');
+    try {
+      let person = {fname: 'John', lname: 'Doe', age: 25};
+      let props = new UDC.UnifiedDataProperties();
+      props.tag = 'DataTag';
+      props.shareOptions = UDC.ShareOptions.CROSS_APP;
+      props.extras = person;
+      unifiedData01.properties = props;
+      UDC.insertData(optionsValid, unifiedData01).then((data) => {
+        console.info(TAG, `insert success. The key: ${data}`);
+        let options = { key: data };
+        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+        UDC.queryData(options).then((data) => {
+          console.info(TAG, 'query success.');
+          console.info(TAG, `data.length = ${data.length}.`);
+          expect(data.length).assertEqual(1);
+          let readProps = data[0].properties;
+          console.info(TAG, `readProps.tag = ${readProps.tag}.`);
+          console.info(TAG, `readProps.shareOptions = ${readProps.shareOptions}.`);
+          console.info(TAG, `readProps.extras = ${JSON.stringify(readProps.extras)}.`);
+          expect(readProps.tag).assertEqual('DataTag');
+          expect(readProps.shareOptions).assertEqual(UDC.ShareOptions.CROSS_APP);
+          expect(Object.keys(readProps.extras).length).assertEqual(3);
+          expect(readProps.extras.fname).assertEqual(person.fname);
+          done();
+        }).catch(() => {
+          console.info(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      }).catch(() => {
+        console.info(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      });
+    } catch (e) {
+      console.error(TAG, 'Unreachable code!');
+      expect(null).assertFail();
+      done();
+    }
+    console.info(TAG, 'end');
+  });
 });

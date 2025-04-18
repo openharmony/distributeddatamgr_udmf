@@ -20,18 +20,30 @@ namespace UDMF {
 Folder::Folder() : Folder("")
 {
     SetType(FOLDER);
-    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(FOLDER);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Folder::Folder(const std::string &uri) : File(uri)
 {
     SetType(FOLDER);
-    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(FOLDER);
+    utdId2_ = GENERAL_FILE_URI;
 }
 
 Folder::Folder(UDType type, ValueType value) : File(type, value)
 {
     SetType(FOLDER);
+    utdId2_ = GENERAL_FILE_URI;
+}
+
+void Folder::InitObject()
+{
+    File::InitObject();
+    auto object = std::get<std::shared_ptr<Object>>(value_);
+    if (!fileType_.empty()) {
+        object->value_[FILE_TYPE] = fileType_;
+    } else {
+        object->value_[FILE_TYPE] = "general.folder";
+    }
 }
 } // namespace UDMF
 } // namespace OHOS

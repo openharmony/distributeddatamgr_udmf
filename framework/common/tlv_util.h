@@ -104,6 +104,16 @@ template <> size_t API_EXPORT CountBufferSize(const UriInfo &input, TLVObject &d
 template <> bool API_EXPORT Writing(const UriInfo &input, TLVObject &data, TAG tag);
 template <> bool API_EXPORT Reading(UriInfo &output, TLVObject &data, const TLVHead &head);
 
+template <> bool API_EXPORT Reading(ShareOptions &output, TLVObject &data, const TLVHead &head);
+
+template <> size_t API_EXPORT CountBufferSize(const UnifiedDataProperties &input, TLVObject &data);
+template <> bool API_EXPORT Writing(const UnifiedDataProperties &input, TLVObject &data, TAG tag);
+template <> bool API_EXPORT Reading(UnifiedDataProperties &output, TLVObject &data, const TLVHead &head);
+
+template <> size_t API_EXPORT CountBufferSize(const OHOS::AAFwk::WantParams &input, TLVObject &data);
+template <> bool API_EXPORT Writing(const OHOS::AAFwk::WantParams &input, TLVObject &data, TAG tag);
+template <> bool API_EXPORT Reading(OHOS::AAFwk::WantParams &output, TLVObject &data, const TLVHead &head);
+
 template <> size_t API_EXPORT CountBufferSize(const std::shared_ptr<OHOS::Media::PixelMap> &input, TLVObject &data);
 template <> bool API_EXPORT Writing(const std::shared_ptr<OHOS::Media::PixelMap> &input, TLVObject &data, TAG tag);
 template <>

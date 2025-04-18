@@ -17,7 +17,6 @@ import I18n from '@ohos.i18n';
 import image from '@ohos.multimedia.image';
 import uniformDataStruct from '@ohos.data.uniformDataStruct';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { display } from '@kit.ArkUI';
 
 export enum FormType {
   TYPE_BIG = 0,
@@ -81,7 +80,6 @@ const TITLE_FONT_COLOR: string = '#ff182431';
 const DESCRIPTION_FONT_COLOR: string = '#99182431';
 const DEFAULT_MID_IMAGE_HEIGHT: number = 72; // 4x2卡片，图片默认高度
 const DEFAULT_SMALL_IMAGE_HEIGHT: number = 59; // 2x1卡片，图片默认高度
-const DEFAULT_DENSITY: number = 3.25;
 
 interface CardStyle {
   thumbWidth: number,
@@ -310,9 +308,9 @@ export struct ContentFormCard {
         .width(this.formStyle.appIconSize * this.cardScale)
         .height(this.formStyle.appIconSize * this.cardScale)
         .objectFit(ImageFit.Fill)
+	.draggable(false)
         .alt($r('sys.media.ohos_app_icon'))
         .borderRadius($r('sys.float.corner_radius_level1'))
-        .draggable(false)
       Text(this.contentFormData?.appName ? this.contentFormData?.appName : ' ')
         .fontSize(this.formStyle.appNameFontSize * this.cardScale)
         .fontColor(APP_NAME_COLOR)
@@ -475,10 +473,10 @@ export struct ContentFormCard {
             if (this.thumbImage) {
               Image(this.thumbImage)
                 .objectFit(ImageFit.Cover)
+		.draggable(false)
                 .borderRadius($r('sys.float.corner_radius_level2'))
                 .width(this.formStyle.thumbWidth * this.cardScale)
                 .height(this.formStyle.thumbHeight * this.cardScale)
-                .draggable(false)
                 .margin({
                   left: this.isMirrorLanguageType ? 0 : (this.formStyle.thumbMarginLeft as number * this.cardScale),
                   right: this.isMirrorLanguageType ? (this.formStyle.thumbMarginLeft as number * this.cardScale) : 0
@@ -517,11 +515,11 @@ export struct ContentFormCard {
     .shadow(ShadowStyle.OUTER_DEFAULT_SM)
     .width(this.cardWidth)
     .onClick(() => {
+      this.handleOnClick();
       if (!this.contentFormData?.linkUri) {
         console.warn(`${TAG}, linkUri is null`);
         return;
       }
-      this.handleOnClick();
       try {
         let context = getContext(this) as common.UIAbilityContext;
         context.openLink(this.contentFormData?.linkUri, { appLinkingOnly: false, parameters: {} });
