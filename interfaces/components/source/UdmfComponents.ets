@@ -60,7 +60,7 @@ const defaultIcon: string =
     ',73,141,205,245,214,23,231,110,132,188,27,13,88,8,43,145,225,60,68,0,42,15,95,85,238,25,204,75,166,163,127,0,0';
 const MAX_CARD_SCALE: number = 1.2;
 const MIN_CARD_SCALE: number = 0.8;
-const SMALL_MIN_CARD_SCALE: number = 0.6;
+const SMALL_MIN_CARD_SCALE: number = 0.4;
 const DEFAULT_BIG_CARD_SIZE: number = 200;
 const DEFAULT_MID_CARD_WIDTH: number = 200;
 const DEFAULT_MID_CARD_HEIGHT: number = 100;
