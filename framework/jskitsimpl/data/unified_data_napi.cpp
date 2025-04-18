@@ -109,13 +109,25 @@ napi_status UnifiedDataNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedDa
     ASSERT_CALL_STATUS(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
 
     UnifiedDataNapi* unifiedData = nullptr;
-    napi_unwrap(env, out, reinterpret_cast<void **>(&unifiedData));
+    napi_status status = napi_unwrap(env, out, reinterpret_cast<void **>(&unifiedData));
+    if (status != napi_ok || unifiedData == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_unwrap unifiedData failed, status=%{public}d", status);
+        return status;
+    }
     unifiedData->value_ = in;
 
     napi_value value;
-    napi_get_reference_value(env, unifiedData->propertyRef_, &value);
+    status = napi_get_reference_value(env, unifiedData->propertyRef_, &value);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_get_reference_value propertyRef failed, status=%{public}d", status);
+        return status;
+    }
     UnifiedDataPropertiesNapi* propertiesNapi = nullptr;
-    napi_unwrap(env, value, reinterpret_cast<void **>(&propertiesNapi));
+    status = napi_unwrap(env, value, reinterpret_cast<void **>(&propertiesNapi));
+    if (status != napi_ok || propertiesNapi == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_unwrap propertiesNapi failed, status=%{public}d", status);
+        return status;
+    }
     propertiesNapi->value_ = in->GetProperties();
     return napi_ok;
 }

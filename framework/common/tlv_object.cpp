@@ -259,6 +259,7 @@ bool TLVObject::Read(OHOS::AAFwk::Want &value, const TLVHead &head)
         return false;
     }
     value = *want;
+    delete want;
     return true;
 }
 

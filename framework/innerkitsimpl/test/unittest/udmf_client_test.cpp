@@ -3728,4 +3728,60 @@ HWTEST_F(UdmfClientTest, GetBatchData001, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "GetBatchData001 end.");
 }
+
+/**
+* @tc.name: UpdateData003
+* @tc.desc: test update data properties
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, UpdateData003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "UpdateData003 begin.");
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_TRUE(unifiedDataSet.empty());
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "plainTextContent");
+    data.AddRecord(record);
+    std::shared_ptr<UnifiedDataProperties> properties = std::make_shared<UnifiedDataProperties>();
+    std::string tag = "this is a tag of test UpdateData003";
+    properties->tag = tag;
+    data.SetProperties(std::move(properties));
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+    query = { .key = key, .intention = Intention::UD_INTENTION_DATA_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), 1);
+    auto readProperties = unifiedDataSet[0].GetProperties();
+    ASSERT_NE(readProperties, nullptr);
+    EXPECT_EQ(readProperties->tag, tag);
+    std::shared_ptr<UnifiedDataProperties> properties1 = std::make_shared<UnifiedDataProperties>();
+    std::string tag1 = "this is a tag of test UpdateData003test";
+    properties1->tag = tag1;
+    data.SetProperties(std::move(properties1));
+    status = UdmfClient::GetInstance().UpdateData(query, data);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), 1);
+    auto readProperties1 = unifiedDataSet[0].GetProperties();
+    ASSERT_NE(readProperties1, nullptr);
+    EXPECT_EQ(readProperties1->tag, tag1);
+    status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_TRUE(unifiedDataSet.empty());
+    LOG_INFO(UDMF_TEST, "UpdateData003 end.");
+}
 } // OHOS::Test

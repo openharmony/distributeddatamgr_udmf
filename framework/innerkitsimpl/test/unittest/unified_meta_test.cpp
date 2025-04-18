@@ -433,20 +433,23 @@ HWTEST_F(UnifiedMetaTest, IsValidOptions001, TestSize.Level1)
     std::string intentionDataHub = "DataHub";
     std::string intentionDrag = "drag";
     std::string intentionEmpty = "";
+    UnifiedKey key1("");
 
-    bool ret = UnifiedDataUtils::IsValidOptions("", intentionDataHub);
+    bool ret = UnifiedDataUtils::IsValidOptions(key1, intentionDataHub);
     EXPECT_TRUE(ret);
 
-    bool ret1 = UnifiedDataUtils::IsValidOptions(keyDataHub, intentionEmpty);
+    UnifiedKey key2(keyDataHub);
+    bool ret1 = UnifiedDataUtils::IsValidOptions(key2, intentionEmpty);
     EXPECT_TRUE(ret1);
 
-    bool ret2 = UnifiedDataUtils::IsValidOptions(keyDataHub, intentionDataHub);
+    bool ret2 = UnifiedDataUtils::IsValidOptions(key2, intentionDataHub);
     EXPECT_TRUE(ret2);
 
-    bool ret3 = UnifiedDataUtils::IsValidOptions(keyDataHub, intentionDrag);
+    bool ret3 = UnifiedDataUtils::IsValidOptions(key2, intentionDrag);
     EXPECT_FALSE(ret3);
 
-    bool ret4 = UnifiedDataUtils::IsValidOptions(keyDrag, intentionDrag);
+    UnifiedKey key3(keyDrag);
+    bool ret4 = UnifiedDataUtils::IsValidOptions(key3, intentionDrag);
     EXPECT_FALSE(ret4);
 }
 
