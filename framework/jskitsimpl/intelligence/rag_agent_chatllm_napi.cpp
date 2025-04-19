@@ -38,8 +38,8 @@ napi_value RAGAgentChatLLMNapi::Init(napi_env env, napi_value exports)
         return nullptr;
     }
     napi_value chatLLMClass;
-    napi_define_class(env, "ChatLLM", NAPI_AUTO_LENGTH, Constructor, nullptr, 0, nullptr, &chatLLMClass);
-    napi_set_named_property(env, exports, "ChatLLM", chatLLMClass);
+    napi_define_class(env, "ChatLlm", NAPI_AUTO_LENGTH, Constructor, nullptr, 0, nullptr, &chatLLMClass);
+    napi_set_named_property(env, exports, "ChatLlm", chatLLMClass);
     return exports;
 }
 
@@ -55,7 +55,7 @@ napi_status RAGAgentChatLLMNapi::InitEnum(napi_env env, napi_value exports)
     AipNapiUtils::SetInt32Property(env, llmRequestStatus, LLM_LOAD_FAILED, "LLM_LOAD_FAILED");
     AipNapiUtils::SetInt32Property(env, llmRequestStatus, LLM_TIMEOUT, "LLM_TIMEOUT");
     AipNapiUtils::SetInt32Property(env, llmRequestStatus, LLM_BUSY, "LLM_BUSY");
-    AipNapiUtils::SetPropertyName(env, exports, "LLMRequestStatus", llmRequestStatus);
+    AipNapiUtils::SetPropertyName(env, exports, "LlmRequestStatus", llmRequestStatus);
     return napi_ok;
 }
 
