@@ -344,10 +344,10 @@ void RAGSessionNapi::CloseCompleteCB(napi_env env, napi_status status, void *dat
     if (ret != ERR_OK) {
         napi_value result = nullptr;
         if (ret == DEVICE_EXCEPTION) {
-            ThrowIntelligenceErrByPromise(env, DEVICE_EXCEPTION, "StreamRunCompleteCB failed", result);
+            ThrowIntelligenceErrByPromise(env, DEVICE_EXCEPTION, "CloseCompleteCB failed", result);
         } else {
             int32_t errCode = ConvertErrCodeNative2Ts(ret);
-            ThrowIntelligenceErrByPromise(env, errCode, "StreamRunCompleteCB failed", result);
+            ThrowIntelligenceErrByPromise(env, errCode, "CloseCompleteCB failed", result);
         }
         napi_reject_deferred(env, asyncClose->deferred, result);
     } else {
