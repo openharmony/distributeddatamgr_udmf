@@ -67,7 +67,7 @@ RAGSessionNapi::~RAGSessionNapi()
 napi_value RAGSessionNapi::Init(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("createRAGSession", CreateRAGSession),
+        DECLARE_NAPI_FUNCTION("createRagSession", CreateRAGSession),
     };
     napi_status status = napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     if (status != napi_ok) {
