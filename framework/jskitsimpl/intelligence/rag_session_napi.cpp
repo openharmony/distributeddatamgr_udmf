@@ -67,7 +67,7 @@ RAGSessionNapi::~RAGSessionNapi()
 napi_value RAGSessionNapi::Init(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("createRAGSession", CreateRAGSession),
+        DECLARE_NAPI_FUNCTION("createRagSession", CreateRAGSession),
     };
     napi_status status = napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     if (status != napi_ok) {
@@ -344,10 +344,10 @@ void RAGSessionNapi::CloseCompleteCB(napi_env env, napi_status status, void *dat
     if (ret != ERR_OK) {
         napi_value result = nullptr;
         if (ret == DEVICE_EXCEPTION) {
-            ThrowIntelligenceErrByPromise(env, DEVICE_EXCEPTION, "StreamRunCompleteCB failed", result);
+            ThrowIntelligenceErrByPromise(env, DEVICE_EXCEPTION, "CloseCompleteCB failed", result);
         } else {
             int32_t errCode = ConvertErrCodeNative2Ts(ret);
-            ThrowIntelligenceErrByPromise(env, errCode, "StreamRunCompleteCB failed", result);
+            ThrowIntelligenceErrByPromise(env, errCode, "CloseCompleteCB failed", result);
         }
         napi_reject_deferred(env, asyncClose->deferred, result);
     } else {

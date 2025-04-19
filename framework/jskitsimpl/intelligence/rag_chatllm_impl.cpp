@@ -333,15 +333,21 @@ napi_value ChatLLM::PromiseThenCallback(napi_env env, napi_callback_info info)
 
     napi_valuetype resultType;
     napi_typeof(env, args[0], &resultType);
-    if (resultType == napi_number) {
-        int32_t number;
-        napi_get_value_int32(env, args[0], &number);
-        if (number != TsLLMRequestStatus::LLM_SUCCESS) {
-            AIP_HILOGE("LLM return error. errCode: %{public}d", number);
+    if (resultType == napi_object) {
+        napi_value statusNapi;
+        napi_status status = napi_get_named_property(env, args[0], "status", &statusNapi);
+        if (status == napi_ok) {
+            int32_t number = 0;
+            napi_get_value_int32(env, statusNapi, &number);
+            if (number != TsLLMRequestStatus::LLM_SUCCESS) {
+                AIP_HILOGE("LLM return error. errCode: %{public}d", number);
+            }
+            callbackParam->result = number;
+        } else {
+            AIP_HILOGE("cannot get prperty status");
         }
-        callbackParam->result = number;
     } else {
-        AIP_HILOGE("The resolved value is not a number, type: %{public}d", resultType);
+        AIP_HILOGE("The resolved value is not a object, type: %{public}d", resultType);
     }
 
     std::unique_lock<std::mutex> lock(callbackParam->lockInfo->mutex);
