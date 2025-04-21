@@ -104,7 +104,6 @@ arkui_x_public_source = [
 ]
 
 ohos_source_set("arkui_x_udmf_data") {
-  use_exceptions = true
   sources = [
     "${udmf_framework_path}/common/base32_utils.cpp",
     "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
@@ -169,6 +168,9 @@ config("arkui_x_udmf_napi_config") {
     "${arkui_x_graphic_2d_path}/rosen/modules/platform/ipc_core",
     "${third_party_path}/skia",
   ]
+  if (current_os == "ios") {
+    defines = [ "IOS_PLATFORM" ]
+  }
 }
 
 ohos_source_set("arkui_x_uniformtypedescriptor") {

@@ -74,7 +74,6 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
         LOG_ERROR(UDMF_CLIENT, "catch regex_error, bundleName: %{public}s.", bundleName.c_str());
         return false;
     }
-    
     std::vector<TypeDescriptorCfg> inputTypeCfgs;
     if (!typeCfgs.first.empty()) {
         inputTypeCfgs.insert(inputTypeCfgs.end(), typeCfgs.first.begin(), typeCfgs.first.end());
