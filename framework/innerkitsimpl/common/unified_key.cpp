@@ -59,7 +59,7 @@ std::string UnifiedKey::GetUnifiedKey()
     return this->key;
 }
 
-std::string UnifiedKey::GetPropertyKey() const
+std::string UnifiedKey::GetKeyCommonPrefix() const
 {
     if (this->key.size() > INDEX_LEN) {
         return this->key.substr(0, key.size() - SUFIX_LEN);
