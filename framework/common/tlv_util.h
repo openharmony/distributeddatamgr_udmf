@@ -16,6 +16,7 @@
 #ifndef UDMF_TLV_UTIL_H
 #define UDMF_TLV_UTIL_H
 
+
 #include <utility>
 #include <vector>
 #include "unified_types.h"
@@ -153,7 +154,7 @@ template <typename T> bool ReadTlv(T &output, TLVObject &data, TAG tag)
     return true;
 }
 
-template <typename T> void InitWhenFirst(const T &input, TLVObject &data)
+template <typename T> void InitWhenFirst(T &input, TLVObject &data)
 {
     if (data.GetCursor() == data.GetTotal()) {
         CountBufferSize(input, data);
