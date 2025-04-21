@@ -55,7 +55,9 @@ bool UtdCfgsChecker::CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::ve
 
 bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string &bundleName)
 {
+#ifndef CROSS_PLATFORM
     try {
+#endif
         for (auto declarationType: typeCfgs.first) {
             if (!std::regex_match(declarationType.typeId, std::regex(bundleName + TYPE_ID_REGEX))) {
                 LOG_ERROR(UDMF_CLIENT, "Declaration typeId check failed, id: %{public}s, bundleName: %{public}s.",
@@ -70,10 +72,12 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
                 return false;
             }
         }
+#ifndef CROSS_PLATFORM
     } catch (const std::regex_error& e) {
         LOG_ERROR(UDMF_CLIENT, "catch regex_error, bundleName: %{public}s.", bundleName.c_str());
         return false;
     }
+#endif
     std::vector<TypeDescriptorCfg> inputTypeCfgs;
     if (!typeCfgs.first.empty()) {
         inputTypeCfgs.insert(inputTypeCfgs.end(), typeCfgs.first.begin(), typeCfgs.first.end());
