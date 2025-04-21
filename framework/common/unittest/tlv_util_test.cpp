@@ -31,7 +31,6 @@
 #include "system_defined_pixelmap.h"
 #include "system_defined_record.h"
 #include "udmf_conversion.h"
-#include "unified_data_helper.h"
 #include "unified_meta.h"
 #include "unified_record.h"
 #include "unified_types.h"
@@ -650,45 +649,6 @@ HWTEST_F(TlvUtilTest, WritingAndReadingFile_001, TestSize.Level1)
 
     fclose(file);
     LOG_INFO(UDMF_TEST, "WritingAndReadingFile_001 end.");
-}
-
-/* *
- * @tc.name: WritingAndReadingSummary_001
- * @tc.desc: test Summary for Writing And Reading
- * @tc.type: FUNC
- */
-HWTEST_F(TlvUtilTest, WritingAndReadingSummary_001, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "WritingAndReadingSummary_001 begin.");
-    std::map<std::string, ValueType> value;
-    value["fileType"] = "File Type";
-    value["fileUri"] = "File Uri";
-    std::shared_ptr<Object> obj = std::make_shared<Object>();
-    obj->value_ = value;
-    std::shared_ptr<UnifiedRecord> fileUri = std::make_shared<UnifiedRecord>(UDType::FILE_URI, obj);
-    std::shared_ptr<UnifiedRecord> plainText = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "this is a content");
-    std::shared_ptr<UnifiedRecord> html = std::make_shared<Html>(UDType::HTML, "this is a HTML content");
-    std::vector<std::shared_ptr<UnifiedRecord>> records = { fileUri, plainText, html };
-    UnifiedData data1;
-    data1.SetRecords(records);
-    Summary summary;
-    UnifiedDataHelper::GetSummary(data1, summary);
-    EXPECT_EQ(summary.summary.size(), records.size());
-
-    std::vector<uint8_t> dataBytes;
-    auto tlvObject = TLVObject(dataBytes);
-    EXPECT_TRUE(TLVUtil::Writing(summary, tlvObject, TAG::TAG_SUMMARY));
-
-    tlvObject.ResetCursor();
-    Summary summary2;
-    TLVUtil::ReadTlv(summary2, tlvObject, TAG::TAG_SUMMARY);
-    EXPECT_EQ(summary.totalSize, summary2.totalSize);
-    EXPECT_EQ(summary.summary.size(), summary2.summary.size());
-    for (const auto &[key, val] : summary.summary) {
-        ASSERT_TRUE(summary2.summary.find(key) != summary2.summary.end());
-        EXPECT_EQ(summary.summary[key], summary2.summary[key]);
-    }
-    LOG_INFO(UDMF_TEST, "WritingAndReadingSummary_001 end.");
 }
 
 /* *

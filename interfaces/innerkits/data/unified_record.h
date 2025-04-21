@@ -74,6 +74,7 @@ public:
     void API_EXPORT SetChannelName(const std::string &channelName);
 
     virtual void InitObject();
+    bool HasObject();
     bool HasFileType(std::string &fileUri) const;
     void SetFileUri(const std::string &fileUri);
 
@@ -86,6 +87,7 @@ protected:
     std::string utdId_;
     std::string utdId2_;
     ValueType value_;
+    bool hasObject_ = false;
 private:
     void AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri) const;
     

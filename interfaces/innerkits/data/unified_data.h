@@ -58,10 +58,10 @@ public:
     uint32_t GetDataId() const;
     void SetChannelName(const std::string &name);
     std::vector<std::string> GetFileUris() const;
-    bool API_EXPORT IsNeedTransferToEntries() const;
-    void API_EXPORT ConvertRecordsToEntries();
     std::string API_EXPORT GetSdkVersion() const;
     void API_EXPORT SetSdkVersion(const std::string &version);
+    bool API_EXPORT IsNeedTransferToEntries() const;
+    void API_EXPORT ConvertRecordsToEntries();
 
     static constexpr int64_t MAX_DATA_SIZE = 200 * 1024 * 1024;
 
