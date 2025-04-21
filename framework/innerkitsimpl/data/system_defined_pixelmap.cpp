@@ -139,13 +139,12 @@ std::unique_ptr<Media::PixelMap> SystemDefinedPixelMap::GetPixelMapFromRawData()
     Media::InitializationOptions opts;
     auto details = ObjectUtils::ConvertToObject(details_);
     int32_t pixelFormat = 0;
-    int32_t alphaType = 0;
     if (details->GetValue(PIXEL_MAP_WIDTH, opts.size.width) &&
         details->GetValue(PIXEL_MAP_HEIGHT, opts.size.height) &&
-        details->GetValue(PIXEL_MAP_FORMAT, pixelFormat) &&
-        details->GetValue(PIXEL_MAP_ALPHA_TYPE, alphaType)) {
+        details->GetValue(PIXEL_MAP_FORMAT, pixelFormat)) {
         opts.pixelFormat = static_cast<Media::PixelFormat>(pixelFormat);
-        opts.alphaType = static_cast<Media::AlphaType>(alphaType);
+        // This create does not do pre-multiplication.
+        opts.alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL;
 
         if (rawData_.size() % BYTES_PER_COLOR != 0) {
             LOG_ERROR(UDMF_KITS_INNER, "RawData size error, size = %{public}zu", rawData_.size());
