@@ -159,7 +159,7 @@ public:
         }
 
     private:
-        ani_ref saveRemote_;
+        ani_ref saveRemote_ = nullptr;
         std::shared_ptr<UnifiedRecord> object_;
 };
 
@@ -193,7 +193,7 @@ public:
         }
 
     private:
-        ani_ref saveRemote_;
+        ani_ref saveRemote_ = nullptr;
         std::shared_ptr<UnifiedData> object_;
 };
 
