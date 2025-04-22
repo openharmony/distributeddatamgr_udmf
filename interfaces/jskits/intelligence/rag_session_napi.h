@@ -77,7 +77,7 @@ private:
     static void StreamRunExecutionCB(napi_env env, void *data);
     static void StreamRunCompleteCB(napi_env env, napi_status status, void *data);
     static void StreamRunCallbackExecute(RAGSessionNapi *session_napi, StreamStruct stream, int32_t errCode);
-    static void StreamRunCallbackWorkerFunc(uv_work_t *work, int inStatus);
+    static void StreamRunCallbackEventFunc(StreamRunCallbackWorkParam *workParam);
     static void StreamRunCallbackJSExecute (StreamRunCallbackWorkParam *workParam);
     static AipCoreManagerHandle aipAipCoreMgrHandle_;
     static napi_ref callbackRef_;
