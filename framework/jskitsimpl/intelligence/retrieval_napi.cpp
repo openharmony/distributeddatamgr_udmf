@@ -126,7 +126,7 @@ napi_value RetrievalNapi::GetRetriever(napi_env env, napi_callback_info info)
         ThrowIntelligenceErr(env, INNER_ERROR, "create promise failed");
         return nullptr;
     }
-    auto asyncGetRetriever = new AsyncGetRetriever{
+    auto asyncGetRetriever = new (std::nothrow) AsyncGetRetriever{
         .asyncWork = nullptr,
         .deferred = deferred,
         .config = retrievalConfig,
@@ -181,10 +181,12 @@ napi_value RetrievalNapi::WrapAipCoreManager(napi_env env, IAipCoreManager *retr
     napi_value retrieveFn;
     status = napi_create_function(env, nullptr, NAPI_AUTO_LENGTH, Retrieve, nullptr, &retrieveFn);
     if (status != napi_ok) {
+        delete retrievalAipCoreManager;
         return nullptr;
     }
     status = napi_set_named_property(env, result, "retrieveRdb", retrieveFn);
     if (status != napi_ok) {
+        delete retrievalAipCoreManager;
         return nullptr;
     }
     return result;
@@ -205,7 +207,7 @@ void RetrievalNapi::GetRetrieverExecutionCB(napi_env env, void *data)
     }
     if (retrievalAipCoreManager == nullptr) {
         AIP_HILOGI("Init retrieval by new.");
-        retrievalAipCoreManager = new IAipCoreManagerImpl();
+        retrievalAipCoreManager = new (std::nothrow) IAipCoreManagerImpl();
     }
     int32_t ret = retrievalAipCoreManager->InitRetriever(config);
     asyncGetRetrieverdata->ret = ret;
@@ -353,7 +355,7 @@ napi_value RetrievalNapi::Retrieve(napi_env env, napi_callback_info info)
     if (status != napi_ok) {
         return nullptr;
     }
-    auto asyncRetrieve = new AsyncRetrieve{
+    auto asyncRetrieve = new (std::nothrow) AsyncRetrieve{
         .asyncWork = nullptr,
         .deferred = deferred,
         .query = query,
