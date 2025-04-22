@@ -34,6 +34,9 @@ public:
 
     void InitObject() override;
 private:
+    bool SetRawDataFromPixels(const std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
+    std::unique_ptr<Media::PixelMap> GetPixelMapFromRawData();
+
     std::vector<uint8_t> rawData_;
 };
 } // namespace UDMF

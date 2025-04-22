@@ -356,17 +356,19 @@ HWTEST_F(NdkDataConversionTest, ConvertPixelMap_002, TestSize.Level1)
 HWTEST_F(NdkDataConversionTest, ConvertPixelMap_003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "ConvertPixelMap_003 begin.");
-    uint32_t color[100] = { 3, 7, 9, 9, 7, 6 };
+    uint32_t color[35] = { 3, 7, 9, 9, 7, 6 };
     OHOS::Media::InitializationOptions opts = { { 5, 7 },
         Media::PixelFormat::ARGB_8888, Media::PixelFormat::ARGB_8888 };
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap =
         OHOS::Media::PixelMap::Create(color, sizeof(color) / sizeof(color[0]), opts);
-    std::shared_ptr<OHOS::Media::PixelMap> pixelMapIn = move(pixelMap);
     std::vector<uint8_t> buff;
-    pixelMapIn->EncodeTlv(buff);
+    buff.resize(pixelMap->GetByteCount());
+    auto status = pixelMap->ReadPixels(pixelMap->GetByteCount(), buff.data());
+    ASSERT_EQ(status, E_OK);
 
     std::shared_ptr<SystemDefinedPixelMap> systemDefinedPixelMap =
         std::make_shared<SystemDefinedPixelMap>(UDType::SYSTEM_DEFINED_PIXEL_MAP, buff);
+    systemDefinedPixelMap->SetPixelMapDetails(std::move(pixelMap));
     UnifiedData data;
     std::vector<std::shared_ptr<UnifiedRecord>> records = { systemDefinedPixelMap };
     data.SetRecords(records);
@@ -392,10 +394,11 @@ HWTEST_F(NdkDataConversionTest, ConvertPixelMap_003, TestSize.Level1)
     auto type = OH_UdsPixelMap_GetType(pixelMapUds);
     EXPECT_EQ(std::string(type), std::string(UDMF_META_OPENHARMONY_PIXEL_MAP));
 
+    uint32_t color2[100] = { 3, 7, 9, 9, 7, 6 };
     OHOS::Media::InitializationOptions opts2 = { { 10, 10 },
         Media::PixelFormat::ARGB_8888, Media::PixelFormat::ARGB_8888 };
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap2 =
-        OHOS::Media::PixelMap::Create(color, sizeof(color) / sizeof(color[0]), opts2);
+        OHOS::Media::PixelMap::Create(color2, sizeof(color) / sizeof(color[0]), opts2);
 
     OH_PixelmapNative *ohPixelmapNative = new OH_PixelmapNative(std::move(pixelMap2));
     OH_UdsPixelMap_GetPixelMap(pixelMapUds, ohPixelmapNative);
@@ -407,6 +410,56 @@ HWTEST_F(NdkDataConversionTest, ConvertPixelMap_003, TestSize.Level1)
     OH_UdmfData_Destroy(ndkData);
     delete ohPixelmapNative;
     LOG_INFO(UDMF_TEST, "ConvertPixelMap_003 end.");
+}
+
+/* *
+ * @tc.name: ConvertPixelMap_004
+ * @tc.desc: test pixel-map conversion between UDS and C-API
+ * @tc.type: FUNC
+ */
+HWTEST_F(NdkDataConversionTest, ConvertPixelMap_004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ConvertPixelMap_004 begin.");
+    uint32_t color[35] = { 3, 7, 9, 9, 7, 6 };
+    OHOS::Media::InitializationOptions opts = { { 5, 7 },
+        Media::PixelFormat::ARGB_8888, Media::PixelFormat::ARGB_8888 };
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap =
+        OHOS::Media::PixelMap::Create(color, sizeof(color) / sizeof(color[0]), opts);
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMapIn = move(pixelMap);
+
+    auto pixelMapUds = OH_UdsPixelMap_Create();
+    OH_PixelmapNative *ohPixelmapNative = new OH_PixelmapNative(pixelMapIn);
+    OH_UdsPixelMap_SetPixelMap(pixelMapUds, ohPixelmapNative);
+    auto record = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddPixelMap(record, pixelMapUds);
+    auto data = OH_UdmfData_Create();
+    OH_UdmfData_AddRecord(data, record);
+    std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
+    auto conversionStatus = NdkDataConversion::GetNativeUnifiedData(data, unifiedData);
+    EXPECT_EQ(conversionStatus, E_OK);
+    std::string key;
+    CustomOption option = {.intention = UD_INTENTION_DRAG};
+    auto setRet = UdmfClient::GetInstance().SetData(option, *unifiedData, key);
+    EXPECT_EQ(setRet, E_OK);
+    std::shared_ptr<UnifiedData> readData = std::make_shared<UnifiedData>();
+    QueryOption query = {.key = key};
+    auto getRet = UdmfClient::GetInstance().GetData(query, *readData);
+    EXPECT_EQ(getRet, E_OK);
+
+    auto readRecord = readData->GetRecordAt(0);
+    auto value = readRecord->GetEntry(UDMF_META_OPENHARMONY_PIXEL_MAP);
+    ASSERT_TRUE(std::holds_alternative<std::shared_ptr<Object>>(value));
+    auto obj = std::get<std::shared_ptr<Object>>(value);
+    std::shared_ptr<Media::PixelMap> getPixelMap = nullptr;
+    ASSERT_TRUE(obj->GetValue(PIXEL_MAP, getPixelMap));
+    ASSERT_NE(getPixelMap, nullptr);
+    ASSERT_EQ(getPixelMap->GetHeight(), pixelMapIn->GetHeight());
+    ASSERT_EQ(getPixelMap->GetByteCount(), pixelMapIn->GetByteCount());
+    OH_UdsPixelMap_Destroy(pixelMapUds);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(data);
+    delete ohPixelmapNative;
+    LOG_INFO(UDMF_TEST, "ConvertPixelMap_004 end.");
 }
 
 /* *
