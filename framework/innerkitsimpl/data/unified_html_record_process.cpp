@@ -93,16 +93,14 @@ std::string UnifiedHtmlRecordProcess::RebuildHtmlContent(const std::string &str,
     std::map<uint32_t, std::pair<std::string, std::string>, Cmp> replaceUris;
     std::string strResult = str;
     for (auto &uri : uris) {
-        if (uri.dfsUri.empty()) {
-            continue;
-        }
-        std::string realUri = uri.dfsUri;
-        if (realUri.substr(0, strlen(FILE_SCHEME_PREFIX)) == FILE_SCHEME_PREFIX) {
-            AppFileService::ModuleFileUri::FileUri fileUri(uri.dfsUri);
+        std::string tmpUri = uri.dfsUri.empty() ? uri.authUri : uri.dfsUri;
+        std::string realUri = tmpUri;
+        if (tmpUri.substr(0, strlen(FILE_SCHEME_PREFIX)) == FILE_SCHEME_PREFIX) {
+            AppFileService::ModuleFileUri::FileUri fileUri(tmpUri);
             realUri = FILE_SCHEME_PREFIX;
             realUri += fileUri.GetRealPath();
+            replaceUris[uri.position] = std::make_pair(std::move(uri.oriUri), std::move(realUri));
         }
-        replaceUris[uri.position] = std::make_pair(std::move(uri.oriUri), std::move(realUri));
     }
     if (replaceUris.empty()) {
         return "";
