@@ -78,6 +78,11 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
         return false;
     }
 #endif
+    return CheckTypesOptions(typeCfgs, bundleName);
+}
+
+bool UtdCfgsChecker::CheckTypesOptions(CustomUtdCfgs &typeCfgs, const std::string &bundleName)
+{
     std::vector<TypeDescriptorCfg> inputTypeCfgs;
     if (!typeCfgs.first.empty()) {
         inputTypeCfgs.insert(inputTypeCfgs.end(), typeCfgs.first.begin(), typeCfgs.first.end());
@@ -89,7 +94,7 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
         for (std::string filenames : typeCfg.filenameExtensions) {
             if (filenames.size() <= 1 || filenames[0] != FILE_EXTENSION_PREFIX) {
                 LOG_ERROR(UDMF_CLIENT, "Extension not valid, extension: %{public}s, bundleName: %{public}s.",
-                    filenames.c_str(), bundleName.c_str());
+                          filenames.c_str(), bundleName.c_str());
                 return false;
             }
         }
@@ -100,7 +105,7 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
         for (std::string mimeType : typeCfg.mimeTypes) {
             if (mimeType.empty()) {
                 LOG_ERROR(UDMF_CLIENT, "mimeType can not be an empty string, typeId: %{public}s.",
-                    typeCfg.typeId.c_str());
+                          typeCfg.typeId.c_str());
                 return false;
             }
         }
