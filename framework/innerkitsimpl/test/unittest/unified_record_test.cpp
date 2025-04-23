@@ -386,4 +386,30 @@ HWTEST_F(UnifiedRecordTest, GetEntryTest003, TestSize.Level1)
     EXPECT_TRUE(std::holds_alternative<std::monostate>(
         std::get<std::shared_ptr<Object>>(fifthValue)->value_[VALUE_TYPE]));
 }
+
+/**
+* @tc.name: SetFileUriTest001
+* @tc.desc: Test set a base UnifiedRecord data, then get data with GetEntry function.
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedRecordTest, SetFileUriTest001, TestSize.Level1)
+{
+    std::string uri = "file://1111/a.jpeg";
+    std::shared_ptr<Object> fileObj = std::make_shared<Object>();
+    fileObj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    fileObj->value_[FILE_TYPE] = "general.jpeg";
+    std::shared_ptr<UnifiedRecord> fileRecord = std::make_shared<UnifiedRecord>(FILE_URI, fileObj);
+    fileRecord->SetFileUri(uri);
+    std::shared_ptr<Object> fileObj1 = std::get<std::shared_ptr<Object>>(fileRecord->GetValue());
+    EXPECT_EQ(std::get<std::string>(fileObj1->value_[FILE_URI_PARAM]), uri);
+
+    std::shared_ptr<Object> plaintextObj = std::make_shared<Object>();
+    plaintextObj->value_[UNIFORM_DATA_TYPE] = "general.plain-text";
+    plaintextObj->value_[CONTENT] = "plaintext";
+    std::shared_ptr<UnifiedRecord> plaintextRecord = std::make_shared<UnifiedRecord>(PLAIN_TEXT, plaintextObj);
+    plaintextRecord->SetFileUri(uri);
+    std::shared_ptr<Object> plaintextObj1 = std::get<std::shared_ptr<Object>>(plaintextRecord->GetValue());
+    auto val = std::get<std::string>(plaintextObj1->value_[FILE_URI_PARAM]);
+    EXPECT_EQ(val, uri);
+}
 } // OHOS::Test
