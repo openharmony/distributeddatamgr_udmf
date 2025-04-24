@@ -49,18 +49,7 @@ TsLLMRequestStatus ChatLLM::StreamChat(const std::string &query, const LLMStream
         return LLM_ERROR;
     }
     llmStreamCallback_ = std::make_shared<LLMStreamCallback>(streamCallback);
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(env_, &loop);
-    if (loop == nullptr) {
-        AIP_HILOGE("loop instance is nullptr");
-        return LLM_ERROR;
-    }
 
-    auto *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        AIP_HILOGE("work is nullptr");
-        return LLM_ERROR;
-    }
     auto *param = new (std::nothrow) WorkParam {
         query,
         std::make_shared<LLMStreamCallback>(streamCallback),
@@ -71,17 +60,22 @@ TsLLMRequestStatus ChatLLM::StreamChat(const std::string &query, const LLMStream
         std::make_shared<ThreadLockInfo>(),
     };
     if (param == nullptr) {
-        delete work;
-        work = nullptr;
         AIP_HILOGE("WorkParam is nullptr");
         return LLM_ERROR;
     }
-    work->data = reinterpret_cast<void *>(param);
-    int ret = uv_queue_work(loop, work, [](uv_work_t *) { }, LLMStreamCallbackWorkerFunc);
-    AIP_HILOGD("uv_queue_work running, ret: %{public}d, wait for llmStreamChatWorker", ret);
+
+    napi_status status = napi_send_event(env_, [param] {
+        StreamChatCallbackEventFunc(param);
+    }, napi_eprio_high);
+    if (status != napi_ok) {
+        AIP_HILOGE("napi_send_event running failed, status: %{public}d", status);
+        delete param;
+        param = nullptr;
+        return LLM_ERROR;
+    }
 
     std::unique_lock<std::mutex> lock(param->lockInfo->mutex);
-    if (ret == 0 && param->lockInfo->condition.wait_for(lock, std::chrono::seconds(STREAM_CHAT_WORK_DEFAULT_WAIT),
+    if (param->lockInfo->condition.wait_for(lock, std::chrono::seconds(STREAM_CHAT_WORK_DEFAULT_WAIT),
         [param] { return param->lockInfo->ready; })) {
         AIP_HILOGE("call js callback not complete.");
     }
@@ -90,8 +84,7 @@ TsLLMRequestStatus ChatLLM::StreamChat(const std::string &query, const LLMStream
 
     delete param;
     param = nullptr;
-    delete work;
-    work = nullptr;
+
     return static_cast<TsLLMRequestStatus>(retInt);
 }
 
@@ -187,32 +180,28 @@ napi_value ChatLLM::StreamCallbackFunc(napi_env env, napi_callback_info info)
     return result;
 }
 
-void ChatLLM::LLMStreamCallbackWorkerFunc(uv_work_t *work, int inStatus)
+void ChatLLM::StreamChatCallbackEventFunc(WorkParam *param)
 {
-    if (work == nullptr || work->data == nullptr) {
-        AIP_HILOGE("invalid parameter");
+    if (param == nullptr) {
+        AIP_HILOGE("param is nullptr");
         return;
     }
 
-    auto *llmWorkParam = reinterpret_cast<WorkParam *>(work->data);
-    if (llmWorkParam->query.empty() || llmWorkParam->llmStreamCallback == nullptr
-        || llmWorkParam->ref == nullptr) {
+    if (param->query.empty() || param->llmStreamCallback == nullptr || param->ref == nullptr) {
         AIP_HILOGE("param of llmWorkParam is null");
         return;
     }
 
-    auto env = llmWorkParam->env;
-    auto ref = llmWorkParam->ref;
     napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
+    napi_open_handle_scope(param->env, &scope);
     if (scope == nullptr) {
-        AIP_HILOGE("scope is null");
+        AIP_HILOGE("scope open failed. scope is nullptr");
         return;
     }
 
-    CallJSStreamChat(env, ref, llmWorkParam);
+    CallJSStreamChat(param->env, param->ref, param);
 
-    napi_close_handle_scope(env, scope);
+    napi_close_handle_scope(param->env, scope);
 }
 
 void ChatLLM::CallJSStreamChat(napi_env env, napi_ref ref, WorkParam *llmWorkParam)

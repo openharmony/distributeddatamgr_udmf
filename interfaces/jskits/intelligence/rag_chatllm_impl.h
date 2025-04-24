@@ -57,7 +57,7 @@ public:
     napi_ref GetRef();
 private:
     static napi_value StreamCallbackFunc(napi_env env, napi_callback_info info);
-    static void LLMStreamCallbackWorkerFunc(uv_work_t *work, int inStatus);
+    static void StreamChatCallbackEventFunc(WorkParam *param);
     static void CallJSStreamChat(napi_env env, napi_ref ref, WorkParam *llmWorkParam);
     static void HandlePromiseValue(napi_env env, napi_value promiseResult, WorkParam *llmWorkParam);
     static napi_value PromiseThenCallback(napi_env env, napi_callback_info info);
