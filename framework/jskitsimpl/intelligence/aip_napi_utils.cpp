@@ -707,7 +707,7 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, Reca
     if (isFiltersPresent) {
         napi_value filtersNapi;
         napi_get_named_property(env, in, "filters", &filtersNapi);
-        napi_status status = AipNapiUtils::Convert2Value(env, filtersNapi, out.filters);
+        status = AipNapiUtils::Convert2Value(env, filtersNapi, out.filters);
         LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field filter.", napi_invalid_arg);
     }
     return napi_ok;
@@ -885,7 +885,6 @@ static napi_status ConvertRerankChannelParams(napi_env env, const napi_value &in
             keyInt <= TsChannelType::INVERTED_INDEX_DATABASE, "channelType is ileagl.", napi_invalid_arg);
         napi_value valueNapi;
         napi_get_property(env, parametersNapi, keyNapi, &valueNapi);
-        std::shared_ptr<ChannelRerankParamsStruct> channelParams;
         bool isVectorWeightsPresent = false;
         napi_has_named_property(env, valueNapi, "vectorWeights", &isVectorWeightsPresent);
         if (isVectorWeightsPresent) {

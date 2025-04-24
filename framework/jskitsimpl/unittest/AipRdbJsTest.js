@@ -83,12 +83,15 @@ describe('AipJSTest', function () {
       }
       console.info(TAG + 'Delete RdbStore successfully.');
     });
-    rdbStore1 = await relationalStore.getRdbStore(context, storeConfigVector);
-    if (rdbStore1 !== undefined) {
-      let createSql = 'CREATE TABLE IF NOT EXISTS vector_table(fileid TEXT PRIMARY KEY, filename_text TEXT, filename FLOATVECTOR(128), keywords_text TEXT, keywords FLOATVECTOR(128), chapter FLOATVECTOR(128), abstract FLOATVECTOR(128));';
-      await rdbStore1.execute(createSql, 0, undefined);
-      await insertVectorDB();
-    };
+    let result = relationalStore.isVectorSupported();
+    if (result) {
+      rdbStore1 = await relationalStore.getRdbStore(context, storeConfigVector);
+      if (rdbStore1 !== undefined) {
+        let createSql = 'CREATE TABLE IF NOT EXISTS vector_table(fileid TEXT PRIMARY KEY, filename_text TEXT, filename FLOATVECTOR(128), keywords_text TEXT, keywords FLOATVECTOR(128), chapter FLOATVECTOR(128), abstract FLOATVECTOR(128));';
+        await rdbStore1.execute(createSql, 0, undefined);
+        await insertVectorDB();
+      };
+    }
     rdbStore2 = await relationalStore.getRdbStore(context, storeConfigInvIdx);
     if (rdbStore2 !== undefined) {
       let createSql = 'CREATE VIRTUAL TABLE IF NOT EXISTS invidx_table USING fts5(fileid, filename, keywords, chapter, abstract, content, tokenize = "customtokenizer");';
@@ -126,19 +129,14 @@ describe('AipJSTest', function () {
 
   async function insertInvIdxDB() {
     let insertSQL = 'INSERT INTO invidx_table VALUES("1", "大模型系统概述", "生成式AI, 人工智能, 大模型", "人工智能导论", "这是一篇关于大模型的综述文章", "这是一篇关于大模型的综述文章");';
-    console.info(TAG + 'insertInvIdxDB insertSQL::' + insertSQL);
     await rdbStore2.executeSql(insertSQL);
     insertSQL = 'INSERT INTO invidx_table VALUES("2", "数据库在大模型时代下的发展", "数据库, 内核, 向量", "数据库导论", "这是一篇关于数据库和大模型交叉的综述文章", "这是一篇关于数据库和大模型交叉的综述文章");';
-    console.info(TAG + 'insertInvIdxDB insertSQL::' + insertSQL);
     await rdbStore2.executeSql(insertSQL);
     insertSQL = 'INSERT INTO invidx_table VALUES("3", "社会发展报告", "旅游, 民生, 交通", "社会发展", "这是一篇关于社会发展的综述文章", "这是一篇关于社会发展的综述文章");';
-    console.info(TAG + 'insertInvIdxDB insertSQL::' + insertSQL);
     await rdbStore2.executeSql(insertSQL);
     insertSQL = 'INSERT INTO invidx_table VALUES("4", "鸿蒙", "鸿蒙, 生态, 遥遥领先", "鸿蒙系统", "这是一篇关于鸿蒙系统的综述文章", "这是一篇关于鸿蒙系统的综述文章");';
-    console.info(TAG + 'insertInvIdxDB insertSQL::' + insertSQL);
     await rdbStore2.executeSql(insertSQL);
     insertSQL = 'INSERT INTO invidx_table VALUES("5", "AI系统", "鸿蒙, 生态, 大模型", "AI系统", "这是一篇关于AI系统的综述文章", "这是一篇关于AI系统的综述文章");';
-    console.info(TAG + 'insertInvIdxDB insertSQL::' + insertSQL);
     await rdbStore2.executeSql(insertSQL);
     console.info(TAG + 'insertInvIdxDB end');
   }
@@ -198,21 +196,12 @@ describe('AipJSTest', function () {
     let retrievalConfig = {
       channelConfigs: []
     };
-    if (currentDeviceIsPc) {
-      try {
-        await intelligence.getRetriever(retrievalConfig);
-      } catch (err) {
-        console.info(TAG, 'Aip_002 catch::' + err.code);
-        expect(err.code).assertEqual(401);
-        done();
-      }
-    } else {
-      await intelligence.getRetriever(retrievalConfig)
-        .catch((err) => {
-          console.info(TAG, 'catch::' + err.code);
-          expect(err.code).assertEqual(801);
-          done();
-        });
+    try {
+      await intelligence.getRetriever(retrievalConfig);
+    } catch (err) {
+      console.info(TAG, 'Aip_002 catch::' + err.code);
+      expect(err.code).assertEqual(401);
+      done();
     }
   });
 
