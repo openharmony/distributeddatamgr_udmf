@@ -33,6 +33,7 @@ private:
     UtdCfgsChecker(const UtdCfgsChecker &obj) = delete;
     UtdCfgsChecker &operator=(const UtdCfgsChecker &obj) = delete;
     bool CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string &bundleName);
+    bool CheckTypesOptions(CustomUtdCfgs &typeCfgs, const std::string &bundleName);
     bool CheckTypesRelation(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
         const std::vector<TypeDescriptorCfg> &customCfgs);
     bool CanConstructDAG(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,

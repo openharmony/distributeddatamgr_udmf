@@ -104,7 +104,6 @@ arkui_x_public_source = [
 ]
 
 ohos_source_set("arkui_x_udmf_data") {
-  use_exceptions = true
   sources = [
     "${udmf_framework_path}/common/base32_utils.cpp",
     "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
