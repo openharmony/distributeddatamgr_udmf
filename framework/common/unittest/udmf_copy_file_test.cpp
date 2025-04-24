@@ -25,7 +25,6 @@ using namespace testing::ext;
 using namespace OHOS::UDMF;
 using namespace OHOS;
 namespace OHOS::Test {
-using namespace std;
 
 class CopyFileTest : public testing::Test {
 public:
@@ -79,6 +78,24 @@ HWTEST_F(CopyFileTest, Copy001, TestSize.Level1)
 }
 
 /**
+* @tc.name: Copy002
+* @tc.desc: normal copy test
+* @tc.type: FUNC
+*/
+HWTEST_F(CopyFileTest, Copy002, TestSize.Level1)
+{
+    std::string srcUri = "test_src.txt";
+    std::string destUri = "test_dest.txt";
+    auto record = std::make_shared<UnifiedRecord>();
+    auto asyncHelper = std::make_unique<AsyncHelper>();
+    UdmfCopyFile::CopyContext context(asyncHelper);
+
+    bool result = UdmfCopyFile::GetInstance().CopyFile(srcUri, destUri, record, context);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(context.status, E_OK);
+}
+
+/**
 * @tc.name: ConstructDestUri
 * @tc.desc: Construct DestUri Should Correctly Construct Destination Path
 * @tc.type: FUNC
@@ -92,15 +109,27 @@ HWTEST_F(CopyFileTest, ConstructDestUri, TestSize.Level1)
 }
 
 /**
-* @tc.name: GetFileName
+* @tc.name: GetFileName001
 * @tc.desc: GetFileName Should Handle Remote Files Correctly
 * @tc.type: FUNC
 */
-HWTEST_F(CopyFileTest, GetFileName, TestSize.Level1)
+HWTEST_F(CopyFileTest, GetFileName001, TestSize.Level1)
 {
-    std::string remoteFile = "file.txt?networkid=123";
+    std::string remoteFile = "file://data/storage/el2/distributedfiles/103.png";
     auto result = UdmfCopyFile::GetInstance().GetFileName(remoteFile);
-    ASSERT_EQ(result, "file.txt");
+    ASSERT_EQ(result, "103.png");
+}
+
+/**
+* @tc.name: GetFileName002
+* @tc.desc: GetFileName Should Handle Remote Files Correctly
+* @tc.type: FUNC
+*/
+HWTEST_F(CopyFileTest, GetFileName002, TestSize.Level1)
+{
+    std::string remoteFile = "file://data/storage/el2/distributedfiles/103.png?networkid=xxx";
+    auto result = UdmfCopyFile::GetInstance().GetFileName(remoteFile);
+    ASSERT_EQ(result, "103.png");
 }
 
 /**
