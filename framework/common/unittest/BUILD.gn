@@ -187,17 +187,17 @@ ohos_unittest("CopyFileTest") {
 
   sources = [
     "${udmf_framework_path}/common/udmf_copy_file.cpp",
+    "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/common/unittest/mock/file_copy_manager_mock.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_async_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/progress_queue.cpp",
+    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/progress_callback.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
-    "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/common/udmf_utils.cpp",
     "udmf_copy_file_test.cpp",
   ]
 
@@ -211,6 +211,7 @@ ohos_unittest("CopyFileTest") {
     "private=public",
     "protected=public",
   ]
+
   use_exceptions = true
 }
 
