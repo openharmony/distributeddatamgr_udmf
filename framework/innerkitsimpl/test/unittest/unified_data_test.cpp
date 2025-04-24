@@ -19,6 +19,7 @@
 #include <string>
 
 #include "file.h"
+#include "image.h"
 #include "logger.h"
 #include "plain_text.h"
 #include "udmf_capi_common.h"
@@ -310,4 +311,114 @@ HWTEST_F(UnifiedDataTest, TransferToEntries002, TestSize.Level1)
     TransferToEntriesCompareEntries(recordFirst);
     LOG_INFO(UDMF_TEST, "TransferToEntries001 end.");
 }
+
+/**
+* @tc.name: HasHigherFileTypeTest001
+* @tc.desc: Normal test of HasHigherFileType return true.
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataTest, HasHigherFileTypeTest001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "HasHigherFileTypeTest001 begin.");
+    std::shared_ptr<Object> fileObj = std::make_shared<Object>();
+    fileObj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    fileObj->value_[FILE_URI_PARAM] = "file://1111/a.jpeg";
+    fileObj->value_[FILE_TYPE] = "general.jpeg";
+    std::shared_ptr<UnifiedRecord> file = std::make_shared<UnifiedRecord>(FILE_URI, fileObj);
+
+    std::shared_ptr<Object> fileObj1 = std::make_shared<Object>();
+    fileObj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    fileObj1->value_[FILE_URI_PARAM] = "file://1111/a.mp4";
+    fileObj1->value_[FILE_TYPE] = "general.mpeg-4";
+    std::shared_ptr<UnifiedRecord> file1 = std::make_shared<UnifiedRecord>(FILE_URI, fileObj1);
+
+    std::shared_ptr<Object> fileObj2 = std::make_shared<Object>();
+    fileObj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    fileObj2->value_[FILE_URI_PARAM] = "file://1111/a.txt";
+    fileObj2->value_[FILE_TYPE] = "general.file";
+    std::shared_ptr<UnifiedRecord> file2 = std::make_shared<UnifiedRecord>(FILE_URI, fileObj2);
+    UnifiedData unifiedData;
+    unifiedData.AddRecord(file);
+    unifiedData.AddRecord(file1);
+    unifiedData.AddRecord(file2);
+    EXPECT_TRUE(unifiedData.HasHigherFileType("general.file-uri"));
+    EXPECT_TRUE(unifiedData.HasHigherFileType("general.image"));
+    EXPECT_TRUE(unifiedData.HasHigherFileType("general.file"));
+    EXPECT_TRUE(unifiedData.HasHigherFileType("general.video"));
+    EXPECT_TRUE(unifiedData.HasHigherFileType("general.jpeg"));
+    EXPECT_TRUE(unifiedData.HasHigherFileType("general.mpeg-4"));
+    EXPECT_FALSE(unifiedData.HasHigherFileType("general.folder"));
+    EXPECT_FALSE(unifiedData.HasHigherFileType("general.audio"));
+    LOG_INFO(UDMF_TEST, "HasHigherFileTypeTest001 end.");
+}
+
+/**
+* @tc.name: IsCompleteTest001
+* @tc.desc: Normal test of HasHigherFileType return true.
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataTest, IsCompleteTest001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsCompleteTest001 begin.");
+    UnifiedData unifiedData;
+    EXPECT_FALSE(unifiedData.IsComplete());
+
+    Runtime runtime;
+    runtime.recordTotalNum = 1;
+    unifiedData.SetRuntime(runtime);
+    EXPECT_FALSE(unifiedData.IsComplete());
+
+    std::shared_ptr<Object> fileObj = std::make_shared<Object>();
+    fileObj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    fileObj->value_[FILE_URI_PARAM] = "file://1111/a.jpeg";
+    fileObj->value_[FILE_TYPE] = "general.jpeg";
+    std::shared_ptr<UnifiedRecord> fileRecord = std::make_shared<UnifiedRecord>(FILE_URI, fileObj);
+    unifiedData.AddRecord(fileRecord);
+    EXPECT_TRUE(unifiedData.IsComplete());
+
+    std::shared_ptr<Object> plainTextObj = std::make_shared<Object>();
+    plainTextObj->value_[UNIFORM_DATA_TYPE] = "general.plain-text";
+    plainTextObj->value_[CONTENT] = "Hello, World!";
+    plainTextObj->value_[ABSTRACT] = "This is a test.";
+    std::shared_ptr<UnifiedRecord> plainTextRecord = std::make_shared<UnifiedRecord>(PLAIN_TEXT, plainTextObj);
+    unifiedData.AddRecord(plainTextRecord);
+    EXPECT_FALSE(unifiedData.IsComplete());
+    LOG_INFO(UDMF_TEST, "IsCompleteTest001 end.");
+}
+
+/**
+* @tc.name: GetFileUrisTest001
+* @tc.desc: Normal test of HasHigherFileType return true.
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataTest, GetFileUrisTest001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetFileUrisTest001 begin.");
+    UnifiedData unifiedData;
+    std::shared_ptr<Object> fileObj = std::make_shared<Object>();
+    fileObj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    fileObj->value_[FILE_URI_PARAM] = "file://1111/a.jpeg";
+    fileObj->value_[FILE_TYPE] = "general.jpeg";
+    std::shared_ptr<UnifiedRecord> fileRecord = std::make_shared<UnifiedRecord>(FILE_URI, fileObj);
+    unifiedData.AddRecord(fileRecord);
+
+    std::shared_ptr<Object> plainTextObj = std::make_shared<Object>();
+    plainTextObj->value_[UNIFORM_DATA_TYPE] = "general.plain-text";
+    plainTextObj->value_[CONTENT] = "Hello, World!";
+    plainTextObj->value_[ABSTRACT] = "This is a test.";
+    std::shared_ptr<UnifiedRecord> plainTextRecord = std::make_shared<UnifiedRecord>(PLAIN_TEXT, plainTextObj);
+    unifiedData.AddRecord(plainTextRecord);
+
+    std::shared_ptr<Image> image = std::make_shared<Image>();
+    image->SetUri("file://1111/a.png");
+    unifiedData.AddRecord(image);
+
+    unifiedData.AddRecord(nullptr);
+    std::vector<std::string> fileUris = unifiedData.GetFileUris();
+    EXPECT_EQ(fileUris.size(), 2);
+    EXPECT_TRUE(std::find(fileUris.begin(), fileUris.end(), "file://1111/a.jpeg") != fileUris.end());
+    EXPECT_TRUE(std::find(fileUris.begin(), fileUris.end(), "file://1111/a.png") != fileUris.end());
+    LOG_INFO(UDMF_TEST, "GetFileUrisTest001 end.");
+}
+
 } // OHOS::Test
