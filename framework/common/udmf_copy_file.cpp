@@ -221,7 +221,7 @@ std::string UdmfCopyFile::GetFileName(const std::string &path)
 {
     std::string realSrc = path;
     if (IsRemote(path)) {
-        size_t index = path.rfind("?", 0);
+        size_t index = path.rfind("?");
         realSrc = path.substr(0, index);
     }
     std::filesystem::path filePath(realSrc);
