@@ -26,6 +26,8 @@
 #include <unordered_map>
 #include <vector>
 #include <iostream>
+#include "ani_util_native_ptr.h"
+#include "ani_util_class.h"
 
 class AniObjectUtils {
 public:

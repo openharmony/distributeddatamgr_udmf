@@ -303,6 +303,61 @@ static ani_object GetRecords([[maybe_unused]] ani_env *env, [[maybe_unused]] ani
     return arrayObj;
 }
 
+static ani_status BindCleanerclassMethods(ani_env *env, ani_namespace &ns)
+{
+    auto cleanerCls = AniTypeFinder(env).FindClass(ns, "LCleaner;");
+    return NativePtrCleaner(env).Bind(cleanerCls.value());
+}
+
+static ani_status LoadUnifiedRecord(ani_env *env, ani_namespace &ns)
+{
+    if (env == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "env is nullptr");
+        return ANI_ERROR;
+    }
+    static const char *recordclsName = "LUnifiedRecord;";
+    ani_class unifiedRecordClass;
+    if (ANI_OK != env->Namespace_FindClass(ns, recordclsName, &unifiedRecordClass)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "Not found class %{public}s", recordclsName);
+        return ANI_NOT_FOUND;
+    }
+
+    std::array methods = {
+        ani_native_function {"init", nullptr, reinterpret_cast<void *>(UnifiedRecodeValueTypeConstructor)},
+    };
+
+    if (ANI_OK != env->Class_BindNativeMethods(unifiedRecordClass, methods.data(), methods.size())) {
+        LOG_ERROR(UDMF_KITS_NAPI, "Cannot bind native methods to %{public}s", recordclsName);
+        return ANI_ERROR;
+    }
+    return ANI_OK;
+}
+
+static ani_status LoadUnifiedData(ani_env *env, ani_namespace &ns)
+{
+    if (env == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "env is nullptr");
+        return ANI_ERROR;
+    }
+    static const char *dataclsName = "LUnifiedData;";
+    ani_class unifiedDataClass;
+    if (ANI_OK != env->Namespace_FindClass(ns, dataclsName, &unifiedDataClass)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "Cannot find class %{public}s", dataclsName);
+        return ANI_NOT_FOUND;
+    }
+
+    std::array datamethods = {
+        ani_native_function {"initData", nullptr, reinterpret_cast<void *>(UnifiedDataConstructor)},
+        ani_native_function {"getRecords", nullptr, reinterpret_cast<void *>(GetRecords)},
+    };
+
+    if (ANI_OK != env->Class_BindNativeMethods(unifiedDataClass, datamethods.data(), datamethods.size())) {
+        LOG_ERROR(UDMF_KITS_NAPI, "Cannot bind native methods to %{public}s", dataclsName);
+        return ANI_ERROR;
+    }
+    return ANI_OK;
+}
+
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "ANI_Constructor start...");
@@ -320,37 +375,14 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_NOT_FOUND;
     }
 
-    static const char *recordclsName = "LUnifiedRecord;";
-    ani_class unifiedRecordClass;
-    if (ANI_OK != env->Namespace_FindClass(ns, recordclsName, &unifiedRecordClass)) {
-        LOG_ERROR(UDMF_KITS_NAPI, "Not found class %{public}s", recordclsName);
+    if (ANI_OK != LoadUnifiedRecord(env, ns)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "LoadUnifiedRecord ERROR");
         return ANI_NOT_FOUND;
     }
 
-    std::array methods = {
-        ani_native_function {"init", nullptr, reinterpret_cast<void *>(UnifiedRecodeValueTypeConstructor)},
-    };
-
-    if (ANI_OK != env->Class_BindNativeMethods(unifiedRecordClass, methods.data(), methods.size())) {
-        LOG_ERROR(UDMF_KITS_NAPI, "Cannot bind native methods to %{public}s", recordclsName);
-        return ANI_ERROR;
-    }
-
-    static const char *dataclsName = "LUnifiedData;";
-    ani_class unifiedDataClass;
-    if (ANI_OK != env->Namespace_FindClass(ns, dataclsName, &unifiedDataClass)) {
-        LOG_ERROR(UDMF_KITS_NAPI, "Cannot find class %{public}s", dataclsName);
+    if (ANI_OK != LoadUnifiedData(env, ns)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "LoadUnifiedData ERROR");
         return ANI_NOT_FOUND;
-    }
-
-    std::array datamethods = {
-        ani_native_function {"initData", nullptr, reinterpret_cast<void *>(UnifiedDataConstructor)},
-        ani_native_function {"getRecords", nullptr, reinterpret_cast<void *>(GetRecords)},
-    };
-
-    if (ANI_OK != env->Class_BindNativeMethods(unifiedDataClass, datamethods.data(), datamethods.size())) {
-        LOG_ERROR(UDMF_KITS_NAPI, "Cannot bind native methods to %{public}s", dataclsName);
-        return ANI_ERROR;
     }
 
     if (result == nullptr) {
@@ -358,6 +390,10 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     }
 
+    if (ANI_OK != BindCleanerclassMethods(env, ns)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "[ANI] BindCleanerclassMethods failed");
+        return ANI_ERROR;
+    }
     *result = ANI_VERSION_1;
     LOG_DEBUG(UDMF_KITS_NAPI, "ANI_Constructor end...");
     return ANI_OK;
