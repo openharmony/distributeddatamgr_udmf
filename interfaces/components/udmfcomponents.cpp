@@ -37,7 +37,7 @@ extern "C" __attribute__((constructor)) void UdmfComponentsRegisterModule(void)
         .nm_version = 1,
         .nm_flags = 0,
         .nm_filename = nullptr,
-        .nm_modname = "data.udmfComponents",
+        .nm_modname = "data.UdmfComponents",
         .nm_priv = ((void *)0),
         .reserved = { 0 },
     };
