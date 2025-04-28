@@ -28,6 +28,7 @@
 #include "pixel_map.h"
 #include "string_ex.h"
 #include "want.h"
+#include "unified_key.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -563,12 +564,18 @@ enum Intention : int32_t {
     UD_INTENTION_BASE = 0,
     UD_INTENTION_DRAG,
     UD_INTENTION_DATA_HUB,
+    UD_INTENTION_SYSTEM_SHARE,
+    UD_INTENTION_PICKER,
+    UD_INTENTION_MENU,
     UD_INTENTION_BUTT,
 };
 
 static const std::unordered_map<int32_t, std::string> UD_INTENTION_MAP {
     { UD_INTENTION_DRAG, "drag" },
     { UD_INTENTION_DATA_HUB, "DataHub" },
+    { UD_INTENTION_SYSTEM_SHARE, "SystemShare" },
+    { UD_INTENTION_PICKER, "Picker" },
+    { UD_INTENTION_MENU, "Menu" },
 };
 
 static const std::unordered_map<int32_t, std::string> UD_SYSTEM_INTENTION_MAP {
@@ -578,6 +585,10 @@ static const std::unordered_map<int32_t, std::string> UD_SYSTEM_INTENTION_MAP {
 static const std::unordered_map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
     { UD_INTENTION_DATA_HUB, "DATA_HUB" },
     { UD_INTENTION_DRAG, "DRAG" },
+    { UD_INTENTION_SYSTEM_SHARE, "SYSTEM_SHARE" },
+    { UD_INTENTION_PICKER, "PICKER" },
+    { UD_INTENTION_MENU, "MENU" },
+
 };
 
 enum ShareOptions : int32_t {
@@ -607,7 +618,12 @@ public:
     static bool API_EXPORT IsPersist(const Intention &intention);
     static bool API_EXPORT IsPersist(const std::string &intention);
     static Intention API_EXPORT GetIntentionByString(const std::string &intention);
-    static bool API_EXPORT IsValidOptions(const std::string &key, std::string &intention);
+    static bool API_EXPORT IsValidOptions(UnifiedKey &key, const std::string &intention);
+    static bool API_EXPORT IsValidOptions(UnifiedKey &key, const std::string &intention,
+        const std::string &validIntention);
+    static bool API_EXPORT IsFileMangerIntention(const std::string &intention);
+    static std::string API_EXPORT FindIntentionMap(const Intention &queryintention);
+    static bool API_EXPORT ValidateIntention(UnifiedKey &key, const std::string &intention);
 };
 
 struct Object;

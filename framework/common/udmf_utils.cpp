@@ -97,6 +97,16 @@ bool IsTokenNative()
     return tokenType == Security::AccessToken::TypeATokenTypeEnum::TOKEN_NATIVE;
 }
 
+bool IsNativeCallingToken()
+{
+    uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
+    if (tokenId == 0) {
+        return false;
+    }
+    auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    LOG_DEBUG(UDMF_FRAMEWORK, "tokenId=%{public}u, tokenType=%{public}d", tokenId, tokenType);
+    return tokenType == Security::AccessToken::TypeATokenTypeEnum::TOKEN_NATIVE;
+}
 } // namespace UTILS
 } // namespace UDMF
 } // namespace OHOS

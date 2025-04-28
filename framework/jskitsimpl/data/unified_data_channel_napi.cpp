@@ -56,6 +56,12 @@ napi_value UnifiedDataChannelNapi::CreateIntention(napi_env env)
         UD_INTENTION_MAP.at(UD_INTENTION_DATA_HUB));
     SetNamedProperty(env, intention, JS_UD_INTENTION_NAME_MAP.at(UD_INTENTION_DRAG),
         UD_SYSTEM_INTENTION_MAP.at(UD_INTENTION_DRAG));
+    SetNamedProperty(env, intention, JS_UD_INTENTION_NAME_MAP.at(UD_INTENTION_PICKER),
+        UD_INTENTION_MAP.at(UD_INTENTION_PICKER));
+    SetNamedProperty(env, intention, JS_UD_INTENTION_NAME_MAP.at(UD_INTENTION_SYSTEM_SHARE),
+        UD_INTENTION_MAP.at(UD_INTENTION_SYSTEM_SHARE));
+    SetNamedProperty(env, intention, JS_UD_INTENTION_NAME_MAP.at(UD_INTENTION_MENU),
+        UD_INTENTION_MAP.at(UD_INTENTION_MENU));
     napi_object_freeze(env, intention);
     return intention;
 }
@@ -87,9 +93,8 @@ napi_value UnifiedDataChannelNapi::InsertData(napi_env env, napi_callback_info i
         ASSERT_BUSINESS_ERR(ctxt, argc >= 2,
             E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
         ctxt->status = GetNamedProperty(env, argv[0], "intention", intention);
-        ASSERT_BUSINESS_ERR(ctxt, UnifiedDataUtils::GetIntentionByString(intention) != UD_INTENTION_DRAG,
-            E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid");
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok && UnifiedDataUtils::IsPersist(intention),
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok &&
+            (UnifiedDataUtils::IsPersist(intention)),
             E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
         ctxt->status = napi_unwrap(env, argv[1], reinterpret_cast<void **>(&unifiedDataNapi));
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
@@ -129,7 +134,8 @@ napi_value UnifiedDataChannelNapi::UpdateData(napi_env env, napi_callback_info i
         ctxt->status = GetNamedProperty(env, argv[0], "key", ctxt->key);
         UnifiedKey key(ctxt->key);
         ASSERT_BUSINESS_ERR(ctxt,
-            ctxt->status == napi_ok && key.IsValid() && UnifiedDataUtils::IsPersist(key.intention),
+            ctxt->status == napi_ok && key.IsValid() &&
+            (key.intention == UD_INTENTION_MAP.at(Intention::UD_INTENTION_DATA_HUB)),
             E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
         ctxt->status = napi_unwrap(env, argv[1], reinterpret_cast<void **>(&unifiedDataNapi));
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
@@ -168,15 +174,17 @@ napi_value UnifiedDataChannelNapi::QueryData(napi_env env, napi_callback_info in
         auto options = argv[0];
         keyStatus = GetNamedProperty(env, options, "key", ctxt->key);
         intentionStatus = GetNamedProperty(env, options, "intention", intention);
-        ASSERT_BUSINESS_ERR(ctxt, UnifiedDataUtils::GetIntentionByString(intention) != UD_INTENTION_DRAG,
-            E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid");
+        UnifiedKey key(ctxt->key);
         ASSERT_BUSINESS_ERR(ctxt, (keyStatus == napi_ok || intentionStatus == napi_ok) &&
-            UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
+            UnifiedDataUtils::ValidateIntention(key, intention),
             E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
     };
     ctxt->GetCbInfo(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "Query Exit");
-    ctxt->intention = UnifiedDataUtils::GetIntentionByString(intention);
+    Intention tempIntention = UnifiedDataUtils::GetIntentionByString(intention);
+    if (tempIntention != UD_INTENTION_BUTT) {
+        ctxt->intention = tempIntention;
+    }
     auto execute = [env, ctxt]() {
         QueryOption option = {
             .key = ctxt->key,
@@ -212,17 +220,18 @@ napi_value UnifiedDataChannelNapi::DeleteData(napi_env env, napi_callback_info i
         napi_value options = argv[0];
         keyStatus = GetNamedProperty(env, options, "key", ctxt->key);
         intentionStatus = GetNamedProperty(env, options, "intention", intention);
-        ASSERT_BUSINESS_ERR(ctxt, intention.empty() ||
-            UnifiedDataUtils::GetIntentionByString(intention) == UD_INTENTION_DATA_HUB,
-            E_INVALID_PARAMETERS, "Parameter error: The intention parameter is invalid");
+        UnifiedKey key(ctxt->key);
         ASSERT_BUSINESS_ERR(ctxt,
             (keyStatus == napi_ok || intentionStatus == napi_ok) &&
-                UnifiedDataUtils::IsValidOptions(ctxt->key, intention),
+            (UnifiedDataUtils::ValidateIntention(key, intention)),
             E_INVALID_PARAMETERS, "Parameter error: parameter options intention type must correspond to Intention");
     };
     ctxt->GetCbInfo(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "Delete Exit");
-    ctxt->intention = UnifiedDataUtils::GetIntentionByString(intention);
+    Intention tempIntention = UnifiedDataUtils::GetIntentionByString(intention);
+    if (tempIntention != UD_INTENTION_BUTT) {
+        ctxt->intention = tempIntention;
+    }
     auto execute = [env, ctxt]() {
         QueryOption option = {
             .key = ctxt->key,
