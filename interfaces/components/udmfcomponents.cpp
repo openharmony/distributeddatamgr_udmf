@@ -20,8 +20,7 @@
 extern const char _binary_udmfcomponents_abc_start[];
 extern const char _binary_udmfcomponents_abc_end[];
 
-extern "C" __attribute__((visibility("default")))
-    void NAPI_data_UdmfComponents_GetABCCode(const char **buf, int *buflen)
+extern "C" __attribute__((visibility("default"))) void NAPI_data_UdmfComponents_GetABCCode(const char **buf, int *buflen)
 {
     if (buf != nullptr) {
         *buf = _binary_udmfcomponents_abc_start;
