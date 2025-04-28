@@ -338,7 +338,8 @@ napi_value UnifiedDataChannelNapi::SetAppShareOptions(napi_env env, napi_callbac
                E_INVALID_PARAMETERS, "Parameter error: The shareOptions parameter is invalid!");
     std::transform(intention.begin(), intention.end(), intention.begin(), ::tolower); // js : Drag --> drag
     status = UdmfClient::GetInstance().SetAppShareOption(intention, static_cast<ShareOptions>(shareOptionValue));
-    ASSERT_BUSINESS_ERR_VOID(ctxt, !(status == E_SETTINGS_EXISTED), E_SETTINGS_EXISTED, "Settings already exist!");
+    ASSERT_BUSINESS_ERR_VOID(ctxt, !(status == E_SETTINGS_EXISTED), E_SETTINGS_EXISTED,
+        "Settings already exist, if need to reconfigure, please remove the previous share options.");
     ASSERT_BUSINESS_ERR_VOID(ctxt, status != E_NO_PERMISSION, E_NO_PERMISSION, "Permission denied!");
     ASSERT_ERR(ctxt->env, status == E_OK, status, "invalid arguments!");
     return nullptr;
