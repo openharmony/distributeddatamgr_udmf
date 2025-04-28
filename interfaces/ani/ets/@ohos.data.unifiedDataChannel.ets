@@ -18,7 +18,39 @@ import Want from "@ohos.app.ability.Want";
 type ValueType = number | string | boolean | image.PixelMap | Want | ArrayBuffer | object | null | undefined;
 
  export default namespace unifiedDataChannel {
+    export class Cleaner {
+        static { loadLibrary("unifieddatachannel_ani") }
+        static callback(cleaner: Cleaner): void {
+            cleaner.clean()
+        }
+        constructor(targetPtr: long) {
+            this.targetPtr = targetPtr
+        }
 
+        native clean(): void
+
+        private targetPtr: long = 0
+    }
+    class FinalizationAgent<T extends Object> {
+        constructor(obj: T, ptr: long) {
+            this.register(obj, ptr);
+        }
+
+        register(obj: T, ptr: long): void {
+            this.unregisterToken = {};
+            this.cleaner = new Cleaner(ptr);
+            finalizer.register(obj, this.cleaner!, this.unregisterToken);
+        }
+
+        unregister(): void {
+            finalizer.unregister(this.unregisterToken);
+        }
+
+        private cleaner: Cleaner | null = null;
+        private unregisterToken: object;
+    }
+
+    let finalizer = new FinalizationRegistry<Cleaner>(Cleaner.callback)
     export class UnifiedRecord {
         static { loadLibrary("unifieddatachannel_ani") }
 
@@ -28,12 +60,21 @@ type ValueType = number | string | boolean | image.PixelMap | Want | ArrayBuffer
             } else {
                 this.init(type, value)
             }
+            this.registerCleaner();
         }
 
+        registerCleaner(): void {
+            this.fzAgent = new FinalizationAgent<UnifiedRecord>(this, this.nativePtr);
+        }
+
+        unregisterCleaner(): void {
+            this.fzAgent.unregister();
+        }
         setNativePtr(context: long) {
             this.nativePtr = context
         }
 
+        private fzAgent: FinalizationAgent<UnifiedRecord>;
         native init(type: string, value: ValueType): void;
         private nativePtr: long = 0;
     }
@@ -46,8 +87,16 @@ type ValueType = number | string | boolean | image.PixelMap | Want | ArrayBuffer
             } else {
                 this.initData(record)
             }
+            this.registerCleaner();
         }
 
+        registerCleaner(): void {
+            this.fzAgent = new FinalizationAgent<UnifiedData>(this, this.nativePtr);
+        }
+
+        unregisterCleaner(): void {
+            this.fzAgent.unregister();
+        }
         native initData(record: UnifiedRecord): void;
         native getRecords(): Array<UnifiedRecord>;
 
@@ -55,6 +104,7 @@ type ValueType = number | string | boolean | image.PixelMap | Want | ArrayBuffer
             return this.nativePtr;
         }
 
+        private fzAgent: FinalizationAgent<UnifiedData>;
         private nativePtr: long = 0;
     }
 }
