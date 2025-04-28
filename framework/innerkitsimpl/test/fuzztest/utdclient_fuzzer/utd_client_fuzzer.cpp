@@ -16,6 +16,8 @@
 #include "utd_client_fuzzer.h"
 #include "utd_client.h"
 
+#include <fuzzer/FuzzedDataProvider.h>
+
 using namespace OHOS;
 using namespace OHOS::UDMF;
 
@@ -28,76 +30,76 @@ void TearDown()
 {
 }
 
-void GetTypeDescriptorFuzz(const uint8_t *data, size_t size)
+void GetTypeDescriptorFuzz(FuzzedDataProvider &provider)
 {
-    std::string typeId(data, data + size);
+    std::string typeId = provider.ConsumeRandomLengthString();
     std::shared_ptr<TypeDescriptor> typeDescriptor;
     UtdClient::GetInstance().GetTypeDescriptor(typeId, typeDescriptor);
 }
 
-void GetUniformDataTypeByFilenameExtensionDefaultBelongsFuzz(const uint8_t *data, size_t size)
+void GetUniformDataTypeByFilenameExtensionDefaultBelongsFuzz(FuzzedDataProvider &provider)
 {
-    std::string fileExtension(data, data + size);
+    std::string fileExtension = provider.ConsumeRandomLengthString();
     std::string typeId;
     UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(fileExtension, typeId);
 }
 
-void GetUniformDataTypeByFilenameExtensionFuzz(const uint8_t *data, size_t size)
+void GetUniformDataTypeByFilenameExtensionFuzz(FuzzedDataProvider &provider)
 {
-    std::string fileExtension(data, data + size);
+    std::string fileExtension = provider.ConsumeRandomLengthString();
     std::string typeId;
-    std::string belongsTo(data, data + size);
+    std::string belongsTo = provider.ConsumeRandomLengthString();
     UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(fileExtension, typeId, belongsTo);
 }
 
-void GetUniformDataTypesByFilenameExtensionDefaultBelongsFuzz(const uint8_t *data, size_t size)
+void GetUniformDataTypesByFilenameExtensionDefaultBelongsFuzz(FuzzedDataProvider &provider)
 {
-    std::string fileExtension(data, data + size);
+    std::string fileExtension = provider.ConsumeRandomLengthString();
     std::vector<std::string> typeIds;
     UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(fileExtension, typeIds);
 }
 
-void GetUniformDataTypesByFilenameExtensionFuzz(const uint8_t *data, size_t size)
+void GetUniformDataTypesByFilenameExtensionFuzz(FuzzedDataProvider &provider)
 {
-    std::string fileExtension(data, data + size);
+    std::string fileExtension = provider.ConsumeRandomLengthString();
     std::vector<std::string> typeIds;
-    std::string belongsTo(data, data + size);
+    std::string belongsTo = provider.ConsumeRandomLengthString();
     UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(fileExtension, typeIds, belongsTo);
 }
 
-void GetUniformDataTypeByMIMETypeDefaultBelongsFuzz(const uint8_t *data, size_t size)
+void GetUniformDataTypeByMIMETypeDefaultBelongsFuzz(FuzzedDataProvider &provider)
 {
-    std::string mimeType(data, data + size);
+    std::string mimeType = provider.ConsumeRandomLengthString();
     std::string typeId;
     UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, typeId);
 }
 
-void GetUniformDataTypeByMIMETypeFuzz(const uint8_t *data, size_t size)
+void GetUniformDataTypeByMIMETypeFuzz(FuzzedDataProvider &provider)
 {
-    std::string mimeType(data, data + size);
+    std::string mimeType = provider.ConsumeRandomLengthString();
     std::string typeId;
-    std::string belongsTo(data, data + size);
+    std::string belongsTo = provider.ConsumeRandomLengthString();
     UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, typeId, belongsTo);
 }
 
-void GetUniformDataTypesByMIMETypeDefaultBelongsFuzz(const uint8_t *data, size_t size)
+void GetUniformDataTypesByMIMETypeDefaultBelongsFuzz(FuzzedDataProvider &provider)
 {
-    std::string mimeType(data, data + size);
+    std::string mimeType = provider.ConsumeRandomLengthString();
     std::vector<std::string> typeIds;
     UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, typeIds);
 }
 
-void GetUniformDataTypesByMIMETypeFuzz(const uint8_t *data, size_t size)
+void GetUniformDataTypesByMIMETypeFuzz(FuzzedDataProvider &provider)
 {
-    std::string mimeType(data, data + size);
+    std::string mimeType = provider.ConsumeRandomLengthString();
     std::vector<std::string> typeIds;
-    std::string belongsTo(data, data + size);
+    std::string belongsTo = provider.ConsumeRandomLengthString();
     UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, typeIds, belongsTo);
 }
 
-void IsUtdFuzz(const uint8_t *data, size_t size)
+void IsUtdFuzz(FuzzedDataProvider &provider)
 {
-    std::string typeId(data, data + size);
+    std::string typeId = provider.ConsumeRandomLengthString();
     bool result;
     UtdClient::GetInstance().IsUtd(typeId, result);
 }
@@ -107,16 +109,17 @@ void IsUtdFuzz(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
+    FuzzedDataProvider provider(data, size);
     OHOS::SetUpTestCase();
-    OHOS::GetTypeDescriptorFuzz(data, size);
-    OHOS::GetUniformDataTypeByFilenameExtensionDefaultBelongsFuzz(data, size);
-    OHOS::GetUniformDataTypeByFilenameExtensionFuzz(data, size);
-    OHOS::GetUniformDataTypesByFilenameExtensionDefaultBelongsFuzz(data, size);
-    OHOS::GetUniformDataTypesByFilenameExtensionFuzz(data, size);
-    OHOS::GetUniformDataTypeByMIMETypeDefaultBelongsFuzz(data, size);
-    OHOS::GetUniformDataTypeByMIMETypeFuzz(data, size);
-    OHOS::GetUniformDataTypesByMIMETypeDefaultBelongsFuzz(data, size);
-    OHOS::GetUniformDataTypesByMIMETypeFuzz(data, size);
-    OHOS::IsUtdFuzz(data, size);
+    OHOS::GetTypeDescriptorFuzz(provider);
+    OHOS::GetUniformDataTypeByFilenameExtensionDefaultBelongsFuzz(provider);
+    OHOS::GetUniformDataTypeByFilenameExtensionFuzz(provider);
+    OHOS::GetUniformDataTypesByFilenameExtensionDefaultBelongsFuzz(provider);
+    OHOS::GetUniformDataTypesByFilenameExtensionFuzz(provider);
+    OHOS::GetUniformDataTypeByMIMETypeDefaultBelongsFuzz(provider);
+    OHOS::GetUniformDataTypeByMIMETypeFuzz(provider);
+    OHOS::GetUniformDataTypesByMIMETypeDefaultBelongsFuzz(provider);
+    OHOS::GetUniformDataTypesByMIMETypeFuzz(provider);
+    OHOS::IsUtdFuzz(provider);
     return 0;
 }
