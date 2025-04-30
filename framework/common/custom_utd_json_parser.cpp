@@ -26,6 +26,7 @@ constexpr const char* REFERENCE_URL = "referenceURL";
 constexpr const char* ICON_FILE = "iconFile";
 constexpr const char* OWNER = "ownerBundle";
 constexpr const char* INSTALLERS = "installerBundles";
+constexpr const int32_t MAX_UTD_CUSTOM_SIZE = 1024 * 1024;
 
 CustomUtdJsonParser::CustomUtdJsonParser()
 {
@@ -122,6 +123,10 @@ bool CustomUtdJsonParser::GetTypeDescriptors(const json &jsonRoot, const std::st
     if (cJSON_HasObjectItem(&jsonRoot, nodeName.c_str())) {
         cJSON *subNode = cJSON_GetObjectItem(&jsonRoot, nodeName.c_str());
         int itemNum = cJSON_GetArraySize(subNode);
+        if (itemNum > MAX_UTD_CUSTOM_SIZE) {
+            LOG_ERROR(UDMF_CLIENT, "itemNum is too large, itemNum:%{public}d", itemNum);
+            return false;
+        }
         for (int i = 0; i < itemNum; i++) {
             cJSON *node = cJSON_GetArrayItem(subNode, i);
             TypeDescriptorCfg typeCfg;
