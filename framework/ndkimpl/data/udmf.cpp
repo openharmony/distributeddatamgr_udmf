@@ -600,7 +600,7 @@ int OH_UdmfRecord_AddFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
         for (const auto &fileSub : FILE_SUB_TYPES) {
             descriptor->BelongsTo(fileSub, isFileType);
             if (isFileType) {
-                utdId = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(*fileType));
+                utdId = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileSub));
                 break;
             }
         }
