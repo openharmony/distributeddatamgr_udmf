@@ -253,6 +253,15 @@ HWTEST_F(UnifiedMetaTest, IsValidIntention001, TestSize.Level1)
 
     bool ret1 = UnifiedDataUtils::IsValidIntention(Intention::UD_INTENTION_DATA_HUB);
     EXPECT_TRUE(ret1);
+
+    bool ret2 = UnifiedDataUtils::IsValidIntention(Intention::UD_INTENTION_SYSTEM_SHARE);
+    EXPECT_TRUE(ret2);
+
+    bool ret3 = UnifiedDataUtils::IsValidIntention(Intention::UD_INTENTION_PICKER);
+    EXPECT_TRUE(ret3);
+
+    bool ret4 = UnifiedDataUtils::IsValidIntention(Intention::UD_INTENTION_MENU);
+    EXPECT_TRUE(ret4);
 }
 
 /**
@@ -385,6 +394,15 @@ HWTEST_F(UnifiedMetaTest, IsPersistByIntention001, TestSize.Level1)
 
     bool ret3 = UnifiedDataUtils::IsPersist(Intention::UD_INTENTION_BASE);
     EXPECT_FALSE(ret3);
+
+    bool ret4 = UnifiedDataUtils::IsPersist(Intention::UD_INTENTION_PICKER);
+    EXPECT_TRUE(ret4);
+
+    bool ret5 = UnifiedDataUtils::IsPersist(Intention::UD_INTENTION_MENU);
+    EXPECT_TRUE(ret5);
+
+    bool ret6 = UnifiedDataUtils::IsPersist(Intention::UD_INTENTION_SYSTEM_SHARE);
+    EXPECT_TRUE(ret6);
 }
 
 /**
@@ -402,6 +420,15 @@ HWTEST_F(UnifiedMetaTest, IsPersistByStr001, TestSize.Level1)
 
     bool ret2 = UnifiedDataUtils::IsPersist("invalid param");
     EXPECT_FALSE(ret2);
+
+    bool ret3 = UnifiedDataUtils::IsPersist("Picker");
+    EXPECT_TRUE(ret3);
+
+    bool ret4 = UnifiedDataUtils::IsPersist("Menu");
+    EXPECT_TRUE(ret4);
+
+    bool ret5 = UnifiedDataUtils::IsPersist("SystemShare");
+    EXPECT_TRUE(ret5);
 }
 
 /**
@@ -419,35 +446,217 @@ HWTEST_F(UnifiedMetaTest, GetIntentionByString001, TestSize.Level1)
 
     Intention ret2 = UnifiedDataUtils::GetIntentionByString("invalid param");
     EXPECT_EQ(ret2, UD_INTENTION_BUTT);
+
+    Intention ret3 = UnifiedDataUtils::GetIntentionByString("Picker");
+    EXPECT_EQ(ret3, Intention::UD_INTENTION_PICKER);
+
+    Intention ret4 = UnifiedDataUtils::GetIntentionByString("Menu");
+    EXPECT_EQ(ret4, Intention::UD_INTENTION_MENU);
+
+    Intention ret5 = UnifiedDataUtils::GetIntentionByString("SystemShare");
+    EXPECT_EQ(ret5, Intention::UD_INTENTION_SYSTEM_SHARE);
 }
 
 /**
-* @tc.name: IsValidOptions001
+* @tc.name: ValidateIntention001
 * @tc.desc: Normal testcase of IsPersist
 * @tc.type: FUNC
 */
-HWTEST_F(UnifiedMetaTest, IsValidOptions001, TestSize.Level1)
+HWTEST_F(UnifiedMetaTest, ValidateIntention001, TestSize.Level1)
 {
     std::string keyDataHub = "udmf://DataHub/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
     std::string keyDrag = "udmf://drag/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    std::string keyPicker = "udmf://Picker/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    std::string keyMenu = "udmf://Menu/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    std::string keySystemShare = "udmf://SystemShare/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
     std::string intentionDataHub = "DataHub";
     std::string intentionDrag = "drag";
+    std::string intentionPicker = "Picker";
+    std::string intentionMenu = "Menu";
+    std::string intentionSystemShare = "SystemShare";
     std::string intentionEmpty = "";
+    UnifiedKey key1("");
 
-    bool ret = UnifiedDataUtils::IsValidOptions("", intentionDataHub);
+    bool ret = UnifiedDataUtils::ValidateIntention(key1, intentionDataHub);
     EXPECT_TRUE(ret);
 
-    bool ret1 = UnifiedDataUtils::IsValidOptions(keyDataHub, intentionEmpty);
+    UnifiedKey key2(keyDataHub);
+    bool ret1 = UnifiedDataUtils::ValidateIntention(key2, intentionEmpty);
+    EXPECT_TRUE(ret1);
+    bool ret2 = UnifiedDataUtils::ValidateIntention(key2, intentionDataHub);
+    EXPECT_TRUE(ret2);
+    bool ret3 = UnifiedDataUtils::ValidateIntention(key2, intentionDrag);
+    EXPECT_FALSE(ret3);
+    bool ret4 = UnifiedDataUtils::ValidateIntention(key2, intentionPicker);
+    EXPECT_FALSE(ret4);
+    bool ret5 = UnifiedDataUtils::ValidateIntention(key2, intentionMenu);
+    EXPECT_FALSE(ret5);
+    bool ret6 = UnifiedDataUtils::ValidateIntention(key2, intentionSystemShare);
+    EXPECT_FALSE(ret6);
+    UnifiedKey key3(keyDrag);
+    bool ret7 = UnifiedDataUtils::ValidateIntention(key3, intentionDrag);
+    EXPECT_FALSE(ret7);
+    UnifiedKey key4(keyPicker);
+    bool ret8 = UnifiedDataUtils::ValidateIntention(key4, intentionPicker);
+    EXPECT_TRUE(ret8);
+    UnifiedKey key5(keyMenu);
+    bool ret9 = UnifiedDataUtils::ValidateIntention(key5, intentionMenu);
+    EXPECT_TRUE(ret9);
+    UnifiedKey key6(keySystemShare);
+    bool ret10 = UnifiedDataUtils::ValidateIntention(key6, intentionSystemShare);
+    EXPECT_TRUE(ret10);
+}
+
+/**
+* @tc.name: ValidateIntention
+* @tc.desc: Normal testcase of key and intention
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, IsAllowedQuery, TestSize.Level1)
+{
+    std::string keyDataHub = "udmf://DataHub/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    std::string keyDrag = "udmf://drag/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    std::string keyPicker = "udmf://Picker/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    std::string keyMenu = "udmf://Menu/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    std::string keySystemShare = "udmf://SystemShare/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    std::string intentionDataHub = "DataHub";
+    std::string intentionDrag = "drag";
+    std::string intentionPicker = "Picker";
+    std::string intentionMenu = "Menu";
+    std::string intentionSystemShare = "SystemShare";
+    std::string intentionEmpty = "";
+    UnifiedKey key1("");
+
+    bool ret = UnifiedDataUtils::ValidateIntention(key1, intentionDataHub);
+    EXPECT_TRUE(ret);
+
+    UnifiedKey key2(keyDataHub);
+    bool ret1 = UnifiedDataUtils::ValidateIntention(key2, intentionEmpty);
     EXPECT_TRUE(ret1);
 
-    bool ret2 = UnifiedDataUtils::IsValidOptions(keyDataHub, intentionDataHub);
+    bool ret2 = UnifiedDataUtils::ValidateIntention(key2, intentionDataHub);
     EXPECT_TRUE(ret2);
 
-    bool ret3 = UnifiedDataUtils::IsValidOptions(keyDataHub, intentionDrag);
+    bool ret3 = UnifiedDataUtils::ValidateIntention(key2, intentionDrag);
     EXPECT_FALSE(ret3);
 
-    bool ret4 = UnifiedDataUtils::IsValidOptions(keyDrag, intentionDrag);
+    bool ret4 = UnifiedDataUtils::ValidateIntention(key2, intentionPicker);
     EXPECT_FALSE(ret4);
+
+    bool ret5 = UnifiedDataUtils::ValidateIntention(key2, intentionMenu);
+    EXPECT_FALSE(ret5);
+
+    bool ret6 = UnifiedDataUtils::ValidateIntention(key2, intentionSystemShare);
+    EXPECT_FALSE(ret6);
+
+    UnifiedKey key3(keyDrag);
+    bool ret7 = UnifiedDataUtils::ValidateIntention(key3, intentionDrag);
+    EXPECT_FALSE(ret7);
+}
+
+/**
+* @tc.name: IsValidQuery001
+* @tc.desc: Normal testcase of key and intention
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, IsValidQuery001, TestSize.Level1)
+{
+    std::string keyPicker = "udmf://Picker/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    std::string intentionDataHub = "DataHub";
+    std::string intentionDrag = "drag";
+    std::string intentionPicker = "Picker";
+    std::string intentionMenu = "Menu";
+    std::string intentionSystemShare = "SystemShare";
+    std::string intentionEmpty = "";
+
+    UnifiedKey key(keyPicker);
+    bool ret = UnifiedDataUtils::ValidateIntention(key, intentionPicker);
+    EXPECT_TRUE(ret);
+
+    bool ret1 = UnifiedDataUtils::ValidateIntention(key, intentionEmpty);
+    EXPECT_TRUE(ret1);
+
+    bool ret2 = UnifiedDataUtils::ValidateIntention(key, intentionDataHub);
+    EXPECT_FALSE(ret2);
+
+    bool ret3 = UnifiedDataUtils::ValidateIntention(key, intentionDrag);
+    EXPECT_FALSE(ret3);
+
+    bool ret4 = UnifiedDataUtils::ValidateIntention(key, intentionMenu);
+    EXPECT_FALSE(ret4);
+
+    bool ret5 = UnifiedDataUtils::ValidateIntention(key, intentionSystemShare);
+    EXPECT_FALSE(ret5);
+}
+
+/**
+* @tc.name: IsValidQuery002
+* @tc.desc: Normal testcase of key and intention
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, IsValidQuery002, TestSize.Level1)
+{
+    std::string keyMenu = "udmf://Menu/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    std::string intentionDataHub = "DataHub";
+    std::string intentionDrag = "drag";
+    std::string intentionPicker = "Picker";
+    std::string intentionMenu = "Menu";
+    std::string intentionSystemShare = "SystemShare";
+    std::string intentionEmpty = "";
+
+    UnifiedKey key(keyMenu);
+    bool ret = UnifiedDataUtils::ValidateIntention(key, intentionMenu);
+    EXPECT_TRUE(ret);
+
+    bool ret1 = UnifiedDataUtils::ValidateIntention(key, intentionEmpty);
+    EXPECT_TRUE(ret1);
+
+    bool ret2 = UnifiedDataUtils::ValidateIntention(key, intentionDataHub);
+    EXPECT_FALSE(ret2);
+
+    bool ret3 = UnifiedDataUtils::ValidateIntention(key, intentionDrag);
+    EXPECT_FALSE(ret3);
+
+    bool ret4 = UnifiedDataUtils::ValidateIntention(key, intentionPicker);
+    EXPECT_FALSE(ret4);
+
+    bool ret5 = UnifiedDataUtils::ValidateIntention(key, intentionSystemShare);
+    EXPECT_FALSE(ret5);
+}
+
+/**
+* @tc.name: IsValidQuery003
+* @tc.desc: Normal testcase of key and intention
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, IsValidQuery003, TestSize.Level1)
+{
+    std::string keySystemShare = "udmf://SystemShare/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    std::string intentionDataHub = "DataHub";
+    std::string intentionDrag = "drag";
+    std::string intentionPicker = "Picker";
+    std::string intentionMenu = "Menu";
+    std::string intentionSystemShare = "SystemShare";
+    std::string intentionEmpty = "";
+
+    UnifiedKey key(keySystemShare);
+    bool ret = UnifiedDataUtils::ValidateIntention(key, intentionSystemShare);
+    EXPECT_TRUE(ret);
+
+    bool ret1 = UnifiedDataUtils::ValidateIntention(key, intentionEmpty);
+    EXPECT_TRUE(ret1);
+
+    bool ret2 = UnifiedDataUtils::ValidateIntention(key, intentionDataHub);
+    EXPECT_FALSE(ret2);
+
+    bool ret3 = UnifiedDataUtils::ValidateIntention(key, intentionDrag);
+    EXPECT_FALSE(ret3);
+
+    bool ret4 = UnifiedDataUtils::ValidateIntention(key, intentionMenu);
+    EXPECT_FALSE(ret4);
+
+    bool ret5 = UnifiedDataUtils::ValidateIntention(key, intentionPicker);
+    EXPECT_FALSE(ret5);
 }
 
 /**

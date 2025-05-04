@@ -155,7 +155,8 @@ int32_t UdmfServiceClient::GetBatchData(const QueryOption &query, std::vector<Un
     LOG_DEBUG(UDMF_SERVICE, "start, tag: intention = %{public}d, key = %{public}s", query.intention, query.key.c_str());
     auto find = UD_INTENTION_MAP.find(query.intention);
     std::string intention = find == UD_INTENTION_MAP.end() ? intention : find->second;
-    if (!UnifiedDataUtils::IsValidOptions(query.key, intention)) {
+    UnifiedKey key(query.key);
+    if (!key.IsValid() && !UnifiedDataUtils::ValidateIntention(key, intention)) {
         LOG_ERROR(UDMF_SERVICE, "invalid option, query.key: %{public}s, intention: %{public}s", query.key.c_str(),
             intention.c_str());
         return E_INVALID_PARAMETERS;
@@ -185,7 +186,16 @@ int32_t UdmfServiceClient::UpdateData(const QueryOption &query, UnifiedData &uni
         LOG_ERROR(UDMF_SERVICE, "invalid key, key.intention: %{public}s", key.intention.c_str());
         return E_INVALID_PARAMETERS;
     }
-
+    std::string intention = UnifiedDataUtils::FindIntentionMap(query.intention);
+    if (!UnifiedDataUtils::ValidateIntention(key, intention)) {
+        LOG_ERROR(UDMF_SERVICE, "invalid option, query.key: %{public}s, intention: %{public}s", query.key.c_str(),
+            intention.c_str());
+        return E_INVALID_PARAMETERS;
+    }
+    if (key.intention != UD_INTENTION_MAP.at(Intention::UD_INTENTION_DATA_HUB)) {
+        LOG_ERROR(UDMF_SERVICE, "key.intention: %{public}s is invalid.", key.intention.c_str());
+        return E_INVALID_PARAMETERS;
+    }
     if (!unifiedData.IsValid()) {
         LOG_ERROR(UDMF_SERVICE, "UnifiedData is invalid.");
         return E_INVALID_PARAMETERS;
@@ -204,7 +214,8 @@ int32_t UdmfServiceClient::DeleteData(const QueryOption &query, std::vector<Unif
     LOG_DEBUG(UDMF_SERVICE, "start, tag: intention = %{public}d, key = %{public}s", query.intention, query.key.c_str());
     auto find = UD_INTENTION_MAP.find(query.intention);
     std::string intention = find == UD_INTENTION_MAP.end() ? intention : find->second;
-    if (!UnifiedDataUtils::IsValidOptions(query.key, intention)) {
+    UnifiedKey key(query.key);
+    if (!key.IsValid() && !UnifiedDataUtils::ValidateIntention(key, intention)) {
         LOG_ERROR(UDMF_SERVICE, "invalid option, query.key: %{public}s, intention: %{public}s", query.key.c_str(),
             intention.c_str());
         return E_INVALID_PARAMETERS;

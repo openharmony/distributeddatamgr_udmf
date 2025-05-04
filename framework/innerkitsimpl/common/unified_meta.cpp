@@ -648,6 +648,17 @@ bool UnifiedDataUtils::IsPersist(const std::string &intention)
     return IsPersist(GetIntentionByString(intention));
 }
 
+bool UnifiedDataUtils::IsFileMangerIntention(const std::string &intention)
+{
+    Intention optionIntention = GetIntentionByString(intention);
+    if (optionIntention == UD_INTENTION_SYSTEM_SHARE ||
+        optionIntention == UD_INTENTION_MENU ||
+        optionIntention == UD_INTENTION_PICKER) {
+        return true;
+    }
+    return false;
+}
+
 Intention UnifiedDataUtils::GetIntentionByString(const std::string &intention)
 {
     for (const auto &it : UD_INTENTION_MAP) {
@@ -658,18 +669,58 @@ Intention UnifiedDataUtils::GetIntentionByString(const std::string &intention)
     return UD_INTENTION_BUTT;
 }
 
-bool UnifiedDataUtils::IsValidOptions(const std::string &key, std::string &intention)
+std::string UnifiedDataUtils::FindIntentionMap(const Intention &queryIntention)
 {
-    UnifiedKey unifiedKey(key);
-    auto isValidKey = unifiedKey.IsValid();
-    if (key.empty() && IsPersist(intention)) {
-        return true;
+    auto find = UD_INTENTION_MAP.find(queryIntention);
+    std::string intention = find == UD_INTENTION_MAP.end() ? intention : find->second;
+    return intention;
+}
+
+bool UnifiedDataUtils::IsValidOptions(UnifiedKey &key, const std::string &intention,
+    const std::string &validIntention)
+{
+    if (key.key.empty() && intention.empty()) {
+        return false;
     }
-    if (intention.empty() && isValidKey && IsPersist(unifiedKey.intention)) {
-        return true;
+    bool isIntentionValid = intention.empty() || intention == validIntention;
+    if (!isIntentionValid) {
+        return false;
     }
-    if (isValidKey && unifiedKey.intention == intention && IsPersist(intention)) {
-        intention = "";
+    bool isValidKey = key.key.empty() || (key.IsValid() && key.intention == validIntention);
+    if (!isValidKey) {
+        return false;
+    }
+    return true;
+}
+
+bool UnifiedDataUtils::IsValidOptions(UnifiedKey &key, const std::string &intention)
+{
+    if (key.key.empty() && intention.empty()) {
+        return false;
+    }
+
+    bool isIntentionValid = intention.empty() || IsPersist(intention);
+    if (!isIntentionValid) {
+        return false;
+    }
+
+    bool isValidKey = key.key.empty() || (key.IsValid() && IsPersist(key.intention));
+    if (!isValidKey) {
+        return false;
+    }
+
+    if (!key.key.empty() && !intention.empty()) {
+        return key.intention == intention;
+    }
+    return true;
+}
+
+bool UnifiedDataUtils::ValidateIntention(UnifiedKey &key, const std::string &intention)
+{
+    if (IsValidOptions(key, intention)) {
+        if (intention != UD_INTENTION_MAP.at(Intention::UD_INTENTION_DATA_HUB) && key.key.empty()) {
+            return false;
+        }
         return true;
     }
     return false;
