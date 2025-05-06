@@ -13,13 +13,12 @@
  * limitations under the License.
  */
 #define LOG_TAG "unifiedDataChannelANI"
+#include "unifieddatachannel_ani.h"
 #include "ani_utils.h"
 #include "logger.h"
 #include "ani_common_want.h"
 #include "image_ani_utils.h"
 
-#include "unified_data.h"
-#include "unified_record.h"
 #include "unified_types.h"
 #include "unified_meta.h"
 
@@ -88,114 +87,101 @@ static UDMF::ValueType ParseANIRecordValueType(ani_env *env, const std::string t
     }
 }
 
-class UnifiedRecordHolder {
-public:
-    explicit UnifiedRecordHolder(ani_env *env, const std::string type, ani_object unionValue)
-        {
-            if (type == "default") {
-                object_ = std::make_shared<UnifiedRecord>();
-                return;
-            }
+UnifiedRecordHolder::UnifiedRecordHolder(ani_env *env, const std::string type, ani_object unionValue)
+{
+    if (type == "default") {
+        object_ = std::make_shared<UnifiedRecord>();
+        return;
+    }
 
-            UDType utdType = ENTITY;
-            if (UtdUtils::IsValidUtdId(type)) {
-                utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(type));
-            }
+    UDType utdType = ENTITY;
+    if (UtdUtils::IsValidUtdId(type)) {
+        utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(type));
+    }
 
-            UDMF::ValueType value = ParseANIRecordValueType(env, type, unionValue);
+    UDMF::ValueType value = ParseANIRecordValueType(env, type, unionValue);
 
-            std::map<UDType, std::function<std::shared_ptr<UnifiedRecord>(UDType, ValueType)>> constructors = {
-                {TEXT, [](UDType type, ValueType value) { return std::make_shared<Text>(type, value); }},
-                {PLAIN_TEXT, [](UDType type, ValueType value) { return std::make_shared<PlainText>(type, value); }},
-                {HTML, [](UDType type, ValueType value) { return std::make_shared<Html>(type, value); }},
-                {HYPERLINK, [](UDType type, ValueType value) { return std::make_shared<Link>(type, value); }},
-                {UDType::FILE, [](UDType type, ValueType value) { return std::make_shared<File>(type, value); }},
-                {IMAGE, [](UDType type, ValueType value) { return std::make_shared<Image>(type, value); }},
-                {VIDEO, [](UDType type, ValueType value) { return std::make_shared<Video>(type, value); }},
-                {AUDIO, [](UDType type, ValueType value) { return std::make_shared<Audio>(type, value); }},
-                {FOLDER, [](UDType type, ValueType value) { return std::make_shared<Folder>(type, value); }},
-                {SYSTEM_DEFINED_RECORD, [](UDType type, ValueType value)
-                    { return std::make_shared<SystemDefinedRecord>(type, value); }},
-                {SYSTEM_DEFINED_APP_ITEM, [](UDType type, ValueType value)
-                    { return std::make_shared<SystemDefinedAppItem>(type, value); }},
-                {SYSTEM_DEFINED_FORM, [](UDType type, ValueType value)
-                    { return std::make_shared<SystemDefinedForm>(type, value); }},
-                {SYSTEM_DEFINED_PIXEL_MAP, [](UDType type, ValueType value)
-                    { return std::make_shared<SystemDefinedPixelMap>(type, value); }},
-                {APPLICATION_DEFINED_RECORD, [](UDType type, ValueType value)
-                    { return std::make_shared<ApplicationDefinedRecord>(type, value); }},
-            };
+    std::map<UDType, std::function<std::shared_ptr<UnifiedRecord>(UDType, ValueType)>> constructors = {
+        {TEXT, [](UDType type, ValueType value) { return std::make_shared<Text>(type, value); }},
+        {PLAIN_TEXT, [](UDType type, ValueType value) { return std::make_shared<PlainText>(type, value); }},
+        {HTML, [](UDType type, ValueType value) { return std::make_shared<Html>(type, value); }},
+        {HYPERLINK, [](UDType type, ValueType value) { return std::make_shared<Link>(type, value); }},
+        {UDType::FILE, [](UDType type, ValueType value) { return std::make_shared<File>(type, value); }},
+        {IMAGE, [](UDType type, ValueType value) { return std::make_shared<Image>(type, value); }},
+        {VIDEO, [](UDType type, ValueType value) { return std::make_shared<Video>(type, value); }},
+        {AUDIO, [](UDType type, ValueType value) { return std::make_shared<Audio>(type, value); }},
+        {FOLDER, [](UDType type, ValueType value) { return std::make_shared<Folder>(type, value); }},
+        {SYSTEM_DEFINED_RECORD, [](UDType type, ValueType value)
+            { return std::make_shared<SystemDefinedRecord>(type, value); }},
+        {SYSTEM_DEFINED_APP_ITEM, [](UDType type, ValueType value)
+            { return std::make_shared<SystemDefinedAppItem>(type, value); }},
+        {SYSTEM_DEFINED_FORM, [](UDType type, ValueType value)
+            { return std::make_shared<SystemDefinedForm>(type, value); }},
+        {SYSTEM_DEFINED_PIXEL_MAP, [](UDType type, ValueType value)
+            { return std::make_shared<SystemDefinedPixelMap>(type, value); }},
+        {APPLICATION_DEFINED_RECORD, [](UDType type, ValueType value)
+            { return std::make_shared<ApplicationDefinedRecord>(type, value); }},
+    };
 
-            auto constructor = constructors.find(utdType);
-            if (constructor == constructors.end()) {
-                object_ = std::make_shared<UnifiedRecord>();
-                return;
-            }
+    auto constructor = constructors.find(utdType);
+    if (constructor == constructors.end()) {
+        object_ = std::make_shared<UnifiedRecord>();
+        return;
+    }
 
-            object_ = constructor->second(utdType, value);
-            if (utdType == APPLICATION_DEFINED_RECORD) {
-                std::shared_ptr<ApplicationDefinedRecord> applicationDefinedRecord =
-                    std::static_pointer_cast<ApplicationDefinedRecord>(object_);
-                applicationDefinedRecord->SetApplicationDefinedType(type);
-            }
+    object_ = constructor->second(utdType, value);
+    if (utdType == APPLICATION_DEFINED_RECORD) {
+        std::shared_ptr<ApplicationDefinedRecord> applicationDefinedRecord =
+            std::static_pointer_cast<ApplicationDefinedRecord>(object_);
+        applicationDefinedRecord->SetApplicationDefinedType(type);
+    }
+}
+
+const std::shared_ptr<UnifiedRecord> UnifiedRecordHolder::Get()
+{
+    if (object_ == nullptr) {
+        object_ = std::make_shared<UnifiedRecord>();
+    }
+    return object_;
+}
+
+void UnifiedRecordHolder::Set(ani_ref saveRemote)
+{
+    saveRemote_ = saveRemote;
+}
+
+UnifiedRecordHolder::~UnifiedRecordHolder()
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "[ANI] enter UnifiedRecordHolder dtor ");
+}
+
+
+UnifiedDataHolder::UnifiedDataHolder(UnifiedRecordHolder* recordHolder)
+{
+    object_ = std::make_shared<UnifiedData>();
+
+    if (recordHolder != nullptr) {
+        auto recordPtr = recordHolder->Get();
+        if (recordPtr != nullptr) {
+            object_->AddRecord(recordPtr);
         }
+    }
+}
 
-        const std::shared_ptr<UnifiedRecord> Get()
-        {
-            if (object_ == nullptr) {
-                object_ = std::make_shared<UnifiedRecord>();
-            }
-            return object_;
-        }
+std::shared_ptr<UnifiedData> UnifiedDataHolder::Get()
+{
+    return object_;
+}
 
-        void Set(ani_ref saveRemote)
-        {
-            saveRemote_ = saveRemote;
-        }
+void UnifiedDataHolder::Set(ani_ref saveRemote)
+{
+    saveRemote_ = saveRemote;
+}
 
-        ~UnifiedRecordHolder()
-        {
-            LOG_DEBUG(UDMF_KITS_NAPI, "[ANI] enter UnifiedRecordHolder dtor ");
-        }
-
-    private:
-        ani_ref saveRemote_ = nullptr;
-        std::shared_ptr<UnifiedRecord> object_;
-};
-
-class UnifiedDataHolder {
-public:
-        explicit UnifiedDataHolder(UnifiedRecordHolder* recordHolder)
-        {
-            object_ = std::make_shared<UnifiedData>();
-
-            if (recordHolder != nullptr) {
-                auto recordPtr = recordHolder->Get();
-                if (recordPtr != nullptr) {
-                    object_->AddRecord(recordPtr);
-                }
-            }
-        }
-
-        std::shared_ptr<UnifiedData> Get()
-        {
-            return object_;
-        }
-
-        void Set(ani_ref saveRemote)
-        {
-            saveRemote_ = saveRemote;
-        }
-
-        ~UnifiedDataHolder()
-        {
-            LOG_DEBUG(UDMF_KITS_NAPI, "[ANI] enter UnifiedDataHolder dtor ");
-        }
-
-    private:
-        ani_ref saveRemote_ = nullptr;
-        std::shared_ptr<UnifiedData> object_;
-};
+UnifiedDataHolder::~UnifiedDataHolder()
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "[ANI] enter UnifiedDataHolder dtor ");
+}
 
 static void UnifiedRecodeValueTypeConstructor([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
     ani_string descriptor, ani_object unionValue)

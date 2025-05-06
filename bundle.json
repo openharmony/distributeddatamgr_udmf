@@ -175,6 +175,15 @@
             ],
             "header_base":"//foundation/distributeddatamgr/udmf/interfaces/jskits/intelligence"
           }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/ani:unifieddatachannel_ani",
+          "header": {
+            "header_files": [
+              "unifieddatachannel_ani.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/ani/native/include"
+          }
         }
       ],
       "test": [
