@@ -23,11 +23,58 @@
 
 using namespace OHOS::UDMF;
 
+uint32_t paramsCheckError = 401;
+
+static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
+{
+    LOG_INFO(UDMF_KITS_NAPI, "Begin ThrowBusinessError.");
+    static const char *errorClsName = "L@ohos/base/BusinessError;";
+    ani_class cls {};
+    if (ANI_OK != env->FindClass(errorClsName, &cls)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "find class BusinessError %{public}s failed", errorClsName);
+        return;
+    }
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "find method BusinessError.constructor failed");
+        return;
+    }
+    ani_object errorObject;
+    if (ANI_OK != env->Object_New(cls, ctor, &errorObject)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "create BusinessError object failed");
+        return;
+    }
+    ani_double aniErrCode = static_cast<ani_double>(errCode);
+    ani_string errMsgStr;
+    if (ANI_OK != env->String_NewUTF8(errMsg.c_str(), errMsg.size(), &errMsgStr)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "convert errMsg to ani_string failed");
+        return;
+    }
+    if (ANI_OK != env->Object_SetFieldByName_Double(errorObject, "code", aniErrCode)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "set error code failed");
+        return;
+    }
+    if (ANI_OK != env->Object_SetPropertyByName_Ref(errorObject, "message", errMsgStr)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "set error message failed");
+        return;
+    }
+    env->ThrowError(static_cast<ani_error>(errorObject));
+    return;
+}
+
 static ani_string GetUniformDataTypeByFilenameExtension(ani_env *env, ani_string filenameExtension,
     ani_object belongsTo)
 {
-    LOG_ERROR(UDMF_KITS_NAPI, "GetUniformDataTypeByFilenameExtension is called!");
+    LOG_INFO(UDMF_KITS_NAPI, "GetUniformDataTypeByFilenameExtension is called!");
+    if (filenameExtension == nullptr) {
+        ThrowBusinessError(env, paramsCheckError, "ParserParam failed!");
+        return nullptr;
+    }
     std::string filenameExtension_ = AniStringUtils::ToStd(env, filenameExtension);
+    if (filenameExtension_.empty()) {
+        ThrowBusinessError(env, paramsCheckError, "ParserParam failed!");
+        return nullptr;
+    }
     ani_boolean isUndefined;
     if (ANI_OK != env->Reference_IsUndefined(belongsTo, &isUndefined)) {
         LOG_ERROR(UDMF_KITS_NAPI, "Object_GetFieldByName_Ref isRepeat failed.");
