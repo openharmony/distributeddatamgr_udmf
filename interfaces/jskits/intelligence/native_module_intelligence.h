@@ -19,6 +19,5 @@
 #include "image_embedding_napi.h"
 #include "napi/native_node_api.h"
 #include "text_embedding_napi.h"
-#include "retrieval_napi.h"
 
 #endif // NATIVE_MODULE_INTELLIGENCE_H
