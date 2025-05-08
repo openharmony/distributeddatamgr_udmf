@@ -298,9 +298,6 @@ public:
     IAipCoreManager() = default;
     virtual ~IAipCoreManager() = default;
 
-    virtual int32_t InitRetriever(const RetrievalConfigStruct& retrievalConfig) = 0;
-    virtual int32_t Retrieve(const std::string query, const RetrievalConditionStruct &condition,
-        RetrievalResponseStruct &retrievalResponse) = 0;
     virtual int32_t InitTextModel(const ModelConfigData &config) = 0;
     virtual int32_t InitImageModel(const ModelConfigData &config) = 0;
     virtual int32_t LoadTextModel() = 0;
