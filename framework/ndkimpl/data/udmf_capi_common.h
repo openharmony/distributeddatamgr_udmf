@@ -130,6 +130,11 @@ struct OH_UdmfGetDataParams {
     OH_Udmf_DataProgressListener dataProgressListener;
 };
 
+struct OH_UdmfOptions {
+    std::string key;
+    Udmf_Intention intention {};
+};
+
 bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid);
 
 bool IsInvalidUdsObjectByType(const UdsObject* pThis, const OHOS::UDMF::UDType& type);
