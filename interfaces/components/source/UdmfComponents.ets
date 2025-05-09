@@ -61,7 +61,7 @@ const defaultIcon: string =
     ',73,141,205,245,214,23,231,110,132,188,27,13,88,8,43,145,225,60,68,0,42,15,95,85,238,25,204,75,166,163,127,0,0';
 const MAX_CARD_SCALE: number = 1.2;
 const MIN_CARD_SCALE: number = 0.8;
-const SMALL_MIN_CARD_SCALE: number = 0.6;
+const SMALL_MIN_CARD_SCALE: number = 0.4;
 const DEFAULT_BIG_CARD_SIZE: number = 200;
 const DEFAULT_MID_CARD_WIDTH: number = 200;
 const DEFAULT_MID_CARD_HEIGHT: number = 100;
@@ -74,6 +74,7 @@ const SMALL_EMPTY_APPNAME_WIDTH: number = 30;
 const DEFAULT_EMPTY_TEXT_RADIUS: number = 2;
 const DEFAULT_EMPTY_DESCRIPTION_WIDTH: string = '100%';
 const CARD_BACKGROUND: string = '#E6FFFFFF';
+const TRANSLATE_BACKGROUND: string = '#00000000';
 const APP_NAME_COLOR: string = '#99182431';
 const DEFAULT_THUMB_BACKGROUND: string = '#CCCCCC';
 const DEFAULT_FONT_BACKGROUND: string = '#55CCCCCC';
@@ -517,11 +518,11 @@ export struct ContentFormCard {
     .shadow(ShadowStyle.OUTER_DEFAULT_SM)
     .width(this.cardWidth)
     .onClick(() => {
+      this.handleOnClick();
       if (!this.contentFormData?.linkUri) {
         console.warn(`${TAG}, linkUri is null`);
         return;
       }
-      this.handleOnClick();
       try {
         let context = getContext(this) as common.UIAbilityContext;
         context.openLink(this.contentFormData?.linkUri, { appLinkingOnly: false, parameters: {} });
@@ -609,7 +610,7 @@ export struct ContentFormCard {
 
   getTextBackground(text: string | undefined): string {
     if (text && text.length > 0) {
-      return CARD_BACKGROUND;
+      return TRANSLATE_BACKGROUND;
     }
     return DEFAULT_FONT_BACKGROUND;
   }
