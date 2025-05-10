@@ -18,7 +18,7 @@ if (!("finalizeConstruction" in ViewPU.prototype)) {
 }
 
 let image = requireNapi('multimedia.image');
-let i = requireNapi('i18n');
+let j = requireNapi('i18n');
 
 export var FormType;
 (function (FormType) {
