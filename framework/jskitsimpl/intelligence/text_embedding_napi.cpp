@@ -102,6 +102,7 @@ TextEmbeddingNapi::~TextEmbeddingNapi()
     AIP_HILOGI("Enter");
     AipNapiUtils::UnLoadAlgoLibrary(textAipCoreMgrHandle_);
     delete textAipCoreManager_;
+    textAipCoreManager_ = nullptr;
 }
 
 static napi_value StartInit(napi_env env, napi_value exports, struct TextEmbeddingConstructorInfo info)

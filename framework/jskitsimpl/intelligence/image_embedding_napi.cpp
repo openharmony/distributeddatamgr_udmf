@@ -79,8 +79,8 @@ ImageEmbeddingNapi::ImageEmbeddingNapi() : env_(nullptr) {}
 ImageEmbeddingNapi::~ImageEmbeddingNapi()
 {
     AipNapiUtils::UnLoadAlgoLibrary(imgAipCoreMgrHandle_);
-    imageAipCoreManager_ = nullptr;
     delete imageAipCoreManager_;
+    imageAipCoreManager_ = nullptr;
 }
 
 static napi_value StartInit(napi_env env, napi_value exports, struct ImageEmbeddingConstructorInfo info)
