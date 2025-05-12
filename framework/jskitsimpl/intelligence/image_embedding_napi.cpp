@@ -235,6 +235,11 @@ napi_value ImageEmbeddingNapi::GetImageEmbeddingModel(napi_env env, napi_callbac
         .deferred = deferred,
         .config = imgModelConfig,
     };
+    if (asyncGetImgEmbeddingModelData == nullptr) {
+        AIP_HILOGE("new asyncGetImgEmbeddingModelData error.");
+        ThrowIntelligenceErr(env, INNER_ERROR, "new asyncGetImgEmbeddingModelData failed");
+        return nullptr;
+    }
 
     if (!CreateAsyncImgModelExecution(env, asyncGetImgEmbeddingModelData)) {
         AIP_HILOGE("create AsyncTextModelExecution failed");
@@ -436,6 +441,10 @@ bool ImageEmbeddingNapi::GetEmbeddingAsyncExecution(napi_env env, napi_deferred 
         .deferred = deferred,
         .strArg = strArg,
     };
+    if (imageCallbackData == nullptr) {
+        AIP_HILOGE("new imageCallbackData error.");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "ImageGetEmbedding", NAPI_AUTO_LENGTH, &resourceName);
@@ -557,6 +566,10 @@ bool ImageEmbeddingNapi::LoadAsyncExecution(napi_env env, napi_deferred deferred
         .asyncWork = nullptr,
         .deferred = deferred,
     };
+    if (loadCallbackData == nullptr) {
+        AIP_HILOGE("new loadCallbackData error.");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "imageLoad", NAPI_AUTO_LENGTH, &resourceName);
@@ -668,6 +681,10 @@ bool ImageEmbeddingNapi::ReleaseAsyncExecution(napi_env env, napi_deferred defer
         .asyncWork = nullptr,
         .deferred = deferred,
     };
+    if (releaseCallbackData == nullptr) {
+        AIP_HILOGE("new releaseCallbackData error.");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "textLoad", NAPI_AUTO_LENGTH, &resourceName);
