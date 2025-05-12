@@ -264,6 +264,11 @@ napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_
         .deferred = deferred,
         .config = textModelConfig,
     };
+    if (asyncGetTextEmbeddingModelData == nullptr) {
+        AIP_HILOGE("new asyncGetTextEmbeddingModelData error.");
+        ThrowIntelligenceErr(env, INNER_ERROR, "new asyncGetTextEmbeddingModelData failed");
+        return nullptr;
+    }
 
     if (!CreateAsyncTextModelExecution(env, asyncGetTextEmbeddingModelData)) {
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "create AsyncTextModelExecution failed");
@@ -487,6 +492,10 @@ bool TextEmbeddingNapi::SplitTextAsyncExecution(napi_env env, napi_deferred defe
         .configSize = configSize,
         .configOverlap = configOverlap,
     };
+    if (splitTextCallbackData == nullptr) {
+        AIP_HILOGE("new splitTextCallbackData error.");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "SplitText", NAPI_AUTO_LENGTH, &resourceName);
@@ -653,6 +662,10 @@ bool TextEmbeddingNapi::GetEmbeddingStringAsyncExecution(napi_env env, napi_defe
         .deferred = deferred,
         .strArg = strArg,
     };
+    if (textStringCallbackData == nullptr) {
+        AIP_HILOGE("new textStringCallbackData error.");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "textStringEmbedding", NAPI_AUTO_LENGTH, &resourceName);
@@ -799,6 +812,10 @@ bool TextEmbeddingNapi::GetEmbeddingArrayAsyncExecution(napi_env env, napi_defer
         .deferred = deferred,
         .text = text,
     };
+    if (textArrayCallbackData == nullptr) {
+        AIP_HILOGE("new textArrayCallbackData error.");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "textArrayEmbedding", NAPI_AUTO_LENGTH, &resourceName);
@@ -931,6 +948,10 @@ bool TextEmbeddingNapi::LoadAsyncExecution(napi_env env, napi_deferred deferred)
         .asyncWork = nullptr,
         .deferred = deferred,
     };
+    if (loadCallbackData == nullptr) {
+        AIP_HILOGE("new loadCallbackData error.");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "textLoad", NAPI_AUTO_LENGTH, &resourceName);
@@ -1042,6 +1063,10 @@ bool TextEmbeddingNapi::ReleaseAsyncExecution(napi_env env, napi_deferred deferr
         .asyncWork = nullptr,
         .deferred = deferred,
     };
+    if (releaseCallbackData == nullptr) {
+        AIP_HILOGE("new releaseCallbackData error.");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "textLoad", NAPI_AUTO_LENGTH, &resourceName);
