@@ -509,4 +509,130 @@ HWTEST_F(UnifiedMetaTest, GetValue002, TestSize.Level1)
     bool ret2 = object.GetValue("invalid key", valueEmpty);
     EXPECT_FALSE(ret2);
 }
+
+/**
+* @tc.name: IsValidOptions002
+* @tc.desc: Abnormal testcase of IsValidOptions, intention is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, IsValidOptions002, TestSize.Level1)
+{
+    UnifiedKey key;
+    key.key = "key://";
+    std::string intention;
+    std::string validIntention;
+    UnifiedDataUtils unifiedDataUtils;
+    bool ret = unifiedDataUtils.IsValidOptions(key, intention, validIntention);
+    EXPECT_FALSE(ret);
+}
+
+/**
+* @tc.name: IsValidOptions003
+* @tc.desc: Abnormal testcase of IsValidOptions, intention != validIntention
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, IsValidOptions003, TestSize.Level1)
+{
+    UnifiedKey key;
+    key.key = "key://";
+    std::string intention = "drag";
+    std::string validIntention = "DataHub";
+    UnifiedDataUtils unifiedDataUtils;
+    bool ret = unifiedDataUtils.IsValidOptions(key, intention, validIntention);
+    EXPECT_FALSE(ret);
+}
+
+/**
+* @tc.name: IsValidOptions004
+* @tc.desc: Abnormal testcase of IsValidOptions, key.intention != validIntention
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, IsValidOptions004, TestSize.Level1)
+{
+    UnifiedKey key;
+    key.key = "key://";
+    key.intention = "DataHub";
+    std::string intention = "DataHub";
+    std::string validIntention = "drag";
+    UnifiedDataUtils unifiedDataUtils;
+    bool ret = unifiedDataUtils.IsValidOptions(key, intention, validIntention);
+    EXPECT_FALSE(ret);
+}
+
+/**
+* @tc.name: ConvertToUDDetails001
+* @tc.desc: Abnormal testcase of ConvertToUDDetails, object is nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, ConvertToUDDetails001, TestSize.Level1)
+{
+    std::shared_ptr<Object> object = nullptr;
+    EXPECT_NO_FATAL_FAILURE(ObjectUtils::ConvertToUDDetails(object));
+}
+
+/**
+* @tc.name: GetValueSize001
+* @tc.desc: Normal testcase of GetValueSize
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, GetValueSize001, TestSize.Level1)
+{
+    ValueType value = std::make_shared<OHOS::Media::PixelMap>();
+    bool isCalValueType = true;
+    int64_t ret = ObjectUtils::GetValueSize(value, isCalValueType);
+    EXPECT_EQ(ret, (std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value))->GetByteCount());
+}
+
+
+/**
+* @tc.name: GetValueSize002
+* @tc.desc: Normal testcase of GetValueSize
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, GetValueSize002, TestSize.Level1)
+{
+    ValueType value = std::make_shared<OHOS::AAFwk::Want>();
+    bool isCalValueType = true;
+    int64_t ret = ObjectUtils::GetValueSize(value, isCalValueType);
+    EXPECT_NE(ret, 0);
+}
+
+/**
+* @tc.name: GetValueSize003
+* @tc.desc: Abnormal testcase of GetValueSize, value is invalid
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, GetValueSize003, TestSize.Level1)
+{
+    ValueType value = true;
+    bool isCalValueType = true;
+    int64_t ret = ObjectUtils::GetValueSize(value, isCalValueType);
+    EXPECT_EQ(ret, std::visit([] (const auto &val) { return sizeof(val); }, value));
+}
+
+/* *
+* @tc.name: GetObjectValueSize_001
+* @tc.desc: Abnormal test of GetObjectValueSize, key is DETAILS
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, GetObjectValueSize_001, TestSize.Level1)
+{
+    std::shared_ptr<Object> object = std::make_shared<Object>();
+    bool isCalValueType = true;
+    object->value_["details"] = std::make_shared<OHOS::Media::PixelMap>();
+    size_t ret = ObjectUtils::GetObjectValueSize(object, isCalValueType);
+    EXPECT_EQ(ret, 0);
+}
+
+/* *
+* @tc.name: GetAllObjectSize_001
+* @tc.desc: Abnormal test of GetAllObjectSize, object is nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, GetAllObjectSize_001, TestSize.Level1)
+{
+    std::shared_ptr<Object> object = nullptr;
+    int64_t ret = ObjectUtils::GetAllObjectSize(object);
+    EXPECT_EQ(ret, 0);
+}
 } // OHOS::Test

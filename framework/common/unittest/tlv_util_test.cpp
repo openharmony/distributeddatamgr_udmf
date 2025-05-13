@@ -803,4 +803,130 @@ HWTEST_F(TlvUtilTest, WritingAndReading_007, TestSize.Level1)
     EXPECT_EQ(idValue, wantParamsResult.GetIntParam(idKey, 0));
     LOG_INFO(UDMF_TEST, "WritingAndReading_007 end.");
 }
+
+/* *
+ * @tc.name: Reading_001
+ * @tc.desc: Normal test of Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Reading_001, TestSize.Level1)
+{
+    std::nullptr_t output;
+    std::vector<std::uint8_t> buffer = { 1, 2 };
+    TLVObject data(buffer);
+    TLVHead head;
+    bool ret = TLVUtil::Reading(output, data, head);
+    EXPECT_EQ(ret, data.Read(output, head));
+}
+
+/* *
+ * @tc.name: Reading_002
+ * @tc.desc: Abnormal test of Reading, data is invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Reading_002, TestSize.Level1)
+{
+    DataStatus output;
+    std::vector<std::uint8_t> buffer = { 1, 2 };
+    TLVObject data(buffer);
+    TLVHead head;
+    bool ret = TLVUtil::Reading(output, data, head);
+    EXPECT_FALSE(ret);
+}
+
+/* *
+ * @tc.name: Reading_003
+ * @tc.desc: Abnormal test of Reading, buffer_ is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Reading_003, TestSize.Level1)
+{
+    Object output;
+    std::vector<std::uint8_t> buffer = { 1, 2 };
+    TLVObject data(buffer);
+    TLVHead head;
+    bool ret = TLVUtil::Reading(output, data, head);
+    EXPECT_FALSE(ret);
+}
+
+/* *
+ * @tc.name: Reading_004
+ * @tc.desc: Abnormal test of Reading, data is invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Reading_004, TestSize.Level1)
+{
+    OHOS::AAFwk::WantParams output;
+    TLVObject data;
+    TLVHead head;
+    bool ret = TLVUtil::Reading(output, data, head);
+    EXPECT_FALSE(ret);
+}
+
+/* *
+ * @tc.name: Writing_001
+ * @tc.desc: Abnormal test of Writing, input.tag is invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Writing_001, TestSize.Level1)
+{
+    UnifiedDataProperties input;
+    std::vector<std::uint8_t> buffer = { 1, 2 };
+    TLVObject data(buffer);
+    TAG tag = TAG::TAG_NULL;
+    input.tag = "test";
+    bool ret = TLVUtil::Writing(input, data, tag);
+    EXPECT_FALSE(ret);
+}
+
+/* *
+ * @tc.name: Writing_002
+ * @tc.desc: Abnormal test of Writing, input.timestamp is invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Writing_002, TestSize.Level1)
+{
+    UnifiedDataProperties input;
+    std::vector<std::uint8_t> buffer = { 1, 2 };
+    TLVObject data(buffer);
+    std::string dataFile = "demo1";
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    std::FILE *file = fopen(dataFile.c_str(), "w+");
+    tlvObject.SetFile(file);
+    TAG tag = TAG::TAG_NULL;
+    input.tag = "test";
+    input.timestamp = 0;
+    bool ret = TLVUtil::Writing(input, data, tag);
+    EXPECT_FALSE(ret);
+}
+
+/* *
+ * @tc.name: Writing_003
+ * @tc.desc: Abnormal test of Writing input is invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Writing_003, TestSize.Level1)
+{
+    Privilege input;
+    std::vector<std::uint8_t> buffer = { 1, 2 };
+    TLVObject data(buffer);
+    TAG tag = TAG::TAG_NULL;
+    bool ret = TLVUtil::Writing(input, data, tag);
+    EXPECT_FALSE(ret);
+}
+
+/* *
+ * @tc.name: CountBufferSize_006
+ * @tc.desc: Abnormal test of CountBufferSize, input is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, CountBufferSize_006, TestSize.Level1)
+{
+    std::shared_ptr<std::map<std::string, ValueType>> input = nullptr;
+    std::vector<std::uint8_t> buffer = { 1, 2 };
+    TLVObject data(buffer);
+    size_t ret = TLVUtil::CountBufferSize(input, data);
+    EXPECT_EQ(ret, data.CountHead());
+}
 }

@@ -143,7 +143,10 @@ template <> size_t CountBufferSize(const UnifiedData &input, TLVObject &data)
 
 template <> bool Writing(const UnifiedData &input, TLVObject &data, TAG tag)
 {
-    return false;
+    if (input.dataId_ == 0) {
+        return false;
+    }
+    return true;
 }
 
 template <> bool Reading(UnifiedData &output, TLVObject &data, const TLVHead &head)
