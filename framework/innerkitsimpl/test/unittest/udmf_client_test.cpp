@@ -3534,4 +3534,41 @@ HWTEST_F(UdmfClientTest, UpdateData003, TestSize.Level1)
     ASSERT_TRUE(unifiedDataSet.empty());
     LOG_INFO(UDMF_TEST, "UpdateData003 end.");
 }
+
+/**
+* @tc.name: SetData036
+* @tc.desc: test set html type data image src is base64 format
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData036, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData036 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "http://demo.com";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    std::string html = "<img data-ohos='clipboard' src='data:image/png;base64,IVBORw0KGgoAAAANSUhEUgAAAF'>";
+    auto htmlRecord = Html(html, "abstract");
+    htmlRecord.InitObject();
+    record->AddEntry(htmlRecord.GetUtdId(), htmlRecord.GetOriginValue());
+    data.AddRecord(record);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+    std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
+    ASSERT_NE(readRecord, nullptr);
+    auto uris = readRecord->GetUris();
+    EXPECT_EQ(uris.size(), 0);
+
+    LOG_INFO(UDMF_TEST, "SetData036 end.");
+}
 } // OHOS::Test
