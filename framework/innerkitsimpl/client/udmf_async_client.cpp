@@ -69,6 +69,10 @@ Status UdmfAsyncClient::StartAsyncDataRetrieval(const GetDataParams &params)
     if (status != E_OK) {
         return status;
     }
+    if (asyncHelperMap_.find(params.query.key) == asyncHelperMap_.end()) {
+        LOG_ERROR(UDMF_CLIENT, "RegisterAsyncHelper failed, key=%{public}s", params.query.key.c_str());
+        return E_ERROR;
+    }
     auto &asyncHelper = asyncHelperMap_.at(params.query.key);
     if (params.progressIndicator == ProgressIndicator::DEFAULT) {
         asyncHelper->progressQueue.SetClearable(false);

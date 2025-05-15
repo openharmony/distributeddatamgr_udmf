@@ -190,7 +190,6 @@ void* UDMFTest::GetDataCallbackFunc(void* context, const char* type)
  * @tc.name: OH_Udmf_CreateUnifiedData001
  * @tc.desc: test OH_UdmfData_Create
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_CreateUnifiedData001, TestSize.Level0)
 {
@@ -204,7 +203,6 @@ HWTEST_F(UDMFTest, OH_Udmf_CreateUnifiedData001, TestSize.Level0)
  * @tc.name: OH_Udmf_AddRecordToUnifiedData001
  * @tc.desc: OH_UdmfData_AddRecord with return UDMF_E_INVALID_PARAM
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_AddRecordToUnifiedData001, TestSize.Level0)
 {
@@ -232,7 +230,6 @@ HWTEST_F(UDMFTest, OH_Udmf_AddRecordToUnifiedData001, TestSize.Level0)
  * @tc.name: OH_Udmf_AddRecordToUnifiedData002
  * @tc.desc: OH_UdmfData_AddRecord with return UDMF_E_OK
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_AddRecordToUnifiedData002, TestSize.Level0)
 {
@@ -249,7 +246,6 @@ HWTEST_F(UDMFTest, OH_Udmf_AddRecordToUnifiedData002, TestSize.Level0)
  * @tc.name: OH_Udmf_HasUnifiedDataType001
  * @tc.desc: OH_UdmfData_HasType with return UDMF_E_INVALID_PARAM
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_HasUnifiedDataType001, TestSize.Level0)
 {
@@ -276,7 +272,6 @@ HWTEST_F(UDMFTest, OH_Udmf_HasUnifiedDataType001, TestSize.Level0)
  * @tc.name: OH_Udmf_HasUnifiedDataType002
  * @tc.desc: OH_UdmfData_HasType with return whether has type, number 1 represent true, number 0 represent false
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_HasUnifiedDataType002, TestSize.Level0)
 {
@@ -303,7 +298,6 @@ HWTEST_F(UDMFTest, OH_Udmf_HasUnifiedDataType002, TestSize.Level0)
  * @tc.name: OH_Udmf_GetUnifiedDataTypes001
  * @tc.desc: OH_UdmfData_GetTypes with invalid params
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedDataTypes001, TestSize.Level0)
 {
@@ -327,7 +321,6 @@ HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedDataTypes001, TestSize.Level0)
  * @tc.name: OH_Udmf_GetUnifiedDataTypes002
  * @tc.desc: OH_UdmfData_GetTypes with valid params
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedDataTypes002, TestSize.Level0)
 {
@@ -359,7 +352,6 @@ HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedDataTypes002, TestSize.Level0)
  * @tc.name: OH_Udmf_GetUnifiedRecordTypes001
  * @tc.desc: OH_UdmfRecord_GetTypes with invalid params
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedRecordTypes001, TestSize.Level0)
 {
@@ -382,7 +374,6 @@ HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedRecordTypes001, TestSize.Level0)
  * @tc.name: OH_Udmf_GetUnifiedRecordTypes002
  * @tc.desc: OH_UdmfRecord_GetTypes with valid params
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedRecordTypes002, TestSize.Level0)
 {
@@ -407,7 +398,6 @@ HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedRecordTypes002, TestSize.Level0)
  * @tc.name: OH_Udmf_GetRecords001
  * @tc.desc: OH_UdmfRecord_GetTypes with invalid params
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_GetRecords001, TestSize.Level0)
 {
@@ -431,7 +421,6 @@ HWTEST_F(UDMFTest, OH_Udmf_GetRecords001, TestSize.Level0)
  * @tc.name: OH_Udmf_GetRecords002
  * @tc.desc: OH_UdmfRecord_GetTypes with valid params
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_GetRecords002, TestSize.Level0)
 {
@@ -466,7 +455,6 @@ HWTEST_F(UDMFTest, OH_Udmf_GetRecords002, TestSize.Level0)
  * @tc.name: OH_Udmf_SetUnifiedData001
  * @tc.desc: OH_Udmf_SetUnifiedData with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, UdmfTest006, TestSize.Level0)
 {
@@ -497,7 +485,6 @@ HWTEST_F(UDMFTest, UdmfTest006, TestSize.Level0)
  * @tc.name: OH_Udmf_GetUnifiedData001
  * @tc.desc: OH_Udmf_GetUnifiedData with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedData001, TestSize.Level0)
 {
@@ -523,7 +510,6 @@ HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedData001, TestSize.Level0)
  * @tc.name: OH_Udmf_SetAndGetUnifiedData001
  * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with valid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData001, TestSize.Level0)
 {
@@ -563,7 +549,6 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData001, TestSize.Level0)
  * @tc.name: OH_Udmf_SetAndGetUnifiedData002
  * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with valid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData002, TestSize.Level0)
 {
@@ -599,7 +584,6 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData002, TestSize.Level0)
  * @tc.name: OH_Udmf_CreateUnifiedRecord001
  * @tc.desc: OH_Udmf_CreateUnifiedRecord001
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_CreateUnifiedRecord001, TestSize.Level0)
 {
@@ -613,7 +597,6 @@ HWTEST_F(UDMFTest, OH_Udmf_CreateUnifiedRecord001, TestSize.Level0)
  * @tc.name: OH_Udmf_AddGeneralEntry001
  * @tc.desc: test OH_UdmfRecord_AddGeneralEntry with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_AddGeneralEntry001, TestSize.Level0)
 {
@@ -639,7 +622,6 @@ HWTEST_F(UDMFTest, OH_Udmf_AddGeneralEntry001, TestSize.Level0)
  * @tc.name: OH_Udmf_GetGeneralEntry001
  * @tc.desc: test OH_UdmfRecord_GetGeneralEntry with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_GetGeneralEntry001, TestSize.Level0)
 {
@@ -664,7 +646,6 @@ HWTEST_F(UDMFTest, OH_Udmf_GetGeneralEntry001, TestSize.Level0)
  * @tc.name: OH_Udmf_AddAndGetGeneralEntry002
  * @tc.desc: test OH_UdmfRecord_AddGeneralEntry and OH_UdmfRecord_GetGeneralEntry with valid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_AddAndGetGeneralEntry002, TestSize.Level0)
 {
@@ -741,7 +722,6 @@ HWTEST_F(UDMFTest, OH_Udmf_AddAndGetGeneralEntry004, TestSize.Level0)
  * @tc.name: OH_Udmf_BuildRecordByPlainText001
  * @tc.desc: test OH_UdmfRecord_AddPlainText with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByPlainText001, TestSize.Level0)
 {
@@ -767,7 +747,6 @@ HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByPlainText001, TestSize.Level0)
  * @tc.name: OH_Udmf_GetPlainTextFromRecord001
  * @tc.desc: test OH_UdmfRecord_GetPlainText with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_GetPlainTextFromRecord001, TestSize.Level0)
 {
@@ -793,7 +772,6 @@ HWTEST_F(UDMFTest, OH_Udmf_GetPlainTextFromRecord001, TestSize.Level0)
  * @tc.name: OH_Udmf_BuildAndGetPlainTextFromRecord001
  * @tc.desc: test OH_UdmfRecord_GetPlainText and OH_Udmf_BuildPlainTextFromRecord with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_BuildAndGetPlainTextFromRecord001, TestSize.Level0)
 {
@@ -820,7 +798,6 @@ HWTEST_F(UDMFTest, OH_Udmf_BuildAndGetPlainTextFromRecord001, TestSize.Level0)
  * @tc.name: OH_Udmf_BuildRecordByHyperlink001
  * @tc.desc: test OH_UdmfRecord_AddHyperlink with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByHyperlink001, TestSize.Level0)
 {
@@ -846,7 +823,6 @@ HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByHyperlink001, TestSize.Level0)
  * @tc.name: OH_Udmf_GetHyperlinkFromRecord001
  * @tc.desc: test OH_UdmfRecord_GetHyperlink with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_GetHyperlinkFromRecord001, TestSize.Level0)
 {
@@ -872,7 +848,6 @@ HWTEST_F(UDMFTest, OH_Udmf_GetHyperlinkFromRecord001, TestSize.Level0)
  * @tc.name: OH_Udmf_BuildAndGetHyperlinkFromRecord001
  * @tc.desc: test OH_Udmf_BuildAndGetHyperlinkFromRecord with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_BuildAndGetHyperlinkFromRecord001, TestSize.Level0)
 {
@@ -899,7 +874,6 @@ HWTEST_F(UDMFTest, OH_Udmf_BuildAndGetHyperlinkFromRecord001, TestSize.Level0)
  * @tc.name: OH_Udmf_BuildRecordByHtml001
  * @tc.desc: test OH_UdmfRecord_AddHtml with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByHtml001, TestSize.Level0)
 {
@@ -925,7 +899,6 @@ HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByHtml001, TestSize.Level0)
  * @tc.name: OH_Udmf_GetHtmlFromRecord001
  * @tc.desc: test OH_UdmfRecord_GetHtml with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_GetHtmlFromRecord001, TestSize.Level0)
 {
@@ -951,7 +924,6 @@ HWTEST_F(UDMFTest, OH_Udmf_GetHtmlFromRecord001, TestSize.Level0)
  * @tc.name: OH_Udmf_BuildAndGetHtmlFromRecord001
  * @tc.desc: test OH_Udmf_BuildAndGetHtmlFromRecord with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_BuildAndGetHtmlFromRecord001, TestSize.Level0)
 {
@@ -978,7 +950,6 @@ HWTEST_F(UDMFTest, OH_Udmf_BuildAndGetHtmlFromRecord001, TestSize.Level0)
  * @tc.name: OH_Udmf_BuildRecordByOpenHarmonyAppItem001
  * @tc.desc: test OH_UdmfRecord_AddAppItem with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByOpenHarmonyAppItem001, TestSize.Level0)
 {
@@ -1004,7 +975,6 @@ HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByOpenHarmonyAppItem001, TestSize.Level0)
  * @tc.name: OH_Udmf_GetOpenHarmonyAppItemFromRecord001
  * @tc.desc: test OH_UdmfRecord_GetAppItem with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_GetOpenHarmonyAppItemFromRecord001, TestSize.Level0)
 {
@@ -1030,7 +1000,6 @@ HWTEST_F(UDMFTest, OH_Udmf_GetOpenHarmonyAppItemFromRecord001, TestSize.Level0)
  * @tc.name: OH_Udmf_BuildAndGetAppItemFromRecord001
  * @tc.desc: test OH_Udmf_BuildAndGetAppItemFromRecord with invalid param
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_BuildAndGetAppItemFromRecord001, TestSize.Level0)
 {
@@ -2333,7 +2302,6 @@ HWTEST_F(UDMFTest, FileUriTest007, TestSize.Level1)
  * @tc.name: OH_Udmf_SetAndGetUnifiedData003
  * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with file uri
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData003, TestSize.Level1)
 {
@@ -2374,7 +2342,6 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData003, TestSize.Level1)
  * @tc.name: OH_Udmf_SetAndGetUnifiedData004
  * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with file uri
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData004, TestSize.Level1)
 {
@@ -2414,7 +2381,6 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData004, TestSize.Level1)
  * @tc.name: OH_Udmf_SetAndGetUnifiedData005
  * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with file uri
  * @tc.type: FUNC
- * @tc.require: AROOOH5R5G
  */
 HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData005, TestSize.Level1)
 {

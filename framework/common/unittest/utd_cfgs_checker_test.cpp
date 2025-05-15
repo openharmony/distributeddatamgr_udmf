@@ -269,7 +269,7 @@ HWTEST_F(UtdCfgsCheckerTest, CheckTypeDescriptors_005, TestSize.Level1)
     presetCfg2.belongingToTypes = {"com.demo.test.parent6"};
     presetCfg2.mimeTypes = {"parent3/abc"};
     std::vector<TypeDescriptorCfg> presetCfgs = {presetCfg1, presetCfg2};
-    
+
     std::vector<TypeDescriptorCfg> customCfgs = {tdc1, tdc3};
 
     std::string bundleName("com.demo.test");

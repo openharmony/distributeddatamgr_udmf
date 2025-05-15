@@ -478,13 +478,17 @@ bool TextEmbeddingNapi::SplitTextAsyncExecution(napi_env env, napi_deferred defe
     int32_t configSize, double configOverlap)
 {
     AIP_HILOGD("Enter");
-    auto splitTextCallbackData = new SplitTextCallbackData{
+    auto splitTextCallbackData = new (std::nothrow) SplitTextCallbackData{
         .asyncWork = nullptr,
         .deferred = deferred,
         .strArg = strArg,
         .configSize = configSize,
         .configOverlap = configOverlap,
     };
+    if (splitTextCallbackData == nullptr) {
+        AIP_HILOGE("splitTextCallbackData is nullptr");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "SplitText", NAPI_AUTO_LENGTH, &resourceName);
@@ -646,7 +650,7 @@ napi_value TextEmbeddingNapi::StringType(napi_env env, napi_value args, napi_val
 bool TextEmbeddingNapi::GetEmbeddingStringAsyncExecution(napi_env env, napi_deferred deferred, std::string strArg)
 {
     AIP_HILOGD("Enter");
-    auto textStringCallbackData = new TextStringCallbackData{
+    auto textStringCallbackData = new (std::nothrow) TextStringCallbackData{
         .asyncWork = nullptr,
         .deferred = deferred,
         .strArg = strArg,
@@ -792,11 +796,15 @@ bool TextEmbeddingNapi::GetEmbeddingArrayAsyncExecution(napi_env env, napi_defer
     std::vector<std::string> text)
 {
     AIP_HILOGD("Enter");
-    auto textArrayCallbackData = new TextArrayCallbackData{
+    auto textArrayCallbackData = new (std::nothrow) TextArrayCallbackData{
         .asyncWork = nullptr,
         .deferred = deferred,
         .text = text,
     };
+    if (textArrayCallbackData == nullptr) {
+        AIP_HILOGE("textArrayCallbackData is nullptr");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "textArrayEmbedding", NAPI_AUTO_LENGTH, &resourceName);
@@ -925,10 +933,14 @@ napi_value TextEmbeddingNapi::LoadModel(napi_env env, napi_callback_info info)
 bool TextEmbeddingNapi::LoadAsyncExecution(napi_env env, napi_deferred deferred)
 {
     AIP_HILOGD("Enter");
-    auto loadCallbackData = new LoadCallbackData{
+    auto loadCallbackData = new (std::nothrow) LoadCallbackData{
         .asyncWork = nullptr,
         .deferred = deferred,
     };
+    if (loadCallbackData == nullptr) {
+        AIP_HILOGE("loadCallbackData is nullptr");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "textLoad", NAPI_AUTO_LENGTH, &resourceName);
@@ -1036,10 +1048,14 @@ napi_value TextEmbeddingNapi::ReleaseModel(napi_env env, napi_callback_info info
 bool TextEmbeddingNapi::ReleaseAsyncExecution(napi_env env, napi_deferred deferred)
 {
     AIP_HILOGD("Enter");
-    auto releaseCallbackData = new ReleaseCallbackData{
+    auto releaseCallbackData = new (std::nothrow) ReleaseCallbackData{
         .asyncWork = nullptr,
         .deferred = deferred,
     };
+    if (releaseCallbackData == nullptr) {
+        AIP_HILOGE("releaseCallbackData is nullptr");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "textLoad", NAPI_AUTO_LENGTH, &resourceName);

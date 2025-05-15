@@ -430,11 +430,15 @@ napi_value ImageEmbeddingNapi::GetEmbedding(napi_env env, napi_callback_info inf
 bool ImageEmbeddingNapi::GetEmbeddingAsyncExecution(napi_env env, napi_deferred deferred, std::string strArg)
 {
     AIP_HILOGD("Enter");
-    auto imageCallbackData = new ImageCallbackData{
+    auto imageCallbackData = new (std::nothrow) ImageCallbackData{
         .asyncWork = nullptr,
         .deferred = deferred,
         .strArg = strArg,
     };
+    if (imageCallbackData == nullptr) {
+        AIP_HILOGE("imageCallbackData is nullptr");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "ImageGetEmbedding", NAPI_AUTO_LENGTH, &resourceName);
