@@ -52,11 +52,13 @@ public:
     static void AllocHapToken1();
     static void AllocHapToken2();
     void SetHapToken1();
+    void SetHapToken2();
     bool CheckUnsignedChar(unsigned char* dst, unsigned char* src, int size);
     static void FinalizeFunc(void* context);
     static void* GetDataCallbackFunc(void* context, const char* type);
     static constexpr int USER_ID = 100;
     static constexpr int INST_INDEX = 0;
+    int64_t CountTime();
 };
 
 void UDMFTest::SetUpTestCase()
@@ -164,6 +166,12 @@ void UDMFTest::SetHapToken1()
     SetSelfTokenID(tokenId);
 }
 
+void UDMFTest::SetHapToken2()
+{
+    auto tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo2", INST_INDEX);
+    SetSelfTokenID(tokenId);
+}
+
 bool UDMFTest::CheckUnsignedChar(unsigned char* dst, unsigned char* src, int size)
 {
     EXPECT_NE(dst, nullptr);
@@ -184,6 +192,12 @@ void* UDMFTest::GetDataCallbackFunc(void* context, const char* type)
     OH_UdsPlainText_SetAbstract(plainText, "doing something");
     OH_UdsPlainText_SetContent(plainText, "doing something");
     return plainText;
+}
+
+int64_t UDMFTest::CountTime()
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 /**
@@ -2493,6 +2507,418 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData006, TestSize.Level1)
     OH_UdmfData_Destroy(udmfUnifiedData);
 
     OH_UdsContentForm_Destroy(getContentForm);
+    OH_UdmfData_Destroy(readUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData007
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with invlid params
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData007, TestSize.Level1)
+{
+    std::string uri = "file://file_010.txt";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_FOLDER);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_MENU;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    Udmf_Intention intention1 = UDMF_INTENTION_SYSTEM_SHARE;
+    int getRes = OH_Udmf_GetUnifiedData(key, intention1, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+    char key1[UDMF_KEY_BUFFER_LEN];
+    getRes = OH_Udmf_GetUnifiedData(key1, intention1, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+    getRes = OH_Udmf_GetUnifiedData(key1, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+    OH_UdmfData_Destroy(readUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData008
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with invlid params
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData008, TestSize.Level1)
+{
+    std::string uri = "file://file_011.txt";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_FOLDER);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_SYSTEM_SHARE;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    Udmf_Intention intention1 = UDMF_INTENTION_MENU;
+    int getRes = OH_Udmf_GetUnifiedData(key, intention1, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+    char key1[UDMF_KEY_BUFFER_LEN];
+    getRes = OH_Udmf_GetUnifiedData(key1, intention1, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+    getRes = OH_Udmf_GetUnifiedData(key1, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+    OH_UdmfData_Destroy(readUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData009
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with UDMF_ERR
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData009, TestSize.Level1)
+{
+    std::string uri = "file://file_009.txt";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_FOLDER);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_PICKER;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    Udmf_Intention intention1 = UDMF_INTENTION_MENU;
+    int getRes = OH_Udmf_GetUnifiedData(key, intention1, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+    char key1[UDMF_KEY_BUFFER_LEN];
+    getRes = OH_Udmf_GetUnifiedData(key1, intention1, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+    getRes = OH_Udmf_GetUnifiedData(key1, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+    OH_UdmfData_Destroy(readUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData010
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with file uri
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData010, TestSize.Level1)
+{
+    std::string uri = "file://file_010.txt";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_FOLDER);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_PICKER;
+    char key[UDMF_KEY_BUFFER_LEN];
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    SetHapToken2();
+    int getRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData011
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with file uri
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData011, TestSize.Level1)
+{
+    std::string uri = "file://file_011.txt";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_FOLDER);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_MENU;
+    char key[UDMF_KEY_BUFFER_LEN];
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    SetHapToken2();
+    int getRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData012
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with file uri
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData012, TestSize.Level1)
+{
+    std::string uri = "file://file_012.txt";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_FOLDER);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_SYSTEM_SHARE;
+    char key[UDMF_KEY_BUFFER_LEN];
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    SetHapToken2();
+    int getRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData013
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData013, TestSize.Level1)
+{
+    std::string uri = "file://file_007.txt";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdsContentForm *contentForm = OH_UdsContentForm_Create();
+    unsigned char thumbData[] = {0, 1, 2, 3, 4};
+    OH_UdsContentForm_SetThumbData(contentForm, thumbData, 5);
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_FOLDER);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_SYSTEM_SHARE;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    Udmf_Intention intention1 = UDMF_INTENTION_PICKER;
+    int getRes = OH_Udmf_GetUnifiedData(key, intention1, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+    char key1[UDMF_KEY_BUFFER_LEN] = "udmf://aaabbbccc/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    getRes = OH_Udmf_GetUnifiedData(key1, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+    getRes = OH_Udmf_GetUnifiedData(key1, intention1, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+    OH_UdmfData_Destroy(readUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData014
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData014, TestSize.Level1)
+{
+    std::string uri = "file://file_008.txt";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_FOLDER);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_PICKER;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    Udmf_Intention intention1 = UDMF_INTENTION_SYSTEM_SHARE;
+    int getRes = OH_Udmf_GetUnifiedData(key, intention1, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+    char key1[UDMF_KEY_BUFFER_LEN] = "udmf://aaabbbccc/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    getRes = OH_Udmf_GetUnifiedData(key1, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+    getRes = OH_Udmf_GetUnifiedData(key1, intention1, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+    OH_UdmfData_Destroy(readUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData015
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData015, TestSize.Level1)
+{
+    std::string uri = "file://file_009.txt";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_FOLDER);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_MENU;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    Udmf_Intention intention1 = UDMF_INTENTION_SYSTEM_SHARE;
+    int getRes = OH_Udmf_GetUnifiedData(key, intention1, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+    char key1[UDMF_KEY_BUFFER_LEN] = "udmf://aaabbbccc/com.hmos.photos/CSl;cdcGFcmdkasaccCSCAAScscdc";
+    getRes = OH_Udmf_GetUnifiedData(key1, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+    intention = UDMF_INTENTION_MENU;
+    getRes = OH_Udmf_GetUnifiedData(key1, intention, readUnifiedData);
+    EXPECT_EQ(getRes, UDMF_ERR);
+
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+    OH_UdmfData_Destroy(readUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData016
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData016, TestSize.Level1)
+{
+    std::string uri = "file://file_010.txt";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_FOLDER);
+    for (int32_t i = 0; i < 1000; i++) {
+        OH_UdmfRecord_AddFileUri(record, fileUri);
+    }
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_SYSTEM_SHARE;
+    char key[UDMF_KEY_BUFFER_LEN];
+    int64_t start = CountTime();
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    int64_t end = CountTime();
+    LOG_INFO(UDMF_TEST, "systemshare setdata 1000 cost timet:%{public}" PRIi64, (end - start));
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    start = CountTime();
+    int getRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
+    end = CountTime();
+    LOG_INFO(UDMF_TEST, "systemshare setdata 1000 cost timet:%{public}" PRIi64, (end - start));
+    EXPECT_EQ(getRes, UDMF_E_OK);
+
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+    OH_UdmfData_Destroy(readUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData017
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData017, TestSize.Level1)
+{
+    std::string uri = "file://file_008.txt";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_FOLDER);
+    for (int32_t i = 0; i < 1000; i++) {
+        OH_UdmfRecord_AddFileUri(record, fileUri);
+    }
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_PICKER;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int64_t start = CountTime();
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    int64_t end = CountTime();
+    LOG_INFO(UDMF_TEST, "picker setdata 1000 cost timet:%{public}" PRIi64, (end - start));
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    start = CountTime();
+    int getRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
+    end = CountTime();
+    LOG_INFO(UDMF_TEST, "picker setdata 1000 cost timet:%{public}" PRIi64, (end - start));
+    EXPECT_EQ(getRes, UDMF_E_OK);
+
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+    OH_UdmfData_Destroy(readUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedData018
+ * @tc.desc: OH_Udmf_SetUnifiedData and OH_Udmf_GetUnifiedData with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData018, TestSize.Level1)
+{
+    std::string uri = "file://file_010.txt";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_FOLDER);
+    for (int32_t i = 0; i < 1000; i++) {
+        OH_UdmfRecord_AddFileUri(record, fileUri);
+    }
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    Udmf_Intention intention = UDMF_INTENTION_MENU;
+    char key[UDMF_KEY_BUFFER_LEN];
+    int64_t start = CountTime();
+    int setRes = OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    int64_t end = CountTime();
+    LOG_INFO(UDMF_TEST, "menu setdata 1000 cost timet:%{public}" PRIi64, (end - start));
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    OH_UdmfData *readUnifiedData = OH_UdmfData_Create();
+    start = CountTime();
+    int getRes = OH_Udmf_GetUnifiedData(key, intention, readUnifiedData);
+    end = CountTime();
+    LOG_INFO(UDMF_TEST, "menu setdata 1000 cost timet:%{public}" PRIi64, (end - start));
+    EXPECT_EQ(getRes, UDMF_E_OK);
+
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
     OH_UdmfData_Destroy(readUnifiedData);
 }
 }

@@ -68,6 +68,30 @@ typedef enum Udmf_Intention {
      * @brief The intention is pasteboard.
      */
     UDMF_INTENTION_PASTEBOARD,
+    /**
+     * @brief The intention is data hub.
+     *
+     * @since 20
+     */
+    UDMF_INTENTION_DATA_HUB,
+    /**
+     * @brief The intention is system share.
+     *
+     * @since 20
+     */
+    UDMF_INTENTION_SYSTEM_SHARE,
+    /**
+     * @brief The intention is picker.
+     *
+     * @since 20
+     */
+    UDMF_INTENTION_PICKER,
+    /**
+     * @brief The intention is menu.
+     *
+     * @since 20
+     */
+    UDMF_INTENTION_MENU,
 } Udmf_Intention;
 
 /**

@@ -648,6 +648,17 @@ bool UnifiedDataUtils::IsPersist(const std::string &intention)
     return IsPersist(GetIntentionByString(intention));
 }
 
+bool UnifiedDataUtils::IsFileMangerIntention(const std::string &intention)
+{
+    Intention optionIntention = GetIntentionByString(intention);
+    if (optionIntention == UD_INTENTION_SYSTEM_SHARE ||
+        optionIntention == UD_INTENTION_MENU ||
+        optionIntention == UD_INTENTION_PICKER) {
+        return true;
+    }
+    return false;
+}
+
 Intention UnifiedDataUtils::GetIntentionByString(const std::string &intention)
 {
     for (const auto &it : UD_INTENTION_MAP) {
@@ -656,6 +667,12 @@ Intention UnifiedDataUtils::GetIntentionByString(const std::string &intention)
         }
     }
     return UD_INTENTION_BUTT;
+}
+
+std::string UnifiedDataUtils::FindIntentionMap(const Intention &queryIntention)
+{
+    auto find = UD_INTENTION_MAP.find(queryIntention);
+    return find == UD_INTENTION_MAP.end() ? "" : find->second;
 }
 
 bool UnifiedDataUtils::IsValidOptions(UnifiedKey &key, const std::string &intention,
@@ -695,6 +712,14 @@ bool UnifiedDataUtils::IsValidOptions(UnifiedKey &key, const std::string &intent
         return key.intention == intention;
     }
     return true;
+}
+
+bool UnifiedDataUtils::IsValidOptionsNonDrag(UnifiedKey &key, const std::string &intention)
+{
+    if (IsValidOptions(key, intention)) {
+        return !key.key.empty() || intention == UD_INTENTION_MAP.at(Intention::UD_INTENTION_DATA_HUB);
+    }
+    return false;
 }
 
 std::shared_ptr<Object> ObjectUtils::ConvertToObject(UDDetails &details)
