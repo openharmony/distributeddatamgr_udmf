@@ -419,7 +419,7 @@ Udmf_Intention OH_UdmfOptions_GetIntention(OH_UdmfOptions* pThis)
 {
     if (pThis == nullptr) {
         LOG_ERROR(UDMF_CAPI, "The OH_UdmfOptions get intention error, invaild params!");
-        return UDMF_INTENTION_DRAG;
+        return Udmf_Intention {};
     }
     return pThis->intention;
 }
@@ -623,7 +623,7 @@ int OH_Udmf_DeleteUnifiedData(OH_UdmfOptions* options, OH_UdmfData** dataArray, 
     switch (options->intention) {
         case UDMF_INTENTION_DATA_HUB:
             queryOptIntent = Intention::UD_INTENTION_DATA_HUB;
-        break;
+            break;
         case UDMF_INTENTION_SYSTEM_SHARE:
             queryOptIntent = Intention::UD_INTENTION_SYSTEM_SHARE;
             break;
@@ -640,7 +640,7 @@ int OH_Udmf_DeleteUnifiedData(OH_UdmfOptions* options, OH_UdmfData** dataArray, 
     QueryOption query = {.key = options->key, .intention = queryOptIntent};
     std::vector<UnifiedData> unifiedData;
     int32_t ret = UdmfClient::GetInstance().DeleteData(query, unifiedData);
-    if(ret != E_OK) {
+    if (ret != E_OK) {
         LOG_ERROR(UDMF_CAPI, "Delete data error,key is %{public}s, ret = %{public}d",
             query.key.c_str(), ret);
         return UDMF_ERR;
