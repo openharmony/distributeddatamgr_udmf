@@ -507,7 +507,8 @@ static constexpr UtdType UTD_TYPES[] = {
     { OPENHARMONY_GOPAINT, "OPENHARMONY_GOPAINT", "openharmony.gopaint" },
     { OPENHARMONY_GOBRUSH, "OPENHARMONY_GOBRUSH", "openharmony.gobrush" },
     { OPENHARMONY_GOBRUSHES, "OPENHARMONY_GOBRUSHES", "openharmony.gobrushes" },
-    { OPENHARMONY_GOCOLOR, "OPENHARMONY_GOCOLOR", "openharmony.gocolor" }
+    { OPENHARMONY_GOCOLOR, "OPENHARMONY_GOCOLOR", "openharmony.gocolor" },
+    { OPENHARMONY_DLP, "OPENHARMONY_DLP", "openharmony.dlp"}
 };
 
 static constexpr std::initializer_list<std::string_view> NOT_NEED_COUNT_VALUE_LIST = {
