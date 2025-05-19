@@ -63,19 +63,19 @@ const m =
 const o = 1.2;
 const t = 0.8;
 const u = 0.4;
+const a1 = 200;
 const b1 = 200;
-const c1 = 200;
-const d1 = 100;
-const e1 = 137;
-const f1 = 83;
-const g1 = 70;
-const h1 = 40;
-const i1 = 50;
-const j1 = 30;
-const l1 = 2;
-const m1 = '100%';
-const n1 = '#E6FFFFFF';
-const q3 = '#00000000';
+const c1 = 100;
+const d1 = 137;
+const e1 = 83;
+const f1 = 70;
+const g1 = 40;
+const h1 = 50;
+const i1 = 30;
+const j1 = 2;
+const l1 = '100%';
+const m1 = '#E6FFFFFF';
+const n1 = '#00000000';
 const o1 = '#99182431';
 const q1 = '#CCCCCC';
 const s1 = '#55CCCCCC';
@@ -154,20 +154,20 @@ export class ContentFormCard extends ViewPU {
         if (typeof paramsLambda === "function") {
             this.paramsGenerator_ = paramsLambda;
         }
-        this.c3 = new SynchedPropertySimpleOneWayPU(params.formType, this, "formType");
+        this.__formType = new SynchedPropertySimpleOneWayPU(params.formType, this, "formType");
         this.contentFormData = undefined;
         this.formStyle = b2;
         this.controller = new TextController();
-        this.d3 = new ObservedPropertySimplePU(1, this, "cardScale");
-        this.e3 = new SynchedPropertySimpleOneWayPU(params.formWidth, this, "formWidth");
-        this.f3 = new SynchedPropertySimpleOneWayPU(params.formHeight, this, "formHeight");
-        this.g3 = new ObservedPropertySimplePU(0, this, "cardWidth");
-        this.h3 = new ObservedPropertySimplePU(0, this, "cardHeight");
-        this.i3 = new ObservedPropertyObjectPU(undefined, this, "defaultThumbImage");
-        this.j3 = new ObservedPropertyObjectPU(undefined, this, "thumbImage");
-        this.l3 = new ObservedPropertyObjectPU(undefined, this, "appImage");
-        this.m3 = new ObservedPropertySimplePU(1, this, "lineCount");
-        this.n3 = new ObservedPropertySimplePU(false, this, "isMirrorLanguageType");
+        this.__cardScale = new ObservedPropertySimplePU(1, this, "cardScale");
+        this.__formWidth = new SynchedPropertySimpleOneWayPU(params.formWidth, this, "formWidth");
+        this.__formHeight = new SynchedPropertySimpleOneWayPU(params.formHeight, this, "formHeight");
+        this.__cardWidth = new ObservedPropertySimplePU(0, this, "cardWidth");
+        this.__cardHeight = new ObservedPropertySimplePU(0, this, "cardHeight");
+        this.__defaultThumbImage = new ObservedPropertyObjectPU(undefined, this, "defaultThumbImage");
+        this.__thumbImage = new ObservedPropertyObjectPU(undefined, this, "thumbImage");
+        this.__appImage = new ObservedPropertyObjectPU(undefined, this, "appImage");
+        this.__lineCount = new ObservedPropertySimplePU(1, this, "lineCount");
+        this.__isMirrorLanguageType = new ObservedPropertySimplePU(false, this, "isMirrorLanguageType");
         this.handleOnClick = () => {
         };
         this.setInitiallyProvidedValue(params);
@@ -179,7 +179,7 @@ export class ContentFormCard extends ViewPU {
 
     setInitiallyProvidedValue(params) {
         if (params.formType === undefined) {
-            this.c3.set(FormType.TYPE_MID);
+            this.__formType.set(FormType.TYPE_MID);
         }
         if (params.contentFormData !== undefined) {
             this.contentFormData = params.contentFormData;
@@ -194,10 +194,10 @@ export class ContentFormCard extends ViewPU {
             this.cardScale = params.cardScale;
         }
         if (params.formWidth === undefined) {
-            this.e3.set(0);
+            this.__formWidth.set(0);
         }
         if (params.formHeight === undefined) {
-            this.f3.set(0);
+            this.__formHeight.set(0);
         }
         if (params.cardWidth !== undefined) {
             this.cardWidth = params.cardWidth;
@@ -226,127 +226,127 @@ export class ContentFormCard extends ViewPU {
     }
 
     updateStateVars(params) {
-        this.c3.reset(params.formType);
-        this.e3.reset(params.formWidth);
-        this.f3.reset(params.formHeight);
+        this.__formType.reset(params.formType);
+        this.__formWidth.reset(params.formWidth);
+        this.__formHeight.reset(params.formHeight);
     }
 
     purgeVariableDependenciesOnElmtId(rmElmtId) {
-        this.c3.purgeDependencyOnElmtId(rmElmtId);
-        this.d3.purgeDependencyOnElmtId(rmElmtId);
-        this.e3.purgeDependencyOnElmtId(rmElmtId);
-        this.f3.purgeDependencyOnElmtId(rmElmtId);
-        this.g3.purgeDependencyOnElmtId(rmElmtId);
-        this.h3.purgeDependencyOnElmtId(rmElmtId);
-        this.i3.purgeDependencyOnElmtId(rmElmtId);
-        this.j3.purgeDependencyOnElmtId(rmElmtId);
-        this.l3.purgeDependencyOnElmtId(rmElmtId);
-        this.m3.purgeDependencyOnElmtId(rmElmtId);
-        this.n3.purgeDependencyOnElmtId(rmElmtId);
+        this.__formType.purgeDependencyOnElmtId(rmElmtId);
+        this.__cardScale.purgeDependencyOnElmtId(rmElmtId);
+        this.__formWidth.purgeDependencyOnElmtId(rmElmtId);
+        this.__formHeight.purgeDependencyOnElmtId(rmElmtId);
+        this.__cardWidth.purgeDependencyOnElmtId(rmElmtId);
+        this.__cardHeight.purgeDependencyOnElmtId(rmElmtId);
+        this.__defaultThumbImage.purgeDependencyOnElmtId(rmElmtId);
+        this.__thumbImage.purgeDependencyOnElmtId(rmElmtId);
+        this.__appImage.purgeDependencyOnElmtId(rmElmtId);
+        this.__lineCount.purgeDependencyOnElmtId(rmElmtId);
+        this.__isMirrorLanguageType.purgeDependencyOnElmtId(rmElmtId);
     }
 
     aboutToBeDeleted() {
-        this.c3.aboutToBeDeleted();
-        this.d3.aboutToBeDeleted();
-        this.e3.aboutToBeDeleted();
-        this.f3.aboutToBeDeleted();
-        this.g3.aboutToBeDeleted();
-        this.h3.aboutToBeDeleted();
-        this.i3.aboutToBeDeleted();
-        this.j3.aboutToBeDeleted();
-        this.l3.aboutToBeDeleted();
-        this.m3.aboutToBeDeleted();
-        this.n3.aboutToBeDeleted();
+        this.__formType.aboutToBeDeleted();
+        this.__cardScale.aboutToBeDeleted();
+        this.__formWidth.aboutToBeDeleted();
+        this.__formHeight.aboutToBeDeleted();
+        this.__cardWidth.aboutToBeDeleted();
+        this.__cardHeight.aboutToBeDeleted();
+        this.__defaultThumbImage.aboutToBeDeleted();
+        this.__thumbImage.aboutToBeDeleted();
+        this.__appImage.aboutToBeDeleted();
+        this.__lineCount.aboutToBeDeleted();
+        this.__isMirrorLanguageType.aboutToBeDeleted();
         SubscriberManager.Get().delete(this.id__());
         this.aboutToBeDeletedInternal();
     }
 
     get formType() {
-        return this.c3.get();
+        return this.__formType.get();
     }
 
     set formType(newValue) {
-        this.c3.set(newValue);
+        this.__formType.set(newValue);
     }
 
     get cardScale() {
-        return this.d3.get();
+        return this.__cardScale.get();
     }
 
     set cardScale(newValue) {
-        this.d3.set(newValue);
+        this.__cardScale.set(newValue);
     }
 
     get formWidth() {
-        return this.e3.get();
+        return this.__formWidth.get();
     }
 
     set formWidth(newValue) {
-        this.e3.set(newValue);
+        this.__formWidth.set(newValue);
     }
 
     get formHeight() {
-        return this.f3.get();
+        return this.__formHeight.get();
     }
 
     set formHeight(newValue) {
-        this.f3.set(newValue);
+        this.__formHeight.set(newValue);
     }
 
     get cardWidth() {
-        return this.g3.get();
+        return this.__cardWidth.get();
     }
 
     set cardWidth(newValue) {
-        this.g3.set(newValue);
+        this.__cardWidth.set(newValue);
     }
 
     get cardHeight() {
-        return this.h3.get();
+        return this.__cardHeight.get();
     }
 
     set cardHeight(newValue) {
-        this.h3.set(newValue);
+        this.__cardHeight.set(newValue);
     }
 
     get defaultThumbImage() {
-        return this.i3.get();
+        return this.__defaultThumbImage.get();
     }
 
     set defaultThumbImage(newValue) {
-        this.i3.set(newValue);
+        this.__defaultThumbImage.set(newValue);
     }
 
     get thumbImage() {
-        return this.j3.get();
+        return this.__thumbImage.get();
     }
 
     set thumbImage(newValue) {
-        this.j3.set(newValue);
+        this.__thumbImage.set(newValue);
     }
 
     get appImage() {
-        return this.l3.get();
+        return this.__appImage.get();
     }
 
     set appImage(newValue) {
-        this.l3.set(newValue);
+        this.__appImage.set(newValue);
     }
 
     get lineCount() {
-        return this.m3.get();
+        return this.__lineCount.get();
     }
 
     set lineCount(newValue) {
-        this.m3.set(newValue);
+        this.__lineCount.set(newValue);
     }
 
     get isMirrorLanguageType() {
-        return this.n3.get();
+        return this.__isMirrorLanguageType.get();
     }
 
     set isMirrorLanguageType(newValue) {
-        this.n3.set(newValue);
+        this.__isMirrorLanguageType.set(newValue);
     }
 
     aboutToAppear() {
@@ -364,13 +364,13 @@ export class ContentFormCard extends ViewPU {
     formTypeChange() {
         switch (this.formType) {
             case FormType.TYPE_BIG:
-                this.formWidth = b1;
+                this.formWidth = a1;
                 break;
             case FormType.TYPE_MID:
-                this.formWidth = c1;
+                this.formWidth = b1;
                 break;
             default:
-                this.formWidth = e1;
+                this.formWidth = d1;
                 break;
         }
         this.initCardStyle();
@@ -401,18 +401,18 @@ export class ContentFormCard extends ViewPU {
         switch (this.formType) {
             case FormType.TYPE_BIG:
                 this.formStyle = a2;
-                n2 = this.formWidth ? this.formWidth / b1 : 1;
-                this.initCardScale(n2, b1, b1);
+                n2 = this.formWidth ? this.formWidth / a1 : 1;
+                this.initCardScale(n2, a1, a1);
                 break;
             case FormType.TYPE_MID:
                 this.formStyle = b2;
-                n2 = this.formWidth ? this.formWidth / c1 : 1;
-                this.initCardScale(n2, c1, d1);
+                n2 = this.formWidth ? this.formWidth / b1 : 1;
+                this.initCardScale(n2, b1, c1);
                 break;
             default:
                 this.formStyle = c2;
-                n2 = this.formWidth ? this.formWidth / e1 : 1;
-                this.initCardScale(n2, e1, f1);
+                n2 = this.formWidth ? this.formWidth / d1 : 1;
+                this.initCardScale(n2, d1, e1);
                 break;
         }
     }
@@ -422,29 +422,35 @@ export class ContentFormCard extends ViewPU {
             Column.create();
             Column.size({ width: '100%' });
             Column.layoutWeight(this.formHeight > 0 ? 1 : 0);
-            Column.backgroundColor(this.thumbImage ? n1 : q1);
+            Column.backgroundColor(this.thumbImage ? m1 : q1);
         }, Column);
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             If.create();
             if (this.formHeight > 0) {
                 this.ifElseBranchUpdateFunction(0, () => {
-                    this.observeComponentCreation2((elmtId, isInitialRender) => {
-                        Image.create(this.thumbImage ? this.thumbImage : this.defaultThumbImage);
-                        Image.objectFit(ImageFit.Contain);
-                        Image.width('100%');
-                        Image.layoutWeight(1);
-                        Image.draggable(false);
-                    }, Image);
+                    if (!If.canRetake('cardThumbImage')) {
+                        this.observeComponentCreation2((elmtId, isInitialRender) => {
+                            Image.create(this.thumbImage ? this.thumbImage : this.defaultThumbImage);
+                            Image.objectFit(ImageFit.Contain);
+                            Image.width('100%');
+                            Image.layoutWeight(1);
+                            Image.draggable(false);
+                            Image.id('cardThumbImage');
+                        }, Image);
+                    }
                 });
             } else {
                 this.ifElseBranchUpdateFunction(1, () => {
-                    this.observeComponentCreation2((elmtId, isInitialRender) => {
-                        Image.create(this.thumbImage ? this.thumbImage : this.defaultThumbImage);
-                        Image.objectFit(ImageFit.Contain);
-                        Image.width('100%');
-                        Image.aspectRatio(this.getAspectRatio());
-                        Image.draggable(false);
-                    }, Image);
+                    if (!If.canRetake('cardThumbImage')) {
+                        this.observeComponentCreation2((elmtId, isInitialRender) => {
+                            Image.create(this.thumbImage ? this.thumbImage : this.defaultThumbImage);
+                            Image.objectFit(ImageFit.Contain);
+                            Image.width('100%');
+                            Image.aspectRatio(this.getAspectRatio());
+                            Image.draggable(false);
+                            Image.id('cardThumbImage');
+                        }, Image);
+                    }
                 });
             }
         }, If);
@@ -479,7 +485,6 @@ export class ContentFormCard extends ViewPU {
             Image.width(this.formStyle.q2 * this.cardScale);
             Image.height(this.formStyle.q2 * this.cardScale);
             Image.objectFit(ImageFit.Fill);
-            Image.draggable(false);
             Image.alt({
                 "id": -1,
                 "type": 20000,
@@ -495,6 +500,7 @@ export class ContentFormCard extends ViewPU {
                 "moduleName": "__harDefaultModuleName__"
             });
             Image.draggable(false);
+            Image.id('cardAppIcon');
         }, Image);
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             Text.create(this.contentFormData?.appName ? this.contentFormData?.appName : ' ');
@@ -506,10 +512,11 @@ export class ContentFormCard extends ViewPU {
             Text.constraintSize({ minWidth: this.getTextSize(TextType.APP_NAME, this.contentFormData?.appName) });
             Text.backgroundColor(this.getTextBackground(this.contentFormData?.appName));
             Text.fontWeight(FontWeight.Regular);
-            Text.borderRadius(this.contentFormData?.title === '' ? 0 : l1);
+            Text.borderRadius(this.contentFormData?.title === '' ? 0 : j1);
             Text.direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr);
             Text.maxFontScale(1);
             Text.layoutWeight(1);
+            Text.id('cardAppName');
         }, Text);
         Text.pop();
         Row.pop();
@@ -527,9 +534,10 @@ export class ContentFormCard extends ViewPU {
             Text.margin({ top: this.formStyle.h2 * this.cardScale });
             Text.constraintSize({ minWidth: this.getTextSize(TextType.TITLE, this.contentFormData?.title) });
             Text.backgroundColor(this.getTextBackground(this.contentFormData?.title));
-            Text.borderRadius(this.contentFormData?.title === '' ? 0 : l1);
+            Text.borderRadius(this.contentFormData?.title === '' ? 0 : j1);
             Text.direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr);
             Text.maxFontScale(1);
+            Text.id('cardTitleText');
         }, Text);
         Text.pop();
     }
@@ -544,8 +552,9 @@ export class ContentFormCard extends ViewPU {
             Image.objectFit(ImageFit.Cover);
             Image.width('100%');
             Image.height(this.formStyle.e2 * this.cardScale);
-            Image.backgroundColor(this.thumbImage ? n1 : q1);
+            Image.backgroundColor(this.thumbImage ? m1 : q1);
             Image.draggable(false);
+            Image.id('cardThumbImage');
         }, Image);
         this.observeComponentCreation2((elmtId, isInitialRender) => {
             Column.create();
@@ -573,9 +582,10 @@ export class ContentFormCard extends ViewPU {
             Text.margin({ top: this.formStyle.l2 * this.cardScale });
             Text.backgroundColor(this.getTextBackground(this.contentFormData?.description));
             Text.fontWeight(FontWeight.Regular);
-            Text.borderRadius(this.contentFormData?.description ? 0 : l1);
+            Text.borderRadius(this.contentFormData?.description ? 0 : j1);
             Text.direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr);
             Text.maxFontScale(1);
+            Text.id('cardDescription');
         }, Text);
         Text.pop();
         Column.pop();
@@ -601,13 +611,14 @@ export class ContentFormCard extends ViewPU {
                 minWidth: this.getTextSize(TextType.DESCRIPTION, this.contentFormData?.description)
             });
             Text.backgroundColor(this.getTextBackground(this.contentFormData?.description));
-            Text.borderRadius(this.contentFormData?.description ? 0 : l1);
+            Text.borderRadius(this.contentFormData?.description ? 0 : j1);
             Text.onAreaChange(() => {
                 let m2 = this.controller.getLayoutManager();
                 this.lineCount = m2.getLineCount();
             });
             Text.direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr);
             Text.maxFontScale(1);
+            Text.id('cardDescription');
         }, Text);
         Text.pop();
     }
@@ -649,19 +660,22 @@ export class ContentFormCard extends ViewPU {
                         If.create();
                         if (this.thumbImage) {
                             this.ifElseBranchUpdateFunction(0, () => {
-                                this.observeComponentCreation2((elmtId, isInitialRender) => {
-                                    Image.create(this.thumbImage);
-                                    Image.width(this.formStyle.d2 * this.cardScale);
-                                    Image.height(this.formStyle.e2 * this.cardScale);
-                                    Image.objectFit(this.thumbImage ? ImageFit.Cover : ImageFit.Contain);
-                                    Image.borderRadius(4);
-                                    Image.draggable(false);
-                                    Image.margin({
-                                        right: this.isMirrorLanguageType ? (this.formStyle.z2 * this.cardScale) : 0,
-                                        left: this.isMirrorLanguageType ? 0 : (this.formStyle.z2 * this.cardScale),
-                                        top: this.formStyle.h2 * this.cardScale
-                                    });
-                                }, Image);
+                                if (!If.canRetake('cardThumbImage')) {
+                                    this.observeComponentCreation2((elmtId, isInitialRender) => {
+                                        Image.create(this.thumbImage);
+                                        Image.width(this.formStyle.d2 * this.cardScale);
+                                        Image.height(this.formStyle.e2 * this.cardScale);
+                                        Image.objectFit(this.thumbImage ? ImageFit.Cover : ImageFit.Contain);
+                                        Image.borderRadius(4);
+                                        Image.draggable(false);
+                                        Image.margin({
+                                            right: this.isMirrorLanguageType ? (this.formStyle.z2 * this.cardScale) : 0,
+                                            left: this.isMirrorLanguageType ? 0 : (this.formStyle.z2 * this.cardScale),
+                                            top: this.formStyle.h2 * this.cardScale
+                                        });
+                                        Image.id('cardThumbImage');
+                                    }, Image);
+                                }
                             });
                         } else {
                             this.ifElseBranchUpdateFunction(1, () => {
@@ -721,25 +735,27 @@ export class ContentFormCard extends ViewPU {
                         If.create();
                         if (this.thumbImage) {
                             this.ifElseBranchUpdateFunction(0, () => {
-                                this.observeComponentCreation2((elmtId, isInitialRender) => {
-                                    Image.create(this.thumbImage);
-                                    Image.objectFit(ImageFit.Cover);
-                                    Image.draggable(false);
-                                    Image.borderRadius({
-                                        "id": -1,
-                                        "type": 10002,
-                                        params: ['sys.float.corner_radius_level2'],
-                                        "bundleName": "__harDefaultBundleName__",
-                                        "moduleName": "__harDefaultModuleName__"
-                                    });
-                                    Image.width(this.formStyle.d2 * this.cardScale);
-                                    Image.height(this.formStyle.e2 * this.cardScale);
-                                    Image.draggable(false);
-                                    Image.margin({
-                                        left: this.isMirrorLanguageType ? 0 : (this.formStyle.z2 * this.cardScale),
-                                        right: this.isMirrorLanguageType ? (this.formStyle.z2 * this.cardScale) : 0
-                                    });
-                                }, Image);
+                                if (!If.canRetake('cardThumbImage')) {
+                                    this.observeComponentCreation2((elmtId, isInitialRender) => {
+                                        Image.create(this.thumbImage);
+                                        Image.objectFit(ImageFit.Cover);
+                                        Image.borderRadius({
+                                            "id": -1,
+                                            "type": 10002,
+                                            params: ['sys.float.corner_radius_level2'],
+                                            "bundleName": "__harDefaultBundleName__",
+                                            "moduleName": "__harDefaultModuleName__"
+                                        });
+                                        Image.width(this.formStyle.d2 * this.cardScale);
+                                        Image.height(this.formStyle.e2 * this.cardScale);
+                                        Image.draggable(false);
+                                        Image.margin({
+                                            left: this.isMirrorLanguageType ? 0 : (this.formStyle.z2 * this.cardScale),
+                                            right: this.isMirrorLanguageType ? (this.formStyle.z2 * this.cardScale) : 0
+                                        });
+                                        Image.id('cardThumbImage');
+                                    }, Image);
+                                }
                             });
                         } else {
                             this.ifElseBranchUpdateFunction(1, () => {
@@ -763,7 +779,7 @@ export class ContentFormCard extends ViewPU {
             Column.create();
             Column.borderRadius(this.formStyle.s2 * this.cardScale);
             Column.clip(true);
-            Column.backgroundColor(n1);
+            Column.backgroundColor(m1);
             Column.backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK,
                 { colorMode: ThemeColorMode.LIGHT, adaptiveColor: AdaptiveColor.DEFAULT, scale: 1.0 });
             Column.shadow(ShadowStyle.OUTER_DEFAULT_SM);
@@ -862,7 +878,7 @@ export class ContentFormCard extends ViewPU {
 
     getAspectRatio() {
         let d2 = this.thumbImage?.getImageInfoSync().size;
-        let e2 = this.formType === FormType.TYPE_MID ? c1 : e1;
+        let e2 = this.formType === FormType.TYPE_MID ? b1 : d1;
         let f2 = this.formType === FormType.TYPE_MID ? v1 : w1;
         if (d2 && this.thumbImage) {
             if ((d2.width / d2.height) > (e2 / (f2 * t))) {
@@ -878,7 +894,7 @@ export class ContentFormCard extends ViewPU {
 
     getTextBackground(text) {
         if (text && text.length > 0) {
-            return q3;
+            return n1;
         }
         return s1;
     }
@@ -887,20 +903,20 @@ export class ContentFormCard extends ViewPU {
         if (textType === TextType.TITLE) {
             if (text === '' || text === undefined || text === null) {
                 if (this.formType === FormType.TYPE_SMALL) {
-                    return i1;
+                    return h1;
                 }
-                return g1;
+                return f1;
             }
-            return m1;
+            return l1;
         }
         if (textType === TextType.APP_NAME) {
             if (text === '' || text === undefined || text === null) {
                 if (this.formType === FormType.TYPE_SMALL) {
-                    return j1;
+                    return i1;
                 }
-                return h1;
+                return g1;
             }
-            return m1;
+            return l1;
         }
         return '100%';
     }
