@@ -20,7 +20,8 @@
 extern const char _binary_udmfcomponents_abc_start[];
 extern const char _binary_udmfcomponents_abc_end[];
 
-extern "C" __attribute__((visibility("default"))) void NAPI_data_udmfComponents_GetABCCode(const char **buf, int *buflen)
+extern "C" __attribute__((visibility("default"))) void NAPI_data_UdmfComponents_GetABCCode(const char **buf,
+    int *buflen)
 {
     if (buf != nullptr) {
         *buf = _binary_udmfcomponents_abc_start;
@@ -33,13 +34,13 @@ extern "C" __attribute__((visibility("default"))) void NAPI_data_udmfComponents_
 
 extern "C" __attribute__((constructor)) void UdmfComponentsRegisterModule(void)
 {
-    static napi_module udmfComponentsModule = {
+    static napi_module UdmfComponentsModule = {
         .nm_version = 1,
         .nm_flags = 0,
         .nm_filename = nullptr,
-        .nm_modname = "data.udmfComponents",
+        .nm_modname = "data.UdmfComponents",
         .nm_priv = ((void *)0),
         .reserved = { 0 },
     };
-    napi_module_register(&udmfComponentsModule);
+    napi_module_register(&UdmfComponentsModule);
 }

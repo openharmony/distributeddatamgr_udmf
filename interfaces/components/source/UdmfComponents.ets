@@ -280,12 +280,14 @@ export struct ContentFormCard {
           .width('100%')
           .layoutWeight(1)
           .draggable(false)
+          .id('cardThumbImage')
       } else {
         Image(this.thumbImage ? this.thumbImage : this.defaultThumbImage)
           .objectFit(ImageFit.Contain)
           .width('100%')
           .aspectRatio(this.getAspectRatio())
           .draggable(false)
+          .id('cardThumbImage')
       }
     }
     .size({ width: '100%' })
@@ -314,6 +316,7 @@ export struct ContentFormCard {
         .alt($r('sys.media.ohos_app_icon'))
         .borderRadius($r('sys.float.corner_radius_level1'))
         .draggable(false)
+        .id('cardAppIcon')
       Text(this.contentFormData?.appName ? this.contentFormData?.appName : ' ')
         .fontSize(this.formStyle.appNameFontSize * this.cardScale)
         .fontColor(APP_NAME_COLOR)
@@ -327,6 +330,7 @@ export struct ContentFormCard {
         .direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr)
         .maxFontScale(1)
         .layoutWeight(1)
+        .id('cardAppName')
 
     }
     .padding({
@@ -352,6 +356,7 @@ export struct ContentFormCard {
       .borderRadius(this.contentFormData?.title === '' ? 0 : DEFAULT_EMPTY_TEXT_RADIUS)
       .direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr)
       .maxFontScale(1)
+      .id('cardTitleText')
   }
 
   @Builder
@@ -363,6 +368,7 @@ export struct ContentFormCard {
         .height(this.formStyle.thumbHeight * this.cardScale)
         .backgroundColor(this.thumbImage ? CARD_BACKGROUND : DEFAULT_THUMB_BACKGROUND)
         .draggable(false)
+        .id('cardThumbImage')
       Column() {
         this.TitleText()
         Text(this.contentFormData?.description)
@@ -379,6 +385,7 @@ export struct ContentFormCard {
           .borderRadius(this.contentFormData?.description ? 0 : DEFAULT_EMPTY_TEXT_RADIUS)
           .direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr)
           .maxFontScale(1)
+          .id('cardDescription')
       }
       .alignItems(HorizontalAlign.Start)
       .width('100%')
@@ -416,6 +423,7 @@ export struct ContentFormCard {
       })
       .direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr)
       .maxFontScale(1)
+      .id('cardDescription')
   }
 
   @Builder
@@ -444,6 +452,7 @@ export struct ContentFormCard {
                 left: this.isMirrorLanguageType ? 0 : (this.formStyle.thumbMarginLeft as number * this.cardScale),
                 top: this.formStyle.titleFontMarginTop * this.cardScale
               })
+              .id('cardThumbImage')
           }
         }
         .thumbStyle()
@@ -484,6 +493,7 @@ export struct ContentFormCard {
                   left: this.isMirrorLanguageType ? 0 : (this.formStyle.thumbMarginLeft as number * this.cardScale),
                   right: this.isMirrorLanguageType ? (this.formStyle.thumbMarginLeft as number * this.cardScale) : 0
                 })
+                .id('cardThumbImage')
             }
           }
           .margin({ top: this.formStyle.descriptionMarginTop * this.cardScale })
