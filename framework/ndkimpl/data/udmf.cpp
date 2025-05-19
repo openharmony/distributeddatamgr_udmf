@@ -52,6 +52,13 @@ static const std::map<std::string, UDType> FILE_TYPES = {
 static const std::set<std::string> FILE_SUB_TYPES = {
     "general.image", "general.video", "general.audio", "general.folder" };
 
+static const std::map<Udmf_Intention, Intention> VAILD_INTENTIONS = {
+    { UDMF_INTENTION_DRAG, Intention::UD_INTENTION_DRAG },
+    { UDMF_INTENTION_SYSTEM_SHARE, Intention::UD_INTENTION_SYSTEM_SHARE },
+    { UDMF_INTENTION_PICKER, Intention::UD_INTENTION_PICKER },
+    { UDMF_INTENTION_MENU, Intention::UD_INTENTION_MENU }
+};
+
 static void DestroyStringArray(char**& bufArray, unsigned int& count)
 {
     if (bufArray == nullptr) {
@@ -374,17 +381,32 @@ int OH_Udmf_GetUnifiedData(const char* key, Udmf_Intention intention, OH_UdmfDat
         return UDMF_E_INVALID_PARAM;
     }
     Intention queryOptIntent;
-    switch (intention) {
-        case UDMF_INTENTION_DRAG:
-            queryOptIntent = Intention::UD_INTENTION_DRAG;
-            break;
-        default:
-            return UDMF_E_INVALID_PARAM;
+    auto it = VAILD_INTENTIONS.find(intention);
+    if (it != VAILD_INTENTIONS.end()) {
+        queryOptIntent = it->second;
+    } else {
+        return UDMF_E_INVALID_PARAM;
     }
     QueryOption query = {.key = std::string(key), .intention = queryOptIntent};
-    if (UdmfClient::GetInstance().GetData(query, *(data->unifiedData_)) != E_OK) {
-        LOG_ERROR(UDMF_CAPI, "get data error");
-        return UDMF_ERR;
+    if (Intention::UD_INTENTION_DRAG == queryOptIntent) {
+        if (UdmfClient::GetInstance().GetData(query, *(data->unifiedData_)) != E_OK) {
+            LOG_ERROR(UDMF_CAPI, "get data error");
+            return UDMF_ERR;
+        }
+        return UDMF_E_OK;
+    }
+    if (UnifiedDataUtils::IsFileMangerIntention(UD_INTENTION_MAP.at(queryOptIntent))) {
+        std::vector<UnifiedData> unifiedDataSet;
+        auto ret = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+        if (ret != E_OK) {
+            LOG_ERROR(UDMF_CAPI, "get batchdata error:%{public}d", ret);
+            return UDMF_ERR;
+        }
+        if (unifiedDataSet.empty()) {
+            return UDMF_E_OK;
+        } else {
+            data->unifiedData_ = std::make_shared<OHOS::UDMF::UnifiedData>(unifiedDataSet[0]);
+        }
     }
     return UDMF_E_OK;
 }
@@ -394,13 +416,13 @@ int OH_Udmf_SetUnifiedData(Udmf_Intention intention, OH_UdmfData* unifiedData, c
     if (!IsUnifiedDataValid(unifiedData) || key == nullptr || keyLen < UDMF_KEY_BUFFER_LEN) {
         return UDMF_E_INVALID_PARAM;
     }
-    enum Intention customOptIntent;
-    switch (intention) {
-        case UDMF_INTENTION_DRAG:
-            customOptIntent = Intention::UD_INTENTION_DRAG;
-            break;
-        default:
-            return UDMF_E_INVALID_PARAM;
+    Intention customOptIntent;
+    auto it = VAILD_INTENTIONS.find(intention);
+    if (it != VAILD_INTENTIONS.end()) {
+        customOptIntent = it->second;
+    } else {
+        LOG_ERROR(UDMF_CAPI, "The intention is invalid");
+        return UDMF_E_INVALID_PARAM;
     }
     CustomOption option = {.intention = customOptIntent};
     std::string keyStr;

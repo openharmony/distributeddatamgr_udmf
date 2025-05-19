@@ -21,6 +21,7 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "udmf_client.h"
+#include "unified_key.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -46,6 +47,7 @@ private:
     static napi_value CreateFileConflictOptions(napi_env env, napi_callback_info info);
     static napi_value CreateProgressIndicator(napi_env env, napi_callback_info info);
     static napi_value CreateListenerStatus(napi_env env, napi_callback_info info);
+    static bool IsValidOptionInfoNonDrag(UnifiedKey &key, const std::string &intention);
 };
 } // namespace UDMF
 } // namespace OHOS
