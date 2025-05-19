@@ -26,6 +26,8 @@
 
 using namespace OHOS::UDMF;
 
+constexpr const int32_t MAX_PARAM_NAME = 1024;
+
 static const char* GetUdsStrValue(UdsObject* pThis, NdkStructId ndkStructId, const char* paramName)
 {
     if (IsInvalidUdsObjectPtr(pThis, ndkStructId)) {
@@ -107,6 +109,10 @@ OH_UdsContentForm::OH_UdsContentForm() : UdsObject(NdkStructId::UDS_CONTENT_FORM
 
 template <typename T> bool UdsObject::HasObjectKey(const char* paramName)
 {
+    if (strlen(paramName) > MAX_PARAM_NAME) {
+        LOG_ERROR(UDMF_CAPI, "paramName too long! paramName size = %{public}zu.", strlen(paramName));
+        return false;
+    }
     auto it = obj->value_.find(paramName);
     if (it == obj->value_.end() || !std::holds_alternative<T>(it->second)) {
         LOG_ERROR(UDMF_CAPI, "Don't have property %{public}s.", paramName);
@@ -131,7 +137,15 @@ int UdsObject::SetUdsValue(const char* paramName, const T &pramValue)
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     std::lock_guard<std::mutex> lock(mutex);
-    obj->value_[paramName] = pramValue;
+    try {
+        obj->value_[paramName] = pramValue;
+    } catch (std::bad_alloc& e) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
+        return Udmf_ErrCode::UDMF_ERR;
+    } catch (...) {
+        LOG_ERROR(UDMF_CAPI, "An unexpected exception occurred.");
+        return Udmf_ErrCode::UDMF_ERR;
+    }
     return Udmf_ErrCode::UDMF_E_OK;
 }
 
@@ -532,11 +546,20 @@ int OH_UdsArrayBuffer_SetData(OH_UdsArrayBuffer* buffer, unsigned char* data, un
         LOG_ERROR(UDMF_CAPI, "Param is invalid.");
         return UDMF_E_INVALID_PARAM;
     }
-    std::vector<uint8_t> arrayBuffer(data, data + len);
-    int ret = buffer->SetUdsValue<std::vector<uint8_t>>(ARRAY_BUFFER, arrayBuffer);
-    if (ret != UDMF_E_OK) {
-        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory. ret: %{public}d", ret);
-        return ret;
+    int ret = UDMF_ERR;
+    try {
+        std::vector<uint8_t> arrayBuffer(data, data + len);
+        ret = buffer->SetUdsValue<std::vector<uint8_t>>(ARRAY_BUFFER, arrayBuffer);
+        if (ret != UDMF_E_OK) {
+            LOG_ERROR(UDMF_CAPI, "Failed to apply for memory. ret: %{public}d", ret);
+            return ret;
+        }
+    } catch (std::bad_alloc& e) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
+        return Udmf_ErrCode::UDMF_ERR;
+    } catch (...) {
+        LOG_ERROR(UDMF_CAPI, "An unexpected exception occurred.");
+        return Udmf_ErrCode::UDMF_ERR;
     }
     ret = buffer->SetUdsValue<int>(ARRAY_BUFFER_LENGTH, static_cast<int>(len));
     return ret;
@@ -625,11 +648,20 @@ int OH_UdsContentForm_SetThumbData(OH_UdsContentForm* pThis, const unsigned char
         LOG_ERROR(UDMF_CAPI, "Param is invalid.");
         return UDMF_E_INVALID_PARAM;
     }
-    std::vector<uint8_t> data(thumbData, thumbData + len);
-    int ret = pThis->SetUdsValue<std::vector<uint8_t>>(THUMB_DATA, data);
-    if (ret != UDMF_E_OK) {
-        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory. ret: %{public}d", ret);
-        return ret;
+    int ret = UDMF_ERR;
+    try {
+        std::vector<uint8_t> data(thumbData, thumbData + len);
+        ret = pThis->SetUdsValue<std::vector<uint8_t>>(THUMB_DATA, data);
+        if (ret != UDMF_E_OK) {
+            LOG_ERROR(UDMF_CAPI, "Failed to apply for memory. ret: %{public}d", ret);
+            return ret;
+        }
+    } catch (std::bad_alloc& e) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
+        return Udmf_ErrCode::UDMF_ERR;
+    } catch (...) {
+        LOG_ERROR(UDMF_CAPI, "An unexpected exception occurred.");
+        return Udmf_ErrCode::UDMF_ERR;
     }
     ret = pThis->SetUdsValue<int>(THUMB_DATA_LENGTH, static_cast<int>(len));
     return ret;
