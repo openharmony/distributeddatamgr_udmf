@@ -624,6 +624,10 @@ public:
     static bool IsFileMangerIntention(const std::string &intention);
     static std::string FindIntentionMap(const Intention &queryintention);
     static bool IsValidOptionsNonDrag(UnifiedKey &key, const std::string &intention);
+    static std::string IsFileSubType(const std::string &type);
+    static bool IsFilterFileType(const std::string &type);
+    static void MergeSummary(std::map<std::string, int64_t> &summary,
+        std::set<std::string> &summaryKey, const std::string &key, int64_t value);
 };
 
 struct Object;

@@ -34,6 +34,7 @@ enum DataStatus : int32_t {
 
 struct Summary {
     std::map<std::string, int64_t> summary;
+    std::vector<std::string> fileTypes;
     int64_t totalSize;
 };
 
