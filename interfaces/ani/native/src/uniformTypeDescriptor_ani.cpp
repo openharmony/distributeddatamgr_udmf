@@ -23,7 +23,7 @@
 
 using namespace OHOS::UDMF;
 
-uint32_t paramsCheckError = 401;
+static uint32_t paramsCheckError = 401;
 
 static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
 {
