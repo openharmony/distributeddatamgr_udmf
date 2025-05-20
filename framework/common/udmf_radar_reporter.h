@@ -32,9 +32,10 @@ enum BizScene : int32_t {
 
 enum SetDataStage : int32_t {
     SET_DATA_BEGIN = 1,
-    VERIFY_SHARE_PERMISSIONS = 2,
-    GERERATE_DFS_URI = 3,
-    SET_DATA_END = 4
+    SET_DATA_SERVICE_BEGIN = 2,
+    VERIFY_SHARE_PERMISSIONS = 3,
+    GERERATE_DFS_URI = 4,
+    SET_DATA_END = 5
 };
 
 enum SyncDataStage : int32_t {
@@ -74,6 +75,7 @@ class API_EXPORT RadarReporterAdapter {
 public:
     static void ReportNormal(std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t state);
     static void ReportNormal(std::string func, int32_t scene, int32_t stage, int32_t stageRes);
+    static void ReportNormal(std::string func, int32_t scene, int32_t stage, int32_t stageRes, std::string &bundleName);
     static void ReportFail(
         std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state);
     static void ReportFail(std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode);
