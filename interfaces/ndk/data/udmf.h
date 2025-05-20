@@ -197,6 +197,12 @@ typedef struct OH_UdmfGetDataParams OH_UdmfGetDataParams;
 */
 typedef void (*OH_Udmf_DataProgressListener)(OH_Udmf_ProgressInfo* progressInfo, OH_UdmfData* data);
 
+/**
+ * @brief Describes the optional arguments of data operation
+ *
+ * @since 20
+ */
+typedef struct OH_UdmfOptions OH_UdmfOptions;
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdmfData}.
@@ -799,6 +805,83 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* pThis,
     const char* key, const char* param);
 
 /**
+ * @brief Creation a pointer to the instance of the {@link OH_UdmfOptions}.
+ *
+ * @return If the operation is successful, a pointer to the instance of the {@link OH_UdmfOptions}
+ * structure is returned. If the operation is failed, nullptr is returned.
+ * @see OH_UdmfOptions.
+ * @since 20
+ */
+OH_UdmfOptions* OH_UdmfOptions_Create();
+
+/**
+ * @brief Destroy a pointer that points to an instance of {@link OH_UdmfOptions}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfOptions}.
+ * @see OH_UdmfOptions.
+ * @since 20
+ */
+void OH_UdmfOptions_Destroy(OH_UdmfOptions* pThis);
+
+/**
+ * @brief Get key from the {@link OH_UdmfOptions}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfOptions}.
+ * @return Returns a pointer of the value string when input args normally, otherwise return nullptr.
+ * @see OH_UdmfOptions
+ * @since 20
+ */
+const char* OH_UdmfOptions_GetKey(OH_UdmfOptions* pThis);
+
+/**
+ * @brief Set the key to the {@link OH_UdmfOptions}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfOptions}.
+ * @param key Represents a new string value of the key.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdmfOptions Udmf_ErrCode
+ * @since 20
+ */
+int OH_UdmfOptions_SetKey(OH_UdmfOptions* pThis, const char* key);
+
+/**
+ * @brief Get intention from the {@link OH_UdmfOptions}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfOptions}.
+ * @return Returns {@link Udmf_Intention} value.
+ * @see OH_UdmfOptions Udmf_Intention
+ * @since 20
+ */
+Udmf_Intention OH_UdmfOptions_GetIntention(OH_UdmfOptions* pThis);
+
+/**
+ * @brief Set intention value to {@link OH_UdmfOptions}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfOptions}.
+ * @param intention Represents new {@link Udmf_Intention} param.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdmfOptions Udmf_Intention Udmf_ErrCode.
+ * @since 20
+ */
+int OH_UdmfOptions_SetIntention(OH_UdmfOptions* pThis, Udmf_Intention intention);
+
+/**
+ * @brief Reset {@link OH_UdmfOptions} to default.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfOptions}.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdmfOptions Udmf_ErrCode.
+ * @since 20
+ */
+int OH_UdmfOptions_Reset(OH_UdmfOptions* pThis);
+
+/**
  * @brief Get {@link OH_UdmfData} data from udmf database.
  *
  * @param key Represents database store's key value.
@@ -811,6 +894,22 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* pThis,
  * @since 12
  */
 int OH_Udmf_GetUnifiedData(const char* key, Udmf_Intention intention, OH_UdmfData* unifiedData);
+
+/**
+ * @brief Get {@link OH_UdmfData} data array from udmf database by intention.
+ *
+ * @param options Represents a pointer to an instance of {@link OH_UdmfOptions}.
+ * @param dataArray Represents output params of {@link OH_UdmfData}.
+ * This pointer needs to be released using the {@link OH_Udmf_DestroyDataArray} function.
+ * @param dataSize Represents the data count of output params.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ *         {@link UDMF_ERR} Internal data error.
+ * @see OH_UdmfData Udmf_Intention Udmf_ErrCode.
+ * @since 20
+ */
+int OH_Udmf_GetUnifiedDataByOptions(OH_UdmfOptions* options, OH_UdmfData** dataArray, unsigned int* dataSize);
 
 /**
  * @brief Set {@link OH_UdmfData} data to database.
@@ -828,6 +927,63 @@ int OH_Udmf_GetUnifiedData(const char* key, Udmf_Intention intention, OH_UdmfDat
  */
 int OH_Udmf_SetUnifiedData(Udmf_Intention intention, OH_UdmfData* unifiedData,
     char* key, unsigned int keyLen);
+
+/**
+ * @brief Set {@link OH_UdmfData} data to database with options.
+ *
+ * @param options Represents a pointer to an instance of {@link OH_UdmfOptions}.
+ * @param unifiedData Represents a pointer to an instance of {@link OH_UdmfData}.
+ * @param key Represents return value after set data to database successfully,
+ * it's memory size not less than {@link UDMF_KEY_BUFFER_LEN}.
+ * @param keyLen Represents size of key param.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ *         {@link UDMF_ERR} Internal data error.
+ * @see OH_UdmfOptions OH_UdmfData Udmf_ErrCode.
+ * @since 20
+ */
+int OH_Udmf_SetUnifiedDataByOptions(OH_UdmfOptions* options, OH_UdmfData *unifiedData, char *key, unsigned int keyLen);
+
+/**
+ * @brief Update {@link OH_UdmfData} data to database with options.
+ *
+ * @param options Represents a pointer to an instance of {@link OH_UdmfOptions}.
+ * @param unifiedData Represents a pointer to an instance of {@link OH_UdmfData}.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ *         {@link UDMF_ERR} Internal data error.
+ * @see OH_UdmfOptions OH_UdmfData Udmf_ErrCode.
+ * @since 20
+ */
+int OH_Udmf_UpdateUnifiedData(OH_UdmfOptions* options, OH_UdmfData* unifiedData);
+
+/**
+ * @brief Delete {@link OH_UdmfData} data of database with options.
+ *
+ * @param options Represents a pointer to an instance of {@link OH_UdmfOptions}.
+ * @param dataArray Represents output params of {@link OH_UdmfData}.
+ * This pointer needs to be released using the {@link OH_Udmf_DestroyDataArray} function.
+ * @param dataSize Represents the data count of output params.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ *         {@link UDMF_ERR} Internal data error.
+ * @see OH_UdmfData Udmf_Intention Udmf_ErrCode.
+ * @since 20
+ */
+int OH_Udmf_DeleteUnifiedData(OH_UdmfOptions* options, OH_UdmfData** dataArray, unsigned int* dataSize);
+
+/**
+ * @brief Destory data array memory.
+ *
+ * @param dataArray Represents a pointer to {@link OH_UdmfData}.
+ * @param dataSize Represents data size in list.
+ * @see OH_UdmfData
+ * @since 20
+ */
+void OH_Udmf_DestroyDataArray(OH_UdmfData** dataArray, unsigned int dataSize);
 
 /**
  * @brief Gets the progress from the {@OH_Udmf_ProgressInfo}.

@@ -2921,4 +2921,587 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedData018, TestSize.Level1)
     OH_UdmfData_Destroy(udmfUnifiedData);
     OH_UdmfData_Destroy(readUnifiedData);
 }
+
+/**
+ * @tc.name: OH_UdmfOptions001
+ * @tc.desc: OH_UdmfOptions with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfOptions001, TestSize.Level1)
+{
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    ASSERT_TRUE(options != nullptr);
+    const char* testKey = "testKey";
+    int result = OH_UdmfOptions_SetKey(options, testKey);
+    EXPECT_EQ(result, UDMF_E_OK);
+    const char* getKey = OH_UdmfOptions_GetKey(options);
+    EXPECT_STREQ(getKey, testKey);
+    Udmf_Intention testIntention = UDMF_INTENTION_DRAG;
+    int setResult = OH_UdmfOptions_SetIntention(options, testIntention);
+    EXPECT_EQ(setResult, UDMF_E_OK);
+    Udmf_Intention getIntention = OH_UdmfOptions_GetIntention(options);
+    EXPECT_EQ(getIntention, testIntention);
+    int resetResult = OH_UdmfOptions_Reset(options);
+    EXPECT_EQ(resetResult, UDMF_E_OK);
+    EXPECT_EQ(options->key.empty(), true);
+    EXPECT_EQ(options->intention, Udmf_Intention {});
+    OH_UdmfOptions_Destroy(options);
+}
+
+/**
+ * @tc.name: OH_UdmfOptions002
+ * @tc.desc: OH_UdmfOptions with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfOptions002, TestSize.Level1)
+{
+    OH_UdmfOptions* options1 = nullptr;
+    const char * key = nullptr;
+    int setRes = OH_UdmfOptions_SetKey(options1, key);
+    EXPECT_EQ(setRes, UDMF_E_INVALID_PARAM);
+    const char* getRes = OH_UdmfOptions_GetKey(options1);
+    EXPECT_EQ(getRes, nullptr);
+    Udmf_Intention testIntention = UDMF_INTENTION_DRAG;
+    OH_UdmfOptions_GetIntention(options1);
+    int setIntention = OH_UdmfOptions_SetIntention(options1, testIntention);
+    EXPECT_EQ(setIntention, UDMF_E_INVALID_PARAM);
+    int reSet = OH_UdmfOptions_Reset(options1);
+    EXPECT_EQ(reSet, UDMF_E_INVALID_PARAM);
+    OH_UdmfOptions_Destroy(options1);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetUnifiedDataByOptions001
+ * @tc.desc: OH_Udmf_SetUnifiedDataByOptions with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetUnifiedDataByOptions001, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    options->intention = UDMF_INTENTION_DRAG;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedDataByOptions(options, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_INVALID_PARAM);
+    
+    OH_UdmfOptions_Destroy(options);
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetAndGetUnifiedDataByOptions001
+ * @tc.desc: OH_Udmf_SetUnifiedDataByOptions and OH_Udmf_GetUnifiedDataByOptions with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedDataByOptions001, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    options->intention = UDMF_INTENTION_DATA_HUB;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedDataByOptions(options, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    std::string uri2 = "https://new/uri/path.jpg";
+    OH_UdmfData *udmfUnifiedData2 = OH_UdmfData_Create();
+    OH_UdmfRecord *record2 = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri2 = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri2, uri2.c_str());
+    OH_UdsFileUri_SetFileType(fileUri2, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record2, fileUri2);
+    OH_UdmfData_AddRecord(udmfUnifiedData2, record2);
+    OH_UdmfOptions* options2 = OH_UdmfOptions_Create();
+    options2->intention = UDMF_INTENTION_DATA_HUB;
+    char key2[UDMF_KEY_BUFFER_LEN];
+    int setRes2 = OH_Udmf_SetUnifiedDataByOptions(options2, udmfUnifiedData2, key2, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes2, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+    unsigned int dataSize = 0;
+    OH_UdmfData* dataArray = nullptr;
+    int getRes = OH_Udmf_GetUnifiedDataByOptions(options, &dataArray, &dataSize);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    EXPECT_NE(dataArray, nullptr);
+    unsigned int dataSize2 = 0;
+    OH_UdmfData* dataArray2 = nullptr;
+    int deleteRes = OH_Udmf_DeleteUnifiedData(options2, &dataArray2, &dataSize2);
+    EXPECT_EQ(deleteRes, UDMF_E_OK);
+    EXPECT_NE(dataArray2, nullptr);
+    EXPECT_EQ(dataSize2,2);
+    OH_Udmf_DestroyDataArray(&dataArray, dataSize);
+    OH_Udmf_DestroyDataArray(&dataArray2, dataSize2);
+    OH_UdmfOptions_Destroy(options);
+    OH_UdmfOptions_Destroy(options2);
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdsFileUri_Destroy(fileUri2);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfRecord_Destroy(record2);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+    OH_UdmfData_Destroy(udmfUnifiedData2);
+}
+
+/**
+ * @tc.name: OH_Udmf_UpdateUnifiedData001
+ * @tc.desc: OH_Udmf_UpdateUnifiedData001 with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_UpdateUnifiedData001, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    options->intention = UDMF_INTENTION_DATA_HUB;
+    char key[UDMF_KEY_BUFFER_LEN];
+    int setRes = OH_Udmf_SetUnifiedDataByOptions(options, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+
+    std::string uri2 = "https://new/uri/path.jpg";
+    OH_UdmfData *udmfUnifiedData2 = OH_UdmfData_Create();
+    OH_UdmfRecord *record2 = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri2 = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri2, uri2.c_str());
+    OH_UdsFileUri_SetFileType(fileUri2, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record2, fileUri2);
+    OH_UdmfData_AddRecord(udmfUnifiedData2, record2);
+    OH_UdmfOptions* options2 = OH_UdmfOptions_Create();
+    options2->intention = UDMF_INTENTION_DATA_HUB;
+    options2->key = key;
+    int updataRes = OH_Udmf_UpdateUnifiedData(options2, udmfUnifiedData2);
+    EXPECT_EQ(updataRes, UDMF_E_OK);
+
+    unsigned int dataSize2 = 0;
+    OH_UdmfData* dataArray2 = nullptr;
+    int deleteRes = OH_Udmf_DeleteUnifiedData(options2, &dataArray2, &dataSize2);
+    EXPECT_EQ(deleteRes, UDMF_E_OK);
+    EXPECT_NE(dataArray2, nullptr);
+    EXPECT_EQ(dataSize2, 1);
+    OH_UdmfOptions_Destroy(options);
+    OH_UdmfOptions_Destroy(options2);
+
+    OH_Udmf_DestroyDataArray(&dataArray2, dataSize2);
+
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdsFileUri_Destroy(fileUri2);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfRecord_Destroy(record2);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+    OH_UdmfData_Destroy(udmfUnifiedData2);
+}
+
+/**
+ * @tc.name: OH_Udmf_GetUnifiedDataByOptions001
+ * @tc.desc: OH_Udmf_GetUnifiedDataByOptions with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedDataByOptions001, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    options->intention = UDMF_INTENTION_PICKER;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedDataByOptions(options, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+
+    OH_UdmfOptions* options1 = OH_UdmfOptions_Create();
+    options1->intention = UDMF_INTENTION_PICKER;
+    options1->key = key;
+    unsigned dataSize1 = 0;
+    OH_UdmfData* dataArray1 = nullptr;
+    int getRes = OH_Udmf_GetUnifiedDataByOptions(options1, &dataArray1, &dataSize1);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    unsigned int recordCount = 0;
+    OH_UdmfRecord** getRecords = OH_UdmfData_GetRecords(&dataArray1[0], &recordCount);
+    EXPECT_EQ(recordCount, 1);
+    OH_UdsFileUri *getFileUri = OH_UdsFileUri_Create();
+    OH_UdmfRecord_GetFileUri(getRecords[0], getFileUri);
+    const char *getUri = OH_UdsFileUri_GetFileUri(getFileUri);
+    EXPECT_EQ(strcmp(getUri, uri.c_str()), 0);
+    OH_Udmf_DestroyDataArray(&dataArray1, dataSize1);
+    OH_UdmfOptions_Destroy(options);
+    OH_UdmfOptions_Destroy(options1);
+
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdsFileUri_Destroy(getFileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_GetUnifiedDataByOptions002
+ * @tc.desc: OH_Udmf_GetUnifiedDataByOptions with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedDataByOptions002, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    options->intention = UDMF_INTENTION_MENU;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedDataByOptions(options, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+
+    OH_UdmfOptions* options1 = OH_UdmfOptions_Create();
+    options1->intention = UDMF_INTENTION_MENU;
+    options1->key = key;
+    unsigned dataSize1 = 0;
+    OH_UdmfData* dataArray1 = nullptr;
+    int getRes = OH_Udmf_GetUnifiedDataByOptions(options1, &dataArray1, &dataSize1);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    unsigned int recordCount = 0;
+    OH_UdmfRecord** getRecords = OH_UdmfData_GetRecords(&dataArray1[0], &recordCount);
+    EXPECT_EQ(recordCount, 1);
+    OH_UdsFileUri *getFileUri = OH_UdsFileUri_Create();
+    OH_UdmfRecord_GetFileUri(getRecords[0], getFileUri);
+    const char *getUri = OH_UdsFileUri_GetFileUri(getFileUri);
+    EXPECT_EQ(strcmp(getUri, uri.c_str()), 0);
+    OH_Udmf_DestroyDataArray(&dataArray1, dataSize1);
+    
+    OH_UdmfOptions_Destroy(options);
+    OH_UdmfOptions_Destroy(options1);
+
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdsFileUri_Destroy(getFileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_DeleteUnifiedData001
+ * @tc.desc: OH_Udmf_DeleteUnifiedData with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_DeleteUnifiedData001, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    options->intention = UDMF_INTENTION_DATA_HUB;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedDataByOptions(options, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+
+    unsigned int dataSize = 0;
+    OH_UdmfData* dataArray = nullptr;
+    int dateleRes = OH_Udmf_DeleteUnifiedData(options, &dataArray, &dataSize);
+    EXPECT_EQ(dateleRes, UDMF_E_OK);
+    EXPECT_NE(dataArray, nullptr);
+    unsigned int recordCount = 0;
+    OH_UdmfRecord** getRecords = OH_UdmfData_GetRecords(&dataArray[0], &recordCount);
+    EXPECT_EQ(recordCount, 1);
+    OH_UdsFileUri *getFileUri = OH_UdsFileUri_Create();
+    OH_UdmfRecord_GetFileUri(getRecords[0], getFileUri);
+    const char *getUri = OH_UdsFileUri_GetFileUri(getFileUri);
+    EXPECT_EQ(strcmp(getUri, uri.c_str()), 0);
+    OH_Udmf_DestroyDataArray(&dataArray, dataSize);
+
+    OH_UdmfOptions_Destroy(options);
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdsFileUri_Destroy(getFileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_DeleteUnifiedData002
+ * @tc.desc: OH_Udmf_DeleteUnifiedData with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_DeleteUnifiedData002, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    options->intention = UDMF_INTENTION_SYSTEM_SHARE;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedDataByOptions(options, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+
+    OH_UdmfOptions* options1 = OH_UdmfOptions_Create();
+    options1->intention = UDMF_INTENTION_SYSTEM_SHARE;
+    options1->key = key;
+    unsigned int dataSize1 = 0;
+    OH_UdmfData* dataArray1 = nullptr;
+    int getRes = OH_Udmf_GetUnifiedDataByOptions(options1, &dataArray1, &dataSize1);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    unsigned int recordCount = 0;
+    OH_UdmfRecord** getRecords = OH_UdmfData_GetRecords(&dataArray1[0], &recordCount);
+    EXPECT_EQ(recordCount, 1);
+    OH_UdsFileUri *getFileUri = OH_UdsFileUri_Create();
+    OH_UdmfRecord_GetFileUri(getRecords[0], getFileUri);
+    const char *getUri = OH_UdsFileUri_GetFileUri(getFileUri);
+    EXPECT_EQ(strcmp(getUri, uri.c_str()), 0);
+    OH_UdmfOptions* options2 = OH_UdmfOptions_Create();
+    options2->intention = UDMF_INTENTION_SYSTEM_SHARE;
+    options2->key = key;
+    unsigned int dataSize2 = 0;
+    OH_UdmfData* dataArray2 = nullptr;
+    int deleteRes = OH_Udmf_DeleteUnifiedData(options2, &dataArray2, &dataSize2);
+    EXPECT_EQ(deleteRes, UDMF_E_OK);
+    
+    OH_Udmf_DestroyDataArray(&dataArray1, dataSize1);
+    OH_Udmf_DestroyDataArray(&dataArray2, dataSize2);
+
+    OH_UdmfOptions_Destroy(options);
+    OH_UdmfOptions_Destroy(options1);
+    OH_UdmfOptions_Destroy(options2);
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdsFileUri_Destroy(getFileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_DeleteUnifiedData003
+ * @tc.desc: OH_Udmf_DeleteUnifiedData with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_DeleteUnifiedData003, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    options->intention = UDMF_INTENTION_PICKER;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedDataByOptions(options, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+
+    OH_UdmfOptions* options2 = OH_UdmfOptions_Create();
+    options2->intention = UDMF_INTENTION_PICKER;
+    options2->key = key;
+    unsigned int dataSize2 = 0;
+    OH_UdmfData* dataArray2 = nullptr;
+    int deleteRes = OH_Udmf_DeleteUnifiedData(options2, &dataArray2, &dataSize2);
+    EXPECT_EQ(deleteRes, UDMF_E_OK);
+    EXPECT_NE(dataArray2, nullptr);
+    unsigned int recordCount = 0;
+    OH_UdmfRecord** getRecords = OH_UdmfData_GetRecords(&dataArray2[0], &recordCount);
+    EXPECT_EQ(recordCount, 1);
+    OH_UdsFileUri *getFileUri = OH_UdsFileUri_Create();
+    OH_UdmfRecord_GetFileUri(getRecords[0], getFileUri);
+    const char *getUri = OH_UdsFileUri_GetFileUri(getFileUri);
+    EXPECT_EQ(strcmp(getUri, uri.c_str()), 0);
+    OH_Udmf_DestroyDataArray(&dataArray2, dataSize2);
+
+    OH_UdmfOptions_Destroy(options);
+    OH_UdmfOptions_Destroy(options2);
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdsFileUri_Destroy(getFileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_DeleteUnifiedData004
+ * @tc.desc: OH_Udmf_DeleteUnifiedData with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_DeleteUnifiedData004, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    options->intention = UDMF_INTENTION_MENU;
+    char key[UDMF_KEY_BUFFER_LEN];
+
+    int setRes = OH_Udmf_SetUnifiedDataByOptions(options, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    EXPECT_NE(key[0], '\0');
+
+    OH_UdmfOptions* options2 = OH_UdmfOptions_Create();
+    options2->intention = UDMF_INTENTION_MENU;
+    options2->key = key;
+    unsigned int dataSize2 = 0;
+    OH_UdmfData* dataArray2 = nullptr;
+    int deleteRes = OH_Udmf_DeleteUnifiedData(options2, &dataArray2, &dataSize2);
+    EXPECT_EQ(deleteRes, UDMF_E_OK);
+    EXPECT_NE(dataArray2, nullptr);
+    unsigned int recordCount = 0;
+    OH_UdmfRecord** getRecords = OH_UdmfData_GetRecords(&dataArray2[0], &recordCount);
+    EXPECT_EQ(recordCount, 1);
+    OH_UdsFileUri *getFileUri = OH_UdsFileUri_Create();
+    OH_UdmfRecord_GetFileUri(getRecords[0], getFileUri);
+    const char *getUri = OH_UdsFileUri_GetFileUri(getFileUri);
+    EXPECT_EQ(strcmp(getUri, uri.c_str()), 0);
+    OH_Udmf_DestroyDataArray(&dataArray2, dataSize2);
+
+    OH_UdmfOptions_Destroy(options);
+    OH_UdmfOptions_Destroy(options2);
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdsFileUri_Destroy(getFileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_GetUnifiedDataByOptions003
+ * @tc.desc: OH_Udmf_GetUnifiedDataByOptions with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_GetUnifiedDataByOptions003, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx.jpg";
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, uri.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+    OH_UdmfOptions* options = nullptr;
+    unsigned int dataSize = 0;
+    OH_UdmfData* dataArray = nullptr;
+    int getRes = OH_Udmf_GetUnifiedDataByOptions(options, &dataArray, &dataSize);
+    EXPECT_EQ(getRes, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfOptions* options1 = OH_UdmfOptions_Create();
+    options1->intention = UDMF_INTENTION_DRAG;
+    unsigned int dataSize1 = 0;
+    OH_UdmfData* dataArray1 = nullptr;
+    int getRes1 = OH_Udmf_GetUnifiedDataByOptions(options1, &dataArray1, &dataSize1);
+    EXPECT_EQ(getRes1, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfOptions* options2 = OH_UdmfOptions_Create();
+    options2->intention = UDMF_INTENTION_MENU;
+    unsigned int dataSize2 = 0;
+    OH_UdmfData* dataArray2 = nullptr;
+    int getRes2 = OH_Udmf_GetUnifiedDataByOptions(options2, &dataArray2, &dataSize2);
+    EXPECT_EQ(getRes2, UDMF_ERR);
+
+    OH_UdmfOptions_Destroy(options1);
+    OH_UdmfOptions_Destroy(options2);
+    OH_Udmf_DestroyDataArray(&dataArray2, dataSize2);
+    OH_Udmf_DestroyDataArray(&dataArray1, dataSize1);
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+}
+
+/**
+ * @tc.name: OH_Udmf_UpdateUnifiedData002
+ * @tc.desc: OH_Udmf_UpdateUnifiedData001 with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_UpdateUnifiedData002, TestSize.Level1)
+{
+    OH_UdmfData *udmfUnifiedData = nullptr;
+    OH_UdmfOptions* options = nullptr;
+    int updataRes = OH_Udmf_UpdateUnifiedData(options, udmfUnifiedData);
+    EXPECT_EQ(updataRes, UDMF_E_INVALID_PARAM);
+
+    std::string uri2 = "https://new/uri/path.jpg";
+    OH_UdmfData *udmfUnifiedData2 = OH_UdmfData_Create();
+    OH_UdmfRecord *record2 = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri2 = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri2, uri2.c_str());
+    OH_UdsFileUri_SetFileType(fileUri2, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record2, fileUri2);
+    OH_UdmfData_AddRecord(udmfUnifiedData2, record2);
+    OH_UdmfOptions* options2 = OH_UdmfOptions_Create();
+    options2->intention = UDMF_INTENTION_DRAG;
+    options2->key = "testKey";
+    int updataRes1 = OH_Udmf_UpdateUnifiedData(options2, udmfUnifiedData2);
+    EXPECT_EQ(updataRes1, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfOptions_Destroy(options2);
+    OH_UdsFileUri_Destroy(fileUri2);
+    OH_UdmfRecord_Destroy(record2);
+    OH_UdmfData_Destroy(udmfUnifiedData2);
+}
+
+/**
+ * @tc.name: OH_Udmf_DeleteUnifiedData005
+ * @tc.desc: OH_Udmf_DeleteUnifiedData with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_DeleteUnifiedData005, TestSize.Level1)
+{
+    unsigned int* dataSize = nullptr;
+    OH_UdmfData* dataArray = nullptr;
+    OH_UdmfOptions* options = nullptr;
+    int deleteRes = OH_Udmf_DeleteUnifiedData(options, &dataArray, dataSize);
+    EXPECT_EQ(deleteRes, UDMF_E_INVALID_PARAM);
+
+    unsigned int dataSize2 = 0 ;
+    OH_UdmfData* dataArray2 = nullptr;
+    OH_UdmfOptions* options2 = OH_UdmfOptions_Create();
+    options2->intention = UDMF_INTENTION_DRAG;
+    options2->key = "testKey";
+    int deleteRes2 = OH_Udmf_DeleteUnifiedData(options2, &dataArray2, &dataSize2);
+    EXPECT_EQ(deleteRes2, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfOptions_Destroy(options2);
+    OH_UdmfData* dataArray1 = nullptr;
+    OH_Udmf_DestroyDataArray(&dataArray1, dataSize2);
+}
 }
