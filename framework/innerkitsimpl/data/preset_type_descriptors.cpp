@@ -3329,6 +3329,13 @@ void PresetTypeDescriptors::InitDescriptors()
          {},
          "Gocolor file format defined for Openharmony",
          REFERENCE_URL,
+         ""},
+         {"openharmony.dlp",
+         {"general.composite-object"},
+         {".dlp"},
+         {},
+         "Account identify encryption file format defined by OpenHarmony",
+         REFERENCE_URL,
          ""}
     };
 };
