@@ -40,7 +40,7 @@ static constexpr uint32_t MAX_STR_PARAM_LEN = 512;
 static const std::string CLASS_NAME = "TextEmbedding";
 const std::vector<std::string> EXPECTED_SPLITTEXT_ARG_TYPES = { "string", "object" };
 const std::vector<std::string> EXPECTED_GET_TEXT_MODEL_ARG_TYPES = { "object" };
-constexpr const char *AIP_MANAGER_PATH = "libaip_core.z.so";
+const std::string AIP_MANAGER_PATH = "/system/lib64/platformsdk/libaip_core.z.so";
 } // namespace
 AipCoreManagerHandle TextEmbeddingNapi::textAipCoreMgrHandle_{};
 thread_local napi_ref TextEmbeddingNapi::sConstructor_ = nullptr;
@@ -145,7 +145,7 @@ static napi_value StartInit(napi_env env, napi_value exports, struct TextEmbeddi
 napi_value TextEmbeddingNapi::Init(napi_env env, napi_value exports)
 {
     AIP_HILOGD("Enter");
-    if (!AipNapiUtils::LoadAlgoLibrary(AIP_MANAGER_PATH, textAipCoreMgrHandle_, true)) {
+    if (!AipNapiUtils::LoadAlgoLibrary(AIP_MANAGER_PATH, textAipCoreMgrHandle_)) {
         AIP_HILOGE("LoadAlgoLibrary failed");
     }
 
@@ -460,16 +460,23 @@ napi_value TextEmbeddingNapi::SplitText(napi_env env, napi_callback_info info)
     AipNapiUtils::TransJsToDouble(env, cfgOverlap, configOverlap);
     AIP_HILOGD("string strArg: %{public}d", configSize);
     AIP_HILOGD("string strArg: %{public}f", configOverlap);
-    if (configSize <= NUM_0 || configOverlap < NUM_0 || configOverlap >= NUM_1) {
-        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "The parameter value range is incorrect");
-        return nullptr;
-    }
 
     napi_value promise = nullptr;
     napi_deferred deferred = nullptr;
     status = napi_create_promise(env, &deferred, &promise);
     if (status != napi_ok) {
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "create promise failed");
+        return nullptr;
+    }
+
+    if (!textAipCoreManager_->CheckDeviceType()) {
+        napi_value value = nullptr;
+        ThrowIntelligenceErrByPromise(env, DEVICE_EXCEPTION, "SplitText failed", value);
+        napi_reject_deferred(env, deferred, value);
+        return promise;
+    }
+    if (configSize <= NUM_0 || configOverlap < NUM_0 || configOverlap >= NUM_1) {
+        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "The parameter value range is incorrect");
         return nullptr;
     }
 
@@ -1134,4 +1141,3 @@ void TextEmbeddingNapi::ReleaseCompleteCB(napi_env env, napi_status status, void
 }
 } // namespace DataIntelligence
 } // namespace OHOS
-++
