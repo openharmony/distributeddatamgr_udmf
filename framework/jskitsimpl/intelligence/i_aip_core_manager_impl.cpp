@@ -92,6 +92,7 @@ int32_t IAipCoreManagerImpl::RAGSessionRun(const std::string &query, const Optio
 {
     return DEVICE_EXCEPTION;
 }
+++
 
 } // namespace DataIntelligence
 } // namespace OHOS

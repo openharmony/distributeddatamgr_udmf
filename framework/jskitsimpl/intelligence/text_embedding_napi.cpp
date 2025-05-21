@@ -1134,3 +1134,4 @@ void TextEmbeddingNapi::ReleaseCompleteCB(napi_env env, napi_status status, void
 }
 } // namespace DataIntelligence
 } // namespace OHOS
+++

@@ -44,6 +44,7 @@ public:
         std::function<void(const StreamStruct&, int32_t)> callback) override;
     int32_t ReleaseRAGSession() override;
     int32_t RAGSessionRun(const std::string &query, const OptionStruct &runOption, AnswerStruct &answer) override;
+    ++
 };
 } // namespace DataIntelligence
 } // namespace OHOS
