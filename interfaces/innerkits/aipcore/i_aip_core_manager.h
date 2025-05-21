@@ -315,7 +315,8 @@ public:
         std::function<void(const StreamStruct&, int32_t)> callback) = 0;
     virtual int32_t ReleaseRAGSession() = 0;
     virtual int32_t RAGSessionRun(const std::string &query, const OptionStruct &runOption, AnswerStruct &answer) = 0;
-    ++
+
+    virtual bool CheckDeviceType() = 0;
 };
 
 struct AipCoreManagerHandle {
