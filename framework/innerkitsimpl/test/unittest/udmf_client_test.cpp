@@ -3571,4 +3571,92 @@ HWTEST_F(UdmfClientTest, SetData036, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "SetData036 end.");
 }
+
+/**
+* @tc.name: GetParentType001
+* @tc.desc: test Summary fileType
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetParentType001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetParentType001 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    auto obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_TYPE] = "general.file";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    auto obj1 = std::make_shared<Object>();
+    obj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj1->value_[FILE_TYPE] = "general.image";
+    auto record1 = std::make_shared<UnifiedRecord>(FILE_URI, obj1);
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj2->value_[FILE_TYPE] = "general.png";
+    auto record2 = std::make_shared<UnifiedRecord>(FILE_URI, obj2);
+    data.AddRecord(record);
+    data.AddRecord(record1);
+    data.AddRecord(record2);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    QueryOption option2 = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+    ASSERT_EQ(status, E_OK);
+    EXPECT_EQ(summary.fileTypes.size(), data.GetRecords().size());
+    summary.summary["general.image"] = 1;
+    summary.summary["general.png"] = 1;
+    Summary newSummary;
+    status = UdmfClient::GetInstance().GetParentType(summary, newSummary);
+    ASSERT_EQ(status, E_OK);
+    EXPECT_EQ(newSummary.summary["general.image"], 1 + 1);
+
+    LOG_INFO(UDMF_TEST, "GetParentType001 end.");
+}
+
+/**
+* @tc.name: GetParentType002
+* @tc.desc: test Summary fileType
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetParentType002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetParentType002 start.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    auto obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_TYPE] = "general.file";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    auto obj1 = std::make_shared<Object>();
+    obj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj1->value_[FILE_TYPE] = "general.html";
+    auto record1 = std::make_shared<UnifiedRecord>(FILE_URI, obj1);
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj2->value_[FILE_TYPE] = "general.audio";
+    auto record2 = std::make_shared<UnifiedRecord>(FILE_URI, obj2);
+    data.AddRecord(record);
+    data.AddRecord(record1);
+    data.AddRecord(record2);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    QueryOption option2 = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+    ASSERT_EQ(status, E_OK);
+    EXPECT_EQ(summary.fileTypes.size(), data.GetRecords().size());
+    summary.summary["general.file"] = 1;
+    summary.summary["general.html"] = 1;
+    Summary newSummary;
+    status = UdmfClient::GetInstance().GetParentType(summary, newSummary);
+    ASSERT_EQ(status, E_OK);
+    EXPECT_EQ(newSummary.summary["general.file"], 1 + 1);
+
+    LOG_INFO(UDMF_TEST, "GetParentType002 end.");
+}
 } // OHOS::Test

@@ -104,13 +104,13 @@ bool Unmarshalling(std::vector<UnifiedData> &output, MessageParcel &parcel)
 template<>
 bool Marshalling(const Summary &input, MessageParcel &parcel)
 {
-    return ITypesUtil::Marshal(parcel, input.summary, input.totalSize);
+    return ITypesUtil::Marshal(parcel, input.summary, input.fileTypes, input.totalSize);
 }
 
 template<>
 bool Unmarshalling(Summary &output, MessageParcel &parcel)
 {
-    return ITypesUtil::Unmarshal(parcel, output.summary, output.totalSize);
+    return ITypesUtil::Unmarshal(parcel, output.summary, output.fileTypes, output.totalSize);
 }
 
 template<>

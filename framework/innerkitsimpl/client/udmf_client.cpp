@@ -324,5 +324,30 @@ Status UdmfClient::GetDataFromCache(const QueryOption &query, UnifiedData &unifi
     return E_NOT_FOUND;
 }
 
+Status UdmfClient::GetParentType(Summary &oldSummary, Summary &newSummary)
+{
+    newSummary = oldSummary;
+    if (oldSummary.fileTypes.empty()) {
+        LOG_ERROR(UDMF_CLIENT, "fileTypes is empty.");
+        return E_OK;
+    }
+    std::map<std::string, int64_t> tmpSummary;
+    auto types = oldSummary.fileTypes;
+    std::set<std::string> summaryKey;
+    for (auto item : oldSummary.summary) {
+        // This type does not belong to the basic file types or is not a file type.
+        if (UnifiedDataUtils::IsFilterFileType(item.first) ||
+            (std::find(types.begin(), types.end(), item.first) == types.end())) {
+            UnifiedDataUtils::MergeSummary(tmpSummary, summaryKey, item.first, item.second);
+        } else {
+            auto type = UnifiedDataUtils::IsFileSubType(item.first);
+            LOG_DEBUG(UDMF_CLIENT, "convert beforeType=%{public}s, afterType=%{public}s",
+                item.first.c_str(), type.c_str());
+            UnifiedDataUtils::MergeSummary(tmpSummary, summaryKey, type, item.second);
+        }
+    }
+    newSummary.summary = tmpSummary;
+    return E_OK;
+}
 } // namespace UDMF
 } // namespace OHOS

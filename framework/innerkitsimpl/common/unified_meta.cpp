@@ -515,6 +515,8 @@ static constexpr std::initializer_list<std::string_view> NOT_NEED_COUNT_VALUE_LI
     FILE_TYPE
 };
 
+static const std::string FILE_TYPE_STR = "general.file";
+
 static const std::set<std::string> FILE_SUB_TYPES = {
     "general.image", "general.video", "general.audio", "general.folder" };
 
@@ -842,6 +844,43 @@ void ObjectUtils::ProcessFileUriType(UDType &utdType, ValueType &value)
                 return;
             }
         }
+    }
+}
+
+bool UnifiedDataUtils::IsFilterFileType(const std::string &type)
+{
+    auto iter = FILE_SUB_TYPES.find(type);
+    if (iter != FILE_SUB_TYPES.end()) {
+        return true;
+    }
+    return false;
+}
+
+std::string UnifiedDataUtils::IsFileSubType(const std::string &type)
+{
+    std::shared_ptr<TypeDescriptor> descriptor;
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(type, descriptor);
+    if (status != E_OK || descriptor == nullptr) {
+        return FILE_TYPE_STR;
+    }
+    bool isFileType = false;
+    for (const auto &fileSub : FILE_SUB_TYPES) {
+        descriptor->BelongsTo(fileSub, isFileType);
+        if (isFileType) {
+            return fileSub;
+        }
+    }
+    return FILE_TYPE_STR;
+}
+
+void UnifiedDataUtils::MergeSummary(std::map<std::string, int64_t> &summary,
+    std::set<std::string> &summaryKey, const std::string &key, int64_t value)
+{
+    if (summaryKey.find(key) == summaryKey.end()) {
+        summaryKey.insert(key);
+        summary[key] = value;
+    } else {
+        summary[key] += value;
     }
 }
 } // namespace UDMF
