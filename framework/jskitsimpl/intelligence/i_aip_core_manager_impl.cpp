@@ -92,7 +92,11 @@ int32_t IAipCoreManagerImpl::RAGSessionRun(const std::string &query, const Optio
 {
     return DEVICE_EXCEPTION;
 }
-++
+
+bool IAipCoreManagerImpl::CheckDeviceType()
+{
+    return false;
+}
 
 } // namespace DataIntelligence
 } // namespace OHOS
