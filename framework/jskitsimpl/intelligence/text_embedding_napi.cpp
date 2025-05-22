@@ -460,16 +460,23 @@ napi_value TextEmbeddingNapi::SplitText(napi_env env, napi_callback_info info)
     AipNapiUtils::TransJsToDouble(env, cfgOverlap, configOverlap);
     AIP_HILOGD("string strArg: %{public}d", configSize);
     AIP_HILOGD("string strArg: %{public}f", configOverlap);
-    if (configSize <= NUM_0 || configOverlap < NUM_0 || configOverlap >= NUM_1) {
-        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "The parameter value range is incorrect");
-        return nullptr;
-    }
 
     napi_value promise = nullptr;
     napi_deferred deferred = nullptr;
     status = napi_create_promise(env, &deferred, &promise);
     if (status != napi_ok) {
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "create promise failed");
+        return nullptr;
+    }
+
+    if (!textAipCoreManager_->CheckDeviceType()) {
+        napi_value value = nullptr;
+        ThrowIntelligenceErrByPromise(env, DEVICE_EXCEPTION, "SplitText failed", value);
+        napi_reject_deferred(env, deferred, value);
+        return promise;
+    }
+    if (configSize <= NUM_0 || configOverlap < NUM_0 || configOverlap >= NUM_1) {
+        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "The parameter value range is incorrect");
         return nullptr;
     }
 
