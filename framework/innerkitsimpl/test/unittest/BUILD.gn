@@ -26,6 +26,7 @@ config("module_private_config") {
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/innerkitsimpl/data",
     "${udmf_framework_path}/innerkitsimpl/client/",
+    "${udmf_framework_path}/innerkitsimpl/service",
     "${udmf_framework_path}/innerkitsimpl/test/unittest/mock/include",
     "${udmf_framework_path}/ndkimpl/data",
   ]
@@ -52,7 +53,6 @@ common_external_deps = [
   "hisysevent:libhisysevent",
   "hitrace:hitrace_meter",
   "hitrace:libhitracechain",
-  "image_framework:image",
   "image_framework:image",
   "image_framework:image_native",
   "image_framework:pixelmap",
@@ -86,6 +86,7 @@ ohos_unittest("UdmfClientTest") {
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_notifier_stub.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
     "udmf_client_test.cpp",
@@ -189,6 +190,16 @@ ohos_unittest("UdmfAsyncClientTest") {
   module_out_path = module_output_path
 
   sources = [ "udmf_async_client_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+}
+
+ohos_unittest("UdmfDelayDataTest") {
+  module_out_path = module_output_path
+
+  sources = [ "udmf_delay_data_test.cpp" ]
 
   deps = common_deps
 
@@ -674,6 +685,7 @@ ohos_unittest("UdmfClientAbnormalTest") {
     "${udmf_framework_path}/innerkitsimpl/data/unified_html_record_process.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/video.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_notifier_stub.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
     "${udmf_framework_path}/innerkitsimpl/test/unittest/mock/system_defined_pixelmap_mock.cpp",
     "${udmf_framework_path}/innerkitsimpl/test/unittest/mock/tlv_object_mock.cpp",

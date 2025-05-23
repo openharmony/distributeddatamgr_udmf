@@ -15,7 +15,6 @@
 #define LOG_TAG "FlexibleType"
 #include "flexible_type.h"
 #include "logger.h"
-#include "udmf_utils.h"
 #include "base32_utils.h"
 
 namespace OHOS {
@@ -46,9 +45,9 @@ bool FlexibleType::ParseFlexibleUtd(const std::string &typeId, TypeDescriptorCfg
         LOG_WARN(UDMF_CLIENT, "The typeId cannot be parsed, %{public}s ", typeId.c_str());
         return false;
     }
-    std::vector<std::string> flexibleTypeAttrs = UTILS::StrSplit(flexibleUtdDecode, ":");
+    std::vector<std::string> flexibleTypeAttrs = StrSplit(flexibleUtdDecode, ":");
     for (auto attr : flexibleTypeAttrs) {
-        std::vector<std::string> attrkv = UTILS::StrSplit(attr, "=");
+        std::vector<std::string> attrkv = StrSplit(attr, "=");
         if (attrkv.size() != ATTRIBUTE_PAIR_SIZE) {
             continue;
         }
@@ -85,6 +84,20 @@ std::string FlexibleType::GenFlexibleUtd(const std::string &mimeType, const std:
     LOG_DEBUG(UDMF_CLIENT, "FlexibleUtd typeId is: %{public}s, encodeUtd is: %{public}s",
         flexibleUtd.c_str(), encodeUtd.c_str());
     return FLEXIBLE_TYPE_FLAG + encodeUtd;
+}
+
+std::vector<std::string> FlexibleType::StrSplit(const std::string &str, const std::string &delimiter)
+{
+    std::vector<std::string> result;
+    size_t start = 0;
+    size_t end = str.find(delimiter);
+    while (end != std::string::npos) {
+        result.push_back(str.substr(start, end - start));
+        start = end + delimiter.length();
+        end = str.find(delimiter, start);
+    }
+    result.push_back(str.substr(start));
+    return result;
 }
 
 } // namespace UDMF

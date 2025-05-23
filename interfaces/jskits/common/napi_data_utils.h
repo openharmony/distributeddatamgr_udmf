@@ -48,6 +48,10 @@ public:
     static napi_status GetValue(napi_env env, napi_value in, int32_t &out);
     static napi_status SetValue(napi_env env, const int32_t &in, napi_value &out);
 
+    /* napi_value <-> uint32_t */
+    static napi_status GetValue(napi_env env, napi_value in, uint32_t &out);
+    static napi_status SetValue(napi_env env, const uint32_t &in, napi_value &out);
+
     /* napi_value <-> int64_t */
     static napi_status GetValue(napi_env env, napi_value in, int64_t &out);
     static napi_status SetValue(napi_env env, const int64_t &in, napi_value &out);
@@ -79,6 +83,10 @@ public:
     /* napi_value <-> std::map<std::string, int64_t> */
     static napi_status GetValue(napi_env env, napi_value in, std::map<std::string, int64_t> &out);
     static napi_status SetValue(napi_env env, const std::map<std::string, int64_t> &in, napi_value &out);
+
+    /* napi_value <-> std::set<std::string> */
+    static napi_status GetValue(napi_env env, napi_value in, std::set<std::string> &out);
+    static napi_status SetValue(napi_env env, const std::set<std::string> &in, napi_value &out);
 
     /* napi_value <-> UDVariant */
     static napi_status GetValue(napi_env env, napi_value in, UDVariant &out);
@@ -112,6 +120,10 @@ public:
 
     /* napi_value <- ProgressInfo */
     static napi_status SetValue(napi_env env, const ProgressInfo &in, napi_value &out);
+
+    /* napi_value <-> DataLoadInfo */
+    static napi_status GetValue(napi_env env, napi_value in, DataLoadInfo &out);
+    static napi_status SetValue(napi_env env, const DataLoadInfo &in, napi_value &out);
 
     static bool IsTypeForNapiValue(napi_env env, napi_value param, napi_valuetype expectType);
 

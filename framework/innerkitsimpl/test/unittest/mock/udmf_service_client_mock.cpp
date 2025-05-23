@@ -53,6 +53,15 @@ int32_t UdmfServiceClient::GetData(const QueryOption &query, UnifiedData &unifie
     }
 }
 
+int32_t UdmfServiceClient::GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData)
+{
+    if (MUdmfServiceClient::udmfServiceClient == nullptr) {
+        return -1;
+    } else {
+        return MUdmfServiceClient::udmfServiceClient->GetDelayData(dataLoadInfo, iUdmfNotifier, unifiedData);
+    }
+}
+
 int32_t UdmfServiceClient::GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)
 {
     if (MUdmfServiceClient::udmfServiceClient == nullptr) {
@@ -150,6 +159,24 @@ int32_t UdmfServiceClient::ObtainAsynProcess(AsyncProcessInfo &processInfo)
         return -1;
     } else {
         return MUdmfServiceClient::udmfServiceClient->ObtainAsynProcess(processInfo);
+    }
+}
+
+int32_t UdmfServiceClient::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::string &key)
+{
+    if (MUdmfServiceClient::udmfServiceClient == nullptr) {
+        return -1;
+    } else {
+        return MUdmfServiceClient::udmfServiceClient->SetDelayInfo(dataLoadInfo, iUdmfNotifier, key);
+    }
+}
+
+int32_t UdmfServiceClient::SetDelayData(const std::string &key, UnifiedData &unifiedData)
+{
+    if (MUdmfServiceClient::udmfServiceClient == nullptr) {
+        return -1;
+    } else {
+        return MUdmfServiceClient::udmfServiceClient->SetDelayData(key, unifiedData);
     }
 }
 } // namespace OHOS::UDMF

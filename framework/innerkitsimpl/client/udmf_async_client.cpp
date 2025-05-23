@@ -23,6 +23,7 @@
 #include "udmf_client.h"
 #include "udmf_copy_file.h"
 #include "udmf_service_client.h"
+#include "udmf_notifier_stub.h"
 
 namespace OHOS::UDMF {
 static constexpr size_t MAX_THREADS = 10;
@@ -197,6 +198,7 @@ Status UdmfAsyncClient::RegisterAsyncHelper(const GetDataParams &params)
     asyncHelper->progressIndicator = params.progressIndicator;
     asyncHelper->fileConflictOptions = params.fileConflictOptions;
     asyncHelper->destUri = params.destUri;
+    asyncHelper->acceptableInfo = params.acceptableInfo;
     asyncHelperMap_.insert_or_assign(params.query.key, std::move(asyncHelper));
     return E_OK;
 }
@@ -246,7 +248,17 @@ Status UdmfAsyncClient::CheckSync(std::unique_ptr<AsyncHelper> &asyncHelper, con
 Status UdmfAsyncClient::GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper, const QueryOption &query)
 {
     auto &data = *(asyncHelper->data);
-    auto status = static_cast<Status>(UdmfServiceClient::GetInstance()->GetData(query, data));
+    auto dataChange = [&](const std::string &key, const UnifiedData &unifiedData) {
+        data = unifiedData;
+        ProcessUnifiedData(asyncHelper);
+    };
+    sptr<IRemoteObject> iUdmfNotifier = new (std::nothrow) DelayDataCallbackClient(dataChange);
+    if (iUdmfNotifier == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "IUdmfNotifier unavailable");
+        return E_IPC;
+    }
+    std::shared_ptr<UnifiedData> dataPtr = nullptr;
+    auto status = static_cast<Status>(UdmfServiceClient::GetInstance()->GetDelayData(asyncHelper->acceptableInfo, iUdmfNotifier, dataPtr));
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "GetData error, status = %{public}d", status);
         ProgressInfo progressInfo = {
@@ -256,6 +268,11 @@ Status UdmfAsyncClient::GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper,
         CallProgress(asyncHelper, progressInfo, nullptr);
         return status;
     }
+    if (dataPtr == nullptr) {
+        LOG_INFO(UDMF_CLIENT, "zzz Wait delay data");
+        return E_OK;
+    }
+    data = *dataPtr;
     return ProcessUnifiedData(asyncHelper);
 }
 

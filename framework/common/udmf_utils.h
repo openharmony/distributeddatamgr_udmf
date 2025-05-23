@@ -22,15 +22,14 @@
 namespace OHOS {
 namespace UDMF {
 namespace UTILS {
-std::vector<std::string> StrSplit(const std::string &str, const std::string &delimiter);
 std::vector<uint8_t> Random(int32_t len, int32_t minimum = 0,
                             int32_t maximum = std::numeric_limits<uint8_t>::max());
-std::string GenerateId();
+std::string API_EXPORT GenerateId();
 std::string GetSdkVersionByToken(uint32_t tokenId);
 std::string GetCurrentSdkVersion();
-
 bool API_EXPORT IsTokenNative();
 bool API_EXPORT IsNativeCallingToken();
+std::string API_EXPORT GetHandlerKey(const std::string &udKey);
 
 } // namespace UTILS
 } // namespace UDMF

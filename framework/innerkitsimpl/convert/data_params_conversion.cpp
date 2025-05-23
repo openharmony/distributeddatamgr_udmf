@@ -12,9 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define LOG_TAG "DataParamsConversion"
 #include "data_params_conversion.h"
+#include "logger.h"
 #include "ndk_data_conversion.h"
+#include "udmf_client.h"
+#include "udmf_utils.h"
 
 namespace OHOS::UDMF {
 Status DataParamsConversion::GetInnerDataParams(OH_UdmfGetDataParams &ndkDataParams, QueryOption &query,
@@ -41,6 +44,40 @@ Status DataParamsConversion::GetInnerDataParams(OH_UdmfGetDataParams &ndkDataPar
         NdkDataConversion::GetNdkUnifiedData(data, ndkData);
         ndkDataParams.dataProgressListener(&ndkProgrssInfo, ndkData);
         OH_UdmfData_Destroy(ndkData);
+    };
+    return Status::E_OK;
+}
+
+Status DataParamsConversion::GetDataLoaderParams(const OH_UdmfDataLoadParams &ndkDataParams, DataLoadParams &dataLoadParams)
+{
+    if (ndkDataParams.dataLoadHandler == nullptr) {
+        return Status::E_INVALID_PARAMETERS;
+    }
+    std::set<std::string> types;
+    for (size_t i = 0; i < ndkDataParams.dataLoadInfo.typesCount; i++) {
+        types.insert(ndkDataParams.dataLoadInfo.typesArray[i]);
+    }
+    dataLoadParams.dataLoadInfo = {
+        .udKey = UTILS::GenerateId(),
+        .types = types,
+        .recordCount = ndkDataParams.dataLoadInfo.recordsCount,
+    };
+    dataLoadParams.loadHandler = [ndkDataParams](const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
+        std::vector<std::string> types(dataLoadInfo.types.begin(), dataLoadInfo.types.end());
+        OH_UdmfDataLoadInfo ndkDataLoadInfo {
+            .typesArray = NdkDataConversion::StrVectorToTypesArray(types),
+            .typesCount = types.size(),
+            .recordsCount = dataLoadInfo.recordCount,
+        };
+        OH_UdmfData *data = ndkDataParams.dataLoadHandler(&ndkDataLoadInfo);
+        if (data == nullptr || data->unifiedData_ == nullptr) {
+            LOG_ERROR(UDMF_CAPI, "Data is null");
+            return;
+        }
+        auto status = UdmfClient::GetInstance().SetDelayData(udKey, *data->unifiedData_);
+        if (status != Status::E_OK) {
+            LOG_ERROR(UDMF_CAPI, "Set delay data failed, status = %{public}d", status);
+        }
     };
     return Status::E_OK;
 }

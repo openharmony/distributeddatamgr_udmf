@@ -55,6 +55,19 @@ napi_status NapiDataUtils::SetValue(napi_env env, const int32_t &in, napi_value 
     return napi_create_int32(env, in, &out);
 }
 
+/* napi_value <-> uint32_t */
+napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, uint32_t &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> int32_t");
+    return napi_get_value_uint32(env, in, &out);
+}
+
+napi_status NapiDataUtils::SetValue(napi_env env, const uint32_t &in, napi_value &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value <- int32_t");
+    return napi_create_uint32(env, in, &out);
+}
+
 /* napi_value <-> int64_t */
 napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, int64_t &out)
 {
@@ -276,6 +289,54 @@ napi_status NapiDataUtils::SetValue(napi_env env, const std::map<std::string, in
         napi_set_element(env, out, index++, element);
     }
     return status;
+}
+
+napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::set<std::string> &out)
+{
+    napi_value global, iterator, values_fn;
+    napi_get_global(env, &global);
+    napi_get_named_property(env, in, "values", &values_fn);
+    napi_call_function(env, in, values_fn, 0, nullptr, &iterator);
+
+    napi_value next_fn, result_obj, done_val, value_val;
+    bool done = false;
+
+    while (!done) {
+        napi_get_named_property(env, iterator, "next", &next_fn);
+        napi_call_function(env, iterator, next_fn, 0, nullptr, &result_obj);
+
+        napi_get_named_property(env, result_obj, "done", &done_val);
+        napi_get_value_bool(env, done_val, &done);
+        if (done) break;
+
+        napi_get_named_property(env, result_obj, "value", &value_val);
+
+        size_t str_len;
+        napi_get_value_string_utf8(env, value_val, nullptr, 0, &str_len);
+        std::string str(str_len, '\0');
+        napi_get_value_string_utf8(env, value_val, &str[0], str_len + 1, nullptr);
+
+        out.insert(str);
+    }
+    LOG_ERROR(UDMF_KITS_NAPI, "zzz 321");
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::SetValue(napi_env env, const std::set<std::string> &in, napi_value &out)
+{
+    std::vector<std::string> vec(in.begin(), in.end());
+    napi_value jsArray;
+    NapiDataUtils::SetValue(env, vec, jsArray);
+
+    napi_value global;
+    napi_get_global(env, &global);
+
+    napi_value setConstructor;
+    napi_get_named_property(env, global, "Set", &setConstructor);
+
+    napi_value argv[1] = { jsArray };
+    napi_new_instance(env, setConstructor, 1, argv, &out);
+    return napi_ok;
 }
 
 /* napi_value <-> UDVariant */
@@ -591,6 +652,47 @@ napi_status NapiDataUtils::SetValue(napi_env env, const ProgressInfo &in, napi_v
     napi_value jsListenerStatus = nullptr;
     SetValue(env, in.progressStatus, jsListenerStatus);
     NAPI_CALL_BASE(env, napi_set_named_property(env, out, "status", jsListenerStatus), napi_invalid_arg);
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::SetValue(napi_env env, const DataLoadInfo &in, napi_value &out)
+{
+    LOG_ERROR(UDMF_KITS_NAPI, "zzz napi_value <- DataLoadInfo");
+    napi_create_object(env, &out);
+
+    LOG_ERROR(UDMF_KITS_NAPI, "zzz 664");
+    napi_value jsRecordCount = nullptr;
+    NAPI_CALL_BASE(env, SetValue(env, in.recordCount, jsRecordCount), napi_invalid_arg);
+    LOG_ERROR(UDMF_KITS_NAPI, "zzz 667");
+    NAPI_CALL_BASE(env, napi_set_named_property(env, out, "recordCount", jsRecordCount), napi_invalid_arg);
+
+    napi_value jsTypes = nullptr;
+    LOG_ERROR(UDMF_KITS_NAPI, "zzz 671");
+    NAPI_CALL_BASE(env, SetValue(env, in.types, jsTypes), napi_invalid_arg);
+    LOG_ERROR(UDMF_KITS_NAPI, "zzz 673");
+    NAPI_CALL_BASE(env, napi_set_named_property(env, out, "types", jsTypes), napi_invalid_arg);
+    LOG_ERROR(UDMF_KITS_NAPI, "zzz 675");
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, DataLoadInfo &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> DataLoadInfo");
+    bool hasTypes = false;
+    NAPI_CALL_BASE(env, napi_has_named_property(env, in, "types", &hasTypes), napi_invalid_arg);
+    if (hasTypes) {
+        napi_value jsTypes = nullptr;
+        NAPI_CALL_BASE(env, napi_get_named_property(env, in, "types", &jsTypes), napi_invalid_arg);
+        NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsTypes, out.types), napi_invalid_arg);
+    }
+
+    bool hasRecordCount = false;
+    NAPI_CALL_BASE(env, napi_has_named_property(env, in, "recordCount", &hasRecordCount), napi_invalid_arg);
+    if (hasRecordCount) {
+        napi_value jsRecordCount = nullptr;
+        NAPI_CALL_BASE(env, napi_get_named_property(env, in, "recordCount", &jsRecordCount), napi_invalid_arg);
+        NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsRecordCount, out.recordCount), napi_invalid_arg);
+    }
     return napi_ok;
 }
 

@@ -22,11 +22,13 @@
 #include "error_code.h"
 
 namespace OHOS::UDMF {
-    class NdkDataConversion {
-    public:
-        static Status API_EXPORT GetNativeUnifiedData(OH_UdmfData* ndkData, std::shared_ptr<UnifiedData>& data);
-        static Status API_EXPORT GetNdkUnifiedData(std::shared_ptr<UnifiedData> data, OH_UdmfData* ndkData);
-    };
+class NdkDataConversion {
+public:
+    static Status API_EXPORT GetNativeUnifiedData(OH_UdmfData* ndkData, std::shared_ptr<UnifiedData>& data);
+    static Status API_EXPORT GetNdkUnifiedData(std::shared_ptr<UnifiedData> data, OH_UdmfData* ndkData);
+    static char** StrVectorToTypesArray(const std::vector<std::string>& strVector);
+    static void DestroyStringArray(char**& bufArray, unsigned int& count);
+};
 }
 
 #endif // UDMF_DATA_CONVERSION_H

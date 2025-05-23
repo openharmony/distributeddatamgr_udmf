@@ -307,5 +307,36 @@ int32_t UdmfServiceClient::ClearAsynProcessByKey(const std::string &businessUdKe
 {
     return udmfProxy_->ClearAsynProcessByKey(businessUdKey);
 }
+
+int32_t UdmfServiceClient::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::string &key)
+{
+    return udmfProxy_->SetDelayInfo(dataLoadInfo, iUdmfNotifier, key);
+}
+
+int32_t UdmfServiceClient::SetDelayData(const std::string &key, UnifiedData &unifiedData)
+{
+    return udmfProxy_->SetDelayData(key, unifiedData);
+}
+
+int32_t UdmfServiceClient::GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData)
+{
+    LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}s", dataLoadInfo.udKey.c_str());
+    UnifiedKey udkey(dataLoadInfo.udKey);
+    if (!udkey.IsValid()) {
+        LOG_ERROR(UDMF_SERVICE, "invalid key");
+        return E_INVALID_PARAMETERS;
+    }
+
+    auto status = udmfProxy_->GetDelayData(dataLoadInfo, iUdmfNotifier, unifiedData);
+    if (status == E_OK && unifiedData != nullptr) {
+        if (UnifiedDataHelper::IsTempUData(*unifiedData)) {
+            if (!UnifiedDataHelper::Unpack(*unifiedData)) {
+                LOG_ERROR(UDMF_SERVICE, "failed to unpack unified data");
+                return E_FS_ERROR;
+            }
+        }
+    }
+    return status;
+}
 } // namespace UDMF
 } // namespace OHOS

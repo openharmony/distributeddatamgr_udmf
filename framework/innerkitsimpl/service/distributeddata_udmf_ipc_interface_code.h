@@ -34,6 +34,10 @@ enum class UdmfServiceInterfaceCode : uint32_t {
     REMOVE_APP_SHARE_OPTION,
     OBTAIN_ASYN_PROCESS,
     CLEAR_ASYN_PROCESS_BY_KEY,
+    SET_DELAY_INFO,
+    SET_DELAY_DATA,
+    GET_DELAY_DATA,
+    HANDLE_DELAY_OBSERVER,
     CODE_BUTT
 };
 } // namespace OHOS::UDMF

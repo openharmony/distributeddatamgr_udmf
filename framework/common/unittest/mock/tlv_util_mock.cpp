@@ -230,6 +230,19 @@ template <> bool Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &
     return true;
 }
 
+template <> size_t API_EXPORT CountBufferSize(const DataLoadInfo &input, TLVObject &data)
+{
+    return sizeof(TLVHead);
+}
 
+template <> bool API_EXPORT Writing(const DataLoadInfo &input, TLVObject &data, TAG tag)
+{
+    return true;
+}
+
+template <> bool API_EXPORT Reading(DataLoadInfo &output, TLVObject &data, const TLVHead &head)
+{
+    return true;
+}
 } // namespace TLVUtil
 } // namespace OHOS

@@ -36,6 +36,8 @@ public:
                                      const std::string &belongsTo);
     static constexpr size_t MAX_TYPE_SIZE = 128;
     static constexpr size_t ATTRIBUTE_PAIR_SIZE = 2;
+private:
+    static std::vector<std::string> StrSplit(const std::string &str, const std::string &delimiter);
 };
 } // namespace UDMF
 } // namespace OHOS

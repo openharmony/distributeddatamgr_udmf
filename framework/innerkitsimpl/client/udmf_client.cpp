@@ -26,10 +26,12 @@
 #include "ipc_skeleton.h"
 #include "unified_data_helper.h"
 #include "unified_html_record_process.h"
+#include "udmf_notifier_stub.h"
 
 namespace OHOS {
 namespace UDMF {
 constexpr const char *TAG = "UdmfClient::";
+static constexpr int KEY_LEN = 32;
 using namespace OHOS::DistributedDataDfx;
 using namespace RadarReporter;
 UdmfClient &UdmfClient::GetInstance()
@@ -349,5 +351,67 @@ Status UdmfClient::GetParentType(Summary &oldSummary, Summary &newSummary)
     newSummary.summary = tmpSummary;
     return E_OK;
 }
+
+Status UdmfClient::SetDelayInfo(const DataLoadParams &dataLoadParams, std::string &key)
+{
+    if (dataLoadParams.dataLoadInfo.udKey.length() != KEY_LEN) {
+        LOG_ERROR(UDMF_CLIENT, "Invalid key=%{public}s", dataLoadParams.dataLoadInfo.udKey.c_str());
+        return E_INVALID_PARAMETERS;
+    }
+    // SetDelayInfo
+    auto service = UdmfServiceClient::GetInstance();
+    if (service == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        return E_IPC;
+    }
+    sptr<IRemoteObject> iUdmfNotifier = new (std::nothrow) UdmfNotifierClient(dataLoadParams.loadHandler);
+    if (iUdmfNotifier == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "IUdmfNotifier unavailable");
+        return E_IPC;
+    }
+    auto ret = service->SetDelayInfo(dataLoadParams.dataLoadInfo, iUdmfNotifier, key);
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d, udkey = %{public}s.", ret, dataLoadParams.dataLoadInfo.udKey.c_str());
+    }
+    return static_cast<Status>(ret);
+}
+
+Status UdmfClient::SetDelayData(const std::string &key, UnifiedData &unifiedData)
+{
+    if (key.empty()) {
+        LOG_ERROR(UDMF_CLIENT, "Empty key");
+        return E_INVALID_PARAMETERS;
+    }
+    auto service = UdmfServiceClient::GetInstance();
+    if (service == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        return E_IPC;
+    }
+    auto status = service->SetDelayData(key, unifiedData);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d", status);
+    }
+    return static_cast<Status>(status);
+}
+
+Status UdmfClient::GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData)
+{
+    if (dataLoadInfo.udKey.empty() || iUdmfNotifier == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Empty key or notifier");
+        return E_INVALID_PARAMETERS;
+    }
+    auto service = UdmfServiceClient::GetInstance();
+    if (service == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        return E_IPC;
+    }
+    int32_t ret = service->GetDelayData(dataLoadInfo, iUdmfNotifier, unifiedData);
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
+        return static_cast<Status>(ret);
+    }
+    return E_OK;
+}
+
 } // namespace UDMF
 } // namespace OHOS

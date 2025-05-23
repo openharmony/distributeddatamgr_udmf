@@ -65,6 +65,14 @@ bool GetDataParamsNapi::Convert2NativeValue(napi_env env, napi_value in,
         getDataParams.fileConflictOptions = static_cast<FileConflictOptions>(fileConflictOptions);
     }
 
+    bool hasAcceptableInfo = false;
+    NAPI_CALL_BASE(env, napi_has_named_property(env, in, "acceptableInfo", &hasAcceptableInfo), false);
+    if (hasAcceptableInfo) {
+        napi_value jsDataLoadInfo = nullptr;
+        NAPI_CALL_BASE(env, napi_get_named_property(env, in, "acceptableInfo", &jsDataLoadInfo), false);
+        NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsDataLoadInfo, getDataParams.acceptableInfo), false);
+    }
+    getDataParams.acceptableInfo.udKey = key;
     return true;
 }
 

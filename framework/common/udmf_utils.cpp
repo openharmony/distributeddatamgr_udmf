@@ -87,6 +87,17 @@ bool IsNativeCallingToken()
     LOG_DEBUG(UDMF_FRAMEWORK, "tokenId=%{public}u, tokenType=%{public}d", tokenId, tokenType);
     return tokenType == Security::AccessToken::TypeATokenTypeEnum::TOKEN_NATIVE;
 }
+
+std::string GetHandlerKey(const std::string &udKey)
+{
+    auto pos = udKey.rfind('/');
+    if (pos == std::string::npos || pos + 1 >= udKey.length()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Error udKey:%{public}s", udKey.c_str());
+        return "";
+    }
+    return udKey.substr(pos + 1);
+}
+
 } // namespace UTILS
 } // namespace UDMF
 } // namespace OHOS

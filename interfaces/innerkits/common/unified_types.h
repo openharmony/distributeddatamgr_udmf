@@ -116,6 +116,24 @@ struct UriInfo {
     std::string dfsUri;
     uint32_t position;
 };
+
+struct DataLoadInfo {
+    std::string udKey;
+    std::set<std::string> types;
+    uint32_t recordCount;
+};
+
+using LoadHandler = std::function<void(const std::string &udKey, const DataLoadInfo &dataLoadInfo)>;
+
+struct DataLoadParams {
+    LoadHandler loadHandler;
+    DataLoadInfo dataLoadInfo;
+};
+
+struct DelayGetDataInfo {
+    uint32_t tokenId;
+    sptr<IRemoteObject> dataCallback;
+};
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_UNIFIED_TYPES_H

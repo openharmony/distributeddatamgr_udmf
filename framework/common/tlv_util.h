@@ -52,6 +52,10 @@ template <typename T, typename R> size_t API_EXPORT CountBufferSize(const std::m
 template <typename T, typename R> bool API_EXPORT Writing(const std::map<T, R> &input, TLVObject &data, TAG tag);
 template <typename T, typename R> bool API_EXPORT Reading(std::map<T, R> &output, TLVObject &data, const TLVHead &head);
 
+template <typename T> size_t API_EXPORT CountBufferSize(const std::set<T> &input, TLVObject &data);
+template <typename T> bool API_EXPORT Writing(const std::set<T> &input, TLVObject &data, TAG tag);
+template <typename T> bool API_EXPORT Reading(std::set<T> &output, TLVObject &data, const TLVHead &head);
+
 template <> size_t API_EXPORT CountBufferSize(const std::nullptr_t &input, TLVObject &data);
 template <> bool API_EXPORT Writing(const std::nullptr_t &input, TLVObject &data, TAG tag);
 template <> bool API_EXPORT Reading(std::nullptr_t &output, TLVObject &data, const TLVHead &head);
@@ -134,6 +138,10 @@ template <> bool API_EXPORT Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, 
 template <> size_t API_EXPORT CountBufferSize(const Summary &input, TLVObject &data);
 template <> bool API_EXPORT Writing(const Summary &input, TLVObject &data, TAG tag);
 template <> bool API_EXPORT Reading(Summary &output, TLVObject &data, const TLVHead &head);
+
+template <> size_t API_EXPORT CountBufferSize(const DataLoadInfo &input, TLVObject &data);
+template <> bool API_EXPORT Writing(const DataLoadInfo &input, TLVObject &data, TAG tag);
+template <> bool API_EXPORT Reading(DataLoadInfo &output, TLVObject &data, const TLVHead &head);
 
 template <typename T> bool ReadTlv(T &output, TLVObject &data, TAG tag)
 {
@@ -402,6 +410,56 @@ template <typename... _Types> bool Reading(std::variant<_Types...> &output, TLVO
             }
         } else {
             return ReadVariant<decltype(output), _Types...>(data, 0, index, output, headItem);
+        }
+    }
+    return true;
+}
+
+template <typename T> size_t CountBufferSize(const std::set<T> &input, TLVObject &data)
+{
+    auto size = data.CountHead() + data.CountBasic(input.size());
+    for (auto item : input) {
+        size += CountBufferSize(item, data);
+    }
+    return size;
+}
+
+template <typename T> bool Writing(const std::set<T> &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    auto tagCursor = data.GetCursor();
+    data.OffsetHead();
+    if (!data.WriteBasic(TAG::TAG_SET_SIZE, input.size())) {
+        return false;
+    }
+    if (!input.empty()) {
+        for (const auto &item : input) {
+            if (!Writing(item, data, TAG::TAG_SET_ITEM)) {
+                return false;
+            }
+        }
+    }
+    return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
+}
+
+template <typename T> bool Reading(std::set<T> &output, TLVObject &data, const TLVHead &head)
+{
+    auto endCursor = data.GetCursor() + head.len;
+    while (data.GetCursor() < endCursor) {
+        TLVHead itemHead{};
+        if (!data.ReadHead(itemHead)) {
+            return false;
+        }
+        if (itemHead.tag == static_cast<uint16_t>(TAG::TAG_SET_ITEM)) {
+            T item{};
+            if (!Reading(item, data, itemHead)) {
+                return false;
+            }
+            output.insert(std::move(item));
+            continue;
+        }
+        if (!data.Skip(itemHead)) {
+            return false;
         }
     }
     return true;

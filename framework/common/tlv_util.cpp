@@ -946,5 +946,58 @@ template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
     }
     return true;
 }
+
+template <> size_t API_EXPORT CountBufferSize(const DataLoadInfo &input, TLVObject &data)
+{
+    return data.CountHead() + data.Count(input.udKey) + CountBufferSize(input.types, data) + data.CountBasic(input.recordCount);
+}
+
+template <> bool API_EXPORT Writing(const DataLoadInfo &input, TLVObject &data, TAG tag)
+{
+    InitWhenFirst(input, data);
+    auto tagCursor = data.GetCursor();
+    data.OffsetHead();
+    if (!TLVUtil::Writing(input.udKey, data, TAG::TAG_DATA_LOAD_KEY)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.types, data, TAG::TAG_SET_TYPES)) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_RECORD_COUNT, input.recordCount)) {
+        return false;
+    }
+    return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
+}
+
+template <> bool API_EXPORT Reading(DataLoadInfo &output, TLVObject &data, const TLVHead &head)
+{
+    auto endCursor = data.GetCursor() + head.len;
+    while (data.GetCursor() < endCursor) {
+        TLVHead headItem{};
+        if (!data.ReadHead(headItem)) {
+            return false;
+        }
+        switch (headItem.tag) {
+            case static_cast<uint16_t>(TAG::TAG_DATA_LOAD_KEY):
+                if (!TLVUtil::Reading(output.udKey, data, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_SET_TYPES):
+                if (!TLVUtil::Reading(output.types, data, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_RECORD_COUNT):
+                if (!data.ReadBasic(output.recordCount, headItem)) {
+                    return false;
+                }
+                break;
+            default:
+                data.Skip(headItem);
+        }
+    }
+    return true;
+}
 } // namespace TLVUtil
 } // namespace OHOS
