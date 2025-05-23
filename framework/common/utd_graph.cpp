@@ -89,7 +89,7 @@ std::unique_ptr<Graph> UtdGraph::ConstructNewGraph(const std::vector<TypeDescrip
         typeIdIndex.insert(std::make_pair(descriptorCfgs[i].typeId, i));
     }
     auto graph = std::make_unique<Graph>(descriptorsNum, typeIdIndex);
-    
+
     for (const auto &descriptorCfg : descriptorCfgs) {
         std::vector<std::string> belongsTo = descriptorCfg.belongingToTypes;
         for (auto belongsToType : belongsTo) {

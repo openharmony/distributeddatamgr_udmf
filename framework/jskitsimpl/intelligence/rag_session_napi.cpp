@@ -623,4 +623,3 @@ void RAGSessionNapi::StreamRunCallbackExecute(RAGSessionNapi *sessionNapi, Strea
 }
 } // namespace DataIntelligence
 } // namespace OHOS
- 
