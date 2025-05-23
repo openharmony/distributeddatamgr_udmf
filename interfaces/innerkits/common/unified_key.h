@@ -31,6 +31,7 @@ struct API_EXPORT UnifiedKey {
     std::string bundleName;
     std::string groupId;
     std::string GetUnifiedKey();
+    std::string GetKeyCommonPrefix() const;
     bool IsValid();
     void PreliminaryWork();
     bool CheckCharacter(std::string data, std::bitset<MAX_BIT_SIZE> rule);
