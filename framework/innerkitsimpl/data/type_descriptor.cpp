@@ -66,6 +66,10 @@ bool TypeDescriptor::CmpFlexibleTypeLevel(const std::string higherLevelTypeId, b
 
 Status TypeDescriptor::BelongsTo(const std::string &typeId, bool &checkResult)
 {
+    if (typeId_ == typeId) {
+        checkResult = true;
+        return Status::E_OK;
+    };
     checkResult = false;
     bool isFlexibleType = typeId.find(FLEXIBLE_TYPE_FLAG) != typeId_.npos;
     if (!UtdGraph::GetInstance().IsValidType(typeId) && !isFlexibleType) {
@@ -74,18 +78,10 @@ Status TypeDescriptor::BelongsTo(const std::string &typeId, bool &checkResult)
     }
 
     if (isFlexibleType_) {
-        if (typeId_ == typeId) {
-            checkResult = true;
-            return Status::E_OK;
-        };
         checkResult = CmpFlexibleTypeLevel(typeId, isFlexibleType);
         return Status::E_OK;
     }
 
-    if (typeId_ == typeId) {
-        checkResult = true;
-        return Status::E_OK;
-    };
     checkResult = UtdGraph::GetInstance().IsLowerLevelType(typeId, typeId_);
     return Status::E_OK;
 }

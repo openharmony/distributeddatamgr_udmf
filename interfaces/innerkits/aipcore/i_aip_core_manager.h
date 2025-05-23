@@ -298,9 +298,6 @@ public:
     IAipCoreManager() = default;
     virtual ~IAipCoreManager() = default;
 
-    virtual int32_t InitRetriever(const RetrievalConfigStruct& retrievalConfig) = 0;
-    virtual int32_t Retrieve(const std::string query, const RetrievalConditionStruct &condition,
-        RetrievalResponseStruct &retrievalResponse) = 0;
     virtual int32_t InitTextModel(const ModelConfigData &config) = 0;
     virtual int32_t InitImageModel(const ModelConfigData &config) = 0;
     virtual int32_t LoadTextModel() = 0;
@@ -318,6 +315,8 @@ public:
         std::function<void(const StreamStruct&, int32_t)> callback) = 0;
     virtual int32_t ReleaseRAGSession() = 0;
     virtual int32_t RAGSessionRun(const std::string &query, const OptionStruct &runOption, AnswerStruct &answer) = 0;
+
+    virtual bool CheckDeviceType() = 0;
 };
 
 struct AipCoreManagerHandle {

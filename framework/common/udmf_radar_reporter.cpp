@@ -90,6 +90,44 @@ void RadarReporterAdapter::ReportNormal(std::string func, int32_t scene, int32_t
     );
 }
 
+void RadarReporterAdapter::ReportNormal(std::string func, int32_t scene, int32_t stage,
+                                        int32_t stageRes, std::string &bundleName)
+{
+    struct HiSysEventParam params[] = {
+        { .name = { "ORG_PKG" },
+            .t = HISYSEVENT_STRING,
+            .v = { .s = const_cast<char *>(ORG_PKG) },
+            .arraySize = 0 },
+        { .name = { "FUNC" },
+            .t = HISYSEVENT_STRING,
+            .v = { .s = const_cast<char *>(func.c_str()) },
+            .arraySize = 0 },
+        { .name = { "BIZ_SCENE" },
+            .t = HISYSEVENT_INT32,
+            .v = { .i32 = scene },
+            .arraySize = 0 },
+        { .name = { "BIZ_STAGE" },
+            .t = HISYSEVENT_INT32,
+            .v = { .i32 = stage },
+            .arraySize = 0 },
+        { .name = { "STAGE_RES" },
+            .t = HISYSEVENT_INT32,
+            .v = { .i32 = stageRes },
+            .arraySize = 0 },
+        { .name = { "APP_CALLER" },
+            .t = HISYSEVENT_STRING,
+            .v = { .s = const_cast<char *>(bundleName.c_str()) },
+            .arraySize = 0 }
+    };
+    OH_HiSysEvent_Write(
+        DOMAIN,
+        EVENT_NAME,
+        HISYSEVENT_BEHAVIOR,
+        params,
+        sizeof(params) / sizeof(params[0])
+    );
+}
+
 void RadarReporterAdapter::ReportFail(
     std::string func, int32_t scene, int32_t stage, int32_t stageRes, int32_t errorCode, int32_t state)
 {

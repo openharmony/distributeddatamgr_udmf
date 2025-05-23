@@ -18,6 +18,7 @@ config("udmf_napi_config") {
     "${udmf_interfaces_path}/innerkits/client",
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_interfaces_path}/innerkits/include",
     "${udmf_interfaces_path}/jskits/common",
     "${udmf_interfaces_path}/jskits/data",
 
@@ -260,7 +261,6 @@ ohos_shared_library("intelligence_napi") {
     "${udmf_framework_path}/jskitsimpl/intelligence/image_embedding_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/intelligence/js_ability.cpp",
     "${udmf_framework_path}/jskitsimpl/intelligence/native_module_intelligence.cpp",
-    "${udmf_framework_path}/jskitsimpl/intelligence/retrieval_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/intelligence/text_embedding_napi.cpp",
   ]
 

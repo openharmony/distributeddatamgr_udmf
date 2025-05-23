@@ -16,6 +16,7 @@
 #include "udmf_client_fuzzer.h"
 
 #include <unistd.h>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "accesstoken_kit.h"
 #include "nativetoken_kit.h"
@@ -114,10 +115,10 @@ void SetHapToken()
     SetSelfTokenID(tokenId);
 }
 
-void SetDataTextFuzz(const uint8_t *data, size_t size)
+void SetDataTextFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
-    std::string svalue(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
+    std::string svalue = provider.ConsumeRandomLengthString();
     UnifiedData unifiedData;
     CustomOption option = {.intention = Intention::UD_INTENTION_BUTT};
     auto text = std::make_shared<Text>();
@@ -142,10 +143,10 @@ void SetDataTextFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetData(option2, data2);
 }
 
-void SetDataPlainTextFuzz(const uint8_t *data, size_t size)
+void SetDataPlainTextFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
-    std::string svalue(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
+    std::string svalue = provider.ConsumeRandomLengthString();
     CustomOption option1 = {.intention = Intention::UD_INTENTION_DRAG};
     UnifiedData data1;
     UDDetails details1;
@@ -174,10 +175,10 @@ void SetDataPlainTextFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetData(option2, data2);
 }
 
-void SetDataHtmlFuzz(const uint8_t *data, size_t size)
+void SetDataHtmlFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
-    std::string svalue(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
+    std::string svalue = provider.ConsumeRandomLengthString();
     CustomOption option1 = {.intention = Intention::UD_INTENTION_DRAG};
     UnifiedData data1;
     std::string key;
@@ -206,10 +207,10 @@ void SetDataHtmlFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetData(option2, data2);
 }
 
-void SetDataLinkFuzz(const uint8_t *data, size_t size)
+void SetDataLinkFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
-    std::string svalue(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
+    std::string svalue = provider.ConsumeRandomLengthString();
     CustomOption option1 = {.intention = Intention::UD_INTENTION_DRAG};
     UnifiedData data1;
     std::string key;
@@ -238,9 +239,9 @@ void SetDataLinkFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetData(option2, data2);
 }
 
-void SetDataFileFuzz(const uint8_t *data, size_t size)
+void SetDataFileFuzz(FuzzedDataProvider &provider)
 {
-    std::string svalue(data, data + size);
+    std::string svalue = provider.ConsumeRandomLengthString();
     CustomOption option1 = {.intention = Intention::UD_INTENTION_DRAG};
     UnifiedData data1;
     std::string key;
@@ -267,9 +268,9 @@ void SetDataFileFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetData(option2, data2);
 }
 
-void SetDataImageFuzz(const uint8_t *data, size_t size)
+void SetDataImageFuzz(FuzzedDataProvider &provider)
 {
-    std::string svalue(data, data + size);
+    std::string svalue = provider.ConsumeRandomLengthString();
     CustomOption option1 = {.intention = Intention::UD_INTENTION_DRAG};
     UnifiedData data1;
     std::string key;
@@ -293,9 +294,9 @@ void SetDataImageFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetData(option2, data2);
 }
 
-void SetDataVideoFuzz(const uint8_t *data, size_t size)
+void SetDataVideoFuzz(FuzzedDataProvider &provider)
 {
-    std::string svalue(data, data + size);
+    std::string svalue = provider.ConsumeRandomLengthString();
     CustomOption option1 = {.intention = Intention::UD_INTENTION_DRAG};
     UnifiedData data1;
     std::string key;
@@ -319,10 +320,10 @@ void SetDataVideoFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetData(option2, data2);
 }
 
-void SetDataSystemDefinedRecordFuzz(const uint8_t *data, size_t size)
+void SetDataSystemDefinedRecordFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
-    std::string svalue(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
+    std::string svalue = provider.ConsumeRandomLengthString();
     CustomOption option1 = {.intention = Intention::UD_INTENTION_DRAG};
     UnifiedData data1;
     std::string key;
@@ -347,10 +348,10 @@ void SetDataSystemDefinedRecordFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetData(option2, data2);
 }
 
-void SetDataSystemDefinedFormFuzz(const uint8_t *data, size_t size)
+void SetDataSystemDefinedFormFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
-    std::string svalue(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
+    std::string svalue = provider.ConsumeRandomLengthString();
     CustomOption option1 = {.intention = Intention::UD_INTENTION_DRAG};
     UnifiedData data1;
     std::string key;
@@ -386,10 +387,10 @@ void SetDataSystemDefinedFormFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetData(option2, data2);
 }
 
-void SetDataSystemDefinedAppItemFuzz(const uint8_t *data, size_t size)
+void SetDataSystemDefinedAppItemFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
-    std::string svalue(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
+    std::string svalue = provider.ConsumeRandomLengthString();
     CustomOption option1 = {.intention = Intention::UD_INTENTION_DRAG};
     UnifiedData data1;
     std::string key;
@@ -426,10 +427,10 @@ void SetDataSystemDefinedAppItemFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetData(option2, data2);
 }
 
-void SetDataSystemDefinedPixelMapFuzz(const uint8_t *data, size_t size)
+void SetDataSystemDefinedPixelMapFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
-    std::string svalue(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
+    std::string svalue = provider.ConsumeRandomLengthString();
     CustomOption option1 = {.intention = Intention::UD_INTENTION_DRAG};
     UnifiedData data1;
     std::string key;
@@ -456,10 +457,10 @@ void SetDataSystemDefinedPixelMapFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetData(option2, data2);
 }
 
-void GetSummaryFuzz(const uint8_t *data, size_t size)
+void GetSummaryFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
-    std::string svalue(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
+    std::string svalue = provider.ConsumeRandomLengthString();
     CustomOption option1 = {.intention = Intention::UD_INTENTION_DRAG};
     UnifiedData UData;
     std::string key;
@@ -510,9 +511,9 @@ void GetSummaryFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetData(option2, data2);
 }
 
-void GetBatchDataByKeyFuzz(const uint8_t *data, size_t size)
+void GetBatchDataByKeyFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
     CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
     UnifiedData data1;
     std::string key;
@@ -531,9 +532,9 @@ void GetBatchDataByKeyFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetBatchData(option3, dataSet3);
 }
 
-void GetBatchDataByIntentionFuzz(const uint8_t *data, size_t size)
+void GetBatchDataByIntentionFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
     CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
     UnifiedData data1;
     std::string key;
@@ -548,9 +549,9 @@ void GetBatchDataByIntentionFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().GetBatchData(option2, dataSet);
 }
 
-void DeleteDataByKeyFuzz(const uint8_t *data, size_t size)
+void DeleteDataByKeyFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
     CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
     UnifiedData data1;
     std::string key;
@@ -569,9 +570,9 @@ void DeleteDataByKeyFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().DeleteData(option3, dataSet3);
 }
 
-void DeleteDataByIntentionFuzz(const uint8_t *data, size_t size)
+void DeleteDataByIntentionFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
     CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
     UnifiedData data1;
     std::string key;
@@ -586,9 +587,9 @@ void DeleteDataByIntentionFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().DeleteData(option2, dataSet);
 }
 
-void UpdateDataFuzz(const uint8_t *data, size_t size)
+void UpdateDataFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
     CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
     UnifiedData data1;
     std::string key;
@@ -609,13 +610,15 @@ void UpdateDataFuzz(const uint8_t *data, size_t size)
     UdmfClient::GetInstance().UpdateData(option3, data3);
 }
 
-void StartAsyncDataRetrievalFuzz(const uint8_t *data, size_t size)
+void StartAsyncDataRetrievalFuzz(FuzzedDataProvider &provider)
 {
+    size_t dataSize = provider.ConsumeIntegralInRange<size_t>(1, 50);
+    std::vector<uint8_t> data = provider.ConsumeBytes<uint8_t>(dataSize);
     CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
     UnifiedData data1;
     std::string key;
     auto plainText = std::make_shared<PlainText>();
-    std::string content(data, data + size);
+    std::string content = provider.ConsumeRandomLengthString();
     plainText->SetContent(content);
     data1.AddRecord(plainText);
     UdmfClient::GetInstance().SetData(option1, data1, key);
@@ -627,13 +630,15 @@ void StartAsyncDataRetrievalFuzz(const uint8_t *data, size_t size)
     UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
 }
 
-void CancelAsyncDataRetrievalFuzz(const uint8_t *data, size_t size)
+void CancelAsyncDataRetrievalFuzz(FuzzedDataProvider &provider)
 {
+    size_t dataSize = provider.ConsumeIntegralInRange<size_t>(1, 50);
+    std::vector<uint8_t> data = provider.ConsumeBytes<uint8_t>(dataSize);
     CustomOption option1 = { .intention = UD_INTENTION_DATA_HUB };
     UnifiedData data1;
     std::string key;
     auto plainText = std::make_shared<PlainText>();
-    std::string content(data, data + size);
+    std::string content = provider.ConsumeRandomLengthString();
     plainText->SetContent(content);
     data1.AddRecord(plainText);
     UdmfClient::GetInstance().SetData(option1, data1, key);
@@ -653,26 +658,27 @@ void CancelAsyncDataRetrievalFuzz(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
+    FuzzedDataProvider provider(data, size);
     OHOS::SetUpTestCase();
-    OHOS::SetDataFileFuzz(data, size);
-    OHOS::SetDataHtmlFuzz(data, size);
-    OHOS::SetDataImageFuzz(data, size);
-    OHOS::SetDataLinkFuzz(data, size);
-    OHOS::SetDataPlainTextFuzz(data, size);
-    OHOS::SetDataSystemDefinedAppItemFuzz(data, size);
-    OHOS::SetDataSystemDefinedFormFuzz(data, size);
-    OHOS::SetDataSystemDefinedPixelMapFuzz(data, size);
-    OHOS::SetDataSystemDefinedRecordFuzz(data, size);
-    OHOS::SetDataTextFuzz(data, size);
-    OHOS::SetDataVideoFuzz(data, size);
-    OHOS::GetSummaryFuzz(data, size);
-    OHOS::GetBatchDataByKeyFuzz(data, size);
-    OHOS::GetBatchDataByIntentionFuzz(data, size);
-    OHOS::DeleteDataByKeyFuzz(data, size);
-    OHOS::DeleteDataByIntentionFuzz(data, size);
-    OHOS::UpdateDataFuzz(data, size);
-    OHOS::StartAsyncDataRetrievalFuzz(data, size);
-    OHOS::CancelAsyncDataRetrievalFuzz(data, size);
+    OHOS::SetDataFileFuzz(provider);
+    OHOS::SetDataHtmlFuzz(provider);
+    OHOS::SetDataImageFuzz(provider);
+    OHOS::SetDataLinkFuzz(provider);
+    OHOS::SetDataPlainTextFuzz(provider);
+    OHOS::SetDataSystemDefinedAppItemFuzz(provider);
+    OHOS::SetDataSystemDefinedFormFuzz(provider);
+    OHOS::SetDataSystemDefinedPixelMapFuzz(provider);
+    OHOS::SetDataSystemDefinedRecordFuzz(provider);
+    OHOS::SetDataTextFuzz(provider);
+    OHOS::SetDataVideoFuzz(provider);
+    OHOS::GetSummaryFuzz(provider);
+    OHOS::GetBatchDataByKeyFuzz(provider);
+    OHOS::GetBatchDataByIntentionFuzz(provider);
+    OHOS::DeleteDataByKeyFuzz(provider);
+    OHOS::DeleteDataByIntentionFuzz(provider);
+    OHOS::UpdateDataFuzz(provider);
+    OHOS::StartAsyncDataRetrievalFuzz(provider);
+    OHOS::CancelAsyncDataRetrievalFuzz(provider);
     OHOS::TearDown();
     return 0;
 }

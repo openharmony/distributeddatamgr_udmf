@@ -27,7 +27,6 @@ constexpr const char *IMG_TAG_PATTERN = "<img.*?>";
 constexpr const char *IMG_TAG_SRC_PATTERN = "src=(['\"])(.*?)\\1";
 constexpr const char *IMG_TAG_SRC_HEAD = "src=\"";
 constexpr const char *IMG_LOCAL_URI = "file:///";
-constexpr const char *IMG_LOCAL_PATH = "://";
 constexpr const char *FILE_SCHEME_PREFIX = "file://";
 
 struct Cmp {
@@ -207,8 +206,7 @@ std::vector<UriInfo> UnifiedHtmlRecordProcess::SplitHtmlWithImgSrcLabel(
 
 bool UnifiedHtmlRecordProcess::IsLocalURI(const std::string &uri) noexcept
 {
-    return uri.substr(0, strlen(IMG_LOCAL_URI)) == std::string(IMG_LOCAL_URI) ||
-        uri.find(IMG_LOCAL_PATH) == std::string::npos;
+    return uri.substr(0, strlen(IMG_LOCAL_URI)) == std::string(IMG_LOCAL_URI);
 }
 
 } // namespace UDMF

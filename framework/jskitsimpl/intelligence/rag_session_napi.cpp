@@ -562,37 +562,33 @@ void RAGSessionNapi::StreamRunCallbackJSExecute(StreamRunCallbackWorkParam *work
     status = napi_call_function(env, thisJs, callback, argc, argv, nullptr);
     if (status != napi_ok) {
         AIP_HILOGE("js callback function call failed. ret: %{public}d", status);
-        return;
     }
 }
 
-void RAGSessionNapi::StreamRunCallbackWorkerFunc(uv_work_t *work, int inStatus)
+void RAGSessionNapi::StreamRunCallbackEventFunc(StreamRunCallbackWorkParam *workParam)
 {
-    if (inStatus == UV_ECANCELED  || work == nullptr || work->data == nullptr) {
-        AIP_HILOGE("invalid parameter");
-        if (work != nullptr) {
-            delete work;
-            work = nullptr;
-        }
+    if (workParam == nullptr) {
+        AIP_HILOGE("workParam is nullptr");
         return;
     }
-
-    auto *workParam = reinterpret_cast<StreamRunCallbackWorkParam *>(work->data);
     if (workParam->env == nullptr || workParam->ref == nullptr) {
         AIP_HILOGE("streamRun callback work param is null");
         delete workParam;
         workParam = nullptr;
-        delete work;
-        work = nullptr;
+        return;
+    }
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(workParam->env, &scope);
+    if (scope == nullptr) {
+        AIP_HILOGE("scope open failed. scope is nullptr");
         return;
     }
 
     StreamRunCallbackJSExecute(workParam);
 
+    napi_close_handle_scope(workParam->env, scope);
     delete workParam;
     workParam = nullptr;
-    delete work;
-    work = nullptr;
 }
 
 void RAGSessionNapi::StreamRunCallbackExecute(RAGSessionNapi *sessionNapi, StreamStruct stream, int32_t errCode)
@@ -601,21 +597,9 @@ void RAGSessionNapi::StreamRunCallbackExecute(RAGSessionNapi *sessionNapi, Strea
         AIP_HILOGE("sessionNapi is nullptr: %{public}d", sessionNapi == nullptr);
         return;
     }
-    uv_loop_s *loop = nullptr;
     auto env = sessionNapi->env_;
     auto ref = sessionNapi->ref_;
     auto thisJs = sessionNapi->thisJsRef_;
-    napi_get_uv_event_loop(env, &loop);
-    if (loop == nullptr) {
-        AIP_HILOGE("loop instance is nullptr");
-        return;
-    }
-
-    auto *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        AIP_HILOGE("work is nullptr");
-        return;
-    }
     auto *workParam = new (std::nothrow) StreamRunCallbackWorkParam {
         std::move(stream),
         errCode,
@@ -625,22 +609,17 @@ void RAGSessionNapi::StreamRunCallbackExecute(RAGSessionNapi *sessionNapi, Strea
         std::make_shared<ThreadLockInfo>(),
     };
     if (workParam == nullptr) {
-        delete work;
-        work = nullptr;
         AIP_HILOGE("WorkParam is nullptr");
         return;
     }
-    work->data = reinterpret_cast<void *>(workParam);
-    int ret = uv_queue_work(loop, work, [](uv_work_t *work) { AIP_HILOGE("llm run callback"); },
-        StreamRunCallbackWorkerFunc);
-    if (ret != 0) {
-        AIP_HILOGE("uv_queue_work running failed, ret: %{public}d", ret);
+    napi_status status = napi_send_event(env, [workParam] {
+        StreamRunCallbackEventFunc(workParam);
+    }, napi_eprio_high);
+    if (status != napi_ok) {
+        AIP_HILOGE("napi_send_event running failed, status: %{public}d", status);
         delete workParam;
         workParam = nullptr;
-        delete work;
-        work = nullptr;
     }
 }
 } // namespace DataIntelligence
 } // namespace OHOS
- 

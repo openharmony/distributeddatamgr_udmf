@@ -28,9 +28,6 @@ public:
     IAipCoreManagerImpl() = default;
     ~IAipCoreManagerImpl() = default;
 
-    int32_t InitRetriever(const RetrievalConfigStruct& retrievalConfig) override;
-    int32_t Retrieve(const std::string query, const RetrievalConditionStruct &condition,
-        RetrievalResponseStruct &retrievalResponse) override;
     int32_t InitTextModel(const ModelConfigData &config) override;
     int32_t InitImageModel(const ModelConfigData &config) override;
     int32_t LoadTextModel() override;
@@ -47,6 +44,8 @@ public:
         std::function<void(const StreamStruct&, int32_t)> callback) override;
     int32_t ReleaseRAGSession() override;
     int32_t RAGSessionRun(const std::string &query, const OptionStruct &runOption, AnswerStruct &answer) override;
+
+    bool CheckDeviceType() override;
 };
 } // namespace DataIntelligence
 } // namespace OHOS

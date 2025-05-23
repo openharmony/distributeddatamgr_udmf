@@ -37,6 +37,7 @@
 #include "video.h"
 #include "utd.h"
 #include "utd_client.h"
+#include "unified_key.h"
 
 using namespace OHOS::UDMF;
 
@@ -51,6 +52,13 @@ static const std::map<std::string, UDType> FILE_TYPES = {
 };
 static const std::set<std::string> FILE_SUB_TYPES = {
     "general.image", "general.video", "general.audio", "general.folder" };
+
+static const std::map<Udmf_Intention, Intention> VAILD_INTENTIONS = {
+    { UDMF_INTENTION_DRAG, Intention::UD_INTENTION_DRAG },
+    { UDMF_INTENTION_SYSTEM_SHARE, Intention::UD_INTENTION_SYSTEM_SHARE },
+    { UDMF_INTENTION_PICKER, Intention::UD_INTENTION_PICKER },
+    { UDMF_INTENTION_MENU, Intention::UD_INTENTION_MENU }
+};
 
 static void DestroyStringArray(char**& bufArray, unsigned int& count)
 {
@@ -368,23 +376,158 @@ bool OH_UdmfData_IsLocal(OH_UdmfData* data)
     return !isRemote;
 }
 
+OH_UdmfOptions* OH_UdmfOptions_Create()
+{
+    OH_UdmfOptions* options = new (std::nothrow) OH_UdmfOptions;
+    if (options == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "The OH_UdmfOptions create error");
+        return nullptr;
+    }
+    return options;
+}
+
+void OH_UdmfOptions_Destroy(OH_UdmfOptions* pThis)
+{
+    if (pThis != nullptr) {
+        delete pThis;
+        pThis = nullptr;
+    }
+}
+
+const char* OH_UdmfOptions_GetKey(OH_UdmfOptions* pThis)
+{
+    if (pThis == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "The OH_UdmfOptions get key error, invaild params!");
+        return nullptr;
+    }
+    return pThis->key.c_str();
+}
+
+int OH_UdmfOptions_SetKey(OH_UdmfOptions* pThis, const char* key)
+{
+    if (pThis == nullptr || key == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "The OH_UdmfOptions set key error, invaild params!");
+        return UDMF_E_INVALID_PARAM;
+    }
+    std::string keyStr(key);
+    if (keyStr.length() > UDMF_KEY_BUFFER_LEN) {
+        LOG_ERROR(UDMF_CAPI, "key length exceeds maximum length, length is %{public}zu", keyStr.length());
+        return UDMF_E_INVALID_PARAM;
+    }
+    pThis->key = keyStr;
+    return UDMF_E_OK;
+}
+
+Udmf_Intention OH_UdmfOptions_GetIntention(OH_UdmfOptions* pThis)
+{
+    if (pThis == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "The OH_UdmfOptions get intention error, invaild params!");
+        return Udmf_Intention {};
+    }
+    return pThis->intention;
+}
+
+int OH_UdmfOptions_SetIntention(OH_UdmfOptions* pThis, Udmf_Intention intention)
+{
+    if (pThis == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "The OH_UdmfOptions set intention error, invaild params!");
+        return UDMF_E_INVALID_PARAM;
+    }
+
+    pThis->intention = intention;
+    return UDMF_E_OK;
+}
+
+int OH_UdmfOptions_Reset(OH_UdmfOptions* pThis)
+{
+    if (pThis == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "The OH_UdmfOptions reset error, invaild params!");
+        return UDMF_E_INVALID_PARAM;
+    }
+    pThis->key.clear();
+    pThis->intention = Udmf_Intention {};
+    return UDMF_E_OK;
+}
+
 int OH_Udmf_GetUnifiedData(const char* key, Udmf_Intention intention, OH_UdmfData* data)
 {
     if (!IsUnifiedDataValid(data) || key == nullptr) {
         return UDMF_E_INVALID_PARAM;
     }
     Intention queryOptIntent;
-    switch (intention) {
-        case UDMF_INTENTION_DRAG:
-            queryOptIntent = Intention::UD_INTENTION_DRAG;
-            break;
-        default:
-            return UDMF_E_INVALID_PARAM;
+    auto it = VAILD_INTENTIONS.find(intention);
+    if (it != VAILD_INTENTIONS.end()) {
+        queryOptIntent = it->second;
+    } else {
+        return UDMF_E_INVALID_PARAM;
     }
     QueryOption query = {.key = std::string(key), .intention = queryOptIntent};
-    if (UdmfClient::GetInstance().GetData(query, *(data->unifiedData_)) != E_OK) {
-        LOG_ERROR(UDMF_CAPI, "get data error");
+    if (Intention::UD_INTENTION_DRAG == queryOptIntent) {
+        if (UdmfClient::GetInstance().GetData(query, *(data->unifiedData_)) != E_OK) {
+            LOG_ERROR(UDMF_CAPI, "get data error");
+            return UDMF_ERR;
+        }
+        return UDMF_E_OK;
+    }
+    if (UnifiedDataUtils::IsFileMangerIntention(UD_INTENTION_MAP.at(queryOptIntent))) {
+        std::vector<UnifiedData> unifiedDataSet;
+        auto ret = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+        if (ret != E_OK) {
+            LOG_ERROR(UDMF_CAPI, "get batchdata error:%{public}d", ret);
+            return UDMF_ERR;
+        }
+        if (unifiedDataSet.empty()) {
+            return UDMF_E_OK;
+        } else {
+            data->unifiedData_ = std::make_shared<OHOS::UDMF::UnifiedData>(unifiedDataSet[0]);
+        }
+    }
+    return UDMF_E_OK;
+}
+
+int OH_Udmf_GetUnifiedDataByOptions(OH_UdmfOptions* options, OH_UdmfData** dataArray, unsigned int* dataSize)
+{
+    if (options == nullptr || dataSize == nullptr || dataArray == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "The input param error");
+        return UDMF_E_INVALID_PARAM;
+    }
+    Intention queryOptIntent;
+    switch (options->intention) {
+        case UDMF_INTENTION_DATA_HUB:
+            queryOptIntent = Intention::UD_INTENTION_DATA_HUB;
+            break;
+        case UDMF_INTENTION_SYSTEM_SHARE:
+            queryOptIntent = Intention::UD_INTENTION_SYSTEM_SHARE;
+            break;
+        case UDMF_INTENTION_PICKER:
+            queryOptIntent = Intention::UD_INTENTION_PICKER;
+            break;
+        case UDMF_INTENTION_MENU:
+            queryOptIntent = Intention::UD_INTENTION_MENU;
+            break;
+        default:
+            LOG_ERROR(UDMF_CAPI, "Intention error, it's not one of the above enumerations");
+            return UDMF_E_INVALID_PARAM;
+    }
+    QueryOption query = {.key = std::string(options->key), .intention = queryOptIntent};
+
+    std::vector<UnifiedData> unifiedData;
+    int32_t ret = UdmfClient::GetInstance().GetBatchData(query, unifiedData);
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Get batch data error,ret = %{public}d", ret);
         return UDMF_ERR;
+    }
+    *dataSize = unifiedData.size();
+    if (*dataSize == 0) {
+        return E_OK;
+    }
+    *dataArray = new (std::nothrow) OH_UdmfData[*dataSize];
+    if (*dataArray == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "New dataArray error");
+        return UDMF_ERR;
+    }
+    for (unsigned int i = 0; i < *dataSize; i++) {
+        (*dataArray)[i].unifiedData_ = std::make_shared<UnifiedData>(unifiedData[i]);
     }
     return UDMF_E_OK;
 }
@@ -394,25 +537,136 @@ int OH_Udmf_SetUnifiedData(Udmf_Intention intention, OH_UdmfData* unifiedData, c
     if (!IsUnifiedDataValid(unifiedData) || key == nullptr || keyLen < UDMF_KEY_BUFFER_LEN) {
         return UDMF_E_INVALID_PARAM;
     }
-    enum Intention customOptIntent;
-    switch (intention) {
-        case UDMF_INTENTION_DRAG:
-            customOptIntent = Intention::UD_INTENTION_DRAG;
-            break;
-        default:
-            return UDMF_E_INVALID_PARAM;
+    Intention customOptIntent;
+    auto it = VAILD_INTENTIONS.find(intention);
+    if (it != VAILD_INTENTIONS.end()) {
+        customOptIntent = it->second;
+    } else {
+        LOG_ERROR(UDMF_CAPI, "The intention is invalid");
+        return UDMF_E_INVALID_PARAM;
     }
     CustomOption option = {.intention = customOptIntent};
     std::string keyStr;
     if ((UdmfClient::GetInstance().SetData(option, *(unifiedData->unifiedData_), keyStr)) != E_OK) {
-        LOG_ERROR(UDMF_CAPI, "set data error");
+        LOG_ERROR(UDMF_CAPI, "Set data error");
         return UDMF_ERR;
     }
     if (strcpy_s(key, keyLen, keyStr.c_str()) != EOK) {
-        LOG_ERROR(UDMF_CAPI, "string copy failed");
+        LOG_ERROR(UDMF_CAPI, "String copy failed");
         return UDMF_ERR;
     }
     return UDMF_E_OK;
+}
+
+int OH_Udmf_SetUnifiedDataByOptions(OH_UdmfOptions* options, OH_UdmfData* unifiedData, char* key, unsigned int keyLen)
+{
+    if (!IsUnifiedDataValid(unifiedData) || key == nullptr || keyLen < UDMF_KEY_BUFFER_LEN || options == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "The set param invalid");
+        return UDMF_E_INVALID_PARAM;
+    }
+    Intention customOptIntent;
+    switch (options->intention) {
+        case UDMF_INTENTION_DATA_HUB:
+            customOptIntent = Intention::UD_INTENTION_DATA_HUB;
+            break;
+        case UDMF_INTENTION_SYSTEM_SHARE:
+            customOptIntent = Intention::UD_INTENTION_SYSTEM_SHARE;
+            break;
+        case UDMF_INTENTION_PICKER:
+            customOptIntent = Intention::UD_INTENTION_PICKER;
+            break;
+        case UDMF_INTENTION_MENU:
+            customOptIntent = Intention::UD_INTENTION_MENU;
+            break;
+        default:
+            LOG_ERROR(UDMF_CAPI, "Intention error, it's not one of the above enumerations");
+            return UDMF_E_INVALID_PARAM;
+    }
+    CustomOption option = {.intention = customOptIntent};
+    std::string keyStr;
+    int32_t ret = UdmfClient::GetInstance().SetData(option, *(unifiedData->unifiedData_), keyStr);
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Set data error,ret = %{public}d", ret);
+        return UDMF_ERR;
+    }
+    if (strcpy_s(key, keyLen, keyStr.c_str()) != E_OK) {
+        LOG_ERROR(UDMF_CAPI, "String copy failed");
+        return UDMF_ERR;
+    }
+    return UDMF_E_OK;
+}
+
+int OH_Udmf_UpdateUnifiedData(OH_UdmfOptions* options, OH_UdmfData* unifiedData)
+{
+    if (!IsUnifiedDataValid(unifiedData) || options->key.empty()) {
+        LOG_ERROR(UDMF_CAPI, "The update error, lnvaild params!");
+        return UDMF_E_INVALID_PARAM;
+    }
+    if (options->intention != UDMF_INTENTION_DATA_HUB) {
+        LOG_ERROR(UDMF_CAPI, "Intention error, Intention is %{public}d", options->intention);
+        return UDMF_E_INVALID_PARAM;
+    }
+    QueryOption query = {.key = options->key};
+    int32_t ret = UdmfClient::GetInstance().UpdateData(query, *(unifiedData->unifiedData_));
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Updata error,ret = %{public}d", ret);
+        return UDMF_ERR;
+    }
+    return UDMF_E_OK;
+}
+
+int OH_Udmf_DeleteUnifiedData(OH_UdmfOptions* options, OH_UdmfData** dataArray, unsigned int* dataSize)
+{
+    if (options == nullptr || dataSize == nullptr || dataArray == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "The delete param invalid");
+        return UDMF_E_INVALID_PARAM;
+    }
+    Intention queryOptIntent;
+    switch (options->intention) {
+        case UDMF_INTENTION_DATA_HUB:
+            queryOptIntent = Intention::UD_INTENTION_DATA_HUB;
+            break;
+        case UDMF_INTENTION_SYSTEM_SHARE:
+            queryOptIntent = Intention::UD_INTENTION_SYSTEM_SHARE;
+            break;
+        case UDMF_INTENTION_PICKER:
+            queryOptIntent = Intention::UD_INTENTION_PICKER;
+            break;
+        case UDMF_INTENTION_MENU:
+            queryOptIntent = Intention::UD_INTENTION_MENU;
+            break;
+        default:
+            LOG_ERROR(UDMF_CAPI, "Intention error, it's not one of the above enumerations");
+            return UDMF_E_INVALID_PARAM;
+    }
+    QueryOption query = {.key = options->key, .intention = queryOptIntent};
+    std::vector<UnifiedData> unifiedData;
+    int32_t ret = UdmfClient::GetInstance().DeleteData(query, unifiedData);
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Delete data error,key is %{public}s, ret = %{public}d",
+            query.key.c_str(), ret);
+        return UDMF_ERR;
+    }
+    *dataSize = unifiedData.size();
+    *dataArray = new (std::nothrow) OH_UdmfData[*dataSize];
+    if (*dataArray == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "New dataArray error");
+        return UDMF_ERR;
+    }
+    for (unsigned int i = 0; i < *dataSize; i++) {
+        (*dataArray)[i].unifiedData_ = std::make_shared<UnifiedData>(unifiedData[i]);
+    }
+    return UDMF_E_OK;
+}
+
+void OH_Udmf_DestroyDataArray(OH_UdmfData** dataArray, unsigned int dataSize)
+{
+    if (dataArray == nullptr || *dataArray == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "The DestroyDataArray error, invaild params!");
+        return;
+    }
+    delete[] *dataArray;
+    *dataArray = nullptr;
 }
 
 OH_UdmfRecord* OH_UdmfRecord_Create()
@@ -600,7 +854,7 @@ int OH_UdmfRecord_AddFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
         for (const auto &fileSub : FILE_SUB_TYPES) {
             descriptor->BelongsTo(fileSub, isFileType);
             if (isFileType) {
-                utdId = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(*fileType));
+                utdId = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileSub));
                 break;
             }
         }

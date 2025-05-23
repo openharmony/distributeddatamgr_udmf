@@ -895,7 +895,8 @@ template <> bool Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &
 
 template <> size_t CountBufferSize(const Summary &input, TLVObject &data)
 {
-    return data.CountHead() + CountBufferSize(input.summary, data) + data.CountBasic(input.totalSize);
+    return data.CountHead() + CountBufferSize(input.summary, data) + data.CountBasic(input.totalSize) +
+        CountBufferSize(input.fileTypes, data);
 }
 
 template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
@@ -907,6 +908,9 @@ template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
         return false;
     }
     if (!data.WriteBasic(TAG::TAG_SUMMARY_SIZE, input.totalSize)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.fileTypes, data, TAG::TAG_SUMMARY_FILE_TYPES)) {
         return false;
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
@@ -928,6 +932,11 @@ template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
                 break;
             case static_cast<uint16_t>(TAG::TAG_SUMMARY_SIZE):
                 if (!data.ReadBasic(output.totalSize, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_SUMMARY_FILE_TYPES):
+                if (!TLVUtil::Reading(output.fileTypes, data, headItem)) {
                     return false;
                 }
                 break;

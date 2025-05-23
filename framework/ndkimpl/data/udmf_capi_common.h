@@ -29,9 +29,10 @@ struct UdsObject {
     std::shared_ptr<OHOS::UDMF::Object> obj;
     std::mutex mutex;
     explicit UdsObject(int cid);
-    template<typename T> bool HasObjectKey(const char* paramName);
     template<typename T> T* GetUdsValue(const char* paramName);
     template<typename T> int SetUdsValue(const char* paramName, const T &pramValue);
+private:
+    template<typename T> bool HasObjectKey(const char* paramName);
 };
 
 enum NdkStructId : std::int64_t {
@@ -128,6 +129,11 @@ struct OH_UdmfGetDataParams {
     Udmf_FileConflictOptions fileConflictOptions;
     Udmf_ProgressIndicator progressIndicator;
     OH_Udmf_DataProgressListener dataProgressListener;
+};
+
+struct OH_UdmfOptions {
+    std::string key;
+    Udmf_Intention intention {};
 };
 
 bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid);

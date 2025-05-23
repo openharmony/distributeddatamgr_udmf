@@ -104,9 +104,11 @@ void UnifiedDataHelper::CreateDirIfNotExist(const std::string& dirPath, const mo
 
 void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
 {
+    std::set<std::string> fileTypes;
     for (const auto &record : data.GetRecords()) {
-        CalRecordSummary(*record->GetEntries(), summary);
+        CalRecordSummary(*record->GetEntries(), summary, fileTypes);
     }
+    summary.fileTypes.insert(summary.fileTypes.end(), fileTypes.begin(), fileTypes.end());
 }
 
 bool UnifiedDataHelper::Pack(UnifiedData &data)
@@ -262,12 +264,16 @@ void UnifiedDataHelper::ProcessTypeId(const ValueType &value, std::string &typeI
     }
 }
 
-void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry, Summary &summary)
+void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry,
+    Summary &summary, std::set<std::string> &fileTypes)
 {
     for (const auto &[utdId, value] : entry) {
         auto typeId = utdId;
         auto valueSize = ObjectUtils::GetValueSize(value, false);
         ProcessTypeId(value, typeId);
+        if (typeId != utdId) {
+            fileTypes.insert(typeId);
+        }
         auto it = summary.summary.find(typeId);
         if (it == summary.summary.end()) {
             summary.summary[typeId] = valueSize;

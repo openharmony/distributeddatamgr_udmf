@@ -66,7 +66,7 @@ void UdmfTypesUtilAbnormalTest::TearDown()
 
 /**
 * @tc.name: Marshalling001
-* @tc.desc: Abnrmal testcase of Marshalling, the return value of Writing() is nullptr
+* @tc.desc: Abnrmal testcase of Marshalling, the return value of Writing() is false
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfTypesUtilAbnormalTest, Marshalling001, TestSize.Level1)
@@ -91,7 +91,7 @@ HWTEST_F(UdmfTypesUtilAbnormalTest, Marshalling001, TestSize.Level1)
 
 /**
 * @tc.name: Marshalling002
-* @tc.desc: Abnrmal testcase of Marshalling, the return value of Writing() is nullptr
+* @tc.desc: Abnrmal testcase of Marshalling, the return value of Writing() is false
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfTypesUtilAbnormalTest, Marshalling002, TestSize.Level1)
@@ -107,23 +107,23 @@ HWTEST_F(UdmfTypesUtilAbnormalTest, Marshalling002, TestSize.Level1)
 
 /**
 * @tc.name: Marshalling003
-* @tc.desc: Abnrmal testcase of Marshalling, the return value of Reading() is nullptr
+* @tc.desc: Abnrmal testcase of Marshalling, the return value of ReadTlv() is false
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfTypesUtilAbnormalTest, Marshalling003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Marshalling003 begin.");
     UnifiedData unifiedData;
-    std::vector<UnifiedData> input = {unifiedData};
+    unifiedData.dataId_ = 1;
     MessageParcel parcel;
-    bool ret = ITypesUtil::Marshalling(input, parcel);
+    bool ret = ITypesUtil::Marshalling(unifiedData, parcel);
     EXPECT_FALSE(ret);
     LOG_INFO(UDMF_TEST, "Marshalling003 end.");
 }
 
 /**
 * @tc.name: Unmarshalling001
-* @tc.desc: Abnrmal testcase of Unmarshalling, the return value of Reading() is nullptr
+* @tc.desc: Abnrmal testcase of Unmarshalling, the return value of ReadInt32() is 0
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfTypesUtilAbnormalTest, Unmarshalling001, TestSize.Level1)
@@ -135,5 +135,20 @@ HWTEST_F(UdmfTypesUtilAbnormalTest, Unmarshalling001, TestSize.Level1)
     bool ret = ITypesUtil::Unmarshalling(output, parcel);
     EXPECT_FALSE(ret);
     LOG_INFO(UDMF_TEST, "Unmarshalling001 end.");
+}
+
+/**
+* @tc.name: Unmarshalling002
+* @tc.desc: Abnrmal testcase of Unmarshalling, the return value of ReadInt32() is 0
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilAbnormalTest, Unmarshalling002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Unmarshalling002 begin.");
+    UnifiedData output;
+    MessageParcel parcel;
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "Unmarshalling002 end.");
 }
 } // OHOS::Test

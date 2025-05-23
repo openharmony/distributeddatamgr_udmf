@@ -19,18 +19,6 @@
 
 namespace OHOS {
 namespace DataIntelligence {
-
-int32_t IAipCoreManagerImpl::InitRetriever(const RetrievalConfigStruct &retrievalConfig)
-{
-    return DEVICE_EXCEPTION;
-}
-
-int32_t IAipCoreManagerImpl::Retrieve(const std::string query, const RetrievalConditionStruct &condition,
-    RetrievalResponseStruct &retrievalResponse)
-{
-    return DEVICE_EXCEPTION;
-}
-
 int32_t IAipCoreManagerImpl::InitTextModel(const ModelConfigData &config)
 {
     return DEVICE_EXCEPTION;
@@ -103,6 +91,11 @@ int32_t IAipCoreManagerImpl::RAGSessionRun(const std::string &query, const Optio
     AnswerStruct &answer)
 {
     return DEVICE_EXCEPTION;
+}
+
+bool IAipCoreManagerImpl::CheckDeviceType()
+{
+    return false;
 }
 
 } // namespace DataIntelligence

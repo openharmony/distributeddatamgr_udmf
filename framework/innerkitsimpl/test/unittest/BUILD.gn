@@ -103,6 +103,45 @@ ohos_unittest("UdmfClientTest") {
   ]
 }
 
+ohos_unittest("UdmfClientFileMangerTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${udmf_framework_path}/common/udmf_utils.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/folder.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
+    "udmf_client_file_manger_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ohos_unittest("UdmfClientSystemHapTest") {
   module_out_path = module_output_path
 
@@ -680,6 +719,7 @@ group("unittest") {
     ":TextTest",
     ":UdmfAsyncClientTest",
     ":UdmfClientAbnormalTest",
+    ":UdmfClientFileMangerTest",
     ":UdmfClientHapPermissionTest",
     ":UdmfClientSaInvokeTest",
     ":UdmfClientSystemHapTest",

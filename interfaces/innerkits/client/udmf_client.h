@@ -47,6 +47,7 @@ public:
     Status API_EXPORT RemoveAppShareOption(const std::string &intention);
     Status API_EXPORT GetAppShareOption(const std::string &intention, enum ShareOptions &shareOption);
     Status GetDataFromCache(const QueryOption &query, UnifiedData &unifiedData);
+    Status API_EXPORT GetParentType(Summary &oldSummary, Summary &newSummary);
 
 private:
     UdmfClient() = default;

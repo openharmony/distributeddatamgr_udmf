@@ -53,7 +53,11 @@ void Graph::AddEdge(const std::string &startNode, const std::string &endNode)
 
 void Graph::AddEdge(uint32_t start, uint32_t end)
 {
-    EdgeNode *edge = new EdgeNode;  // add new edge
+    EdgeNode *edge = new (std::nothrow) EdgeNode;  // add new edge
+    if (edge == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "edge is nullptr");
+        return;
+    }
     edge->adjIndex = end;
     edge->next = adjList_[start].firstEdge;
     adjList_[start].firstEdge = edge;

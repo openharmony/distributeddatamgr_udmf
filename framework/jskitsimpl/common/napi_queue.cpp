@@ -67,7 +67,11 @@ napi_value NapiQueue::AsyncWork(napi_env env, std::shared_ptr<ContextBase> conte
     NapiAsyncExecute execute, NapiAsyncComplete complete)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork name = %{public}s", name.c_str());
-    AsyncContext *aCtx = new AsyncContext;
+    AsyncContext *aCtx = new (std::nothrow) AsyncContext;
+    if (aCtx == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "aCtx is nullptr");
+        return nullptr;
+    }
     aCtx->ctxt = std::move(contextBase);
     aCtx->execute = std::move(execute);
     aCtx->complete = std::move(complete);

@@ -29,6 +29,7 @@
 #include "application_defined_record.h"
 #include "audio.h"
 #include "file.h"
+#include "file_uri.h"
 #include "folder.h"
 #include "html.h"
 #include "image.h"
@@ -52,6 +53,7 @@ constexpr int SLEEP_TIME = 50;   // 50 ms
 constexpr int BATCH_SIZE_2K = 2000;
 constexpr int BATCH_SIZE_5K = 5000;
 constexpr double BASE_CONVERSION = 1000.0;
+constexpr const char *FILE_SCHEME_PREFIX = "file://";
 class UdmfClientTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -2288,10 +2290,13 @@ HWTEST_F(UdmfClientTest, SetData029, TestSize.Level1)
     UnifiedData readData;
     status = UdmfClient::GetInstance().GetData(option2, readData);
     ASSERT_EQ(status, E_OK);
-    std::string readHtml = "<img data-ohos='clipboard' src='file:///storage/Users/currentUser/appdata/el2/"
-                            "base/ohos.test.demo1/haps/101.png'>"
-                            "<img data-ohos='clipboard' src=\"file:///storage/Users/currentUser/appdata/el2/"
-                            "base/ohos.test.demo1/haps/102.png\">";
+    std::string tmpUri1 = "file://ohos.test.demo1/data/storage/el2/base/haps/101.png";
+    std::string tmpUri2 = "file://ohos.test.demo1/data/storage/el2/base/haps/102.png";
+    AppFileService::ModuleFileUri::FileUri fileUri1(tmpUri1);
+    AppFileService::ModuleFileUri::FileUri fileUri2(tmpUri2);
+    std::string readHtml = "<img data-ohos='clipboard' src='";
+    readHtml += FILE_SCHEME_PREFIX + fileUri1.GetRealPath() + "'><img data-ohos='clipboard' src=\"";
+    readHtml += FILE_SCHEME_PREFIX + fileUri2.GetRealPath() + "\">";
     std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
     ASSERT_NE(readRecord, nullptr);
     auto readHtmlRecord = std::static_pointer_cast<Html>(readRecord);
@@ -2337,10 +2342,12 @@ HWTEST_F(UdmfClientTest, SetData030, TestSize.Level1)
     UnifiedData readData;
     status = UdmfClient::GetInstance().GetData(option2, readData);
     ASSERT_EQ(status, E_OK);
-    std::string readHtml = "<img data-ohos='clipboard' src='file:///storage/Users/currentUser/appdata/el2/"
-                            "base/ohos.test.demo1/haps/101.png'>"
-                            "<img data-ohos='clipboard' src='https://data/storage/el2/base/haps/102.png'>"
-                            "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/103.png'>";
+    std::string tmpUri1 = "file://ohos.test.demo1/data/storage/el2/base/haps/101.png";
+    AppFileService::ModuleFileUri::FileUri fileUri1(tmpUri1);
+    std::string readHtml = "<img data-ohos='clipboard' src='";
+    readHtml += FILE_SCHEME_PREFIX + fileUri1.GetRealPath() + "'>";
+    readHtml += "<img data-ohos='clipboard' src='https://data/storage/el2/base/haps/102.png'>"
+        "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/103.png'>";
     std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
     ASSERT_NE(readRecord, nullptr);
     auto readHtmlRecord = std::static_pointer_cast<Html>(readRecord);
@@ -2467,7 +2474,6 @@ HWTEST_F(UdmfClientTest, SetData033, TestSize.Level1)
     std::shared_ptr<Object> obj = std::make_shared<Object>();
     obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
     obj->value_[FILE_URI_PARAM] = "http://demo.com";
-    obj->value_[FILE_TYPE] = "abcdefg";
     auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
     std::string html = "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/101.png'>"
                         "<img data-ohos='clipboard' src='https://data/storage/el2/base/haps/102.png'>"
@@ -2479,17 +2485,18 @@ HWTEST_F(UdmfClientTest, SetData033, TestSize.Level1)
     data.AddRecord(record);
     auto status = UdmfClient::GetInstance().SetData(option1, data, key);
     ASSERT_EQ(status, E_OK);
-
     QueryOption option2 = { .key = key };
     AddPrivilege1(option2);
     SetHapToken1();
     UnifiedData readData;
     status = UdmfClient::GetInstance().GetData(option2, readData);
     ASSERT_EQ(status, E_OK);
+    std::string tmpUri1 = "file://ohos.test.demo1/data/storage/el2/base/haps/103.png";
+    AppFileService::ModuleFileUri::FileUri fileUri1(tmpUri1);
     std::string readHtml = "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/101.png'>"
                             "<img data-ohos='clipboard' src='https://data/storage/el2/base/haps/102.png'>"
-                            "<img data-ohos='clipboard' src='file:///storage/Users/currentUser/appdata/el2/"
-                            "base/ohos.test.demo1/haps/103.png'>";
+                            "<img data-ohos='clipboard' src='";
+    readHtml += FILE_SCHEME_PREFIX + fileUri1.GetRealPath() + "'>";
     std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
     ASSERT_NE(readRecord, nullptr);
     auto entryValue = readRecord->GetEntry(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML));
@@ -3526,5 +3533,130 @@ HWTEST_F(UdmfClientTest, UpdateData003, TestSize.Level1)
     ASSERT_EQ(status, E_OK);
     ASSERT_TRUE(unifiedDataSet.empty());
     LOG_INFO(UDMF_TEST, "UpdateData003 end.");
+}
+
+/**
+* @tc.name: SetData036
+* @tc.desc: test set html type data image src is base64 format
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData036, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData036 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "http://demo.com";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    std::string html = "<img data-ohos='clipboard' src='data:image/png;base64,IVBORw0KGgoAAAANSUhEUgAAAF'>";
+    auto htmlRecord = Html(html, "abstract");
+    htmlRecord.InitObject();
+    record->AddEntry(htmlRecord.GetUtdId(), htmlRecord.GetOriginValue());
+    data.AddRecord(record);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+    std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
+    ASSERT_NE(readRecord, nullptr);
+    auto uris = readRecord->GetUris();
+    EXPECT_EQ(uris.size(), 0);
+
+    LOG_INFO(UDMF_TEST, "SetData036 end.");
+}
+
+/**
+* @tc.name: GetParentType001
+* @tc.desc: test Summary fileType
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetParentType001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetParentType001 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    auto obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_TYPE] = "general.file";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    auto obj1 = std::make_shared<Object>();
+    obj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj1->value_[FILE_TYPE] = "general.image";
+    auto record1 = std::make_shared<UnifiedRecord>(FILE_URI, obj1);
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj2->value_[FILE_TYPE] = "general.png";
+    auto record2 = std::make_shared<UnifiedRecord>(FILE_URI, obj2);
+    data.AddRecord(record);
+    data.AddRecord(record1);
+    data.AddRecord(record2);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    QueryOption option2 = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+    ASSERT_EQ(status, E_OK);
+    EXPECT_EQ(summary.fileTypes.size(), data.GetRecords().size());
+    summary.summary["general.image"] = 1;
+    summary.summary["general.png"] = 1;
+    Summary newSummary;
+    status = UdmfClient::GetInstance().GetParentType(summary, newSummary);
+    ASSERT_EQ(status, E_OK);
+    EXPECT_EQ(newSummary.summary["general.image"], 1 + 1);
+
+    LOG_INFO(UDMF_TEST, "GetParentType001 end.");
+}
+
+/**
+* @tc.name: GetParentType002
+* @tc.desc: test Summary fileType
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetParentType002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetParentType002 start.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    auto obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_TYPE] = "general.file";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    auto obj1 = std::make_shared<Object>();
+    obj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj1->value_[FILE_TYPE] = "general.html";
+    auto record1 = std::make_shared<UnifiedRecord>(FILE_URI, obj1);
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj2->value_[FILE_TYPE] = "general.audio";
+    auto record2 = std::make_shared<UnifiedRecord>(FILE_URI, obj2);
+    data.AddRecord(record);
+    data.AddRecord(record1);
+    data.AddRecord(record2);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    QueryOption option2 = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+    ASSERT_EQ(status, E_OK);
+    EXPECT_EQ(summary.fileTypes.size(), data.GetRecords().size());
+    summary.summary["general.file"] = 1;
+    summary.summary["general.html"] = 1;
+    Summary newSummary;
+    status = UdmfClient::GetInstance().GetParentType(summary, newSummary);
+    ASSERT_EQ(status, E_OK);
+    EXPECT_EQ(newSummary.summary["general.file"], 1 + 1);
+
+    LOG_INFO(UDMF_TEST, "GetParentType002 end.");
 }
 } // OHOS::Test
