@@ -507,13 +507,16 @@ static constexpr UtdType UTD_TYPES[] = {
     { OPENHARMONY_GOPAINT, "OPENHARMONY_GOPAINT", "openharmony.gopaint" },
     { OPENHARMONY_GOBRUSH, "OPENHARMONY_GOBRUSH", "openharmony.gobrush" },
     { OPENHARMONY_GOBRUSHES, "OPENHARMONY_GOBRUSHES", "openharmony.gobrushes" },
-    { OPENHARMONY_GOCOLOR, "OPENHARMONY_GOCOLOR", "openharmony.gocolor" }
+    { OPENHARMONY_GOCOLOR, "OPENHARMONY_GOCOLOR", "openharmony.gocolor" },
+    { OPENHARMONY_DLP, "OPENHARMONY_DLP", "openharmony.dlp"}
 };
 
 static constexpr std::initializer_list<std::string_view> NOT_NEED_COUNT_VALUE_LIST = {
     UNIFORM_DATA_TYPE, ARRAY_BUFFER_LENGTH, THUMB_DATA_LENGTH, APP_ICON_LENGTH, APPLICATION_DEFINED_RECORD_MARK,
     FILE_TYPE
 };
+
+static const std::string FILE_TYPE_STR = "general.file";
 
 static const std::set<std::string> FILE_SUB_TYPES = {
     "general.image", "general.video", "general.audio", "general.folder" };
@@ -648,6 +651,17 @@ bool UnifiedDataUtils::IsPersist(const std::string &intention)
     return IsPersist(GetIntentionByString(intention));
 }
 
+bool UnifiedDataUtils::IsFileMangerIntention(const std::string &intention)
+{
+    Intention optionIntention = GetIntentionByString(intention);
+    if (optionIntention == UD_INTENTION_SYSTEM_SHARE ||
+        optionIntention == UD_INTENTION_MENU ||
+        optionIntention == UD_INTENTION_PICKER) {
+        return true;
+    }
+    return false;
+}
+
 Intention UnifiedDataUtils::GetIntentionByString(const std::string &intention)
 {
     for (const auto &it : UD_INTENTION_MAP) {
@@ -656,6 +670,12 @@ Intention UnifiedDataUtils::GetIntentionByString(const std::string &intention)
         }
     }
     return UD_INTENTION_BUTT;
+}
+
+std::string UnifiedDataUtils::FindIntentionMap(const Intention &queryIntention)
+{
+    auto find = UD_INTENTION_MAP.find(queryIntention);
+    return find == UD_INTENTION_MAP.end() ? "" : find->second;
 }
 
 bool UnifiedDataUtils::IsValidOptions(UnifiedKey &key, const std::string &intention,
@@ -695,6 +715,14 @@ bool UnifiedDataUtils::IsValidOptions(UnifiedKey &key, const std::string &intent
         return key.intention == intention;
     }
     return true;
+}
+
+bool UnifiedDataUtils::IsValidOptionsNonDrag(UnifiedKey &key, const std::string &intention)
+{
+    if (IsValidOptions(key, intention)) {
+        return !key.key.empty() || intention == UD_INTENTION_MAP.at(Intention::UD_INTENTION_DATA_HUB);
+    }
+    return false;
 }
 
 std::shared_ptr<Object> ObjectUtils::ConvertToObject(UDDetails &details)
@@ -817,6 +845,43 @@ void ObjectUtils::ProcessFileUriType(UDType &utdType, ValueType &value)
                 return;
             }
         }
+    }
+}
+
+bool UnifiedDataUtils::IsFilterFileType(const std::string &type)
+{
+    auto iter = FILE_SUB_TYPES.find(type);
+    if (iter != FILE_SUB_TYPES.end()) {
+        return true;
+    }
+    return false;
+}
+
+std::string UnifiedDataUtils::IsFileSubType(const std::string &type)
+{
+    std::shared_ptr<TypeDescriptor> descriptor;
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(type, descriptor);
+    if (status != E_OK || descriptor == nullptr) {
+        return FILE_TYPE_STR;
+    }
+    bool isFileType = false;
+    for (const auto &fileSub : FILE_SUB_TYPES) {
+        descriptor->BelongsTo(fileSub, isFileType);
+        if (isFileType) {
+            return fileSub;
+        }
+    }
+    return FILE_TYPE_STR;
+}
+
+void UnifiedDataUtils::MergeSummary(std::map<std::string, int64_t> &summary,
+    std::set<std::string> &summaryKey, const std::string &key, int64_t value)
+{
+    if (summaryKey.find(key) == summaryKey.end()) {
+        summaryKey.insert(key);
+        summary[key] = value;
+    } else {
+        summary[key] += value;
     }
 }
 } // namespace UDMF

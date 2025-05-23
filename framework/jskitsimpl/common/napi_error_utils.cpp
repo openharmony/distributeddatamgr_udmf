@@ -23,7 +23,7 @@ static constexpr NapiErrorCode JS_ERROR_CODE_MSGS[] = {
     { Status::E_NO_PERMISSION, 201, "Permission denied!" },
     { Status::E_INVALID_PARAMETERS, 401, "Parameter error." },
     { Status::E_SETTINGS_EXISTED, 20400001,
-      "Settings already exist, if need to reconfigure, please remove the previous share options." },
+      "Settings already exist. To reconfigure, remove the existing sharing options." },
     { Status::E_NO_SYSTEM_PERMISSION, 202,
       "Permission denied, application which is not a system application uses system API." },
 };

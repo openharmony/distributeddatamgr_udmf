@@ -18,6 +18,7 @@ config("udmf_napi_config") {
     "${udmf_interfaces_path}/innerkits/client",
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_interfaces_path}/innerkits/include",
     "${udmf_interfaces_path}/jskits/common",
     "${udmf_interfaces_path}/jskits/data",
 

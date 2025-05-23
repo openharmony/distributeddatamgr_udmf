@@ -30,6 +30,7 @@ std::string GetSdkVersionByToken(uint32_t tokenId);
 std::string GetCurrentSdkVersion();
 
 bool API_EXPORT IsTokenNative();
+bool API_EXPORT IsNativeCallingToken();
 
 } // namespace UTILS
 } // namespace UDMF

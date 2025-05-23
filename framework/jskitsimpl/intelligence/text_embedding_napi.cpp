@@ -102,6 +102,7 @@ TextEmbeddingNapi::~TextEmbeddingNapi()
     AIP_HILOGI("Enter");
     AipNapiUtils::UnLoadAlgoLibrary(textAipCoreMgrHandle_);
     delete textAipCoreManager_;
+    textAipCoreManager_ = nullptr;
 }
 
 static napi_value StartInit(napi_env env, napi_value exports, struct TextEmbeddingConstructorInfo info)
@@ -151,7 +152,7 @@ napi_value TextEmbeddingNapi::Init(napi_env env, napi_value exports)
     if (textAipCoreMgrHandle_.pAipManager != nullptr) {
         textAipCoreManager_ = AipNapiUtils::GetAlgoObj(textAipCoreMgrHandle_);
     } else {
-        textAipCoreManager_ = new IAipCoreManagerImpl();
+        textAipCoreManager_ = new (std::nothrow) IAipCoreManagerImpl();
     }
 
     if (textAipCoreManager_ == nullptr) {
@@ -258,11 +259,16 @@ napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_
         return nullptr;
     }
 
-    auto asyncGetTextEmbeddingModelData = new AsyncGetTextEmbeddingModelData{
+    auto asyncGetTextEmbeddingModelData = new (std::nothrow) AsyncGetTextEmbeddingModelData{
         .asyncWork = nullptr,
         .deferred = deferred,
         .config = textModelConfig,
     };
+    if (asyncGetTextEmbeddingModelData == nullptr) {
+        AIP_HILOGE("new asyncGetTextEmbeddingModelData error.");
+        ThrowIntelligenceErr(env, INNER_ERROR, "new asyncGetTextEmbeddingModelData failed");
+        return nullptr;
+    }
 
     if (!CreateAsyncTextModelExecution(env, asyncGetTextEmbeddingModelData)) {
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "create AsyncTextModelExecution failed");
@@ -399,6 +405,7 @@ void TextEmbeddingNapi::GetTextEmbeddingModelCompleteCB(napi_env env, napi_statu
         if (status != napi_ok) {
             AIP_HILOGE("napi_new_instance failed");
             napi_get_undefined(env, &result);
+            delete modelData;
             return;
         }
 
@@ -453,16 +460,23 @@ napi_value TextEmbeddingNapi::SplitText(napi_env env, napi_callback_info info)
     AipNapiUtils::TransJsToDouble(env, cfgOverlap, configOverlap);
     AIP_HILOGD("string strArg: %{public}d", configSize);
     AIP_HILOGD("string strArg: %{public}f", configOverlap);
-    if (configSize <= NUM_0 || configOverlap < NUM_0 || configOverlap >= NUM_1) {
-        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "The parameter value range is incorrect");
-        return nullptr;
-    }
 
     napi_value promise = nullptr;
     napi_deferred deferred = nullptr;
     status = napi_create_promise(env, &deferred, &promise);
     if (status != napi_ok) {
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "create promise failed");
+        return nullptr;
+    }
+
+    if (!textAipCoreManager_->CheckDeviceType()) {
+        napi_value value = nullptr;
+        ThrowIntelligenceErrByPromise(env, DEVICE_EXCEPTION, "SplitText failed", value);
+        napi_reject_deferred(env, deferred, value);
+        return promise;
+    }
+    if (configSize <= NUM_0 || configOverlap < NUM_0 || configOverlap >= NUM_1) {
+        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "The parameter value range is incorrect");
         return nullptr;
     }
 
@@ -486,7 +500,7 @@ bool TextEmbeddingNapi::SplitTextAsyncExecution(napi_env env, napi_deferred defe
         .configOverlap = configOverlap,
     };
     if (splitTextCallbackData == nullptr) {
-        AIP_HILOGE("splitTextCallbackData is nullptr");
+        AIP_HILOGE("new splitTextCallbackData error.");
         return false;
     }
 
@@ -655,6 +669,10 @@ bool TextEmbeddingNapi::GetEmbeddingStringAsyncExecution(napi_env env, napi_defe
         .deferred = deferred,
         .strArg = strArg,
     };
+    if (textStringCallbackData == nullptr) {
+        AIP_HILOGE("new textStringCallbackData error.");
+        return false;
+    }
 
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(env, "textStringEmbedding", NAPI_AUTO_LENGTH, &resourceName);
@@ -802,7 +820,7 @@ bool TextEmbeddingNapi::GetEmbeddingArrayAsyncExecution(napi_env env, napi_defer
         .text = text,
     };
     if (textArrayCallbackData == nullptr) {
-        AIP_HILOGE("textArrayCallbackData is nullptr");
+        AIP_HILOGE("new textArrayCallbackData error.");
         return false;
     }
 
@@ -938,7 +956,7 @@ bool TextEmbeddingNapi::LoadAsyncExecution(napi_env env, napi_deferred deferred)
         .deferred = deferred,
     };
     if (loadCallbackData == nullptr) {
-        AIP_HILOGE("loadCallbackData is nullptr");
+        AIP_HILOGE("new loadCallbackData error.");
         return false;
     }
 
@@ -1053,7 +1071,7 @@ bool TextEmbeddingNapi::ReleaseAsyncExecution(napi_env env, napi_deferred deferr
         .deferred = deferred,
     };
     if (releaseCallbackData == nullptr) {
-        AIP_HILOGE("releaseCallbackData is nullptr");
+        AIP_HILOGE("new releaseCallbackData error.");
         return false;
     }
 
