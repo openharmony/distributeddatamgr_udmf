@@ -91,6 +91,7 @@ ohos_unittest("UdmfClientTest") {
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/progress_callback.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_notifier_stub.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
@@ -98,6 +99,8 @@ ohos_unittest("UdmfClientTest") {
   ]
 
   configs = [ ":module_private_config" ]
+
+  use_exceptions = true
 
   deps = common_deps
 
@@ -113,8 +116,11 @@ ohos_unittest("UdmfClientFileMangerTest") {
   module_out_path = module_output_path
 
   sources = [
+    "${udmf_framework_path}/common/udmf_copy_file.cpp",
     "${udmf_framework_path}/common/udmf_utils.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/udmf_async_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/common/progress_queue.cpp",
     "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
@@ -131,6 +137,7 @@ ohos_unittest("UdmfClientFileMangerTest") {
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/progress_callback.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_notifier_stub.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
@@ -138,6 +145,8 @@ ohos_unittest("UdmfClientFileMangerTest") {
   ]
 
   configs = [ ":module_private_config" ]
+
+  use_exceptions = true
 
   deps = common_deps
 
@@ -667,11 +676,14 @@ ohos_unittest("UdmfClientAbnormalTest") {
   sources = [
     "${udmf_framework_path}/common/endian_converter.cpp",
     "${udmf_framework_path}/common/tlv_util.cpp",
+    "${udmf_framework_path}/common/udmf_copy_file.cpp",
     "${udmf_framework_path}/common/udmf_radar_reporter.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
     "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/getter_system.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/udmf_async_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/common/progress_queue.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
     "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
@@ -691,6 +703,7 @@ ohos_unittest("UdmfClientAbnormalTest") {
     "${udmf_framework_path}/innerkitsimpl/data/unified_html_record_process.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/video.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/progress_callback.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_notifier_stub.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
     "${udmf_framework_path}/innerkitsimpl/test/unittest/mock/system_defined_pixelmap_mock.cpp",
@@ -700,6 +713,8 @@ ohos_unittest("UdmfClientAbnormalTest") {
   ]
 
   configs = [ ":module_private_config" ]
+
+  use_exceptions = true
 
   deps = [
     "${udmf_interfaces_path}/innerkits:utd_client",
