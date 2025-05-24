@@ -262,7 +262,8 @@ int32_t UdmfServiceProxy::ClearAsynProcessByKey(const std::string &businessUdKey
     return E_OK;
 }
 
-int32_t UdmfServiceProxy::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::string &key)
+int32_t UdmfServiceProxy::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+    std::string &key)
 {
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_DELAY_INFO, reply, dataLoadInfo, iUdmfNotifier);
@@ -290,7 +291,8 @@ int32_t UdmfServiceProxy::SetDelayData(const std::string &key, UnifiedData &unif
     return E_OK;
 }
 
-int32_t UdmfServiceProxy::GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData)
+int32_t UdmfServiceProxy::GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+    std::shared_ptr<UnifiedData> unifiedData)
 {
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::GET_DELAY_DATA, reply, dataLoadInfo, iUdmfNotifier);

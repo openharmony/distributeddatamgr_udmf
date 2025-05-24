@@ -49,9 +49,11 @@ public:
     int32_t RemoveAppShareOption(const std::string &intention) override;
     int32_t ObtainAsynProcess(AsyncProcessInfo &processInfo) override;
     int32_t ClearAsynProcessByKey(const std::string &businessUdKey) override;
-    int32_t SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::string &key) override;
+    int32_t SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+        std::string &key) override;
     int32_t SetDelayData(const std::string &key, UnifiedData &unifiedData) override;
-    int32_t GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData) override;
+    int32_t GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+        std::shared_ptr<UnifiedData> unifiedData) override;
 private:
     static inline BrokerDelegator<UdmfServiceProxy> delegator_;
     int32_t SendRequest(UdmfServiceInterfaceCode code, MessageParcel &data,

@@ -22,8 +22,8 @@
 #include "progress_callback.h"
 #include "udmf_client.h"
 #include "udmf_copy_file.h"
-#include "udmf_service_client.h"
 #include "udmf_notifier_stub.h"
+#include "udmf_service_client.h"
 
 namespace OHOS::UDMF {
 static constexpr size_t MAX_THREADS = 10;
@@ -248,17 +248,23 @@ Status UdmfAsyncClient::CheckSync(std::unique_ptr<AsyncHelper> &asyncHelper, con
 Status UdmfAsyncClient::GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper, const QueryOption &query)
 {
     auto &data = *(asyncHelper->data);
-    auto dataChange = [&](const std::string &key, const UnifiedData &unifiedData) {
-        data = unifiedData;
-        ProcessUnifiedData(asyncHelper);
+    auto delayDataCallback = [this](const std::string &key, const UnifiedData &unifiedData) {
+        if (asyncHelperMap_.find(key) == asyncHelperMap_.end()) {
+            LOG_ERROR(UDMF_CLIENT, "No task exist, key=%{public}s", key.c_str());
+            return;
+        }
+        auto &asyncHelper = asyncHelperMap_.at(key);
+        *(asyncHelper->data) = unifiedData;
+        UdmfAsyncClient::GetInstance().ProcessUnifiedData(asyncHelper);
     };
-    sptr<IRemoteObject> iUdmfNotifier = new (std::nothrow) DelayDataCallbackClient(dataChange);
+    sptr<IRemoteObject> iUdmfNotifier = new (std::nothrow) DelayDataCallbackClient(delayDataCallback);
     if (iUdmfNotifier == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "IUdmfNotifier unavailable");
-        return E_IPC;
+        return E_ERROR;
     }
     std::shared_ptr<UnifiedData> dataPtr = nullptr;
-    auto status = static_cast<Status>(UdmfServiceClient::GetInstance()->GetDelayData(asyncHelper->acceptableInfo, iUdmfNotifier, dataPtr));
+    auto status = static_cast<Status>(UdmfClient::GetInstance().GetDelayData(
+        asyncHelper->acceptableInfo, iUdmfNotifier, dataPtr));
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "GetData error, status = %{public}d", status);
         ProgressInfo progressInfo = {
@@ -269,7 +275,7 @@ Status UdmfAsyncClient::GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper,
         return status;
     }
     if (dataPtr == nullptr) {
-        LOG_INFO(UDMF_CLIENT, "zzz Wait delay data");
+        LOG_INFO(UDMF_CLIENT, "Wait delay data");
         return E_OK;
     }
     data = *dataPtr;

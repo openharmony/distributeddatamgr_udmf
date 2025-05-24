@@ -949,7 +949,8 @@ template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
 
 template <> size_t API_EXPORT CountBufferSize(const DataLoadInfo &input, TLVObject &data)
 {
-    return data.CountHead() + data.Count(input.udKey) + CountBufferSize(input.types, data) + data.CountBasic(input.recordCount);
+    return data.CountHead() + data.Count(input.udKey) + CountBufferSize(input.types, data) +
+        data.CountBasic(input.recordCount);
 }
 
 template <> bool API_EXPORT Writing(const DataLoadInfo &input, TLVObject &data, TAG tag)

@@ -24,7 +24,8 @@ class DataParamsConversion {
 public:
     static Status API_EXPORT GetInnerDataParams(OH_UdmfGetDataParams &ndkDataParams, QueryOption &query,
         GetDataParams &dataParams);
-    static Status API_EXPORT GetDataLoaderParams(const OH_UdmfDataLoadParams &ndkDataParams, DataLoadParams &dataLoadParams);
+    static Status API_EXPORT GetDataLoaderParams(const OH_UdmfDataLoadParams &ndkDataParams,
+        DataLoadParams &dataLoadParams);
 };
 }
 

@@ -24,13 +24,13 @@ namespace OHOS {
 namespace UDMF {
 class IUdmfNotifier : public IRemoteBroker {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"zzz IUdmfNotifier descriptor");
+    DECLARE_INTERFACE_DESCRIPTOR(u"IUdmfNotifier descriptor");
     virtual void HandleDelayObserver(const std::string &key, const DataLoadInfo &dataLoadInfo) = 0;
 };
 
 class IDelayDataCallback : public IRemoteBroker {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"zzz IDelayDataCallback descriptor");
+    DECLARE_INTERFACE_DESCRIPTOR(u"IDelayDataCallback descriptor");
     virtual void DelayDataCallback(const std::string &key, const UnifiedData &data) = 0;
 };
 

@@ -27,7 +27,6 @@ namespace UDMF {
 
 int32_t UdmfNotifierStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    LOG_ERROR(UDMF_SERVICE, "zzz start");
     LOG_INFO(UDMF_SERVICE, "code:%{public}u callingPid:%{public}u", code, IPCSkeleton::GetCallingPid());
     std::u16string local = GetDescriptor();
     std::u16string remote = data.ReadInterfaceToken();
@@ -57,11 +56,8 @@ void UdmfNotifierClient::HandleDelayObserver(const std::string &key, const DataL
     std::thread(updateTask).detach();
 }
 
-
-
 int32_t DelayDataCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    LOG_ERROR(UDMF_SERVICE, "zzz start");
     LOG_INFO(UDMF_SERVICE, "code:%{public}u callingPid:%{public}u", code, IPCSkeleton::GetCallingPid());
     std::u16string local = GetDescriptor();
     std::u16string remote = data.ReadInterfaceToken();

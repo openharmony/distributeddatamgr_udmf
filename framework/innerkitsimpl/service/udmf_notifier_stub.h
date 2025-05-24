@@ -40,13 +40,10 @@ private:
     LoadHandler loadHandler_;
 };
 
-
-
 class DelayDataCallbackStub : public IRemoteStub<IDelayDataCallback> {
 public:
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 };
-
 
 class DelayDataCallbackClient : public DelayDataCallbackStub {
 public:

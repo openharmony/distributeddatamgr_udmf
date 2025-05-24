@@ -52,9 +52,11 @@ public:
     virtual int32_t RemoveAppShareOption(const std::string &intention) = 0;
     virtual int32_t ObtainAsynProcess(AsyncProcessInfo &processInfo) = 0;
     virtual int32_t ClearAsynProcessByKey(const std::string &businessUdKey) = 0;
-    virtual int32_t SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::string &key) = 0;
+    virtual int32_t SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+        std::string &key) = 0;
     virtual int32_t SetDelayData(const std::string &key, UnifiedData &unifiedData) = 0;
-    virtual int32_t GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData) = 0;
+    virtual int32_t GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+        std::shared_ptr<UnifiedData> unifiedData) = 0;
 };
 } // namespace UDMF
 } // namespace OHOS

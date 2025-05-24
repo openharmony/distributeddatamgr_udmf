@@ -318,7 +318,6 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::set<std::s
 
         out.insert(str);
     }
-    LOG_ERROR(UDMF_KITS_NAPI, "zzz 321");
     return napi_ok;
 }
 
@@ -657,21 +656,16 @@ napi_status NapiDataUtils::SetValue(napi_env env, const ProgressInfo &in, napi_v
 
 napi_status NapiDataUtils::SetValue(napi_env env, const DataLoadInfo &in, napi_value &out)
 {
-    LOG_ERROR(UDMF_KITS_NAPI, "zzz napi_value <- DataLoadInfo");
+    LOG_ERROR(UDMF_KITS_NAPI, "napi_value <- DataLoadInfo");
     napi_create_object(env, &out);
 
-    LOG_ERROR(UDMF_KITS_NAPI, "zzz 664");
     napi_value jsRecordCount = nullptr;
     NAPI_CALL_BASE(env, SetValue(env, in.recordCount, jsRecordCount), napi_invalid_arg);
-    LOG_ERROR(UDMF_KITS_NAPI, "zzz 667");
     NAPI_CALL_BASE(env, napi_set_named_property(env, out, "recordCount", jsRecordCount), napi_invalid_arg);
 
     napi_value jsTypes = nullptr;
-    LOG_ERROR(UDMF_KITS_NAPI, "zzz 671");
     NAPI_CALL_BASE(env, SetValue(env, in.types, jsTypes), napi_invalid_arg);
-    LOG_ERROR(UDMF_KITS_NAPI, "zzz 673");
     NAPI_CALL_BASE(env, napi_set_named_property(env, out, "types", jsTypes), napi_invalid_arg);
-    LOG_ERROR(UDMF_KITS_NAPI, "zzz 675");
     return napi_ok;
 }
 

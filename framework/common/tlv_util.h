@@ -418,7 +418,7 @@ template <typename... _Types> bool Reading(std::variant<_Types...> &output, TLVO
 template <typename T> size_t CountBufferSize(const std::set<T> &input, TLVObject &data)
 {
     auto size = data.CountHead() + data.CountBasic(input.size());
-    for (auto item : input) {
+    for (const auto &item : input) {
         size += CountBufferSize(item, data);
     }
     return size;
@@ -432,11 +432,9 @@ template <typename T> bool Writing(const std::set<T> &input, TLVObject &data, TA
     if (!data.WriteBasic(TAG::TAG_SET_SIZE, input.size())) {
         return false;
     }
-    if (!input.empty()) {
-        for (const auto &item : input) {
-            if (!Writing(item, data, TAG::TAG_SET_ITEM)) {
-                return false;
-            }
+    for (const auto &item : input) {
+        if (!Writing(item, data, TAG::TAG_SET_ITEM)) {
+            return false;
         }
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));

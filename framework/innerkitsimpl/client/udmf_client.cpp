@@ -24,9 +24,9 @@
 #include "udmf_utils.h"
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
+#include "udmf_notifier_stub.h"
 #include "unified_data_helper.h"
 #include "unified_html_record_process.h"
-#include "udmf_notifier_stub.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -358,7 +358,6 @@ Status UdmfClient::SetDelayInfo(const DataLoadParams &dataLoadParams, std::strin
         LOG_ERROR(UDMF_CLIENT, "Invalid key=%{public}s", dataLoadParams.dataLoadInfo.udKey.c_str());
         return E_INVALID_PARAMETERS;
     }
-    // SetDelayInfo
     auto service = UdmfServiceClient::GetInstance();
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
@@ -407,7 +406,7 @@ Status UdmfClient::GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteOb
     }
     int32_t ret = service->GetDelayData(dataLoadInfo, iUdmfNotifier, unifiedData);
     if (ret != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
+        LOG_ERROR(UDMF_CLIENT, "Failed! ret = %{public}d", ret);
         return static_cast<Status>(ret);
     }
     return E_OK;

@@ -27,7 +27,7 @@ ConcurrentMap<std::string, napi_threadsafe_function> DataLoadParamsNapi::tsfns_;
 
 bool DataLoadParamsNapi::Convert2NativeValue(napi_env env, napi_value in, DataLoadParams &dataLoadParams)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "zzz Start.");
+    LOG_DEBUG(UDMF_KITS_NAPI, "Start.");
     napi_value jsDataLoadInfo = nullptr;
     NAPI_CALL_BASE(env, napi_get_named_property(env, in, "dataLoadInfo", &jsDataLoadInfo), false);
     NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsDataLoadInfo, dataLoadParams.dataLoadInfo), false);
@@ -53,7 +53,7 @@ bool DataLoadParamsNapi::Convert2NativeValue(napi_env env, napi_value in, DataLo
     });
 
     dataLoadParams.loadHandler = [](const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
-        LOG_INFO(UDMF_KITS_NAPI, "zzz Load handler Start.");
+        LOG_INFO(UDMF_KITS_NAPI, "Load handler Start.");
         auto handlerKey = UTILS::GetHandlerKey(udKey);
         if (handlerKey.empty()) {
             LOG_ERROR(UDMF_KITS_NAPI, "Error udKey:%{public}s", udKey.c_str());
@@ -85,27 +85,21 @@ void DataLoadParamsNapi::CallDataLoadHandler(napi_env env, napi_value callback, 
     DataLoadArgs* infoArgs = static_cast<DataLoadArgs*>(data);
     std::string udKey = infoArgs->udKey;
     napi_value param;
-    LOG_ERROR(UDMF_KITS_NAPI, "zzz 85");
     auto status = NapiDataUtils::SetValue(env, infoArgs->dataLoadInfo, param);
-    LOG_ERROR(UDMF_KITS_NAPI, "zzz 92");
     delete infoArgs;
     if (status != napi_ok) {
         LOG_ERROR(UDMF_KITS_NAPI, "SetValue dataLoadInfo failed, status=%{public}d", status);
         return;
     }
-    LOG_ERROR(UDMF_KITS_NAPI, "zzz 87");
-
     napi_value result = nullptr;
     status = napi_call_function(env, nullptr, callback, 1, &param, &result);
-    LOG_ERROR(UDMF_KITS_NAPI, "zzz 102");
     if (status != napi_ok || result == nullptr) {
         LOG_ERROR(UDMF_KITS_NAPI, "napi_call_function failed, status=%{public}d", status);
         return;
     }
-    LOG_ERROR(UDMF_KITS_NAPI, "zzz 107");
+    LOG_INFO(UDMF_KITS_NAPI, "Call napi_call_function end.");
     napi_valuetype type = napi_undefined;
     napi_typeof(env, result, &type);
-    LOG_ERROR(UDMF_KITS_NAPI, "zzz 110");
     if (type == napi_null) {
         LOG_ERROR(UDMF_KITS_NAPI, "DataLoad has no data");
         return;
