@@ -118,7 +118,7 @@ struct UriInfo {
 };
 
 struct DataLoadInfo {
-    std::string udKey;
+    std::string sequenceKey;
     std::set<std::string> types;
     uint32_t recordCount;
 };

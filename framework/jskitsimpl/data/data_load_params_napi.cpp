@@ -27,15 +27,13 @@ ConcurrentMap<std::string, napi_threadsafe_function> DataLoadParamsNapi::tsfns_;
 
 bool DataLoadParamsNapi::Convert2NativeValue(napi_env env, napi_value in, DataLoadParams &dataLoadParams)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "Start.");
     napi_value jsDataLoadInfo = nullptr;
     NAPI_CALL_BASE(env, napi_get_named_property(env, in, "dataLoadInfo", &jsDataLoadInfo), false);
     NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsDataLoadInfo, dataLoadParams.dataLoadInfo), false);
     napi_value jsLoadHandler = nullptr;
     NAPI_CALL_BASE(env, napi_get_named_property(env, in, "loadHandler", &jsLoadHandler), false);
-
-    dataLoadParams.dataLoadInfo.udKey = UTILS::GenerateId();
-    tsfns_.Compute(dataLoadParams.dataLoadInfo.udKey, [&](const std::string &key, napi_threadsafe_function &tsfn) {
+    dataLoadParams.dataLoadInfo.sequenceKey = UTILS::GenerateId();
+    tsfns_.Compute(dataLoadParams.dataLoadInfo.sequenceKey, [&](const std::string &k, napi_threadsafe_function &tsfn) {
         if (tsfn != nullptr) {
             LOG_WARN(UDMF_KITS_NAPI, "Listener has existed!");
             napi_release_threadsafe_function(tsfn, napi_tsfn_release);
@@ -51,15 +49,14 @@ bool DataLoadParamsNapi::Convert2NativeValue(napi_env env, napi_value in, DataLo
         }
         return true;
     });
-
     dataLoadParams.loadHandler = [](const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
         LOG_INFO(UDMF_KITS_NAPI, "Load handler Start.");
-        auto handlerKey = UTILS::GetHandlerKey(udKey);
-        if (handlerKey.empty()) {
+        auto seqKey = UTILS::GetSequenceKey(udKey);
+        if (seqKey.empty()) {
             LOG_ERROR(UDMF_KITS_NAPI, "Error udKey:%{public}s", udKey.c_str());
             return;
         }
-        bool tsfnExist = tsfns_.ComputeIfPresent(handlerKey, [&](const std::string &key, napi_threadsafe_function &tsfn){
+        bool tsfnExist = tsfns_.ComputeIfPresent(seqKey, [&](const std::string &key, napi_threadsafe_function &tsfn) {
             DataLoadArgs *infoArgs = new (std::nothrow) DataLoadArgs;
             if (infoArgs == nullptr) {
                 LOG_ERROR(UDMF_KITS_NAPI, "No space for dataLoadArgs, udKey=%{public}s", udKey.c_str());
@@ -69,13 +66,12 @@ bool DataLoadParamsNapi::Convert2NativeValue(napi_env env, napi_value in, DataLo
             infoArgs->dataLoadInfo = dataLoadInfo;
             auto status = napi_call_threadsafe_function(tsfn, infoArgs, napi_tsfn_blocking);
             if (status != napi_ok) {
-                LOG_ERROR(UDMF_KITS_NAPI, "napi_call_threadsafe_function failed, status=%{public}d, udKey=%{public}s", status, udKey.c_str());
+                LOG_ERROR(UDMF_KITS_NAPI, "call func failed,status=%{public}d,udKey=%{public}s", status, udKey.c_str());
             }
+            napi_release_threadsafe_function(tsfn, napi_tsfn_release);
             return false;
         });
-        if (!tsfnExist) {
-            LOG_ERROR(UDMF_KITS_NAPI, "Tsfn not exist, udKey=%{public}s", udKey.c_str());
-        }
+        if (!tsfnExist) { LOG_ERROR(UDMF_KITS_NAPI, "Tsfn not exist, udKey=%{public}s", udKey.c_str()); }
     };
     return true;
 }

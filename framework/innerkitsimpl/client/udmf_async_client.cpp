@@ -263,7 +263,7 @@ Status UdmfAsyncClient::GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper,
         return E_ERROR;
     }
     std::shared_ptr<UnifiedData> dataPtr = nullptr;
-    auto status = static_cast<Status>(UdmfClient::GetInstance().GetDataIfAvailable(
+    auto status = static_cast<Status>(UdmfClient::GetInstance().GetDataIfAvailable(query.key,
         asyncHelper->acceptableInfo, iUdmfNotifier, dataPtr));
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "GetData error, status = %{public}d", status);
@@ -434,5 +434,10 @@ bool UdmfAsyncClient::IsParamValid(const GetDataParams &params)
         return false;
     }
     return true;
+}
+
+void UdmfAsyncClient::PushTaskToExecutor(Executor::Task task)
+{
+    executor_.Execute(task);
 }
 } // namespace OHOS::UDMF

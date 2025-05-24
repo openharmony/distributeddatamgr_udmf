@@ -1184,6 +1184,7 @@ void OH_UdmfGetDataParams_SetDataProgressListener(OH_UdmfGetDataParams* params,
 void OH_UdmfGetDataParams_SetAcceptableInfo(OH_UdmfGetDataParams* params, OH_UdmfDataLoadInfo* acceptableInfo)
 {
     if (params == nullptr || acceptableInfo == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
         return;
     }
     params->acceptableInfo = *acceptableInfo;
@@ -1202,6 +1203,7 @@ OH_UdmfDataLoadParams* OH_UdmfDataLoadParams_Create()
 void OH_UdmfDataLoadParams_Destroy(OH_UdmfDataLoadParams* pThis)
 {
     if (pThis == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
         return;
     }
     delete pThis;
@@ -1210,6 +1212,7 @@ void OH_UdmfDataLoadParams_Destroy(OH_UdmfDataLoadParams* pThis)
 void OH_UdmfDataLoadParams_SetLoadHandler(OH_UdmfDataLoadParams* params, const OH_Udmf_DataLoadHandler dataLoadHandler)
 {
     if (params == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
         return;
     }
     params->dataLoadHandler = dataLoadHandler;
@@ -1218,6 +1221,7 @@ void OH_UdmfDataLoadParams_SetLoadHandler(OH_UdmfDataLoadParams* params, const O
 void OH_UdmfDataLoadParams_SetDataLoadInfo(OH_UdmfDataLoadParams* params, OH_UdmfDataLoadInfo* dataLoadInfo)
 {
     if (params == nullptr || dataLoadInfo == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
         return;
     }
     params->dataLoadInfo = *dataLoadInfo;
@@ -1236,6 +1240,7 @@ OH_UdmfDataLoadInfo* OH_UdmfDataLoadInfo_Create()
 void OH_UdmfDataLoadInfo_Destroy(OH_UdmfDataLoadInfo* dataLoadInfo)
 {
     if (dataLoadInfo == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
         return;
     }
     NdkDataConversion::DestroyStringArray(dataLoadInfo->typesArray, dataLoadInfo->typesCount);
@@ -1245,6 +1250,7 @@ void OH_UdmfDataLoadInfo_Destroy(OH_UdmfDataLoadInfo* dataLoadInfo)
 char** OH_UdmfDataLoadInfo_GetTypes(OH_UdmfDataLoadInfo* dataLoadInfo, unsigned int* count)
 {
     if (dataLoadInfo == nullptr || count == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
         return nullptr;
     }
     *count = dataLoadInfo->typesCount;
@@ -1254,6 +1260,7 @@ char** OH_UdmfDataLoadInfo_GetTypes(OH_UdmfDataLoadInfo* dataLoadInfo, unsigned 
 void OH_UdmfDataLoadInfo_SetType(OH_UdmfDataLoadInfo* dataLoadInfo, const char* type)
 {
     if (dataLoadInfo == nullptr || type == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
         return;
     }
     std::set<std::string> types;
@@ -1269,6 +1276,7 @@ void OH_UdmfDataLoadInfo_SetType(OH_UdmfDataLoadInfo* dataLoadInfo, const char* 
 int OH_UdmfDataLoadInfo_GetRecordCount(OH_UdmfDataLoadInfo* dataLoadInfo)
 {
     if (dataLoadInfo == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
         return 0;
     }
     return static_cast<int>(dataLoadInfo->recordsCount);
@@ -1277,6 +1285,7 @@ int OH_UdmfDataLoadInfo_GetRecordCount(OH_UdmfDataLoadInfo* dataLoadInfo)
 void OH_UdmfDataLoadInfo_SetRecordCount(OH_UdmfDataLoadInfo* dataLoadInfo, unsigned int recordCount)
 {
     if (dataLoadInfo == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
         return;
     }
     dataLoadInfo->recordsCount = recordCount;

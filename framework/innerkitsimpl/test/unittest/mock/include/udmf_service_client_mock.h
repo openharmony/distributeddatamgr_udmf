@@ -45,7 +45,8 @@ public:
     virtual int32_t ClearAsynProcessByKey(const std::string &businessUdKey) = 0;
     virtual int32_t SetDelayInfo(const DataLoadInfo &, sptr<IRemoteObject>, std::string &) = 0;
     virtual int32_t PushDelayData(const std::string &, const UnifiedData &) = 0;
-    virtual int32_t GetDataIfAvailable(const DataLoadInfo &, sptr<IRemoteObject>, std::shared_ptr<UnifiedData>) = 0;
+    virtual int32_t GetDataIfAvailable(const std::string &key, const DataLoadInfo &, sptr<IRemoteObject>,
+        std::shared_ptr<UnifiedData>) = 0;
 public:
     static inline std::shared_ptr<MUdmfServiceClient> udmfServiceClient = nullptr;
 };
@@ -69,7 +70,8 @@ public:
     MOCK_METHOD(int32_t, ClearAsynProcessByKey, (const std::string &));
     MOCK_METHOD(int32_t, SetDelayInfo, (const DataLoadInfo &, sptr<IRemoteObject>, std::string &));
     MOCK_METHOD(int32_t, PushDelayData, (const std::string &, const UnifiedData &));
-    MOCK_METHOD(int32_t, GetDataIfAvailable, (const DataLoadInfo &, sptr<IRemoteObject>, std::shared_ptr<UnifiedData>));
+    MOCK_METHOD(int32_t, GetDataIfAvailable, (const std::string &, const DataLoadInfo &, sptr<IRemoteObject>,
+        std::shared_ptr<UnifiedData>));
 };
 } // namespace UDMF
 } // namespace OHOS

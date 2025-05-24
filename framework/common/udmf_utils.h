@@ -29,7 +29,7 @@ std::string GetSdkVersionByToken(uint32_t tokenId);
 std::string GetCurrentSdkVersion();
 bool API_EXPORT IsTokenNative();
 bool API_EXPORT IsNativeCallingToken();
-std::string API_EXPORT GetHandlerKey(const std::string &udKey);
+std::string API_EXPORT GetSequenceKey(const std::string &udKey);
 
 } // namespace UTILS
 } // namespace UDMF

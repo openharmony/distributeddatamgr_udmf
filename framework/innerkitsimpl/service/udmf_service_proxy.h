@@ -52,8 +52,8 @@ public:
     int32_t SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
         std::string &key) override;
     int32_t PushDelayData(const std::string &key, UnifiedData &unifiedData) override;
-    int32_t GetDataIfAvailable(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
-        std::shared_ptr<UnifiedData> unifiedData) override;
+    int32_t GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
+        sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData) override;
 private:
     static inline BrokerDelegator<UdmfServiceProxy> delegator_;
     int32_t SendRequest(UdmfServiceInterfaceCode code, MessageParcel &data,

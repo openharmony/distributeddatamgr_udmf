@@ -319,10 +319,10 @@ int32_t UdmfServiceClient::PushDelayData(const std::string &key, UnifiedData &un
     return udmfProxy_->PushDelayData(key, unifiedData);
 }
 
-int32_t UdmfServiceClient::GetDataIfAvailable(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
-    std::shared_ptr<UnifiedData> unifiedData)
+int32_t UdmfServiceClient::GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
+    sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData)
 {
-    return udmfProxy_->GetDataIfAvailable(dataLoadInfo, iUdmfNotifier, unifiedData);
+    return udmfProxy_->GetDataIfAvailable(key, dataLoadInfo, iUdmfNotifier, unifiedData);
 }
 } // namespace UDMF
 } // namespace OHOS

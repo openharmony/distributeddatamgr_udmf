@@ -18,6 +18,7 @@
 #include "error_code.h"
 #include "ipc_skeleton.h"
 #include "logger.h"
+#include "udmf_async_client.h"
 #include "udmf_types_util.h"
 #include "udmf_conversion.h"
 #include "unified_html_record_process.h"
@@ -51,10 +52,8 @@ UdmfNotifierClient::UdmfNotifierClient(LoadHandler loadHandler):loadHandler_(loa
 
 void UdmfNotifierClient::HandleDelayObserver(const std::string &key, const DataLoadInfo &dataLoadInfo)
 {
-    auto updateTask = [=]() {
-        loadHandler_(key, dataLoadInfo);
-    };
-    std::thread(updateTask).detach();
+    UdmfAsyncClient::GetInstance().PushTaskToExecutor(
+        [=] { loadHandler_(key, dataLoadInfo); });
 }
 
 int32_t DelayDataCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
@@ -83,14 +82,12 @@ int32_t DelayDataCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &dat
     return 0;
 }
 
-DelayDataCallbackClient::DelayDataCallbackClient(DataCallback loadHandler):loadHandler_(loadHandler) {}
+DelayDataCallbackClient::DelayDataCallbackClient(DataCallback dataCallback):dataCallback_(dataCallback) {}
 
 void DelayDataCallbackClient::DelayDataCallback(const std::string &key, const UnifiedData &unifiedData)
 {
-    auto updateTask = [=]() {
-        loadHandler_(key, unifiedData);
-    };
-    std::thread(updateTask).detach();
+    UdmfAsyncClient::GetInstance().PushTaskToExecutor(
+        [=] { dataCallback_(key, unifiedData); });
 }
 
 } // namespace UDMF

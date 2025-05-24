@@ -354,8 +354,8 @@ Status UdmfClient::GetParentType(Summary &oldSummary, Summary &newSummary)
 
 Status UdmfClient::SetDelayInfo(const DataLoadParams &dataLoadParams, std::string &key)
 {
-    if (dataLoadParams.dataLoadInfo.udKey.length() != KEY_LEN) {
-        LOG_ERROR(UDMF_CLIENT, "Invalid key=%{public}s", dataLoadParams.dataLoadInfo.udKey.c_str());
+    if (dataLoadParams.dataLoadInfo.sequenceKey.length() != KEY_LEN) {
+        LOG_ERROR(UDMF_CLIENT, "Invalid key=%{public}s", dataLoadParams.dataLoadInfo.sequenceKey.c_str());
         return E_INVALID_PARAMETERS;
     }
     auto service = UdmfServiceClient::GetInstance();
@@ -370,8 +370,7 @@ Status UdmfClient::SetDelayInfo(const DataLoadParams &dataLoadParams, std::strin
     }
     auto ret = service->SetDelayInfo(dataLoadParams.dataLoadInfo, iUdmfNotifier, key);
     if (ret != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d, udkey = %{public}s.",
-            ret, dataLoadParams.dataLoadInfo.udKey.c_str());
+        LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d, udkey = %{public}s.", ret, key.c_str());
     }
     return static_cast<Status>(ret);
 }
@@ -394,10 +393,10 @@ Status UdmfClient::PushDelayData(const std::string &key, UnifiedData &unifiedDat
     return static_cast<Status>(status);
 }
 
-Status UdmfClient::GetDataIfAvailable(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
-    std::shared_ptr<UnifiedData> unifiedData)
+Status UdmfClient::GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
+    sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData)
 {
-    if (dataLoadInfo.udKey.empty() || iUdmfNotifier == nullptr) {
+    if (key.empty() || iUdmfNotifier == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Empty key or notifier");
         return E_INVALID_PARAMETERS;
     }
@@ -406,7 +405,7 @@ Status UdmfClient::GetDataIfAvailable(const DataLoadInfo &dataLoadInfo, sptr<IRe
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         return E_IPC;
     }
-    int32_t ret = service->GetDataIfAvailable(dataLoadInfo, iUdmfNotifier, unifiedData);
+    int32_t ret = service->GetDataIfAvailable(key, dataLoadInfo, iUdmfNotifier, unifiedData);
     if (ret != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Failed! ret = %{public}d", ret);
         return static_cast<Status>(ret);

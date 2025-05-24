@@ -171,13 +171,13 @@ int32_t UdmfServiceClient::PushDelayData(const std::string &key, UnifiedData &un
     }
 }
 
-int32_t UdmfServiceClient::GetDataIfAvailable(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
-    std::shared_ptr<UnifiedData> unifiedData)
+int32_t UdmfServiceClient::GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
+    sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData)
 {
     if (MUdmfServiceClient::udmfServiceClient == nullptr) {
         return -1;
     } else {
-        return MUdmfServiceClient::udmfServiceClient->GetDataIfAvailable(dataLoadInfo, iUdmfNotifier, unifiedData);
+        return MUdmfServiceClient::udmfServiceClient->GetDataIfAvailable(key, dataLoadInfo, iUdmfNotifier, unifiedData);
     }
 }
 } // namespace OHOS::UDMF

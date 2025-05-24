@@ -45,10 +45,19 @@ Status DataParamsConversion::GetInnerDataParams(OH_UdmfGetDataParams &ndkDataPar
         ndkDataParams.dataProgressListener(&ndkProgrssInfo, ndkData);
         OH_UdmfData_Destroy(ndkData);
     };
+    std::set<std::string> types;
+    for (size_t i = 0; i < ndkDataParams.acceptableInfo.typesCount; i++) {
+        types.insert(ndkDataParams.acceptableInfo.typesArray[i]);
+    }
+    dataParams.acceptableInfo = {
+        .types = types,
+        .recordCount = ndkDataParams.acceptableInfo.recordsCount,
+    };
     return Status::E_OK;
 }
 
-Status DataParamsConversion::GetDataLoaderParams(const OH_UdmfDataLoadParams &ndkDataParams, DataLoadParams &dataLoadParams)
+Status DataParamsConversion::GetDataLoaderParams(const OH_UdmfDataLoadParams &ndkDataParams,
+    DataLoadParams &dataLoadParams)
 {
     if (ndkDataParams.dataLoadHandler == nullptr) {
         LOG_ERROR(UDMF_CAPI, "DataLoadHandler is null");
@@ -59,7 +68,7 @@ Status DataParamsConversion::GetDataLoaderParams(const OH_UdmfDataLoadParams &nd
         types.insert(ndkDataParams.dataLoadInfo.typesArray[i]);
     }
     dataLoadParams.dataLoadInfo = {
-        .udKey = UTILS::GenerateId(),
+        .sequenceKey = UTILS::GenerateId(),
         .types = types,
         .recordCount = ndkDataParams.dataLoadInfo.recordsCount,
     };

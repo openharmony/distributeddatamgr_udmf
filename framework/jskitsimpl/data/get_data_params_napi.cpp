@@ -72,7 +72,6 @@ bool GetDataParamsNapi::Convert2NativeValue(napi_env env, napi_value in,
         NAPI_CALL_BASE(env, napi_get_named_property(env, in, "acceptableInfo", &jsDataLoadInfo), false);
         NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsDataLoadInfo, getDataParams.acceptableInfo), false);
     }
-    getDataParams.acceptableInfo.udKey = key;
     return true;
 }
 

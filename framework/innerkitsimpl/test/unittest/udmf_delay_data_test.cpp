@@ -197,7 +197,7 @@ HWTEST_F(UdmfDelayDataTest, UdmfDelayDataTest001, TestSize.Level1)
     DataLoadInfo dataLoadInfo1{
         .recordCount = 10,
         .types{"general.plain-text", "general.html"},
-        .udKey = UTILS::GenerateId()
+        .sequenceKey = UTILS::GenerateId()
     };
     DataLoadInfo dataLoadInfo2{
         .recordCount = 100,
@@ -246,7 +246,6 @@ HWTEST_F(UdmfDelayDataTest, UdmfDelayDataTest001, TestSize.Level1)
     AddPrivilege(query);
 
     SetHapToken2();
-    dataLoadInfo2.udKey = key;
     auto callback = [this](ProgressInfo progress, std::shared_ptr<UnifiedData> data) {
         LOG_INFO(UDMF_TEST, "Callback begin status=%{public}d, progress=%{public}d",
             progress.progressStatus, progress.progress);
@@ -281,7 +280,7 @@ HWTEST_F(UdmfDelayDataTest, UdmfDelayDataTest002, TestSize.Level1)
     DataLoadInfo dataLoadInfo1{
         .recordCount = 10,
         .types{"general.plain-text", "general.html"},
-        .udKey = UTILS::GenerateId()
+        .sequenceKey = UTILS::GenerateId()
     };
     DataLoadInfo dataLoadInfo2{
         .recordCount = 100,
@@ -331,7 +330,6 @@ HWTEST_F(UdmfDelayDataTest, UdmfDelayDataTest002, TestSize.Level1)
     AddPrivilege(query);
 
     SetHapToken2();
-    dataLoadInfo2.udKey = key;
     auto callback = [this](ProgressInfo progress, std::shared_ptr<UnifiedData> data) {
         LOG_INFO(UDMF_TEST, "Callback begin status=%{public}d, progress=%{public}d",
             progress.progressStatus, progress.progress);
@@ -407,7 +405,7 @@ std::string UdmfDelayDataTest::SetDataInfoTest(const std::string &key)
     DataLoadInfo dataLoadInfo1{
         .recordCount = 10,
         .types{"general.plain-text", "general.html"},
-        .udKey = key
+        .sequenceKey = key
     };
     DataLoadInfo dataLoadInfo2{
         .recordCount = 100,
@@ -440,7 +438,6 @@ void UdmfDelayDataTest::GetDelayDataTest(const std::string &key)
     DataLoadInfo dataLoadInfo2{
         .recordCount = 100,
         .types{"general.plain-text"},
-        .udKey = key
     };
     auto callback = [](ProgressInfo progress, std::shared_ptr<UnifiedData> data) {
         LOG_INFO(UDMF_TEST, "Callback begin status=%{public}d, progress=%{public}d",

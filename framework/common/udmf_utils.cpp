@@ -88,7 +88,7 @@ bool IsNativeCallingToken()
     return tokenType == Security::AccessToken::TypeATokenTypeEnum::TOKEN_NATIVE;
 }
 
-std::string GetHandlerKey(const std::string &udKey)
+std::string GetSequenceKey(const std::string &udKey)
 {
     auto pos = udKey.rfind('/');
     if (pos == std::string::npos || pos + 1 >= udKey.length()) {
