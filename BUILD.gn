@@ -45,5 +45,8 @@ group("unittest") {
 group("fuzztest") {
   testonly = true
 
-  deps = [ "framework/innerkitsimpl/test/fuzztest:fuzztest" ]
+  deps = [
+    "framework/innerkitsimpl/test/fuzztest:fuzztest",
+    "framework/ndkimpl/udmf_fuzzer:fuzztest",
+  ]
 }
