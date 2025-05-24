@@ -3587,14 +3587,17 @@ HWTEST_F(UdmfClientTest, GetParentType001, TestSize.Level1)
     auto obj = std::make_shared<Object>();
     obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
     obj->value_[FILE_TYPE] = "general.file";
+    obj->value_[FILE_URI_PARAM] = "http://file.com";
     auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
     auto obj1 = std::make_shared<Object>();
     obj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
     obj1->value_[FILE_TYPE] = "general.image";
+    obj1->value_[FILE_URI_PARAM] = "http://image.com";
     auto record1 = std::make_shared<UnifiedRecord>(FILE_URI, obj1);
     auto obj2 = std::make_shared<Object>();
     obj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
     obj2->value_[FILE_TYPE] = "general.png";
+    obj2->value_[FILE_URI_PARAM] = "http://png.com";
     auto record2 = std::make_shared<UnifiedRecord>(FILE_URI, obj2);
     data.AddRecord(record);
     data.AddRecord(record1);
@@ -3606,12 +3609,12 @@ HWTEST_F(UdmfClientTest, GetParentType001, TestSize.Level1)
     status = UdmfClient::GetInstance().GetSummary(option2, summary);
     ASSERT_EQ(status, E_OK);
     EXPECT_EQ(summary.fileTypes.size(), data.GetRecords().size());
-    summary.summary["general.image"] = 1;
-    summary.summary["general.png"] = 1;
     Summary newSummary;
     status = UdmfClient::GetInstance().GetParentType(summary, newSummary);
     ASSERT_EQ(status, E_OK);
-    EXPECT_EQ(newSummary.summary["general.image"], 1 + 1);
+    EXPECT_EQ(newSummary.summary["general.file"], record->GetSize());
+    EXPECT_EQ(newSummary.summary["general.image"], record1->GetSize() + record2->GetSize());
+    EXPECT_EQ(newSummary.totalSize, record->GetSize() + record1->GetSize() + record2->GetSize());
 
     LOG_INFO(UDMF_TEST, "GetParentType001 end.");
 }
@@ -3631,14 +3634,17 @@ HWTEST_F(UdmfClientTest, GetParentType002, TestSize.Level1)
     auto obj = std::make_shared<Object>();
     obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
     obj->value_[FILE_TYPE] = "general.file";
+    obj->value_[FILE_URI_PARAM] = "http://file.com";
     auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
     auto obj1 = std::make_shared<Object>();
     obj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
     obj1->value_[FILE_TYPE] = "general.html";
+    obj1->value_[FILE_URI_PARAM] = "http://html-content.com";
     auto record1 = std::make_shared<UnifiedRecord>(FILE_URI, obj1);
     auto obj2 = std::make_shared<Object>();
     obj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
-    obj2->value_[FILE_TYPE] = "general.audio";
+    obj2->value_[FILE_TYPE] = "general.png";
+    obj2->value_[FILE_URI_PARAM] = "http://png.com";
     auto record2 = std::make_shared<UnifiedRecord>(FILE_URI, obj2);
     data.AddRecord(record);
     data.AddRecord(record1);
@@ -3650,12 +3656,12 @@ HWTEST_F(UdmfClientTest, GetParentType002, TestSize.Level1)
     status = UdmfClient::GetInstance().GetSummary(option2, summary);
     ASSERT_EQ(status, E_OK);
     EXPECT_EQ(summary.fileTypes.size(), data.GetRecords().size());
-    summary.summary["general.file"] = 1;
-    summary.summary["general.html"] = 1;
     Summary newSummary;
     status = UdmfClient::GetInstance().GetParentType(summary, newSummary);
     ASSERT_EQ(status, E_OK);
-    EXPECT_EQ(newSummary.summary["general.file"], 1 + 1);
+    EXPECT_EQ(newSummary.summary["general.file"], record->GetSize() + record1->GetSize());
+    EXPECT_EQ(newSummary.summary["general.image"], record2->GetSize());
+    EXPECT_EQ(newSummary.totalSize, record->GetSize() + record1->GetSize() + record2->GetSize());
 
     LOG_INFO(UDMF_TEST, "GetParentType002 end.");
 }
