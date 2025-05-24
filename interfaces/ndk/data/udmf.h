@@ -201,30 +201,30 @@ typedef void (*OH_Udmf_DataProgressListener)(OH_Udmf_ProgressInfo* progressInfo,
  * @brief Describes the optional arguments of data operation
  *
  * @since 20
-*/
+ */
 typedef struct OH_UdmfOptions OH_UdmfOptions;
 
 /**
- * @brief Represents the parameters of udmf get data with data load.
+ * @brief Indicates data loading params.
  *
  * @since 20
-*/
+ */
 typedef struct OH_UdmfDataLoadParams OH_UdmfDataLoadParams;
 
 /**
- * @brief Represents the udmf data load information.
+ * @brief Indicates data loading information.
  *
  * @since 20
-*/
+ */
 typedef struct OH_UdmfDataLoadInfo OH_UdmfDataLoadInfo;
 
 /**
  * @brief Indicates the callback function for loading data.
  *
  * @param acceptableInfo Indicates the type and number of data that can be accepted by the receiver.
- * @param data Returns the data to be loaded.
+ * @return Returns the data to be loaded.
  * @since 20
-*/
+ */
 typedef OH_UdmfData* (*OH_Udmf_DataLoadHandler)(OH_UdmfDataLoadInfo* acceptableInfo);
 
 /**
@@ -1093,7 +1093,7 @@ void OH_UdmfGetDataParams_SetDataProgressListener(OH_UdmfGetDataParams* params,
  * @brief Sets the acceptable info to the {@OH_UdmfGetDataParams}.
  *
  * @param params Represents a pointer to an instance of {@link OH_UdmfGetDataParams}.
- * @param acceptableInfo Represents a pointer to an instance of {@link OH_UdmfDataLoadParams}.
+ * @param acceptableInfo Represents a pointer to an instance of {@link OH_UdmfDataLoadInfo}.
  * @see OH_UdmfGetDataParams OH_UdmfDataLoadInfo
  * @since 20
  */

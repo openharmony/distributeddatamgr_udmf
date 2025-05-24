@@ -370,12 +370,13 @@ Status UdmfClient::SetDelayInfo(const DataLoadParams &dataLoadParams, std::strin
     }
     auto ret = service->SetDelayInfo(dataLoadParams.dataLoadInfo, iUdmfNotifier, key);
     if (ret != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d, udkey = %{public}s.", ret, dataLoadParams.dataLoadInfo.udKey.c_str());
+        LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d, udkey = %{public}s.",
+            ret, dataLoadParams.dataLoadInfo.udKey.c_str());
     }
     return static_cast<Status>(ret);
 }
 
-Status UdmfClient::SetDelayData(const std::string &key, UnifiedData &unifiedData)
+Status UdmfClient::PushDelayData(const std::string &key, UnifiedData &unifiedData)
 {
     if (key.empty()) {
         LOG_ERROR(UDMF_CLIENT, "Empty key");
@@ -386,14 +387,15 @@ Status UdmfClient::SetDelayData(const std::string &key, UnifiedData &unifiedData
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         return E_IPC;
     }
-    auto status = service->SetDelayData(key, unifiedData);
+    auto status = service->PushDelayData(key, unifiedData);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d", status);
     }
     return static_cast<Status>(status);
 }
 
-Status UdmfClient::GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData)
+Status UdmfClient::GetDataIfAvailable(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+    std::shared_ptr<UnifiedData> unifiedData)
 {
     if (dataLoadInfo.udKey.empty() || iUdmfNotifier == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Empty key or notifier");
@@ -404,7 +406,7 @@ Status UdmfClient::GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteOb
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         return E_IPC;
     }
-    int32_t ret = service->GetDelayData(dataLoadInfo, iUdmfNotifier, unifiedData);
+    int32_t ret = service->GetDataIfAvailable(dataLoadInfo, iUdmfNotifier, unifiedData);
     if (ret != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Failed! ret = %{public}d", ret);
         return static_cast<Status>(ret);

@@ -308,24 +308,21 @@ int32_t UdmfServiceClient::ClearAsynProcessByKey(const std::string &businessUdKe
     return udmfProxy_->ClearAsynProcessByKey(businessUdKey);
 }
 
-int32_t UdmfServiceClient::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::string &key)
+int32_t UdmfServiceClient::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+    std::string &key)
 {
     return udmfProxy_->SetDelayInfo(dataLoadInfo, iUdmfNotifier, key);
 }
 
-int32_t UdmfServiceClient::SetDelayData(const std::string &key, UnifiedData &unifiedData)
+int32_t UdmfServiceClient::PushDelayData(const std::string &key, UnifiedData &unifiedData)
 {
-    return udmfProxy_->SetDelayData(key, unifiedData);
+    return udmfProxy_->PushDelayData(key, unifiedData);
 }
 
-int32_t UdmfServiceClient::GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData)
+int32_t UdmfServiceClient::GetDataIfAvailable(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+    std::shared_ptr<UnifiedData> unifiedData)
 {
-    UnifiedKey udkey(dataLoadInfo.udKey);
-    if (!udkey.IsValid()) {
-        LOG_ERROR(UDMF_SERVICE, "Invalid key");
-        return E_INVALID_PARAMETERS;
-    }
-    return udmfProxy_->GetDelayData(dataLoadInfo, iUdmfNotifier, unifiedData);
+    return udmfProxy_->GetDataIfAvailable(dataLoadInfo, iUdmfNotifier, unifiedData);
 }
 } // namespace UDMF
 } // namespace OHOS

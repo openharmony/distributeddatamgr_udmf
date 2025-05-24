@@ -278,7 +278,7 @@ int32_t UdmfServiceProxy::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IR
     return E_OK;
 }
 
-int32_t UdmfServiceProxy::SetDelayData(const std::string &key, UnifiedData &unifiedData)
+int32_t UdmfServiceProxy::PushDelayData(const std::string &key, UnifiedData &unifiedData)
 {
     UdmfConversion::InitValueObject(unifiedData);
     MessageParcel reply;
@@ -291,7 +291,7 @@ int32_t UdmfServiceProxy::SetDelayData(const std::string &key, UnifiedData &unif
     return E_OK;
 }
 
-int32_t UdmfServiceProxy::GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+int32_t UdmfServiceProxy::GetDataIfAvailable(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
     std::shared_ptr<UnifiedData> unifiedData)
 {
     MessageParcel reply;

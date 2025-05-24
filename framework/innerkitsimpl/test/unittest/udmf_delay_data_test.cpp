@@ -214,7 +214,7 @@ HWTEST_F(UdmfDelayDataTest, UdmfDelayDataTest001, TestSize.Level1)
         auto plainText = std::make_shared<PlainText>(UDType::PLAIN_TEXT, obj);
         plainText->SetContent("content1");
         data.AddRecord(plainText);
-        auto ret = UdmfClient::GetInstance().SetDelayData(udKey, data);
+        auto ret = UdmfClient::GetInstance().PushDelayData(udKey, data);
         EXPECT_EQ(ret, E_OK);
     };
     DataLoadParams dataLoadParams = {
@@ -299,7 +299,7 @@ HWTEST_F(UdmfDelayDataTest, UdmfDelayDataTest002, TestSize.Level1)
         auto plainText = std::make_shared<PlainText>(UDType::PLAIN_TEXT, obj);
         plainText->SetContent("content1");
         data.AddRecord(plainText);
-        auto ret = UdmfClient::GetInstance().SetDelayData(udKey, data);
+        auto ret = UdmfClient::GetInstance().PushDelayData(udKey, data);
         EXPECT_EQ(ret, E_OK);
     };
     DataLoadParams dataLoadParams = {
@@ -397,7 +397,7 @@ HWTEST_F(UdmfDelayDataTest, UdmfDelayDataTest004, TestSize.Level1)
     plainText->SetContent("content1");
     data.AddRecord(plainText);
     std::string udKey = "";
-    auto ret = UdmfClient::GetInstance().SetDelayData(udKey, data);
+    auto ret = UdmfClient::GetInstance().PushDelayData(udKey, data);
     EXPECT_EQ(ret, E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "UdmfDelayDataTest004 end.");
 }
@@ -422,7 +422,7 @@ std::string UdmfDelayDataTest::SetDataInfoTest(const std::string &key)
         auto plainText = std::make_shared<PlainText>(UDType::PLAIN_TEXT, obj);
         plainText->SetContent("content1");
         data.AddRecord(plainText);
-        auto ret = UdmfClient::GetInstance().SetDelayData(udKey, data);
+        auto ret = UdmfClient::GetInstance().PushDelayData(udKey, data);
         EXPECT_EQ(ret, E_OK);
     };
     DataLoadParams dataLoadParams = {

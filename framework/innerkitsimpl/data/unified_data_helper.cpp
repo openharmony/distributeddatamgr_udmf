@@ -111,6 +111,14 @@ void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
     summary.fileTypes.insert(summary.fileTypes.end(), fileTypes.begin(), fileTypes.end());
 }
 
+void UnifiedDataHelper::GetSummaryFromLoadInfo(const DataLoadInfo &dataLoadInfo, Summary &summary)
+{
+    summary.totalSize = dataLoadInfo.recordCount;
+    for (const auto &type : dataLoadInfo.types) {
+        summary.summary.emplace(type, 0);
+    }
+}
+
 bool UnifiedDataHelper::Pack(UnifiedData &data)
 {
     UdmfConversion::InitValueObject(data);

@@ -49,7 +49,7 @@ class DelayDataCallbackClient : public DelayDataCallbackStub {
 public:
     using DataCallback = std::function<void(const std::string &udKey, const UnifiedData &unifiedData)>;
 
-    DelayDataCallbackClient(DataCallback loadHandler_);
+    DelayDataCallbackClient(DataCallback loadHandler);
     virtual ~DelayDataCallbackClient() = default;
     void DelayDataCallback(const std::string &key, const UnifiedData &data) override;
 

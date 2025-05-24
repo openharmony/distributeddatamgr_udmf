@@ -51,6 +51,7 @@ Status DataParamsConversion::GetInnerDataParams(OH_UdmfGetDataParams &ndkDataPar
 Status DataParamsConversion::GetDataLoaderParams(const OH_UdmfDataLoadParams &ndkDataParams, DataLoadParams &dataLoadParams)
 {
     if (ndkDataParams.dataLoadHandler == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "DataLoadHandler is null");
         return Status::E_INVALID_PARAMETERS;
     }
     std::set<std::string> types;
@@ -74,7 +75,7 @@ Status DataParamsConversion::GetDataLoaderParams(const OH_UdmfDataLoadParams &nd
             LOG_ERROR(UDMF_CAPI, "Data is null");
             return;
         }
-        auto status = UdmfClient::GetInstance().SetDelayData(udKey, *data->unifiedData_);
+        auto status = UdmfClient::GetInstance().PushDelayData(udKey, *data->unifiedData_);
         if (status != Status::E_OK) {
             LOG_ERROR(UDMF_CAPI, "Set delay data failed, status = %{public}d", status);
         }

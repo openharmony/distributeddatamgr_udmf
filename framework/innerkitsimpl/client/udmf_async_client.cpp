@@ -263,7 +263,7 @@ Status UdmfAsyncClient::GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper,
         return E_ERROR;
     }
     std::shared_ptr<UnifiedData> dataPtr = nullptr;
-    auto status = static_cast<Status>(UdmfClient::GetInstance().GetDelayData(
+    auto status = static_cast<Status>(UdmfClient::GetInstance().GetDataIfAvailable(
         asyncHelper->acceptableInfo, iUdmfNotifier, dataPtr));
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "GetData error, status = %{public}d", status);

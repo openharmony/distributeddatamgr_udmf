@@ -196,6 +196,7 @@ ohos_unittest("CopyFileTest") {
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/progress_callback.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_notifier_stub.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
     "udmf_copy_file_test.cpp",

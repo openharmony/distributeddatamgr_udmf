@@ -107,7 +107,7 @@ void DataLoadParamsNapi::CallDataLoadHandler(napi_env env, napi_value callback, 
     UnifiedDataNapi *unifiedDataNapi = nullptr;
     napi_unwrap(env, result, reinterpret_cast<void **>(&unifiedDataNapi));
 
-    auto ret = UdmfClient::GetInstance().SetDelayData(udKey, *unifiedDataNapi->value_);
+    auto ret = UdmfClient::GetInstance().PushDelayData(udKey, *unifiedDataNapi->value_);
     if (ret != E_OK) {
         LOG_ERROR(UDMF_KITS_NAPI, "SetData failed, status=%{public}d", ret);
     }

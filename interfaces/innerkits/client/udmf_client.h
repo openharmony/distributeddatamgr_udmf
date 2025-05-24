@@ -49,8 +49,8 @@ public:
     Status GetDataFromCache(const QueryOption &query, UnifiedData &unifiedData);
     Status API_EXPORT GetParentType(Summary &oldSummary, Summary &newSummary);
     Status API_EXPORT SetDelayInfo(const DataLoadParams &dataLoadParams, std::string &key);
-    Status API_EXPORT SetDelayData(const std::string &key, UnifiedData &unifiedData);
-    Status GetDelayData(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+    Status API_EXPORT PushDelayData(const std::string &key, UnifiedData &unifiedData);
+    Status GetDataIfAvailable(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
         std::shared_ptr<UnifiedData> unifiedData);
 
 private:
