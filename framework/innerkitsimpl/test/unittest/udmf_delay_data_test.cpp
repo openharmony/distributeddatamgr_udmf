@@ -15,18 +15,16 @@
 #define LOG_TAG "UdmfDelayDataTest"
 #include <gtest/gtest.h>
 
-#include "token_setproc.h"
 #include "accesstoken_kit.h"
 #include "nativetoken_kit.h"
-
-#include "image.h"
+#include "token_setproc.h"
+#include "async_task_params.h"
+#include "data_params_conversion.h"
 #include "logger.h"
 #include "plain_text.h"
 #include "udmf.h"
 #include "udmf_async_client.h"
 #include "udmf_client.h"
-#include "async_task_params.h"
-#include "data_params_conversion.h"
 #include "udmf_utils.h"
 
 using namespace testing::ext;
