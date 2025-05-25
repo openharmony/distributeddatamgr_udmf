@@ -47,6 +47,7 @@ public:
     ProgressListener progressListener;
     std::string destUri;
     QueryOption query;
+    DataLoadInfo acceptableInfo;
 };
 
 struct AsyncHelper {
@@ -66,6 +67,7 @@ struct AsyncHelper {
     std::string destUri;
     std::shared_ptr<UnifiedData> data = std::make_shared<UnifiedData>();
     ProgressQueue progressQueue;
+    DataLoadInfo acceptableInfo;
 };
 
 enum ListenerStatus: int32_t {

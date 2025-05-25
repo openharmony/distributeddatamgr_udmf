@@ -48,6 +48,10 @@ public:
     Status API_EXPORT GetAppShareOption(const std::string &intention, enum ShareOptions &shareOption);
     Status GetDataFromCache(const QueryOption &query, UnifiedData &unifiedData);
     Status API_EXPORT GetParentType(Summary &oldSummary, Summary &newSummary);
+    Status API_EXPORT SetDelayInfo(const DataLoadParams &dataLoadParams, std::string &key);
+    Status API_EXPORT PushDelayData(const std::string &key, UnifiedData &unifiedData);
+    Status GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
+        sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData);
 
 private:
     UdmfClient() = default;

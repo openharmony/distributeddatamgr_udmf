@@ -49,6 +49,7 @@ ohos_shared_library("unifieddatachannel_napi") {
   sources = [
     "${udmf_framework_path}/jskitsimpl/data/application_defined_record_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/audio_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/data_load_params_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/file_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/folder_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/get_data_params_napi.cpp",
@@ -157,6 +158,7 @@ ohos_shared_library("udmf_data_napi") {
   sources = [
     "${udmf_framework_path}/jskitsimpl/data/application_defined_record_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/audio_napi.cpp",
+    "${udmf_framework_path}/jskitsimpl/data/data_load_params_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/file_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/folder_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/get_data_params_napi.cpp",

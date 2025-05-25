@@ -30,6 +30,7 @@ public:
     static bool Unpack(UnifiedData &data);
     static void GetSummary(const UnifiedData &data, Summary &summary);
     static int32_t ProcessBigData(UnifiedData &data, Intention intention, bool isSaInvoke);
+    static void GetSummaryFromLoadInfo(const DataLoadInfo &dataLoadInfo, Summary &summary);
 private:
     static void CreateDirIfNotExist(const std::string& dirPath, const mode_t& mode);
     static bool SaveUDataToFile(const std::string &dataFile, UnifiedData &data);

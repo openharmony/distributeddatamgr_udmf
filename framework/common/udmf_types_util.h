@@ -21,6 +21,7 @@
 #include "unified_data.h"
 #include "unified_meta.h"
 #include "unified_types.h"
+#include "async_task_params.h"
 
 namespace OHOS {
 namespace ITypesUtil {
@@ -32,6 +33,7 @@ using QueryOption = UDMF::QueryOption;
 using UDType = UDMF::UDType;
 using Intention = UDMF::Intention;
 using AsyncProcessInfo = UDMF::AsyncProcessInfo;
+using DataLoadInfo = UDMF::DataLoadInfo;
 
 template<>
 bool API_EXPORT Marshalling(const UnifiedData &input, MessageParcel &parcel);
@@ -77,6 +79,11 @@ template<>
 bool API_EXPORT Marshalling(const AsyncProcessInfo &input, MessageParcel &parcel);
 template<>
 bool API_EXPORT Unmarshalling(AsyncProcessInfo &output, MessageParcel &parcel);
+
+template<>
+bool API_EXPORT Marshalling(const DataLoadInfo &input, MessageParcel &parcel);
+template<>
+bool API_EXPORT Unmarshalling(DataLoadInfo &output, MessageParcel &parcel);
 } // namespace ITypesUtil
 } // namespace OHOS
 #endif // UDMF_TYPES_UTIL_H

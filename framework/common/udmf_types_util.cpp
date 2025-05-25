@@ -223,5 +223,40 @@ bool Unmarshalling(AsyncProcessInfo &output, MessageParcel &parcel)
     output.permStatus = static_cast<AsyncTaskStatus>(permStatus);
     return true;
 }
+
+template<>
+bool Marshalling(const DataLoadInfo &input, MessageParcel &parcel)
+{
+    std::vector<uint8_t> dataSetBytes;
+    auto recordTlv = TLVObject(dataSetBytes);
+    if (!TLVUtil::Writing(input, recordTlv, TAG::TAG_DATA_LOAD_INFO)) {
+        LOG_ERROR(UDMF_SERVICE, "TLV writing failed!");
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(dataSetBytes.size()))
+        || !parcel.WriteRawData(dataSetBytes.data(), dataSetBytes.size())) {
+        LOG_ERROR(UDMF_SERVICE, "Marshall dataLoadInfo failed!");
+        return false;
+    }
+    return true;
+}
+
+template<>
+bool Unmarshalling(DataLoadInfo &output, MessageParcel &parcel)
+{
+    auto size = parcel.ReadInt32();
+    const uint8_t *rawData = reinterpret_cast<const uint8_t *>(parcel.ReadRawData(size));
+    if (rawData == nullptr) {
+        LOG_ERROR(UDMF_SERVICE, "RawData is null!");
+        return false;
+    }
+    std::vector<uint8_t> dataSetBytes(rawData, rawData + size);
+    auto dataTlv = TLVObject(dataSetBytes);
+    if (!TLVUtil::ReadTlv(output, dataTlv, TAG::TAG_DATA_LOAD_INFO)) {
+        LOG_ERROR(UDMF_SERVICE, "Unmarshall dataLoadInfo failed!");
+        return false;
+    }
+    return true;
+}
 } // namespace ITypesUtil
 } // namespace OHOS

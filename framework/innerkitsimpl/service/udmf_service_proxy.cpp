@@ -261,5 +261,55 @@ int32_t UdmfServiceProxy::ClearAsynProcessByKey(const std::string &businessUdKey
     }
     return E_OK;
 }
+
+int32_t UdmfServiceProxy::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+    std::string &key)
+{
+    MessageParcel reply;
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_DELAY_INFO, reply, dataLoadInfo, iUdmfNotifier);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x", status);
+        return status;
+    }
+    if (!ITypesUtil::Unmarshal(reply, key)) {
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal status failed!");
+        return E_READ_PARCEL_ERROR;
+    }
+    return E_OK;
+}
+
+int32_t UdmfServiceProxy::PushDelayData(const std::string &key, UnifiedData &unifiedData)
+{
+    UdmfConversion::InitValueObject(unifiedData);
+    MessageParcel reply;
+
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_DELAY_DATA, reply, key, unifiedData);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x", status);
+        return status;
+    }
+    return E_OK;
+}
+
+int32_t UdmfServiceProxy::GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
+    sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData)
+{
+    MessageParcel reply;
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::GET_DELAY_DATA, reply, key, dataLoadInfo, iUdmfNotifier);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s!", status, key.c_str());
+        return status;
+    }
+    UnifiedData data;
+    if (!ITypesUtil::Unmarshal(reply, data)) {
+        LOG_ERROR(UDMF_SERVICE, "Unmarshal UnifiedData failed!");
+        return E_READ_PARCEL_ERROR;
+    }
+    if (!data.IsEmpty()) {
+        UdmfConversion::ConvertRecordToSubclass(data);
+        unifiedData = std::make_shared<UnifiedData>(data);
+    }
+    return status;
+}
 } // namespace UDMF
 } // namespace OHOS

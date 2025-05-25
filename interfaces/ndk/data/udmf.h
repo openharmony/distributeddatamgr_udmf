@@ -205,6 +205,29 @@ typedef void (*OH_Udmf_DataProgressListener)(OH_Udmf_ProgressInfo* progressInfo,
 typedef struct OH_UdmfOptions OH_UdmfOptions;
 
 /**
+ * @brief Indicates data loading params.
+ *
+ * @since 20
+ */
+typedef struct OH_UdmfDataLoadParams OH_UdmfDataLoadParams;
+
+/**
+ * @brief Indicates data loading information.
+ *
+ * @since 20
+ */
+typedef struct OH_UdmfDataLoadInfo OH_UdmfDataLoadInfo;
+
+/**
+ * @brief Indicates the callback function for loading data.
+ *
+ * @param acceptableInfo Indicates the type and number of data that can be accepted by the receiver.
+ * @return Returns the data to be loaded.
+ * @since 20
+ */
+typedef OH_UdmfData* (*OH_Udmf_DataLoadHandler)(OH_UdmfDataLoadInfo* acceptableInfo);
+
+/**
  * @brief Creation a pointer to the instance of the {@link OH_UdmfData}.
  *
  * @return If the operation is successful, a pointer to the instance of the {@link OH_UdmfData}
@@ -1065,6 +1088,115 @@ void OH_UdmfGetDataParams_SetProgressIndicator(OH_UdmfGetDataParams* params,
  */
 void OH_UdmfGetDataParams_SetDataProgressListener(OH_UdmfGetDataParams* params,
     const OH_Udmf_DataProgressListener dataProgressListener);
+
+/**
+ * @brief Sets the acceptable info to the {@OH_UdmfGetDataParams}.
+ *
+ * @param params Represents a pointer to an instance of {@link OH_UdmfGetDataParams}.
+ * @param acceptableInfo Represents a pointer to an instance of {@link OH_UdmfDataLoadInfo}.
+ * @see OH_UdmfGetDataParams OH_UdmfDataLoadInfo
+ * @since 20
+ */
+void OH_UdmfGetDataParams_SetAcceptableInfo(OH_UdmfGetDataParams* params, OH_UdmfDataLoadInfo* acceptableInfo);
+
+/**
+ * @brief Creation a pointer to the instance of the {@link OH_UdmfDataLoadParams}.
+ *
+ * @return If the operation is successful, a pointer to the instance of the {@link OH_UdmfDataLoadParams}
+ * structure is returned. If the operation is failed, nullptr is returned.
+ * @see OH_UdmfDataLoadParams
+ * @since 20
+ */
+OH_UdmfDataLoadParams* OH_UdmfDataLoadParams_Create();
+
+/**
+ * @brief Destroy a pointer that points to an instance of {@link OH_UdmfDataLoadParams}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfDataLoadParams}.
+ * @see OH_UdmfDataLoadParams
+ * @since 20
+ */
+void OH_UdmfDataLoadParams_Destroy(OH_UdmfDataLoadParams* pThis);
+
+/**
+ * @brief Sets the data load handler to the {@OH_UdmfDataLoadParams}.
+ *
+ * @param params Represents a pointer to an instance of {@link OH_UdmfDataLoadParams}.
+ * @param dataLoadHandler Represents to the data load handler.
+ * @see OH_UdmfDataLoadParams OH_Udmf_DataLoadHandler
+ * @since 20
+ */
+void OH_UdmfDataLoadParams_SetLoadHandler(OH_UdmfDataLoadParams* params, const OH_Udmf_DataLoadHandler dataLoadHandler);
+
+/**
+ * @brief Sets the data load info to the {@OH_UdmfDataLoadParams}.
+ *
+ * @param params Represents a pointer to an instance of {@link OH_UdmfDataLoadParams}.
+ * @param dataLoadInfo Represents a pointer to an instance of {@link OH_UdmfDataLoadInfo}.
+ * @see OH_UdmfDataLoadParams OH_UdmfDataLoadInfo
+ * @since 20
+ */
+void OH_UdmfDataLoadParams_SetDataLoadInfo(OH_UdmfDataLoadParams* params, OH_UdmfDataLoadInfo* dataLoadInfo);
+
+/**
+ * @brief Creation a pointer to the instance of the {@link OH_UdmfDataLoadInfo}.
+ *
+ * @return If the operation is successful, a pointer to the instance of the {@link OH_UdmfDataLoadInfo}
+ * structure is returned. If the operation is failed, nullptr is returned.
+ * @see OH_UdmfDataLoadInfo
+ * @since 20
+ */
+OH_UdmfDataLoadInfo* OH_UdmfDataLoadInfo_Create();
+
+/**
+ * @brief Destroy a pointer that points to an instance of {@link OH_UdmfDataLoadInfo}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfDataLoadInfo}.
+ * @see OH_UdmfDataLoadInfo
+ * @since 20
+ */
+void OH_UdmfDataLoadInfo_Destroy(OH_UdmfDataLoadInfo* dataLoadInfo);
+
+/**
+ * @brief Gets the types from the {@OH_UdmfDataLoadInfo}.
+ *
+ * @param dataLoadInfo Represents a pointer to an instance of {@link OH_UdmfDataLoadInfo}.
+ * @param count the types count of data.
+ * @return Returns the types of data.
+ * @see OH_UdmfDataLoadInfo
+ * @since 20
+ */
+char** OH_UdmfDataLoadInfo_GetTypes(OH_UdmfDataLoadInfo* dataLoadInfo, unsigned int* count);
+
+/**
+ * @brief Sets the data load info to the {@OH_UdmfDataLoadInfo}.
+ *
+ * @param dataLoadInfo Represents a pointer to an instance of {@link OH_UdmfDataLoadInfo}.
+ * @param types Represents the type of data.
+ * @see OH_UdmfDataLoadInfo
+ * @since 20
+ */
+void OH_UdmfDataLoadInfo_SetType(OH_UdmfDataLoadInfo* dataLoadInfo, const char* type);
+
+/**
+ * @brief Gets the record count from the {@OH_UdmfDataLoadInfo}.
+ *
+ * @param dataLoadInfo Represents a pointer to an instance of {@link OH_UdmfDataLoadInfo}.
+ * @return Returns the record count.
+ * @see OH_UdmfDataLoadInfo
+ * @since 20
+ */
+int OH_UdmfDataLoadInfo_GetRecordCount(OH_UdmfDataLoadInfo* dataLoadInfo);
+
+/**
+ * @brief Sets the record count to the {@OH_UdmfDataLoadInfo}.
+ *
+ * @param dataLoadInfo Represents a pointer to an instance of {@link OH_UdmfDataLoadInfo}.
+ * @param recordCount Represents the types of data.
+ * @see OH_UdmfDataLoadInfo
+ * @since 20
+ */
+void OH_UdmfDataLoadInfo_SetRecordCount(OH_UdmfDataLoadInfo* dataLoadInfo, unsigned int recordCount);
 
 #ifdef __cplusplus
 };

@@ -14,30 +14,30 @@
  */
 #define LOG_TAG "Udmf"
 #include "udmf.h"
-#include "udmf_err_code.h"
-#include "data_provider_impl.h"
-#include "udmf_client.h"
-#include "securec.h"
-#include "udmf_capi_common.h"
-#include "int_wrapper.h"
-#include "string_wrapper.h"
-#include "unified_meta.h"
-#include "udmf_meta.h"
-#include "logger.h"
-#include "plain_text.h"
-#include "link.h"
-#include "html.h"
-#include "system_defined_appitem.h"
 #include "application_defined_record.h"
-#include "system_defined_pixelmap.h"
-#include "file.h"
 #include "audio.h"
+#include "data_provider_impl.h"
+#include "file.h"
 #include "folder.h"
+#include "html.h"
 #include "image.h"
-#include "video.h"
+#include "int_wrapper.h"
+#include "link.h"
+#include "logger.h"
+#include "ndk_data_conversion.h"
+#include "plain_text.h"
+#include "securec.h"
+#include "string_wrapper.h"
+#include "system_defined_appitem.h"
+#include "system_defined_pixelmap.h"
+#include "udmf_capi_common.h"
+#include "udmf_client.h"
+#include "udmf_err_code.h"
+#include "udmf_meta.h"
+#include "unified_meta.h"
 #include "utd.h"
 #include "utd_client.h"
-#include "unified_key.h"
+#include "video.h"
 
 using namespace OHOS::UDMF;
 
@@ -60,22 +60,6 @@ static const std::map<Udmf_Intention, Intention> VAILD_INTENTIONS = {
     { UDMF_INTENTION_MENU, Intention::UD_INTENTION_MENU }
 };
 
-static void DestroyStringArray(char**& bufArray, unsigned int& count)
-{
-    if (bufArray == nullptr) {
-        return;
-    }
-    for (unsigned int i = 0; i < count; i++) {
-        if (bufArray[i] != nullptr) {
-            delete[] bufArray[i];
-            bufArray[i] = nullptr;
-        }
-    }
-    delete[] bufArray;
-    bufArray = nullptr;
-    count = 0;
-}
-
 static void DestroyUnifiedRecordArray(OH_UdmfRecord**& records, unsigned int& count)
 {
     if (records == nullptr) {
@@ -90,36 +74,6 @@ static void DestroyUnifiedRecordArray(OH_UdmfRecord**& records, unsigned int& co
     delete[] records;
     records = nullptr;
     count = 0;
-}
-
-static char** StrVectorToTypesArray(const std::vector<std::string>& strVector)
-{
-    unsigned int vectorSize = strVector.size();
-    if (vectorSize == 0 || vectorSize > MAX_RECORDS_COUNT) {
-        return nullptr;
-    }
-    char** typesArray = new (std::nothrow) char* [vectorSize];
-    if (typesArray == nullptr) {
-        LOG_ERROR(UDMF_CAPI, "create types array failed!, vectorSize: %{public}d, MAX_RECORDS_COUNT: %{public}" PRIu64,
-            vectorSize, MAX_RECORDS_COUNT);
-        return nullptr;
-    }
-    for (unsigned int i = 0; i < vectorSize; ++i) {
-        unsigned int strLen = strVector[i].length() + 1;
-        if (strLen > MAX_KEY_STRING_LEN) {
-            LOG_INFO(UDMF_CAPI, "string exceeds maximum length, length is %{public}d", strLen);
-            DestroyStringArray(typesArray, vectorSize);
-            return nullptr;
-        }
-        typesArray[i] = new (std::nothrow) char[strLen];
-        if (typesArray[i] == nullptr ||
-            (strcpy_s(typesArray[i], strLen, strVector[i].c_str())) != EOK) {
-            LOG_ERROR(UDMF_CAPI, "string copy failed");
-            DestroyStringArray(typesArray, vectorSize);
-            return nullptr;
-        }
-    }
-    return typesArray;
 }
 
 static OH_UdmfRecord** CreateUnifiedDataRecordsArray(OH_UdmfData* unifiedData,
@@ -193,7 +147,7 @@ void OH_UdmfData_Destroy(OH_UdmfData* data)
     if (data == nullptr) {
         return;
     }
-    DestroyStringArray(data->typesArray, data->typesCount);
+    NdkDataConversion::DestroyStringArray(data->typesArray, data->typesCount);
     DestroyUnifiedRecordArray(data->records, data->recordsCount);
     delete data;
 }
@@ -225,7 +179,7 @@ char** OH_UdmfData_GetTypes(OH_UdmfData* unifiedData, unsigned int* count)
     }
     std::vector<std::string> typeLabels = unifiedData->unifiedData_->GetEntriesTypes();
     AddFileUriTypeIfContains(typeLabels);
-    unifiedData->typesArray = StrVectorToTypesArray(typeLabels);
+    unifiedData->typesArray = NdkDataConversion::StrVectorToTypesArray(typeLabels);
     unifiedData->typesArray == nullptr ? unifiedData->typesCount = 0 : unifiedData->typesCount = typeLabels.size();
     *count = unifiedData->typesCount;
     return unifiedData->typesArray;
@@ -245,7 +199,7 @@ char** OH_UdmfRecord_GetTypes(OH_UdmfRecord* record, unsigned int* count)
     auto types = record->record_->GetUtdIdsWithAddFileType();
     std::vector<std::string> typeLabels {types.begin(), types.end()};
     AddFileUriTypeIfContains(typeLabels);
-    record->typesArray = StrVectorToTypesArray(typeLabels);
+    record->typesArray = NdkDataConversion::StrVectorToTypesArray(typeLabels);
     record->typesArray == nullptr ? record->typesCount = 0 : record->typesCount = typeLabels.size();
     *count = record->typesCount;
     return record->typesArray;
@@ -688,7 +642,7 @@ void OH_UdmfRecord_Destroy(OH_UdmfRecord* record)
         delete[] record->recordData;
         record->recordData = nullptr;
     }
-    DestroyStringArray(record->typesArray, record->typesCount);
+    NdkDataConversion::DestroyStringArray(record->typesArray, record->typesCount);
     delete record;
 }
 
@@ -1225,4 +1179,114 @@ void OH_UdmfGetDataParams_SetDataProgressListener(OH_UdmfGetDataParams* params,
         return;
     }
     params->dataProgressListener = dataProgressListener;
+}
+
+void OH_UdmfGetDataParams_SetAcceptableInfo(OH_UdmfGetDataParams* params, OH_UdmfDataLoadInfo* acceptableInfo)
+{
+    if (params == nullptr || acceptableInfo == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return;
+    }
+    params->acceptableInfo = *acceptableInfo;
+}
+
+OH_UdmfDataLoadParams* OH_UdmfDataLoadParams_Create()
+{
+    OH_UdmfDataLoadParams *params = new (std::nothrow) OH_UdmfDataLoadParams;
+    if (params == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Allocate OH_UdmfDataLoadParams memory failed.");
+        return nullptr;
+    }
+    return params;
+}
+
+void OH_UdmfDataLoadParams_Destroy(OH_UdmfDataLoadParams* pThis)
+{
+    if (pThis == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return;
+    }
+    delete pThis;
+}
+
+void OH_UdmfDataLoadParams_SetLoadHandler(OH_UdmfDataLoadParams* params, const OH_Udmf_DataLoadHandler dataLoadHandler)
+{
+    if (params == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return;
+    }
+    params->dataLoadHandler = dataLoadHandler;
+}
+
+void OH_UdmfDataLoadParams_SetDataLoadInfo(OH_UdmfDataLoadParams* params, OH_UdmfDataLoadInfo* dataLoadInfo)
+{
+    if (params == nullptr || dataLoadInfo == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return;
+    }
+    params->dataLoadInfo = *dataLoadInfo;
+}
+
+OH_UdmfDataLoadInfo* OH_UdmfDataLoadInfo_Create()
+{
+    OH_UdmfDataLoadInfo *params = new (std::nothrow) OH_UdmfDataLoadInfo;
+    if (params == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Allocate OH_UdmfDataLoadInfo memory failed.");
+        return nullptr;
+    }
+    return params;
+}
+
+void OH_UdmfDataLoadInfo_Destroy(OH_UdmfDataLoadInfo* dataLoadInfo)
+{
+    if (dataLoadInfo == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return;
+    }
+    NdkDataConversion::DestroyStringArray(dataLoadInfo->typesArray, dataLoadInfo->typesCount);
+    delete dataLoadInfo;
+}
+
+char** OH_UdmfDataLoadInfo_GetTypes(OH_UdmfDataLoadInfo* dataLoadInfo, unsigned int* count)
+{
+    if (dataLoadInfo == nullptr || count == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return nullptr;
+    }
+    *count = dataLoadInfo->typesCount;
+    return dataLoadInfo->typesArray;
+}
+
+void OH_UdmfDataLoadInfo_SetType(OH_UdmfDataLoadInfo* dataLoadInfo, const char* type)
+{
+    if (dataLoadInfo == nullptr || type == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return;
+    }
+    std::set<std::string> types;
+    for (unsigned int i = 0; i < dataLoadInfo->typesCount; ++i) {
+        types.insert(dataLoadInfo->typesArray[i]);
+    }
+    types.insert(type);
+    std::vector<std::string> typeLabels {types.begin(), types.end()};
+    dataLoadInfo->typesArray = NdkDataConversion::StrVectorToTypesArray(typeLabels);
+    dataLoadInfo->typesCount = typeLabels.size();
+}
+
+int OH_UdmfDataLoadInfo_GetRecordCount(OH_UdmfDataLoadInfo* dataLoadInfo)
+{
+    if (dataLoadInfo == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return 0;
+    }
+    return static_cast<int>(dataLoadInfo->recordsCount);
+}
+
+void OH_UdmfDataLoadInfo_SetRecordCount(OH_UdmfDataLoadInfo* dataLoadInfo, unsigned int recordCount)
+{
+    if (dataLoadInfo == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return;
+    }
+    dataLoadInfo->recordsCount = recordCount;
 }

@@ -46,6 +46,11 @@ public:
     int32_t RemoveAppShareOption(const std::string &intention) override;
     int32_t ObtainAsynProcess(AsyncProcessInfo& processInfo) override;
     int32_t ClearAsynProcessByKey(const std::string &businessUdKey) override;
+    int32_t SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+        std::string &key) override;
+    int32_t PushDelayData(const std::string &key, UnifiedData &unifiedData) override;
+    int32_t GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
+        sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData) override;
 
 private:
     class ServiceDeathRecipient : public IRemoteObject::DeathRecipient {

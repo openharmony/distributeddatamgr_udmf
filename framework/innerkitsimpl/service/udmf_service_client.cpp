@@ -307,5 +307,22 @@ int32_t UdmfServiceClient::ClearAsynProcessByKey(const std::string &businessUdKe
 {
     return udmfProxy_->ClearAsynProcessByKey(businessUdKey);
 }
+
+int32_t UdmfServiceClient::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+    std::string &key)
+{
+    return udmfProxy_->SetDelayInfo(dataLoadInfo, iUdmfNotifier, key);
+}
+
+int32_t UdmfServiceClient::PushDelayData(const std::string &key, UnifiedData &unifiedData)
+{
+    return udmfProxy_->PushDelayData(key, unifiedData);
+}
+
+int32_t UdmfServiceClient::GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
+    sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData)
+{
+    return udmfProxy_->GetDataIfAvailable(key, dataLoadInfo, iUdmfNotifier, unifiedData);
+}
 } // namespace UDMF
 } // namespace OHOS

@@ -123,12 +123,23 @@ struct OH_Udmf_ProgressInfo {
     int status;
 };
 
+struct OH_UdmfDataLoadInfo {
+    char **typesArray{nullptr};
+    unsigned int typesCount{0};
+    unsigned int recordsCount{0};
+};
 
 struct OH_UdmfGetDataParams {
     std::string destUri;
     Udmf_FileConflictOptions fileConflictOptions;
     Udmf_ProgressIndicator progressIndicator;
     OH_Udmf_DataProgressListener dataProgressListener;
+    OH_UdmfDataLoadInfo acceptableInfo;
+};
+
+struct OH_UdmfDataLoadParams {
+    OH_UdmfDataLoadInfo dataLoadInfo;
+    OH_Udmf_DataLoadHandler dataLoadHandler;
 };
 
 struct OH_UdmfOptions {
