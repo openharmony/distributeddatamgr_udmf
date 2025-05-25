@@ -438,6 +438,6 @@ bool UdmfAsyncClient::IsParamValid(const GetDataParams &params)
 
 void UdmfAsyncClient::PushTaskToExecutor(Executor::Task task)
 {
-    executor_.Execute(task);
+    executor_.Execute(std::move(task));
 }
 } // namespace OHOS::UDMF

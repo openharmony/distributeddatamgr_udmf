@@ -33,7 +33,7 @@ using namespace OHOS::UDMF;
 using namespace OHOS;
 namespace OHOS::Test {
 static constexpr int USER_ID = 100;
-static constexpr int END_INTERVAL = 2;
+static constexpr int END_INTERVAL = 3;
 class UdmfDelayDataTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -75,8 +75,10 @@ void UdmfDelayDataTest::TearDownTestCase()
 
 void UdmfDelayDataTest::SetUp() {}
 
-void UdmfDelayDataTest::TearDown() {}
-
+void UdmfDelayDataTest::TearDown()
+{
+    std::this_thread::sleep_for(std::chrono::seconds(END_INTERVAL));
+}
 
 void UdmfDelayDataTest::AllocHapToken1()
 {

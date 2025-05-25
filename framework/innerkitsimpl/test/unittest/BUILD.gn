@@ -757,6 +757,7 @@ group("unittest") {
     ":UdmfClientSaInvokeTest",
     ":UdmfClientSystemHapTest",
     ":UdmfClientTest",
+    ":UdmfDelayDataTest",
     ":UnifiedDataHelperTest",
     ":UnifiedDataTest",
     ":UnifiedMetaTest",
