@@ -307,7 +307,7 @@ int32_t UdmfServiceProxy::GetDataIfAvailable(const std::string &key, const DataL
     }
     if (!data.IsEmpty()) {
         UdmfConversion::ConvertRecordToSubclass(data);
-        *unifiedData = data;
+        unifiedData = std::make_shared<UnifiedData>(data);
     }
     return status;
 }
