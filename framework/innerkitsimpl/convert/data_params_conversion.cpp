@@ -50,7 +50,7 @@ Status DataParamsConversion::GetInnerDataParams(OH_UdmfGetDataParams &ndkDataPar
         types.insert(ndkDataParams.acceptableInfo.typesArray[i]);
     }
     dataParams.acceptableInfo = {
-        .types = types,
+        .types = std::move(types),
         .recordCount = ndkDataParams.acceptableInfo.recordsCount,
     };
     return Status::E_OK;
@@ -69,7 +69,7 @@ Status DataParamsConversion::GetDataLoaderParams(const OH_UdmfDataLoadParams &nd
     }
     dataLoadParams.dataLoadInfo = {
         .sequenceKey = UTILS::GenerateId(),
-        .types = types,
+        .types = std::move(types),
         .recordCount = ndkDataParams.dataLoadInfo.recordsCount,
     };
     dataLoadParams.loadHandler = [ndkDataParams](const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
