@@ -539,7 +539,8 @@ template <> size_t CountBufferSize(const Runtime &input, TLVObject &data)
         data.CountBasic(static_cast<int64_t>(input.lastModifiedTime)) +
         data.CountBasic(static_cast<int32_t>(input.dataStatus)) + data.Count(input.sourcePackage) +
         data.Count(input.createPackage) + data.Count(input.deviceId) + TLVUtil::CountBufferSize(input.key, data) +
-        data.Count(input.sdkVersion) + TLVUtil::CountBufferSize(input.privileges, data);
+        data.Count(input.sdkVersion) + TLVUtil::CountBufferSize(input.privileges, data) +
+        data.CountBasic(static_cast<int32_t>(input.visibility));
 }
 
 template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
@@ -586,6 +587,9 @@ template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
     if (!TLVUtil::Writing(input.sdkVersion, data, TAG::TAG_VERSION)) {
         return false;
     }
+    if (!data.WriteBasic(TAG::TAG_VISIBILITY, static_cast<int32_t>(input.visibility))) {
+        return false;
+    }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
 }
 
@@ -600,6 +604,7 @@ template <> bool Reading(Runtime &output, TLVObject &data, const TLVHead &head)
         bool result = true;
         int64_t createTime = 0;
         int64_t lastModifiedTime = 0;
+        int32_t visibility = 0;
         switch (headItem.tag) {
             case static_cast<uint16_t>(TAG::TAG_KEY):
                 result = TLVUtil::Reading(output.key, data, headItem);
@@ -641,6 +646,10 @@ template <> bool Reading(Runtime &output, TLVObject &data, const TLVHead &head)
                 break;
             case static_cast<uint16_t>(TAG::TAG_VERSION):
                 result = data.Read(output.sdkVersion, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_VISIBILITY):
+                result = data.ReadBasic(visibility, headItem);
+                output.visibility = static_cast<UDMF::Visibility>(visibility);
                 break;
             default:
                 result = data.Skip(headItem);

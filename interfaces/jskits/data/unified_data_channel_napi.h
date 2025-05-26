@@ -39,6 +39,7 @@ private:
     static napi_value DeleteData(napi_env env, napi_callback_info info);
     static napi_value ConvertRecordsToEntries(napi_env env, napi_callback_info info);
     static napi_status GetNamedProperty(napi_env env, napi_value &obj, const std::string &key, std::string &value);
+    static napi_status GetOptionalProperty(napi_env env, napi_value &obj, const std::string &key, int32_t &value);
     static napi_value CreateShareOptions(napi_env env, napi_callback_info info);
     static napi_value SetAppShareOptions(napi_env env, napi_callback_info info);
     static napi_value RemoveAppShareOptions(napi_env env, napi_callback_info info);
@@ -48,6 +49,7 @@ private:
     static napi_value CreateProgressIndicator(napi_env env, napi_callback_info info);
     static napi_value CreateListenerStatus(napi_env env, napi_callback_info info);
     static bool IsValidOptionInfoNonDrag(UnifiedKey &key, const std::string &intention);
+    static napi_value CreateVisibility(napi_env env, napi_callback_info info);
 };
 } // namespace UDMF
 } // namespace OHOS

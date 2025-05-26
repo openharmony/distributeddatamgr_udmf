@@ -403,6 +403,25 @@ int OH_UdmfOptions_Reset(OH_UdmfOptions* pThis)
     return UDMF_E_OK;
 }
 
+Udmf_Visibility OH_UdmfOptions_GetVisibility(OH_UdmfOptions* pThis)
+{
+    if (pThis == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "The Udmf_Visibility get visibility error, invaild params!");
+        return Udmf_Visibility::UDMF_ALL;
+    }
+    return pThis->visibility;
+}
+
+int OH_UdmfOptions_SetVisibility(OH_UdmfOptions* pThis, Udmf_Visibility visibility)
+{
+    if (pThis == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "The Udmf_Visibility set visibility error, invaild params!");
+        return UDMF_E_INVALID_PARAM;
+    }
+    pThis->visibility = visibility;
+    return UDMF_E_OK;
+}
+
 int OH_Udmf_GetUnifiedData(const char* key, Udmf_Intention intention, OH_UdmfData* data)
 {
     if (!IsUnifiedDataValid(data) || key == nullptr) {
@@ -536,7 +555,19 @@ int OH_Udmf_SetUnifiedDataByOptions(OH_UdmfOptions* options, OH_UdmfData* unifie
             LOG_ERROR(UDMF_CAPI, "Intention error, it's not one of the above enumerations");
             return UDMF_E_INVALID_PARAM;
     }
-    CustomOption option = {.intention = customOptIntent};
+    Visibility customOptVisibility;
+    switch (options->visibility) {
+        case UDMF_ALL:
+            customOptVisibility = Visibility::VISIBILITY_ALL;
+            break;
+        case UDMF_OWN_PROCESS:
+            customOptVisibility = Visibility::VISIBILITY_OWN_PROCESS;
+            break;
+        default:
+            LOG_ERROR(UDMF_CAPI, "Invalid visibility value: %{public}d", options->visibility);
+            return UDMF_E_INVALID_PARAM;
+    }
+    CustomOption option = {.intention = customOptIntent, .visibility = customOptVisibility};
     std::string keyStr;
     int32_t ret = UdmfClient::GetInstance().SetData(option, *(unifiedData->unifiedData_), keyStr);
     if (ret != E_OK) {

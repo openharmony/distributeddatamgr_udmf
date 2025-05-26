@@ -32,6 +32,7 @@ using CustomOption = UDMF::CustomOption;
 using QueryOption = UDMF::QueryOption;
 using UDType = UDMF::UDType;
 using Intention = UDMF::Intention;
+using Visibility = UDMF::Visibility;
 using AsyncProcessInfo = UDMF::AsyncProcessInfo;
 using DataLoadInfo = UDMF::DataLoadInfo;
 
@@ -74,6 +75,11 @@ template<>
 bool API_EXPORT Marshalling(const Intention &input, MessageParcel &parcel);
 template<>
 bool API_EXPORT Unmarshalling(Intention &output, MessageParcel &parcel);
+
+template<>
+bool API_EXPORT Marshalling(const Visibility &input, MessageParcel &parcel);
+template<>
+bool API_EXPORT Unmarshalling(Visibility &output, MessageParcel &parcel);
 
 template<>
 bool API_EXPORT Marshalling(const AsyncProcessInfo &input, MessageParcel &parcel);

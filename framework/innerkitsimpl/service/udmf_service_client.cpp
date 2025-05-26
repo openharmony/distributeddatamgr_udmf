@@ -109,7 +109,12 @@ int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedDat
         LOG_ERROR(UDMF_SERVICE, "Invalid intention");
         return E_INVALID_PARAMETERS;
     }
-
+    if (option.intention == UD_INTENTION_DATA_HUB) {
+        if (option.visibility != Visibility::VISIBILITY_ALL &&
+            option.visibility != Visibility::VISIBILITY_OWN_PROCESS) {
+            option.visibility = Visibility::VISIBILITY_ALL;
+        }
+    }
     if (!unifiedData.IsValid()) {
         LOG_ERROR(UDMF_SERVICE, "UnifiedData is invalid.");
         return E_INVALID_PARAMETERS;

@@ -147,6 +147,23 @@ typedef enum Udmf_ProgressIndicator {
 } Udmf_ProgressIndicator;
 
 /**
+ * @brief Describe the visibility range of data
+ *
+ * @since 20
+ */
+typedef enum Udmf_Visibility {
+    /**
+     * @brief The visibility level that specifies that any hap or native can be obtained.
+     */
+    UDMF_ALL,
+
+    /**
+     * @brief The visibility level that specifies that only data providers can be obtained.
+     */
+    UDMF_OWN_PROCESS
+} Udmf_Visibility;
+
+/**
  * @brief Describes the unified data type.
  *
  * @since 12
@@ -905,6 +922,29 @@ int OH_UdmfOptions_SetIntention(OH_UdmfOptions* pThis, Udmf_Intention intention)
 int OH_UdmfOptions_Reset(OH_UdmfOptions* pThis);
 
 /**
+ * @brief Get visibility from the {@link OH_UdmfOptions}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfOptions}.
+ * @return Returns {@link Udmf_Visibility} value.
+ * @see OH_UdmfOptions Udmf_Visibility
+ * @since 20
+ */
+Udmf_Visibility OH_UdmfOptions_GetVisibility(OH_UdmfOptions* pThis);
+
+/**
+ * @brief Set visibility value to {@link OH_UdmfOptions}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfOptions}.
+ * @param visibility Represents new {@link Udmf_Visibility} param.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdmfOptions Udmf_Visibility Udmf_ErrCode.
+ * @since 20
+ */
+int OH_UdmfOptions_SetVisibility(OH_UdmfOptions* pThis, Udmf_Visibility visibility);
+
+/**
  * @brief Get {@link OH_UdmfData} data from udmf database.
  *
  * @param key Represents database store's key value.
@@ -999,9 +1039,9 @@ int OH_Udmf_UpdateUnifiedData(OH_UdmfOptions* options, OH_UdmfData* unifiedData)
 int OH_Udmf_DeleteUnifiedData(OH_UdmfOptions* options, OH_UdmfData** dataArray, unsigned int* dataSize);
 
 /**
- * @brief Destory data array memory.
+ * @brief Destroy data array memory.
  *
- * @param dataArray Represents a pointer to {@link OH_UdmfData}.
+ * @param dataArray Represents a point to {@link OH_UdmfData}.
  * @param dataSize Represents data size in list.
  * @see OH_UdmfData
  * @since 20
