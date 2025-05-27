@@ -294,20 +294,22 @@ int32_t UdmfServiceProxy::PushDelayData(const std::string &key, UnifiedData &uni
 int32_t UdmfServiceProxy::GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
     sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData)
 {
+    if (unifiedData == nullptr) {
+        LOG_ERROR(UDMF_SERVICE, "Data is null!");
+        return E_INVALID_PARAMETERS;
+    }
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::GET_DELAY_DATA, reply, key, dataLoadInfo, iUdmfNotifier);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s!", status, key.c_str());
         return status;
     }
-    UnifiedData data;
-    if (!ITypesUtil::Unmarshal(reply, data)) {
+    if (!ITypesUtil::Unmarshal(reply, *unifiedData)) {
         LOG_ERROR(UDMF_SERVICE, "Unmarshal UnifiedData failed!");
         return E_READ_PARCEL_ERROR;
     }
-    if (!data.IsEmpty()) {
-        UdmfConversion::ConvertRecordToSubclass(data);
-        unifiedData = std::make_shared<UnifiedData>(data);
+    if (!unifiedData->IsEmpty()) {
+        UdmfConversion::ConvertRecordToSubclass(*unifiedData);
     }
     return status;
 }
