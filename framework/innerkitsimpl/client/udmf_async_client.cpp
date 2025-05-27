@@ -274,7 +274,7 @@ Status UdmfAsyncClient::GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper,
         CallProgress(asyncHelper, progressInfo, nullptr);
         return status;
     }
-    if (dataPtr.IsEmpty()) {
+    if (dataPtr->IsEmpty()) {
         LOG_INFO(UDMF_CLIENT, "Wait delay data");
         return E_OK;
     }
