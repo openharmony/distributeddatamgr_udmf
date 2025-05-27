@@ -56,7 +56,6 @@ ohos_shared_library("libudmf") {
     "image_framework:pixelmap",
   ]
 
-  use_exceptions = true
   relative_install_dir = "ndk"
   part_name = "udmf"
   subsystem_name = "distributeddatamgr"
