@@ -137,15 +137,7 @@ int UdsObject::SetUdsValue(const char* paramName, const T &pramValue)
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
     std::lock_guard<std::mutex> lock(mutex);
-    try {
-        obj->value_[paramName] = pramValue;
-    } catch (std::bad_alloc& e) {
-        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
-        return Udmf_ErrCode::UDMF_ERR;
-    } catch (...) {
-        LOG_ERROR(UDMF_CAPI, "An unexpected exception occurred.");
-        return Udmf_ErrCode::UDMF_ERR;
-    }
+    obj->value_[paramName] = pramValue;
     return Udmf_ErrCode::UDMF_E_OK;
 }
 
@@ -546,20 +538,11 @@ int OH_UdsArrayBuffer_SetData(OH_UdsArrayBuffer* buffer, unsigned char* data, un
         LOG_ERROR(UDMF_CAPI, "Param is invalid.");
         return UDMF_E_INVALID_PARAM;
     }
-    int ret = UDMF_ERR;
-    try {
-        std::vector<uint8_t> arrayBuffer(data, data + len);
-        ret = buffer->SetUdsValue<std::vector<uint8_t>>(ARRAY_BUFFER, arrayBuffer);
-        if (ret != UDMF_E_OK) {
-            LOG_ERROR(UDMF_CAPI, "Failed to apply for memory. ret: %{public}d", ret);
-            return ret;
-        }
-    } catch (std::bad_alloc& e) {
-        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
-        return Udmf_ErrCode::UDMF_ERR;
-    } catch (...) {
-        LOG_ERROR(UDMF_CAPI, "An unexpected exception occurred.");
-        return Udmf_ErrCode::UDMF_ERR;
+    std::vector<uint8_t> arrayBuffer(data, data + len);
+    int ret = buffer->SetUdsValue<std::vector<uint8_t>>(ARRAY_BUFFER, arrayBuffer);
+    if (ret != UDMF_E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory. ret: %{public}d", ret);
+        return ret;
     }
     ret = buffer->SetUdsValue<int>(ARRAY_BUFFER_LENGTH, static_cast<int>(len));
     return ret;
@@ -648,20 +631,11 @@ int OH_UdsContentForm_SetThumbData(OH_UdsContentForm* pThis, const unsigned char
         LOG_ERROR(UDMF_CAPI, "Param is invalid.");
         return UDMF_E_INVALID_PARAM;
     }
-    int ret = UDMF_ERR;
-    try {
-        std::vector<uint8_t> data(thumbData, thumbData + len);
-        ret = pThis->SetUdsValue<std::vector<uint8_t>>(THUMB_DATA, data);
-        if (ret != UDMF_E_OK) {
-            LOG_ERROR(UDMF_CAPI, "Failed to apply for memory. ret: %{public}d", ret);
-            return ret;
-        }
-    } catch (std::bad_alloc& e) {
-        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
-        return Udmf_ErrCode::UDMF_ERR;
-    } catch (...) {
-        LOG_ERROR(UDMF_CAPI, "An unexpected exception occurred.");
-        return Udmf_ErrCode::UDMF_ERR;
+    std::vector<uint8_t> data(thumbData, thumbData + len);
+    int ret = pThis->SetUdsValue<std::vector<uint8_t>>(THUMB_DATA, data);
+    if (ret != UDMF_E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory. ret: %{public}d", ret);
+        return ret;
     }
     ret = pThis->SetUdsValue<int>(THUMB_DATA_LENGTH, static_cast<int>(len));
     return ret;
