@@ -308,7 +308,7 @@ int32_t UdmfServiceProxy::GetDataIfAvailable(const std::string &key, const DataL
         LOG_ERROR(UDMF_SERVICE, "Unmarshal UnifiedData failed!");
         return E_READ_PARCEL_ERROR;
     }
-    if (!data.IsEmpty()) {
+    if (!unifiedData->IsEmpty()) {
         UdmfConversion::ConvertRecordToSubclass(*unifiedData);
     }
     return status;
