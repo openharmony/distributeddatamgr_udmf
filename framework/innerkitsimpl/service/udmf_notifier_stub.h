@@ -31,7 +31,7 @@ public:
 
 class UdmfNotifierClient : public UdmfNotifierStub {
 public:
-    UdmfNotifierClient(LoadHandler loadHandler_);
+    explicit UdmfNotifierClient(LoadHandler loadHandler_);
     virtual ~UdmfNotifierClient() = default;
 
     void HandleDelayObserver(const std::string &key, const DataLoadInfo &dataLoadInfo) override;
@@ -49,7 +49,7 @@ class DelayDataCallbackClient : public DelayDataCallbackStub {
 public:
     using DataCallback = std::function<void(const std::string &udKey, const UnifiedData &unifiedData)>;
 
-    DelayDataCallbackClient(DataCallback dataCallback);
+    explicit DelayDataCallbackClient(DataCallback dataCallback);
     virtual ~DelayDataCallbackClient() = default;
     void DelayDataCallback(const std::string &key, const UnifiedData &data) override;
 
