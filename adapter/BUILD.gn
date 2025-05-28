@@ -171,6 +171,7 @@ config("arkui_x_udmf_napi_config") {
   if (current_os == "ios") {
     defines = [ "IOS_PLATFORM" ]
   }
+  defines = [ "CROSS_PLATFORM" ]
 }
 
 ohos_source_set("arkui_x_uniformtypedescriptor") {
