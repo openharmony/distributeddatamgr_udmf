@@ -132,7 +132,9 @@ struct DataLoadParams {
 
 struct DelayGetDataInfo {
     uint32_t tokenId;
+#ifndef CROSS_PLATFORM
     sptr<IRemoteObject> dataCallback;
+#endif
 };
 } // namespace UDMF
 } // namespace OHOS

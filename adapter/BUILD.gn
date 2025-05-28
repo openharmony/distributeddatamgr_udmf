@@ -168,8 +168,9 @@ config("arkui_x_udmf_napi_config") {
     "${arkui_x_graphic_2d_path}/rosen/modules/platform/ipc_core",
     "${third_party_path}/skia",
   ]
+  defines = [ "CROSS_PLATFORM" ]
   if (current_os == "ios") {
-    defines = [ "IOS_PLATFORM" ]
+    defines += [ "IOS_PLATFORM" ]
   }
 }
 
