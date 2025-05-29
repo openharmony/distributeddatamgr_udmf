@@ -49,6 +49,8 @@ public:
     static void SetNativeToken(const std::string &processName);
     static std::string SetDataInfoTest(const std::string &key);
     static void GetDelayDataTest(const std::string &key);
+    static std::string NdkSetDataInfoTest();
+    static void NdkGetDelayDataTest(const std::string &key);
 };
 
 void UdmfDelayDataTest::SetUpTestCase()
@@ -527,23 +529,12 @@ HWTEST_F(UdmfDelayDataTest, GetSequenceKey002, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "GetSequenceKey002 end.");
 }
 
-/* *
- * @tc.name: UdmfDelayDataNDKTest001
- * @tc.desc: Test ndk delay data
- * @tc.type: FUNC
- */
-HWTEST_F(UdmfDelayDataTest, UdmfDelayDataNDKTest001, TestSize.Level1)
+std::string UdmfDelayDataTest::NdkSetDataInfoTest()
 {
-    LOG_INFO(UDMF_TEST, "UdmfDelayDataNDKTest001 begin.");
     DataLoadInfo dataLoadInfo1{
         .recordCount = 10,
         .types{"general.plain-text", "general.html"},
     };
-    DataLoadInfo dataLoadInfo2{
-        .recordCount = 100,
-        .types{"general.plain-text"},
-    };
-
     OH_UdmfDataLoadInfo *info1 = OH_UdmfDataLoadInfo_Create();
     OH_UdmfDataLoadInfo_SetType(info1, "general.plain-text");
     OH_UdmfDataLoadInfo_SetType(info1, "general.html");
@@ -573,30 +564,23 @@ HWTEST_F(UdmfDelayDataTest, UdmfDelayDataNDKTest001, TestSize.Level1)
     OH_UdmfDataLoadParams *ndkParams = OH_UdmfDataLoadParams_Create();
     OH_UdmfDataLoadParams_SetDataLoadInfo(ndkParams, info1);
     OH_UdmfDataLoadParams_SetLoadHandler(ndkParams, loadHandler);
-
     DataLoadParams dataLoadParams;
     auto status = DataParamsConversion::GetDataLoaderParams(*ndkParams, dataLoadParams);
     EXPECT_EQ(status, E_OK);
 
     SetHapToken1();
-    std::string key = "";
-    status = UdmfClient::GetInstance().SetDelayInfo(dataLoadParams, key);
+    std::string udkey = "";
+    status = UdmfClient::GetInstance().SetDelayInfo(dataLoadParams, udkey);
     EXPECT_EQ(status, E_OK);
+    return udkey;
+}
 
-    QueryOption option{
-        .intention = UD_INTENTION_DRAG,
-        .key = key
+void UdmfDelayDataTest::NdkGetDelayDataTest(const std::string &key)
+{
+    DataLoadInfo dataLoadInfo2{
+        .recordCount = 100,
+        .types{"general.plain-text"},
     };
-    Summary summary;
-    status = UdmfClient::GetInstance().GetSummary(option, summary);
-    EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(summary.totalSize, dataLoadInfo1.recordCount);
-    EXPECT_EQ(summary.summary.size(), dataLoadInfo1.types.size());
-    for (auto item: summary.summary) {
-        EXPECT_NE(summary.summary.find(item.first), summary.summary.end());
-        EXPECT_EQ(item.second, 0);
-    }
-
     QueryOption query = {
         .intention = UD_INTENTION_DRAG,
         .key = key
@@ -626,10 +610,45 @@ HWTEST_F(UdmfDelayDataTest, UdmfDelayDataNDKTest001, TestSize.Level1)
     };
     OH_UdmfGetDataParams_SetDataProgressListener(param, dataProgressListener);
     GetDataParams dataParams;
-    status = DataParamsConversion::GetInnerDataParams(*param, query, dataParams);
+    auto status = DataParamsConversion::GetInnerDataParams(*param, query, dataParams);
+    EXPECT_EQ(status, E_OK);
     status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(dataParams);
     EXPECT_EQ(status, E_OK);
-    
+}
+
+/* *
+ * @tc.name: UdmfDelayDataNDKTest001
+ * @tc.desc: Test CAPI delay data
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfDelayDataTest, UdmfDelayDataNDKTest001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "UdmfDelayDataNDKTest001 begin.");
+    DataLoadInfo dataLoadInfo1{
+        .recordCount = 10,
+        .types{"general.plain-text", "general.html"},
+    };
+    DataLoadInfo dataLoadInfo2{
+        .recordCount = 100,
+        .types{"general.plain-text"},
+    };
+    auto key = NdkSetDataInfoTest();
+
+    QueryOption option{
+        .intention = UD_INTENTION_DRAG,
+        .key = key
+    };
+    Summary summary;
+    auto status = UdmfClient::GetInstance().GetSummary(option, summary);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(summary.totalSize, dataLoadInfo1.recordCount);
+    EXPECT_EQ(summary.summary.size(), dataLoadInfo1.types.size());
+    for (auto item: summary.summary) {
+        EXPECT_NE(summary.summary.find(item.first), summary.summary.end());
+        EXPECT_EQ(item.second, 0);
+    }
+    NdkGetDelayDataTest(key);
+
     LOG_INFO(UDMF_TEST, "UdmfDelayDataNDKTest001 end.");
 }
 
