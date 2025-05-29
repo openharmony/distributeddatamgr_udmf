@@ -299,4 +299,31 @@ HWTEST_F(UdmfTypesUtilTest, Unmarshalling009, TestSize.Level1)
     EXPECT_TRUE(ret);
     LOG_INFO(UDMF_TEST, "Unmarshalling009 end.");
 }
+
+/**
+* @tc.name: Unmarshalling010
+* @tc.desc: Normal testcase of Unmarshalling
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Unmarshalling010, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Unmarshalling010 begin.");
+    DataLoadInfo input;
+    input.sequenceKey = "seq_2023";
+    input.types = {"typeA", "typeB", "typeC"};
+    input.recordCount = 1000;
+
+    MessageParcel parcel;
+    ITypesUtil::Marshalling(input, parcel);
+    DataLoadInfo output;
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(input.sequenceKey, output.sequenceKey);
+    EXPECT_EQ(input.recordCount, output.recordCount);
+    ASSERT_EQ(input.types.size(), output.types.size());
+    for (auto &item : input.types) {
+        EXPECT_TRUE(output.types.find(item) != output.types.end());
+    }
+    LOG_INFO(UDMF_TEST, "Unmarshalling010 end.");
+}
 } // OHOS::Test

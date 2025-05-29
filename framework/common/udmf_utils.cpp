@@ -29,20 +29,6 @@ static constexpr int MINIMUM = 48;
 static constexpr int MAXIMUM = 121;
 constexpr char SPECIAL = '^';
 
-std::vector<std::string> StrSplit(const std::string &str, const std::string &delimiter)
-{
-    std::vector<std::string> result;
-    size_t start = 0;
-    size_t end = str.find(delimiter);
-    while (end != std::string::npos) {
-        result.push_back(str.substr(start, end - start));
-        start = end + delimiter.length();
-        end = str.find(delimiter, start);
-    }
-    result.push_back(str.substr(start));
-    return result;
-}
-
 std::vector<uint8_t> Random(int32_t len, int32_t minimum, int32_t maximum)
 {
     std::random_device randomDevice;
