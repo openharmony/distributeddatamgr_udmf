@@ -39,6 +39,7 @@ std::vector<TypeDescriptorCfg> &PresetTypeDescriptors::GetPresetTypes()
 }
 void PresetTypeDescriptors::InitDescriptors()
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     typeDescriptors_ = {
         {"general.entity",
          {},
