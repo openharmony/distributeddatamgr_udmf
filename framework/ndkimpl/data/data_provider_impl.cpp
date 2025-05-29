@@ -48,6 +48,7 @@ ValueType DataProviderImpl::GetValueByType(const std::string &utdId)
     UdsObject* object = static_cast<UdsObject *>(value);
     if (IsInvalidUdsObjectByType(object, static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(utdId)))) {
         LOG_ERROR(UDMF_CAPI, "data type mismatch");
+        delete object;
         return std::monostate();
     }
     std::shared_ptr<OHOS::UDMF::Object> obj = std::move(object->obj);

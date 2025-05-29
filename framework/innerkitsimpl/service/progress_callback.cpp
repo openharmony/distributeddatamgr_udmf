@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace UDMF {
+constexpr int CONVERSION_RULES = 10;
 int32_t ProgressSignalStub::OnRemoteRequest(uint32_t code,
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -44,12 +45,14 @@ void ProgressSignalCallback::HandleProgressSignalValue(MessageParcel &data)
     int32_t cancelStatus = 0;
     std::string signalValue = data.ReadString();
 
-    try {
-        cancelStatus = std::stoi(signalValue);
-    } catch (const std::exception& e) {
-        LOG_ERROR(UDMF_CLIENT, "Signal value error, signalValue=%{public}s", signalValue.c_str());
+    char* end = nullptr;
+    errno = 0;
+    cancelStatus = std::strtoul(signalValue.c_str(), &end, CONVERSION_RULES);
+    if (errno == ERANGE || end == signalValue || *end != '\0') {
+        LOG_ERROR(UDMF_CLIENT, "Failed to convert signalValue, signalValue=%{public}s", signalValue.c_str());
         return;
     }
+
     switch (cancelStatus) {
         case NORMAL_PASTE:
             break;
