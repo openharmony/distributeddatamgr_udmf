@@ -15,6 +15,7 @@
 #ifndef UDMF_PRESET_TYPE_DESCRIPTORS
 #define UDMF_PRESET_TYPE_DESCRIPTORS
 #include <string>
+#include <mutex>
 #include "error_code.h"
 #include "utd_common.h"
 #include "visibility.h"
@@ -31,6 +32,7 @@ private:
     PresetTypeDescriptors &operator=(const PresetTypeDescriptors &obj) = delete;
     void InitDescriptors();
     std::vector<TypeDescriptorCfg> typeDescriptors_;
+    mutable std::recursive_mutex mutex_;
 };
 } // namespace UDMF
 } // namespace OHOS
