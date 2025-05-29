@@ -118,15 +118,14 @@ OH_Utd* OH_Utd_Create(const char* typeId)
     if (typeId == nullptr) {
         return nullptr;
     }
-    auto pThis = new (std::nothrow) OH_Utd();
-    if (pThis == nullptr) {
-        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
-        return nullptr;
-    }
     auto typeDescriptor = GetTypeDescriptorByUtdClient(typeId);
     if (typeDescriptor == nullptr) {
         LOG_ERROR(UDMF_CAPI, "Failed to create by invoking the native function.");
-        delete pThis;
+        return nullptr;
+    }
+    auto pThis = new (std::nothrow) OH_Utd();
+    if (pThis == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Failed to apply for memory.");
         return nullptr;
     }
     pThis->typeId = typeDescriptor->GetTypeId();
