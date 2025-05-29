@@ -544,10 +544,10 @@ std::string UdmfDelayDataTest::NdkSetDataInfoTest()
         LOG_INFO(UDMF_TEST, "loadHandler begin.");
         auto recordCount = OH_UdmfDataLoadInfo_GetRecordCount(acceptableInfo);
         EXPECT_EQ(recordCount, 100);
-        size_t typeCount = 0;
+        unsigned int typeCount = 0;
         auto types = OH_UdmfDataLoadInfo_GetTypes(acceptableInfo, &typeCount);
         EXPECT_EQ(typeCount, 1);
-        EXPECT_EQ(types[0], "general.plain-text");
+        EXPECT_STREQ(types[0], "general.plain-text");
 
         OH_UdmfData *unifiedData = OH_UdmfData_Create();
         OH_UdmfRecord *record = OH_UdmfRecord_Create();
