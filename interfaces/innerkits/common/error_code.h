@@ -17,15 +17,25 @@
 #define UDMF_ERROR_CODE_H
 
 #include <cstdint>
-#include <errors.h>
 #include <string>
 #include <unordered_map>
 
 namespace OHOS {
 namespace UDMF {
+using ErrCode = int;
+constexpr int ERR_OK = 0;
+constexpr int SUBSYS_DISTRIBUTEDDATAMNG = 13;
+
 enum UdmfModule {
     UDMF_MODULE_SERVICE_ID = 0x07,
 };
+
+constexpr ErrCode ErrCodeOffset(unsigned int subsystem, unsigned int module = 0)
+{
+    constexpr int SUBSYTSTEM_BIT_NUM = 21;
+    constexpr int MODULE_BIT_NUM = 16;
+    return (subsystem << SUBSYTSTEM_BIT_NUM) | (module << MODULE_BIT_NUM);
+}
 
 // UDMF error offset, used only in this file.
 constexpr ErrCode UDMF_ERR_OFFSET = ErrCodeOffset(SUBSYS_DISTRIBUTEDDATAMNG, UDMF_MODULE_SERVICE_ID);
