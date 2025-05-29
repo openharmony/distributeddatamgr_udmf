@@ -25,9 +25,6 @@ config("udmf_napi_config") {
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/innerkits/service",
 
-    "//third_party/libuv/include",
-    "//third_party/node/src",
-
     "${aafwk_inner_api_path}/ability_manager/include",
     "${aafwk_kits_path}/appkit/native/app/include/",
     "${aafwk_kits_path}/ability/native/include",
@@ -76,7 +73,6 @@ ohos_shared_library("unifieddatachannel_napi") {
   public_configs = [ ":udmf_napi_config" ]
 
   deps = [
-    "${third_party_path}/bounds_checking_function:libsec_shared",
     "../innerkits:udmf_client",
     "../innerkits:utd_client",
     "../jskits:udmf_js_common",
@@ -123,7 +119,6 @@ ohos_shared_library("uniformtypedescriptor_napi") {
   public_configs = [ ":udmf_napi_config" ]
 
   deps = [
-    "${third_party_path}/bounds_checking_function:libsec_shared",
     "../innerkits:udmf_client",
     "../innerkits:utd_client",
     "../jskits:udmf_js_common",
@@ -185,7 +180,6 @@ ohos_shared_library("udmf_data_napi") {
   public_configs = [ ":udmf_napi_config" ]
 
   deps = [
-    "${third_party_path}/bounds_checking_function:libsec_shared",
     "../innerkits:udmf_client",
     "../innerkits:utd_client",
     "../jskits:udmf_js_common",
