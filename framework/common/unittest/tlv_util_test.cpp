@@ -929,4 +929,88 @@ HWTEST_F(TlvUtilTest, CountBufferSize_006, TestSize.Level1)
     size_t ret = TLVUtil::CountBufferSize(input, data);
     EXPECT_EQ(ret, data.CountHead());
 }
+
+/* *
+ * @tc.name: WritingSet001
+ * @tc.desc: Normal test of Writing Set
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingSet001, TestSize.Level1) {
+    LOG_INFO(UDMF_TEST, "WritingSet001 begin.");
+    std::set<std::string> data = {"typeA", "typeB", "typeC"};
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    auto result = TLVUtil::Writing(data, tlvObject, TAG::TAG_SET_TYPES);
+    EXPECT_TRUE(result);
+
+    tlvObject.ResetCursor();
+    std::set<std::string> dataResult;
+    result = TLVUtil::ReadTlv(dataResult, tlvObject, TAG::TAG_SET_TYPES);
+    EXPECT_TRUE(result);
+    ASSERT_EQ(data.size(), dataResult.size());
+    for (auto &item : data) {
+        EXPECT_TRUE(dataResult.find(item) != dataResult.end());
+    }
+    LOG_INFO(UDMF_TEST, "WritingSet001 end.");
+}
+
+/* *
+ * @tc.name: WritingDataLoadInfo001
+ * @tc.desc: Normal test of Writing DataLoadInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingDataLoadInfo001, TestSize.Level1) {
+    LOG_INFO(UDMF_TEST, "WritingDataLoadInfo001 begin.");
+    DataLoadInfo normalData;
+    normalData.sequenceKey = "seq_2023";
+    normalData.types = {"typeA", "typeB", "typeC"};
+    normalData.recordCount = 1000;
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    auto result = TLVUtil::Writing(normalData, tlvObject, TAG::TAG_DATA_LOAD_INFO);
+    EXPECT_TRUE(result);
+
+    tlvObject.ResetCursor();
+    DataLoadInfo normalDataResult;
+    result = TLVUtil::ReadTlv(normalDataResult, tlvObject, TAG::TAG_DATA_LOAD_INFO);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(normalData.sequenceKey, normalDataResult.sequenceKey);
+    EXPECT_EQ(normalData.recordCount, normalDataResult.recordCount);
+    ASSERT_EQ(normalData.types.size(), normalDataResult.types.size());
+    for (auto &item : normalData.types) {
+        EXPECT_TRUE(normalDataResult.types.find(item) != normalDataResult.types.end());
+    }
+    LOG_INFO(UDMF_TEST, "WritingDataLoadInfo001 end.");
+}
+
+/* *
+ * @tc.name: WritingDataLoadInfo002
+ * @tc.desc: Normal test of Writing boundary DataLoadInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingDataLoadInfo002, TestSize.Level1) {
+    DataLoadInfo boundaryData;
+    boundaryData.sequenceKey = "";
+    boundaryData.types = {};
+    boundaryData.recordCount = 0;
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    auto result = TLVUtil::Writing(boundaryData, tlvObject, TAG::TAG_DATA_LOAD_INFO);
+    EXPECT_TRUE(result);
+
+    tlvObject.ResetCursor();
+    DataLoadInfo boundaryDataResult;
+    result = TLVUtil::ReadTlv(boundaryDataResult, tlvObject, TAG::TAG_DATA_LOAD_INFO);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(boundaryData.sequenceKey, boundaryDataResult.sequenceKey);
+    EXPECT_EQ(boundaryData.recordCount, boundaryDataResult.recordCount);
+    ASSERT_EQ(boundaryData.types.size(), boundaryDataResult.types.size());
+    for (auto &item : boundaryData.types) {
+        EXPECT_TRUE(boundaryDataResult.types.find(item) != boundaryDataResult.types.end());
+    }
+    LOG_INFO(UDMF_TEST, "WritingDataLoadInfo002 end.");
+}
 }
