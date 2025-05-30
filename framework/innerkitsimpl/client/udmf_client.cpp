@@ -413,5 +413,15 @@ Status UdmfClient::GetDataIfAvailable(const std::string &key, const DataLoadInfo
     return E_OK;
 }
 
+std::string UdmfClient::GetBundleNameByUdKey(const std::string &key)
+{
+    UnifiedKey udkey(key);
+    if (!udkey.IsValid()) {
+        LOG_ERROR(UDMF_CLIENT, "IsValid udkey.");
+        return "";
+    }
+    return udkey.bundleName;
+}
+
 } // namespace UDMF
 } // namespace OHOS

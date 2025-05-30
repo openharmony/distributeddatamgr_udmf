@@ -77,8 +77,9 @@ std::string UnifiedKey::GetKeyCommonPrefix() const
 
 bool UnifiedKey::IsValid()
 {
+    LOG_INFO(UDMF_FRAMEWORK, "key:%{public}s", this->key.c_str());
     if (this->key.empty()) {
-        LOG_DEBUG(UDMF_FRAMEWORK, "empty key");
+        LOG_ERROR(UDMF_FRAMEWORK, "empty key");
         return false;
     }
     PreliminaryWork();
@@ -87,21 +88,24 @@ bool UnifiedKey::IsValid()
     std::string separator = "://";
     size_t pos = data.find(separator);
     if (pos == std::string::npos) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Find separator error.");
         return false;
     }
     std::string schema = data.substr(0, pos + separator.size()); // schema
     if (UNIFIED_KEY_SCHEMA != schema) {
-        LOG_DEBUG(UDMF_FRAMEWORK, "wrong schema");
+        LOG_ERROR(UDMF_FRAMEWORK, "Key schema error.");
         return false;
     }
 
     data = data.substr(pos + separator.size()); // intention/bundleName/groupId
     pos = data.find('/');        // intention
     if (pos == std::string::npos) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Find / error.");
         return false;
     }
     std::string intentionTmp = data.substr(0, pos);
     if (!CheckCharacter(intentionTmp, g_ruleIntention)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Check intention character error.");
         return false;
     }
     this->intention = intentionTmp;
@@ -109,21 +113,23 @@ bool UnifiedKey::IsValid()
     data = data.substr(pos + 1);
     pos = data.find('/'); // bundleName
     if (pos == std::string::npos) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Find second / error.");
         return false;
     }
     std::string bundle = data.substr(0, pos);
     if (!CheckCharacter(bundle, g_ruleBundleName)) {
-        LOG_DEBUG(UDMF_FRAMEWORK, "wrong bundle");
+        LOG_ERROR(UDMF_FRAMEWORK, "Check bundle character error.");
         return false;
     }
     this->bundleName = bundle;
 
     data = data.substr(pos + 1); // groupId
     if (data.empty()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Check groupId error.");
         return false;
     }
     if (!CheckCharacter(data, g_ruleGroupId)) {
-        LOG_DEBUG(UDMF_FRAMEWORK, "wrong groupId");
+        LOG_ERROR(UDMF_FRAMEWORK, "Wrong groupId.");
         return false;
     }
     this->groupId = data;
@@ -159,7 +165,7 @@ void UnifiedKey::PreliminaryWork()
     }
     // All bundle name are composed of uppercase and lowercase letters and dots.
     if (g_ruleBundleName.none()) {
-        std::string bundleAggregate = std::string(ALPHA_AGGREGATE) + DIGIT_AGGREGATE + "._";
+        std::string bundleAggregate = std::string(ALPHA_AGGREGATE) + DIGIT_AGGREGATE + "._+-";
         for (char i : bundleAggregate) {
             g_ruleBundleName.set(i);
         }
