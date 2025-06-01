@@ -22,6 +22,9 @@
 #include "progress_callback.h"
 #include "udmf_client.h"
 #include "udmf_copy_file.h"
+#ifndef IOS_PLATFORM
+#include "udmf_executor.h"
+#endif
 #include "udmf_notifier_stub.h"
 #include "udmf_service_client.h"
 
@@ -48,10 +51,10 @@ static constexpr int32_t PROGRESS_SYNC_FINSHED = 10;
 static constexpr int32_t PROGRESS_GET_DATA_FINISHED = 20;
 static constexpr int32_t PROGRESS_ALL_FINISHED = 100;
 
-#ifdef IOS_PLATFORM
-UdmfAsyncClient::UdmfAsyncClient() {}
-#else
-UdmfAsyncClient::UdmfAsyncClient() : executor_(MAX_THREADS, MIN_THREADS) {}
+UdmfAsyncClient::UdmfAsyncClient() = default;
+
+#ifndef IOS_PLATFORM
+static UdmfExecutor udmfExecutor(MAX_THREADS, MIN_THREADS);
 #endif
 
 UdmfAsyncClient &UdmfAsyncClient::GetInstance()
@@ -77,11 +80,11 @@ Status UdmfAsyncClient::StartAsyncDataRetrieval(const GetDataParams &params)
     auto &asyncHelper = asyncHelperMap_.at(params.query.key);
     if (params.progressIndicator == ProgressIndicator::DEFAULT) {
         asyncHelper->progressQueue.SetClearable(false);
-        asyncHelper->invokeHapTask = executor_.Schedule(std::chrono::milliseconds(START_ABILITY_INTERVAL),
+        asyncHelper->invokeHapTask = udmfExecutor.Schedule(std::chrono::milliseconds(START_ABILITY_INTERVAL),
             (std::bind(&UdmfAsyncClient::InvokeHapTask, this, params.query.key)));
     }
-    asyncHelper->getDataTask = executor_.Execute(std::bind(&UdmfAsyncClient::GetDataTask, this, params.query));
-    asyncHelper->progressTask = executor_.Execute(std::bind(&UdmfAsyncClient::ProgressTask, this, params.query.key));
+    asyncHelper->getDataTask = udmfExecutor.Execute(std::bind(&UdmfAsyncClient::GetDataTask, this, params.query));
+    asyncHelper->progressTask = udmfExecutor.Execute(std::bind(&UdmfAsyncClient::ProgressTask, this, params.query.key));
 #endif
     return E_OK;
 }
@@ -239,7 +242,7 @@ Status UdmfAsyncClient::CheckSync(std::unique_ptr<AsyncHelper> &asyncHelper, con
         return E_SYNC_FAILED;
     }
     (asyncHelper->sycnRetryTime)++;
-    asyncHelper->getDataTask = executor_.Schedule(std::chrono::milliseconds(SYNC_INTERVAL),
+    asyncHelper->getDataTask = udmfExecutor.Schedule(std::chrono::milliseconds(SYNC_INTERVAL),
         std::bind(&UdmfAsyncClient::GetDataTask, this, query));
 #endif
     return E_OK;
@@ -392,10 +395,10 @@ Status UdmfAsyncClient::Clear(const std::string &businessUdKey)
         return E_OK;
     }
     if (asyncHelper->invokeHapTask != ExecutorPool::INVALID_TASK_ID) {
-        executor_.Remove(asyncHelper->invokeHapTask);
+        udmfExecutor.Remove(asyncHelper->invokeHapTask);
     }
-    executor_.Remove(asyncHelper->getDataTask);
-    executor_.Remove(asyncHelper->progressTask);
+    udmfExecutor.Remove(asyncHelper->getDataTask);
+    udmfExecutor.Remove(asyncHelper->progressTask);
     asyncHelperMap_.erase(businessUdKey);
     UdmfServiceClient::GetInstance()->ClearAsynProcessByKey(businessUdKey);
     LOG_INFO(UDMF_CLIENT, "Clear task success, key = %{public}s", businessUdKey.c_str());
@@ -436,8 +439,8 @@ bool UdmfAsyncClient::IsParamValid(const GetDataParams &params)
     return true;
 }
 
-void UdmfAsyncClient::PushTaskToExecutor(Executor::Task task)
+void UdmfAsyncClient::PushTaskToExecutor(UdmfTask task)
 {
-    executor_.Execute(std::move(task));
+    udmfExecutor.Execute(std::move(task));
 }
 } // namespace OHOS::UDMF

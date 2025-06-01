@@ -25,6 +25,7 @@
 #include "udmf.h"
 #include "udmf_async_client.h"
 #include "udmf_client.h"
+#include "udmf_executor.h"
 #include "udmf_utils.h"
 
 using namespace testing::ext;

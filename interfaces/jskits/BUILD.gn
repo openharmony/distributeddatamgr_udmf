@@ -21,16 +21,8 @@ config("udmf_napi_config") {
     "${udmf_interfaces_path}/innerkits/include",
     "${udmf_interfaces_path}/jskits/common",
     "${udmf_interfaces_path}/jskits/data",
-
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/innerkits/service",
-
-    "${aafwk_inner_api_path}/ability_manager/include",
-    "${aafwk_kits_path}/appkit/native/app/include/",
-    "${aafwk_kits_path}/ability/native/include",
-    "${aafwk_napi_path}/inner/napi_common",
-    "${aafwk_service_path}/abilitymgr/include",
-    "${aafwk_service_path}/common/include",
   ]
 }
 

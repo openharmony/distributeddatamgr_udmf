@@ -21,12 +21,13 @@
 namespace OHOS::UDMF {
 class UdmfAsyncClient {
 public:
+    using UdmfTask = std::function<void()>;
     friend class UdmfCopyFile;
     static UdmfAsyncClient API_EXPORT &GetInstance();
     Status API_EXPORT StartAsyncDataRetrieval(const GetDataParams &params);
     Status API_EXPORT Cancel(std::string businessUdKey);
     Status CancelOnSingleTask();
-    void PushTaskToExecutor(Executor::Task task);
+    void PushTaskToExecutor(UdmfTask task);
 private:
     UdmfAsyncClient();
     ~UdmfAsyncClient() = default;
@@ -51,9 +52,6 @@ private:
     Status ProcessUnifiedData(std::unique_ptr<AsyncHelper> &asyncHelper);
     bool IsParamValid(const GetDataParams &params);
 
-#ifndef IOS_PLATFORM
-    ExecutorPool executor_;
-#endif
     std::map<std::string, std::unique_ptr<AsyncHelper>> asyncHelperMap_;
     std::mutex mutex_;
 };

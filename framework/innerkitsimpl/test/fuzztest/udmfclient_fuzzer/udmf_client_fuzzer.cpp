@@ -35,6 +35,7 @@
 #include "system_defined_appitem.h"
 #include "system_defined_pixelmap.h"
 #include "udmf_async_client.h"
+#include "udmf_executor.h"
 #include "unified_types.h"
 
 using namespace OHOS;
