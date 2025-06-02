@@ -864,6 +864,105 @@ HWTEST_F(TlvUtilTest, Reading_004, TestSize.Level1)
 }
 
 /* *
+ * @tc.name: Reading_005
+ * @tc.desc: Test reading DataStatus with value below WORKING
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Reading_005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Reading_005 begin.");
+    int32_t invalidStatus = -1;
+    TLVHead head;
+    head.tag = static_cast<uint16_t>(TAG::TAG_DATA_STATUS);
+    head.len = sizeof(invalidStatus);
+
+    std::vector<uint8_t> buffer;
+    buffer.resize(sizeof(head) + head.len);
+
+    errno_t err = memcpy_s(buffer.data(), buffer.size(), &head, sizeof(head));
+    ASSERT_EQ(err, EOK);
+    err = memcpy_s(buffer.data() + sizeof(head), buffer.size() - sizeof(head),
+                   &invalidStatus, sizeof(invalidStatus));
+    ASSERT_EQ(err, EOK);
+    TLVObject data(buffer);
+    TLVHead readHead;
+    ASSERT_TRUE(data.ReadHead(readHead));
+
+    DataStatus output;
+    EXPECT_FALSE(TLVUtil::Reading(output, data, readHead));
+    LOG_INFO(UDMF_TEST, "Reading_005 end.");
+}
+
+/* *
+ * @tc.name: Reading_006
+ * @tc.desc: Test reading DataStatus with value at or above FADE
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Reading_006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Reading_006 begin.");
+    int32_t invalidStatus = 3;
+    TLVHead head;
+    head.tag = static_cast<uint16_t>(TAG::TAG_DATA_STATUS);
+    head.len = sizeof(invalidStatus);
+
+    std::vector<uint8_t> buffer;
+    buffer.resize(sizeof(head) + head.len);
+    errno_t err = memcpy_s(buffer.data(), buffer.size(), &head, sizeof(head));
+    ASSERT_EQ(err, EOK);
+    err = memcpy_s(buffer.data() + sizeof(head), buffer.size() - sizeof(head),
+                   &invalidStatus, sizeof(invalidStatus));
+    ASSERT_EQ(err, EOK);
+    TLVObject data(buffer);
+    TLVHead readHead;
+    ASSERT_TRUE(data.ReadHead(readHead));
+
+    DataStatus output;
+    EXPECT_FALSE(TLVUtil::Reading(output, data, readHead));
+    LOG_INFO(UDMF_TEST, "Reading_006 end.");
+}
+
+/* *
+ * @tc.name: Reading_007
+ * @tc.desc: Test reading Object with incorrect inner tag
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Reading_007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Reading_007 begin.");
+    TLVHead outerHead;
+    outerHead.tag = static_cast<uint16_t>(TAG::TAG_OBJECT_VALUE);
+    outerHead.len = sizeof(TLVHead) + 4;
+
+    TLVHead innerHead;
+    innerHead.tag = static_cast<uint16_t>(TAG::TAG_STRING);
+    innerHead.len = 4;
+
+    const char* testData = "test";
+    std::vector<uint8_t> buffer;
+    buffer.resize(sizeof(outerHead) + sizeof(innerHead) + innerHead.len);
+
+    errno_t err = memcpy_s(buffer.data(), buffer.size(), &outerHead, sizeof(outerHead));
+    ASSERT_EQ(err, EOK);
+    err = memcpy_s(buffer.data() + sizeof(outerHead), buffer.size() - sizeof(outerHead),
+                   &innerHead, sizeof(innerHead));
+    ASSERT_EQ(err, EOK);
+    err = memcpy_s(buffer.data() + sizeof(outerHead) + sizeof(innerHead),
+                   buffer.size() - sizeof(outerHead) - sizeof(innerHead),
+                   testData, innerHead.len);
+    ASSERT_EQ(err, EOK);
+
+    TLVObject data(buffer);
+    TLVHead readOuterHead;
+    ASSERT_TRUE(data.ReadHead(readOuterHead));
+
+    Object output;
+    bool result = TLVUtil::Reading(output, data, readOuterHead);
+    EXPECT_FALSE(result);
+    LOG_INFO(UDMF_TEST, "Reading_007 end.");
+}
+
+/* *
  * @tc.name: Writing_001
  * @tc.desc: Abnormal test of Writing, input.tag is invalid
  * @tc.type: FUNC
