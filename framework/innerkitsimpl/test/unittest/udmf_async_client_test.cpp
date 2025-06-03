@@ -25,6 +25,7 @@
 #include "udmf.h"
 #include "udmf_async_client.h"
 #include "udmf_client.h"
+#include "udmf_executor.h"
 #include "async_task_params.h"
 #include "data_params_conversion.h"
 

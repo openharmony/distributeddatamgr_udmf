@@ -26,15 +26,6 @@ config("udmf_client_config") {
     "${udmf_framework_path}/innerkitsimpl/service",
     "${udmf_framework_path}/innerkitsimpl/convert",
     "${udmf_framework_path}/ndkimpl/data",
-    "${kv_store_path}/frameworks/common",
-    "//third_party/libuv/include",
-    "//third_party/node/src",
-    "${kv_store_path}/frameworks/innerkitsimpl/distributeddatafwk/include",
-    "${kv_store_path}/frameworks/innerkitsimpl/distributeddatafwk/src",
-    "${kv_store_path}/frameworks/innerkitsimpl/distributeddatasvc/include",
-    "${kv_store_path}/interfaces/innerkits/distributeddata/include",
-    "${file_service_path}/interfaces/common/include",
-    "${file_service_path}/interfaces/innerkits/native/file_uri/include",
   ]
 }
 
@@ -52,6 +43,7 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/common/tlv_object.cpp",
     "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/common/udmf_copy_file.cpp",
+    "${udmf_framework_path}/common/udmf_executor.cpp",
     "${udmf_framework_path}/common/udmf_radar_reporter.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
     "${udmf_framework_path}/common/udmf_utils.cpp",
@@ -106,6 +98,7 @@ ohos_shared_library("udmf_client") {
     "image_framework:image_native",
     "ipc:ipc_core",
     "kv_store:distributeddata_mgr",
+    "libuv:uv",
     "samgr:samgr_proxy",
   ]
 

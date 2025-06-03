@@ -94,6 +94,8 @@ ohos_unittest("UdmfTest") {
   deps = common_deps
 
   external_deps = common_external_deps
+
+  external_deps += [ "kv_store:distributeddata_inner" ]
 }
 
 ohos_unittest("DataProviderImplTest") {

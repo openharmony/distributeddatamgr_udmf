@@ -189,6 +189,7 @@ ohos_unittest("CopyFileTest") {
 
   sources = [
     "${udmf_framework_path}/common/udmf_copy_file.cpp",
+    "${udmf_framework_path}/common/udmf_executor.cpp",
     "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/common/unittest/mock/file_copy_manager_mock.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_async_client.cpp",
@@ -209,6 +210,8 @@ ohos_unittest("CopyFileTest") {
   deps = common_deps
 
   external_deps = common_external_deps
+
+  external_deps += [ "app_file_service:fileuri_native" ]
 
   defines = [
     "private=public",

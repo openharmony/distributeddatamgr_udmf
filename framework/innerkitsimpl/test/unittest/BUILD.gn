@@ -69,6 +69,7 @@ ohos_unittest("UdmfClientTest") {
   sources = [
     "${udmf_framework_path}/common/graph.cpp",
     "${udmf_framework_path}/common/udmf_copy_file.cpp",
+    "${udmf_framework_path}/common/udmf_executor.cpp",
     "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_async_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
@@ -115,6 +116,7 @@ ohos_unittest("UdmfClientFileMangerTest") {
 
   sources = [
     "${udmf_framework_path}/common/udmf_copy_file.cpp",
+    "${udmf_framework_path}/common/udmf_executor.cpp",
     "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_async_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
@@ -675,6 +677,7 @@ ohos_unittest("UdmfClientAbnormalTest") {
     "${udmf_framework_path}/common/endian_converter.cpp",
     "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/common/udmf_copy_file.cpp",
+    "${udmf_framework_path}/common/udmf_executor.cpp",
     "${udmf_framework_path}/common/udmf_radar_reporter.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
     "${udmf_framework_path}/common/udmf_utils.cpp",
