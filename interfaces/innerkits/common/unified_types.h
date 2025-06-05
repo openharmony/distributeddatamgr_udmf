@@ -65,6 +65,7 @@ struct Runtime {
     std::uint32_t recordTotalNum {};
     uint32_t tokenId;
     std::string sdkVersion;
+    Visibility visibility {};
 };
 
 /*
@@ -73,6 +74,7 @@ struct Runtime {
 struct CustomOption {
     Intention intention {};
     uint32_t tokenId {};
+    Visibility visibility {};
 };
 
 /*

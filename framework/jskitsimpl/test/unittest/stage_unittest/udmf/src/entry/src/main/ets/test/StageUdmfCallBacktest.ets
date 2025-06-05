@@ -60,7 +60,109 @@ export default function stageUdmfCallbackJsTest() {
         expect(error.code).assertEqual('401');
         done();
       }
-    })
+    });
+
+    /**
+     * @tc.name UdmfTestVisibilityOwn
+     * @tc.desc insertData with visibility Own
+     * @tc.type: Function
+     * @tc.require: issueNumber
+     */
+    it('UdmfTestVisibilityOwn', 1, (done) {
+      const TAG = 'UdmfTestVisibilityOwn:';
+      console.info(TAG, 'start');
+      try {
+        let options: unifiedDataChannel.Options = { intention : unifiedDataChannel.Intention.DATA_HUB, 
+          visibility : unifiedDataChannel.Visibility.OWN_PROCESS };
+        let content = "content";
+        let plainText = new unifiedDataChannel.PlainText();
+        plainText.textContent = content;
+        let unifiedData = new unifiedDataChannel.UnifiedData(plainText);
+        unifiedDataChannel.insertData(options, unifiedData).then((data) => {
+          console.info(TAG, `insert success. The key: ${data}`);
+          let options = { key: data };
+          console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+          unifiedDataChannel.queryData(options).then((data) => {
+            console.info(TAG, 'query success.');
+            expect(data.length).assertEqual(1);
+            expect(data[0].getRecords()[0].textContent).assertEqual(content);
+            unifiedDataChannel.deleteData(options).then((data) => {
+              console.info(TAG, 'delete success.');
+              expect(data.length).assertEqual(1);
+              done();
+            }).catch(() => {
+              console.error(TAG, 'Unreachable code!');
+              expect(null).assertFail();
+              done();
+            });
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      } catch (e) {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      }
+      console.info(TAG, 'end');
+    });
+
+    /**
+     * @tc.name UdmfTestVisibilityAll
+     * @tc.desc insertData with visibility All
+     * @tc.type: Function
+     * @tc.require: issueNumber
+     */
+    it('UdmfTestVisibilityAll', 1, (done) {
+      const TAG = 'UdmfTestVisibilityAll:';
+      console.info(TAG, 'start');
+      try {
+        let options: unifiedDataChannel.Options = { intention : unifiedDataChannel.Intention.DATA_HUB, 
+          visibility : unifiedDataChannel.Visibility.ALL };
+        let content = "content";
+        let plainText = new unifiedDataChannel.PlainText();
+        plainText.textContent = content;
+        let unifiedData = new unifiedDataChannel.UnifiedData(plainText);
+        unifiedDataChannel.insertData(options, unifiedData).then((data) => {
+          console.info(TAG, `insert success. The key: ${data}`);
+          let options = { key: data };
+          console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
+          unifiedDataChannel.queryData(options).then((data) => {
+            console.info(TAG, 'query success.');
+            expect(data.length).assertEqual(1);
+            expect(data[0].getRecords()[0].textContent).assertEqual(content);
+            unifiedDataChannel.deleteData(options).then((data) => {
+              console.info(TAG, 'delete success.');
+              expect(data.length).assertEqual(1);
+              done();
+            }).catch(() => {
+              console.error(TAG, 'Unreachable code!');
+              expect(null).assertFail();
+              done();
+            });
+          }).catch(() => {
+            console.error(TAG, 'Unreachable code!');
+            expect(null).assertFail();
+            done();
+          });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
+        });
+      } catch (e) {
+        console.error(TAG, 'Unreachable code!');
+        expect(null).assertFail();
+        done();
+      }
+      console.info(TAG, 'end');
+    });
   })
 
   console.log(TAG + "*************Unit Test End*************");

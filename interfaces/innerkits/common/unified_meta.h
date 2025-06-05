@@ -592,6 +592,17 @@ static const std::unordered_map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
 
 };
 
+enum Visibility : int32_t {
+    VISIBILITY_ALL,
+    VISIBILITY_OWN_PROCESS,
+    VISIBILITY_BUTT,
+};
+
+static const std::unordered_map<int32_t, std::string> UD_VISIBILITY_MAP {
+    { VISIBILITY_ALL, "ALL" },
+    { VISIBILITY_OWN_PROCESS, "OWN_PROCESS" },
+};
+
 enum ShareOptions : int32_t {
     IN_APP,
     CROSS_APP,

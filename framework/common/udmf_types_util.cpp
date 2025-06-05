@@ -128,13 +128,13 @@ bool Unmarshalling(Privilege &output, MessageParcel &parcel)
 template<>
 bool Marshalling(const CustomOption &input, MessageParcel &parcel)
 {
-    return ITypesUtil::Marshal(parcel, input.intention);
+    return ITypesUtil::Marshal(parcel, input.intention, input.visibility);
 }
 
 template<>
 bool Unmarshalling(CustomOption &output, MessageParcel &parcel)
 {
-    return ITypesUtil::Unmarshal(parcel, output.intention);
+    return ITypesUtil::Unmarshal(parcel, output.intention, output.visibility);
 }
 
 template<>
@@ -192,6 +192,29 @@ bool Unmarshalling(Intention &output, MessageParcel &parcel)
         return false;
     }
     output = static_cast<Intention>(intention);
+    return true;
+}
+
+template<>
+bool Marshalling(const Visibility &input, MessageParcel &parcel)
+{
+    int32_t visibility = input;
+    return ITypesUtil::Marshal(parcel, visibility);
+}
+
+template<>
+bool Unmarshalling(Visibility &output, MessageParcel &parcel)
+{
+    int32_t visibility;
+    if (!ITypesUtil::Unmarshal(parcel, visibility)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal Visibility failed!");
+        return false;
+    }
+    if (visibility < VISIBILITY_ALL || visibility >= VISIBILITY_BUTT) {
+        LOG_ERROR(UDMF_FRAMEWORK, "invalid visibility : %{public}d", visibility);
+        return false;
+    }
+    output = static_cast<Visibility>(visibility);
     return true;
 }
 

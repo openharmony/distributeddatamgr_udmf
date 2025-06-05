@@ -39,6 +39,7 @@ napi_value UnifiedDataChannelNapi::UnifiedDataChannelInit(napi_env env, napi_val
         DECLARE_NAPI_GETTER("FileConflictOptions", CreateFileConflictOptions),
         DECLARE_NAPI_GETTER("ProgressIndicator", CreateProgressIndicator),
         DECLARE_NAPI_GETTER("ListenerStatus", CreateListenerStatus),
+        DECLARE_NAPI_GETTER("Visibility", CreateVisibility),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
@@ -67,6 +68,21 @@ napi_value UnifiedDataChannelNapi::CreateIntention(napi_env env)
     return intention;
 }
 
+napi_value UnifiedDataChannelNapi::CreateVisibility(napi_env env, napi_callback_info info)
+{
+    napi_value jsVisibility = nullptr;
+    napi_create_object(env, &jsVisibility);
+
+    napi_value jsALL;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(Visibility::VISIBILITY_ALL), jsALL);
+    NAPI_CALL(env, napi_set_named_property(env, jsVisibility, "ALL", jsALL));
+
+    napi_value jsOwnProcess;
+    NapiDataUtils::SetValue(env, static_cast<int32_t>(Visibility::VISIBILITY_OWN_PROCESS), jsOwnProcess);
+    NAPI_CALL(env, napi_set_named_property(env, jsVisibility, "OWN_PROCESS", jsOwnProcess));
+    return jsVisibility;
+}
+
 napi_status UnifiedDataChannelNapi::SetNamedProperty(napi_env env, napi_value &obj, const std::string &name,
     const std::string &value)
 {
@@ -85,11 +101,13 @@ napi_value UnifiedDataChannelNapi::InsertData(napi_env env, napi_callback_info i
         std::string key;
         Intention intention;
         std::shared_ptr<UnifiedData> unifiedData;
+        Visibility visibility;
     };
     std::string intention;
     UnifiedDataNapi *unifiedDataNapi = nullptr;
+    int32_t visibility = static_cast<int32_t>(Visibility::VISIBILITY_BUTT);
     auto ctxt = std::make_shared<InsertContext>();
-    auto input = [env, ctxt, &intention, &unifiedDataNapi](size_t argc, napi_value *argv) {
+    auto input = [env, ctxt, &intention, &unifiedDataNapi, &visibility](size_t argc, napi_value *argv) {
         // require 2 arguments <options, unifiedData>
         ASSERT_BUSINESS_ERR(ctxt, argc >= 2,
             E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
@@ -100,13 +118,17 @@ napi_value UnifiedDataChannelNapi::InsertData(napi_env env, napi_callback_info i
         ctxt->status = napi_unwrap(env, argv[1], reinterpret_cast<void **>(&unifiedDataNapi));
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
             "Parameter error: parameter data type must be UnifiedData");
+        ctxt->status = GetOptionalProperty(env, argv[0], "visibility", visibility);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            E_INVALID_PARAMETERS, "Parameter error: parameter options visibility type must correspond to Visibility");
     };
     ctxt->GetCbInfo(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "Insert Exit");
     ctxt->unifiedData = unifiedDataNapi->value_;
     ctxt->intention = UnifiedDataUtils::GetIntentionByString(intention);
+    ctxt->visibility = static_cast<Visibility>(visibility);
     auto execute = [ctxt]() {
-        CustomOption option = { .intention = ctxt->intention };
+        CustomOption option = { .intention = ctxt->intention, .visibility = ctxt->visibility };
         auto status = UdmfClient::GetInstance().SetData(option, *(ctxt->unifiedData), ctxt->key);
         ASSERT_WITH_ERRCODE(ctxt, status == E_OK, status, "InsertData failed!");
     };
@@ -300,6 +322,36 @@ napi_status UnifiedDataChannelNapi::GetNamedProperty(napi_env env, napi_value &o
         return status;
     }
     LOG_DEBUG(UDMF_KITS_NAPI, "Param parse successful, Options.%{public}s = %{public}s", key.c_str(), value.c_str());
+    return status;
+}
+
+napi_status UnifiedDataChannelNapi::GetOptionalProperty(napi_env env, napi_value &obj, const std::string &key,
+    int32_t &value)
+{
+    bool hasKey = false;
+    napi_status status = napi_has_named_property(env, obj, key.c_str(), &hasKey);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_has_named_property failed, name = %{public}s", key.c_str());
+        return napi_generic_failure;
+    }
+    if (!hasKey) {
+        return napi_ok;
+    }
+    napi_value napiValue = nullptr;
+    status = napi_get_named_property(env, obj, key.c_str(), &napiValue);
+    if (status != napi_ok || napiValue == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_get_named_property failed, name = %{public}s", key.c_str());
+        return napi_generic_failure;
+    }
+    if (NapiDataUtils::IsNull(env, napiValue)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "The property value is null, name = %{public}s", key.c_str());
+        return napi_generic_failure;
+    }
+    status = NapiDataUtils::GetValue(env, napiValue, value);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "NapiDataUtils::GetValue failed, name = %{public}s", key.c_str());
+        return status;
+    }
     return status;
 }
 

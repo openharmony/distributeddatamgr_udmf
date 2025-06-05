@@ -179,7 +179,7 @@ HWTEST_F(TlvUtilTest, CountBufferSize_004, TestSize.Level1)
     EXPECT_EQ(4 * sizeof(TLVHead) + sizeof(int32_t), TLVUtil::CountBufferSize(privilege, tlvObject));
 
     Runtime runtime;
-    EXPECT_EQ(19 * sizeof(TLVHead) + sizeof(bool) + sizeof(size_t) + 2 * sizeof(int64_t) + 2 * sizeof(int32_t) +
+    EXPECT_EQ(20 * sizeof(TLVHead) + sizeof(bool) + sizeof(size_t) + 2 * sizeof(int64_t) + 3 * sizeof(int32_t) +
         2 * sizeof(uint32_t),
         TLVUtil::CountBufferSize(runtime, tlvObject));
     LOG_INFO(UDMF_TEST, "CountBufferSize_004 end.");

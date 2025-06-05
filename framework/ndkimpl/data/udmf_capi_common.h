@@ -145,6 +145,7 @@ struct OH_UdmfDataLoadParams {
 struct OH_UdmfOptions {
     std::string key;
     Udmf_Intention intention {};
+    Udmf_Visibility visibility {};
 };
 
 bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid);
