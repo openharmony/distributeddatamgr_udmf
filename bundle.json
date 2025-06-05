@@ -48,7 +48,8 @@
     "build": {
       "sub_component": [
         "//foundation/distributeddatamgr/udmf:udmf_packages",
-        "//foundation/distributeddatamgr/udmf/interfaces/components:udmfcomponents"
+        "//foundation/distributeddatamgr/udmf/interfaces/components:udmfcomponents",
+        "//foundation/distributeddatamgr/udmf/conf:utd_conf"
       ],
       "inner_kits": [
         {
