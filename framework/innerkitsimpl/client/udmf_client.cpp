@@ -417,7 +417,7 @@ std::string UdmfClient::GetBundleNameByUdKey(const std::string &key)
 {
     UnifiedKey udkey(key);
     if (!udkey.IsValid()) {
-        LOG_ERROR(UDMF_CLIENT, "IsValid udkey.");
+        LOG_ERROR(UDMF_CLIENT, "IsValid udkey:%{public}s", key.c_str());
         return "";
     }
     return udkey.bundleName;
