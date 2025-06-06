@@ -49,12 +49,12 @@ int32_t FileCopyManager::ExecRemote(std::shared_ptr<FileInfos> infos, ProcessCal
     return 0;
 }
 
-int32_t FileCopyManager::Cancel()
+int32_t FileCopyManager::Cancel(const bool isKeepFiles)
 {
     return 0;
 }
 
-int32_t FileCopyManager::Cancel(const std::string &srcUri, const std::string &destUri)
+int32_t FileCopyManager::Cancel(const std::string &srcUri, const std::string &destUri, const bool isKeepFiles)
 {
     return 0;
 }
