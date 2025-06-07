@@ -78,47 +78,29 @@ std::string UnifiedKey::GetKeyCommonPrefix() const
 
 bool UnifiedKey::IsValid()
 {
-    if (this->key.empty()) {
-        LOG_ERROR(UDMF_FRAMEWORK, "empty key");
+    if (key.empty()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Empty key");
         return false;
     }
     PreliminaryWork();
-    std::string data = this->key; // schema/intention/groupId
+    std::string data = key;
     size_t pos = data.find(SCHEME_SEPARATOR);
     if (pos == std::string::npos) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Find separator error. Key=%{public}s", this->key.c_str());
+        LOG_ERROR(UDMF_FRAMEWORK, "Missing scheme separator. Key=%{public}s", this->key.c_str());
         return false;
     }
-    std::string schema = data.substr(0, pos + strlen(SCHEME_SEPARATOR)); // schema
-    if (UNIFIED_KEY_SCHEMA != schema) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Key schema error. Key=%{public}s", this->key.c_str());
+    std::string schema = data.substr(0, pos + strlen(SCHEME_SEPARATOR));
+    if (schema != UNIFIED_KEY_SCHEMA) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid key schema. Key=%{public}s", this->key.c_str());
         return false;
     }
-    data = data.substr(pos + strlen(SCHEME_SEPARATOR)); // intention/bundleName/groupId
-    pos = data.find('/');        // intention
-    if (pos == std::string::npos) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Find intention error. Key=%{public}s", this->key.c_str());
+    data = data.substr(pos + strlen(SCHEME_SEPARATOR)); // intention/bundle/group
+    if (!ExtractAndValidateSegment(data, this->intention, g_ruleIntention, "intention")) {
         return false;
     }
-    std::string intentionTmp = data.substr(0, pos);
-    if (!CheckCharacter(intentionTmp, g_ruleIntention)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Check intention character error. Key=%{public}s", this->key.c_str());
+    if (!ExtractAndValidateSegment(data, this->bundleName, g_ruleBundleName, "bundleName")) {
         return false;
     }
-    this->intention = intentionTmp;
-    data = data.substr(pos + 1);
-    pos = data.find('/'); // bundleName
-    if (pos == std::string::npos) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Find bundleName error. Key=%{public}s", this->key.c_str());
-        return false;
-    }
-    std::string bundle = data.substr(0, pos);
-    if (!CheckCharacter(bundle, g_ruleBundleName)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Check bundle character error. Key=%{public}s", this->key.c_str());
-        return false;
-    }
-    this->bundleName = bundle;
-    data = data.substr(pos + 1); // groupId
     if (data.empty()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Find groupId error. Key=%{public}s", this->key.c_str());
         return false;
@@ -128,6 +110,23 @@ bool UnifiedKey::IsValid()
         return false;
     }
     this->groupId = data;
+    return true;
+}
+
+bool UnifiedKey::ExtractAndValidateSegment(std::string& data, std::string& field,
+                                           const std::bitset<MAX_BIT_SIZE>& rule, const std::string& name)
+{
+    size_t pos = data.find('/');
+    if (pos == std::string::npos) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Missing '/' for %{public}s", name.c_str());
+        return false;
+    }
+    field = data.substr(0, pos);
+    if (!CheckCharacter(field, rule)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid character in %{public}s", name.c_str());
+        return false;
+    }
+    data = data.substr(pos + 1);
     return true;
 }
 
