@@ -24,11 +24,14 @@ static std::bitset<MAX_BIT_SIZE> g_ruleIntention;
 static std::bitset<MAX_BIT_SIZE> g_ruleBundleName;
 static std::bitset<MAX_BIT_SIZE> g_ruleGroupId;
 static constexpr const char *UNIFIED_KEY_SCHEMA = "udmf://";
-static constexpr const char *ALPHA_AGGREGATE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-static constexpr const char *DIGIT_AGGREGATE = "0123456789";
-static constexpr const char *SYMBOL_AGGREGATE = ":;<=>?@[\\]_`";
-static constexpr const char *SCHEME_SEPARATOR = "://";
 static constexpr const char SEPARATOR = '/';
+static constexpr std::string_view SCHEME_SEPARATOR = "://";
+#define ALPHA_AGGREGATE "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#define DIGIT_AGGREGATE "0123456789"
+#define SYMBOL_AGGREGATE ":;<=>?@[\\]_`"
+static constexpr std::string_view INTENTION_AGGREGATE_VIEW = ALPHA_AGGREGATE "_";
+static constexpr std::string_view BUNDLE_AGGREGATE_VIEW = ALPHA_AGGREGATE DIGIT_AGGREGATE "._+-";
+static constexpr std::string_view GROUPID_AGGREGATE_VIEW = ALPHA_AGGREGATE DIGIT_AGGREGATE SYMBOL_AGGREGATE;
 static constexpr uint32_t PREFIX_LEN = 24;
 static constexpr uint32_t SUFIX_LEN = 8;
 static constexpr uint32_t INDEX_LEN = 32;
@@ -83,18 +86,18 @@ bool UnifiedKey::IsValid()
         return false;
     }
     PreliminaryWork();
-    std::string data = key;
+    std::string_view data = key;
     size_t pos = data.find(SCHEME_SEPARATOR);
     if (pos == std::string::npos) {
         LOG_ERROR(UDMF_FRAMEWORK, "Missing scheme separator. Key=%{public}s", this->key.c_str());
         return false;
     }
-    std::string schema = data.substr(0, pos + strlen(SCHEME_SEPARATOR));
+    auto schema = data.substr(0, pos + SCHEME_SEPARATOR.length());
     if (schema != UNIFIED_KEY_SCHEMA) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid key schema. Key=%{public}s", this->key.c_str());
         return false;
     }
-    data = data.substr(pos + strlen(SCHEME_SEPARATOR)); // intention/bundle/group
+    data = data.substr(pos + SCHEME_SEPARATOR.length()); // intention/bundle/group
     if (!ExtractAndValidateSegment(data, this->intention, g_ruleIntention, "intention")) {
         return false;
     }
@@ -113,24 +116,25 @@ bool UnifiedKey::IsValid()
     return true;
 }
 
-bool UnifiedKey::ExtractAndValidateSegment(std::string& data, std::string& field,
+bool UnifiedKey::ExtractAndValidateSegment(std::string_view& data, std::string& field,
                                            const std::bitset<MAX_BIT_SIZE>& rule, const std::string& name)
 {
-    size_t pos = data.find('/');
-    if (pos == std::string::npos) {
+    size_t pos = data.find(SEPARATOR);
+    if (pos == std::string_view::npos) {
         LOG_ERROR(UDMF_FRAMEWORK, "Missing '/' for %{public}s", name.c_str());
         return false;
     }
-    field = data.substr(0, pos);
+    field = std::string(data.substr(0, pos));
     if (!CheckCharacter(field, rule)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid character in %{public}s", name.c_str());
         return false;
     }
+    // Remove the prefix '/'
     data = data.substr(pos + 1);
     return true;
 }
 
-bool UnifiedKey::CheckCharacter(std::string data, std::bitset<MAX_BIT_SIZE> rule)
+bool UnifiedKey::CheckCharacter(const std::string_view& data, const std::bitset<MAX_BIT_SIZE> &rule)
 {
     if (data.empty()) {
         LOG_DEBUG(UDMF_FRAMEWORK, "empty key");
@@ -152,22 +156,19 @@ void UnifiedKey::PreliminaryWork()
 {
     // All intentions are composed of uppercase and lowercase letters and underscores.
     if (g_ruleIntention.none()) {
-        std::string intentionTmp = std::string(ALPHA_AGGREGATE) + "_";
-        for (char i : intentionTmp) {
+        for (char i : INTENTION_AGGREGATE_VIEW) {
             g_ruleIntention.set(i);
         }
     }
     // All bundle name are composed of uppercase and lowercase letters and dots.
     if (g_ruleBundleName.none()) {
-        std::string bundleAggregate = std::string(ALPHA_AGGREGATE) + DIGIT_AGGREGATE + "._+-";
-        for (char i : bundleAggregate) {
+        for (char i : BUNDLE_AGGREGATE_VIEW) {
             g_ruleBundleName.set(i);
         }
     }
     // Characters of groupId are taken from Ascii codes 48 to 122.
     if (g_ruleGroupId.none()) {
-        std::string idAggregate = std::string(DIGIT_AGGREGATE) + ALPHA_AGGREGATE + SYMBOL_AGGREGATE;
-        for (char i : idAggregate) {
+        for (char i : GROUPID_AGGREGATE_VIEW) {
             g_ruleGroupId.set(i);
         }
     }
