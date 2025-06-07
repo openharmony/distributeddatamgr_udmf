@@ -27,6 +27,7 @@ static constexpr const char *UNIFIED_KEY_SCHEMA = "udmf://";
 static constexpr const char *ALPHA_AGGREGATE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static constexpr const char *DIGIT_AGGREGATE = "0123456789";
 static constexpr const char *SYMBOL_AGGREGATE = ":;<=>?@[\\]_`";
+static constexpr const char *SCHEME_SEPARATOR = "://";
 static constexpr const char SEPARATOR = '/';
 static constexpr uint32_t PREFIX_LEN = 24;
 static constexpr uint32_t SUFIX_LEN = 8;
@@ -82,21 +83,18 @@ bool UnifiedKey::IsValid()
         return false;
     }
     PreliminaryWork();
-
     std::string data = this->key; // schema/intention/groupId
-    std::string separator = "://";
-    size_t pos = data.find(separator);
+    size_t pos = data.find(SCHEME_SEPARATOR);
     if (pos == std::string::npos) {
         LOG_ERROR(UDMF_FRAMEWORK, "Find separator error. Key=%{public}s", this->key.c_str());
         return false;
     }
-    std::string schema = data.substr(0, pos + separator.size()); // schema
+    std::string schema = data.substr(0, pos + strlen(SCHEME_SEPARATOR)); // schema
     if (UNIFIED_KEY_SCHEMA != schema) {
         LOG_ERROR(UDMF_FRAMEWORK, "Key schema error. Key=%{public}s", this->key.c_str());
         return false;
     }
-
-    data = data.substr(pos + separator.size()); // intention/bundleName/groupId
+    data = data.substr(pos + strlen(SCHEME_SEPARATOR)); // intention/bundleName/groupId
     pos = data.find('/');        // intention
     if (pos == std::string::npos) {
         LOG_ERROR(UDMF_FRAMEWORK, "Find intention error. Key=%{public}s", this->key.c_str());
@@ -108,7 +106,6 @@ bool UnifiedKey::IsValid()
         return false;
     }
     this->intention = intentionTmp;
-
     data = data.substr(pos + 1);
     pos = data.find('/'); // bundleName
     if (pos == std::string::npos) {
@@ -121,7 +118,6 @@ bool UnifiedKey::IsValid()
         return false;
     }
     this->bundleName = bundle;
-
     data = data.substr(pos + 1); // groupId
     if (data.empty()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Find groupId error. Key=%{public}s", this->key.c_str());
