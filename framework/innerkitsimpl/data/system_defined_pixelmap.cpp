@@ -136,26 +136,34 @@ bool SystemDefinedPixelMap::SetRawDataFromPixels(const std::shared_ptr<OHOS::Med
 
 std::unique_ptr<Media::PixelMap> SystemDefinedPixelMap::GetPixelMapFromRawData()
 {
+    if (rawData_.size() % BYTES_PER_COLOR != 0) {
+        LOG_ERROR(UDMF_KITS_INNER, "RawData size error, size = %{public}zu", rawData_.size());
+        return nullptr;
+    }
     Media::InitializationOptions opts;
     auto details = ObjectUtils::ConvertToObject(details_);
     int32_t pixelFormat = 0;
-    if (details->GetValue(PIXEL_MAP_WIDTH, opts.size.width) &&
-        details->GetValue(PIXEL_MAP_HEIGHT, opts.size.height) &&
-        details->GetValue(PIXEL_MAP_FORMAT, pixelFormat)) {
-        opts.pixelFormat = static_cast<Media::PixelFormat>(pixelFormat);
-        // This create does not do pre-multiplication.
-        opts.alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL;
-        opts.srcPixelFormat = Media::PixelFormat::RGBA_8888;
-
-        if (rawData_.size() % BYTES_PER_COLOR != 0) {
-            LOG_ERROR(UDMF_KITS_INNER, "RawData size error, size = %{public}zu", rawData_.size());
-            return nullptr;
-        }
-        return Media::PixelMap::Create(
-            reinterpret_cast<uint32_t*>(rawData_.data()), rawData_.size() / BYTES_PER_COLOR, opts);
+    opts.size.width = details->GetValue(PIXEL_MAP_WIDTH, opts.size.width) ? opts.size.width : -1;
+    opts.size.height = details->GetValue(PIXEL_MAP_HEIGHT, opts.size.height) ? opts.size.height : -1;
+    opts.pixelFormat = details->GetValue(PIXEL_MAP_FORMAT, pixelFormat) ?
+        static_cast<Media::PixelFormat>(pixelFormat) : Media::PixelFormat::UNKNOWN;
+    LOG_INFO(UDMF_KITS_INNER,
+        "PixelMap width = %{public}d, height = %{public}d, pixelFormat = %{public}d, rawData size = %{public}zu",
+        opts.size.width, opts.size.height, opts.pixelFormat, rawData_.size());
+    // This create does not do pre-multiplication.
+    opts.alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL;
+    opts.srcPixelFormat = opts.pixelFormat;
+    auto pixelMap = Media::PixelMap::Create(
+        reinterpret_cast<uint32_t*>(rawData_.data()), rawData_.size() / BYTES_PER_COLOR, opts);
+    if (pixelMap == nullptr) {
+        LOG_ERROR(UDMF_KITS_INNER, "Create PixelMap from rawData_ failed");
+        return nullptr;
     }
-    LOG_ERROR(UDMF_KITS_INNER, "PixelMap data incomplete, size = %{public}zu", rawData_.size());
-    return nullptr;
+    Media::ImageInfo imageInfo;
+    pixelMap->GetImageInfo(imageInfo);
+    LOG_INFO(UDMF_KITS_INNER, "PixelMap width = %{public}d, height = %{public}d, pixelFormat = %{public}d",
+        imageInfo.size.width, imageInfo.size.height, imageInfo.pixelFormat);
+    return pixelMap;
 }
 } // namespace UDMF
 } // namespace OHOS
