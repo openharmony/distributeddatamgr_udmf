@@ -77,7 +77,6 @@ std::string UnifiedKey::GetKeyCommonPrefix() const
 
 bool UnifiedKey::IsValid()
 {
-    LOG_INFO(UDMF_FRAMEWORK, "key:%{public}s", this->key.c_str());
     if (this->key.empty()) {
         LOG_ERROR(UDMF_FRAMEWORK, "empty key");
         return false;
@@ -88,24 +87,24 @@ bool UnifiedKey::IsValid()
     std::string separator = "://";
     size_t pos = data.find(separator);
     if (pos == std::string::npos) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Find separator error.");
+        LOG_ERROR(UDMF_FRAMEWORK, "Find separator error. Key=%{public}s", this->key.c_str());
         return false;
     }
     std::string schema = data.substr(0, pos + separator.size()); // schema
     if (UNIFIED_KEY_SCHEMA != schema) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Key schema error.");
+        LOG_ERROR(UDMF_FRAMEWORK, "Key schema error. Key=%{public}s", this->key.c_str());
         return false;
     }
 
     data = data.substr(pos + separator.size()); // intention/bundleName/groupId
     pos = data.find('/');        // intention
     if (pos == std::string::npos) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Find / error.");
+        LOG_ERROR(UDMF_FRAMEWORK, "Find intention error. Key=%{public}s", this->key.c_str());
         return false;
     }
     std::string intentionTmp = data.substr(0, pos);
     if (!CheckCharacter(intentionTmp, g_ruleIntention)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Check intention character error.");
+        LOG_ERROR(UDMF_FRAMEWORK, "Check intention character error. Key=%{public}s", this->key.c_str());
         return false;
     }
     this->intention = intentionTmp;
@@ -113,23 +112,23 @@ bool UnifiedKey::IsValid()
     data = data.substr(pos + 1);
     pos = data.find('/'); // bundleName
     if (pos == std::string::npos) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Find second / error.");
+        LOG_ERROR(UDMF_FRAMEWORK, "Find bundleName error. Key=%{public}s", this->key.c_str());
         return false;
     }
     std::string bundle = data.substr(0, pos);
     if (!CheckCharacter(bundle, g_ruleBundleName)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Check bundle character error.");
+        LOG_ERROR(UDMF_FRAMEWORK, "Check bundle character error. Key=%{public}s", this->key.c_str());
         return false;
     }
     this->bundleName = bundle;
 
     data = data.substr(pos + 1); // groupId
     if (data.empty()) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Check groupId error.");
+        LOG_ERROR(UDMF_FRAMEWORK, "Find groupId error. Key=%{public}s", this->key.c_str());
         return false;
     }
     if (!CheckCharacter(data, g_ruleGroupId)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Wrong groupId.");
+        LOG_ERROR(UDMF_FRAMEWORK, "Check groupId character error. Key=%{public}s", this->key.c_str());
         return false;
     }
     this->groupId = data;
