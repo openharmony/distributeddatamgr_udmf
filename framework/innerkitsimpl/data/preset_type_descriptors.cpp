@@ -12,12 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- #include "utd_common.h"
-#include <sstream>
-#include <string>
-#include <variant>
 #define LOG_TAG "PresetTypeDescriptors"
+
 #include "preset_type_descriptors.h"
+#include <sstream>
 #include <fstream>
 #include "cJSON.h"
 #include "custom_utd_json_parser.h"
