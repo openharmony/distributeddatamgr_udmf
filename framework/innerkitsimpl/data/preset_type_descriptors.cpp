@@ -65,7 +65,7 @@ void PresetTypeDescriptors::InitDescriptors()
         utdJsonParser.GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_DECLAEEARION, typeDescriptors_);
     }
     cJSON_Delete(jsonRoot);
-    LOG_DEBUG(UDMF_CLIENT, "Preset type descriptors init success, utd size is %{public}d", typeDescriptors_.size());
+    LOG_DEBUG(UDMF_CLIENT, "Preset type descriptors init success, utd size is %{public}lu", typeDescriptors_.size());
 };
 } // namespace UDMF
 } // namespace OHOS
