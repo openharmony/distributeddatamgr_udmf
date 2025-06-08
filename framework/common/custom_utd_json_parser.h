@@ -33,11 +33,11 @@ public:
     bool ParseUserCustomUtdJson(const std::string &jsonData, std::vector<TypeDescriptorCfg> &typesDeclarations,
                           std::vector<TypeDescriptorCfg> &typesReference);
     bool ConvertUtdCfgsToJson(const std::vector<TypeDescriptorCfg> &typesCfg, std::string &jsonData);
+    bool GetTypeDescriptors(const json &jsonRoot, const std::string &nodeName,
+                            std::vector<TypeDescriptorCfg> &typesCfg);
 
 private:
     bool AddJsonStringArray(const std::vector<std::string> &datas, const std::string &nodeName, json &node);
-    bool GetTypeDescriptors(const json &jsonRoot, const std::string &nodeName,
-                            std::vector<TypeDescriptorCfg> &typesCfg);
     std::string GetStringValue(const json &node, const std::string &nodeName);
     std::vector<std::string> GetStringArrayValue(const json &node, const std::string &nodeName);
 };

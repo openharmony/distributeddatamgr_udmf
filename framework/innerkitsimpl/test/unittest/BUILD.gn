@@ -469,6 +469,27 @@ ohos_unittest("PlainTextTest") {
   ]
 }
 
+ohos_unittest("PresetTypeDescriptorsTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
+    "preset_type_descriptor_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ohos_unittest("SystemDefinedAppitemTest") {
   module_out_path = module_output_path
 
@@ -747,6 +768,7 @@ group("unittest") {
     ":LinkTest",
     ":NdkDataConversionTest",
     ":PlainTextTest",
+    ":PresetTypeDescriptorsTest",
     ":SystemDefinedAppitemTest",
     ":SystemDefinedFormTest",
     ":SystemDefinedPixelMapTest",
