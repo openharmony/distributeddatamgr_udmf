@@ -58,10 +58,12 @@ HWTEST_F(PresetTypeDescriptorsTest, TestDoubleInit, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "TestDoubleInit begin.");
     PresetTypeDescriptors &instance = PresetTypeDescriptors::GetInstance();
     auto presetTypes = instance.GetPresetTypes();
-    EXPECT_GE(presetTypes.size(), 0);
+    auto sizeFirst = presetTypes.size();
+    EXPECT_GT(sizeFirst, 0);
     instance.InitDescriptors();
     presetTypes = instance.GetPresetTypes();
-    EXPECT_GE(presetTypes.size(), 0);
+    auto sizeSecond = presetTypes.size();
+    EXPECT_EQ(sizeSecond, sizeFirst);
     LOG_INFO(UDMF_TEST, "TestDoubleInit end.");
 }
 
