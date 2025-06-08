@@ -1,0 +1,2 @@
+#pragma once
+struct ohos_data_unifiedDataChannel_ValueType_t;

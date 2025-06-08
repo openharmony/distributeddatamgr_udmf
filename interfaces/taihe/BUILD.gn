@@ -1,0 +1,116 @@
+# Copyright (C) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//build/ohos.gni")
+import("//build/ohos/taihe_idl/taihe.gni")
+import("//foundation/distributeddatamgr/udmf/udmf.gni")
+
+copy_taihe_idl("copy_udmf_taihe") {
+  sources = [
+    "idl/ohos.data.unifiedDataChannel.taihe",
+    "idl/ohos.data.uniformTypeDescriptor.taihe",
+  ]
+  external_deps = []
+}
+
+config("taihe_config") {
+  include_dirs = [ "include" ]
+}
+
+subsystem_name = "distributeddatamgr"
+part_name = "udmf"
+taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
+
+ohos_taihe("run_udmf_taihe") {
+  taihe_generated_file_path = "$taihe_generated_file_path"
+  deps = [ ":copy_udmf_taihe" ]
+  outputs = [
+    "$taihe_generated_file_path/src/ohos.data.unifiedDataChannel.ani.cpp",
+    "$taihe_generated_file_path/src/ohos.data.unifiedDataChannel.abi.c",
+    "$taihe_generated_file_path/src/ohos.data.uniformTypeDescriptor.ani.cpp",
+    "$taihe_generated_file_path/src/ohos.data.uniformTypeDescriptor.abi.c",
+  ]
+}
+
+taihe_shared_library("udmf_taihe_native") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  taihe_generated_file_path = "$taihe_generated_file_path"
+  part_name = "$part_name"
+  subsystem_name = "$subsystem_name"
+  include_dirs = [
+    "include",
+    "${udmf_interfaces_path}/innerkits/common",
+    "${udmf_interfaces_path}/innerkits/data",
+  ]
+  sources = get_target_outputs(":run_udmf_taihe")
+  sources += [
+    "src/ani_common_utils.cpp",
+    "src/ani_constructor.cpp",
+    "src/ohos.data.uniformTypeDescriptor.impl.cpp",
+    "src/ohos.data.unifiedDataChannel.impl.cpp",
+    "src/taihe_common_utils.cpp",
+    "src/udmf_ani_converter_utils.cpp",
+    "src/unified_data_taihe.cpp",
+    "src/unified_record_taihe.cpp",
+  ]
+  deps = [
+    ":run_udmf_taihe",
+    "${udmf_interfaces_path}/innerkits:udmf_client",
+    "${udmf_interfaces_path}/innerkits:utd_client",
+    "${udmf_interfaces_path}/jskits:udmf_js_common",
+  ]
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:abilitykit_native",
+    "image_framework:image_taihe",
+    "hilog:libhilog",
+    "ability_runtime:ani_common",
+  ]
+  public_configs = [ ":taihe_config" ]
+}
+
+generate_static_abc("udmf_abc") {
+  base_url = "$taihe_generated_file_path"
+  files = [ 
+    "$taihe_generated_file_path/@ohos.data.unifiedDataChannel.ets",
+    "$taihe_generated_file_path/@ohos.data.uniformTypeDescriptor.ets"
+  ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/udmf_abc.abc"
+  dependencies = [ ":run_udmf_taihe" ]
+}
+
+ohos_prebuilt_etc("udmf_etc") {
+  source = "$target_out_dir/udmf_abc.abc"
+  module_install_dir = "framework"
+  subsystem_name = "$subsystem_name"
+  part_name = "$part_name"
+  deps = [
+    ":udmf_abc",
+  ]
+}
+
+group("udmf_taihe") {
+  deps = [
+    ":udmf_etc",
+    ":udmf_taihe_native",
+  ]
+}
