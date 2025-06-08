@@ -42,33 +42,40 @@ static constexpr int PARAMETERSERROR = 401;
 
 class FileImpl {
     public:
-    FileImpl() {
+    FileImpl()
+    {
         this->value_ = std::make_shared<taiheUdmf::File>();
     }
 
-    ::taihe::string GetType() {
+    ::taihe::string GetType()
+    {
         return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
     }
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue() {
+    ::ohos::data::unifiedDataChannel::ValueType GetValue()
+    {
         return taiheUdmf::ConvertValueType(this->value_->GetValue());
     }
 
-    ::taihe::string GetUri() {
+    ::taihe::string GetUri()
+    {
         return ::taihe::string(this->value_->GetUri());
     }
 
-    void SetUri(::taihe::string_view uri) {
+    void SetUri(::taihe::string_view uri)
+    {
         std::string uriStr(uri);
         this->value_->SetUri(uriStr);
     }
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails() {
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails()
+    {
         return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
             taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
     }
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details) {
+    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+    {
         if (details.size() == 0) {
             return;
         }
@@ -81,33 +88,40 @@ class FileImpl {
 
 class FolderImpl {
     public:
-    FolderImpl() {
+    FolderImpl()
+    {
         this->value_ = std::make_shared<taiheUdmf::Folder>();
     }
 
-    ::taihe::string GetType() {
+    ::taihe::string GetType()
+    {
         return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
     }
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue() {
+    ::ohos::data::unifiedDataChannel::ValueType GetValue()
+    {
         return taiheUdmf::ConvertValueType(this->value_->GetValue());
     }
 
-    ::taihe::string GetUri() {
+    ::taihe::string GetUri()
+    {
         return ::taihe::string(this->value_->GetUri());
     }
 
-    void SetUri(::taihe::string_view uri) {
+    void SetUri(::taihe::string_view uri)
+    {
         std::string uriStr(uri);
         this->value_->SetUri(uriStr);
     }
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails() {
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails()
+    {
         return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
             taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
     }
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details) {
+    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+    {
         if (details.size() == 0) {
             return;
         }
@@ -115,11 +129,13 @@ class FolderImpl {
         this->value_->SetDetails(udmfDetails);
     }
 
-    ::taihe::string GetFolderUri() {
+    ::taihe::string GetFolderUri()
+    {
         return ::taihe::string(this->value_->GetUri());
     }
 
-    void SetFolderUri(::taihe::string_view folderUri) {
+    void SetFolderUri(::taihe::string_view folderUri)
+    {
         std::string folderUriStr(folderUri);
         this->value_->SetUri(folderUriStr);
     }
@@ -129,33 +145,40 @@ class FolderImpl {
 
 class AudioImpl {
     public:
-    AudioImpl() {
+    AudioImpl()
+    {
         this->value_ = std::make_shared<taiheUdmf::Audio>();
     }
 
-    ::taihe::string GetType() {
+    ::taihe::string GetType()
+    {
         return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
     }
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue() {
+    ::ohos::data::unifiedDataChannel::ValueType GetValue()
+    {
         return taiheUdmf::ConvertValueType(this->value_->GetValue());
     }
 
-    ::taihe::string GetUri() {
+    ::taihe::string GetUri()
+    {
         return ::taihe::string(this->value_->GetUri());
     }
 
-    void SetUri(::taihe::string_view uri) {
+    void SetUri(::taihe::string_view uri)
+    {
         std::string uriStr(uri);
         this->value_->SetUri(uriStr);
     }
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails() {
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails()
+    {
         return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
             taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
     }
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details) {
+    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+    {
         if (details.size() == 0) {
             return;
         }
@@ -163,11 +186,13 @@ class AudioImpl {
         this->value_->SetDetails(udmfDetails);;
     }
 
-    ::taihe::string GetAudioUri() {
+    ::taihe::string GetAudioUri()
+    {
         return ::taihe::string(this->value_->GetUri());
     }
 
-    void SetAudioUri(::taihe::string_view audioUri) {
+    void SetAudioUri(::taihe::string_view audioUri)
+    {
         std::string audioUriStr(audioUri);
         this->value_->SetUri(audioUriStr);
     }
@@ -177,33 +202,40 @@ class AudioImpl {
 
 class VideoImpl {
     public:
-    VideoImpl() {
+    VideoImpl()
+    {
         this->value_ = std::make_shared<taiheUdmf::Video>();
     }
 
-    ::taihe::string GetType() {
+    ::taihe::string GetType()
+    {
         return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
     }
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue() {
+    ::ohos::data::unifiedDataChannel::ValueType GetValue()
+    {
         return taiheUdmf::ConvertValueType(this->value_->GetValue());
     }
 
-    ::taihe::string GetUri() {
+    ::taihe::string GetUri()
+    {
         return ::taihe::string(this->value_->GetUri());
     }
 
-    void SetUri(::taihe::string_view uri) {
+    void SetUri(::taihe::string_view uri)
+    {
         std::string uriStr(uri);
         this->value_->SetUri(uriStr);
     }
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails() {
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails()
+    {
         return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
             taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
     }
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details) {
+    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+    {
         if (details.size() == 0) {
             return;
         }
@@ -211,11 +243,13 @@ class VideoImpl {
         this->value_->SetDetails(udmfDetails);
     }
 
-    ::taihe::string GetVideoUri() {
+    ::taihe::string GetVideoUri()
+    {
         return ::taihe::string(this->value_->GetUri());
     }
 
-    void SetVideoUri(::taihe::string_view videoUri) {
+    void SetVideoUri(::taihe::string_view videoUri)
+    {
         std::string videoUriStr(videoUri);
         this->value_->SetUri(videoUriStr);
     }
@@ -225,33 +259,40 @@ class VideoImpl {
 
 class ImageImpl {
     public:
-    ImageImpl() {
+    ImageImpl()
+    {
         this->value_ = std::make_shared<taiheUdmf::Image>();
     }
 
-    ::taihe::string GetType() {
+    ::taihe::string GetType()
+    {
         return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
     }
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue() {
+    ::ohos::data::unifiedDataChannel::ValueType GetValue()
+    {
         return taiheUdmf::ConvertValueType(this->value_->GetValue());
     }
 
-    ::taihe::string GetUri() {
+    ::taihe::string GetUri()
+    {
         return ::taihe::string(this->value_->GetUri());
     }
 
-    void SetUri(::taihe::string_view uri) {
+    void SetUri(::taihe::string_view uri)
+    {
         std::string uriStr(uri);
         this->value_->SetUri(uriStr);
     }
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails() {
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails()
+    {
         return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
             taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
     }
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details) {
+    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+    {
         if (details.size() == 0) {
             return;
         }
@@ -259,11 +300,13 @@ class ImageImpl {
         this->value_->SetDetails(udmfDetails);
     }
 
-    ::taihe::string GetImageUri() {
+    ::taihe::string GetImageUri()
+    {
         return ::taihe::string(this->value_->GetUri());
     }
 
-    void SetImageUri(::taihe::string_view imageUri) {
+    void SetImageUri(::taihe::string_view imageUri)
+    {
         std::string imageUriStr(imageUri);
         this->value_->SetUri(imageUriStr);
     }
@@ -273,24 +316,29 @@ class ImageImpl {
 
 class HTMLImpl {
     public:
-    HTMLImpl() {
+    HTMLImpl()
+    {
         this->value_ = std::make_shared<taiheUdmf::Html>();
     }
 
-    ::taihe::string GetType() {
+    ::taihe::string GetType()
+    {
         return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
     }
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue() {
+    ::ohos::data::unifiedDataChannel::ValueType GetValue()
+    {
         return taiheUdmf::ConvertValueType(this->value_->GetValue());
     }
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails() {
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails()
+    {
         return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
             taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
     }
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details) {
+    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+    {
         if (details.size() == 0) {
             return;
         }
@@ -298,21 +346,25 @@ class HTMLImpl {
         this->value_->SetDetails(udmfDetails);
     }
 
-    void SetHtmlContent(::taihe::string_view htmlContent) {
+    void SetHtmlContent(::taihe::string_view htmlContent)
+    {
         std::string content(htmlContent);
         this->value_->SetHtmlContent(content);
     }
 
-    ::taihe::string GetHtmlContent() {
+    ::taihe::string GetHtmlContent()
+    {
         return ::taihe::string(this->value_->GetHtmlContent());
     }
 
-    void SetPlainContent(::taihe::string_view plainContent) {
+    void SetPlainContent(::taihe::string_view plainContent)
+    {
         std::string content(plainContent);
         this->value_->SetPlainContent(content);
     }
 
-    ::taihe::string GetPlainContent() {
+    ::taihe::string GetPlainContent()
+    {
         return ::taihe::string(this->value_->GetPlainContent());
     }
 
@@ -321,24 +373,29 @@ class HTMLImpl {
 
 class TextImpl {
     public:
-    TextImpl() {
+    TextImpl()
+    {
         this->value_ = std::make_shared<taiheUdmf::Text>();
     }
 
-    ::taihe::string GetType() {
+    ::taihe::string GetType()
+    {
         return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
     }
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue() {
+    ::ohos::data::unifiedDataChannel::ValueType GetValue()
+    {
         return taiheUdmf::ConvertValueType(this->value_->GetValue());
     }
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails() {
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails()
+    {
         return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
             taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
     }
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details) {
+    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+    {
         if (details.size() == 0) {
             return;
         }
@@ -351,24 +408,29 @@ class TextImpl {
 
 class HyperlinkImpl {
     public:
-    HyperlinkImpl() {
+    HyperlinkImpl()
+    {
         this->value_ = std::make_shared<taiheUdmf::Link>();
     }
 
-    ::taihe::string GetType() {
+    ::taihe::string GetType()
+    {
         return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
     }
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue() {
+    ::ohos::data::unifiedDataChannel::ValueType GetValue()
+    {
         return taiheUdmf::ConvertValueType(this->value_->GetValue());
     }
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails() {
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails()
+    {
         return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
             taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
     }
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details) {
+    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+    {
         if (details.size() == 0) {
             return;
         }
@@ -376,21 +438,25 @@ class HyperlinkImpl {
         this->value_->SetDetails(udmfDetails);
     }
 
-    void SetUrl(::taihe::string_view url) {
+    void SetUrl(::taihe::string_view url)
+    {
         std::string urlStr(url);
         this->value_->SetUrl(urlStr);
     }
 
-    ::taihe::string GetUrl() {
+    ::taihe::string GetUrl()
+    {
         return ::taihe::string(this->value_->GetUrl());
     }
 
-    void SetDescription(::taihe::string_view description) {
+    void SetDescription(::taihe::string_view description)
+    {
         std::string desc(description);
         this->value_->SetDescription(desc);
     }
 
-    ::taihe::string GetDescription() {
+    ::taihe::string GetDescription()
+    {
         return ::taihe::string(this->value_->GetDescription());
     }
 
@@ -399,24 +465,29 @@ class HyperlinkImpl {
 
 class PlainTextImpl {
     public:
-    PlainTextImpl() {
+    PlainTextImpl()
+    {
         this->value_ = std::make_shared<taiheUdmf::PlainText>();
     }
 
-    ::taihe::string GetType() {
+    ::taihe::string GetType()
+    {
         return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
     }
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue() {
+    ::ohos::data::unifiedDataChannel::ValueType GetValue()
+    {
         return taiheUdmf::ConvertValueType(this->value_->GetValue());
     }
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails() {
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails()
+    {
         return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
             taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
     }
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details) {
+    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+    {
         if (details.size() == 0) {
             return;
         }
@@ -424,21 +495,25 @@ class PlainTextImpl {
         this->value_->SetDetails(udmfDetails);
     }
 
-    void SetTextContent(::taihe::string_view textContent) {
+    void SetTextContent(::taihe::string_view textContent)
+    {
         std::string content(textContent);
         this->value_->SetContent(content);
     }
 
-    ::taihe::string GetTextContent() {
+    ::taihe::string GetTextContent()
+    {
         return ::taihe::string(this->value_->GetContent());
     }
 
-    void SetAbstract1(::taihe::string_view abstract) {
+    void SetAbstract1(::taihe::string_view abstract)
+    {
         std::string abstractStr(abstract);
         this->value_->SetAbstract(abstractStr);
     }
 
-    ::taihe::string GetAbstract1() {
+    ::taihe::string GetAbstract1()
+    {
         return ::taihe::string(this->value_->GetAbstract());
     }
 
@@ -447,24 +522,29 @@ class PlainTextImpl {
 
 class SystemDefinedRecordImpl {
     public:
-    SystemDefinedRecordImpl() {
+    SystemDefinedRecordImpl()
+    {
         this->value_ = std::make_shared<taiheUdmf::SystemDefinedRecord>();
     }
 
-    ::taihe::string GetType() {
+    ::taihe::string GetType()
+    {
         return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
     }
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue() {
+    ::ohos::data::unifiedDataChannel::ValueType GetValue()
+    {
         return taiheUdmf::ConvertValueType(this->value_->GetValue());
     }
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> GetDetails() {
+    ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> GetDetails()
+    {
         return ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>>::make(
             taiheUdmf::ConvertUDDetailsToUnion(this->value_->GetDetails()));
     }
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details) {
+    void SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details)
+    {
         taiheUdmf::UDDetails udmfDetails = taiheUdmf::ConvertUDDetailsToUnion(details);
         this->value_->SetDetails(udmfDetails);
     }
@@ -474,68 +554,83 @@ class SystemDefinedRecordImpl {
 
 class SystemDefinedFormImpl {
     public:
-    SystemDefinedFormImpl() {
+    SystemDefinedFormImpl()
+    {
         this->value_ = std::make_shared<taiheUdmf::SystemDefinedForm>();
     }
 
-    ::taihe::string GetType() {
+    ::taihe::string GetType()
+    {
         return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
     }
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue() {
+    ::ohos::data::unifiedDataChannel::ValueType GetValue()
+    {
         return taiheUdmf::ConvertValueType(this->value_->GetValue());
     }
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> GetDetails() {
+    ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> GetDetails()
+    {
         return ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>>::make(
             taiheUdmf::ConvertUDDetailsToUnion(this->value_->GetDetails()));
     }
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details) {
+    void SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details)
+    {
         taiheUdmf::UDDetails udmfDetails = taiheUdmf::ConvertUDDetailsToUnion(details);
         this->value_->SetDetails(udmfDetails);
     }
 
-    double GetFormId() {
+    double GetFormId()
+    {
         return this->value_->GetFormId();
     }
 
-    void SetFormId(double formId) {
+    void SetFormId(double formId)
+    {
         this->value_->SetFormId(formId);
     }
 
-    ::taihe::string GetFormName() {
+    ::taihe::string GetFormName()
+    {
         return ::taihe::string(this->value_->GetFormName());
     }
 
-    void SetFormName(::taihe::string_view formName) {
+    void SetFormName(::taihe::string_view formName)
+    {
         std::string name(formName);
         this->value_->SetFormName(name);
     }
 
-    ::taihe::string GetBundleName() {
+    ::taihe::string GetBundleName()
+    {
         return ::taihe::string(this->value_->GetBundleName());
     }
 
-    void SetBundleName(::taihe::string_view bundleName) {
+    void SetBundleName(::taihe::string_view bundleName)
+    {
         std::string name(bundleName);
         this->value_->SetBundleName(name);
     }
 
-    ::taihe::string GetAbilityName() {
+    ::taihe::string GetAbilityName()
+    {
         return ::taihe::string(this->value_->GetAbilityName());
     }
 
-    void SetAbilityName(::taihe::string_view abilityName) {
+    void SetAbilityName(::taihe::string_view abilityName)
+    {
         std::string name(abilityName);
         this->value_->SetAbilityName(name);
     }
 
-    ::taihe::string GetModule() {
+    ::taihe::string GetModule()
+    {
         return ::taihe::string(this->value_->GetModule());
     }
 
-    void SetModule(::taihe::string_view module) {
+    void SetModule(::taihe::string_view module)
+    {
         std::string mudule(module);
         this->value_->SetModule(mudule);
     }
@@ -545,78 +640,95 @@ class SystemDefinedFormImpl {
 
 class SystemDefinedAppItemImpl {
     public:
-    SystemDefinedAppItemImpl() {
+    SystemDefinedAppItemImpl()
+    {
         this->value_ = std::make_shared<taiheUdmf::SystemDefinedAppItem>();
     }
 
-    ::taihe::string GetType() {
+    ::taihe::string GetType()
+    {
         return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
     }
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue() {
+    ::ohos::data::unifiedDataChannel::ValueType GetValue()
+    {
         return taiheUdmf::ConvertValueType(this->value_->GetValue());
     }
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> GetDetails() {
+    ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> GetDetails()
+    {
         return ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>>::make(
             taiheUdmf::ConvertUDDetailsToUnion(this->value_->GetDetails()));
     }
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details) {
+    void SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details)
+    {
         taiheUdmf::UDDetails udmfDetails = taiheUdmf::ConvertUDDetailsToUnion(details);
         this->value_->SetDetails(udmfDetails);
     }
 
-    ::taihe::string GetAppId() {
+    ::taihe::string GetAppId()
+    {
         return ::taihe::string(this->value_->GetAppId());
     }
 
-    void SetAppId(::taihe::string_view appId) {
+    void SetAppId(::taihe::string_view appId)
+    {
         std::string appIdStr(appId);
         this->value_->SetAppId(appIdStr);
     }
 
-    ::taihe::string GetAppName() {
+    ::taihe::string GetAppName()
+    {
         return ::taihe::string(this->value_->GetAppName());
     }
 
-    void SetAppName(::taihe::string_view appName) {
+    void SetAppName(::taihe::string_view appName)
+    {
         std::string appNameStr(appName);
         this->value_->SetAppName(appNameStr);
     }
 
-    ::taihe::string GetAppIconId() {
+    ::taihe::string GetAppIconId()
+    {
         return ::taihe::string(this->value_->GetAppIconId());
     }
 
-    void SetAppIconId(::taihe::string_view appIconId) {
+    void SetAppIconId(::taihe::string_view appIconId)
+    {
         std::string appIconIdStr(appIconId);
         this->value_->SetAppIconId(appIconIdStr);
     }
 
-    ::taihe::string GetAppLabelId() {
+    ::taihe::string GetAppLabelId()
+    {
         return ::taihe::string(this->value_->GetAppLabelId());
     }
 
-    void SetAppLabelId(::taihe::string_view appLabelId) {
+    void SetAppLabelId(::taihe::string_view appLabelId)
+    {
         std::string appLabelIdStr(appLabelId);
         this->value_->SetAppLabelId(appLabelIdStr);
     }
 
-    ::taihe::string GetBundleName() {
+    ::taihe::string GetBundleName()
+    {
         return ::taihe::string(this->value_->GetBundleName());
     }
 
-    void SetBundleName(::taihe::string_view bundleName) {
+    void SetBundleName(::taihe::string_view bundleName)
+    {
         std::string bundleNameStr(bundleName);
         this->value_->SetBundleName(bundleNameStr);
     }
 
-    ::taihe::string GetAbilityName() {
+    ::taihe::string GetAbilityName()
+    {
         return ::taihe::string(this->value_->GetAbilityName());
     }
 
-    void SetAbilityName(::taihe::string_view abilityName) {
+    void SetAbilityName(::taihe::string_view abilityName)
+    {
         std::string abilityNameStr(abilityName);
         this->value_->SetAbilityName(abilityNameStr);
     }
@@ -626,34 +738,42 @@ class SystemDefinedAppItemImpl {
 
 class SystemDefinedPixelMapImpl {
     public:
-    SystemDefinedPixelMapImpl() {
+    SystemDefinedPixelMapImpl()
+    {
+        this->value_ = std::make_shared<taiheUdmf::SystemDefinedPixelMap>();
     }
 
-    ::taihe::string GetType() {
+    ::taihe::string GetType()
+    {
         return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
     }
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue() {
+    ::ohos::data::unifiedDataChannel::ValueType GetValue()
+    {
         return taiheUdmf::ConvertValueType(this->value_->GetValue());
     }
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> GetDetails() {
+    ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> GetDetails()
+    {
         return ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>>::make(
             taiheUdmf::ConvertUDDetailsToUnion(this->value_->GetDetails()));
     }
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details) {
+    void SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details)
+    {
         taiheUdmf::UDDetails udmfDetails = taiheUdmf::ConvertUDDetailsToUnion(details);
         this->value_->SetDetails(udmfDetails);
     }
 
-    ::taihe::optional<::taihe::array<uint8_t>> GetRawData() {
+    ::taihe::optional<::taihe::array<uint8_t>> GetRawData()
+    {
         auto rawData = this->value_->GetRawData();
         return ::taihe::optional<::taihe::array<uint8_t>>::make(
             ::taihe::array<uint8_t>(rawData));
     }
 
-    void SetRawData(::taihe::array_view<uint8_t> rawData) {
+    void SetRawData(::taihe::array_view<uint8_t> rawData)
+    {
         if (rawData.size() == 0) {
             return;
         }
@@ -670,55 +790,68 @@ class SystemDefinedPixelMapImpl {
     return {summary, 0};
 }
 
-::ohos::data::unifiedDataChannel::File CreateUnifiedFile() {
+::ohos::data::unifiedDataChannel::File CreateUnifiedFile()
+{
     return taihe::make_holder<FileImpl, ::ohos::data::unifiedDataChannel::File>();
 }
 
-::ohos::data::unifiedDataChannel::Folder CreateFolder() {
+::ohos::data::unifiedDataChannel::Folder CreateFolder()
+{
     return taihe::make_holder<FolderImpl, ::ohos::data::unifiedDataChannel::Folder>();
 }
 
-::ohos::data::unifiedDataChannel::Audio CreateAudio() {
+::ohos::data::unifiedDataChannel::Audio CreateAudio()
+{
     return taihe::make_holder<AudioImpl, ::ohos::data::unifiedDataChannel::Audio>();
 }
 
-::ohos::data::unifiedDataChannel::Video CreateVideo() {
+::ohos::data::unifiedDataChannel::Video CreateVideo()
+{
     return taihe::make_holder<VideoImpl, ::ohos::data::unifiedDataChannel::Video>();
 }
 
-::ohos::data::unifiedDataChannel::Image CreateImage() {
+::ohos::data::unifiedDataChannel::Image CreateImage()
+{
     return taihe::make_holder<ImageImpl, ::ohos::data::unifiedDataChannel::Image>();
 }
 
-::ohos::data::unifiedDataChannel::Text CreateText() {
+::ohos::data::unifiedDataChannel::Text CreateText()
+{
     return taihe::make_holder<TextImpl, ::ohos::data::unifiedDataChannel::Text>();
 }
 
-::ohos::data::unifiedDataChannel::HTML CreateHtml() {
+::ohos::data::unifiedDataChannel::HTML CreateHtml()
+{
     return taihe::make_holder<HTMLImpl, ::ohos::data::unifiedDataChannel::HTML>();
 }
 
-::ohos::data::unifiedDataChannel::Hyperlink CreateHyperlink() {
+::ohos::data::unifiedDataChannel::Hyperlink CreateHyperlink()
+{
     return taihe::make_holder<HyperlinkImpl, ::ohos::data::unifiedDataChannel::Hyperlink>();
 }
 
-::ohos::data::unifiedDataChannel::PlainText CreatePlainText() {
+::ohos::data::unifiedDataChannel::PlainText CreatePlainText()
+{
     return taihe::make_holder<PlainTextImpl, ::ohos::data::unifiedDataChannel::PlainText>();
 }
 
-::ohos::data::unifiedDataChannel::SystemDefinedRecord CreateSystemDefinedRecord() {
+::ohos::data::unifiedDataChannel::SystemDefinedRecord CreateSystemDefinedRecord()
+{
     return taihe::make_holder<SystemDefinedRecordImpl, ::ohos::data::unifiedDataChannel::SystemDefinedRecord>();
 }
 
-::ohos::data::unifiedDataChannel::SystemDefinedForm CreateSystemDefinedForm() {
+::ohos::data::unifiedDataChannel::SystemDefinedForm CreateSystemDefinedForm()
+{
     return taihe::make_holder<SystemDefinedFormImpl, ::ohos::data::unifiedDataChannel::SystemDefinedForm>();
 }
 
-::ohos::data::unifiedDataChannel::SystemDefinedAppItem CreateSystemDefinedAppItem() {
+::ohos::data::unifiedDataChannel::SystemDefinedAppItem CreateSystemDefinedAppItem()
+{
     return taihe::make_holder<SystemDefinedAppItemImpl, ::ohos::data::unifiedDataChannel::SystemDefinedAppItem>();
 }
 
-::ohos::data::unifiedDataChannel::SystemDefinedPixelMap CreateSystemDefinedPixelMap() {
+::ohos::data::unifiedDataChannel::SystemDefinedPixelMap CreateSystemDefinedPixelMap()
+{
     return taihe::make_holder<SystemDefinedPixelMapImpl, ::ohos::data::unifiedDataChannel::SystemDefinedPixelMap>();
 }
 
