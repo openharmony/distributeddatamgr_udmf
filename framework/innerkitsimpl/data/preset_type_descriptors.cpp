@@ -58,14 +58,20 @@ void PresetTypeDescriptors::InitDescriptors()
     while (std::getline(fin, line)) {
         oss << line;
     }
+    fin.close();
     CustomUtdJsonParser utdJsonParser;
     cJSON* jsonRoot = cJSON_Parse(oss.str().c_str());
     if (jsonRoot != NULL && cJSON_IsObject(jsonRoot)) {
         std::lock_guard<std::recursive_mutex> lock(mutex_);
+        if (typeDescriptors_.size() > 0) {
+            LOG_INFO(UDMF_CLIENT, "Preset type descriptors already init, utd size is %{public}zu",
+                typeDescriptors_.size());
+            return;
+        }
         utdJsonParser.GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_DECLAEEARION, typeDescriptors_);
     }
     cJSON_Delete(jsonRoot);
-    LOG_DEBUG(UDMF_CLIENT, "Preset type descriptors init success, utd size is %{public}lu", typeDescriptors_.size());
+    LOG_DEBUG(UDMF_CLIENT, "Preset type descriptors init success, utd size is %{public}zu", typeDescriptors_.size());
 };
 } // namespace UDMF
 } // namespace OHOS
