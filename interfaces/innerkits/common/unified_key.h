@@ -34,7 +34,9 @@ struct API_EXPORT UnifiedKey {
     std::string GetKeyCommonPrefix() const;
     bool IsValid();
     void PreliminaryWork();
-    bool CheckCharacter(std::string data, std::bitset<MAX_BIT_SIZE> rule);
+    bool CheckCharacter(const std::string_view& data, const std::bitset<MAX_BIT_SIZE> &rule);
+    bool ExtractAndValidateSegment(std::string_view& data, std::string& field,
+        const std::bitset<MAX_BIT_SIZE>& rule, const std::string& name);
 };
 } // namespace UDMF
 } // namespace OHOS

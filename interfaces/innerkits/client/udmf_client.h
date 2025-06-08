@@ -52,6 +52,7 @@ public:
     Status API_EXPORT PushDelayData(const std::string &key, UnifiedData &unifiedData);
     Status GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
         sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData);
+    std::string API_EXPORT GetBundleNameByUdKey(const std::string &key);
 
 private:
     UdmfClient() = default;

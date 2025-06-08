@@ -3804,4 +3804,82 @@ HWTEST_F(UdmfClientTest, GetParentType002, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "GetParentType002 end.");
 }
+
+/**
+ * @tc.name: GetBundleNameByUdKey001
+ * @tc.desc: test GetBundleNameByUdKey with valid UD key
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetBundleNameByUdKey001, TestSize.Level1)
+{
+    std::string key = "udmf://drag/com.example.app/N]2fIEMbrJj@<hH7zpXzzQ>wp:jMuPa7";
+    std::string expectedBundle = "com.example.app";
+
+    std::string actualBundle = UdmfClient::GetInstance().GetBundleNameByUdKey(key);
+    EXPECT_EQ(actualBundle, expectedBundle);
+}
+
+/**
+ * @tc.name: GetBundleNameByUdKey002
+ * @tc.desc: test GetBundleNameByUdKey with invalid UD key (missing schema)
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetBundleNameByUdKey002, TestSize.Level1)
+{
+    std::string key = "invalid://share/com.example.app/123";
+    std::string actualBundle = UdmfClient::GetInstance().GetBundleNameByUdKey(key);
+    EXPECT_EQ(actualBundle, "");
+}
+
+/**
+ * @tc.name: GetBundleNameByUdKey003
+ * @tc.desc: test GetBundleNameByUdKey with incomplete key (missing parts)
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetBundleNameByUdKey003, TestSize.Level1)
+{
+    std::string key = "udmf://share/com.example.app";
+    std::string actualBundle = UdmfClient::GetInstance().GetBundleNameByUdKey(key);
+    EXPECT_EQ(actualBundle, "");
+}
+
+/**
+ * @tc.name: GetBundleNameByUdKey004
+ * @tc.desc: test GetBundleNameByUdKey with empty key
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetBundleNameByUdKey004, TestSize.Level1)
+{
+    std::string key = "";
+    std::string actualBundle = UdmfClient::GetInstance().GetBundleNameByUdKey(key);
+    EXPECT_EQ(actualBundle, "");
+}
+
+/**
+ * @tc.name: GetBundleNameByUdKey005
+ * @tc.desc: test GetBundleNameByUdKey with valid UD key
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetBundleNameByUdKey005, TestSize.Level1)
+{
+    std::string key = "udmf://drag/+clone-1+com.example.app/N]2fIEMbrJj@<hH7zpXzzQ>wp:jMuPa7";
+    std::string expectedBundle = "+clone-1+com.example.app";
+
+    std::string actualBundle = UdmfClient::GetInstance().GetBundleNameByUdKey(key);
+    EXPECT_EQ(actualBundle, expectedBundle);
+}
+
+/**
+ * @tc.name: GetBundleNameByUdKey006
+ * @tc.desc: test GetBundleNameByUdKey with valid UD key
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetBundleNameByUdKey006, TestSize.Level1)
+{
+    std::string key = "udmf://drag/+clone-5+com.example.app/N]2fIEMbrJj@<hH7zpXzzQ>wp:jMuPa7";
+    std::string expectedBundle = "+clone-5+com.example.app";
+
+    std::string actualBundle = UdmfClient::GetInstance().GetBundleNameByUdKey(key);
+    EXPECT_EQ(actualBundle, expectedBundle);
+}
 } // OHOS::Test
