@@ -3882,4 +3882,51 @@ HWTEST_F(UdmfClientTest, GetBundleNameByUdKey006, TestSize.Level1)
     std::string actualBundle = UdmfClient::GetInstance().GetBundleNameByUdKey(key);
     EXPECT_EQ(actualBundle, expectedBundle);
 }
+
+/**
+ * @tc.name: ProcessDragIfInApp001
+ * @tc.desc: test ProcessDragIfInApp with valid shareOption
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, ProcessDragIfInApp001, TestSize.Level1)
+{
+    ShareOptions shareOption = IN_APP;
+    UnifiedData unifiedData;
+    std::string intentionDrag = "drag";
+    std::string key = "test";
+
+    auto ret = UdmfClient::GetInstance().ProcessDragIfInApp(shareOption, unifiedData, intentionDrag, key);
+    EXPECT_EQ(ret, Status::E_OK);
+}
+
+/**
+ * @tc.name: ProcessDragIfInApp002
+ * @tc.desc: test ProcessDragIfInApp with invalid shareOption
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, ProcessDragIfInApp002, TestSize.Level1)
+{
+    ShareOptions shareOption = CROSS_APP;
+    std::string intentionDrag = "drag";
+    UnifiedData unifiedData;
+    std::string key = "test";
+
+    auto ret = UdmfClient::GetInstance().ProcessDragIfInApp(shareOption, unifiedData, intentionDrag, key);
+    EXPECT_EQ(ret, Status::E_ERROR);
+}
+
+/**
+ * @tc.name: SetData0024
+ * @tc.desc: test SetData with invalid intention
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, SetData0024, TestSize.Level1)
+{
+    CustomOption option;
+    UnifiedData unifiedData;
+    std::string key = "test";
+
+    auto ret = UdmfClient::GetInstance().SetData(option, unifiedData, key);
+    EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
+}
 } // OHOS::Test

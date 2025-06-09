@@ -74,6 +74,7 @@ HWTEST_F(UdmfClientAbnormalTest, SetData001, TestSize.Level1)
     UdmfClient client;
     UnifiedData unifiedData;
     CustomOption option;
+    option.intention = Intention::UD_INTENTION_DATA_HUB;
     std::string key = "testKey";
 
     Status ret = client.SetData(option, unifiedData, key);
