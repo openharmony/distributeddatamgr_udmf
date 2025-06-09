@@ -30,6 +30,7 @@ enum UdmfSubModule {
     UDMF_SERVICE,       // for udmf service module
     UDMF_CAPI,          // for udmf capi module
     UDMF_TEST,          // for udmf test module
+    UDMF_ANI,          // for udmf ani module
 };
 
 // 0xD001600: subsystem:distributeddatamgr module:udmf, 8 bits reserved.

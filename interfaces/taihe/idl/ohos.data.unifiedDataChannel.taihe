@@ -1,0 +1,408 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@!namespace("@ohos.data.unifiedDataChannel", "unifiedDataChannel")
+
+@!sts_inject_into_module("import Want from '@ohos.app.ability.Want';")
+ 
+@!sts_inject_into_module("import image from '@ohos.multimedia.image';")
+
+@!sts_inject("""
+static { loadLibrary("udmf_taihe_native.z") }
+""")
+
+union ValueType {
+  number: f64;
+  string: String;
+  boolean: bool;
+  ArrayBuffer: @arraybuffer Array<u8>;
+  @null nullType;
+  @undefined undefinedType;
+  object: @sts_type("(image.PixelMap | Want | object)") Opaque;
+}
+
+union DetailsValue {
+  number: f64;
+  string: String;
+  Uint8Array: @typedarray Array<u8>;
+}
+
+union UnifiedDataOrNull {
+  unifiedData: UnifiedData;
+  @null nullType;
+}
+
+enum Intention: String {
+  DATA_HUB = "DataHub",
+  DRAG = "Drag"
+}
+
+enum ProgressIndicator: i32 {
+  NONE = 0,
+  DEFAULT = 1
+}
+
+enum ListenerStatus: i32 {
+  FINISHED = 0,
+  PROCESSING,
+  CANCELED,
+  INNER_ERROR = 200,
+  INVALID_PARAMETERS,
+  DATA_NOT_FOUND,
+  SYNC_FAILED,
+  COPY_FILE_FAILED
+}
+
+enum FileConflictOptions: i32 {
+  OVERWRITE = 0,
+  SKIP = 1
+}
+
+struct Options {
+  intention: Optional<Intention>;
+  key: Optional<String>;
+}
+
+@class
+struct Summary {
+  summary: @record Map<String, f64>;
+  totalSize: f64;
+}
+
+function CreateSummary(): Summary;
+
+struct ProgressInfo {
+  progress: f64;
+  status: ListenerStatus;
+}
+
+struct GetDataParams {
+  progressIndicator: ProgressIndicator;
+  dataProgressListener: (progressInfo: ProgressInfo, data: UnifiedDataOrNull) => void;
+  destUri: Optional<String>;
+  fileConflictOptions: Optional<FileConflictOptions>;
+}
+
+@class
+interface UnifiedData {
+  AddRecord(unifiedRecord: UnifiedRecord): void;
+  GetRecords(): Array<UnifiedRecord>;
+  GetInner(): i64;
+}
+
+@ctor("UnifiedData")
+function CreateUnifiedData(): UnifiedData;
+
+@ctor("UnifiedData")
+function CreateUnifiedDataWithParams(unifiedRecord: UnifiedRecord): UnifiedData;
+
+@class
+interface UnifiedRecord {
+  GetType(): String;
+  GetValue(): ValueType;
+  GetInner(): i64;
+}
+
+@ctor("UnifiedRecord")
+function CreateUnifiedRecord(): UnifiedRecord;
+
+@ctor("UnifiedRecord")
+function CreateUnifiedRecordWithParams(type: String, value: ValueType): UnifiedRecord;
+
+@class
+interface File {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("uri")
+  GetUri(): String;
+  @set("uri")
+  SetUri(uri: String): void;
+  @get("details")
+  GetDetails(): Optional<@record Map<String, String>>;
+  @set("details")
+  SetDetails(details: @record Map<String, String>): void;
+}
+
+@ctor("File")
+function CreateUnifiedFile(): File;
+
+@class
+interface Folder {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("uri")
+  GetUri(): String;
+  @set("uri")
+  SetUri(uri: String): void;
+  @get("details")
+  GetDetails(): Optional<@record Map<String, String>>;
+  @set("details")
+  SetDetails(details: @record Map<String, String>): void;
+  @get("folderUri")
+  GetFolderUri(): String;
+  @set("folderUri")
+  SetFolderUri(folderUri: String): void;
+}
+
+@ctor("Folder")
+function CreateFolder(): Folder;
+
+@class
+interface Audio {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("uri")
+  GetUri(): String;
+  @set("uri")
+  SetUri(uri: String): void;
+  @get("details")
+  GetDetails(): Optional<@record Map<String, String>>;
+  @set("details")
+  SetDetails(details: @record Map<String, String>): void;
+  @get("audioUri")
+  GetAudioUri(): String;
+  @set("audioUri")
+  SetAudioUri(audioUri: String): void;
+}
+
+@ctor("Audio")
+function CreateAudio(): Audio;
+
+@class
+interface Video {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("uri")
+  GetUri(): String;
+  @set("uri")
+  SetUri(uri: String): void;
+  @get("details")
+  GetDetails(): Optional<@record Map<String, String>>;
+  @set("details")
+  SetDetails(details: @record Map<String, String>): void;
+  @get("videoUri")
+  GetVideoUri(): String;
+  @set("videoUri")
+  SetVideoUri(videoUri: String): void;
+}
+
+@ctor("Video")
+function CreateVideo(): Video;
+
+@class
+interface Image {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("uri")
+  GetUri(): String;
+  @set("uri")
+  SetUri(uri: String): void;
+  @get("details")
+  GetDetails(): Optional<@record Map<String, String>>;
+  @set("details")
+  SetDetails(details: @record Map<String, String>): void;
+  @get("imageUri")
+  GetImageUri(): String;
+  @set("imageUri")
+  SetImageUri(imageUri: String): void;
+}
+
+@ctor("Image")
+function CreateImage(): Image;
+
+@class
+interface Text {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("details")
+  GetDetails(): Optional<@record Map<String, String>>;
+  @set("details")
+  SetDetails(details: @record Map<String, String>): void;
+}
+
+@ctor("Text")
+function CreateText(): Text;
+
+@class
+interface HTML {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("details")
+  GetDetails(): Optional<@record Map<String, String>>;
+  @set("details")
+  SetDetails(details: @record Map<String, String>): void;
+  @set("htmlContent")
+  SetHtmlContent(htmlContent: String): void;
+  @get("htmlContent")
+  GetHtmlContent(): String;
+  @set("plainContent")
+  SetPlainContent(plainContent: String): void;
+  @get("plainContent")
+  GetPlainContent(): String;
+}
+
+@ctor("HTML")
+function CreateHtml(): HTML;
+
+@class
+interface Hyperlink {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("details")
+  GetDetails(): Optional<@record Map<String, String>>;
+  @set("details")
+  SetDetails(details: @record Map<String, String>): void;
+  @set("url")
+  SetUrl(url: String): void;
+  @get("url")
+  GetUrl(): String;
+  @set("description")
+  SetDescription(description: String): void;
+  @get("description")
+  GetDescription(): String;
+}
+
+@ctor("Hyperlink")
+function CreateHyperlink(): Hyperlink;
+
+@class
+interface PlainText {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("details")
+  GetDetails(): Optional<@record Map<String, String>>;
+  @set("details")
+  SetDetails(details: @record Map<String, String>): void;
+  @set("textContent")
+  SetTextContent(textContent: String): void;
+  @get("textContent")
+  GetTextContent(): String;
+  @set("abstract1")
+  SetAbstract1(abstract1: String): void;
+  @get("abstract1")
+  GetAbstract1(): String;
+}
+
+@ctor("PlainText")
+function CreatePlainText(): PlainText;
+
+
+@class
+interface SystemDefinedRecord {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("details")
+  GetDetails(): Optional<@record Map<String, DetailsValue>>;
+  @set("details")
+  SetDetails(details: @record Map<String, DetailsValue>): void;
+}
+
+@ctor("SystemDefinedRecord")
+function CreateSystemDefinedRecord(): SystemDefinedRecord;
+
+@class
+interface SystemDefinedForm {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("details")
+  GetDetails(): Optional<@record Map<String, DetailsValue>>;
+  @set("details")
+  SetDetails(details: @record Map<String, DetailsValue>): void;
+  @get("formId")
+  GetFormId(): f64;
+  @set("formId")
+  SetFormId(formId: f64): void;
+  @get("formName")
+  GetFormName(): String;
+  @set("formName")
+  SetFormName(formName: String): void;
+  @get("bundleName")
+  GetBundleName(): String;
+  @set("bundleName")
+  SetBundleName(bundleName: String): void;
+  @get("abilityName")
+  GetAbilityName(): String;
+  @set("abilityName")
+  SetAbilityName(abilityName: String): void;
+  @get("module")
+  GetModule(): String;
+  @set("module")
+  SetModule(module: String): void;
+}
+
+@ctor("SystemDefinedForm")
+function CreateSystemDefinedForm(): SystemDefinedForm;
+
+@class
+interface SystemDefinedAppItem {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("details")
+  GetDetails(): Optional<@record Map<String, DetailsValue>>;
+  @set("details")
+  SetDetails(details: @record Map<String, DetailsValue>): void;
+  @get("appId")
+  GetAppId(): String;
+  @set("appId")
+  SetAppId(appId: String): void;
+  @get("appName")
+  GetAppName(): String;
+  @set("appName")
+  SetAppName(appName: String): void;
+  @get("appIconId")
+  GetAppIconId(): String;
+  @set("appIconId")
+  SetAppIconId(appIconId: String): void;
+  @get("appLabelId")
+  GetAppLabelId(): String;
+  @set("appLabelId")
+  SetAppLabelId(appLabelId: String): void;
+  @get("bundleName")
+  GetBundleName(): String;
+  @set("bundleName")
+  SetBundleName(bundleName: String): void;
+  @get("abilityName")
+  GetAbilityName(): String;
+  @set("abilityName")
+  SetAbilityName(abilityName: String): void;
+}
+
+@ctor("SystemDefinedAppItem")
+function CreateSystemDefinedAppItem(): SystemDefinedAppItem;
+
+@class
+interface SystemDefinedPixelMap {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("details")
+  GetDetails(): Optional<@record Map<String, DetailsValue>>;
+  @set("details")
+  SetDetails(details: @record Map<String, DetailsValue>): void;
+  @get("rawData")
+  GetRawData(): Optional<@typedarray Array<u8>>;
+  @set("rawData")
+  SetRawData(rawData: @typedarray Array<u8>): void;
+}
+
+@ctor("SystemDefinedPixelMap")
+function CreateSystemDefinedPixelMap(): SystemDefinedPixelMap;
+
+@gen_async("insertData")
+@gen_promise("insertData")
+function InsertDataSync(options: Options, data: UnifiedData);
+
+@gen_async("queryData")
+@gen_promise("queryData")
+function QueryDataSync(options: Options): Array<UnifiedData>;

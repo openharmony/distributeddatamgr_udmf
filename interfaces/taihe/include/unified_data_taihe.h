@@ -13,7 +13,25 @@
  * limitations under the License.
  */
 
- export default namespace uniformTypeDescriptor {
-    loadLibrary("uniformTypeDescriptor_ani")
-    export native function getUniformDataTypeByFilenameExtension(filenameExtension: string, belongsTo?: string): string;
- }
+#ifndef UDMF_UNIFIED_DATA_TAIHE_H
+#define UDMF_UNIFIED_DATA_TAIHE_H
+
+#include "ohos.data.unifiedDataChannel.proj.hpp"
+#include "ohos.data.unifiedDataChannel.impl.hpp"
+#include "unified_data.h"
+
+namespace taiheUdmf = OHOS::UDMF;
+class UnifiedDataImpl {
+public:
+    UnifiedDataImpl();
+
+    void AddRecord(::ohos::data::unifiedDataChannel::weak::UnifiedRecord unifiedRecord);
+
+    ::taihe::array<::ohos::data::unifiedDataChannel::UnifiedRecord> GetRecords();
+
+    int64_t GetInner();
+
+    std::shared_ptr<taiheUdmf::UnifiedData> value_;
+};
+
+#endif // UDMF_UNIFIED_DATA_TAIHE_H
