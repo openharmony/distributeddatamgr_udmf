@@ -164,7 +164,8 @@ taiheUdmf::UDDetails ConvertUDDetailsToUnion(
                 value = std::string(item.second.get_string_ref());
                 break;
             case ohos::data::unifiedDataChannel::DetailsValue::tag_t::Uint8Array:
-                value = std::vector<uint8_t>(item.second.get_Uint8Array_ref().begin(), item.second.get_Uint8Array_ref().end());
+                value = std::vector<uint8_t>(item.second.get_Uint8Array_ref().begin(),
+                    item.second.get_Uint8Array_ref().end());
                 break;
         }
 

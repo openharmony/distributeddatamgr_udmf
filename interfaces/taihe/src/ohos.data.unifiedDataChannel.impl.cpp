@@ -183,7 +183,7 @@ class AudioImpl {
             return;
         }
         auto udmfDetails = taiheUdmf::ConvertUDDetails(details);
-        this->value_->SetDetails(udmfDetails);;
+        this->value_->SetDetails(udmfDetails);
     }
 
     ::taihe::string GetAudioUri()

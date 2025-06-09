@@ -95,7 +95,8 @@ bool SetFieldRef(ani_env *env, ani_class cls, ani_object object, const std::stri
     return true;
 }
 
-bool InnerWrapMapParams(ani_env* env, ani_class mapCls, ani_object mapObject, const std::map<std::string, int64_t> mapParams)
+bool InnerWrapMapParams(ani_env* env, ani_class mapCls, ani_object mapObject,
+    const std::map<std::string, int64_t> mapParams)
 {
     ani_ref mapParamsRef = WrapMapParams(env, mapParams);
     if (mapParamsRef == nullptr) {

@@ -26,7 +26,7 @@ namespace UDMF {
 taiheUdmf::Intention ConvertIntention(::ohos::data::unifiedDataChannel::Intention value);
 
 taiheUdmf::ValueType ConvertValueType(ani_env *env, ::taihe::string_view type,
-        ::ohos::data::unifiedDataChannel::ValueType const& value);
+    ::ohos::data::unifiedDataChannel::ValueType const& value);
 
 ::ohos::data::unifiedDataChannel::ValueType ConvertValueType(const taiheUdmf::ValueType &value);
 
@@ -35,7 +35,7 @@ taiheUdmf::UDDetails ConvertUDDetails(::taihe::map_view<::taihe::string, ::taihe
 ::taihe::map_view<::taihe::string, ::taihe::string> ConvertUDDetailsToString(const taiheUdmf::UDDetails &details);
 
 ::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> ConvertUDDetailsToUnion(
-        const taiheUdmf::UDDetails &details);
+    const taiheUdmf::UDDetails &details);
 
 taiheUdmf::UDDetails ConvertUDDetailsToUnion(
     const ::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> &details);
