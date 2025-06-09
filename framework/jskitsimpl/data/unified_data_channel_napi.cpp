@@ -105,7 +105,7 @@ napi_value UnifiedDataChannelNapi::InsertData(napi_env env, napi_callback_info i
     };
     std::string intention;
     UnifiedDataNapi *unifiedDataNapi = nullptr;
-    int32_t visibility = static_cast<int32_t>(Visibility::VISIBILITY_BUTT);
+    int32_t visibility = static_cast<int32_t>(Visibility::VISIBILITY_ALL);
     auto ctxt = std::make_shared<InsertContext>();
     auto input = [env, ctxt, &intention, &unifiedDataNapi, &visibility](size_t argc, napi_value *argv) {
         // require 2 arguments <options, unifiedData>
