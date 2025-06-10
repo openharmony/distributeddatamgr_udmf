@@ -15,13 +15,13 @@
 
 #include "utils.h"
 
-char* Utils::MallocCString(const std::string& origin)
+char *Utils::MallocCString(const std::string &origin)
 {
     if (origin.empty()) {
         return nullptr;
     }
     auto len = origin.length() + 1;
-    char* res = static_cast<char*>(malloc(sizeof(char) * len));
+    char *res = static_cast<char*>(malloc(sizeof(char) * len));
     if (res == nullptr) {
         return nullptr;
     }
@@ -31,15 +31,28 @@ char* Utils::MallocCString(const std::string& origin)
 CArrString Utils::StringVectorToArray(std::vector<std::string> vector)
 {
     if (vector.size() == 0) {
-        return CArrString{};
+        return CArrString {};
     }
-    char **head = static_cast<char **>(malloc(vector.size() * sizeof(char *)));
+    char **head = static_cast<char**>(malloc(vector.size() * sizeof(char *)));
     if (head == nullptr) {
-        return CArrString{};
+        return CArrString {};
     }
     for (unsigned long i = 0; i < vector.size(); i++) {
         head[i] = Utils::MallocCString(vector[i]);
     }
-    CArrString stringArray = {head, vector.size()};
+    CArrString stringArray = { head, vector.size() };
     return stringArray;
+}
+
+void Utils::FreeCArrString(CArrString &arrStr)
+{
+    if (arrStr.head == nullptr) {
+        return;
+    }
+    for (int64_t i = 0; i < arrStr.size; i++) {
+        free(arrStr.head[i]);
+        arrStr.head[i] = nullptr;
+    }
+    free(arrStr.head);
+    arrStr.head = nullptr;
 }

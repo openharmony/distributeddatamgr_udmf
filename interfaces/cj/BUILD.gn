@@ -40,6 +40,8 @@ ohos_shared_library("cj_unified_data_channel_ffi") {
       "${udmf_interfaces_path}/cj/src/unified_data_impl.cpp",
       "${udmf_interfaces_path}/cj/src/unified_record_ffi.cpp",
       "${udmf_interfaces_path}/cj/src/unified_record_impl.cpp",
+      "${udmf_interfaces_path}/cj/src/unified_data_channel_ffi.cpp",
+      "${udmf_interfaces_path}/cj/src/unified_data_parameter_parse.cpp",
       "${udmf_interfaces_path}/cj/src/utils.cpp",
     ]
 
@@ -50,6 +52,7 @@ ohos_shared_library("cj_unified_data_channel_ffi") {
       "ability_base:want",
       "ability_runtime:abilitykit_native",
       "ability_runtime:napi_common",
+      "ability_runtime:napi_base_context",
       "c_utils:utils",
       "hilog:libhilog",
       "image_framework:cj_image_ffi",

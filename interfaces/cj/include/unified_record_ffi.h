@@ -18,20 +18,46 @@
 
 #include <cstdint>
 
-#include "ffi_remote_data.h"
 #include "cj_common_ffi.h"
-
+#include "ffi_remote_data.h"
 #include "unified_record_impl.h"
 
 namespace OHOS {
 namespace UDMF {
 extern "C" {
-    FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructor();
-    FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value);
-    FFI_EXPORT char *FfiUDMFUnifiedRecordGetType(int64_t unifiedId);
-    FFI_EXPORT CJValueType FfiUDMFUnifiedRecordGetValue(int64_t unifiedId);
+FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructor();
+FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructorwithOnlyType(const char *type);
+FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value);
+FFI_EXPORT char *FfiUDMFUnifiedRecordGetType(int64_t unifiedId);
+FFI_EXPORT CJValueType FfiUDMFUnifiedRecordGetValue(int64_t unifiedId);
+
+FFI_EXPORT int64_t FfiUDMFFileSetUri(int64_t id, const char *uri);
+FFI_EXPORT char *FfiUDMFFileGetUri(int64_t id);
+FFI_EXPORT CRecord FfiUDMFFileGetDetails(int64_t id);
+FFI_EXPORT int64_t FfiUDMFFileSetDetails(int64_t id, CRecord record);
+
+FFI_EXPORT char *FfiUDMFImageGetImageUri(int64_t id);
+FFI_EXPORT int64_t FfiUDMFImageSetImageUri(int64_t id, const char *uri);
+
+FFI_EXPORT char *FfiUDMFVideoGetVideoUri(int64_t id);
+FFI_EXPORT int64_t FfiUDMFVideoSetVideoUri(int64_t id, const char *uri);
+
+FFI_EXPORT CRecord FfiUDMFTextGetDetails(int64_t id);
+FFI_EXPORT int64_t FfiUDMFTextSetDetails(int64_t id, CRecord record);
+
+FFI_EXPORT char *FfiUDMFHyperLinkGetUrl(int64_t id);
+FFI_EXPORT int64_t FfiUDMFHyperLinkSetUrl(int64_t id, const char *url);
+
+FFI_EXPORT char *FfiUDMFHyperLinkGetDescription(int64_t id);
+FFI_EXPORT int64_t FfiUDMFHyperLinkSetDescription(int64_t id, const char *description);
+
+FFI_EXPORT char *FfiUDMFPlainTextGetTextContent(int64_t id);
+FFI_EXPORT int64_t FfiUDMFPlainTextSetTextContent(int64_t id, const char *text);
+
+FFI_EXPORT char *FfiUDMFPlainTextGetAbstract(int64_t id);
+FFI_EXPORT int64_t FfiUDMFPlainTextSetAbstract(int64_t id, const char *abstr);
 }
-}
-}
+} // namespace UDMF
+} // namespace OHOS
 
 #endif
