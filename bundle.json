@@ -42,14 +42,16 @@
         "app_file_service",
         "os_account",
         "selinux_adapter",
-        "libuv"
+        "libuv",
+	      "runtime_core"
       ]
     },
     "build": {
       "sub_component": [
         "//foundation/distributeddatamgr/udmf:udmf_packages",
         "//foundation/distributeddatamgr/udmf/interfaces/components:udmfcomponents",
-        "//foundation/distributeddatamgr/udmf/conf:utd_conf"
+        "//foundation/distributeddatamgr/udmf/conf:utd_conf",
+        "//foundation/distributeddatamgr/udmf/interfaces/ani:udmf_data_ani"
       ],
       "inner_kits": [
         {
@@ -190,6 +192,15 @@
           "header": {
             "header_files": [],
             "header_base":"//foundation/distributeddatamgr/udmf/interfaces/cj/include"
+          }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/ani:unifieddatachannel_ani",
+          "header": {
+            "header_files": [
+              "unifieddatachannel_ani.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/ani/native/include"
           }
         }
       ],
