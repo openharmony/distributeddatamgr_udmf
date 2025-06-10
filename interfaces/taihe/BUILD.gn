@@ -64,6 +64,7 @@ taihe_shared_library("udmf_taihe_native") {
   sources += [
     "src/ani_common_utils.cpp",
     "src/ani_constructor.cpp",
+    "src/file_taihe.cpp",
     "src/ohos.data.uniformTypeDescriptor.impl.cpp",
     "src/ohos.data.unifiedDataChannel.impl.cpp",
     "src/taihe_common_utils.cpp",

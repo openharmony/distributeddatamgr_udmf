@@ -39,6 +39,11 @@ union DetailsValue {
   Uint8Array: @typedarray Array<u8>;
 }
 
+union AllRecords {
+  file: File;
+  unifiedRecord: UnifiedRecord;
+}
+
 union UnifiedDataOrNull {
   unifiedData: UnifiedData;
   @null nullType;
@@ -97,8 +102,8 @@ struct GetDataParams {
 
 @class
 interface UnifiedData {
-  AddRecord(unifiedRecord: UnifiedRecord): void;
-  GetRecords(): Array<UnifiedRecord>;
+  AddRecord(unifiedRecord: AllRecords): void;
+  GetRecords(): Array<AllRecords>;
   GetInner(): i64;
 }
 
@@ -106,7 +111,7 @@ interface UnifiedData {
 function CreateUnifiedData(): UnifiedData;
 
 @ctor("UnifiedData")
-function CreateUnifiedDataWithParams(unifiedRecord: UnifiedRecord): UnifiedData;
+function CreateUnifiedDataWithParams(unifiedRecord: AllRecords): UnifiedData;
 
 @class
 interface UnifiedRecord {

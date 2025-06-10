@@ -15,29 +15,55 @@
 
 #include "unified_data_taihe.h"
 #include "unified_record_taihe.h"
+#include "file_taihe.h"
 
 UnifiedDataImpl::UnifiedDataImpl()
 {
     this->value_ = std::make_shared<taiheUdmf::UnifiedData>();
 }
 
-void UnifiedDataImpl::AddRecord(::ohos::data::unifiedDataChannel::weak::UnifiedRecord unifiedRecord)
+void UnifiedDataImpl::AddRecord(::ohos::data::unifiedDataChannel::AllRecords const& unifiedRecord)
 {
-    auto unifiedRecordImpl = reinterpret_cast<UnifiedRecordImpl*>(unifiedRecord->GetInner());
-    this->value_->AddRecord(unifiedRecordImpl->value_);
+    switch (unifiedRecord.get_tag()) {
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::unifiedRecord: {
+            auto unifiedRecordImpl = reinterpret_cast<UnifiedRecordImpl*>(unifiedRecord.get_unifiedRecord_ref()->GetInner());
+            this->value_->AddRecord(unifiedRecordImpl->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::file: {
+            auto fileImpl = reinterpret_cast<FileImpl*>(unifiedRecord.get_file_ref()->GetInner());
+            this->value_->AddRecord(fileImpl->value_);
+            break;
+        }
+    }
 }
 
-::taihe::array<::ohos::data::unifiedDataChannel::UnifiedRecord> UnifiedDataImpl::GetRecords()
+::taihe::array<::ohos::data::unifiedDataChannel::AllRecords> UnifiedDataImpl::GetRecords()
 {
     auto records = this->value_->GetRecords();
-    std::vector<::ohos::data::unifiedDataChannel::UnifiedRecord> recordsImpls;
+    std::vector<::ohos::data::unifiedDataChannel::AllRecords> recordsImpls;
     for (auto &record : records) {
-        auto recordImpl = taihe::make_holder<UnifiedRecordImpl, ::ohos::data::unifiedDataChannel::UnifiedRecord>();
-        auto recordImplPtr = reinterpret_cast<UnifiedRecordImpl*>(recordImpl->GetInner());
-        recordImplPtr->value_ = record;
-        recordsImpls.push_back(recordImpl);
+        recordsImpls.push_back(GetRecord(record));
     }
-    return ::taihe::array<::ohos::data::unifiedDataChannel::UnifiedRecord>(recordsImpls);
+    return ::taihe::array<::ohos::data::unifiedDataChannel::AllRecords>(recordsImpls);
+}
+
+::ohos::data::unifiedDataChannel::AllRecords UnifiedDataImpl::GetRecord(std::shared_ptr<taiheUdmf::UnifiedRecord> in)
+{
+    switch (in->GetType()) {
+
+        case taiheUdmf::FILE: {
+            auto fileImpl = taihe::make_holder<FileImpl, ::ohos::data::unifiedDataChannel::File>();
+            auto fileImplPtr = reinterpret_cast<FileImpl*>(fileImpl->GetInner());
+            fileImplPtr->value_ = std::static_pointer_cast<taiheUdmf::File>(in);
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_file(fileImpl);
+        }
+        default:
+            auto recordImpl = taihe::make_holder<UnifiedRecordImpl, ::ohos::data::unifiedDataChannel::UnifiedRecord>();
+            auto recordImplPtr = reinterpret_cast<UnifiedRecordImpl*>(recordImpl->GetInner());
+            recordImplPtr->value_ = in;
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_unifiedRecord(recordImpl);
+    }
 }
 
 int64_t UnifiedDataImpl::GetInner()
@@ -51,12 +77,22 @@ int64_t UnifiedDataImpl::GetInner()
 }
 
 ::ohos::data::unifiedDataChannel::UnifiedData CreateUnifiedDataWithParams(
-    ::ohos::data::unifiedDataChannel::weak::UnifiedRecord unifiedRecord)
+    ::ohos::data::unifiedDataChannel::AllRecords const& unifiedRecord)
 {
     auto unifiedData = taihe::make_holder<UnifiedDataImpl, ::ohos::data::unifiedDataChannel::UnifiedData>();
     auto unifiedDataImpl = reinterpret_cast<UnifiedDataImpl*>(unifiedData->GetInner());
-    auto unifiedRecordImpl = reinterpret_cast<UnifiedRecordImpl*>(unifiedRecord->GetInner());
-    unifiedDataImpl->value_->AddRecord(unifiedRecordImpl->value_);
+    switch (unifiedRecord.get_tag()) {
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::unifiedRecord: {
+            auto unifiedRecordImpl = reinterpret_cast<UnifiedRecordImpl*>(unifiedRecord.get_unifiedRecord_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(unifiedRecordImpl->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::file: {
+            auto fileImpl = reinterpret_cast<FileImpl*>(unifiedRecord.get_file_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(fileImpl->value_);
+            break;
+        }
+    }
     return unifiedData;
 }
 

@@ -16,7 +16,6 @@
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "audio.h"
-#include "file.h"
 #include "folder.h"
 #include "html.h"
 #include "image.h"
@@ -40,56 +39,7 @@ namespace {
 namespace taiheUdmf = OHOS::UDMF;
 static constexpr int PARAMETERSERROR = 401;
 
-class FileImpl {
-    public:
-    FileImpl()
-    {
-        this->value_ = std::make_shared<taiheUdmf::File>();
-    }
 
-    ::taihe::string GetType()
-    {
-        return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
-    }
-
-    ::ohos::data::unifiedDataChannel::ValueType GetValue()
-    {
-        return taiheUdmf::ConvertValueType(this->value_->GetValue());
-    }
-
-    ::taihe::string GetUri()
-    {
-        return ::taihe::string(this->value_->GetUri());
-    }
-
-    void SetUri(::taihe::string_view uri)
-    {
-        std::string uriStr(uri);
-        this->value_->SetUri(uriStr);
-    }
-
-    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails()
-    {
-        return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
-            taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
-    }
-
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
-    {
-        if (details.size() == 0) {
-            return;
-        }
-        auto udmfDetails = taiheUdmf::ConvertUDDetails(details);
-        this->value_->SetDetails(udmfDetails);
-    }
-
-    int64_t GetInner()
-    {
-        return reinterpret_cast<int64_t>(this);
-    }
-
-    std::shared_ptr<taiheUdmf::File> value_;
-};
 
 class FolderImpl {
     public:
@@ -855,10 +805,6 @@ class SystemDefinedPixelMapImpl {
     return {summary, 0};
 }
 
-::ohos::data::unifiedDataChannel::File CreateUnifiedFile()
-{
-    return taihe::make_holder<FileImpl, ::ohos::data::unifiedDataChannel::File>();
-}
 
 ::ohos::data::unifiedDataChannel::Folder CreateFolder()
 {
@@ -967,7 +913,6 @@ void InsertDataSync(::ohos::data::unifiedDataChannel::Options const& options,
 }  // namespace
 
 TH_EXPORT_CPP_API_CreateSummary(CreateSummary);
-TH_EXPORT_CPP_API_CreateUnifiedFile(CreateUnifiedFile);
 TH_EXPORT_CPP_API_CreateFolder(CreateFolder);
 TH_EXPORT_CPP_API_CreateAudio(CreateAudio);
 TH_EXPORT_CPP_API_CreateVideo(CreateVideo);
