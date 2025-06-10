@@ -18,33 +18,51 @@
 
 #include <memory>
 
+#include "cj_common_ffi.h"
 #include "unified_data.h"
 #include "unified_record_impl.h"
-#include "cj_common_ffi.h"
 
 namespace OHOS {
 namespace UDMF {
-    using namespace OHOS::UDMF;
+using namespace OHOS::UDMF;
 
-    typedef CArrI64 CArrUnifiedRecord;
+typedef CArrI64 CArrUnifiedRecord;
 
-    class CUnifiedData : public OHOS::FFI::FFIData {
-        DECL_TYPE(CUnifiedData, OHOS::FFI::FFIData)
-        public:
-            CUnifiedData();
-            CUnifiedData(UDMF::CUnifiedRecord *record);
+struct CParameters {
+    int8_t valueType;
+    char *key;
+    void *value;
+    int64_t size;
+};
 
-            void AddRecord(UDMF::CUnifiedRecord *record);
-            CArrUnifiedRecord GetRecords();
-            bool HasType(const char *type);
-            CArrString GetTypes();
+struct CArrParameters {
+    CParameters *head;
+    int64_t size;
+};
 
-        private:
-            std::shared_ptr<UDMF::UnifiedData> unifiedData_;
-            std::vector<UDMF::CUnifiedRecord *> records_;
-    };
+struct CUnifiedDataProperties {
+    CArrParameters extras;
+    char *tag;
+    int64_t timestamp;
+    int32_t shareOptions;
+};
 
-}
-} // namespace OHOS::UDMF
+class CUnifiedData : public OHOS::FFI::FFIData {
+    DECL_TYPE(CUnifiedData, OHOS::FFI::FFIData)
+public:
+    CUnifiedData();
+    CUnifiedData(sptr<UDMF::CUnifiedRecord> record);
+
+    void AddRecord(sptr<UDMF::CUnifiedRecord> record);
+    CArrUnifiedRecord GetRecords();
+    bool HasType(const char *type);
+    CArrString GetTypes();
+    std::shared_ptr<UDMF::UnifiedData> unifiedData_;
+            
+private:
+    std::vector<sptr<UDMF::CUnifiedRecord>> records_;
+};
+} // namespace UDMF
+} // namespace OHOS
 
 #endif

@@ -17,6 +17,7 @@
 #define UDMF_UNIFIED_DATA_FFI_H
 
 #include <cstdint>
+
 #include "ffi_remote_data.h"
 #include "cj_common_ffi.h"
 
@@ -25,14 +26,16 @@
 namespace OHOS {
 namespace UDMF {
 extern "C" {
-    FFI_EXPORT int64_t FfiUDMFUnifiedDataConstructor();
-    FFI_EXPORT int64_t FfiUDMFUnifiedDataConstructorwWithRecord(int64_t unifiedRecordId);
-    FFI_EXPORT void FfiUDMFUnifiedDataAddRecord(int64_t unifiedDataId, int64_t unifiedRecordId);
-    FFI_EXPORT CArrUnifiedRecord FfiUDMFUnifiedDataGetRecords(int64_t unifiedDataId);
-    FFI_EXPORT bool FfiUDMFUnifiedDataHasType(int64_t unifiedDataId, const char *type);
-    FFI_EXPORT CArrString FfiUDMFUnifiedDataGetTypes(int64_t unifiedDataId);
+FFI_EXPORT int64_t FfiUDMFUnifiedDataConstructor();
+FFI_EXPORT int64_t FfiUDMFUnifiedDataConstructorWithRecord(int64_t unifiedRecordId);
+FFI_EXPORT void FfiUDMFUnifiedDataAddRecord(int64_t unifiedDataId, int64_t unifiedRecordId);
+FFI_EXPORT CArrUnifiedRecord FfiUDMFUnifiedDataGetRecords(int64_t unifiedDataId);
+FFI_EXPORT bool FfiUDMFUnifiedDataHasType(int64_t unifiedDataId, const char *type);
+FFI_EXPORT CArrString FfiUDMFUnifiedDataGetTypes(int64_t unifiedDataId);
+FFI_EXPORT CUnifiedDataProperties FfiUDMFGetProperties(int64_t unifiedDataId);
+FFI_EXPORT void FfiUDMFSetProperties(int64_t unifiedDataId, CUnifiedDataProperties properties);
 }
-}
-}
+} // namespace UDMF
+} // namespace OHOS
 
 #endif
