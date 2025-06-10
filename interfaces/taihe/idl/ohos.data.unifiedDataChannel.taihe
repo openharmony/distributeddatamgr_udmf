@@ -133,6 +133,7 @@ interface File {
   GetDetails(): Optional<@record Map<String, String>>;
   @set("details")
   SetDetails(details: @record Map<String, String>): void;
+  GetInner(): i64;
 }
 
 @ctor("File")
@@ -154,6 +155,7 @@ interface Folder {
   GetFolderUri(): String;
   @set("folderUri")
   SetFolderUri(folderUri: String): void;
+  GetInner(): i64;
 }
 
 @ctor("Folder")
@@ -175,6 +177,7 @@ interface Audio {
   GetAudioUri(): String;
   @set("audioUri")
   SetAudioUri(audioUri: String): void;
+  GetInner(): i64;
 }
 
 @ctor("Audio")
@@ -196,6 +199,7 @@ interface Video {
   GetVideoUri(): String;
   @set("videoUri")
   SetVideoUri(videoUri: String): void;
+  GetInner(): i64;
 }
 
 @ctor("Video")
@@ -217,6 +221,7 @@ interface Image {
   GetImageUri(): String;
   @set("imageUri")
   SetImageUri(imageUri: String): void;
+  GetInner(): i64;
 }
 
 @ctor("Image")
@@ -230,6 +235,7 @@ interface Text {
   GetDetails(): Optional<@record Map<String, String>>;
   @set("details")
   SetDetails(details: @record Map<String, String>): void;
+  GetInner(): i64;
 }
 
 @ctor("Text")
@@ -251,6 +257,7 @@ interface HTML {
   SetPlainContent(plainContent: String): void;
   @get("plainContent")
   GetPlainContent(): String;
+  GetInner(): i64;
 }
 
 @ctor("HTML")
@@ -272,6 +279,7 @@ interface Hyperlink {
   SetDescription(description: String): void;
   @get("description")
   GetDescription(): String;
+  GetInner(): i64;
 }
 
 @ctor("Hyperlink")
@@ -293,6 +301,7 @@ interface PlainText {
   SetAbstract1(abstract1: String): void;
   @get("abstract1")
   GetAbstract1(): String;
+  GetInner(): i64;
 }
 
 @ctor("PlainText")
@@ -307,6 +316,7 @@ interface SystemDefinedRecord {
   GetDetails(): Optional<@record Map<String, DetailsValue>>;
   @set("details")
   SetDetails(details: @record Map<String, DetailsValue>): void;
+  GetInner(): i64;
 }
 
 @ctor("SystemDefinedRecord")
@@ -340,6 +350,7 @@ interface SystemDefinedForm {
   GetModule(): String;
   @set("module")
   SetModule(module: String): void;
+  GetInner(): i64;
 }
 
 @ctor("SystemDefinedForm")
@@ -377,6 +388,7 @@ interface SystemDefinedAppItem {
   GetAbilityName(): String;
   @set("abilityName")
   SetAbilityName(abilityName: String): void;
+  GetInner(): i64;
 }
 
 @ctor("SystemDefinedAppItem")
@@ -394,6 +406,7 @@ interface SystemDefinedPixelMap {
   GetRawData(): Optional<@typedarray Array<u8>>;
   @set("rawData")
   SetRawData(rawData: @typedarray Array<u8>): void;
+  GetInner(): i64;
 }
 
 @ctor("SystemDefinedPixelMap")

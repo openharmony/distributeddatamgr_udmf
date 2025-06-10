@@ -83,6 +83,11 @@ class FileImpl {
         this->value_->SetDetails(udmfDetails);
     }
 
+    int64_t GetInner()
+    {
+        return reinterpret_cast<int64_t>(this);
+    }
+
     std::shared_ptr<taiheUdmf::File> value_;
 };
 
@@ -138,6 +143,11 @@ class FolderImpl {
     {
         std::string folderUriStr(folderUri);
         this->value_->SetUri(folderUriStr);
+    }
+
+    int64_t GetInner()
+    {
+        return reinterpret_cast<int64_t>(this);
     }
 
     std::shared_ptr<taiheUdmf::Folder> value_;
@@ -197,6 +207,11 @@ class AudioImpl {
         this->value_->SetUri(audioUriStr);
     }
 
+    int64_t GetInner()
+    {
+        return reinterpret_cast<int64_t>(this);
+    }
+
     std::shared_ptr<taiheUdmf::Audio> value_;
 };
 
@@ -252,6 +267,11 @@ class VideoImpl {
     {
         std::string videoUriStr(videoUri);
         this->value_->SetUri(videoUriStr);
+    }
+
+    int64_t GetInner()
+    {
+        return reinterpret_cast<int64_t>(this);
     }
 
     std::shared_ptr<taiheUdmf::Video> value_;
@@ -311,6 +331,11 @@ class ImageImpl {
         this->value_->SetUri(imageUriStr);
     }
 
+    int64_t GetInner()
+    {
+        return reinterpret_cast<int64_t>(this);
+    }
+
     std::shared_ptr<taiheUdmf::Image> value_;
 };
 
@@ -368,6 +393,11 @@ class HTMLImpl {
         return ::taihe::string(this->value_->GetPlainContent());
     }
 
+    int64_t GetInner()
+    {
+        return reinterpret_cast<int64_t>(this);
+    }
+
     std::shared_ptr<taiheUdmf::Html> value_;
 };
 
@@ -401,6 +431,11 @@ class TextImpl {
         }
         auto udmfDetails = taiheUdmf::ConvertUDDetails(details);
         this->value_->SetDetails(udmfDetails);
+    }
+
+    int64_t GetInner()
+    {
+        return reinterpret_cast<int64_t>(this);
     }
 
     std::shared_ptr<taiheUdmf::Text> value_;
@@ -460,6 +495,11 @@ class HyperlinkImpl {
         return ::taihe::string(this->value_->GetDescription());
     }
 
+    int64_t GetInner()
+    {
+        return reinterpret_cast<int64_t>(this);
+    }
+
     std::shared_ptr<taiheUdmf::Link> value_;
 };
 
@@ -517,6 +557,11 @@ class PlainTextImpl {
         return ::taihe::string(this->value_->GetAbstract());
     }
 
+    int64_t GetInner()
+    {
+        return reinterpret_cast<int64_t>(this);
+    }
+
     std::shared_ptr<taiheUdmf::PlainText> value_;
 };
 
@@ -547,6 +592,11 @@ class SystemDefinedRecordImpl {
     {
         taiheUdmf::UDDetails udmfDetails = taiheUdmf::ConvertUDDetailsToUnion(details);
         this->value_->SetDetails(udmfDetails);
+    }
+
+    int64_t GetInner()
+    {
+        return reinterpret_cast<int64_t>(this);
     }
 
     std::shared_ptr<taiheUdmf::SystemDefinedRecord> value_;
@@ -633,6 +683,11 @@ class SystemDefinedFormImpl {
     {
         std::string mudule(module);
         this->value_->SetModule(mudule);
+    }
+
+    int64_t GetInner()
+    {
+        return reinterpret_cast<int64_t>(this);
     }
 
     std::shared_ptr<taiheUdmf::SystemDefinedForm> value_;
@@ -733,6 +788,11 @@ class SystemDefinedAppItemImpl {
         this->value_->SetAbilityName(abilityNameStr);
     }
 
+    int64_t GetInner()
+    {
+        return reinterpret_cast<int64_t>(this);
+    }
+
     std::shared_ptr<taiheUdmf::SystemDefinedAppItem> value_;
 };
 
@@ -779,6 +839,11 @@ class SystemDefinedPixelMapImpl {
         }
         std::vector<uint8_t> rawDataVec(rawData.begin(), rawData.end());
         this->value_->SetRawData(rawDataVec);
+    }
+
+    int64_t GetInner()
+    {
+        return reinterpret_cast<int64_t>(this);
     }
 
     std::shared_ptr<taiheUdmf::SystemDefinedPixelMap> value_;
