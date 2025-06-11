@@ -119,6 +119,10 @@ void SetUnifiedDataFuzz(const uint8_t *data, size_t size)
     options->intention = UDMF_INTENTION_DATA_HUB;
     char key[UDMF_KEY_BUFFER_LEN];
     OH_Udmf_SetUnifiedDataByOptions(options, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
+    OH_UdmfOptions_Destroy(options);
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
 }
 
 void GetUnifiedDataFuzz(const uint8_t *data, size_t size)
@@ -139,6 +143,11 @@ void GetUnifiedDataFuzz(const uint8_t *data, size_t size)
     unsigned int dataSize = 0;
     OH_UdmfData* dataArray = nullptr;
     OH_Udmf_GetUnifiedDataByOptions(options, &dataArray, &dataSize);
+    OH_UdmfOptions_Destroy(options);
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+    OH_Udmf_DestroyDataArray(&dataArray, dataSize);
 }
 
 void UpdataUnifiedDataFuzz(const uint8_t *data, size_t size)
@@ -168,6 +177,14 @@ void UpdataUnifiedDataFuzz(const uint8_t *data, size_t size)
     options2->intention = UDMF_INTENTION_DATA_HUB;
     options2->key = key;
     OH_Udmf_UpdateUnifiedData(options2, udmfUnifiedData2);
+    OH_UdmfOptions_Destroy(options);
+    OH_UdmfOptions_Destroy(options2);
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdsFileUri_Destroy(fileUri2);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfRecord_Destroy(record2);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+    OH_UdmfData_Destroy(udmfUnifiedData2);
 }
 
 void DeleteUnifiedDataFuzz(const uint8_t *data, size_t size)
@@ -188,6 +205,11 @@ void DeleteUnifiedDataFuzz(const uint8_t *data, size_t size)
     unsigned int dataSize = 0;
     OH_UdmfData* dataArray = nullptr;
     OH_Udmf_DeleteUnifiedData(options, &dataArray, &dataSize);
+    OH_UdmfOptions_Destroy(options);
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+    OH_Udmf_DestroyDataArray(&dataArray, dataSize);
 }
 
 void SetAndGetVisibilityFuzz(const uint8_t *data, size_t size)
