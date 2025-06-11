@@ -262,7 +262,7 @@ Status UdmfAsyncClient::GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper,
         LOG_ERROR(UDMF_CLIENT, "IUdmfNotifier unavailable");
         return E_ERROR;
     }
-    std::shared_ptr<UnifiedData> dataPtr = nullptr;
+    std::shared_ptr<UnifiedData> dataPtr = std::make_shared<UnifiedData>();
     auto status = static_cast<Status>(UdmfClient::GetInstance().GetDataIfAvailable(query.key,
         asyncHelper->acceptableInfo, iUdmfNotifier, dataPtr));
     if (status != E_OK) {
@@ -274,7 +274,7 @@ Status UdmfAsyncClient::GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper,
         CallProgress(asyncHelper, progressInfo, nullptr);
         return status;
     }
-    if (dataPtr == nullptr) {
+    if (dataPtr->IsEmpty()) {
         LOG_INFO(UDMF_CLIENT, "Wait delay data");
         return E_OK;
     }
