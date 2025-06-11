@@ -21,11 +21,11 @@
 #include "unified_record.h"
 
 namespace taiheUdmf = OHOS::UDMF;
-class UnifiedRecordImpl {
+class UnifiedRecordInnerImpl {
 public:
-    UnifiedRecordImpl();
+    UnifiedRecordInnerImpl();
 
-    UnifiedRecordImpl(::taihe::string_view type, ::ohos::data::unifiedDataChannel::ValueType const& value);
+    UnifiedRecordInnerImpl(::taihe::string_view type, ::ohos::data::unifiedDataChannel::ValueType const& value);
 
     ::taihe::string GetType();
 

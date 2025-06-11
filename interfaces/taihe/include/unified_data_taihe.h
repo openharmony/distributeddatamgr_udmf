@@ -25,9 +25,9 @@ class UnifiedDataImpl {
 public:
     UnifiedDataImpl();
 
-    void AddRecord(::ohos::data::unifiedDataChannel::AllRecords const& unifiedRecord);
+    void AddRecord1(::ohos::data::unifiedDataChannel::AllRecords const& unifiedRecord);
 
-    ::taihe::array<::ohos::data::unifiedDataChannel::AllRecords> GetRecords();
+    ::taihe::array<::ohos::data::unifiedDataChannel::AllRecords> GetRecords1();
 
     ::ohos::data::unifiedDataChannel::AllRecords GetRecord(std::shared_ptr<taiheUdmf::UnifiedRecord> in);
 

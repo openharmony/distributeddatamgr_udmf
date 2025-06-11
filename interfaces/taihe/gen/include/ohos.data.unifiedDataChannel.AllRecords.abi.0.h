@@ -1,0 +1,2 @@
+#pragma once
+struct ohos_data_unifiedDataChannel_AllRecords_t;

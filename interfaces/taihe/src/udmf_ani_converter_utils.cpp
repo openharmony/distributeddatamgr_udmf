@@ -69,8 +69,8 @@ std::shared_ptr<UnifiedRecord> AniConverter::UnwrapUnifiedRecord(ani_env *env, a
         LOG_ERROR(UDMF_ANI, "Call getInner method fail");
         return nullptr;
     }
-    auto unifiedRecordImplPtr = reinterpret_cast<UnifiedRecordImpl*>(ptr);
-    return unifiedRecordImplPtr->value_;
+    auto UnifiedRecordInnerImplPtr = reinterpret_cast<UnifiedRecordInnerImpl*>(ptr);
+    return UnifiedRecordInnerImplPtr->value_;
 }
 
 ani_object AniConverter::WrapUnifiedRecord(ani_env *env, std::shared_ptr<UnifiedRecord> unifiedRecord)
@@ -95,8 +95,8 @@ ani_object AniConverter::WrapUnifiedRecord(ani_env *env, std::shared_ptr<Unified
         LOG_ERROR(UDMF_ANI, "Call getInner method fail");
         return obj;
     }
-    auto unifiedRecordImplPtr = reinterpret_cast<UnifiedRecordImpl*>(ptr);
-    unifiedRecordImplPtr->value_ = unifiedRecord;
+    auto UnifiedRecordInnerImplPtr = reinterpret_cast<UnifiedRecordInnerImpl*>(ptr);
+    UnifiedRecordInnerImplPtr->value_ = unifiedRecord;
     return obj;
 }
 

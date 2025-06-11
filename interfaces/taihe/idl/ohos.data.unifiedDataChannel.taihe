@@ -40,8 +40,8 @@ union DetailsValue {
 }
 
 union AllRecords {
-  file: File;
-  unifiedRecord: UnifiedRecord;
+  file: FileInner;
+  unifiedRecord: UnifiedRecordInner;
 }
 
 union UnifiedDataOrNull {
@@ -102,8 +102,30 @@ struct GetDataParams {
 
 @class
 interface UnifiedData {
-  AddRecord(unifiedRecord: AllRecords): void;
-  GetRecords(): Array<AllRecords>;
+  AddRecord1(unifiedRecord: AllRecords): void;
+  
+  GetRecords1(): Array<AllRecords>;
+  @!sts_inject_into_class("""
+  addRecord(unifiedRecord: UnifiedRecord) {
+    if (unifiedRecord instanceof File) {
+      this.addRecord1((unifiedRecord as File).inner);
+    } else if (unifiedRecord instanceof UnifiedRecord) {
+      this.addRecord1((unifiedRecord as UnifiedRecord).inner);
+    }
+  }
+  getRecords(): Array<UnifiedRecord> {
+    let records = this.getRecords1();
+    let arr: Array<UnifiedRecord> = new Array<UnifiedRecord>();
+    for (let i = 0; i < records.length; i++ ) {
+      if (records[i] instanceof UnifiedRecordInner) {
+        arr.push(new UnifiedRecord(records[i] as UnifiedRecordInner));
+      } else if  (records[i] instanceof FileInner) {
+        arr.push(new File(records[i] as FileInner));
+      }
+    }
+    return arr;
+  }
+  """)
   GetInner(): i64;
 }
 
@@ -114,20 +136,20 @@ function CreateUnifiedData(): UnifiedData;
 function CreateUnifiedDataWithParams(unifiedRecord: AllRecords): UnifiedData;
 
 @class
-interface UnifiedRecord {
+interface UnifiedRecordInner {
   GetType(): String;
   GetValue(): ValueType;
   GetInner(): i64;
 }
 
-@ctor("UnifiedRecord")
-function CreateUnifiedRecord(): UnifiedRecord;
+@ctor("UnifiedRecordInner")
+function CreateUnifiedRecord(): UnifiedRecordInner;
 
-@ctor("UnifiedRecord")
-function CreateUnifiedRecordWithParams(type: String, value: ValueType): UnifiedRecord;
+@ctor("UnifiedRecordInner")
+function CreateUnifiedRecordWithParams(type: String, value: ValueType): UnifiedRecordInner;
 
 @class
-interface File {
+interface FileInner {
   GetType(): String;
   GetValue(): ValueType;
   @get("uri")
@@ -141,8 +163,8 @@ interface File {
   GetInner(): i64;
 }
 
-@ctor("File")
-function CreateUnifiedFile(): File;
+@ctor("FileInner")
+function CreateUnifiedFile(): FileInner;
 
 @class
 interface Folder {
@@ -424,3 +446,48 @@ function InsertDataSync(options: Options, data: UnifiedData);
 @gen_async("queryData")
 @gen_promise("queryData")
 function QueryDataSync(options: Options): Array<UnifiedData>;
+
+
+@!sts_inject("""
+
+export class UnifiedRecord {
+  inner: UnifiedRecordInner;
+  constructor() {
+    this.inner = CreateUnifiedRecord_inner();
+  }
+  constructor(inner: UnifiedRecordInner) {
+    this.inner = inner;
+  }
+
+  constructor(type: string, value: ValueType) {
+    this.inner = CreateUnifiedRecordWithParams_inner(type, value);
+  }
+  getType(): string {
+    return this.inner.getType();
+  }
+
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+}
+
+export class File extends UnifiedRecord {
+  inner: FileInner;
+  constructor() {
+    this.inner = CreateUnifiedFile_inner();
+  }
+  constructor(inner: FileInner) {
+    this.inner = inner;
+  }
+  get uri(): string {
+    return this.inner.uri;
+  }
+  set uri(uri: string) {
+    this.inner.uri = uri;
+  }
+
+  getType(): string {
+    return this.inner.getType();
+  }
+}
+""")

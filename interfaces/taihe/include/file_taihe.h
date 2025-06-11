@@ -22,9 +22,9 @@
 
 namespace taiheUdmf = OHOS::UDMF;
 
-class FileImpl {
+class FileInnerImpl {
 public:
-    FileImpl();
+    FileInnerImpl();
 
     ::taihe::string GetType();
 

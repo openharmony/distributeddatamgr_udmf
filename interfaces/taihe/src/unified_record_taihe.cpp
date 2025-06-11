@@ -22,12 +22,12 @@
 #include "pixel_map_taihe_ani.h"
 #include "taihe_common_utils.h"
 
-UnifiedRecordImpl::UnifiedRecordImpl()
+UnifiedRecordInnerImpl::UnifiedRecordInnerImpl()
 {
     this->value_ = std::make_shared<taiheUdmf::UnifiedRecord>();
 }
 
-UnifiedRecordImpl::UnifiedRecordImpl(::taihe::string_view type,
+UnifiedRecordInnerImpl::UnifiedRecordInnerImpl(::taihe::string_view type,
     ::ohos::data::unifiedDataChannel::ValueType const& value)
 {
     taiheUdmf::ValueType valueType = taiheUdmf::ConvertValueType(::taihe::get_env(), type, value);
@@ -38,30 +38,30 @@ UnifiedRecordImpl::UnifiedRecordImpl(::taihe::string_view type,
     this->value_ = std::make_shared<taiheUdmf::UnifiedRecord>(utdType, valueType);
 }
 
-::taihe::string UnifiedRecordImpl::GetType()
+::taihe::string UnifiedRecordInnerImpl::GetType()
 {
     return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType UnifiedRecordImpl::GetValue()
+::ohos::data::unifiedDataChannel::ValueType UnifiedRecordInnerImpl::GetValue()
 {
     return taiheUdmf::ConvertValueType(this->value_->GetValue());
 }
 
-int64_t UnifiedRecordImpl::GetInner()
+int64_t UnifiedRecordInnerImpl::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
 
-::ohos::data::unifiedDataChannel::UnifiedRecord CreateUnifiedRecord()
+::ohos::data::unifiedDataChannel::UnifiedRecordInner CreateUnifiedRecord()
 {
-    return taihe::make_holder<UnifiedRecordImpl, ::ohos::data::unifiedDataChannel::UnifiedRecord>();
+    return taihe::make_holder<UnifiedRecordInnerImpl, ::ohos::data::unifiedDataChannel::UnifiedRecordInner>();
 }
 
-::ohos::data::unifiedDataChannel::UnifiedRecord CreateUnifiedRecordWithParams(::taihe::string_view type,
+::ohos::data::unifiedDataChannel::UnifiedRecordInner CreateUnifiedRecordWithParams(::taihe::string_view type,
     ::ohos::data::unifiedDataChannel::ValueType const& value)
 {
-    return taihe::make_holder<UnifiedRecordImpl, ::ohos::data::unifiedDataChannel::UnifiedRecord>(type, value);
+    return taihe::make_holder<UnifiedRecordInnerImpl, ::ohos::data::unifiedDataChannel::UnifiedRecordInner>(type, value);
 }
 
 TH_EXPORT_CPP_API_CreateUnifiedRecord(CreateUnifiedRecord);
