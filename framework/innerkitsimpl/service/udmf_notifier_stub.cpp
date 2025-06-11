@@ -52,8 +52,9 @@ UdmfNotifierClient::UdmfNotifierClient(LoadHandler loadHandler):loadHandler_(loa
 
 void UdmfNotifierClient::HandleDelayObserver(const std::string &key, const DataLoadInfo &dataLoadInfo)
 {
+    auto loadHandler = loadHandler_;
     UdmfAsyncClient::GetInstance().PushTaskToExecutor(
-        [=] { loadHandler_(key, dataLoadInfo); });
+        [loadHandler, key, dataLoadInfo] { loadHandler(key, dataLoadInfo); });
 }
 
 int32_t DelayDataCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
@@ -86,8 +87,9 @@ DelayDataCallbackClient::DelayDataCallbackClient(DataCallback dataCallback):data
 
 void DelayDataCallbackClient::DelayDataCallback(const std::string &key, const UnifiedData &unifiedData)
 {
+    auto dataCallback = dataCallback_;
     UdmfAsyncClient::GetInstance().PushTaskToExecutor(
-        [=] { dataCallback_(key, unifiedData); });
+        [dataCallback, key, unifiedData] { dataCallback(key, unifiedData); });
 }
 
 } // namespace UDMF
