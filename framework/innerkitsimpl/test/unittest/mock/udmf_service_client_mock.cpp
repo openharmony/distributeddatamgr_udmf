@@ -153,7 +153,8 @@ int32_t UdmfServiceClient::ObtainAsynProcess(AsyncProcessInfo &processInfo)
     }
 }
 
-int32_t UdmfServiceClient::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier, std::string &key)
+int32_t UdmfServiceClient::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
+    std::string &key)
 {
     if (MUdmfServiceClient::udmfServiceClient == nullptr) {
         return -1;

@@ -3022,7 +3022,7 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedDataByOptions001, TestSize.Level1)
     int deleteRes = OH_Udmf_DeleteUnifiedData(options2, &dataArray2, &dataSize2);
     EXPECT_EQ(deleteRes, UDMF_E_OK);
     EXPECT_NE(dataArray2, nullptr);
-    EXPECT_EQ(dataSize2,2);
+    EXPECT_EQ(dataSize2, 2);
     OH_Udmf_DestroyDataArray(&dataArray, dataSize);
     OH_Udmf_DestroyDataArray(&dataArray2, dataSize2);
     OH_UdmfOptions_Destroy(options);
