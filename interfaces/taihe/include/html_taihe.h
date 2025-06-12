@@ -13,29 +13,29 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_FILE_TAIHE_H
-#define UDMF_FILE_TAIHE_H
+#ifndef UDMF_HTML_TAIHE_H
+#define UDMF_HTML_TAIHE_H
 
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
-#include "file.h"
+#include "html.h"
 
 namespace taiheUdmf = OHOS::UDMF;
 
-class FileInnerImpl {
+class HTMLInnerImpl {
 public:
-    FileInnerImpl();
+  HTMLInnerImpl();
 
-    ::taihe::string GetType();
-    ::ohos::data::unifiedDataChannel::ValueType GetValue();
+  ::taihe::string GetType();
+  ::ohos::data::unifiedDataChannel::ValueType GetValue();
+  ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
+  void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
+  void SetHtmlContent(::taihe::string_view htmlContent);
+  ::taihe::string GetHtmlContent();
+  void SetPlainContent(::taihe::string_view plainContent);
+  ::taihe::string GetPlainContent();
+  int64_t GetInner();
 
-    ::taihe::string GetUri();
-    void SetUri(::taihe::string_view uri);
-    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
-    int64_t GetInner();
-
-    std::shared_ptr<taiheUdmf::File> value_;
+  std::shared_ptr<taiheUdmf::Html> value_;
 };
-
-#endif // UDMF_FILE_TAIHE_H
+ #endif // UDMF_HTML_TAIHE_H

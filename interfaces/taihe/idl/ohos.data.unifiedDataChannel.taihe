@@ -41,6 +41,14 @@ union DetailsValue {
 
 union AllRecords {
   file: FileInner;
+  folder: FolderInner;
+  audio: AudioInner;
+  video: VideoInner;
+  image: ImageInner;
+  text: TextInner;
+  plainText: PlainTextInner;
+  html: HTMLInner;
+  hyperlink: HyperlinkInner;
   unifiedRecord: UnifiedRecordInner;
 }
 
@@ -107,7 +115,23 @@ interface UnifiedData {
   GetRecords1(): Array<AllRecords>;
   @!sts_inject_into_class("""
   addRecord(unifiedRecord: UnifiedRecord) {
-    if (unifiedRecord instanceof File) {
+    if (unifiedRecord instanceof Folder) {
+      this.addRecord1((unifiedRecord as Folder).inner);
+    } else if (unifiedRecord instanceof Audio) {
+      this.addRecord1((unifiedRecord as Audio).inner);
+    } else if (unifiedRecord instanceof Video) {
+      this.addRecord1((unifiedRecord as Video).inner);
+    } else if (unifiedRecord instanceof Image) {
+      this.addRecord1((unifiedRecord as Image).inner);
+    } else if (unifiedRecord instanceof PlainText) {
+      this.addRecord1((unifiedRecord as PlainText).inner);
+    } else if (unifiedRecord instanceof HTML) {
+      this.addRecord1((unifiedRecord as HTML).inner);
+    } else if (unifiedRecord instanceof Hyperlink) {
+      this.addRecord1((unifiedRecord as Hyperlink).inner);
+    } else if (unifiedRecord instanceof Text) {
+      this.addRecord1((unifiedRecord as Text).inner);
+    } else if (unifiedRecord instanceof File) {
       this.addRecord1((unifiedRecord as File).inner);
     } else if (unifiedRecord instanceof UnifiedRecord) {
       this.addRecord1((unifiedRecord as UnifiedRecord).inner);
@@ -117,10 +141,26 @@ interface UnifiedData {
     let records = this.getRecords1();
     let arr: Array<UnifiedRecord> = new Array<UnifiedRecord>();
     for (let i = 0; i < records.length; i++ ) {
-      if (records[i] instanceof UnifiedRecordInner) {
+       if (records[i] instanceof UnifiedRecordInner) {
         arr.push(new UnifiedRecord(records[i] as UnifiedRecordInner));
-      } else if  (records[i] instanceof FileInner) {
+      } else if (records[i] instanceof FileInner) {
         arr.push(new File(records[i] as FileInner));
+      } else if (records[i] instanceof FolderInner) {
+        arr.push(new Folder(records[i] as FolderInner));
+      } else if (records[i] instanceof AudioInner) {
+        arr.push(new Audio(records[i] as AudioInner));
+      } else if (records[i] instanceof VideoInner) {
+        arr.push(new Video(records[i] as VideoInner));
+      } else if (records[i] instanceof ImageInner) {
+        arr.push(new Image(records[i] as ImageInner));
+      } else if (records[i] instanceof TextInner) {
+        arr.push(new Text(records[i] as TextInner));
+      } else if (records[i] instanceof PlainTextInner) {
+        arr.push(new PlainText(records[i] as PlainTextInner));
+      } else if (records[i] instanceof HTMLInner) {
+        arr.push(new HTML(records[i] as HTMLInner));
+      } else if (records[i] instanceof HyperlinkInner) {
+        arr.push(new Hyperlink(records[i] as HyperlinkInner));
       }
     }
     return arr;
@@ -167,7 +207,7 @@ interface FileInner {
 function CreateUnifiedFile(): FileInner;
 
 @class
-interface Folder {
+interface FolderInner {
   GetType(): String;
   GetValue(): ValueType;
   @get("uri")
@@ -185,11 +225,11 @@ interface Folder {
   GetInner(): i64;
 }
 
-@ctor("Folder")
-function CreateFolder(): Folder;
+@ctor("FolderInner")
+function CreateUnifiedFolder(): FolderInner;
 
 @class
-interface Audio {
+interface AudioInner {
   GetType(): String;
   GetValue(): ValueType;
   @get("uri")
@@ -207,11 +247,11 @@ interface Audio {
   GetInner(): i64;
 }
 
-@ctor("Audio")
-function CreateAudio(): Audio;
+@ctor("AudioInner")
+function CreateUnifiedAudio(): AudioInner;
 
 @class
-interface Video {
+interface VideoInner {
   GetType(): String;
   GetValue(): ValueType;
   @get("uri")
@@ -229,11 +269,11 @@ interface Video {
   GetInner(): i64;
 }
 
-@ctor("Video")
-function CreateVideo(): Video;
+@ctor("VideoInner")
+function CreateUnifiedVideo(): VideoInner;
 
 @class
-interface Image {
+interface ImageInner {
   GetType(): String;
   GetValue(): ValueType;
   @get("uri")
@@ -251,11 +291,11 @@ interface Image {
   GetInner(): i64;
 }
 
-@ctor("Image")
-function CreateImage(): Image;
+@ctor("ImageInner")
+function CreateUnifiedImage(): ImageInner;
 
 @class
-interface Text {
+interface TextInner {
   GetType(): String;
   GetValue(): ValueType;
   @get("details")
@@ -265,11 +305,11 @@ interface Text {
   GetInner(): i64;
 }
 
-@ctor("Text")
-function CreateText(): Text;
+@ctor("TextInner")
+function CreateText(): TextInner;
 
 @class
-interface HTML {
+interface HTMLInner {
   GetType(): String;
   GetValue(): ValueType;
   @get("details")
@@ -287,11 +327,11 @@ interface HTML {
   GetInner(): i64;
 }
 
-@ctor("HTML")
-function CreateHtml(): HTML;
+@ctor("HTMLInner")
+function CreateHtml(): HTMLInner;
 
 @class
-interface Hyperlink {
+interface HyperlinkInner {
   GetType(): String;
   GetValue(): ValueType;
   @get("details")
@@ -309,11 +349,11 @@ interface Hyperlink {
   GetInner(): i64;
 }
 
-@ctor("Hyperlink")
-function CreateHyperlink(): Hyperlink;
+@ctor("HyperlinkInner")
+function CreateHyperlink(): HyperlinkInner;
 
 @class
-interface PlainText {
+interface PlainTextInner {
   GetType(): String;
   GetValue(): ValueType;
   @get("details")
@@ -331,8 +371,8 @@ interface PlainText {
   GetInner(): i64;
 }
 
-@ctor("PlainText")
-function CreatePlainText(): PlainText;
+@ctor("PlainTextInner")
+function CreatePlainText(): PlainTextInner;
 
 
 @class
@@ -465,7 +505,6 @@ export class UnifiedRecord {
   getType(): string {
     return this.inner.getType();
   }
-
   getValue(): ValueType {
     return this.inner.getValue();
   }
@@ -479,15 +518,295 @@ export class File extends UnifiedRecord {
   constructor(inner: FileInner) {
     this.inner = inner;
   }
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+  getType(): string {
+    return this.inner.getType();
+  }
   get uri(): string {
     return this.inner.uri;
   }
   set uri(uri: string) {
     this.inner.uri = uri;
   }
+}
+
+export class Folder extends File {
+  inner: FolderInner;
+  constructor() {
+    this.inner = CreateUnifiedFolder_inner();
+  }
+  constructor(inner: FolderInner) {
+    this.inner = inner;
+  }
+  getType(): string {
+    return this.inner.getType();
+  }
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+  get uri(): string {
+    return this.inner.uri;
+  }
+  set uri(uri: string) {
+    this.inner.uri = uri;
+  }
+  get details(): Record<String, String> | undefined {
+    return this.inner.details;
+  }
+  set details(details: Record<String, String>) {
+    this.inner.details = details;
+  }
+  get folderUri(): string {
+    return this.inner.folderUri;
+  }
+  set folderUri(folderUri: string) {
+    this.inner.folderUri = folderUri;
+  }
+}
+
+export class Audio extends File {
+  inner: AudioInner;
+  constructor() {
+    this.inner = CreateUnifiedAudio_inner();
+  }
+  constructor(inner: AudioInner) {
+    this.inner = inner;
+  }
+  getType(): string {
+    return this.inner.getType();
+  }
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+  get uri(): string {
+    return this.inner.uri;
+  }
+  set uri(uri: string) {
+    this.inner.uri = uri;
+  }
+  get details(): Record<String, String> | undefined {
+    return this.inner.details;
+  }
+  set details(details: Record<String, String>) {
+    this.inner.details = details;
+  }
+  get audioUri(): string {
+    return this.inner.audioUri;
+  }
+  set audioUri(audioUri: string) {
+    this.inner.audioUri = audioUri;
+  }
+}
+
+export class Video extends File {
+  inner: VideoInner;
+  constructor() {
+    this.inner = CreateUnifiedVideo_inner();
+  }
+  constructor(inner: VideoInner) {
+    this.inner = inner;
+  }
+  getType(): string {
+    return this.inner.getType();
+  }
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+  get uri(): string {
+    return this.inner.uri;
+  }
+  set uri(uri: string) {
+    this.inner.uri = uri;
+  }
+  get details(): Record<String, String> | undefined {
+    return this.inner.details;
+  }
+  set details(details: Record<String, String>) {
+    this.inner.details = details;
+  }
+  get videoUri(): string {
+    return this.inner.videoUri;
+  }
+  set videoUri(videoUri: string) {
+    this.inner.videoUri = videoUri;
+  }
+}
+
+export class Image extends File {
+  inner: ImageInner;
+  constructor() {
+    this.inner = CreateUnifiedImage_inner();
+  }
+  constructor(inner: ImageInner) {
+    this.inner = inner;
+  }
+  getType(): string {
+    return this.inner.getType();
+  }
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+  get uri(): string {
+    return this.inner.uri;
+  }
+  set uri(uri: string) {
+    this.inner.uri = uri;
+  }
+  get details(): Record<String, String> | undefined {
+    return this.inner.details;
+  }
+  set details(details: Record<String, String>) {
+    this.inner.details = details;
+  }
+  get imageUri(): string {
+    return this.inner.imageUri;
+  }
+  set imageUri(imageUri: string) {
+    this.inner.imageUri = imageUri;
+  }
+}
+
+export class Text extends UnifiedRecord {
+  inner: TextInner;
+  constructor() {
+    this.inner = CreateText_inner();
+  }
+  constructor(inner: TextInner) {
+    this.inner = inner;
+  }
+  getType(): string {
+    return this.inner.getType();
+  }
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+  get details(): Record<string, string>| undefined {
+    return this.inner.details;
+  }
+  set details(info: Record<string, string>) {
+    this.inner.details = info;
+  }
+}
+
+export class PlainText extends Text {
+  inner: PlainTextInner;
+  constructor() {
+    this.inner = CreatePlainText_inner();
+  }
+  constructor(inner: PlainTextInner) {
+    this.inner = inner;
+  }
+  get details(): Record<string, string>| undefined {
+    return this.inner.details;
+  }
+  set details(info: Record<string, string>) {
+    this.inner.details = info;
+  }
+
+  get textContent(): string {
+    return this.inner.textContent;
+  }
+
+  set textContent(text: string) {
+    this.inner.textContent = text;
+  }
+
+  get abstract1(): string {
+    return this.inner.abstract1;
+  }
+
+  set abstract1(text: string) {
+    this.inner.abstract1 = text;
+  }
 
   getType(): string {
     return this.inner.getType();
+  }
+
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+}
+
+export class HTML extends Text {
+  inner: HTMLInner;
+  constructor() {
+    this.inner = CreateHtml_inner();
+  }
+  constructor(inner: HTMLInner) {
+    this.inner = inner;
+  }
+  get details(): Record<string, string>| undefined {
+    return this.inner.details;
+  }
+  set details(info: Record<string, string>) {
+    this.inner.details = info;
+  }
+
+  get htmlContent(): string {
+    return this.inner.htmlContent;
+  }
+
+  set htmlContent(html: string) {
+    this.inner.htmlContent = html;
+  }
+
+  get plainContent(): string {
+    return this.inner.plainContent;
+  }
+
+  set plainContent(plain: string) {
+    this.inner.plainContent = plain;
+  }
+
+  getType(): string {
+    return this.inner.getType();
+  }
+
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+}
+
+export class Hyperlink extends Text {
+  inner: HyperlinkInner;
+  constructor() {
+    this.inner = CreateHyperlink_inner();
+  }
+  constructor(inner: HyperlinkInner) {
+    this.inner = inner;
+  }
+  get details(): Record<string, string>| undefined {
+    return this.inner.details;
+  }
+  set details(info: Record<string, string>) {
+    this.inner.details = info;
+  }
+
+  get url(): string {
+    return this.inner.url;
+  }
+
+  set url(url: string) {
+    this.inner.url = url;
+  }
+
+  get description(): string {
+    return this.inner.description;
+  }
+
+  set description(description: string) {
+    this.inner.description = description;
+  }
+
+  getType(): string {
+    return this.inner.getType();
+  }
+
+  getValue(): ValueType {
+    return this.inner.getValue();
   }
 }
 """)

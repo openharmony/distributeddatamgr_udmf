@@ -13,10 +13,19 @@
  * limitations under the License.
  */
 #define LOG_TAG "UNIFIED_DATA_TAIHE"
+
 #include "unified_data_taihe.h"
 #include "unified_record_taihe.h"
 #include "file_taihe.h"
 #include "logger.h"
+#include "folder_taihe.h"
+#include "audio_taihe.h"
+#include "video_taihe.h"
+#include "image_taihe.h"
+#include "text_taihe.h"
+#include "plain_text_taihe.h"
+#include "html_taihe.h"
+#include "hyperlink_taihe.h"
 
 static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
 {
@@ -44,6 +53,54 @@ void UnifiedDataImpl::AddRecord1(::ohos::data::unifiedDataChannel::AllRecords co
             LOG_INFO(UDMF_ANI, "wjc add record case file");
             break;
         }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::folder: {
+            auto folderInnerImpl = reinterpret_cast<FolderInnerImpl*>(unifiedRecord.get_folder_ref()->GetInner());
+            this->value_->AddRecord(folderInnerImpl->value_);
+            LOG_INFO(UDMF_ANI, "wjc add record case folder");
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::audio: {
+            auto audioInnerImpl = reinterpret_cast<AudioInnerImpl*>(unifiedRecord.get_audio_ref()->GetInner());
+            this->value_->AddRecord(audioInnerImpl->value_);
+            LOG_INFO(UDMF_ANI, "wjc add record case audio");
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::video: {
+            auto videoInnerImpl = reinterpret_cast<VideoInnerImpl*>(unifiedRecord.get_video_ref()->GetInner());
+            this->value_->AddRecord(videoInnerImpl->value_);
+            LOG_INFO(UDMF_ANI, "wjc add record case video");
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::image: {
+            auto imageInnerImpl = reinterpret_cast<ImageInnerImpl*>(unifiedRecord.get_image_ref()->GetInner());
+            this->value_->AddRecord(imageInnerImpl->value_);
+            LOG_INFO(UDMF_ANI, "wjc add record case image");
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::text: {
+            auto textInnerImpl = reinterpret_cast<TextInnerImpl*>(unifiedRecord.get_text_ref()->GetInner());
+            this->value_->AddRecord(textInnerImpl->value_);
+            LOG_INFO(UDMF_ANI, "wjc add record case text");
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::plainText: {
+            auto plainTextInnerImpl = reinterpret_cast<PlainTextInnerImpl*>(unifiedRecord.get_plainText_ref()->GetInner());
+            this->value_->AddRecord(plainTextInnerImpl->value_);
+            LOG_INFO(UDMF_ANI, "wjc add record case plainText");
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::html: {
+            auto htmlInnerImpl = reinterpret_cast<HTMLInnerImpl*>(unifiedRecord.get_html_ref()->GetInner());
+            this->value_->AddRecord(htmlInnerImpl->value_);
+            LOG_INFO(UDMF_ANI, "wjc add record case html");
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::hyperlink: {
+            auto hyperlinkInnerImpl = reinterpret_cast<HyperlinkInnerImpl*>(unifiedRecord.get_hyperlink_ref()->GetInner());
+            this->value_->AddRecord(hyperlinkInnerImpl->value_);
+            LOG_INFO(UDMF_ANI, "wjc add record case hyperlink");
+            break;
+        }
     }
 }
 
@@ -68,6 +125,62 @@ void UnifiedDataImpl::AddRecord1(::ohos::data::unifiedDataChannel::AllRecords co
             fileInnerImplPtr->value_ = std::static_pointer_cast<taiheUdmf::File>(in);
             LOG_INFO(UDMF_ANI, "wjc record case file");
             return ::ohos::data::unifiedDataChannel::AllRecords::make_file(fileInnerImpl);
+        }
+        case taiheUdmf::FOLDER: {
+            auto folderInnerImpl = taihe::make_holder<FolderInnerImpl, ::ohos::data::unifiedDataChannel::FolderInner>();
+            auto folderInnerImplPtr = reinterpret_cast<FolderInnerImpl*>(folderInnerImpl->GetInner());
+            folderInnerImplPtr->value_ = std::static_pointer_cast<taiheUdmf::Folder>(in);
+            LOG_INFO(UDMF_ANI, "wjc record case folder");
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_folder(folderInnerImpl);
+        }
+        case taiheUdmf::AUDIO: {
+            auto audioInnerImpl = taihe::make_holder<AudioInnerImpl, ::ohos::data::unifiedDataChannel::AudioInner>();
+            auto audioInnerImplPtr = reinterpret_cast<AudioInnerImpl*>(audioInnerImpl->GetInner());
+            audioInnerImplPtr->value_ = std::static_pointer_cast<taiheUdmf::Audio>(in);
+            LOG_INFO(UDMF_ANI, "wjc record case audio");
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_audio(audioInnerImpl);
+        }
+        case taiheUdmf::VIDEO: {
+            auto videoInnerImpl = taihe::make_holder<VideoInnerImpl, ::ohos::data::unifiedDataChannel::VideoInner>();
+            auto videoInnerImplPtr = reinterpret_cast<VideoInnerImpl*>(videoInnerImpl->GetInner());
+            videoInnerImplPtr->value_ = std::static_pointer_cast<taiheUdmf::Video>(in);
+            LOG_INFO(UDMF_ANI, "wjc record case video");
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_video(videoInnerImpl);
+        }
+        case taiheUdmf::IMAGE: {
+            auto imageInnerImpl = taihe::make_holder<ImageInnerImpl, ::ohos::data::unifiedDataChannel::ImageInner>();
+            auto imageInnerImplPtr = reinterpret_cast<ImageInnerImpl*>(imageInnerImpl->GetInner());
+            imageInnerImplPtr->value_ = std::static_pointer_cast<taiheUdmf::Image>(in);
+            LOG_INFO(UDMF_ANI, "wjc record case image");
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_image(imageInnerImpl);
+        }
+        case taiheUdmf::TEXT: {
+            auto textInnerImpl = taihe::make_holder<TextInnerImpl, ::ohos::data::unifiedDataChannel::TextInner>();
+            auto textInnerImplPtr = reinterpret_cast<TextInnerImpl*>(textInnerImpl->GetInner());
+            textInnerImplPtr->value_ = std::static_pointer_cast<taiheUdmf::Text>(in);
+            LOG_INFO(UDMF_ANI, "wjc record case Text");
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_text(textInnerImpl);
+        }
+        case taiheUdmf::PLAIN_TEXT: {
+            auto plainTextInnerImpl = taihe::make_holder<PlainTextInnerImpl, ::ohos::data::unifiedDataChannel::PlainTextInner>();
+            auto plainTextInnerImplPtr = reinterpret_cast<PlainTextInnerImpl*>(plainTextInnerImpl->GetInner());
+            plainTextInnerImplPtr->value_ = std::static_pointer_cast<taiheUdmf::PlainText>(in);
+            LOG_INFO(UDMF_ANI, "wjc record case PlainText");
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_plainText(plainTextInnerImpl);
+        }
+        case taiheUdmf::HTML: {
+            auto htmlInnerImpl = taihe::make_holder<HTMLInnerImpl, ::ohos::data::unifiedDataChannel::HTMLInner>();
+            auto htmlInnerImplPtr = reinterpret_cast<HTMLInnerImpl*>(htmlInnerImpl->GetInner());
+            htmlInnerImplPtr->value_ = std::static_pointer_cast<taiheUdmf::Html>(in);
+            LOG_INFO(UDMF_ANI, "wjc record case html");
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_html(htmlInnerImpl);
+        }
+        case taiheUdmf::HYPERLINK: {
+            auto hyperlinkInnerImpl = taihe::make_holder<HyperlinkInnerImpl, ::ohos::data::unifiedDataChannel::HyperlinkInner>();
+            auto hyperlinkInnerImplPtr = reinterpret_cast<HyperlinkInnerImpl*>(hyperlinkInnerImpl->GetInner());
+            hyperlinkInnerImplPtr->value_ = std::static_pointer_cast<taiheUdmf::Link>(in);
+            LOG_INFO(UDMF_ANI, "wjc record case hyperlink");
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_hyperlink(hyperlinkInnerImpl);
         }
         default:
             auto recordImpl = taihe::make_holder<UnifiedRecordInnerImpl, ::ohos::data::unifiedDataChannel::UnifiedRecordInner>();
@@ -102,6 +215,46 @@ int64_t UnifiedDataImpl::GetInner()
         case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::file: {
             auto fileInnerImpl = reinterpret_cast<FileInnerImpl*>(unifiedRecord.get_file_ref()->GetInner());
             unifiedDataImpl->value_->AddRecord(fileInnerImpl->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::folder: {
+            auto folderInnerImpl = reinterpret_cast<FolderInnerImpl*>(unifiedRecord.get_folder_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(folderInnerImpl->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::audio: {
+            auto audioInnerImpl = reinterpret_cast<AudioInnerImpl*>(unifiedRecord.get_audio_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(audioInnerImpl->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::video: {
+            auto videoInnerImpl = reinterpret_cast<VideoInnerImpl*>(unifiedRecord.get_video_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(videoInnerImpl->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::image: {
+            auto imageInnerImpl = reinterpret_cast<ImageInnerImpl*>(unifiedRecord.get_image_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(imageInnerImpl->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::text: {
+            auto textInnerImpl = reinterpret_cast<TextInnerImpl*>(unifiedRecord.get_text_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(textInnerImpl->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::plainText: {
+            auto plainTextInnerImpl = reinterpret_cast<PlainTextInnerImpl*>(unifiedRecord.get_plainText_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(plainTextInnerImpl->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::html: {
+            auto htmlInnerImpl = reinterpret_cast<HTMLInnerImpl*>(unifiedRecord.get_html_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(htmlInnerImpl->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::hyperlink: {
+            auto hyperlinkInnerImpl = reinterpret_cast<HyperlinkInnerImpl*>(unifiedRecord.get_hyperlink_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(hyperlinkInnerImpl->value_);
             break;
         }
     }

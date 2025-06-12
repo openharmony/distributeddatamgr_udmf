@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_FILE_TAIHE_H
-#define UDMF_FILE_TAIHE_H
+#ifndef UDMF_FOLDER_TAIHE_H
+#define UDMF_FOLDER_TAIHE_H
 
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
-#include "file.h"
+#include "folder.h"
 
 namespace taiheUdmf = OHOS::UDMF;
 
-class FileInnerImpl {
+class FolderInnerImpl {
 public:
-    FileInnerImpl();
+    FolderInnerImpl();
 
     ::taihe::string GetType();
     ::ohos::data::unifiedDataChannel::ValueType GetValue();
@@ -33,9 +33,10 @@ public:
     void SetUri(::taihe::string_view uri);
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
     void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
+    ::taihe::string GetFolderUri();
+    void SetFolderUri(::taihe::string_view folderUri);
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::File> value_;
+    std::shared_ptr<taiheUdmf::Folder> value_;
 };
-
-#endif // UDMF_FILE_TAIHE_H
+#endif // UDMF_FOLDER_TAIHE_H

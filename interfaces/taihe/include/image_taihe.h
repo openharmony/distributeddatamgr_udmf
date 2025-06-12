@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_FILE_TAIHE_H
-#define UDMF_FILE_TAIHE_H
+#ifndef UDMF_IMAGE_TAIHE_H
+#define UDMF_IMAGE_TAIHE_H
 
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
-#include "file.h"
+#include "image.h"
 
 namespace taiheUdmf = OHOS::UDMF;
 
-class FileInnerImpl {
+class ImageInnerImpl {
 public:
-    FileInnerImpl();
+    ImageInnerImpl();
 
     ::taihe::string GetType();
     ::ohos::data::unifiedDataChannel::ValueType GetValue();
@@ -33,9 +33,10 @@ public:
     void SetUri(::taihe::string_view uri);
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
     void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
+    ::taihe::string GetImageUri();
+    void SetImageUri(::taihe::string_view imageUri);
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::File> value_;
+    std::shared_ptr<taiheUdmf::Image> value_;
 };
-
-#endif // UDMF_FILE_TAIHE_H
+#endif // UDMF_IMAGE_TAIHE_H
