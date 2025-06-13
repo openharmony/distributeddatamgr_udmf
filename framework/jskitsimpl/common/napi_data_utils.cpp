@@ -293,12 +293,17 @@ napi_status NapiDataUtils::SetValue(napi_env env, const std::map<std::string, in
 
 napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::set<std::string> &out)
 {
-    napi_value global, iterator, values_fn;
+    napi_value global;
+    napi_value iterator;
+    napi_value values_fn;
     napi_get_global(env, &global);
     napi_get_named_property(env, in, "values", &values_fn);
     napi_call_function(env, in, values_fn, 0, nullptr, &iterator);
 
-    napi_value next_fn, result_obj, done_val, value_val;
+    napi_value next_fn;
+    napi_value result_obj;
+    napi_value done_val;
+    napi_value value_val;
     bool done = false;
 
     while (!done) {
