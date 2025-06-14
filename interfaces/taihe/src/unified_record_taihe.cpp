@@ -21,6 +21,17 @@
 #include "ani_common_want.h"
 #include "pixel_map_taihe_ani.h"
 #include "taihe_common_utils.h"
+#include "plain_text.h"
+#include "html.h"
+#include "link.h"
+#include "image.h"
+#include "video.h"
+#include "audio.h"
+#include "folder.h"
+#include "system_defined_appitem.h"
+#include "system_defined_form.h"
+#include "system_defined_pixelmap.h"
+#include "application_defined_record.h"
 
 UnifiedRecordInnerImpl::UnifiedRecordInnerImpl()
 {
@@ -35,7 +46,42 @@ UnifiedRecordInnerImpl::UnifiedRecordInnerImpl(::taihe::string_view type,
     if (taiheUdmf::UtdUtils::IsValidUtdId(std::string(type))) {
         utdType = static_cast<taiheUdmf::UDType>(taiheUdmf::UtdUtils::GetUtdEnumFromUtdId(std::string(type)));
     }
-    this->value_ = std::make_shared<taiheUdmf::UnifiedRecord>(utdType, valueType);
+    std::map<taiheUdmf::UDType, std::function<std::shared_ptr<taiheUdmf::UnifiedRecord>(taiheUdmf::UDType, taiheUdmf::ValueType)>> constructors = {
+        {taiheUdmf::TEXT, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Text>(type, value); }},
+        {taiheUdmf::PLAIN_TEXT, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::PlainText>(type, value); }},
+        {taiheUdmf::HTML, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Html>(type, value); }},
+        {taiheUdmf::HYPERLINK, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Link>(type, value); }},
+        {taiheUdmf::FILE, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::File>(type, value); }},
+        {taiheUdmf::IMAGE, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Image>(type, value); }},
+        {taiheUdmf::VIDEO, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Video>(type, value); }},
+        {taiheUdmf::AUDIO, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Audio>(type, value); }},
+        {taiheUdmf::FOLDER, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Folder>(type, value); }},
+        {taiheUdmf::SYSTEM_DEFINED_RECORD,
+            [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::SystemDefinedRecord>(type, value); }},
+        {taiheUdmf::SYSTEM_DEFINED_APP_ITEM,
+            [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::SystemDefinedAppItem>(type, value); }},
+        {taiheUdmf::SYSTEM_DEFINED_FORM,
+            [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::SystemDefinedForm>(type, value); }},
+        {taiheUdmf::SYSTEM_DEFINED_PIXEL_MAP,
+            [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::SystemDefinedPixelMap>(type, value); }},
+        {taiheUdmf::APPLICATION_DEFINED_RECORD,
+            [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::ApplicationDefinedRecord>(type, value); }},
+    };
+    if (utdType == taiheUdmf::FILE_URI && std::holds_alternative<std::shared_ptr<taiheUdmf::Object>>(valueType)) {
+        taiheUdmf::ObjectUtils::ProcessFileUriType(utdType, valueType);
+    }
+    auto constructor = constructors.find(utdType);
+    if (constructor == constructors.end()) {
+        this->value_ = std::make_shared<taiheUdmf::UnifiedRecord>(utdType, valueType);
+        return;
+    }
+    auto uRecord = constructor->second(utdType, valueType);
+    if (utdType == taiheUdmf::APPLICATION_DEFINED_RECORD) {
+        std::shared_ptr<taiheUdmf::ApplicationDefinedRecord> applicationDefinedRecord =
+            std::static_pointer_cast<taiheUdmf::ApplicationDefinedRecord>(uRecord);
+        applicationDefinedRecord->SetApplicationDefinedType(std::string(type));
+    }
+    this->value_ = uRecord;
 }
 
 ::taihe::string UnifiedRecordInnerImpl::GetType()

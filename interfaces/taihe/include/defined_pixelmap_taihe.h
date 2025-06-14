@@ -13,27 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_UNIFIED_DATA_TAIHE_H
-#define UDMF_UNIFIED_DATA_TAIHE_H
+#ifndef UDMF_SYSTEMDEFINEDPIXELMAP_H
+#define UDMF_SYSTEMDEFINEDPIXELMAP_H
 
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
-#include "unified_data.h"
+#include "system_defined_pixelmap.h"
 
 namespace taiheUdmf = OHOS::UDMF;
-class UnifiedDataImpl {
+
+class SystemDefinedPixelMapInnerImpl {
 public:
-    UnifiedDataImpl();
+    SystemDefinedPixelMapInnerImpl();
 
-    void AddRecord(::ohos::data::unifiedDataChannel::AllRecords const& unifiedRecord);
+    ::taihe::string GetType();
+    ::ohos::data::unifiedDataChannel::ValueType GetValue();
 
-    ::taihe::array<::ohos::data::unifiedDataChannel::AllRecords> GetRecords();
-
-    ::ohos::data::unifiedDataChannel::AllRecords GetRecord(std::shared_ptr<taiheUdmf::UnifiedRecord> in);
-
+    ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> GetDetails();
+    void SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details);
+    ::taihe::optional<::taihe::array<uint8_t>> GetRawData();
+    void SetRawData(::taihe::array_view<uint8_t> rawData);
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::UnifiedData> value_;
+    std::shared_ptr<taiheUdmf::SystemDefinedPixelMap> value_;
 };
-
-#endif // UDMF_UNIFIED_DATA_TAIHE_H
+#endif // UDMF_SYSTEMDEFINEDPIXELMAP_H

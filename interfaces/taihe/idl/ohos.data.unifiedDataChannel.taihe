@@ -49,11 +49,15 @@ union AllRecords {
   plainText: PlainTextInner;
   html: HTMLInner;
   hyperlink: HyperlinkInner;
+  systemDefinedRecord: SystemDefinedRecordInner;
+  systemDefinedForm: SystemDefinedFormInner;
+  systemDefinedAppItem: SystemDefinedAppItemInner;
+  systemDefinedPixelMap: SystemDefinedPixelMapInner;
   unifiedRecord: UnifiedRecordInner;
 }
 
 union UnifiedDataOrNull {
-  unifiedData: UnifiedData;
+  unifiedData: UnifiedDataInner;
   @null nullType;
 }
 
@@ -109,71 +113,17 @@ struct GetDataParams {
 }
 
 @class
-interface UnifiedData {
-  AddRecord1(unifiedRecord: AllRecords): void;
-  
-  GetRecords1(): Array<AllRecords>;
-  @!sts_inject_into_class("""
-  addRecord(unifiedRecord: UnifiedRecord) {
-    if (unifiedRecord instanceof Folder) {
-      this.addRecord1((unifiedRecord as Folder).inner);
-    } else if (unifiedRecord instanceof Audio) {
-      this.addRecord1((unifiedRecord as Audio).inner);
-    } else if (unifiedRecord instanceof Video) {
-      this.addRecord1((unifiedRecord as Video).inner);
-    } else if (unifiedRecord instanceof Image) {
-      this.addRecord1((unifiedRecord as Image).inner);
-    } else if (unifiedRecord instanceof PlainText) {
-      this.addRecord1((unifiedRecord as PlainText).inner);
-    } else if (unifiedRecord instanceof HTML) {
-      this.addRecord1((unifiedRecord as HTML).inner);
-    } else if (unifiedRecord instanceof Hyperlink) {
-      this.addRecord1((unifiedRecord as Hyperlink).inner);
-    } else if (unifiedRecord instanceof Text) {
-      this.addRecord1((unifiedRecord as Text).inner);
-    } else if (unifiedRecord instanceof File) {
-      this.addRecord1((unifiedRecord as File).inner);
-    } else if (unifiedRecord instanceof UnifiedRecord) {
-      this.addRecord1((unifiedRecord as UnifiedRecord).inner);
-    }
-  }
-  getRecords(): Array<UnifiedRecord> {
-    let records = this.getRecords1();
-    let arr: Array<UnifiedRecord> = new Array<UnifiedRecord>();
-    for (let i = 0; i < records.length; i++ ) {
-       if (records[i] instanceof UnifiedRecordInner) {
-        arr.push(new UnifiedRecord(records[i] as UnifiedRecordInner));
-      } else if (records[i] instanceof FileInner) {
-        arr.push(new File(records[i] as FileInner));
-      } else if (records[i] instanceof FolderInner) {
-        arr.push(new Folder(records[i] as FolderInner));
-      } else if (records[i] instanceof AudioInner) {
-        arr.push(new Audio(records[i] as AudioInner));
-      } else if (records[i] instanceof VideoInner) {
-        arr.push(new Video(records[i] as VideoInner));
-      } else if (records[i] instanceof ImageInner) {
-        arr.push(new Image(records[i] as ImageInner));
-      } else if (records[i] instanceof TextInner) {
-        arr.push(new Text(records[i] as TextInner));
-      } else if (records[i] instanceof PlainTextInner) {
-        arr.push(new PlainText(records[i] as PlainTextInner));
-      } else if (records[i] instanceof HTMLInner) {
-        arr.push(new HTML(records[i] as HTMLInner));
-      } else if (records[i] instanceof HyperlinkInner) {
-        arr.push(new Hyperlink(records[i] as HyperlinkInner));
-      }
-    }
-    return arr;
-  }
-  """)
+interface UnifiedDataInner {
+  AddRecord(unifiedRecord: AllRecords): void;
+  GetRecords(): Array<AllRecords>;
   GetInner(): i64;
 }
 
-@ctor("UnifiedData")
-function CreateUnifiedData(): UnifiedData;
+@ctor("UnifiedDataInner")
+function CreateUnifiedData(): UnifiedDataInner;
 
-@ctor("UnifiedData")
-function CreateUnifiedDataWithParams(unifiedRecord: AllRecords): UnifiedData;
+@ctor("UnifiedDataInner")
+function CreateUnifiedDataWithParams(unifiedRecord: AllRecords): UnifiedDataInner;
 
 @class
 interface UnifiedRecordInner {
@@ -376,7 +326,7 @@ function CreatePlainText(): PlainTextInner;
 
 
 @class
-interface SystemDefinedRecord {
+interface SystemDefinedRecordInner {
   GetType(): String;
   GetValue(): ValueType;
   @get("details")
@@ -386,11 +336,11 @@ interface SystemDefinedRecord {
   GetInner(): i64;
 }
 
-@ctor("SystemDefinedRecord")
-function CreateSystemDefinedRecord(): SystemDefinedRecord;
+@ctor("SystemDefinedRecordInner")
+function CreateSystemDefinedRecord(): SystemDefinedRecordInner;
 
 @class
-interface SystemDefinedForm {
+interface SystemDefinedFormInner {
   GetType(): String;
   GetValue(): ValueType;
   @get("details")
@@ -420,11 +370,11 @@ interface SystemDefinedForm {
   GetInner(): i64;
 }
 
-@ctor("SystemDefinedForm")
-function CreateSystemDefinedForm(): SystemDefinedForm;
+@ctor("SystemDefinedFormInner")
+function CreateSystemDefinedForm(): SystemDefinedFormInner;
 
 @class
-interface SystemDefinedAppItem {
+interface SystemDefinedAppItemInner {
   GetType(): String;
   GetValue(): ValueType;
   @get("details")
@@ -458,11 +408,11 @@ interface SystemDefinedAppItem {
   GetInner(): i64;
 }
 
-@ctor("SystemDefinedAppItem")
-function CreateSystemDefinedAppItem(): SystemDefinedAppItem;
+@ctor("SystemDefinedAppItemInner")
+function CreateSystemDefinedAppItem(): SystemDefinedAppItemInner;
 
 @class
-interface SystemDefinedPixelMap {
+interface SystemDefinedPixelMapInner {
   GetType(): String;
   GetValue(): ValueType;
   @get("details")
@@ -476,19 +426,126 @@ interface SystemDefinedPixelMap {
   GetInner(): i64;
 }
 
-@ctor("SystemDefinedPixelMap")
-function CreateSystemDefinedPixelMap(): SystemDefinedPixelMap;
+@ctor("SystemDefinedPixelMapInner")
+function CreateSystemDefinedPixelMap(): SystemDefinedPixelMapInner;
 
 @gen_async("insertData")
 @gen_promise("insertData")
-function InsertDataSync(options: Options, data: UnifiedData);
+function InsertDataSync(options: Options, data: UnifiedDataInner);
 
 @gen_async("queryData")
 @gen_promise("queryData")
-function QueryDataSync(options: Options): Array<UnifiedData>;
-
+function QueryDataSync(options: Options): Array<UnifiedDataInner>;
 
 @!sts_inject("""
+
+export class UnifiedData {
+  inner: UnifiedDataInner;
+  constructor() {
+    this.inner = CreateUnifiedData_inner();
+  }
+  constructor(inner: UnifiedDataInner) {
+    this.inner = inner;
+  }
+  constructor(unifiedRecord: UnifiedRecord) {
+    if (unifiedRecord instanceof Folder) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as Folder).inner);
+    } else if (unifiedRecord instanceof Audio) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as Audio).inner);
+    } else if (unifiedRecord instanceof Video) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as Video).inner);
+    } else if (unifiedRecord instanceof Image) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as Image).inner);
+    } else if (unifiedRecord instanceof PlainText) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as PlainText).inner);
+    } else if (unifiedRecord instanceof HTML) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as HTML).inner);
+    } else if (unifiedRecord instanceof Hyperlink) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as Hyperlink).inner);
+    } else if (unifiedRecord instanceof SystemDefinedForm) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as SystemDefinedForm).inner);
+    } else if (unifiedRecord instanceof SystemDefinedAppItem) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as SystemDefinedAppItem).inner);
+    } else if (unifiedRecord instanceof SystemDefinedPixelMap) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as SystemDefinedPixelMap).inner);
+    } else if (unifiedRecord instanceof Text) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as Text).inner);
+    } else if (unifiedRecord instanceof File) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as File).inner);
+    } else if (unifiedRecord instanceof SystemDefinedRecord) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as SystemDefinedRecord).inner);
+    } else if (unifiedRecord instanceof UnifiedRecord) {
+      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as UnifiedRecord).inner);
+    }
+  }
+  addRecord(unifiedRecord: UnifiedRecord) {
+    if (unifiedRecord instanceof Folder) {
+      this.inner.addRecord((unifiedRecord as Folder).inner);
+    } else if (unifiedRecord instanceof Audio) {
+      this.inner.addRecord((unifiedRecord as Audio).inner);
+    } else if (unifiedRecord instanceof Video) {
+      this.inner.addRecord((unifiedRecord as Video).inner);
+    } else if (unifiedRecord instanceof Image) {
+      this.inner.addRecord((unifiedRecord as Image).inner);
+    } else if (unifiedRecord instanceof PlainText) {
+      this.inner.addRecord((unifiedRecord as PlainText).inner);
+    } else if (unifiedRecord instanceof HTML) {
+      this.inner.addRecord((unifiedRecord as HTML).inner);
+    } else if (unifiedRecord instanceof Hyperlink) {
+      this.inner.addRecord((unifiedRecord as Hyperlink).inner);
+    } else if (unifiedRecord instanceof SystemDefinedForm) {
+      this.inner.addRecord((unifiedRecord as SystemDefinedForm).inner);
+    } else if (unifiedRecord instanceof SystemDefinedAppItem) {
+      this.inner.addRecord((unifiedRecord as SystemDefinedAppItem).inner);
+    } else if (unifiedRecord instanceof SystemDefinedPixelMap) {
+      this.inner.addRecord((unifiedRecord as SystemDefinedPixelMap).inner);
+    } else if (unifiedRecord instanceof Text) {
+      this.inner.addRecord((unifiedRecord as Text).inner);
+    } else if (unifiedRecord instanceof File) {
+      this.inner.addRecord((unifiedRecord as File).inner);
+    } else if (unifiedRecord instanceof SystemDefinedRecord) {
+      this.inner.addRecord((unifiedRecord as SystemDefinedRecord).inner);
+    } else if (unifiedRecord instanceof UnifiedRecord) {
+      this.inner.addRecord((unifiedRecord as UnifiedRecord).inner);
+    }
+  }
+  getRecords(): Array<UnifiedRecord> {
+    let records = this.inner.getRecords();
+    let arr: Array<UnifiedRecord> = new Array<UnifiedRecord>();
+    for (let i = 0; i < records.length; i++ ) {
+      if (records[i] instanceof UnifiedRecordInner) {
+        arr.push(new UnifiedRecord(records[i] as UnifiedRecordInner));
+      } else if (records[i] instanceof FileInner) {
+        arr.push(new File(records[i] as FileInner));
+      } else if (records[i] instanceof FolderInner) {
+        arr.push(new Folder(records[i] as FolderInner));
+      } else if (records[i] instanceof AudioInner) {
+        arr.push(new Audio(records[i] as AudioInner));
+      } else if (records[i] instanceof VideoInner) {
+        arr.push(new Video(records[i] as VideoInner));
+      } else if (records[i] instanceof ImageInner) {
+        arr.push(new Image(records[i] as ImageInner));
+      } else if (records[i] instanceof TextInner) {
+        arr.push(new Text(records[i] as TextInner));
+      } else if (records[i] instanceof PlainTextInner) {
+        arr.push(new PlainText(records[i] as PlainTextInner));
+      } else if (records[i] instanceof HTMLInner) {
+        arr.push(new HTML(records[i] as HTMLInner));
+      } else if (records[i] instanceof HyperlinkInner) {
+        arr.push(new Hyperlink(records[i] as HyperlinkInner));
+      } else if (records[i] instanceof SystemDefinedRecordInner) {
+        arr.push(new SystemDefinedRecord(records[i] as SystemDefinedRecordInner));
+      } else if (records[i] instanceof SystemDefinedFormInner) {
+        arr.push(new SystemDefinedForm(records[i] as SystemDefinedFormInner));
+      } else if (records[i] instanceof SystemDefinedAppItemInner) {
+        arr.push(new SystemDefinedAppItem(records[i] as SystemDefinedAppItemInner));
+      } else if (records[i] instanceof SystemDefinedPixelMapInner) {
+        arr.push(new SystemDefinedPixelMap(records[i] as SystemDefinedPixelMapInner));
+      }
+    }
+    return arr;
+  }
+}
 
 export class UnifiedRecord {
   inner: UnifiedRecordInner;
@@ -704,27 +761,21 @@ export class PlainText extends Text {
   set details(info: Record<string, string>) {
     this.inner.details = info;
   }
-
   get textContent(): string {
     return this.inner.textContent;
   }
-
   set textContent(text: string) {
     this.inner.textContent = text;
   }
-
   get abstract1(): string {
     return this.inner.abstract1;
   }
-
   set abstract1(text: string) {
     this.inner.abstract1 = text;
   }
-
   getType(): string {
     return this.inner.getType();
   }
-
   getValue(): ValueType {
     return this.inner.getValue();
   }
@@ -744,27 +795,21 @@ export class HTML extends Text {
   set details(info: Record<string, string>) {
     this.inner.details = info;
   }
-
   get htmlContent(): string {
     return this.inner.htmlContent;
   }
-
   set htmlContent(html: string) {
     this.inner.htmlContent = html;
   }
-
   get plainContent(): string {
     return this.inner.plainContent;
   }
-
   set plainContent(plain: string) {
     this.inner.plainContent = plain;
   }
-
   getType(): string {
     return this.inner.getType();
   }
-
   getValue(): ValueType {
     return this.inner.getValue();
   }
@@ -784,29 +829,254 @@ export class Hyperlink extends Text {
   set details(info: Record<string, string>) {
     this.inner.details = info;
   }
-
   get url(): string {
     return this.inner.url;
   }
-
   set url(url: string) {
     this.inner.url = url;
   }
-
   get description(): string {
     return this.inner.description;
   }
-
   set description(description: string) {
     this.inner.description = description;
   }
-
   getType(): string {
     return this.inner.getType();
   }
-
   getValue(): ValueType {
     return this.inner.getValue();
   }
+}
+
+export class SystemDefinedRecord extends UnifiedRecord {
+  inner: SystemDefinedRecordInner;
+  constructor() {
+    this.inner = CreateSystemDefinedRecord_inner();
+  }
+  constructor(inner: SystemDefinedRecordInner) {
+    this.inner = inner;
+  }
+  getType(): string {
+    return this.inner.getType();
+  }
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+  get details(): Record<String, DetailsValue> | undefined {
+    return this.inner.details;
+  }
+  set details(details: Record<String, DetailsValue>) {
+    this.inner.details = details;
+  }
+}
+
+export class SystemDefinedForm extends SystemDefinedRecord {
+  inner: SystemDefinedFormInner;
+  constructor() {
+    this.inner = CreateSystemDefinedForm_inner();
+  }
+  constructor(inner: SystemDefinedFormInner) {
+    this.inner = inner;
+  }
+  getType(): string {
+    return this.inner.getType();
+  }
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+  get details(): Record<String, DetailsValue> | undefined {
+    return this.inner.details;
+  }
+  set details(details: Record<String, DetailsValue>) {
+    this.inner.details = details;
+  }
+  get formId(): number {
+    return this.inner.formId;
+  }
+  set formId(formId: number) {
+    this.inner.formId = formId;
+  }
+  get formName(): String {
+    return this.inner.formName;
+  }
+  set formName(formName: String) {
+    this.inner.formName = formName;
+  }
+  get bundleName(): String {
+    return this.inner.bundleName;
+  }
+  set bundleName(bundleName: String) {
+    this.inner.bundleName = bundleName;
+  }
+  get abilityName(): String {
+    return this.inner.abilityName;
+  }
+  set abilityName(abilityName: String) {
+    this.inner.abilityName = abilityName;
+  }
+  get module(): String {
+    return this.inner.module;
+  }
+  set module(module: String) {
+    this.inner.module = module;
+  }
+}
+
+export class SystemDefinedAppItem extends SystemDefinedRecord {
+  inner: SystemDefinedAppItemInner;
+  constructor() {
+    this.inner = CreateSystemDefinedAppItem_inner();
+  }
+  constructor(inner: SystemDefinedAppItemInner) {
+    this.inner = inner;
+  }
+  getType(): string {
+    return this.inner.getType();
+  }
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+  get details(): Record<String, DetailsValue> | undefined {
+    return this.inner.details;
+  }
+  set details(details: Record<String, DetailsValue>) {
+    this.inner.details = details;
+  }
+  get appId(): String {
+    return this.inner.appId;
+  }
+  set appId(appId: String) {
+    this.inner.appId = appId;
+  }
+  get appName(): String {
+    return this.inner.appName;
+  }
+  set appName(appName: String) {
+    this.inner.appName = appName;
+  }
+  get appIconId(): String {
+    return this.inner.appIconId;
+  }
+  set appIconId(appIconId: String) {
+    this.inner.appIconId = appIconId;
+  }
+  get appLabelId(): String {
+    return this.inner.appLabelId;
+  }
+  set appLabelId(appLabelId: String) {
+    this.inner.appLabelId = appLabelId;
+  }
+  get bundleName(): String {
+    return this.inner.bundleName;
+  }
+  set bundleName(bundleName: String) {
+    this.inner.bundleName = bundleName;
+  }
+  get abilityName(): String {
+    return this.inner.abilityName;
+  }
+  set abilityName(abilityName: String) {
+    this.inner.abilityName = abilityName;
+  }
+}
+
+export class SystemDefinedPixelMap extends SystemDefinedRecord {
+  inner: SystemDefinedPixelMapInner;
+  constructor() {
+    this.inner = CreateSystemDefinedPixelMap_inner();
+  }
+  constructor(inner: SystemDefinedPixelMapInner) {
+    this.inner = inner;
+  }
+  getType(): string {
+    return this.inner.getType();
+  }
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+  get details(): Record<String, DetailsValue> | undefined {
+    return this.inner.details;
+  }
+  set details(details: Record<String, DetailsValue>) {
+    this.inner.details = details;
+  }
+  get rawData(): Uint8Array | undefined {
+    return this.inner.rawData;
+  }
+  set rawData(rawData: Uint8Array) {
+    this.inner.rawData = rawData;
+  }
+}
+
+native function InsertDataSync_inner(options: Options, data: UnifiedDataInner): void;
+native function QueryDataSync_inner(options: Options): Array<UnifiedDataInner>;
+
+export function insertDataSync(options: Options, data: UnifiedData): void {
+    return InsertDataSync_inner(options, data.inner);
+}
+export function insertData(options: Options, data: UnifiedData): Promise<void> {
+    return new Promise<void>((resolve, reject): void => {
+        taskpool.execute((): void => {
+            return InsertDataSync_inner(options, data.inner);
+        })
+        .then((ret: NullishType): void => {
+            resolve(ret as undefined);
+        })
+        .catch((ret: NullishType): void => {
+            reject(ret as Error);
+        });
+    });
+}
+export function insertData(options: Options, data: UnifiedData, callback: AsyncCallback<void>): void {
+    taskpool.execute((): void => {
+        return InsertDataSync_inner(options, data.inner);
+    })
+    .then((ret: NullishType): void => {
+        callback(new BusinessError(), ret as undefined);
+    })
+    .catch((ret: NullishType): void => {
+        let data: undefined;
+        callback(ret as BusinessError, data);
+    });
+}
+
+export function queryDataSync(options: Options): Array<UnifiedData> {
+    return QueryDataSync_inner(options);
+}
+export function queryData(options: Options): Promise<Array<UnifiedData>> {
+    return new Promise<Array<UnifiedData>>((resolve, reject): void => {
+        taskpool.execute((): Array<UnifiedData> => {
+            let dataArray = QueryDataSync_inner(options);
+            let arr: Array<UnifiedData> = new Array<UnifiedData>();
+            for (let i = 0; i < dataArray.length; i++ ) {
+              arr.push(new UnifiedData(dataArray[i]))
+            }
+            return arr;
+        })
+        .then((ret: NullishType): void => {
+            resolve(ret as Array<UnifiedData>);
+        })
+        .catch((ret: NullishType): void => {
+            reject(ret as Error);
+        });
+    });
+}
+export function queryData(options: Options, callback: AsyncCallback<Array<UnifiedData>>): void {
+    taskpool.execute((): Array<UnifiedData> => {
+        let dataArray = QueryDataSync_inner(options);
+        let arr: Array<UnifiedData> = new Array<UnifiedData>();
+        for (let i = 0; i < dataArray.length; i++ ) {
+          arr.push(new UnifiedData(dataArray[i]))
+        }
+        return arr;
+    })
+    .then((ret: NullishType): void => {
+        callback(new BusinessError(), ret as Array<UnifiedData>);
+    })
+    .catch((ret: NullishType): void => {
+        let data: Array<UnifiedData>;
+        callback(ret as BusinessError, data);
+    });
 }
 """)

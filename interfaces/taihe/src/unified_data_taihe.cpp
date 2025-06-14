@@ -26,6 +26,10 @@
 #include "plain_text_taihe.h"
 #include "html_taihe.h"
 #include "hyperlink_taihe.h"
+#include "defined_form_taihe.h"
+#include "defined_appitem_taihe.h"
+#include "defined_pixelmap_taihe.h"
+#include "defined_record_taihe.h"
 
 static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
 {
@@ -38,7 +42,7 @@ UnifiedDataImpl::UnifiedDataImpl()
     this->value_ = std::make_shared<taiheUdmf::UnifiedData>();
 }
 
-void UnifiedDataImpl::AddRecord1(::ohos::data::unifiedDataChannel::AllRecords const& unifiedRecord)
+void UnifiedDataImpl::AddRecord(::ohos::data::unifiedDataChannel::AllRecords const& unifiedRecord)
 {
     switch (unifiedRecord.get_tag()) {
         case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::unifiedRecord: {
@@ -101,10 +105,34 @@ void UnifiedDataImpl::AddRecord1(::ohos::data::unifiedDataChannel::AllRecords co
             LOG_INFO(UDMF_ANI, "wjc add record case hyperlink");
             break;
         }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::systemDefinedRecord: {
+            auto systemDefinedRecordInnerImpl = reinterpret_cast<SystemDefinedRecordInnerImpl*>(unifiedRecord.get_systemDefinedRecord_ref()->GetInner());
+            this->value_->AddRecord(systemDefinedRecordInnerImpl->value_);
+            LOG_INFO(UDMF_ANI, "wjc add record case systemDefinedRecord");
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::systemDefinedForm: {
+            auto systemDefinedFormInnerImpl = reinterpret_cast<SystemDefinedFormInnerImpl*>(unifiedRecord.get_systemDefinedForm_ref()->GetInner());
+            this->value_->AddRecord(systemDefinedFormInnerImpl->value_);
+            LOG_INFO(UDMF_ANI, "wjc add record case systemDefinedForm");
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::systemDefinedAppItem: {
+            auto systemDefinedAppItemInnerImpl = reinterpret_cast<SystemDefinedAppItemInnerImpl*>(unifiedRecord.get_systemDefinedAppItem_ref()->GetInner());
+            this->value_->AddRecord(systemDefinedAppItemInnerImpl->value_);
+            LOG_INFO(UDMF_ANI, "wjc add record case systemDefinedAppItem");
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::systemDefinedPixelMap: {
+            auto systemDefinedPixelMapInnerImpl = reinterpret_cast<SystemDefinedPixelMapInnerImpl*>(unifiedRecord.get_systemDefinedPixelMap_ref()->GetInner());
+            this->value_->AddRecord(systemDefinedPixelMapInnerImpl->value_);
+            LOG_INFO(UDMF_ANI, "wjc add record case systemDefinedPixelMap");
+            break;
+        }
     }
 }
 
-::taihe::array<::ohos::data::unifiedDataChannel::AllRecords> UnifiedDataImpl::GetRecords1()
+::taihe::array<::ohos::data::unifiedDataChannel::AllRecords> UnifiedDataImpl::GetRecords()
 {
     auto records = this->value_->GetRecords();
     LOG_INFO(UDMF_ANI, "wjc records size: %{public}zu", records.size());
@@ -182,10 +210,38 @@ void UnifiedDataImpl::AddRecord1(::ohos::data::unifiedDataChannel::AllRecords co
             LOG_INFO(UDMF_ANI, "wjc record case hyperlink");
             return ::ohos::data::unifiedDataChannel::AllRecords::make_hyperlink(hyperlinkInnerImpl);
         }
+        case taiheUdmf::SYSTEM_DEFINED_RECORD: {
+            auto systemDefinedRecordInnerImpl = taihe::make_holder<SystemDefinedRecordInnerImpl, ::ohos::data::unifiedDataChannel::SystemDefinedRecordInner>();
+            auto systemDefinedRecordInnerImplPtr = reinterpret_cast<SystemDefinedRecordInnerImpl*>(systemDefinedRecordInnerImpl->GetInner());
+            systemDefinedRecordInnerImplPtr->value_ = std::static_pointer_cast<taiheUdmf::SystemDefinedRecord>(in);
+            LOG_INFO(UDMF_ANI, "wjc record case SystemDefinedRecord");
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_systemDefinedRecord(systemDefinedRecordInnerImpl);
+        }
+        case taiheUdmf::SYSTEM_DEFINED_APP_ITEM: {
+            auto systemDefinedAppItemInnerImpl = taihe::make_holder<SystemDefinedAppItemInnerImpl, ::ohos::data::unifiedDataChannel::SystemDefinedAppItemInner>();
+            auto systemDefinedAppItemInnerImplPtr = reinterpret_cast<SystemDefinedAppItemInnerImpl*>(systemDefinedAppItemInnerImpl->GetInner());
+            systemDefinedAppItemInnerImplPtr->value_ = std::static_pointer_cast<taiheUdmf::SystemDefinedAppItem>(in);
+            LOG_INFO(UDMF_ANI, "wjc record case SystemDefinedAppItem");
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_systemDefinedAppItem(systemDefinedAppItemInnerImpl);
+        }
+        case taiheUdmf::SYSTEM_DEFINED_FORM: {
+            auto systemDefinedFormInnerImpl = taihe::make_holder<SystemDefinedFormInnerImpl, ::ohos::data::unifiedDataChannel::SystemDefinedFormInner>();
+            auto systemDefinedFormInnerImplPtr = reinterpret_cast<SystemDefinedFormInnerImpl*>(systemDefinedFormInnerImpl->GetInner());
+            systemDefinedFormInnerImplPtr->value_ = std::static_pointer_cast<taiheUdmf::SystemDefinedForm>(in);
+            LOG_INFO(UDMF_ANI, "wjc record case SystemDefinedForm");
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_systemDefinedForm(systemDefinedFormInnerImpl);
+        }
+        case taiheUdmf::SYSTEM_DEFINED_PIXEL_MAP: {
+            auto systemDefinedPixelMapInnerImpl = taihe::make_holder<SystemDefinedPixelMapInnerImpl, ::ohos::data::unifiedDataChannel::SystemDefinedPixelMapInner>();
+            auto systemDefinedPixelMapInnerImplPtr = reinterpret_cast<SystemDefinedPixelMapInnerImpl*>(systemDefinedPixelMapInnerImpl->GetInner());
+            systemDefinedPixelMapInnerImplPtr->value_ = std::static_pointer_cast<taiheUdmf::SystemDefinedPixelMap>(in);
+            LOG_INFO(UDMF_ANI, "wjc record case SystemDefinedPixelMap");
+            return ::ohos::data::unifiedDataChannel::AllRecords::make_systemDefinedPixelMap(systemDefinedPixelMapInnerImpl);
+        }
         default:
             auto recordImpl = taihe::make_holder<UnifiedRecordInnerImpl, ::ohos::data::unifiedDataChannel::UnifiedRecordInner>();
             auto recordImplPtr = reinterpret_cast<UnifiedRecordInnerImpl*>(recordImpl->GetInner());
-            recordImplPtr->value_ = in;
+            recordImplPtr->value_ = std::static_pointer_cast<taiheUdmf::UnifiedRecord>(in);
             LOG_INFO(UDMF_ANI, "wjc record case base");
             return ::ohos::data::unifiedDataChannel::AllRecords::make_unifiedRecord(recordImpl);
     }
@@ -196,15 +252,15 @@ int64_t UnifiedDataImpl::GetInner()
     return reinterpret_cast<int64_t>(this);
 }
 
-::ohos::data::unifiedDataChannel::UnifiedData CreateUnifiedData()
+::ohos::data::unifiedDataChannel::UnifiedDataInner CreateUnifiedData()
 {
-    return taihe::make_holder<UnifiedDataImpl, ::ohos::data::unifiedDataChannel::UnifiedData>();
+    return taihe::make_holder<UnifiedDataImpl, ::ohos::data::unifiedDataChannel::UnifiedDataInner>();
 }
 
-::ohos::data::unifiedDataChannel::UnifiedData CreateUnifiedDataWithParams(
+::ohos::data::unifiedDataChannel::UnifiedDataInner CreateUnifiedDataWithParams(
     ::ohos::data::unifiedDataChannel::AllRecords const& unifiedRecord)
 {
-    auto unifiedData = taihe::make_holder<UnifiedDataImpl, ::ohos::data::unifiedDataChannel::UnifiedData>();
+    auto unifiedData = taihe::make_holder<UnifiedDataImpl, ::ohos::data::unifiedDataChannel::UnifiedDataInner>();
     auto unifiedDataImpl = reinterpret_cast<UnifiedDataImpl*>(unifiedData->GetInner());
     switch (unifiedRecord.get_tag()) {
         case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::unifiedRecord: {
@@ -255,6 +311,26 @@ int64_t UnifiedDataImpl::GetInner()
         case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::hyperlink: {
             auto hyperlinkInnerImpl = reinterpret_cast<HyperlinkInnerImpl*>(unifiedRecord.get_hyperlink_ref()->GetInner());
             unifiedDataImpl->value_->AddRecord(hyperlinkInnerImpl->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::systemDefinedRecord: {
+            auto systemDefinedRecordInnerImpl = reinterpret_cast<SystemDefinedRecordInnerImpl*>(unifiedRecord.get_systemDefinedRecord_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(systemDefinedRecordInnerImpl->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::systemDefinedForm: {
+            auto systemDefinedFormImplInner = reinterpret_cast<SystemDefinedFormInnerImpl*>(unifiedRecord.get_systemDefinedForm_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(systemDefinedFormImplInner->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::systemDefinedAppItem: {
+            auto systemDefinedAppItemInnerImpl = reinterpret_cast<SystemDefinedAppItemInnerImpl*>(unifiedRecord.get_systemDefinedAppItem_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(systemDefinedAppItemInnerImpl->value_);
+            break;
+        }
+        case ::ohos::data::unifiedDataChannel::AllRecords::tag_t::systemDefinedPixelMap: {
+            auto systemDefinedPixelMapInnerImpl = reinterpret_cast<SystemDefinedPixelMapInnerImpl*>(unifiedRecord.get_systemDefinedPixelMap_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(systemDefinedPixelMapInnerImpl->value_);
             break;
         }
     }
