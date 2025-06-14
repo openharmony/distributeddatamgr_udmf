@@ -188,7 +188,10 @@ bool UnifiedDataHelper::SaveUDataToFile(const std::string &dataFile, UnifiedData
         }
         return false;
     }
-    (void)fclose(file);
+    if (fclose(file) == EOF) {
+        LOG_ERROR(UDMF_FRAMEWORK, "fclose is failed");
+        return false;
+    }
     return true;
 }
 

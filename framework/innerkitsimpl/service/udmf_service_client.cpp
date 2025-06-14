@@ -105,10 +105,6 @@ void UdmfServiceClient::ServiceDeathRecipient::OnRemoteDied(const wptr<IRemoteOb
 int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
 {
     LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}d", option.intention);
-    if (!UnifiedDataUtils::IsValidIntention(option.intention)) {
-        LOG_ERROR(UDMF_SERVICE, "Invalid intention");
-        return E_INVALID_PARAMETERS;
-    }
     if (option.intention == UD_INTENTION_DATA_HUB) {
         if (option.visibility != Visibility::VISIBILITY_ALL &&
             option.visibility != Visibility::VISIBILITY_OWN_PROCESS) {
