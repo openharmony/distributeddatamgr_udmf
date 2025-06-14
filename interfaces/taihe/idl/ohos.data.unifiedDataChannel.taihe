@@ -119,10 +119,8 @@ interface UnifiedDataInner {
   GetInner(): i64;
 }
 
-@ctor("UnifiedDataInner")
 function CreateUnifiedData(): UnifiedDataInner;
 
-@ctor("UnifiedDataInner")
 function CreateUnifiedDataWithParams(unifiedRecord: AllRecords): UnifiedDataInner;
 
 @class
@@ -132,10 +130,8 @@ interface UnifiedRecordInner {
   GetInner(): i64;
 }
 
-@ctor("UnifiedRecordInner")
 function CreateUnifiedRecord(): UnifiedRecordInner;
 
-@ctor("UnifiedRecordInner")
 function CreateUnifiedRecordWithParams(type: String, value: ValueType): UnifiedRecordInner;
 
 @class
@@ -153,7 +149,6 @@ interface FileInner {
   GetInner(): i64;
 }
 
-@ctor("FileInner")
 function CreateUnifiedFile(): FileInner;
 
 @class
@@ -175,7 +170,6 @@ interface FolderInner {
   GetInner(): i64;
 }
 
-@ctor("FolderInner")
 function CreateUnifiedFolder(): FolderInner;
 
 @class
@@ -197,7 +191,6 @@ interface AudioInner {
   GetInner(): i64;
 }
 
-@ctor("AudioInner")
 function CreateUnifiedAudio(): AudioInner;
 
 @class
@@ -219,7 +212,6 @@ interface VideoInner {
   GetInner(): i64;
 }
 
-@ctor("VideoInner")
 function CreateUnifiedVideo(): VideoInner;
 
 @class
@@ -241,7 +233,6 @@ interface ImageInner {
   GetInner(): i64;
 }
 
-@ctor("ImageInner")
 function CreateUnifiedImage(): ImageInner;
 
 @class
@@ -255,7 +246,6 @@ interface TextInner {
   GetInner(): i64;
 }
 
-@ctor("TextInner")
 function CreateText(): TextInner;
 
 @class
@@ -277,7 +267,6 @@ interface HTMLInner {
   GetInner(): i64;
 }
 
-@ctor("HTMLInner")
 function CreateHtml(): HTMLInner;
 
 @class
@@ -299,7 +288,6 @@ interface HyperlinkInner {
   GetInner(): i64;
 }
 
-@ctor("HyperlinkInner")
 function CreateHyperlink(): HyperlinkInner;
 
 @class
@@ -321,7 +309,6 @@ interface PlainTextInner {
   GetInner(): i64;
 }
 
-@ctor("PlainTextInner")
 function CreatePlainText(): PlainTextInner;
 
 
@@ -336,7 +323,6 @@ interface SystemDefinedRecordInner {
   GetInner(): i64;
 }
 
-@ctor("SystemDefinedRecordInner")
 function CreateSystemDefinedRecord(): SystemDefinedRecordInner;
 
 @class
@@ -370,7 +356,6 @@ interface SystemDefinedFormInner {
   GetInner(): i64;
 }
 
-@ctor("SystemDefinedFormInner")
 function CreateSystemDefinedForm(): SystemDefinedFormInner;
 
 @class
@@ -408,7 +393,6 @@ interface SystemDefinedAppItemInner {
   GetInner(): i64;
 }
 
-@ctor("SystemDefinedAppItemInner")
 function CreateSystemDefinedAppItem(): SystemDefinedAppItemInner;
 
 @class
@@ -426,15 +410,9 @@ interface SystemDefinedPixelMapInner {
   GetInner(): i64;
 }
 
-@ctor("SystemDefinedPixelMapInner")
 function CreateSystemDefinedPixelMap(): SystemDefinedPixelMapInner;
 
-@gen_async("insertData")
-@gen_promise("insertData")
-function InsertDataSync(options: Options, data: UnifiedDataInner);
-
-@gen_async("queryData")
-@gen_promise("queryData")
+function InsertDataSync(options: Options, data: UnifiedDataInner): String;
 function QueryDataSync(options: Options): Array<UnifiedDataInner>;
 
 @!sts_inject("""
@@ -1009,41 +987,32 @@ export class SystemDefinedPixelMap extends SystemDefinedRecord {
   }
 }
 
-native function InsertDataSync_inner(options: Options, data: UnifiedDataInner): void;
-native function QueryDataSync_inner(options: Options): Array<UnifiedDataInner>;
-
-export function insertDataSync(options: Options, data: UnifiedData): void {
-    return InsertDataSync_inner(options, data.inner);
-}
-export function insertData(options: Options, data: UnifiedData): Promise<void> {
-    return new Promise<void>((resolve, reject): void => {
-        taskpool.execute((): void => {
-            return InsertDataSync_inner(options, data.inner);
-        })
-        .then((ret: NullishType): void => {
-            resolve(ret as undefined);
-        })
-        .catch((ret: NullishType): void => {
-            reject(ret as Error);
-        });
-    });
-}
-export function insertData(options: Options, data: UnifiedData, callback: AsyncCallback<void>): void {
-    taskpool.execute((): void => {
+export function insertData(options: Options, data: UnifiedData): Promise<string> {
+return new Promise<string>((resolve, reject): void => {
+    taskpool.execute((): string => {
         return InsertDataSync_inner(options, data.inner);
     })
     .then((ret: NullishType): void => {
-        callback(new BusinessError(), ret as undefined);
+        resolve(ret as string);
     })
     .catch((ret: NullishType): void => {
-        let data: undefined;
-        callback(ret as BusinessError, data);
+        reject(ret as Error);
     });
+});
+}
+export function insertData(options: Options, data: UnifiedData, callback: AsyncCallback<string>): void {
+taskpool.execute((): string => {
+    return InsertDataSync_inner(options, data.inner);
+})
+.then((ret: NullishType): void => {
+    callback(new BusinessError(), ret as string);
+})
+.catch((ret: NullishType): void => {
+    let data: string;
+    callback(ret as BusinessError, data);
+});
 }
 
-export function queryDataSync(options: Options): Array<UnifiedData> {
-    return QueryDataSync_inner(options);
-}
 export function queryData(options: Options): Promise<Array<UnifiedData>> {
     return new Promise<Array<UnifiedData>>((resolve, reject): void => {
         taskpool.execute((): Array<UnifiedData> => {
