@@ -1,5 +1,0 @@
-#pragma once
-#include "ani.h"
-#include "ohos.data.unifiedDataChannel.SystemDefinedFormInner.proj.0.hpp"
-::ohos::data::unifiedDataChannel::SystemDefinedFormInner ohos_data_unifiedDataChannel_SystemDefinedFormInner_fromANI(ani_env* env, ani_object ani_obj);
-ani_object ohos_data_unifiedDataChannel_SystemDefinedFormInner_intoANI(ani_env* env, ::ohos::data::unifiedDataChannel::SystemDefinedFormInner cpp_obj);
