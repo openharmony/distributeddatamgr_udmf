@@ -31,13 +31,15 @@ SystemDefinedPixelMapInnerImpl::SystemDefinedPixelMapInnerImpl()
     return taiheUdmf::ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> SystemDefinedPixelMapInnerImpl::GetDetails()
+::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>>
+    SystemDefinedPixelMapInnerImpl::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>>::make(
         taiheUdmf::ConvertUDDetailsToUnion(this->value_->GetDetails()));
 }
 
-void SystemDefinedPixelMapInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details)
+void SystemDefinedPixelMapInnerImpl::SetDetails(
+    ::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details)
 {
     taiheUdmf::UDDetails udmfDetails = taiheUdmf::ConvertUDDetailsToUnion(details);
     this->value_->SetDetails(udmfDetails);
@@ -66,7 +68,8 @@ int64_t SystemDefinedPixelMapInnerImpl::GetInner()
 
 ::ohos::data::unifiedDataChannel::SystemDefinedPixelMapInner CreateSystemDefinedPixelMap()
 {
-    return taihe::make_holder<SystemDefinedPixelMapInnerImpl, ::ohos::data::unifiedDataChannel::SystemDefinedPixelMapInner>();
+    return taihe::make_holder<SystemDefinedPixelMapInnerImpl,
+        ::ohos::data::unifiedDataChannel::SystemDefinedPixelMapInner>();
 }
 
 

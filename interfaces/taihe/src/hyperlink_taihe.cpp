@@ -16,24 +16,29 @@
 #include "hyperlink_taihe.h"
 #include "taihe_common_utils.h"
 
-HyperlinkInnerImpl::HyperlinkInnerImpl() {
+HyperlinkInnerImpl::HyperlinkInnerImpl()
+{
     this->value_ = std::make_shared<taiheUdmf::Link>();
 }
 
-::taihe::string HyperlinkInnerImpl::GetType() {
+::taihe::string HyperlinkInnerImpl::GetType()
+{
     return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType HyperlinkInnerImpl::GetValue() {
+::ohos::data::unifiedDataChannel::ValueType HyperlinkInnerImpl::GetValue()
+{
     return taiheUdmf::ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> HyperlinkInnerImpl::GetDetails() {
+::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> HyperlinkInnerImpl::GetDetails()
+{
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
         taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void HyperlinkInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details) {
+void HyperlinkInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+{
     if (details.size() == 0) {
         return;
     }
@@ -41,25 +46,30 @@ void HyperlinkInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::
     this->value_->SetDetails(udmfDetails);
 }
 
-void HyperlinkInnerImpl::SetUrl(::taihe::string_view url) {
+void HyperlinkInnerImpl::SetUrl(::taihe::string_view url)
+{
     std::string urlStr(url);
     this->value_->SetUrl(urlStr);
 }
 
-::taihe::string HyperlinkInnerImpl::GetUrl() {
+::taihe::string HyperlinkInnerImpl::GetUrl()
+{
     return ::taihe::string(this->value_->GetUrl());
 }
 
-void HyperlinkInnerImpl::SetDescription(::taihe::string_view description) {
+void HyperlinkInnerImpl::SetDescription(::taihe::string_view description)
+{
     std::string desc(description);
     this->value_->SetDescription(desc);
 }
 
-::taihe::string HyperlinkInnerImpl::GetDescription() {
+::taihe::string HyperlinkInnerImpl::GetDescription()
+{
     return ::taihe::string(this->value_->GetDescription());
 }
 
-int64_t HyperlinkInnerImpl::GetInner() {
+int64_t HyperlinkInnerImpl::GetInner()
+{
     return reinterpret_cast<int64_t>(this);
 }
 

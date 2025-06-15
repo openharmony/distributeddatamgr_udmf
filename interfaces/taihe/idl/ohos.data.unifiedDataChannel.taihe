@@ -302,10 +302,6 @@ interface PlainTextInner {
   SetTextContent(textContent: String): void;
   @get("textContent")
   GetTextContent(): String;
-  @set("abstract1")
-  SetAbstract1(abstract1: String): void;
-  @get("abstract1")
-  GetAbstract1(): String;
   GetInner(): i64;
 }
 
@@ -744,12 +740,6 @@ export class PlainText extends Text {
   }
   set textContent(text: string) {
     this.inner.textContent = text;
-  }
-  get abstract1(): string {
-    return this.inner.abstract1;
-  }
-  set abstract1(text: string) {
-    this.inner.abstract1 = text;
   }
   getType(): string {
     return this.inner.getType();

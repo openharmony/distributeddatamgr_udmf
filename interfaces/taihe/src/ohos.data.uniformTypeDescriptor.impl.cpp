@@ -13,16 +13,14 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "UniformTypeDescriptorTaiHe"
-
 #include "ohos.data.uniformTypeDescriptor.impl.hpp"
 
-#include "logger.h"
 #include "napi_error_utils.h"
 #include "ohos.data.uniformTypeDescriptor.proj.hpp"
 #include "stdexcept"
 #include "taihe/runtime.hpp"
 #include "utd_client.h"
+#include "taihe_common_utils.h"
 
 using namespace taihe;
 using namespace ohos::data::uniformTypeDescriptor;
@@ -30,9 +28,9 @@ using namespace OHOS;
 using namespace OHOS::UDMF;
 
 namespace {
-static constexpr int PARAMETERSERROR = 401;
 
-string getUniformDataTypeByFilenameExtension(string_view filenameExtension, optional_view<string> belongsTo)
+::taihe::string getUniformDataTypeByFilenameExtension(::taihe::string_view filenameExtension,
+    ::taihe::optional_view<::taihe::string> belongsTo)
 {
     std::string fileName(filenameExtension);
     std::string typeId;
@@ -49,12 +47,10 @@ string getUniformDataTypeByFilenameExtension(string_view filenameExtension, opti
         if (errorMsg.has_value()) {
             napiError = errorMsg.value();
         } else {
-            LOG_ERROR(UDMF_ANI, "errorMsg is null!");
             napiError.jsCode = PARAMETERSERROR;
             napiError.message = "Parameter error.";
         }
         set_business_error(napiError.jsCode, napiError.message);
-        LOG_ERROR(UDMF_ANI, "get type failed, status:%{public}d, jsCode:%{public}d", status, napiError.jsCode);
         return "";
     }
     return typeId;

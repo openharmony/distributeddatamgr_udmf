@@ -16,24 +16,29 @@
 #include "text_taihe.h"
 #include "taihe_common_utils.h"
 
-TextInnerImpl::TextInnerImpl() {
+TextInnerImpl::TextInnerImpl()
+{
     this->value_ = std::make_shared<taiheUdmf::Text>();
 }
 
-::taihe::string TextInnerImpl::GetType() {
+::taihe::string TextInnerImpl::GetType()
+{
     return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType TextInnerImpl::GetValue() {
+::ohos::data::unifiedDataChannel::ValueType TextInnerImpl::GetValue()
+{
     return taiheUdmf::ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> TextInnerImpl::GetDetails() {
+::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> TextInnerImpl::GetDetails()
+{
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
         taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void TextInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details) {
+void TextInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+{
     if (details.size() == 0) {
         return;
     }
@@ -41,7 +46,8 @@ void TextInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::strin
     this->value_->SetDetails(udmfDetails);
 }
 
-int64_t TextInnerImpl::GetInner() {
+int64_t TextInnerImpl::GetInner()
+{
     return reinterpret_cast<int64_t>(this);
 }
 

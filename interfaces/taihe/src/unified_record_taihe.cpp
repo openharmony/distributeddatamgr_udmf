@@ -12,12 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#define LOG_TAG "UNIFIED_RECORD_TAIHE"
-
 #include "unified_record_taihe.h"
 #include "taihe/runtime.hpp"
-#include "logger.h"
 #include "ani_common_want.h"
 #include "pixel_map_taihe_ani.h"
 #include "taihe_common_utils.h"
@@ -46,26 +42,41 @@ UnifiedRecordInnerImpl::UnifiedRecordInnerImpl(::taihe::string_view type,
     if (taiheUdmf::UtdUtils::IsValidUtdId(std::string(type))) {
         utdType = static_cast<taiheUdmf::UDType>(taiheUdmf::UtdUtils::GetUtdEnumFromUtdId(std::string(type)));
     }
-    std::map<taiheUdmf::UDType, std::function<std::shared_ptr<taiheUdmf::UnifiedRecord>(taiheUdmf::UDType, taiheUdmf::ValueType)>> constructors = {
-        {taiheUdmf::TEXT, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Text>(type, value); }},
-        {taiheUdmf::PLAIN_TEXT, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::PlainText>(type, value); }},
-        {taiheUdmf::HTML, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Html>(type, value); }},
-        {taiheUdmf::HYPERLINK, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Link>(type, value); }},
-        {taiheUdmf::FILE, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::File>(type, value); }},
-        {taiheUdmf::IMAGE, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Image>(type, value); }},
-        {taiheUdmf::VIDEO, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Video>(type, value); }},
-        {taiheUdmf::AUDIO, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Audio>(type, value); }},
-        {taiheUdmf::FOLDER, [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::Folder>(type, value); }},
+    std::map<taiheUdmf::UDType, std::function<std::shared_ptr<taiheUdmf::UnifiedRecord>(
+        taiheUdmf::UDType, taiheUdmf::ValueType)>> constructors = {
+        {taiheUdmf::TEXT, [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::Text>(type, value); }},
+        {taiheUdmf::PLAIN_TEXT, [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::PlainText>(type, value); }},
+        {taiheUdmf::HTML, [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::Html>(type, value); }},
+        {taiheUdmf::HYPERLINK, [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::Link>(type, value); }},
+        {taiheUdmf::FILE, [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::File>(type, value); }},
+        {taiheUdmf::IMAGE, [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::Image>(type, value); }},
+        {taiheUdmf::VIDEO, [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::Video>(type, value); }},
+        {taiheUdmf::AUDIO, [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::Audio>(type, value); }},
+        {taiheUdmf::FOLDER, [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::Folder>(type, value); }},
         {taiheUdmf::SYSTEM_DEFINED_RECORD,
-            [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::SystemDefinedRecord>(type, value); }},
+            [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::SystemDefinedRecord>(type, value); }},
         {taiheUdmf::SYSTEM_DEFINED_APP_ITEM,
-            [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::SystemDefinedAppItem>(type, value); }},
+            [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::SystemDefinedAppItem>(type, value); }},
         {taiheUdmf::SYSTEM_DEFINED_FORM,
-            [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::SystemDefinedForm>(type, value); }},
+            [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::SystemDefinedForm>(type, value); }},
         {taiheUdmf::SYSTEM_DEFINED_PIXEL_MAP,
-            [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::SystemDefinedPixelMap>(type, value); }},
+            [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::SystemDefinedPixelMap>(type, value); }},
         {taiheUdmf::APPLICATION_DEFINED_RECORD,
-            [](taiheUdmf::UDType type, taiheUdmf::ValueType value) { return std::make_shared<taiheUdmf::ApplicationDefinedRecord>(type, value); }},
+            [](taiheUdmf::UDType type, taiheUdmf::ValueType value)
+            { return std::make_shared<taiheUdmf::ApplicationDefinedRecord>(type, value); }},
     };
     if (utdType == taiheUdmf::FILE_URI && std::holds_alternative<std::shared_ptr<taiheUdmf::Object>>(valueType)) {
         taiheUdmf::ObjectUtils::ProcessFileUriType(utdType, valueType);
@@ -107,7 +118,8 @@ int64_t UnifiedRecordInnerImpl::GetInner()
 ::ohos::data::unifiedDataChannel::UnifiedRecordInner CreateUnifiedRecordWithParams(::taihe::string_view type,
     ::ohos::data::unifiedDataChannel::ValueType const& value)
 {
-    return taihe::make_holder<UnifiedRecordInnerImpl, ::ohos::data::unifiedDataChannel::UnifiedRecordInner>(type, value);
+    return taihe::make_holder<UnifiedRecordInnerImpl,
+        ::ohos::data::unifiedDataChannel::UnifiedRecordInner>(type, value);
 }
 
 TH_EXPORT_CPP_API_CreateUnifiedRecord(CreateUnifiedRecord);

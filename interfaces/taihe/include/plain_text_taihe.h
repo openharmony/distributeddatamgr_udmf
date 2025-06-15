@@ -32,8 +32,6 @@ public:
     void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
     void SetTextContent(::taihe::string_view textContent);
     ::taihe::string GetTextContent();
-    void SetAbstract1(::taihe::string_view abstract);
-    ::taihe::string GetAbstract1();
     int64_t GetInner();
 
     std::shared_ptr<taiheUdmf::PlainText> value_;

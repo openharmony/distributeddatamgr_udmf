@@ -144,6 +144,7 @@ taiheUdmf::UDDetails ConvertUDDetails(::taihe::map_view<::taihe::string, ::taihe
             taiheDetails.emplace(::taihe::string(item.first), std::get<std::string>(item.second));
         }
     }
+    LOG_INFO(UDMF_ANI, "wjc taiheDetails size is %{public}zu", taiheDetails.size());
     return taiheDetails;
 }
 

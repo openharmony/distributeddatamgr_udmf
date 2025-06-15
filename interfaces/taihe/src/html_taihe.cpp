@@ -16,24 +16,29 @@
 #include "html_taihe.h"
 #include "taihe_common_utils.h"
 
-HTMLInnerImpl::HTMLInnerImpl() {
+HTMLInnerImpl::HTMLInnerImpl()
+{
     this->value_ = std::make_shared<taiheUdmf::Html>();
 }
 
-::taihe::string HTMLInnerImpl::GetType() {
+::taihe::string HTMLInnerImpl::GetType()
+{
     return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType HTMLInnerImpl::GetValue() {
+::ohos::data::unifiedDataChannel::ValueType HTMLInnerImpl::GetValue()
+{
     return taiheUdmf::ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> HTMLInnerImpl::GetDetails() {
+::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> HTMLInnerImpl::GetDetails()
+{
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
         taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void HTMLInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details) {
+void HTMLInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+{
     if (details.size() == 0) {
         return;
     }
@@ -41,25 +46,30 @@ void HTMLInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::strin
     this->value_->SetDetails(udmfDetails);
 }
 
-void HTMLInnerImpl::SetHtmlContent(::taihe::string_view htmlContent) {
+void HTMLInnerImpl::SetHtmlContent(::taihe::string_view htmlContent)
+{
     std::string content(htmlContent);
     this->value_->SetHtmlContent(content);
 }
 
-::taihe::string HTMLInnerImpl::GetHtmlContent() {
+::taihe::string HTMLInnerImpl::GetHtmlContent()
+{
     return ::taihe::string(this->value_->GetHtmlContent());
 }
 
-void HTMLInnerImpl::SetPlainContent(::taihe::string_view plainContent) {
+void HTMLInnerImpl::SetPlainContent(::taihe::string_view plainContent)
+{
     std::string content(plainContent);
     this->value_->SetPlainContent(content);
 }
 
-::taihe::string HTMLInnerImpl::GetPlainContent() {
+::taihe::string HTMLInnerImpl::GetPlainContent()
+{
     return ::taihe::string(this->value_->GetPlainContent());
 }
 
-int64_t HTMLInnerImpl::GetInner() {
+int64_t HTMLInnerImpl::GetInner()
+{
     return reinterpret_cast<int64_t>(this);
 }
 

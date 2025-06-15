@@ -32,13 +32,15 @@ SystemDefinedFormInnerImpl::SystemDefinedFormInnerImpl()
     return taiheUdmf::ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> SystemDefinedFormInnerImpl::GetDetails()
+::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>>
+    SystemDefinedFormInnerImpl::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>>::make(
         taiheUdmf::ConvertUDDetailsToUnion(this->value_->GetDetails()));
 }
 
-void SystemDefinedFormInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details)
+void SystemDefinedFormInnerImpl::SetDetails(
+    ::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details)
 {
     taiheUdmf::UDDetails udmfDetails = taiheUdmf::ConvertUDDetailsToUnion(details);
     this->value_->SetDetails(udmfDetails);

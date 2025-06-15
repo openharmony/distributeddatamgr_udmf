@@ -31,13 +31,15 @@ SystemDefinedAppItemInnerImpl::SystemDefinedAppItemInnerImpl()
     return taiheUdmf::ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> SystemDefinedAppItemInnerImpl::GetDetails()
+::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>>
+    SystemDefinedAppItemInnerImpl::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>>::make(
         taiheUdmf::ConvertUDDetailsToUnion(this->value_->GetDetails()));
 }
 
-void SystemDefinedAppItemInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details)
+void SystemDefinedAppItemInnerImpl::SetDetails(
+    ::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details)
 {
     taiheUdmf::UDDetails udmfDetails = taiheUdmf::ConvertUDDetailsToUnion(details);
     this->value_->SetDetails(udmfDetails);
@@ -116,7 +118,8 @@ int64_t SystemDefinedAppItemInnerImpl::GetInner()
 
 ::ohos::data::unifiedDataChannel::SystemDefinedAppItemInner CreateSystemDefinedAppItem()
 {
-    return taihe::make_holder<SystemDefinedAppItemInnerImpl, ::ohos::data::unifiedDataChannel::SystemDefinedAppItemInner>();
+    return taihe::make_holder<SystemDefinedAppItemInnerImpl,
+        ::ohos::data::unifiedDataChannel::SystemDefinedAppItemInner>();
 }
 
 TH_EXPORT_CPP_API_CreateSystemDefinedAppItem(CreateSystemDefinedAppItem);

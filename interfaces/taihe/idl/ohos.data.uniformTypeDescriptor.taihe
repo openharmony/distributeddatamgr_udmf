@@ -15,6 +15,10 @@
 
 @!namespace("@ohos.data.uniformTypeDescriptor", "uniformTypeDescriptor")
 
+@!sts_inject("""
+static { loadLibrary("udmf_taihe_native.z") }
+""")
+
 enum UniformDataType: String {
     OPENHARMONY_PIXEL_MAP = "openharmony.pixel-map",
     FOLDER = "general.folder",

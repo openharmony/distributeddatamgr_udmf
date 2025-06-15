@@ -23,6 +23,7 @@
 namespace taiheUdmf = OHOS::UDMF;
 namespace OHOS {
 namespace UDMF {
+static constexpr int PARAMETERSERROR = 401;
 taiheUdmf::Intention ConvertIntention(::ohos::data::unifiedDataChannel::Intention value);
 
 taiheUdmf::ValueType ConvertValueType(ani_env *env, ::taihe::string_view type,
