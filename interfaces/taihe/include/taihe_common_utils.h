@@ -20,24 +20,24 @@
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "ani.h"
-namespace taiheUdmf = OHOS::UDMF;
 namespace OHOS {
 namespace UDMF {
-taiheUdmf::Intention ConvertIntention(::ohos::data::unifiedDataChannel::Intention value);
+static constexpr int PARAMETERSERROR = 401;
+Intention ConvertIntention(::ohos::data::unifiedDataChannel::Intention value);
 
-taiheUdmf::ValueType ConvertValueType(ani_env *env, ::taihe::string_view type,
+ValueType ConvertValueType(ani_env *env, ::taihe::string_view type,
     ::ohos::data::unifiedDataChannel::ValueType const& value);
 
-::ohos::data::unifiedDataChannel::ValueType ConvertValueType(const taiheUdmf::ValueType &value);
+::ohos::data::unifiedDataChannel::ValueType ConvertValueType(const ValueType &value);
 
-taiheUdmf::UDDetails ConvertUDDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
+UDDetails ConvertUDDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
 
-::taihe::map_view<::taihe::string, ::taihe::string> ConvertUDDetailsToString(const taiheUdmf::UDDetails &details);
+::taihe::map_view<::taihe::string, ::taihe::string> ConvertUDDetailsToString(const UDDetails &details);
 
 ::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> ConvertUDDetailsToUnion(
-    const taiheUdmf::UDDetails &details);
+    const UDDetails &details);
 
-taiheUdmf::UDDetails ConvertUDDetailsToUnion(
+UDDetails ConvertUDDetailsToUnion(
     const ::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> &details);
 
 } // namespace UDMF

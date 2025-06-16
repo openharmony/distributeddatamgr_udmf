@@ -13,30 +13,31 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_UNIFIED_RECORD_TAIHE_H
-#define UDMF_UNIFIED_RECORD_TAIHE_H
+#ifndef UDMF_SYSTEMDEFINEDPIXELMAP_H
+#define UDMF_SYSTEMDEFINEDPIXELMAP_H
 
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
-#include "unified_record.h"
+#include "system_defined_pixelmap.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
 namespace UDMF {
-class UnifiedRecordTaihe {
+class SystemDefinedPixelMapTaihe {
 public:
-    UnifiedRecordTaihe();
-
-    UnifiedRecordTaihe(::taihe::string_view type, ::taiheChannel::ValueType const& value);
+    SystemDefinedPixelMapTaihe();
 
     ::taihe::string GetType();
-
     ::taiheChannel::ValueType GetValue();
 
+    ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> GetDetails();
+    void SetDetails(::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details);
+    ::taihe::optional<::taihe::array<uint8_t>> GetRawData();
+    void SetRawData(::taihe::array_view<uint8_t> rawData);
     int64_t GetInner();
 
-    std::shared_ptr<UnifiedRecord> value_;
+    std::shared_ptr<SystemDefinedPixelMap> value_;
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_UNIFIED_RECORD_TAIHE_H
+#endif // UDMF_SYSTEMDEFINEDPIXELMAP_H

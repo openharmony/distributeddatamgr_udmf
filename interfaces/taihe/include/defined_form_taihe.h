@@ -13,30 +13,39 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_UNIFIED_RECORD_TAIHE_H
-#define UDMF_UNIFIED_RECORD_TAIHE_H
+#ifndef UDMF_SYSTEMDEFINEDFORM_H
+#define UDMF_SYSTEMDEFINEDFORM_H
 
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
-#include "unified_record.h"
+#include "system_defined_form.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
 namespace UDMF {
-class UnifiedRecordTaihe {
+class SystemDefinedFormTaihe {
 public:
-    UnifiedRecordTaihe();
-
-    UnifiedRecordTaihe(::taihe::string_view type, ::taiheChannel::ValueType const& value);
+    SystemDefinedFormTaihe();
 
     ::taihe::string GetType();
+    taiheChannel::ValueType GetValue();
 
-    ::taiheChannel::ValueType GetValue();
-
+    ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> GetDetails();
+    void SetDetails(::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details);
+    double GetFormId();
+    void SetFormId(double formId);
+    ::taihe::string GetFormName();
+    void SetFormName(::taihe::string_view formName);
+    ::taihe::string GetBundleName();
+    void SetBundleName(::taihe::string_view bundleName);
+    ::taihe::string GetAbilityName();
+    void SetAbilityName(::taihe::string_view abilityName);
+    ::taihe::string GetModule();
+    void SetModule(::taihe::string_view module);
     int64_t GetInner();
 
-    std::shared_ptr<UnifiedRecord> value_;
+    std::shared_ptr<SystemDefinedForm> value_;
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_UNIFIED_RECORD_TAIHE_H
+#endif // UDMF_SYSTEMDEFINEDFORM_H

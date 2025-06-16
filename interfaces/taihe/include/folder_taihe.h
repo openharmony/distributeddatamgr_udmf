@@ -13,30 +13,33 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_UNIFIED_RECORD_TAIHE_H
-#define UDMF_UNIFIED_RECORD_TAIHE_H
+#ifndef UDMF_FOLDER_TAIHE_H
+#define UDMF_FOLDER_TAIHE_H
 
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
-#include "unified_record.h"
+#include "folder.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
 namespace UDMF {
-class UnifiedRecordTaihe {
+class FolderTaihe {
 public:
-    UnifiedRecordTaihe();
-
-    UnifiedRecordTaihe(::taihe::string_view type, ::taiheChannel::ValueType const& value);
+    FolderTaihe();
 
     ::taihe::string GetType();
-
     ::taiheChannel::ValueType GetValue();
 
+    ::taihe::string GetUri();
+    void SetUri(::taihe::string_view uri);
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
+    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
+    ::taihe::string GetFolderUri();
+    void SetFolderUri(::taihe::string_view folderUri);
     int64_t GetInner();
 
-    std::shared_ptr<UnifiedRecord> value_;
+    std::shared_ptr<Folder> value_;
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_UNIFIED_RECORD_TAIHE_H
+#endif // UDMF_FOLDER_TAIHE_H

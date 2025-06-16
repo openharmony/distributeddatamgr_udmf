@@ -12,56 +12,104 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#define LOG_TAG "UNIFIED_RECORD_TAIHE"
-
 #include "unified_record_taihe.h"
 #include "taihe/runtime.hpp"
-#include "logger.h"
 #include "ani_common_want.h"
 #include "pixel_map_taihe_ani.h"
 #include "taihe_common_utils.h"
-
-UnifiedRecordImpl::UnifiedRecordImpl()
+#include "plain_text.h"
+#include "html.h"
+#include "link.h"
+#include "image.h"
+#include "video.h"
+#include "audio.h"
+#include "folder.h"
+#include "system_defined_appitem.h"
+#include "system_defined_form.h"
+#include "system_defined_pixelmap.h"
+#include "application_defined_record.h"
+namespace OHOS {
+namespace UDMF {
+UnifiedRecordTaihe::UnifiedRecordTaihe()
 {
-    this->value_ = std::make_shared<taiheUdmf::UnifiedRecord>();
+    this->value_ = std::make_shared<UnifiedRecord>();
 }
 
-UnifiedRecordImpl::UnifiedRecordImpl(::taihe::string_view type,
-    ::ohos::data::unifiedDataChannel::ValueType const& value)
+UnifiedRecordTaihe::UnifiedRecordTaihe(::taihe::string_view type,
+    ::taiheChannel::ValueType const& value)
 {
-    taiheUdmf::ValueType valueType = taiheUdmf::ConvertValueType(::taihe::get_env(), type, value);
-    taiheUdmf::UDType utdType = taiheUdmf::APPLICATION_DEFINED_RECORD;
-    if (taiheUdmf::UtdUtils::IsValidUtdId(std::string(type))) {
-        utdType = static_cast<taiheUdmf::UDType>(taiheUdmf::UtdUtils::GetUtdEnumFromUtdId(std::string(type)));
+    ValueType valueType = ConvertValueType(::taihe::get_env(), type, value);
+    UDType utdType = APPLICATION_DEFINED_RECORD;
+    if (UtdUtils::IsValidUtdId(std::string(type))) {
+        utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(std::string(type)));
     }
-    this->value_ = std::make_shared<taiheUdmf::UnifiedRecord>(utdType, valueType);
+    std::map<UDType, std::function<std::shared_ptr<UnifiedRecord>(
+        UDType, ValueType)>> constructors = {
+        {TEXT, [](UDType type, ValueType value) { return std::make_shared<Text>(type, value); }},
+        {PLAIN_TEXT, [](UDType type, ValueType value) { return std::make_shared<PlainText>(type, value); }},
+        {HTML, [](UDType type, ValueType value) { return std::make_shared<Html>(type, value); }},
+        {HYPERLINK, [](UDType type, ValueType value) { return std::make_shared<Link>(type, value); }},
+        {FILE, [](UDType type, ValueType value) { return std::make_shared<File>(type, value); }},
+        {IMAGE, [](UDType type, ValueType value) { return std::make_shared<Image>(type, value); }},
+        {VIDEO, [](UDType type, ValueType value) { return std::make_shared<Video>(type, value); }},
+        {AUDIO, [](UDType type, ValueType value) { return std::make_shared<Audio>(type, value); }},
+        {FOLDER, [](UDType type, ValueType value) { return std::make_shared<Folder>(type, value); }},
+        {SYSTEM_DEFINED_RECORD, [](UDType type, ValueType value)
+            { return std::make_shared<SystemDefinedRecord>(type, value); }},
+        {SYSTEM_DEFINED_APP_ITEM, [](UDType type, ValueType value)
+            { return std::make_shared<SystemDefinedAppItem>(type, value); }},
+        {SYSTEM_DEFINED_FORM, [](UDType type, ValueType value)
+            { return std::make_shared<SystemDefinedForm>(type, value); }},
+        {SYSTEM_DEFINED_PIXEL_MAP, [](UDType type, ValueType value)
+            { return std::make_shared<SystemDefinedPixelMap>(type, value); }},
+        {APPLICATION_DEFINED_RECORD, [](UDType type, ValueType value)
+            { return std::make_shared<ApplicationDefinedRecord>(type, value); }},
+    };
+    if (utdType == FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(valueType)) {
+        ObjectUtils::ProcessFileUriType(utdType, valueType);
+    }
+    auto constructor = constructors.find(utdType);
+    if (constructor == constructors.end()) {
+        this->value_ = std::make_shared<UnifiedRecord>(utdType, valueType);
+        return;
+    }
+    auto uRecord = constructor->second(utdType, valueType);
+    if (utdType == APPLICATION_DEFINED_RECORD) {
+        std::shared_ptr<ApplicationDefinedRecord> applicationDefinedRecord =
+            std::static_pointer_cast<ApplicationDefinedRecord>(uRecord);
+        applicationDefinedRecord->SetApplicationDefinedType(std::string(type));
+    }
+    this->value_ = uRecord;
 }
 
-::taihe::string UnifiedRecordImpl::GetType()
+::taihe::string UnifiedRecordTaihe::GetType()
 {
-    return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
+    return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType UnifiedRecordImpl::GetValue()
+::taiheChannel::ValueType UnifiedRecordTaihe::GetValue()
 {
-    return taiheUdmf::ConvertValueType(this->value_->GetValue());
+    return ConvertValueType(this->value_->GetValue());
 }
 
-int64_t UnifiedRecordImpl::GetInner()
+int64_t UnifiedRecordTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
 
-::ohos::data::unifiedDataChannel::UnifiedRecord CreateUnifiedRecord()
+} // namespace UDMF
+} // namespace OHOS
+
+::taiheChannel::UnifiedRecordInner CreateUnifiedRecord()
 {
-    return taihe::make_holder<UnifiedRecordImpl, ::ohos::data::unifiedDataChannel::UnifiedRecord>();
+    return taihe::make_holder<OHOS::UDMF::UnifiedRecordTaihe, ::taiheChannel::UnifiedRecordInner>();
 }
 
-::ohos::data::unifiedDataChannel::UnifiedRecord CreateUnifiedRecordWithParams(::taihe::string_view type,
-    ::ohos::data::unifiedDataChannel::ValueType const& value)
+::taiheChannel::UnifiedRecordInner CreateUnifiedRecordWithParams(::taihe::string_view type,
+    ::taiheChannel::ValueType const& value)
 {
-    return taihe::make_holder<UnifiedRecordImpl, ::ohos::data::unifiedDataChannel::UnifiedRecord>(type, value);
+    return taihe::make_holder<OHOS::UDMF::UnifiedRecordTaihe,
+        ::taiheChannel::UnifiedRecordInner>(type, value);
 }
 
 TH_EXPORT_CPP_API_CreateUnifiedRecord(CreateUnifiedRecord);

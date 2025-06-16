@@ -13,30 +13,33 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_UNIFIED_RECORD_TAIHE_H
-#define UDMF_UNIFIED_RECORD_TAIHE_H
+#ifndef UDMF_IMAGE_TAIHE_H
+#define UDMF_IMAGE_TAIHE_H
 
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
-#include "unified_record.h"
+#include "image.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
 namespace UDMF {
-class UnifiedRecordTaihe {
+class ImageTaihe {
 public:
-    UnifiedRecordTaihe();
-
-    UnifiedRecordTaihe(::taihe::string_view type, ::taiheChannel::ValueType const& value);
+    ImageTaihe();
 
     ::taihe::string GetType();
-
     ::taiheChannel::ValueType GetValue();
 
+    ::taihe::string GetUri();
+    void SetUri(::taihe::string_view uri);
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
+    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
+    ::taihe::string GetImageUri();
+    void SetImageUri(::taihe::string_view imageUri);
     int64_t GetInner();
 
-    std::shared_ptr<UnifiedRecord> value_;
+    std::shared_ptr<Image> value_;
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_UNIFIED_RECORD_TAIHE_H
+#endif // UDMF_IMAGE_TAIHE_H
