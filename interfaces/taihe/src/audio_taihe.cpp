@@ -16,19 +16,21 @@
 #include "audio_taihe.h"
 #include "taihe_common_utils.h"
 
+namespace OHOS {
+namespace UDMF {
 AudioInnerImpl::AudioInnerImpl()
 {
-    this->value_ = std::make_shared<taiheUdmf::Audio>();
+    this->value_ = std::make_shared<Audio>();
 }
 
 ::taihe::string AudioInnerImpl::GetType()
 {
-    return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
+    return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType AudioInnerImpl::GetValue()
+::taiheChannel::ValueType AudioInnerImpl::GetValue()
 {
-    return taiheUdmf::ConvertValueType(this->value_->GetValue());
+    return ConvertValueType(this->value_->GetValue());
 }
 
 ::taihe::string AudioInnerImpl::GetUri()
@@ -45,7 +47,7 @@ void AudioInnerImpl::SetUri(::taihe::string_view uri)
 ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> AudioInnerImpl::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
-        taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
+        ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
 void AudioInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
@@ -53,7 +55,7 @@ void AudioInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::stri
     if (details.size() == 0) {
         return;
     }
-    auto udmfDetails = taiheUdmf::ConvertUDDetails(details);
+    auto udmfDetails = ConvertUDDetails(details);
     this->value_->SetDetails(udmfDetails);
 }
 
@@ -72,10 +74,12 @@ int64_t AudioInnerImpl::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
+} // namespace UDMF
+} // namespace OHOS
 
-::ohos::data::unifiedDataChannel::AudioInner CreateUnifiedAudio()
+::taiheChannel::AudioInner CreateUnifiedAudio()
 {
-    return taihe::make_holder<AudioInnerImpl, ::ohos::data::unifiedDataChannel::AudioInner>();
+    return taihe::make_holder<OHOS::UDMF::AudioInnerImpl, ::taiheChannel::AudioInner>();
 }
 
 TH_EXPORT_CPP_API_CreateUnifiedAudio(CreateUnifiedAudio);

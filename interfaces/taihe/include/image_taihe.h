@@ -20,14 +20,15 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "image.h"
 
-namespace taiheUdmf = OHOS::UDMF;
-
+namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace OHOS {
+namespace UDMF {
 class ImageInnerImpl {
 public:
     ImageInnerImpl();
 
     ::taihe::string GetType();
-    ::ohos::data::unifiedDataChannel::ValueType GetValue();
+    ::taiheChannel::ValueType GetValue();
 
     ::taihe::string GetUri();
     void SetUri(::taihe::string_view uri);
@@ -37,6 +38,8 @@ public:
     void SetImageUri(::taihe::string_view imageUri);
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::Image> value_;
+    std::shared_ptr<Image> value_;
 };
+} // namespace UDMF
+} // namespace OHOS
 #endif // UDMF_IMAGE_TAIHE_H

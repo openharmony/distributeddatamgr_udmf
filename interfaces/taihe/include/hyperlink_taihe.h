@@ -20,14 +20,15 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "link.h"
 
-namespace taiheUdmf = OHOS::UDMF;
-
+namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace OHOS {
+namespace UDMF {
 class HyperlinkInnerImpl {
 public:
     HyperlinkInnerImpl();
 
     ::taihe::string GetType();
-    ::ohos::data::unifiedDataChannel::ValueType GetValue();
+    ::taiheChannel::ValueType GetValue();
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
     void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
     void SetUrl(::taihe::string_view url);
@@ -36,6 +37,8 @@ public:
     ::taihe::string GetDescription();
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::Link> value_;
+    std::shared_ptr<Link> value_;
 };
+} // namespace UDMF
+} // namespace OHOS
 #endif // UDMF_HYPERLINK_TAIHE_H

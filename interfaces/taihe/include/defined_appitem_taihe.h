@@ -20,16 +20,18 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "system_defined_appitem.h"
 
-namespace taiheUdmf = OHOS::UDMF;
+namespace taiheChannel = ohos::data::unifiedDataChannel;
 
+namespace OHOS {
+namespace UDMF {
 class SystemDefinedAppItemInnerImpl {
 public:
     SystemDefinedAppItemInnerImpl();
     ::taihe::string GetType();
-    ::ohos::data::unifiedDataChannel::ValueType GetValue();
-    ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> GetDetails();
+    taiheChannel::ValueType GetValue();
+    ::taihe::optional<::taihe::map<::taihe::string, taiheChannel::DetailsValue>> GetDetails();
 
-    void SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details);
+    void SetDetails(::taihe::map_view<::taihe::string, taiheChannel::DetailsValue> details);
     ::taihe::string GetAppId();
     void SetAppId(::taihe::string_view appId);
     ::taihe::string GetAppName();
@@ -44,6 +46,9 @@ public:
     void SetAbilityName(::taihe::string_view abilityName);
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::SystemDefinedAppItem> value_;
+    std::shared_ptr<SystemDefinedAppItem> value_;
 };
+
+} // namespace UDMF
+} // namespace OHOS
 #endif // UDMF_SYSTEMDEFINEDAPPITEM_H

@@ -20,20 +20,23 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "unified_record.h"
 
-namespace taiheUdmf = OHOS::UDMF;
+namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace OHOS {
+namespace UDMF {
 class UnifiedRecordInnerImpl {
 public:
     UnifiedRecordInnerImpl();
 
-    UnifiedRecordInnerImpl(::taihe::string_view type, ::ohos::data::unifiedDataChannel::ValueType const& value);
+    UnifiedRecordInnerImpl(::taihe::string_view type, ::taiheChannel::ValueType const& value);
 
     ::taihe::string GetType();
 
-    ::ohos::data::unifiedDataChannel::ValueType GetValue();
+    ::taiheChannel::ValueType GetValue();
 
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::UnifiedRecord> value_;
+    std::shared_ptr<UnifiedRecord> value_;
 };
-
+} // namespace UDMF
+} // namespace OHOS
 #endif // UDMF_UNIFIED_RECORD_TAIHE_H

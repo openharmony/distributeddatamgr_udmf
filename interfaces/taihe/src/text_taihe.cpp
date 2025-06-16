@@ -15,26 +15,27 @@
 
 #include "text_taihe.h"
 #include "taihe_common_utils.h"
-
+namespace OHOS {
+namespace UDMF {
 TextInnerImpl::TextInnerImpl()
 {
-    this->value_ = std::make_shared<taiheUdmf::Text>();
+    this->value_ = std::make_shared<Text>();
 }
 
 ::taihe::string TextInnerImpl::GetType()
 {
-    return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
+    return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType TextInnerImpl::GetValue()
+::taiheChannel::ValueType TextInnerImpl::GetValue()
 {
-    return taiheUdmf::ConvertValueType(this->value_->GetValue());
+    return ConvertValueType(this->value_->GetValue());
 }
 
 ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> TextInnerImpl::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
-        taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
+        ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
 void TextInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
@@ -42,7 +43,7 @@ void TextInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::strin
     if (details.size() == 0) {
         return;
     }
-    auto udmfDetails = taiheUdmf::ConvertUDDetails(details);
+    auto udmfDetails = ConvertUDDetails(details);
     this->value_->SetDetails(udmfDetails);
 }
 
@@ -51,11 +52,12 @@ int64_t TextInnerImpl::GetInner()
     return reinterpret_cast<int64_t>(this);
 }
 
+} // namespace UDMF
+} // namespace OHOS
 
-
-::ohos::data::unifiedDataChannel::TextInner CreateText()
+::taiheChannel::TextInner CreateText()
 {
-    return taihe::make_holder<TextInnerImpl, ::ohos::data::unifiedDataChannel::TextInner>();
+    return taihe::make_holder<OHOS::UDMF::TextInnerImpl, ::taiheChannel::TextInner>();
 }
 
 TH_EXPORT_CPP_API_CreateText(CreateText);

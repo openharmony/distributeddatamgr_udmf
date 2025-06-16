@@ -20,14 +20,15 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "file.h"
 
-namespace taiheUdmf = OHOS::UDMF;
-
+namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace OHOS {
+namespace UDMF {
 class FileInnerImpl {
 public:
     FileInnerImpl();
 
     ::taihe::string GetType();
-    ::ohos::data::unifiedDataChannel::ValueType GetValue();
+    taiheChannel::ValueType GetValue();
 
     ::taihe::string GetUri();
     void SetUri(::taihe::string_view uri);
@@ -35,7 +36,8 @@ public:
     void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::File> value_;
+    std::shared_ptr<File> value_;
 };
-
+} // namespace UDMF
+} // namespace OHOS
 #endif // UDMF_FILE_TAIHE_H

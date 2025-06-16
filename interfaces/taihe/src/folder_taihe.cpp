@@ -15,20 +15,21 @@
 
 #include "folder_taihe.h"
 #include "taihe_common_utils.h"
-
+namespace OHOS {
+namespace UDMF {
 FolderInnerImpl::FolderInnerImpl()
 {
-    this->value_ = std::make_shared<taiheUdmf::Folder>();
+    this->value_ = std::make_shared<Folder>();
 }
 
 ::taihe::string FolderInnerImpl::GetType()
 {
-    return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
+    return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType FolderInnerImpl::GetValue()
+::taiheChannel::ValueType FolderInnerImpl::GetValue()
 {
-    return taiheUdmf::ConvertValueType(this->value_->GetValue());
+    return ConvertValueType(this->value_->GetValue());
 }
 
 ::taihe::string FolderInnerImpl::GetUri()
@@ -45,7 +46,7 @@ void FolderInnerImpl::SetUri(::taihe::string_view uri)
 ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> FolderInnerImpl::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
-        taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
+        ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
 void FolderInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
@@ -53,7 +54,7 @@ void FolderInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::str
     if (details.size() == 0) {
         return;
     }
-    auto udmfDetails = taiheUdmf::ConvertUDDetails(details);
+    auto udmfDetails = ConvertUDDetails(details);
     this->value_->SetDetails(udmfDetails);
 }
 
@@ -72,10 +73,12 @@ int64_t FolderInnerImpl::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
+} // namespace UDMF
+} // namespace OHOS
 
-::ohos::data::unifiedDataChannel::FolderInner CreateUnifiedFolder()
+::taiheChannel::FolderInner CreateUnifiedFolder()
 {
-    return taihe::make_holder<FolderInnerImpl, ::ohos::data::unifiedDataChannel::FolderInner>();
+    return taihe::make_holder<OHOS::UDMF::FolderInnerImpl, ::taiheChannel::FolderInner>();
 }
 
 TH_EXPORT_CPP_API_CreateUnifiedFolder(CreateUnifiedFolder);

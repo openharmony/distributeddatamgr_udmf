@@ -20,17 +20,18 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "system_defined_form.h"
 
-namespace taiheUdmf = OHOS::UDMF;
-
+namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace OHOS {
+namespace UDMF {
 class SystemDefinedFormInnerImpl {
 public:
     SystemDefinedFormInnerImpl();
 
     ::taihe::string GetType();
-    ::ohos::data::unifiedDataChannel::ValueType GetValue();
+    taiheChannel::ValueType GetValue();
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> GetDetails();
-    void SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details);
+    ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> GetDetails();
+    void SetDetails(::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details);
     double GetFormId();
     void SetFormId(double formId);
     ::taihe::string GetFormName();
@@ -43,6 +44,8 @@ public:
     void SetModule(::taihe::string_view module);
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::SystemDefinedForm> value_;
+    std::shared_ptr<SystemDefinedForm> value_;
 };
+} // namespace UDMF
+} // namespace OHOS
 #endif // UDMF_SYSTEMDEFINEDFORM_H

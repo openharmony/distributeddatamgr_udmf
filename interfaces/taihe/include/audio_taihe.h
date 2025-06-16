@@ -20,14 +20,15 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "audio.h"
 
-namespace taiheUdmf = OHOS::UDMF;
-
+namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace OHOS {
+namespace UDMF {
 class AudioInnerImpl {
 public:
     AudioInnerImpl();
 
     ::taihe::string GetType();
-    ::ohos::data::unifiedDataChannel::ValueType GetValue();
+    taiheChannel::ValueType GetValue();
 
     ::taihe::string GetUri();
     void SetUri(::taihe::string_view uri);
@@ -37,6 +38,8 @@ public:
     void SetAudioUri(::taihe::string_view audioUri);
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::Audio> value_;
+    std::shared_ptr<Audio> value_;
 };
+} // namespace UDMF
+} // namespace OHOS
 #endif // UDMF_AUDIO_TAIHE_H

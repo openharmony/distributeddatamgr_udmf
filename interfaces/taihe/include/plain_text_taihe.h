@@ -20,20 +20,23 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "plain_text.h"
  
-namespace taiheUdmf = OHOS::UDMF;
-
+namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace OHOS {
+namespace UDMF {
 class PlainTextInnerImpl {
 public:
     PlainTextInnerImpl();
 
     ::taihe::string GetType();
-    ::ohos::data::unifiedDataChannel::ValueType GetValue();
+    ::taiheChannel::ValueType GetValue();
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
     void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
     void SetTextContent(::taihe::string_view textContent);
     ::taihe::string GetTextContent();
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::PlainText> value_;
+    std::shared_ptr<PlainText> value_;
 };
+} // namespace UDMF
+} // namespace OHOS
 #endif // UDMF_PLAIN_TEXT_TAIHE_H

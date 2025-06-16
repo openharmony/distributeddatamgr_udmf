@@ -24,12 +24,11 @@
 
 using namespace taihe;
 using namespace ohos::data::uniformTypeDescriptor;
-using namespace OHOS;
-using namespace OHOS::UDMF;
 
-namespace {
+namespace OHOS {
+namespace UDMF {
 
-::taihe::string getUniformDataTypeByFilenameExtension(::taihe::string_view filenameExtension,
+::taihe::string GetUniformDataTypeByFilenameExtension(::taihe::string_view filenameExtension,
     ::taihe::optional_view<::taihe::string> belongsTo)
 {
     std::string fileName(filenameExtension);
@@ -55,6 +54,7 @@ namespace {
     }
     return typeId;
 }
-}  // namespace
+} // namespace UDMF
+} // namespace OHOS
 
-TH_EXPORT_CPP_API_getUniformDataTypeByFilenameExtension(getUniformDataTypeByFilenameExtension);
+TH_EXPORT_CPP_API_getUniformDataTypeByFilenameExtension(OHOS::UDMF::GetUniformDataTypeByFilenameExtension);

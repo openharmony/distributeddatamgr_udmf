@@ -20,21 +20,24 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "system_defined_pixelmap.h"
 
-namespace taiheUdmf = OHOS::UDMF;
-
+namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace OHOS {
+namespace UDMF {
 class SystemDefinedPixelMapInnerImpl {
 public:
     SystemDefinedPixelMapInnerImpl();
 
     ::taihe::string GetType();
-    ::ohos::data::unifiedDataChannel::ValueType GetValue();
+    ::taiheChannel::ValueType GetValue();
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> GetDetails();
-    void SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details);
+    ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> GetDetails();
+    void SetDetails(::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details);
     ::taihe::optional<::taihe::array<uint8_t>> GetRawData();
     void SetRawData(::taihe::array_view<uint8_t> rawData);
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::SystemDefinedPixelMap> value_;
+    std::shared_ptr<SystemDefinedPixelMap> value_;
 };
+} // namespace UDMF
+} // namespace OHOS
 #endif // UDMF_SYSTEMDEFINEDPIXELMAP_H

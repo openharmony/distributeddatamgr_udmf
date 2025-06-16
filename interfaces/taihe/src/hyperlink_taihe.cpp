@@ -15,26 +15,27 @@
 
 #include "hyperlink_taihe.h"
 #include "taihe_common_utils.h"
-
+namespace OHOS {
+namespace UDMF {
 HyperlinkInnerImpl::HyperlinkInnerImpl()
 {
-    this->value_ = std::make_shared<taiheUdmf::Link>();
+    this->value_ = std::make_shared<Link>();
 }
 
 ::taihe::string HyperlinkInnerImpl::GetType()
 {
-    return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
+    return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType HyperlinkInnerImpl::GetValue()
+::taiheChannel::ValueType HyperlinkInnerImpl::GetValue()
 {
-    return taiheUdmf::ConvertValueType(this->value_->GetValue());
+    return ConvertValueType(this->value_->GetValue());
 }
 
 ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> HyperlinkInnerImpl::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
-        taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
+        ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
 void HyperlinkInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
@@ -42,7 +43,7 @@ void HyperlinkInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::
     if (details.size() == 0) {
         return;
     }
-    auto udmfDetails = taiheUdmf::ConvertUDDetails(details);
+    auto udmfDetails = ConvertUDDetails(details);
     this->value_->SetDetails(udmfDetails);
 }
 
@@ -72,10 +73,12 @@ int64_t HyperlinkInnerImpl::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
+} // namespace UDMF
+} // namespace OHOS
 
-::ohos::data::unifiedDataChannel::HyperlinkInner CreateHyperlink()
+::taiheChannel::HyperlinkInner CreateHyperlink()
 {
-    return taihe::make_holder<HyperlinkInnerImpl, ::ohos::data::unifiedDataChannel::HyperlinkInner>();
+    return taihe::make_holder<OHOS::UDMF::HyperlinkInnerImpl, ::taiheChannel::HyperlinkInner>();
 }
 
 TH_EXPORT_CPP_API_CreateHyperlink(CreateHyperlink);

@@ -20,22 +20,24 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "html.h"
 
-namespace taiheUdmf = OHOS::UDMF;
-
+namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace OHOS {
+namespace UDMF {
 class HTMLInnerImpl {
 public:
-  HTMLInnerImpl();
+    HTMLInnerImpl();
+    ::taihe::string GetType();
+    ::taiheChannel::ValueType GetValue();
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
+    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
+    void SetHtmlContent(::taihe::string_view htmlContent);
+    ::taihe::string GetHtmlContent();
+    void SetPlainContent(::taihe::string_view plainContent);
+    ::taihe::string GetPlainContent();
+    int64_t GetInner();
 
-  ::taihe::string GetType();
-  ::ohos::data::unifiedDataChannel::ValueType GetValue();
-  ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
-  void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
-  void SetHtmlContent(::taihe::string_view htmlContent);
-  ::taihe::string GetHtmlContent();
-  void SetPlainContent(::taihe::string_view plainContent);
-  ::taihe::string GetPlainContent();
-  int64_t GetInner();
-
-  std::shared_ptr<taiheUdmf::Html> value_;
+    std::shared_ptr<Html> value_;
 };
- #endif // UDMF_HTML_TAIHE_H
+} // namespace UDMF
+} // namespace OHOS
+#endif // UDMF_HTML_TAIHE_H

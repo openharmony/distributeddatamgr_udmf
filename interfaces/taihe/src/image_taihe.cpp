@@ -15,20 +15,21 @@
 
 #include "image_taihe.h"
 #include "taihe_common_utils.h"
-
+namespace OHOS {
+namespace UDMF {
 ImageInnerImpl::ImageInnerImpl()
 {
-    this->value_ = std::make_shared<taiheUdmf::Image>();
+    this->value_ = std::make_shared<Image>();
 }
 
 ::taihe::string ImageInnerImpl::GetType()
 {
-    return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
+    return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType ImageInnerImpl::GetValue()
+::taiheChannel::ValueType ImageInnerImpl::GetValue()
 {
-    return taiheUdmf::ConvertValueType(this->value_->GetValue());
+    return ConvertValueType(this->value_->GetValue());
 }
 
 ::taihe::string ImageInnerImpl::GetUri()
@@ -45,7 +46,7 @@ void ImageInnerImpl::SetUri(::taihe::string_view uri)
 ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> ImageInnerImpl::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
-        taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
+        ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
 void ImageInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
@@ -53,7 +54,7 @@ void ImageInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::stri
     if (details.size() == 0) {
         return;
     }
-    auto udmfDetails = taiheUdmf::ConvertUDDetails(details);
+    auto udmfDetails = ConvertUDDetails(details);
     this->value_->SetDetails(udmfDetails);
 }
 
@@ -72,10 +73,12 @@ int64_t ImageInnerImpl::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
+} // namespace UDMF
+} // namespace OHOS
 
-::ohos::data::unifiedDataChannel::ImageInner CreateUnifiedImage()
+::taiheChannel::ImageInner CreateUnifiedImage()
 {
-    return taihe::make_holder<ImageInnerImpl, ::ohos::data::unifiedDataChannel::ImageInner>();
+    return taihe::make_holder<OHOS::UDMF::ImageInnerImpl, ::taiheChannel::ImageInner>();
 }
 
 TH_EXPORT_CPP_API_CreateUnifiedImage(CreateUnifiedImage);

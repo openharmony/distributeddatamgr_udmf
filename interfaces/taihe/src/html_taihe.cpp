@@ -15,26 +15,27 @@
 
 #include "html_taihe.h"
 #include "taihe_common_utils.h"
-
+namespace OHOS {
+namespace UDMF {
 HTMLInnerImpl::HTMLInnerImpl()
 {
-    this->value_ = std::make_shared<taiheUdmf::Html>();
+    this->value_ = std::make_shared<Html>();
 }
 
 ::taihe::string HTMLInnerImpl::GetType()
 {
-    return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
+    return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType HTMLInnerImpl::GetValue()
+::taiheChannel::ValueType HTMLInnerImpl::GetValue()
 {
-    return taiheUdmf::ConvertValueType(this->value_->GetValue());
+    return ConvertValueType(this->value_->GetValue());
 }
 
 ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> HTMLInnerImpl::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
-        taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
+        ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
 void HTMLInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
@@ -42,7 +43,7 @@ void HTMLInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::strin
     if (details.size() == 0) {
         return;
     }
-    auto udmfDetails = taiheUdmf::ConvertUDDetails(details);
+    auto udmfDetails = ConvertUDDetails(details);
     this->value_->SetDetails(udmfDetails);
 }
 
@@ -72,10 +73,12 @@ int64_t HTMLInnerImpl::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
+} // namespace UDMF
+} // namespace OHOS
 
-::ohos::data::unifiedDataChannel::HTMLInner CreateHtml()
+::taiheChannel::HTMLInner CreateHtml()
 {
-    return taihe::make_holder<HTMLInnerImpl, ::ohos::data::unifiedDataChannel::HTMLInner>();
+    return taihe::make_holder<OHOS::UDMF::HTMLInnerImpl, ::taiheChannel::HTMLInner>();
 }
 
 TH_EXPORT_CPP_API_CreateHtml(CreateHtml);

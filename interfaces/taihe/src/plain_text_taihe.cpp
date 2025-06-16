@@ -15,26 +15,27 @@
 
 #include "plain_text_taihe.h"
 #include "taihe_common_utils.h"
-
+namespace OHOS {
+namespace UDMF {
 PlainTextInnerImpl::PlainTextInnerImpl()
 {
-    this->value_ = std::make_shared<taiheUdmf::PlainText>();
+    this->value_ = std::make_shared<PlainText>();
 }
 
 ::taihe::string PlainTextInnerImpl::GetType()
 {
-    return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
+    return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType PlainTextInnerImpl::GetValue()
+::taiheChannel::ValueType PlainTextInnerImpl::GetValue()
 {
-    return taiheUdmf::ConvertValueType(this->value_->GetValue());
+    return ConvertValueType(this->value_->GetValue());
 }
 
 ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> PlainTextInnerImpl::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
-        taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
+        ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
 void PlainTextInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
@@ -42,7 +43,7 @@ void PlainTextInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::
     if (details.size() == 0) {
         return;
     }
-    auto udmfDetails = taiheUdmf::ConvertUDDetails(details);
+    auto udmfDetails = ConvertUDDetails(details);
     this->value_->SetDetails(udmfDetails);
 }
 
@@ -61,12 +62,12 @@ int64_t PlainTextInnerImpl::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
+} // namespace UDMF
+} // namespace OHOS
 
-
-
-::ohos::data::unifiedDataChannel::PlainTextInner CreatePlainText()
+::taiheChannel::PlainTextInner CreatePlainText()
 {
-    return taihe::make_holder<PlainTextInnerImpl, ::ohos::data::unifiedDataChannel::PlainTextInner>();
+    return taihe::make_holder<OHOS::UDMF::PlainTextInnerImpl, ::taiheChannel::PlainTextInner>();
 }
 
 TH_EXPORT_CPP_API_CreatePlainText(CreatePlainText);

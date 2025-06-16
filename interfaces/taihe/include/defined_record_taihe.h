@@ -20,19 +20,22 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "system_defined_record.h"
 
-namespace taiheUdmf = OHOS::UDMF;
-
+namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace OHOS {
+namespace UDMF {
 class SystemDefinedRecordInnerImpl {
 public:
     SystemDefinedRecordInnerImpl();
 
     ::taihe::string GetType();
-    ::ohos::data::unifiedDataChannel::ValueType GetValue();
+    ::taiheChannel::ValueType GetValue();
 
-    ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>> GetDetails();
-    void SetDetails(::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details);
+    ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> GetDetails();
+    void SetDetails(::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details);
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::SystemDefinedRecord> value_;
+    std::shared_ptr<SystemDefinedRecord> value_;
 };
+} // namespace UDMF
+} // namespace OHOS
 #endif // UDMF_SYSTEMDEFINEDRECORD_H

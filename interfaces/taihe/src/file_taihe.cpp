@@ -15,20 +15,21 @@
 
 #include "file_taihe.h"
 #include "taihe_common_utils.h"
-
+namespace OHOS {
+namespace UDMF {
 FileInnerImpl::FileInnerImpl()
 {
-    this->value_ = std::make_shared<taiheUdmf::File>();
+    this->value_ = std::make_shared<File>();
 }
 
 ::taihe::string FileInnerImpl::GetType()
 {
-    return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
+    return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType FileInnerImpl::GetValue()
+::taiheChannel::ValueType FileInnerImpl::GetValue()
 {
-    return taiheUdmf::ConvertValueType(this->value_->GetValue());
+    return ConvertValueType(this->value_->GetValue());
 }
 
 ::taihe::string FileInnerImpl::GetUri()
@@ -45,7 +46,7 @@ void FileInnerImpl::SetUri(::taihe::string_view uri)
 ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> FileInnerImpl::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
-        taiheUdmf::ConvertUDDetailsToString(this->value_->GetDetails()));
+        ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
 void FileInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
@@ -53,7 +54,7 @@ void FileInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::strin
     if (details.size() == 0) {
         return;
     }
-    auto udmfDetails = taiheUdmf::ConvertUDDetails(details);
+    auto udmfDetails = ConvertUDDetails(details);
     this->value_->SetDetails(udmfDetails);
 }
 
@@ -61,10 +62,12 @@ int64_t FileInnerImpl::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
+} // namespace UDMF
+} // namespace OHOS
 
-::ohos::data::unifiedDataChannel::FileInner CreateUnifiedFile()
+::taiheChannel::FileInner CreateUnifiedFile()
 {
-    return taihe::make_holder<FileInnerImpl, ::ohos::data::unifiedDataChannel::FileInner>();
+    return taihe::make_holder<OHOS::UDMF::FileInnerImpl, ::taiheChannel::FileInner>();
 }
 
 TH_EXPORT_CPP_API_CreateUnifiedFile(CreateUnifiedFile);

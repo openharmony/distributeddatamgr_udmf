@@ -20,20 +20,23 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "unified_data.h"
 
-namespace taiheUdmf = OHOS::UDMF;
+namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace OHOS {
+namespace UDMF {
 class UnifiedDataImpl {
 public:
     UnifiedDataImpl();
 
-    void AddRecord(::ohos::data::unifiedDataChannel::AllRecords const& unifiedRecord);
+    void AddRecord(::taiheChannel::AllRecords const& unifiedRecord);
 
-    ::taihe::array<::ohos::data::unifiedDataChannel::AllRecords> GetRecords();
+    ::taihe::array<::taiheChannel::AllRecords> GetRecords();
 
-    ::ohos::data::unifiedDataChannel::AllRecords GetRecord(std::shared_ptr<taiheUdmf::UnifiedRecord> in);
+    ::taiheChannel::AllRecords GetRecord(std::shared_ptr<UnifiedRecord> in);
 
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::UnifiedData> value_;
+    std::shared_ptr<UnifiedData> value_;
 };
-
+} // namespace UDMF
+} // namespace OHOS
 #endif // UDMF_UNIFIED_DATA_TAIHE_H

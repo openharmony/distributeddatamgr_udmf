@@ -16,32 +16,34 @@
 #include "defined_appitem_taihe.h"
 #include "taihe_common_utils.h"
 
+namespace OHOS {
+namespace UDMF {
 SystemDefinedAppItemInnerImpl::SystemDefinedAppItemInnerImpl()
 {
-    this->value_ = std::make_shared<taiheUdmf::SystemDefinedAppItem>();
+    this->value_ = std::make_shared<SystemDefinedAppItem>();
 }
 
 ::taihe::string SystemDefinedAppItemInnerImpl::GetType()
 {
-    return ::taihe::string(taiheUdmf::UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
+    return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::ohos::data::unifiedDataChannel::ValueType SystemDefinedAppItemInnerImpl::GetValue()
+::taiheChannel::ValueType SystemDefinedAppItemInnerImpl::GetValue()
 {
-    return taiheUdmf::ConvertValueType(this->value_->GetValue());
+    return ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>>
+::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>>
     SystemDefinedAppItemInnerImpl::GetDetails()
 {
-    return ::taihe::optional<::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue>>::make(
-        taiheUdmf::ConvertUDDetailsToUnion(this->value_->GetDetails()));
+    return ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>>::make(
+        ConvertUDDetailsToUnion(this->value_->GetDetails()));
 }
 
 void SystemDefinedAppItemInnerImpl::SetDetails(
-    ::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> details)
+    ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details)
 {
-    taiheUdmf::UDDetails udmfDetails = taiheUdmf::ConvertUDDetailsToUnion(details);
+    UDDetails udmfDetails = ConvertUDDetailsToUnion(details);
     this->value_->SetDetails(udmfDetails);
 }
 
@@ -115,11 +117,13 @@ int64_t SystemDefinedAppItemInnerImpl::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
+} // namespace UDMF
+} // namespace OHOS
 
-::ohos::data::unifiedDataChannel::SystemDefinedAppItemInner CreateSystemDefinedAppItem()
+::taiheChannel::SystemDefinedAppItemInner CreateSystemDefinedAppItem()
 {
-    return taihe::make_holder<SystemDefinedAppItemInnerImpl,
-        ::ohos::data::unifiedDataChannel::SystemDefinedAppItemInner>();
+    return taihe::make_holder<OHOS::UDMF::SystemDefinedAppItemInnerImpl,
+        ::taiheChannel::SystemDefinedAppItemInner>();
 }
 
 TH_EXPORT_CPP_API_CreateSystemDefinedAppItem(CreateSystemDefinedAppItem);

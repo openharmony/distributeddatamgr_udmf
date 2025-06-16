@@ -20,14 +20,15 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "video.h"
 
-namespace taiheUdmf = OHOS::UDMF;
-
+namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace OHOS {
+namespace UDMF {
 class VideoInnerImpl {
 public:
     VideoInnerImpl();
 
     ::taihe::string GetType();
-    ::ohos::data::unifiedDataChannel::ValueType GetValue();
+    ::taiheChannel::ValueType GetValue();
 
     ::taihe::string GetUri();
     void SetUri(::taihe::string_view uri);
@@ -37,6 +38,8 @@ public:
     void SetVideoUri(::taihe::string_view videoUri);
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::Video> value_;
+    std::shared_ptr<Video> value_;
 };
+} // namespace UDMF
+} // namespace OHOS
 #endif // UDMF_VIDEO_TAIHE_H
