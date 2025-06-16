@@ -139,7 +139,6 @@ void UnifiedDataTaihe::AddRecord(::taiheChannel::AllRecords const& unifiedRecord
 ::taiheChannel::AllRecords UnifiedDataTaihe::GetRecord(std::shared_ptr<UnifiedRecord> in)
 {
     switch (in->GetType()) {
-
         case FILE: {
             auto fileTaihe = taihe::make_holder<FileTaihe, ::taiheChannel::FileInner>();
             auto fileTaihePtr = reinterpret_cast<FileTaihe*>(fileTaihe->GetInner());

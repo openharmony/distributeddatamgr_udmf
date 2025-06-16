@@ -33,8 +33,7 @@ SystemDefinedPixelMapTaihe::SystemDefinedPixelMapTaihe()
     return ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>>
-    SystemDefinedPixelMapTaihe::GetDetails()
+::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> SystemDefinedPixelMapTaihe::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>>::make(
         ConvertUDDetailsToUnion(this->value_->GetDetails()));

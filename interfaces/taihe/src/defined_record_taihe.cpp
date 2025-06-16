@@ -32,8 +32,7 @@ SystemDefinedRecordTaihe::SystemDefinedRecordTaihe()
     return ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>>
-    SystemDefinedRecordTaihe::GetDetails()
+::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> SystemDefinedRecordTaihe::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>>::make(
         ConvertUDDetailsToUnion(this->value_->GetDetails()));
