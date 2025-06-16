@@ -93,12 +93,9 @@ struct Options {
 }
 
 @class
-interface Summary {
-  @get("summary")
-  GetSummary(): @record Map<String, f64>;
-  @get("totalSize")
-  GetTotalSize(): f64;
-  GetInner(): i64;
+struct Summary {
+  summary: @record Map<String, f64>;
+  totalSize: f64;
 }
 
 @ctor("Summary")

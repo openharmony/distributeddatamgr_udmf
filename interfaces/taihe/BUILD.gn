@@ -79,7 +79,6 @@ taihe_shared_library("udmf_taihe_native") {
     "src/defined_record_taihe.cpp",
     "src/ohos.data.uniformTypeDescriptor.impl.cpp",
     "src/ohos.data.unifiedDataChannel.impl.cpp",
-    "src/summary_taihe.cpp",
     "src/taihe_common_utils.cpp",
     "src/udmf_ani_converter_utils.cpp",
     "src/unified_data_taihe.cpp",
