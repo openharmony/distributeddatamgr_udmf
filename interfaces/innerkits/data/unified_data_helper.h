@@ -39,6 +39,7 @@ private:
         Summary &summary, std::set<std::string> &fileTypes);
     static void ProcessTypeId(const ValueType &value, std::string &typeId);
     static std::string GetRootPath();
+    static bool FileClose(std::FILE *file, bool status);
 
 private:
     static std::string rootPath_;

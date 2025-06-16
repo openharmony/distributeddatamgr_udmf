@@ -3890,29 +3890,11 @@ HWTEST_F(UdmfClientTest, GetBundleNameByUdKey006, TestSize.Level1)
  */
 HWTEST_F(UdmfClientTest, ProcessDragIfInApp001, TestSize.Level1)
 {
-    ShareOptions shareOption = IN_APP;
     UnifiedData unifiedData;
     std::string intentionDrag = "drag";
     std::string key = "test";
 
-    auto ret = UdmfClient::GetInstance().ProcessDragIfInApp(shareOption, unifiedData, intentionDrag, key);
-    EXPECT_EQ(ret, Status::E_OK);
-}
-
-/**
- * @tc.name: ProcessDragIfInApp002
- * @tc.desc: test ProcessDragIfInApp with invalid shareOption
- * @tc.type: FUNC
- */
-HWTEST_F(UdmfClientTest, ProcessDragIfInApp002, TestSize.Level1)
-{
-    ShareOptions shareOption = CROSS_APP;
-    std::string intentionDrag = "drag";
-    UnifiedData unifiedData;
-    std::string key = "test";
-
-    auto ret = UdmfClient::GetInstance().ProcessDragIfInApp(shareOption, unifiedData, intentionDrag, key);
-    EXPECT_EQ(ret, Status::E_ERROR);
+    EXPECT_NO_FATAL_FAILURE(UdmfClient::GetInstance().ProcessDragIfInApp(unifiedData, intentionDrag, key));
 }
 
 /**

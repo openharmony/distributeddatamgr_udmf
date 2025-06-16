@@ -181,18 +181,12 @@ bool UnifiedDataHelper::SaveUDataToFile(const std::string &dataFile, UnifiedData
     }
     recordTlv.SetFile(file);
     UdmfConversion::InitValueObject(data);
-    if (!TLVUtil::Writing(data, recordTlv, TAG::TAG_UNIFIED_DATA)) {
+    bool status = TLVUtil::Writing(data, recordTlv, TAG::TAG_UNIFIED_DATA);
+    if (!status) {
         LOG_ERROR(UDMF_FRAMEWORK, "TLV Writing failed!");
-        if (fclose(file) == EOF) {
-            LOG_ERROR(UDMF_FRAMEWORK, "fclose is failed");
-        }
-        return false;
+        return FileClose(file, false);
     }
-    if (fclose(file) == EOF) {
-        LOG_ERROR(UDMF_FRAMEWORK, "fclose is failed");
-        return false;
-    }
-    return true;
+    return FileClose(file, true);
 }
 
 bool UnifiedDataHelper::LoadUDataFromFile(const std::string &dataFile, UnifiedData &data)
@@ -210,15 +204,26 @@ bool UnifiedDataHelper::LoadUDataFromFile(const std::string &dataFile, UnifiedDa
         return false;
     }
     recordTlv.SetFile(file);
-	
-    if (!TLVUtil::ReadTlv(data, recordTlv, TAG::TAG_UNIFIED_DATA)) {
+
+    bool status = TLVUtil::ReadTlv(data, recordTlv, TAG::TAG_UNIFIED_DATA);
+    if (!status) {
         LOG_ERROR(UDMF_FRAMEWORK, "TLV Reading failed!");
-        (void)fclose(file);
-        return false;
+        return FileClose(file, false);
     }
     UdmfConversion::ConvertRecordToSubclass(data);
-    (void)fclose(file);
-    return true;
+    return FileClose(file, true);
+}
+
+bool UnifiedDataHelper::FileClose(std::FILE *file, bool status)
+{
+    if (file == nullptr) {
+        return false;
+    }
+    if ((fclose(file) == EOF)) {
+        LOG_ERROR(UDMF_FRAMEWORK, "fclose is failed");
+        return false;
+    }
+    return status;
 }
 
 std::string UnifiedDataHelper::GetRootPath()
