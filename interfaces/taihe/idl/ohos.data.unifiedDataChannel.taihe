@@ -93,11 +93,15 @@ struct Options {
 }
 
 @class
-struct Summary {
-  summary: @record Map<String, f64>;
-  totalSize: f64;
+interface Summary {
+  @get("summary")
+  GetSummary(): @record Map<String, f64>;
+  @get("totalSize")
+  GetTotalSize(): f64;
+  GetInner(): i64;
 }
 
+@ctor("Summary")
 function CreateSummary(): Summary;
 
 struct ProgressInfo {
@@ -415,6 +419,9 @@ function QueryDataSync(options: Options): Array<UnifiedDataInner>;
 
 export class UnifiedData {
   inner: UnifiedDataInner;
+  getInner(): long {
+    return this.inner.getInner();
+  }
   constructor() {
     this.inner = CreateUnifiedData_inner();
   }
