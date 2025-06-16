@@ -20,10 +20,12 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "unified_types.h"
 
-namespace taiheUdmf = OHOS::UDMF;
-class SummaryImpl {
+namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace OHOS {
+namespace UDMF {
+class SummaryTaihe {
 public:
-    SummaryImpl();
+    SummaryTaihe();
 
     ::taihe::map<::taihe::string, double> GetSummary();
 
@@ -31,8 +33,9 @@ public:
 
     int64_t GetInner();
 
-    std::shared_ptr<taiheUdmf::Summary> value_;
+    std::shared_ptr<Summary> value_;
 };
-
+} // namespace UDMF
+} // namespace OHOS
 
 #endif // UDMF_SUMMARY_TAIHE_H

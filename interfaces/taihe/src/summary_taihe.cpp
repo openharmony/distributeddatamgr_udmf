@@ -15,12 +15,14 @@
 
 #include "summary_taihe.h"
 
-SummaryImpl::SummaryImpl()
+namespace OHOS {
+namespace UDMF {
+SummaryTaihe::SummaryTaihe()
 {
-    this->value_ = std::make_shared<taiheUdmf::Summary>();
+    this->value_ = std::make_shared<Summary>();
 }
 
-::taihe::map<::taihe::string, double> SummaryImpl::GetSummary()
+::taihe::map<::taihe::string, double> SummaryTaihe::GetSummary()
 {
     ::taihe::map<::taihe::string, double> summary;
     for (auto &item : this->value_->summary) {
@@ -29,19 +31,21 @@ SummaryImpl::SummaryImpl()
     return summary;
 }
 
-double SummaryImpl::GetTotalSize()
+double SummaryTaihe::GetTotalSize()
 {
     return this->value_->totalSize;
 }
 
-int64_t SummaryImpl::GetInner()
+int64_t SummaryTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
+} // namespace UDMF
+} // namespace OHOS
 
 ::ohos::data::unifiedDataChannel::Summary CreateSummary()
 {
-    return taihe::make_holder<SummaryImpl, ::ohos::data::unifiedDataChannel::Summary>();
+    return taihe::make_holder<OHOS::UDMF::SummaryTaihe, taiheChannel::Summary>();
 }
 
 TH_EXPORT_CPP_API_CreateSummary(CreateSummary);
