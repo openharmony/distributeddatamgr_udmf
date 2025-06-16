@@ -18,39 +18,39 @@
 
 namespace OHOS {
 namespace UDMF {
-AudioInnerImpl::AudioInnerImpl()
+AudioTaihe::AudioTaihe()
 {
     this->value_ = std::make_shared<Audio>();
 }
 
-::taihe::string AudioInnerImpl::GetType()
+::taihe::string AudioTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::taiheChannel::ValueType AudioInnerImpl::GetValue()
+::taiheChannel::ValueType AudioTaihe::GetValue()
 {
     return ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::string AudioInnerImpl::GetUri()
+::taihe::string AudioTaihe::GetUri()
 {
     return ::taihe::string(this->value_->GetUri());
 }
 
-void AudioInnerImpl::SetUri(::taihe::string_view uri)
+void AudioTaihe::SetUri(::taihe::string_view uri)
 {
     std::string uriStr(uri);
     this->value_->SetUri(uriStr);
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> AudioInnerImpl::GetDetails()
+::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> AudioTaihe::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void AudioInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void AudioTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
 {
     if (details.size() == 0) {
         return;
@@ -59,18 +59,18 @@ void AudioInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::stri
     this->value_->SetDetails(udmfDetails);
 }
 
-::taihe::string AudioInnerImpl::GetAudioUri()
+::taihe::string AudioTaihe::GetAudioUri()
 {
     return ::taihe::string(this->value_->GetUri());
 }
 
-void AudioInnerImpl::SetAudioUri(::taihe::string_view audioUri)
+void AudioTaihe::SetAudioUri(::taihe::string_view audioUri)
 {
     std::string audioUriStr(audioUri);
     this->value_->SetUri(audioUriStr);
 }
 
-int64_t AudioInnerImpl::GetInner()
+int64_t AudioTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
@@ -79,7 +79,7 @@ int64_t AudioInnerImpl::GetInner()
 
 ::taiheChannel::AudioInner CreateUnifiedAudio()
 {
-    return taihe::make_holder<OHOS::UDMF::AudioInnerImpl, ::taiheChannel::AudioInner>();
+    return taihe::make_holder<OHOS::UDMF::AudioTaihe, ::taiheChannel::AudioInner>();
 }
 
 TH_EXPORT_CPP_API_CreateUnifiedAudio(CreateUnifiedAudio);

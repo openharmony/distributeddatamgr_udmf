@@ -17,39 +17,39 @@
 #include "taihe_common_utils.h"
 namespace OHOS {
 namespace UDMF {
-FolderInnerImpl::FolderInnerImpl()
+FolderTaihe::FolderTaihe()
 {
     this->value_ = std::make_shared<Folder>();
 }
 
-::taihe::string FolderInnerImpl::GetType()
+::taihe::string FolderTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::taiheChannel::ValueType FolderInnerImpl::GetValue()
+::taiheChannel::ValueType FolderTaihe::GetValue()
 {
     return ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::string FolderInnerImpl::GetUri()
+::taihe::string FolderTaihe::GetUri()
 {
     return ::taihe::string(this->value_->GetUri());
 }
 
-void FolderInnerImpl::SetUri(::taihe::string_view uri)
+void FolderTaihe::SetUri(::taihe::string_view uri)
 {
     std::string uriStr(uri);
     this->value_->SetUri(uriStr);
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> FolderInnerImpl::GetDetails()
+::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> FolderTaihe::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void FolderInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void FolderTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
 {
     if (details.size() == 0) {
         return;
@@ -58,18 +58,18 @@ void FolderInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::str
     this->value_->SetDetails(udmfDetails);
 }
 
-::taihe::string FolderInnerImpl::GetFolderUri()
+::taihe::string FolderTaihe::GetFolderUri()
 {
     return ::taihe::string(this->value_->GetUri());
 }
 
-void FolderInnerImpl::SetFolderUri(::taihe::string_view folderUri)
+void FolderTaihe::SetFolderUri(::taihe::string_view folderUri)
 {
     std::string folderUriStr(folderUri);
     this->value_->SetUri(folderUriStr);
 }
 
-int64_t FolderInnerImpl::GetInner()
+int64_t FolderTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
@@ -78,7 +78,7 @@ int64_t FolderInnerImpl::GetInner()
 
 ::taiheChannel::FolderInner CreateUnifiedFolder()
 {
-    return taihe::make_holder<OHOS::UDMF::FolderInnerImpl, ::taiheChannel::FolderInner>();
+    return taihe::make_holder<OHOS::UDMF::FolderTaihe, ::taiheChannel::FolderInner>();
 }
 
 TH_EXPORT_CPP_API_CreateUnifiedFolder(CreateUnifiedFolder);

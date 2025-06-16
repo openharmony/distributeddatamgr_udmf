@@ -17,39 +17,39 @@
 #include "taihe_common_utils.h"
 namespace OHOS {
 namespace UDMF {
-ImageInnerImpl::ImageInnerImpl()
+ImageTaihe::ImageTaihe()
 {
     this->value_ = std::make_shared<Image>();
 }
 
-::taihe::string ImageInnerImpl::GetType()
+::taihe::string ImageTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::taiheChannel::ValueType ImageInnerImpl::GetValue()
+::taiheChannel::ValueType ImageTaihe::GetValue()
 {
     return ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::string ImageInnerImpl::GetUri()
+::taihe::string ImageTaihe::GetUri()
 {
     return ::taihe::string(this->value_->GetUri());
 }
 
-void ImageInnerImpl::SetUri(::taihe::string_view uri)
+void ImageTaihe::SetUri(::taihe::string_view uri)
 {
     std::string uriStr(uri);
     this->value_->SetUri(uriStr);
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> ImageInnerImpl::GetDetails()
+::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> ImageTaihe::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void ImageInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void ImageTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
 {
     if (details.size() == 0) {
         return;
@@ -58,18 +58,18 @@ void ImageInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::stri
     this->value_->SetDetails(udmfDetails);
 }
 
-::taihe::string ImageInnerImpl::GetImageUri()
+::taihe::string ImageTaihe::GetImageUri()
 {
     return ::taihe::string(this->value_->GetUri());
 }
 
-void ImageInnerImpl::SetImageUri(::taihe::string_view imageUri)
+void ImageTaihe::SetImageUri(::taihe::string_view imageUri)
 {
     std::string imageUriStr(imageUri);
     this->value_->SetUri(imageUriStr);
 }
 
-int64_t ImageInnerImpl::GetInner()
+int64_t ImageTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
@@ -78,7 +78,7 @@ int64_t ImageInnerImpl::GetInner()
 
 ::taiheChannel::ImageInner CreateUnifiedImage()
 {
-    return taihe::make_holder<OHOS::UDMF::ImageInnerImpl, ::taiheChannel::ImageInner>();
+    return taihe::make_holder<OHOS::UDMF::ImageTaihe, ::taiheChannel::ImageInner>();
 }
 
 TH_EXPORT_CPP_API_CreateUnifiedImage(CreateUnifiedImage);

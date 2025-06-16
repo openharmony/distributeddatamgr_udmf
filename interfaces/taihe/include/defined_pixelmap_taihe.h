@@ -23,9 +23,9 @@
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
 namespace UDMF {
-class SystemDefinedPixelMapInnerImpl {
+class SystemDefinedPixelMapTaihe {
 public:
-    SystemDefinedPixelMapInnerImpl();
+    SystemDefinedPixelMapTaihe();
 
     ::taihe::string GetType();
     ::taiheChannel::ValueType GetValue();

@@ -17,28 +17,28 @@
 #include "taihe_common_utils.h"
 namespace OHOS {
 namespace UDMF {
-PlainTextInnerImpl::PlainTextInnerImpl()
+PlainTextTaihe::PlainTextTaihe()
 {
     this->value_ = std::make_shared<PlainText>();
 }
 
-::taihe::string PlainTextInnerImpl::GetType()
+::taihe::string PlainTextTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::taiheChannel::ValueType PlainTextInnerImpl::GetValue()
+::taiheChannel::ValueType PlainTextTaihe::GetValue()
 {
     return ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> PlainTextInnerImpl::GetDetails()
+::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> PlainTextTaihe::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void PlainTextInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void PlainTextTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
 {
     if (details.size() == 0) {
         return;
@@ -47,18 +47,18 @@ void PlainTextInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::
     this->value_->SetDetails(udmfDetails);
 }
 
-void PlainTextInnerImpl::SetTextContent(::taihe::string_view textContent)
+void PlainTextTaihe::SetTextContent(::taihe::string_view textContent)
 {
     std::string content(textContent);
     this->value_->SetContent(content);
 }
 
-::taihe::string PlainTextInnerImpl::GetTextContent()
+::taihe::string PlainTextTaihe::GetTextContent()
 {
     return ::taihe::string(this->value_->GetContent());
 }
 
-int64_t PlainTextInnerImpl::GetInner()
+int64_t PlainTextTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
@@ -67,7 +67,7 @@ int64_t PlainTextInnerImpl::GetInner()
 
 ::taiheChannel::PlainTextInner CreatePlainText()
 {
-    return taihe::make_holder<OHOS::UDMF::PlainTextInnerImpl, ::taiheChannel::PlainTextInner>();
+    return taihe::make_holder<OHOS::UDMF::PlainTextTaihe, ::taiheChannel::PlainTextInner>();
 }
 
 TH_EXPORT_CPP_API_CreatePlainText(CreatePlainText);

@@ -17,36 +17,36 @@
 #include "taihe_common_utils.h"
 namespace OHOS {
 namespace UDMF {
-SystemDefinedRecordInnerImpl::SystemDefinedRecordInnerImpl()
+SystemDefinedRecordTaihe::SystemDefinedRecordTaihe()
 {
     this->value_ = std::make_shared<SystemDefinedRecord>();
 }
 
-::taihe::string SystemDefinedRecordInnerImpl::GetType()
+::taihe::string SystemDefinedRecordTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::taiheChannel::ValueType SystemDefinedRecordInnerImpl::GetValue()
+::taiheChannel::ValueType SystemDefinedRecordTaihe::GetValue()
 {
     return ConvertValueType(this->value_->GetValue());
 }
 
 ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>>
-    SystemDefinedRecordInnerImpl::GetDetails()
+    SystemDefinedRecordTaihe::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>>::make(
         ConvertUDDetailsToUnion(this->value_->GetDetails()));
 }
 
-void SystemDefinedRecordInnerImpl::SetDetails(
+void SystemDefinedRecordTaihe::SetDetails(
     ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details)
 {
     UDDetails udmfDetails = ConvertUDDetailsToUnion(details);
     this->value_->SetDetails(udmfDetails);
 }
 
-int64_t SystemDefinedRecordInnerImpl::GetInner()
+int64_t SystemDefinedRecordTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
@@ -55,7 +55,7 @@ int64_t SystemDefinedRecordInnerImpl::GetInner()
 
 ::taiheChannel::SystemDefinedRecordInner CreateSystemDefinedRecord()
 {
-    return taihe::make_holder<OHOS::UDMF::SystemDefinedRecordInnerImpl,
+    return taihe::make_holder<OHOS::UDMF::SystemDefinedRecordTaihe,
         ::taiheChannel::SystemDefinedRecordInner>();
 }
 

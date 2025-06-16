@@ -18,102 +18,102 @@
 
 namespace OHOS {
 namespace UDMF {
-SystemDefinedAppItemInnerImpl::SystemDefinedAppItemInnerImpl()
+SystemDefinedAppItemTaihe::SystemDefinedAppItemTaihe()
 {
     this->value_ = std::make_shared<SystemDefinedAppItem>();
 }
 
-::taihe::string SystemDefinedAppItemInnerImpl::GetType()
+::taihe::string SystemDefinedAppItemTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::taiheChannel::ValueType SystemDefinedAppItemInnerImpl::GetValue()
+::taiheChannel::ValueType SystemDefinedAppItemTaihe::GetValue()
 {
     return ConvertValueType(this->value_->GetValue());
 }
 
 ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>>
-    SystemDefinedAppItemInnerImpl::GetDetails()
+    SystemDefinedAppItemTaihe::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>>::make(
         ConvertUDDetailsToUnion(this->value_->GetDetails()));
 }
 
-void SystemDefinedAppItemInnerImpl::SetDetails(
+void SystemDefinedAppItemTaihe::SetDetails(
     ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details)
 {
     UDDetails udmfDetails = ConvertUDDetailsToUnion(details);
     this->value_->SetDetails(udmfDetails);
 }
 
-::taihe::string SystemDefinedAppItemInnerImpl::GetAppId()
+::taihe::string SystemDefinedAppItemTaihe::GetAppId()
 {
     return ::taihe::string(this->value_->GetAppId());
 }
 
-void SystemDefinedAppItemInnerImpl::SetAppId(::taihe::string_view appId)
+void SystemDefinedAppItemTaihe::SetAppId(::taihe::string_view appId)
 {
     std::string appIdStr(appId);
     this->value_->SetAppId(appIdStr);
 }
 
-::taihe::string SystemDefinedAppItemInnerImpl::GetAppName()
+::taihe::string SystemDefinedAppItemTaihe::GetAppName()
 {
     return ::taihe::string(this->value_->GetAppName());
 }
 
-void SystemDefinedAppItemInnerImpl::SetAppName(::taihe::string_view appName)
+void SystemDefinedAppItemTaihe::SetAppName(::taihe::string_view appName)
 {
     std::string appNameStr(appName);
     this->value_->SetAppName(appNameStr);
 }
 
-::taihe::string SystemDefinedAppItemInnerImpl::GetAppIconId()
+::taihe::string SystemDefinedAppItemTaihe::GetAppIconId()
 {
     return ::taihe::string(this->value_->GetAppIconId());
 }
 
-void SystemDefinedAppItemInnerImpl::SetAppIconId(::taihe::string_view appIconId)
+void SystemDefinedAppItemTaihe::SetAppIconId(::taihe::string_view appIconId)
 {
     std::string appIconIdStr(appIconId);
     this->value_->SetAppIconId(appIconIdStr);
 }
 
-::taihe::string SystemDefinedAppItemInnerImpl::GetAppLabelId()
+::taihe::string SystemDefinedAppItemTaihe::GetAppLabelId()
 {
     return ::taihe::string(this->value_->GetAppLabelId());
 }
 
-void SystemDefinedAppItemInnerImpl::SetAppLabelId(::taihe::string_view appLabelId)
+void SystemDefinedAppItemTaihe::SetAppLabelId(::taihe::string_view appLabelId)
 {
     std::string appLabelIdStr(appLabelId);
     this->value_->SetAppLabelId(appLabelIdStr);
 }
 
-::taihe::string SystemDefinedAppItemInnerImpl::GetBundleName()
+::taihe::string SystemDefinedAppItemTaihe::GetBundleName()
 {
     return ::taihe::string(this->value_->GetBundleName());
 }
 
-void SystemDefinedAppItemInnerImpl::SetBundleName(::taihe::string_view bundleName)
+void SystemDefinedAppItemTaihe::SetBundleName(::taihe::string_view bundleName)
 {
     std::string bundleNameStr(bundleName);
     this->value_->SetBundleName(bundleNameStr);
 }
 
-::taihe::string SystemDefinedAppItemInnerImpl::GetAbilityName()
+::taihe::string SystemDefinedAppItemTaihe::GetAbilityName()
 {
     return ::taihe::string(this->value_->GetAbilityName());
 }
 
-void SystemDefinedAppItemInnerImpl::SetAbilityName(::taihe::string_view abilityName)
+void SystemDefinedAppItemTaihe::SetAbilityName(::taihe::string_view abilityName)
 {
     std::string abilityNameStr(abilityName);
     this->value_->SetAbilityName(abilityNameStr);
 }
 
-int64_t SystemDefinedAppItemInnerImpl::GetInner()
+int64_t SystemDefinedAppItemTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
@@ -122,7 +122,7 @@ int64_t SystemDefinedAppItemInnerImpl::GetInner()
 
 ::taiheChannel::SystemDefinedAppItemInner CreateSystemDefinedAppItem()
 {
-    return taihe::make_holder<OHOS::UDMF::SystemDefinedAppItemInnerImpl,
+    return taihe::make_holder<OHOS::UDMF::SystemDefinedAppItemTaihe,
         ::taiheChannel::SystemDefinedAppItemInner>();
 }
 

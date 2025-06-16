@@ -23,9 +23,9 @@
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
 namespace UDMF {
-class UnifiedDataImpl {
+class UnifiedDataTaihe {
 public:
-    UnifiedDataImpl();
+    UnifiedDataTaihe();
 
     void AddRecord(::taiheChannel::AllRecords const& unifiedRecord);
 

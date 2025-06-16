@@ -23,11 +23,11 @@
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
 namespace UDMF {
-class UnifiedRecordInnerImpl {
+class UnifiedRecordTaihe {
 public:
-    UnifiedRecordInnerImpl();
+    UnifiedRecordTaihe();
 
-    UnifiedRecordInnerImpl(::taihe::string_view type, ::taiheChannel::ValueType const& value);
+    UnifiedRecordTaihe(::taihe::string_view type, ::taiheChannel::ValueType const& value);
 
     ::taihe::string GetType();
 

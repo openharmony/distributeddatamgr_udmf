@@ -34,89 +34,89 @@
 
 namespace OHOS {
 namespace UDMF {
-UnifiedDataImpl::UnifiedDataImpl()
+UnifiedDataTaihe::UnifiedDataTaihe()
 {
     this->value_ = std::make_shared<UnifiedData>();
 }
 
-void UnifiedDataImpl::AddRecord(::taiheChannel::AllRecords const& unifiedRecord)
+void UnifiedDataTaihe::AddRecord(::taiheChannel::AllRecords const& unifiedRecord)
 {
     switch (unifiedRecord.get_tag()) {
         case ::taiheChannel::AllRecords::tag_t::unifiedRecord: {
-            auto unifiedRecordInnerImpl =
-                reinterpret_cast<UnifiedRecordInnerImpl*>(unifiedRecord.get_unifiedRecord_ref()->GetInner());
-            this->value_->AddRecord(unifiedRecordInnerImpl->value_);
+            auto inner =
+                reinterpret_cast<UnifiedRecordTaihe*>(unifiedRecord.get_unifiedRecord_ref()->GetInner());
+            this->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::file: {
-            auto fileInnerImpl = reinterpret_cast<FileInnerImpl*>(unifiedRecord.get_file_ref()->GetInner());
-            this->value_->AddRecord(fileInnerImpl->value_);
+            auto inner = reinterpret_cast<FileTaihe*>(unifiedRecord.get_file_ref()->GetInner());
+            this->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::folder: {
-            auto folderInnerImpl = reinterpret_cast<FolderInnerImpl*>(unifiedRecord.get_folder_ref()->GetInner());
-            this->value_->AddRecord(folderInnerImpl->value_);
+            auto inner = reinterpret_cast<FolderTaihe*>(unifiedRecord.get_folder_ref()->GetInner());
+            this->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::audio: {
-            auto audioInnerImpl = reinterpret_cast<AudioInnerImpl*>(unifiedRecord.get_audio_ref()->GetInner());
-            this->value_->AddRecord(audioInnerImpl->value_);
+            auto inner = reinterpret_cast<AudioTaihe*>(unifiedRecord.get_audio_ref()->GetInner());
+            this->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::video: {
-            auto videoInnerImpl = reinterpret_cast<VideoInnerImpl*>(unifiedRecord.get_video_ref()->GetInner());
-            this->value_->AddRecord(videoInnerImpl->value_);
+            auto inner = reinterpret_cast<VideoTaihe*>(unifiedRecord.get_video_ref()->GetInner());
+            this->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::image: {
-            auto imageInnerImpl = reinterpret_cast<ImageInnerImpl*>(unifiedRecord.get_image_ref()->GetInner());
-            this->value_->AddRecord(imageInnerImpl->value_);
+            auto inner = reinterpret_cast<ImageTaihe*>(unifiedRecord.get_image_ref()->GetInner());
+            this->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::text: {
-            auto textInnerImpl = reinterpret_cast<TextInnerImpl*>(unifiedRecord.get_text_ref()->GetInner());
-            this->value_->AddRecord(textInnerImpl->value_);
+            auto inner = reinterpret_cast<TextTaihe*>(unifiedRecord.get_text_ref()->GetInner());
+            this->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::plainText: {
-            auto plainTextInnerImpl =
-                reinterpret_cast<PlainTextInnerImpl*>(unifiedRecord.get_plainText_ref()->GetInner());
-            this->value_->AddRecord(plainTextInnerImpl->value_);
+            auto inner =
+                reinterpret_cast<PlainTextTaihe*>(unifiedRecord.get_plainText_ref()->GetInner());
+            this->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::html: {
-            auto htmlInnerImpl = reinterpret_cast<HTMLInnerImpl*>(unifiedRecord.get_html_ref()->GetInner());
-            this->value_->AddRecord(htmlInnerImpl->value_);
+            auto inner = reinterpret_cast<HtmlTaihe*>(unifiedRecord.get_html_ref()->GetInner());
+            this->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::hyperlink: {
-            auto hyperlinkInnerImpl =
-                reinterpret_cast<HyperlinkInnerImpl*>(unifiedRecord.get_hyperlink_ref()->GetInner());
-            this->value_->AddRecord(hyperlinkInnerImpl->value_);
+            auto inner =
+                reinterpret_cast<HyperlinkTaihe*>(unifiedRecord.get_hyperlink_ref()->GetInner());
+            this->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::systemDefinedRecord: {
-            auto systemDefinedRecordInnerImpl = reinterpret_cast<SystemDefinedRecordInnerImpl*>(
+            auto inner = reinterpret_cast<SystemDefinedRecordTaihe*>(
                 unifiedRecord.get_systemDefinedRecord_ref()->GetInner());
-            this->value_->AddRecord(systemDefinedRecordInnerImpl->value_);
+            this->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::systemDefinedForm: {
-            auto systemDefinedFormInnerImpl = reinterpret_cast<SystemDefinedFormInnerImpl*>(
+            auto inner = reinterpret_cast<SystemDefinedFormTaihe*>(
                 unifiedRecord.get_systemDefinedForm_ref()->GetInner());
-            this->value_->AddRecord(systemDefinedFormInnerImpl->value_);
+            this->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::systemDefinedAppItem: {
-            auto systemDefinedAppItemInnerImpl = reinterpret_cast<SystemDefinedAppItemInnerImpl*>(
+            auto inner = reinterpret_cast<SystemDefinedAppItemTaihe*>(
                 unifiedRecord.get_systemDefinedAppItem_ref()->GetInner());
-            this->value_->AddRecord(systemDefinedAppItemInnerImpl->value_);
+            this->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::systemDefinedPixelMap: {
-            auto systemDefinedPixelMapInnerImpl = reinterpret_cast<SystemDefinedPixelMapInnerImpl*>(
+            auto inner = reinterpret_cast<SystemDefinedPixelMapTaihe*>(
                 unifiedRecord.get_systemDefinedPixelMap_ref()->GetInner());
-            this->value_->AddRecord(systemDefinedPixelMapInnerImpl->value_);
+            this->value_->AddRecord(inner->value_);
             break;
         }
         default: {
@@ -126,7 +126,7 @@ void UnifiedDataImpl::AddRecord(::taiheChannel::AllRecords const& unifiedRecord)
     }
 }
 
-::taihe::array<::taiheChannel::AllRecords> UnifiedDataImpl::GetRecords()
+::taihe::array<::taiheChannel::AllRecords> UnifiedDataTaihe::GetRecords()
 {
     auto records = this->value_->GetRecords();
     std::vector<::taiheChannel::AllRecords> recordsImpls;
@@ -136,113 +136,113 @@ void UnifiedDataImpl::AddRecord(::taiheChannel::AllRecords const& unifiedRecord)
     return ::taihe::array<::taiheChannel::AllRecords>(recordsImpls);
 }
 
-::taiheChannel::AllRecords UnifiedDataImpl::GetRecord(std::shared_ptr<UnifiedRecord> in)
+::taiheChannel::AllRecords UnifiedDataTaihe::GetRecord(std::shared_ptr<UnifiedRecord> in)
 {
     switch (in->GetType()) {
 
         case FILE: {
-            auto fileInnerImpl = taihe::make_holder<FileInnerImpl, ::taiheChannel::FileInner>();
-            auto fileInnerImplPtr = reinterpret_cast<FileInnerImpl*>(fileInnerImpl->GetInner());
-            fileInnerImplPtr->value_ = std::static_pointer_cast<File>(in);
-            return ::taiheChannel::AllRecords::make_file(fileInnerImpl);
+            auto fileTaihe = taihe::make_holder<FileTaihe, ::taiheChannel::FileInner>();
+            auto fileTaihePtr = reinterpret_cast<FileTaihe*>(fileTaihe->GetInner());
+            fileTaihePtr->value_ = std::static_pointer_cast<File>(in);
+            return ::taiheChannel::AllRecords::make_file(fileTaihe);
         }
         case FOLDER: {
-            auto folderInnerImpl =
-                taihe::make_holder<FolderInnerImpl, ::taiheChannel::FolderInner>();
-            auto folderInnerImplPtr = reinterpret_cast<FolderInnerImpl*>(folderInnerImpl->GetInner());
-            folderInnerImplPtr->value_ = std::static_pointer_cast<Folder>(in);
-            return ::taiheChannel::AllRecords::make_folder(folderInnerImpl);
+            auto folderTaihe =
+                taihe::make_holder<FolderTaihe, ::taiheChannel::FolderInner>();
+            auto folderTaihePtr = reinterpret_cast<FolderTaihe*>(folderTaihe->GetInner());
+            folderTaihePtr->value_ = std::static_pointer_cast<Folder>(in);
+            return ::taiheChannel::AllRecords::make_folder(folderTaihe);
         }
         case AUDIO: {
-            auto audioInnerImpl = taihe::make_holder<AudioInnerImpl, ::taiheChannel::AudioInner>();
-            auto audioInnerImplPtr = reinterpret_cast<AudioInnerImpl*>(audioInnerImpl->GetInner());
-            audioInnerImplPtr->value_ = std::static_pointer_cast<Audio>(in);
-            return ::taiheChannel::AllRecords::make_audio(audioInnerImpl);
+            auto audioTaihe = taihe::make_holder<AudioTaihe, ::taiheChannel::AudioInner>();
+            auto audioTaihePtr = reinterpret_cast<AudioTaihe*>(audioTaihe->GetInner());
+            audioTaihePtr->value_ = std::static_pointer_cast<Audio>(in);
+            return ::taiheChannel::AllRecords::make_audio(audioTaihe);
         }
         case VIDEO: {
-            auto videoInnerImpl = taihe::make_holder<VideoInnerImpl, ::taiheChannel::VideoInner>();
-            auto videoInnerImplPtr = reinterpret_cast<VideoInnerImpl*>(videoInnerImpl->GetInner());
-            videoInnerImplPtr->value_ = std::static_pointer_cast<Video>(in);
-            return ::taiheChannel::AllRecords::make_video(videoInnerImpl);
+            auto videoTaihe = taihe::make_holder<VideoTaihe, ::taiheChannel::VideoInner>();
+            auto videoTaihePtr = reinterpret_cast<VideoTaihe*>(videoTaihe->GetInner());
+            videoTaihePtr->value_ = std::static_pointer_cast<Video>(in);
+            return ::taiheChannel::AllRecords::make_video(videoTaihe);
         }
         case IMAGE: {
-            auto imageInnerImpl = taihe::make_holder<ImageInnerImpl, ::taiheChannel::ImageInner>();
-            auto imageInnerImplPtr = reinterpret_cast<ImageInnerImpl*>(imageInnerImpl->GetInner());
-            imageInnerImplPtr->value_ = std::static_pointer_cast<Image>(in);
-            return ::taiheChannel::AllRecords::make_image(imageInnerImpl);
+            auto imageTaihe = taihe::make_holder<ImageTaihe, ::taiheChannel::ImageInner>();
+            auto imageTaihePtr = reinterpret_cast<ImageTaihe*>(imageTaihe->GetInner());
+            imageTaihePtr->value_ = std::static_pointer_cast<Image>(in);
+            return ::taiheChannel::AllRecords::make_image(imageTaihe);
         }
         case TEXT: {
-            auto textInnerImpl = taihe::make_holder<TextInnerImpl, ::taiheChannel::TextInner>();
-            auto textInnerImplPtr = reinterpret_cast<TextInnerImpl*>(textInnerImpl->GetInner());
-            textInnerImplPtr->value_ = std::static_pointer_cast<Text>(in);
-            return ::taiheChannel::AllRecords::make_text(textInnerImpl);
+            auto textTaihe = taihe::make_holder<TextTaihe, ::taiheChannel::TextInner>();
+            auto textTaihePtr = reinterpret_cast<TextTaihe*>(textTaihe->GetInner());
+            textTaihePtr->value_ = std::static_pointer_cast<Text>(in);
+            return ::taiheChannel::AllRecords::make_text(textTaihe);
         }
         case PLAIN_TEXT: {
-            auto plainTextInnerImpl =
-                taihe::make_holder<PlainTextInnerImpl, ::taiheChannel::PlainTextInner>();
-            auto plainTextInnerImplPtr = reinterpret_cast<PlainTextInnerImpl*>(plainTextInnerImpl->GetInner());
-            plainTextInnerImplPtr->value_ = std::static_pointer_cast<PlainText>(in);
-            return ::taiheChannel::AllRecords::make_plainText(plainTextInnerImpl);
+            auto plainTextTaihe =
+                taihe::make_holder<PlainTextTaihe, ::taiheChannel::PlainTextInner>();
+            auto plainTextTaihePtr = reinterpret_cast<PlainTextTaihe*>(plainTextTaihe->GetInner());
+            plainTextTaihePtr->value_ = std::static_pointer_cast<PlainText>(in);
+            return ::taiheChannel::AllRecords::make_plainText(plainTextTaihe);
         }
         case HTML: {
-            auto htmlInnerImpl = taihe::make_holder<HTMLInnerImpl, ::taiheChannel::HTMLInner>();
-            auto htmlInnerImplPtr = reinterpret_cast<HTMLInnerImpl*>(htmlInnerImpl->GetInner());
-            htmlInnerImplPtr->value_ = std::static_pointer_cast<Html>(in);
-            return ::taiheChannel::AllRecords::make_html(htmlInnerImpl);
+            auto htmlTaihe = taihe::make_holder<HtmlTaihe, ::taiheChannel::HTMLInner>();
+            auto htmlTaihePtr = reinterpret_cast<HtmlTaihe*>(htmlTaihe->GetInner());
+            htmlTaihePtr->value_ = std::static_pointer_cast<Html>(in);
+            return ::taiheChannel::AllRecords::make_html(htmlTaihe);
         }
         case HYPERLINK: {
-            auto hyperlinkInnerImpl =
-                taihe::make_holder<HyperlinkInnerImpl, ::taiheChannel::HyperlinkInner>();
-            auto hyperlinkInnerImplPtr = reinterpret_cast<HyperlinkInnerImpl*>(hyperlinkInnerImpl->GetInner());
-            hyperlinkInnerImplPtr->value_ = std::static_pointer_cast<Link>(in);
-            return ::taiheChannel::AllRecords::make_hyperlink(hyperlinkInnerImpl);
+            auto hyperlinkTaihe =
+                taihe::make_holder<HyperlinkTaihe, ::taiheChannel::HyperlinkInner>();
+            auto hyperlinkTaihePtr = reinterpret_cast<HyperlinkTaihe*>(hyperlinkTaihe->GetInner());
+            hyperlinkTaihePtr->value_ = std::static_pointer_cast<Link>(in);
+            return ::taiheChannel::AllRecords::make_hyperlink(hyperlinkTaihe);
         }
         case SYSTEM_DEFINED_RECORD: {
-            auto systemDefinedRecordInnerImpl = taihe::make_holder<SystemDefinedRecordInnerImpl,
+            auto systemDefinedRecordTaihe = taihe::make_holder<SystemDefinedRecordTaihe,
                 ::taiheChannel::SystemDefinedRecordInner>();
-            auto systemDefinedRecordInnerImplPtr =
-                reinterpret_cast<SystemDefinedRecordInnerImpl*>(systemDefinedRecordInnerImpl->GetInner());
-            systemDefinedRecordInnerImplPtr->value_ = std::static_pointer_cast<SystemDefinedRecord>(in);
-            return ::taiheChannel::AllRecords::make_systemDefinedRecord(systemDefinedRecordInnerImpl);
+            auto systemDefinedRecordTaihePtr =
+                reinterpret_cast<SystemDefinedRecordTaihe*>(systemDefinedRecordTaihe->GetInner());
+            systemDefinedRecordTaihePtr->value_ = std::static_pointer_cast<SystemDefinedRecord>(in);
+            return ::taiheChannel::AllRecords::make_systemDefinedRecord(systemDefinedRecordTaihe);
         }
         case SYSTEM_DEFINED_APP_ITEM: {
-            auto systemDefinedAppItemInnerImpl = taihe::make_holder<SystemDefinedAppItemInnerImpl,
+            auto systemDefinedAppItemTaihe = taihe::make_holder<SystemDefinedAppItemTaihe,
                 ::taiheChannel::SystemDefinedAppItemInner>();
-            auto systemDefinedAppItemInnerImplPtr =
-                reinterpret_cast<SystemDefinedAppItemInnerImpl*>(systemDefinedAppItemInnerImpl->GetInner());
-            systemDefinedAppItemInnerImplPtr->value_ = std::static_pointer_cast<SystemDefinedAppItem>(in);
+            auto systemDefinedAppItemTaihePtr =
+                reinterpret_cast<SystemDefinedAppItemTaihe*>(systemDefinedAppItemTaihe->GetInner());
+            systemDefinedAppItemTaihePtr->value_ = std::static_pointer_cast<SystemDefinedAppItem>(in);
             return ::taiheChannel::AllRecords::make_systemDefinedAppItem(
-                systemDefinedAppItemInnerImpl);
+                systemDefinedAppItemTaihe);
         }
         case SYSTEM_DEFINED_FORM: {
-            auto systemDefinedFormInnerImpl =
-                taihe::make_holder<SystemDefinedFormInnerImpl,
+            auto systemDefinedFormTaihe =
+                taihe::make_holder<SystemDefinedFormTaihe,
                 ::taiheChannel::SystemDefinedFormInner>();
-            auto systemDefinedFormInnerImplPtr =
-                reinterpret_cast<SystemDefinedFormInnerImpl*>(systemDefinedFormInnerImpl->GetInner());
-            systemDefinedFormInnerImplPtr->value_ = std::static_pointer_cast<SystemDefinedForm>(in);
-            return ::taiheChannel::AllRecords::make_systemDefinedForm(systemDefinedFormInnerImpl);
+            auto systemDefinedFormTaihePtr =
+                reinterpret_cast<SystemDefinedFormTaihe*>(systemDefinedFormTaihe->GetInner());
+            systemDefinedFormTaihePtr->value_ = std::static_pointer_cast<SystemDefinedForm>(in);
+            return ::taiheChannel::AllRecords::make_systemDefinedForm(systemDefinedFormTaihe);
         }
         case SYSTEM_DEFINED_PIXEL_MAP: {
-            auto systemDefinedPixelMapInnerImpl = taihe::make_holder<SystemDefinedPixelMapInnerImpl,
+            auto systemDefinedPixelMapTaihe = taihe::make_holder<SystemDefinedPixelMapTaihe,
                 ::taiheChannel::SystemDefinedPixelMapInner>();
-            auto systemDefinedPixelMapInnerImplPtr =
-                reinterpret_cast<SystemDefinedPixelMapInnerImpl*>(systemDefinedPixelMapInnerImpl->GetInner());
-            systemDefinedPixelMapInnerImplPtr->value_ =
+            auto systemDefinedPixelMapTaihePtr =
+                reinterpret_cast<SystemDefinedPixelMapTaihe*>(systemDefinedPixelMapTaihe->GetInner());
+            systemDefinedPixelMapTaihePtr->value_ =
                 std::static_pointer_cast<SystemDefinedPixelMap>(in);
             return ::taiheChannel::AllRecords::make_systemDefinedPixelMap(
-                systemDefinedPixelMapInnerImpl);
+                systemDefinedPixelMapTaihe);
         }
         default:
-            auto recordImpl = taihe::make_holder<UnifiedRecordInnerImpl,
+            auto recordImpl = taihe::make_holder<UnifiedRecordTaihe,
                 ::taiheChannel::UnifiedRecordInner>();
-            auto recordImplPtr = reinterpret_cast<UnifiedRecordInnerImpl*>(recordImpl->GetInner());
+            auto recordImplPtr = reinterpret_cast<UnifiedRecordTaihe*>(recordImpl->GetInner());
             recordImplPtr->value_ = std::static_pointer_cast<UnifiedRecord>(in);
             return ::taiheChannel::AllRecords::make_unifiedRecord(recordImpl);
     }
 }
 
-int64_t UnifiedDataImpl::GetInner()
+int64_t UnifiedDataTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
@@ -251,90 +251,90 @@ int64_t UnifiedDataImpl::GetInner()
 
 ::taiheChannel::UnifiedDataInner CreateUnifiedData()
 {
-    return taihe::make_holder<OHOS::UDMF::UnifiedDataImpl, ::taiheChannel::UnifiedDataInner>();
+    return taihe::make_holder<OHOS::UDMF::UnifiedDataTaihe, ::taiheChannel::UnifiedDataInner>();
 }
 
 ::taiheChannel::UnifiedDataInner CreateUnifiedDataWithParams(
     ::taiheChannel::AllRecords const& unifiedRecord)
 {
-    auto unifiedData = taihe::make_holder<OHOS::UDMF::UnifiedDataImpl, ::taiheChannel::UnifiedDataInner>();
-    auto unifiedDataImpl = reinterpret_cast<OHOS::UDMF::UnifiedDataImpl*>(unifiedData->GetInner());
+    auto unifiedData = taihe::make_holder<OHOS::UDMF::UnifiedDataTaihe, ::taiheChannel::UnifiedDataInner>();
+    auto unifiedDataImpl = reinterpret_cast<OHOS::UDMF::UnifiedDataTaihe*>(unifiedData->GetInner());
     switch (unifiedRecord.get_tag()) {
         case ::taiheChannel::AllRecords::tag_t::unifiedRecord: {
-            auto unifiedRecordInnerImpl = reinterpret_cast<OHOS::UDMF::UnifiedRecordInnerImpl*>(
+            auto inner = reinterpret_cast<OHOS::UDMF::UnifiedRecordTaihe*>(
                 unifiedRecord.get_unifiedRecord_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(unifiedRecordInnerImpl->value_);
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::file: {
-            auto fileInnerImpl = reinterpret_cast<OHOS::UDMF::FileInnerImpl*>(unifiedRecord.get_file_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(fileInnerImpl->value_);
+            auto inner = reinterpret_cast<OHOS::UDMF::FileTaihe*>(unifiedRecord.get_file_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::folder: {
-            auto folderInnerImpl = reinterpret_cast<OHOS::UDMF::FolderInnerImpl*>(unifiedRecord.get_folder_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(folderInnerImpl->value_);
+            auto inner = reinterpret_cast<OHOS::UDMF::FolderTaihe*>(unifiedRecord.get_folder_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::audio: {
-            auto audioInnerImpl = reinterpret_cast<OHOS::UDMF::AudioInnerImpl*>(unifiedRecord.get_audio_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(audioInnerImpl->value_);
+            auto inner = reinterpret_cast<OHOS::UDMF::AudioTaihe*>(unifiedRecord.get_audio_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::video: {
-            auto videoInnerImpl = reinterpret_cast<OHOS::UDMF::VideoInnerImpl*>(unifiedRecord.get_video_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(videoInnerImpl->value_);
+            auto inner = reinterpret_cast<OHOS::UDMF::VideoTaihe*>(unifiedRecord.get_video_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::image: {
-            auto imageInnerImpl = reinterpret_cast<OHOS::UDMF::ImageInnerImpl*>(unifiedRecord.get_image_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(imageInnerImpl->value_);
+            auto inner = reinterpret_cast<OHOS::UDMF::ImageTaihe*>(unifiedRecord.get_image_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::text: {
-            auto textInnerImpl = reinterpret_cast<OHOS::UDMF::TextInnerImpl*>(unifiedRecord.get_text_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(textInnerImpl->value_);
+            auto inner = reinterpret_cast<OHOS::UDMF::TextTaihe*>(unifiedRecord.get_text_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::plainText: {
-            auto plainTextInnerImpl = reinterpret_cast<OHOS::UDMF::PlainTextInnerImpl*>(
+            auto inner = reinterpret_cast<OHOS::UDMF::PlainTextTaihe*>(
                 unifiedRecord.get_plainText_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(plainTextInnerImpl->value_);
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::html: {
-            auto htmlInnerImpl = reinterpret_cast<OHOS::UDMF::HTMLInnerImpl*>(unifiedRecord.get_html_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(htmlInnerImpl->value_);
+            auto inner = reinterpret_cast<OHOS::UDMF::HtmlTaihe*>(unifiedRecord.get_html_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::hyperlink: {
-            auto hyperlinkInnerImpl = reinterpret_cast<OHOS::UDMF::HyperlinkInnerImpl*>(
+            auto inner = reinterpret_cast<OHOS::UDMF::HyperlinkTaihe*>(
                 unifiedRecord.get_hyperlink_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(hyperlinkInnerImpl->value_);
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::systemDefinedRecord: {
-            auto systemDefinedRecordInnerImpl = reinterpret_cast<OHOS::UDMF::SystemDefinedRecordInnerImpl*>(
+            auto inner = reinterpret_cast<OHOS::UDMF::SystemDefinedRecordTaihe*>(
                 unifiedRecord.get_systemDefinedRecord_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(systemDefinedRecordInnerImpl->value_);
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::systemDefinedForm: {
-            auto systemDefinedFormImplInner = reinterpret_cast<OHOS::UDMF::SystemDefinedFormInnerImpl*>(
+            auto inner = reinterpret_cast<OHOS::UDMF::SystemDefinedFormTaihe*>(
                 unifiedRecord.get_systemDefinedForm_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(systemDefinedFormImplInner->value_);
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::systemDefinedAppItem: {
-            auto systemDefinedAppItemInnerImpl = reinterpret_cast<OHOS::UDMF::SystemDefinedAppItemInnerImpl*>(
+            auto inner = reinterpret_cast<OHOS::UDMF::SystemDefinedAppItemTaihe*>(
                 unifiedRecord.get_systemDefinedAppItem_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(systemDefinedAppItemInnerImpl->value_);
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
         case ::taiheChannel::AllRecords::tag_t::systemDefinedPixelMap: {
-            auto systemDefinedPixelMapInnerImpl = reinterpret_cast<OHOS::UDMF::SystemDefinedPixelMapInnerImpl*>(
+            auto inner = reinterpret_cast<OHOS::UDMF::SystemDefinedPixelMapTaihe*>(
                 unifiedRecord.get_systemDefinedPixelMap_ref()->GetInner());
-            unifiedDataImpl->value_->AddRecord(systemDefinedPixelMapInnerImpl->value_);
+            unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }
     }

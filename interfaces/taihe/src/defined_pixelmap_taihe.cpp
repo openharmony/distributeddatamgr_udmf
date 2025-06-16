@@ -18,43 +18,43 @@
 
 namespace OHOS {
 namespace UDMF {
-SystemDefinedPixelMapInnerImpl::SystemDefinedPixelMapInnerImpl()
+SystemDefinedPixelMapTaihe::SystemDefinedPixelMapTaihe()
 {
     this->value_ = std::make_shared<SystemDefinedPixelMap>();
 }
 
-::taihe::string SystemDefinedPixelMapInnerImpl::GetType()
+::taihe::string SystemDefinedPixelMapTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::taiheChannel::ValueType SystemDefinedPixelMapInnerImpl::GetValue()
+::taiheChannel::ValueType SystemDefinedPixelMapTaihe::GetValue()
 {
     return ConvertValueType(this->value_->GetValue());
 }
 
 ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>>
-    SystemDefinedPixelMapInnerImpl::GetDetails()
+    SystemDefinedPixelMapTaihe::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>>::make(
         ConvertUDDetailsToUnion(this->value_->GetDetails()));
 }
 
-void SystemDefinedPixelMapInnerImpl::SetDetails(
+void SystemDefinedPixelMapTaihe::SetDetails(
     ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details)
 {
     UDDetails udmfDetails = ConvertUDDetailsToUnion(details);
     this->value_->SetDetails(udmfDetails);
 }
 
-::taihe::optional<::taihe::array<uint8_t>> SystemDefinedPixelMapInnerImpl::GetRawData()
+::taihe::optional<::taihe::array<uint8_t>> SystemDefinedPixelMapTaihe::GetRawData()
 {
     auto rawData = this->value_->GetRawData();
     return ::taihe::optional<::taihe::array<uint8_t>>::make(
         ::taihe::array<uint8_t>(rawData));
 }
 
-void SystemDefinedPixelMapInnerImpl::SetRawData(::taihe::array_view<uint8_t> rawData)
+void SystemDefinedPixelMapTaihe::SetRawData(::taihe::array_view<uint8_t> rawData)
 {
     if (rawData.size() == 0) {
         return;
@@ -63,7 +63,7 @@ void SystemDefinedPixelMapInnerImpl::SetRawData(::taihe::array_view<uint8_t> raw
     this->value_->SetRawData(rawDataVec);
 }
 
-int64_t SystemDefinedPixelMapInnerImpl::GetInner()
+int64_t SystemDefinedPixelMapTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
@@ -72,7 +72,7 @@ int64_t SystemDefinedPixelMapInnerImpl::GetInner()
 
 ::taiheChannel::SystemDefinedPixelMapInner CreateSystemDefinedPixelMap()
 {
-    return taihe::make_holder<OHOS::UDMF::SystemDefinedPixelMapInnerImpl,
+    return taihe::make_holder<OHOS::UDMF::SystemDefinedPixelMapTaihe,
         ::taiheChannel::SystemDefinedPixelMapInner>();
 }
 

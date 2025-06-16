@@ -17,28 +17,28 @@
 #include "taihe_common_utils.h"
 namespace OHOS {
 namespace UDMF {
-HTMLInnerImpl::HTMLInnerImpl()
+HtmlTaihe::HtmlTaihe()
 {
     this->value_ = std::make_shared<Html>();
 }
 
-::taihe::string HTMLInnerImpl::GetType()
+::taihe::string HtmlTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::taiheChannel::ValueType HTMLInnerImpl::GetValue()
+::taiheChannel::ValueType HtmlTaihe::GetValue()
 {
     return ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> HTMLInnerImpl::GetDetails()
+::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> HtmlTaihe::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void HTMLInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void HtmlTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
 {
     if (details.size() == 0) {
         return;
@@ -47,29 +47,29 @@ void HTMLInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::strin
     this->value_->SetDetails(udmfDetails);
 }
 
-void HTMLInnerImpl::SetHtmlContent(::taihe::string_view htmlContent)
+void HtmlTaihe::SetHtmlContent(::taihe::string_view htmlContent)
 {
     std::string content(htmlContent);
     this->value_->SetHtmlContent(content);
 }
 
-::taihe::string HTMLInnerImpl::GetHtmlContent()
+::taihe::string HtmlTaihe::GetHtmlContent()
 {
     return ::taihe::string(this->value_->GetHtmlContent());
 }
 
-void HTMLInnerImpl::SetPlainContent(::taihe::string_view plainContent)
+void HtmlTaihe::SetPlainContent(::taihe::string_view plainContent)
 {
     std::string content(plainContent);
     this->value_->SetPlainContent(content);
 }
 
-::taihe::string HTMLInnerImpl::GetPlainContent()
+::taihe::string HtmlTaihe::GetPlainContent()
 {
     return ::taihe::string(this->value_->GetPlainContent());
 }
 
-int64_t HTMLInnerImpl::GetInner()
+int64_t HtmlTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
@@ -78,7 +78,7 @@ int64_t HTMLInnerImpl::GetInner()
 
 ::taiheChannel::HTMLInner CreateHtml()
 {
-    return taihe::make_holder<OHOS::UDMF::HTMLInnerImpl, ::taiheChannel::HTMLInner>();
+    return taihe::make_holder<OHOS::UDMF::HtmlTaihe, ::taiheChannel::HTMLInner>();
 }
 
 TH_EXPORT_CPP_API_CreateHtml(CreateHtml);

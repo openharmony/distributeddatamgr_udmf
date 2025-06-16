@@ -23,9 +23,9 @@
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
 namespace UDMF {
-class SystemDefinedRecordInnerImpl {
+class SystemDefinedRecordTaihe {
 public:
-    SystemDefinedRecordInnerImpl();
+    SystemDefinedRecordTaihe();
 
     ::taihe::string GetType();
     ::taiheChannel::ValueType GetValue();

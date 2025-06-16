@@ -18,89 +18,89 @@
 
 namespace OHOS {
 namespace UDMF {
-SystemDefinedFormInnerImpl::SystemDefinedFormInnerImpl()
+SystemDefinedFormTaihe::SystemDefinedFormTaihe()
 {
     this->value_ = std::make_shared<SystemDefinedForm>();
 }
 
-::taihe::string SystemDefinedFormInnerImpl::GetType()
+::taihe::string SystemDefinedFormTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::taiheChannel::ValueType SystemDefinedFormInnerImpl::GetValue()
+::taiheChannel::ValueType SystemDefinedFormTaihe::GetValue()
 {
     return ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> SystemDefinedFormInnerImpl::GetDetails()
+::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> SystemDefinedFormTaihe::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>>::make(
         ConvertUDDetailsToUnion(this->value_->GetDetails()));
 }
 
-void SystemDefinedFormInnerImpl::SetDetails(
+void SystemDefinedFormTaihe::SetDetails(
     ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details)
 {
     UDDetails udmfDetails = ConvertUDDetailsToUnion(details);
     this->value_->SetDetails(udmfDetails);
 }
 
-double SystemDefinedFormInnerImpl::GetFormId()
+double SystemDefinedFormTaihe::GetFormId()
 {
     return this->value_->GetFormId();
 }
 
-void SystemDefinedFormInnerImpl::SetFormId(double formId)
+void SystemDefinedFormTaihe::SetFormId(double formId)
 {
     this->value_->SetFormId(formId);
 }
 
-::taihe::string SystemDefinedFormInnerImpl::GetFormName()
+::taihe::string SystemDefinedFormTaihe::GetFormName()
 {
     return ::taihe::string(this->value_->GetFormName());
 }
 
-void SystemDefinedFormInnerImpl::SetFormName(::taihe::string_view formName)
+void SystemDefinedFormTaihe::SetFormName(::taihe::string_view formName)
 {
     std::string name(formName);
     this->value_->SetFormName(name);
 }
 
-::taihe::string SystemDefinedFormInnerImpl::GetBundleName()
+::taihe::string SystemDefinedFormTaihe::GetBundleName()
 {
     return ::taihe::string(this->value_->GetBundleName());
 }
 
-void SystemDefinedFormInnerImpl::SetBundleName(::taihe::string_view bundleName)
+void SystemDefinedFormTaihe::SetBundleName(::taihe::string_view bundleName)
 {
     std::string name(bundleName);
     this->value_->SetBundleName(name);
 }
 
-::taihe::string SystemDefinedFormInnerImpl::GetAbilityName()
+::taihe::string SystemDefinedFormTaihe::GetAbilityName()
 {
     return ::taihe::string(this->value_->GetAbilityName());
 }
 
-void SystemDefinedFormInnerImpl::SetAbilityName(::taihe::string_view abilityName)
+void SystemDefinedFormTaihe::SetAbilityName(::taihe::string_view abilityName)
 {
     std::string name(abilityName);
     this->value_->SetAbilityName(name);
 }
 
-::taihe::string SystemDefinedFormInnerImpl::GetModule()
+::taihe::string SystemDefinedFormTaihe::GetModule()
 {
     return ::taihe::string(this->value_->GetModule());
 }
 
-void SystemDefinedFormInnerImpl::SetModule(::taihe::string_view module)
+void SystemDefinedFormTaihe::SetModule(::taihe::string_view module)
 {
     std::string mudule(module);
     this->value_->SetModule(mudule);
 }
 
-int64_t SystemDefinedFormInnerImpl::GetInner()
+int64_t SystemDefinedFormTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
@@ -109,7 +109,7 @@ int64_t SystemDefinedFormInnerImpl::GetInner()
 
 ::taiheChannel::SystemDefinedFormInner CreateSystemDefinedForm()
 {
-    return taihe::make_holder<OHOS::UDMF::SystemDefinedFormInnerImpl, ::taiheChannel::SystemDefinedFormInner>();
+    return taihe::make_holder<OHOS::UDMF::SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>();
 }
 
 TH_EXPORT_CPP_API_CreateSystemDefinedForm(CreateSystemDefinedForm);

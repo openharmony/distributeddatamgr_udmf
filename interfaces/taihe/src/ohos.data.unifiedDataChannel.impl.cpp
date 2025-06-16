@@ -46,7 +46,7 @@ namespace taiheChannel = ohos::data::unifiedDataChannel;
     }
     
     customOption.intention = ConvertIntention(options.intention.value());
-    auto unifiedDataImpl = reinterpret_cast<OHOS::UDMF::UnifiedDataImpl*>(data->GetInner());
+    auto unifiedDataImpl = reinterpret_cast<OHOS::UDMF::UnifiedDataTaihe*>(data->GetInner());
     auto unifiedData = unifiedDataImpl->value_;
     std::string key;
     auto status = UdmfClient::GetInstance().SetData(customOption, *unifiedData, key);
@@ -79,8 +79,8 @@ namespace taiheChannel = ohos::data::unifiedDataChannel;
         return ::taihe::array<::taiheChannel::UnifiedDataInner>(dataImpls);
     }
     for (auto &data : unifiedDataSet) {
-        auto dataImpl = taihe::make_holder<OHOS::UDMF::UnifiedDataImpl, ::taiheChannel::UnifiedDataInner>();
-        auto dataImplPtr = reinterpret_cast<OHOS::UDMF::UnifiedDataImpl*>(dataImpl->GetInner());
+        auto dataImpl = taihe::make_holder<OHOS::UDMF::UnifiedDataTaihe, ::taiheChannel::UnifiedDataInner>();
+        auto dataImplPtr = reinterpret_cast<OHOS::UDMF::UnifiedDataTaihe*>(dataImpl->GetInner());
         dataImplPtr->value_ = std::make_shared<UnifiedData>(data);
         dataImpls.push_back(dataImpl);
     }

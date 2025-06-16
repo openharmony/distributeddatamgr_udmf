@@ -17,39 +17,39 @@
 #include "taihe_common_utils.h"
 namespace OHOS {
 namespace UDMF {
-VideoInnerImpl::VideoInnerImpl()
+VideoTaihe::VideoTaihe()
 {
     this->value_ = std::make_shared<Video>();
 }
 
-::taihe::string VideoInnerImpl::GetType()
+::taihe::string VideoTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::taiheChannel::ValueType VideoInnerImpl::GetValue()
+::taiheChannel::ValueType VideoTaihe::GetValue()
 {
     return ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::string VideoInnerImpl::GetUri()
+::taihe::string VideoTaihe::GetUri()
 {
     return ::taihe::string(this->value_->GetUri());
 }
 
-void VideoInnerImpl::SetUri(::taihe::string_view uri)
+void VideoTaihe::SetUri(::taihe::string_view uri)
 {
     std::string uriStr(uri);
     this->value_->SetUri(uriStr);
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> VideoInnerImpl::GetDetails()
+::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> VideoTaihe::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void VideoInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void VideoTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
 {
     if (details.size() == 0) {
         return;
@@ -58,18 +58,18 @@ void VideoInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::stri
     this->value_->SetDetails(udmfDetails);
 }
 
-::taihe::string VideoInnerImpl::GetVideoUri()
+::taihe::string VideoTaihe::GetVideoUri()
 {
     return ::taihe::string(this->value_->GetUri());
 }
 
-void VideoInnerImpl::SetVideoUri(::taihe::string_view videoUri)
+void VideoTaihe::SetVideoUri(::taihe::string_view videoUri)
 {
     std::string videoUriStr(videoUri);
     this->value_->SetUri(videoUriStr);
 }
 
-int64_t VideoInnerImpl::GetInner()
+int64_t VideoTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
@@ -78,7 +78,7 @@ int64_t VideoInnerImpl::GetInner()
 
 ::taiheChannel::VideoInner CreateUnifiedVideo()
 {
-    return taihe::make_holder<OHOS::UDMF::VideoInnerImpl, ::taiheChannel::VideoInner>();
+    return taihe::make_holder<OHOS::UDMF::VideoTaihe, ::taiheChannel::VideoInner>();
 }
 
 TH_EXPORT_CPP_API_CreateUnifiedVideo(CreateUnifiedVideo);

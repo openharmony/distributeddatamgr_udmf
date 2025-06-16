@@ -24,9 +24,9 @@ namespace taiheChannel = ohos::data::unifiedDataChannel;
 
 namespace OHOS {
 namespace UDMF {
-class SystemDefinedAppItemInnerImpl {
+class SystemDefinedAppItemTaihe {
 public:
-    SystemDefinedAppItemInnerImpl();
+    SystemDefinedAppItemTaihe();
     ::taihe::string GetType();
     taiheChannel::ValueType GetValue();
     ::taihe::optional<::taihe::map<::taihe::string, taiheChannel::DetailsValue>> GetDetails();

@@ -30,12 +30,12 @@
 #include "application_defined_record.h"
 namespace OHOS {
 namespace UDMF {
-UnifiedRecordInnerImpl::UnifiedRecordInnerImpl()
+UnifiedRecordTaihe::UnifiedRecordTaihe()
 {
     this->value_ = std::make_shared<UnifiedRecord>();
 }
 
-UnifiedRecordInnerImpl::UnifiedRecordInnerImpl(::taihe::string_view type,
+UnifiedRecordTaihe::UnifiedRecordTaihe(::taihe::string_view type,
     ::taiheChannel::ValueType const& value)
 {
     ValueType valueType = ConvertValueType(::taihe::get_env(), type, value);
@@ -45,38 +45,24 @@ UnifiedRecordInnerImpl::UnifiedRecordInnerImpl(::taihe::string_view type,
     }
     std::map<UDType, std::function<std::shared_ptr<UnifiedRecord>(
         UDType, ValueType)>> constructors = {
-        {TEXT, [](UDType type, ValueType value)
-            { return std::make_shared<Text>(type, value); }},
-        {PLAIN_TEXT, [](UDType type, ValueType value)
-            { return std::make_shared<PlainText>(type, value); }},
-        {HTML, [](UDType type, ValueType value)
-            { return std::make_shared<Html>(type, value); }},
-        {HYPERLINK, [](UDType type, ValueType value)
-            { return std::make_shared<Link>(type, value); }},
-        {FILE, [](UDType type, ValueType value)
-            { return std::make_shared<File>(type, value); }},
-        {IMAGE, [](UDType type, ValueType value)
-            { return std::make_shared<Image>(type, value); }},
-        {VIDEO, [](UDType type, ValueType value)
-            { return std::make_shared<Video>(type, value); }},
-        {AUDIO, [](UDType type, ValueType value)
-            { return std::make_shared<Audio>(type, value); }},
-        {FOLDER, [](UDType type, ValueType value)
-            { return std::make_shared<Folder>(type, value); }},
-        {SYSTEM_DEFINED_RECORD,
-            [](UDType type, ValueType value)
+        {TEXT, [](UDType type, ValueType value) { return std::make_shared<Text>(type, value); }},
+        {PLAIN_TEXT, [](UDType type, ValueType value) { return std::make_shared<PlainText>(type, value); }},
+        {HTML, [](UDType type, ValueType value) { return std::make_shared<Html>(type, value); }},
+        {HYPERLINK, [](UDType type, ValueType value) { return std::make_shared<Link>(type, value); }},
+        {FILE, [](UDType type, ValueType value) { return std::make_shared<File>(type, value); }},
+        {IMAGE, [](UDType type, ValueType value) { return std::make_shared<Image>(type, value); }},
+        {VIDEO, [](UDType type, ValueType value) { return std::make_shared<Video>(type, value); }},
+        {AUDIO, [](UDType type, ValueType value) { return std::make_shared<Audio>(type, value); }},
+        {FOLDER, [](UDType type, ValueType value) { return std::make_shared<Folder>(type, value); }},
+        {SYSTEM_DEFINED_RECORD, [](UDType type, ValueType value)
             { return std::make_shared<SystemDefinedRecord>(type, value); }},
-        {SYSTEM_DEFINED_APP_ITEM,
-            [](UDType type, ValueType value)
+        {SYSTEM_DEFINED_APP_ITEM, [](UDType type, ValueType value)
             { return std::make_shared<SystemDefinedAppItem>(type, value); }},
-        {SYSTEM_DEFINED_FORM,
-            [](UDType type, ValueType value)
+        {SYSTEM_DEFINED_FORM, [](UDType type, ValueType value)
             { return std::make_shared<SystemDefinedForm>(type, value); }},
-        {SYSTEM_DEFINED_PIXEL_MAP,
-            [](UDType type, ValueType value)
+        {SYSTEM_DEFINED_PIXEL_MAP, [](UDType type, ValueType value)
             { return std::make_shared<SystemDefinedPixelMap>(type, value); }},
-        {APPLICATION_DEFINED_RECORD,
-            [](UDType type, ValueType value)
+        {APPLICATION_DEFINED_RECORD, [](UDType type, ValueType value)
             { return std::make_shared<ApplicationDefinedRecord>(type, value); }},
     };
     if (utdType == FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(valueType)) {
@@ -96,17 +82,17 @@ UnifiedRecordInnerImpl::UnifiedRecordInnerImpl(::taihe::string_view type,
     this->value_ = uRecord;
 }
 
-::taihe::string UnifiedRecordInnerImpl::GetType()
+::taihe::string UnifiedRecordTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::taiheChannel::ValueType UnifiedRecordInnerImpl::GetValue()
+::taiheChannel::ValueType UnifiedRecordTaihe::GetValue()
 {
     return ConvertValueType(this->value_->GetValue());
 }
 
-int64_t UnifiedRecordInnerImpl::GetInner()
+int64_t UnifiedRecordTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
@@ -116,13 +102,13 @@ int64_t UnifiedRecordInnerImpl::GetInner()
 
 ::taiheChannel::UnifiedRecordInner CreateUnifiedRecord()
 {
-    return taihe::make_holder<OHOS::UDMF::UnifiedRecordInnerImpl, ::taiheChannel::UnifiedRecordInner>();
+    return taihe::make_holder<OHOS::UDMF::UnifiedRecordTaihe, ::taiheChannel::UnifiedRecordInner>();
 }
 
 ::taiheChannel::UnifiedRecordInner CreateUnifiedRecordWithParams(::taihe::string_view type,
     ::taiheChannel::ValueType const& value)
 {
-    return taihe::make_holder<OHOS::UDMF::UnifiedRecordInnerImpl,
+    return taihe::make_holder<OHOS::UDMF::UnifiedRecordTaihe,
         ::taiheChannel::UnifiedRecordInner>(type, value);
 }
 

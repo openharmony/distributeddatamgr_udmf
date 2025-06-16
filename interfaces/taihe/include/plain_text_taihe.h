@@ -23,9 +23,9 @@
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
 namespace UDMF {
-class PlainTextInnerImpl {
+class PlainTextTaihe {
 public:
-    PlainTextInnerImpl();
+    PlainTextTaihe();
 
     ::taihe::string GetType();
     ::taiheChannel::ValueType GetValue();

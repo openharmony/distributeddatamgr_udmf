@@ -17,39 +17,39 @@
 #include "taihe_common_utils.h"
 namespace OHOS {
 namespace UDMF {
-FileInnerImpl::FileInnerImpl()
+FileTaihe::FileTaihe()
 {
     this->value_ = std::make_shared<File>();
 }
 
-::taihe::string FileInnerImpl::GetType()
+::taihe::string FileTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
 }
 
-::taiheChannel::ValueType FileInnerImpl::GetValue()
+::taiheChannel::ValueType FileTaihe::GetValue()
 {
     return ConvertValueType(this->value_->GetValue());
 }
 
-::taihe::string FileInnerImpl::GetUri()
+::taihe::string FileTaihe::GetUri()
 {
     return ::taihe::string(this->value_->GetUri());
 }
 
-void FileInnerImpl::SetUri(::taihe::string_view uri)
+void FileTaihe::SetUri(::taihe::string_view uri)
 {
     std::string uriStr(uri);
     this->value_->SetUri(uriStr);
 }
 
-::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> FileInnerImpl::GetDetails()
+::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> FileTaihe::GetDetails()
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void FileInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void FileTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
 {
     if (details.size() == 0) {
         return;
@@ -58,7 +58,7 @@ void FileInnerImpl::SetDetails(::taihe::map_view<::taihe::string, ::taihe::strin
     this->value_->SetDetails(udmfDetails);
 }
 
-int64_t FileInnerImpl::GetInner()
+int64_t FileTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
@@ -67,7 +67,7 @@ int64_t FileInnerImpl::GetInner()
 
 ::taiheChannel::FileInner CreateUnifiedFile()
 {
-    return taihe::make_holder<OHOS::UDMF::FileInnerImpl, ::taiheChannel::FileInner>();
+    return taihe::make_holder<OHOS::UDMF::FileTaihe, ::taiheChannel::FileInner>();
 }
 
 TH_EXPORT_CPP_API_CreateUnifiedFile(CreateUnifiedFile);
