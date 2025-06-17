@@ -352,4 +352,56 @@ HWTEST_F(UdmfClientHapPermissionTest, RemoveAppShareOption002, TestSize.Level1)
     EXPECT_EQ(status, E_NOT_FOUND);
     LOG_INFO(UDMF_TEST, "RemoveAppShareOption002 end.");
 }
+
+/**
+* @tc.name: SetAppShareOption005
+* @tc.desc: SetAppShareOption CROSS_APP, set data success when CROSS_APP
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientHapPermissionTest, SetAppShareOption005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetAppShareOption005 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    auto text1 = std::make_shared<Text>();
+    data.AddRecord(text1);
+    std::string key;
+    std::string intention = "drag";
+    ShareOptions shareOption = CROSS_APP;
+    SetHapToken2();
+    Status status = UdmfClient::GetInstance().SetAppShareOption(intention, shareOption);
+    EXPECT_EQ(status, E_OK);
+    status = UdmfClient::GetInstance().SetData(option, data, key);
+    EXPECT_EQ(status, E_OK);
+
+    LOG_INFO(UDMF_TEST, "SetAppShareOption005 end.");
+}
+
+/**
+* @tc.name: SetAppShareOption006
+* @tc.desc: SetAppShareOption IN_APP, set data success when IN_APP
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientHapPermissionTest, SetAppShareOption006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetAppShareOption006 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    auto text1 = std::make_shared<Text>();
+    data.AddRecord(text1);
+    std::string key;
+    std::string intention = "drag";
+    ShareOptions shareOption = IN_APP;
+    SetHapToken2();
+    Status status = UdmfClient::GetInstance().RemoveAppShareOption(intention);
+    EXPECT_EQ(status, E_OK);
+    status = UdmfClient::GetInstance().SetAppShareOption(intention, shareOption);
+    EXPECT_EQ(status, E_OK);
+    status = UdmfClient::GetInstance().SetData(option, data, key);
+    EXPECT_EQ(status, E_OK);
+
+    LOG_INFO(UDMF_TEST, "SetAppShareOption006 end.");
+}
 } // OHOS::Test

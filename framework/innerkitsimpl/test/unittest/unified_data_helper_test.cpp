@@ -21,6 +21,7 @@
 #include "logger.h"
 #include "udmf_capi_common.h"
 #include "unified_data_helper.h"
+#include "file_uri.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
@@ -163,5 +164,38 @@ HWTEST_F(UnifiedDataHelperTest, GetRootPath001, TestSize.Level1)
     std::string ret = unifiedDataHelper.GetRootPath();
     EXPECT_EQ(ret, TEMP_UNIFIED_DATA_ROOT_PATH);
     LOG_INFO(UDMF_TEST, "GetRootPath001 end.");
+}
+
+/**
+* @tc.name: FileClose001
+* @tc.desc: Abnormal testcase of FileClose, the file is null
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, FileClose001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FileClose001 begin.");
+    UnifiedDataHelper unifiedDataHelper;
+    const std::string dataFile;
+    AppFileService::ModuleFileUri::FileUri fileUri(dataFile);
+    std::string path = fileUri.GetRealPath();
+    std::FILE *file = fopen(path.c_str(), "r");
+    bool status = unifiedDataHelper.FileClose(file, true);
+    EXPECT_FALSE(status);
+    LOG_INFO(UDMF_TEST, "FileClose001 end.");
+}
+
+/**
+* @tc.name: FileClose002
+* @tc.desc: Abnormal testcase of FileClose, file is nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, FileClose002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "FileClose002 begin.");
+    UnifiedDataHelper unifiedDataHelper;
+    std::FILE *file = nullptr;
+    bool status = unifiedDataHelper.FileClose(file, true);
+    EXPECT_FALSE(status);
+    LOG_INFO(UDMF_TEST, "FileClose002 end.");
 }
 } // OHOS::Test

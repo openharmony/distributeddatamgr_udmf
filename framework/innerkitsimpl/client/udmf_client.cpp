@@ -41,21 +41,16 @@ UdmfClient &UdmfClient::GetInstance()
     return instance;
 }
 
-Status UdmfClient::ProcessDragIfInApp(ShareOptions &shareOption, UnifiedData &unifiedData, std::string &intentionDrag,
-    std::string &key)
+void UdmfClient::ProcessDragIfInApp(UnifiedData &unifiedData, std::string &intentionDrag, std::string &key)
 {
-    if (shareOption == ShareOptions::IN_APP) {
-        std::string bundleName = BUNDLE_IN_APP;
-        UnifiedKey udKey = UnifiedKey(intentionDrag, bundleName, UTILS::GenerateId());
-        key = udKey.GetUnifiedKey();
-        dataCache_.Clear();
-        dataCache_.Insert(key, unifiedData);
-        LOG_INFO(UDMF_CLIENT, "SetData in app success, bundleName:%{public}s.", bundleName.c_str());
-        RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
-            BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::SUCCESS, BizState::DFX_END);
-        return E_OK;
-    }
-    return E_ERROR;
+    std::string bundleName = BUNDLE_IN_APP;
+    UnifiedKey udKey = UnifiedKey(intentionDrag, bundleName, UTILS::GenerateId());
+    key = udKey.GetUnifiedKey();
+    dataCache_.Clear();
+    dataCache_.Insert(key, unifiedData);
+    LOG_INFO(UDMF_CLIENT, "SetData in app success, bundleName:%{public}s.", bundleName.c_str());
+    RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
+        BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::SUCCESS, BizState::DFX_END);
 }
 
 Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
@@ -87,10 +82,9 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
             LOG_ERROR(UDMF_CLIENT, "get appShareOption fail, intention:%{public}s", intentionDrag.c_str());
             return static_cast<Status>(status);
         }
-        auto statusInApp = ProcessDragIfInApp(shareOption, unifiedData, intentionDrag, key);
-        if (statusInApp == E_OK) {
-            LOG_INFO(UDMF_CLIENT, "SetData in app success.");
-            return statusInApp;
+        if (shareOption == ShareOptions::IN_APP) {
+            ProcessDragIfInApp(unifiedData, intentionDrag, key);
+            return E_OK;
         }
         if (unifiedData.HasType(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML))) {
             UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(unifiedData);
