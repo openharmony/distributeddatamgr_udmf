@@ -136,6 +136,22 @@ HWTEST_F(UnifiedDataHelperTest, SaveUDataToFile001, TestSize.Level1)
 }
 
 /**
+* @tc.name: SaveUDataToFile002
+* @tc.desc: Normal testcase of SaveUDataToFile
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, SaveUDataToFile002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SaveUDataToFile002 begin.");
+    const std::string dataFile = "data/test";
+    UnifiedData data;
+    UnifiedDataHelper unifiedDataHelper;
+    bool ret = unifiedDataHelper.SaveUDataToFile(dataFile, data);
+    EXPECT_TRUE(ret);
+    LOG_INFO(UDMF_TEST, "SaveUDataToFile002 end.");
+}
+
+/**
 * @tc.name: LoadUDataFromFile001
 * @tc.desc: Abnormal testcase of LoadUDataFromFile, the data is nullptr
 * @tc.type: FUNC
@@ -149,6 +165,22 @@ HWTEST_F(UnifiedDataHelperTest, LoadUDataFromFile001, TestSize.Level1)
     bool ret = unifiedDataHelper.LoadUDataFromFile(dataFile, data);
     EXPECT_FALSE(ret);
     LOG_INFO(UDMF_TEST, "LoadUDataFromFile001 end.");
+}
+
+/**
+* @tc.name: LoadUDataFromFile002
+* @tc.desc: Abnormal testcase of LoadUDataFromFile, the data is nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, LoadUDataFromFile002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "LoadUDataFromFile002 begin.");
+    const std::string dataFile = "data/test";
+    UnifiedData data;
+    UnifiedDataHelper unifiedDataHelper;
+    bool ret = unifiedDataHelper.LoadUDataFromFile(dataFile, data);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "LoadUDataFromFile002 end.");
 }
 
 /**
@@ -175,12 +207,12 @@ HWTEST_F(UnifiedDataHelperTest, FileClose001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "FileClose001 begin.");
     UnifiedDataHelper unifiedDataHelper;
-    const std::string dataFile;
+    const std::string dataFile = "data/test";
     AppFileService::ModuleFileUri::FileUri fileUri(dataFile);
     std::string path = fileUri.GetRealPath();
     std::FILE *file = fopen(path.c_str(), "r");
     bool status = unifiedDataHelper.FileClose(file, true);
-    EXPECT_FALSE(status);
+    EXPECT_TRUE(status);
     LOG_INFO(UDMF_TEST, "FileClose001 end.");
 }
 
