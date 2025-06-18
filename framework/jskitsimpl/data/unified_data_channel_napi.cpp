@@ -119,7 +119,8 @@ napi_value UnifiedDataChannelNapi::InsertData(napi_env env, napi_callback_info i
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
             "Parameter error: parameter data type must be UnifiedData");
         ctxt->status = GetOptionalProperty(env, argv[0], "visibility", visibility);
-        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok &&
+            (UnifiedDataUtils::IsPersist(visibility)),
             E_INVALID_PARAMETERS, "Parameter error: parameter options visibility type must correspond to Visibility");
     };
     ctxt->GetCbInfo(env, info, input);
