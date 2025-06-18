@@ -15,6 +15,8 @@
 #define LOG_TAG "UtdClient"
 #include <regex>
 #include <thread>
+#include <chrono>
+#include <cinttypes>
 #include "utd_client.h"
 #include "logger.h"
 #include "utd_graph.h"
@@ -27,6 +29,9 @@ namespace UDMF {
 constexpr const int MAX_UTD_LENGTH = 256;
 constexpr const int MAX_FILE_EXTENSION_LENGTH = 14;
 constexpr const char *DEFAULT_ANONYMOUS = "******";
+constexpr const int64_t RELOAD_INTERVAL = 10;
+using namespace std::chrono;
+
 std::string UtdClient::Anonymous(const std::string &fileExtension)
 {
     if (fileExtension.length() <= MAX_FILE_EXTENSION_LENGTH) {
@@ -64,19 +69,24 @@ bool UtdClient::Init()
     bool result = true;
     std::unique_lock<std::shared_mutex> lock(utdMutex_);
     descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
-    std::vector<TypeDescriptorCfg> customTypes;
-    if (IsHapTokenType()) {
-        customTypes = CustomUtdStore::GetInstance().GetHapTypeCfgs();
-    } else {
-        int32_t userId = DEFAULT_USER_ID;
-        if (GetCurrentActiveUserId(userId) != Status::E_OK) {
-            result = false;
-        }
-        customTypes = CustomUtdStore::GetInstance().GetTypeCfgs(userId);
+    int32_t userId = DEFAULT_USER_ID;
+    bool isHap = IsHapTokenType();
+    if (!isHap && GetCurrentActiveUserId(userId) != Status::E_OK) {
+        result = false;
     }
-    LOG_INFO(UDMF_CLIENT, "get customUtd, size:%{public}zu", customTypes.size());
-    if (!customTypes.empty()) {
-        descriptorCfgs_.insert(descriptorCfgs_.end(), customTypes.begin(), customTypes.end());
+
+    std::vector<TypeDescriptorCfg> customUtd;
+    {
+        std::lock_guard<std::mutex> lock(customUtdMutex_);
+        utdFileInfo_ = CustomUtdStore::GetInstance().GetCustomUtdInfo(isHap, userId);
+        customUtd = CustomUtdStore::GetInstance().GetCustomUtd(isHap, userId);
+        lastLoadTime_ = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+    }
+
+    LOG_INFO(UDMF_CLIENT, "get customUtd size:%{public}zu, file size:%{public}" PRIu64,
+        customUtd.size(), utdFileInfo_.size);
+    if (!customUtd.empty()) {
+        descriptorCfgs_.insert(descriptorCfgs_.end(), customUtd.begin(), customUtd.end());
     }
     UtdGraph::GetInstance().InitUtdGraph(descriptorCfgs_);
     return result;
@@ -97,6 +107,9 @@ Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<T
     if (typeId.find(FLEXIBLE_TYPE_FLAG) != typeId.npos) {
         LOG_DEBUG(UDMF_CLIENT, "get flexible descriptor. %{public}s ", typeId.c_str());
         return GetFlexibleTypeDescriptor(typeId, descriptor);
+    }
+    if (TryReloadCustomUtd()) {
+        return GetTypeDescriptor(typeId, descriptor);
     }
     return Status::E_OK;
 }
@@ -146,6 +159,9 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. fileExtension:%{public}s, belongsTo:%{public}s ",
                   fileExtension.c_str(), belongsTo.c_str());
+        if (TryReloadCustomUtd()) {
+            return GetUniformDataTypeByFilenameExtension(fileExtension, typeId, belongsTo);
+        }
         return Status::E_INVALID_PARAMETERS;
     }
     {
@@ -165,12 +181,14 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
             }
         }
     }
+    if (typeId.empty() && TryReloadCustomUtd()) {
+        return GetUniformDataTypeByFilenameExtension(fileExtension, typeId, belongsTo);
+    }
     // the find typeId is not belongsTo to the belongsTo.
     if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
         !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
         typeId = "";
     }
-
     if (typeId.empty()) {
         if (!IsValidFileExtension(lowerFileExtension)) {
             LOG_ERROR(UDMF_CLIENT, "invalid fileExtension. fileExtension:%{public}s, belongsTo:%{public}s ",
@@ -188,6 +206,9 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. fileExtension:%{public}s, belongsTo:%{public}s ",
             fileExtension.c_str(), belongsTo.c_str());
+        if (TryReloadCustomUtd()) {
+            return GetUniformDataTypesByFilenameExtension(fileExtension, typeIds, belongsTo);
+        }
         return Status::E_INVALID_PARAMETERS;
     }
     if (!IsValidFileExtension(fileExtension)) {
@@ -210,6 +231,9 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
                 }
             }
         }
+    }
+    if (typeIdsInCfg.empty() && TryReloadCustomUtd()) {
+        return GetUniformDataTypesByFilenameExtension(fileExtension, typeIds, belongsTo);
     }
     typeIds.clear();
     for (const auto &typeId : typeIdsInCfg) {
@@ -234,6 +258,9 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. mimeType:%{public}s, belongsTo:%{public}s ",
                   mimeType.c_str(), belongsTo.c_str());
+        if (TryReloadCustomUtd()) {
+            return GetUniformDataTypeByMIMEType(mimeType, typeId, belongsTo);
+        }
         return Status::E_INVALID_PARAMETERS;
     }
     typeId = GetTypeIdFromCfg(lowerMimeType);
@@ -276,6 +303,9 @@ std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
             }
         }
     }
+    if (TryReloadCustomUtd()) {
+        return GetTypeIdFromCfg(mimeType);
+    }
     return "";
 }
 
@@ -285,6 +315,9 @@ Status UtdClient::GetUniformDataTypesByMIMEType(const std::string &mimeType, std
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
         LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. mimeType:%{public}s, belongsTo:%{public}s ",
             mimeType.c_str(), belongsTo.c_str());
+        if (TryReloadCustomUtd()) {
+            return GetUniformDataTypesByMIMEType(mimeType, typeIds, belongsTo);
+        }
         return Status::E_INVALID_PARAMETERS;
     }
     if (!IsValidMimeType(mimeType)) {
@@ -330,6 +363,9 @@ std::vector<std::string> UtdClient::GetTypeIdsFromCfg(const std::string &mimeTyp
                 break;
             }
         }
+    }
+    if (typeIdsInCfg.empty() && TryReloadCustomUtd()) {
+        return GetTypeIdsFromCfg(mimeType);
     }
     return typeIdsInCfg;
 }
@@ -395,7 +431,7 @@ void UtdClient::InstallCustomUtds(const std::string &bundleName, const std::stri
         return;
     }
     LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
-    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetTypeCfgs(user);
+    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, user);
     if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user, customTyepCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
             bundleName.c_str(), user);
@@ -418,7 +454,7 @@ void UtdClient::UninstallCustomUtds(const std::string &bundleName, int32_t user)
         return;
     }
     LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
-    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetTypeCfgs(user);
+    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, user);
     if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user, customTyepCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
             bundleName.c_str(), user);
@@ -437,6 +473,42 @@ void UtdClient::UpdateGraph(const std::vector<TypeDescriptorCfg> &customTyepCfgs
     std::unique_lock<std::shared_mutex> lock(utdMutex_);
     UtdGraph::GetInstance().Update(std::move(graph));
     descriptorCfgs_ = allTypeCfgs;
+}
+
+bool UtdClient::TryReloadCustomUtd()
+{
+    {
+        std::lock_guard<std::mutex> lock(customUtdMutex_);
+        auto now = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+        auto delay = now - lastLoadTime_;
+        if (delay <= RELOAD_INTERVAL) {
+            LOG_DEBUG(UDMF_CLIENT, "interval time too short");
+            return false;
+        }
+        lastLoadTime_ = now;
+    }
+
+    bool isHap = IsHapTokenType();
+    int32_t userId = DEFAULT_USER_ID;
+    if (!isHap) {
+        int32_t status = GetCurrentActiveUserId(userId);
+        LOG_DEBUG(UDMF_CLIENT, "get user id status=%{public}d", status);
+        if (status != Status::E_OK) {
+            return false;
+        }
+    }
+    UtdFileInfo info = CustomUtdStore::GetInstance().GetCustomUtdInfo(isHap, userId);
+    if (info.size == utdFileInfo_.size && info.lastTime == utdFileInfo_.lastTime) {
+        LOG_DEBUG(UDMF_CLIENT, "utd file not change");
+        return false;
+    }
+    LOG_INFO(UDMF_CLIENT, "utd file has change, try reload custom utd info");
+    if (Init()) {
+        std::lock_guard<std::mutex> lock(customUtdMutex_);
+        utdFileInfo_ = info;
+        return true;
+    }
+    return false;
 }
 } // namespace UDMF
 } // namespace OHOS

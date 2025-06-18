@@ -17,6 +17,7 @@
 #include <string>
 #include <set>
 #include <vector>
+#include <filesystem>
 #include "error_code.h"
 
 namespace OHOS {
@@ -38,6 +39,11 @@ struct TypeDescriptorCfg {
     {
         return typeDescriptor.typeId == typeId;
     }
+};
+
+struct UtdFileInfo {
+    uint64_t size;
+    std::filesystem::file_time_type lastTime;
 };
 
 // UTD data category
