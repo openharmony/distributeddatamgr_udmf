@@ -20,6 +20,7 @@
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "unified_data_taihe.h"
 #include "unified_record_taihe.h"
+#include "get_data_params_taihe.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -60,6 +61,31 @@ ani_object AniConverter::WrapUnifiedData(ani_env *env, std::shared_ptr<UnifiedDa
     auto unifiedDataImplPtr = reinterpret_cast<UnifiedDataTaihe*>(ptr);
     unifiedDataImplPtr->value_ = unifiedData;
     return obj;
+}
+
+ani_object AniConverter::WrapProgressInfo(ani_env *env, ProgressInfo info)
+{
+    ani_object ani_obj = {};
+    ani_double ani_field_progress = (double)info.progress;
+    ani_enum ani_field_status_cls;
+    env->FindEnum("L@ohos/data/unifiedDataChannel/unifiedDataChannel/ListenerStatus;", &ani_field_status_cls);
+    ani_enum_item ani_field_status;
+    env->Enum_GetEnumItemByIndex(ani_field_status_cls, (ani_size)info.progressStatus, &ani_field_status);
+    ani_class cls;
+    if (ANI_OK!= env->FindClass("L@ohos/data/unifiedDataChannel/unifiedDataChannel/ProgressInfo_inner;", &cls)) {
+        LOG_ERROR(UDMF_ANI, "Find class fail");
+        return ani_obj;
+    }
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+        LOG_ERROR(UDMF_ANI, "Find method fail");
+        return ani_obj;
+    }
+    if (ANI_OK != env->Object_New(cls, ctor, &ani_obj, ani_field_progress, ani_field_status)) {
+        LOG_ERROR(UDMF_ANI, "Create object fail");
+        return ani_obj;
+    }
+    return ani_obj;
 }
 
 std::shared_ptr<UnifiedRecord> AniConverter::UnwrapUnifiedRecord(ani_env *env, ani_object object)
@@ -123,9 +149,10 @@ ani_object AniConverter::WrapSummary(ani_env *env, std::shared_ptr<Summary> summ
     return obj;
 }
 
-GetDataParams AniConverter::UnwrapGetDataParams(ani_env *env, ani_object object)
+GetDataParams AniConverter::UnwrapGetDataParams(ani_env *env, ani_object object, const std::string &key)
 {
     GetDataParams params;
+    GetDataParamsTaihe::Convert2NativeValue(env, object, params, key);
     return params;
 }
 
