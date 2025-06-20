@@ -46,43 +46,35 @@ CustomUtdStore &CustomUtdStore::GetInstance()
     return utdCustomPersistence;
 }
 
-std::vector<TypeDescriptorCfg> CustomUtdStore::GetHapTypeCfgs()
+std::vector<TypeDescriptorCfg> CustomUtdStore::GetCustomUtd(bool isHap, int32_t userId)
 {
-    LOG_DEBUG(UDMF_CLIENT, "get utdcustom from cfg, Path:%{public}s.", CUSTOM_UTD_HAP_DIR);
+    std::string path = GetCustomUtdPath(isHap, userId);
+    LOG_DEBUG(UDMF_CLIENT, "get utdcustom from cfg");
+
     std::string jsonStr;
-    std::ifstream fin(CUSTOM_UTD_HAP_DIR);
+    std::ifstream fin(path);
     while (fin.good()) {
         std::string line;
         std::getline(fin, line);
         jsonStr += line;
     }
-    std::vector<TypeDescriptorCfg> customUtdTypes;
-    utdJsonParser_.ParseStoredCustomUtdJson(jsonStr, customUtdTypes);
-    LOG_DEBUG(UDMF_CLIENT, "GetTypeCfgs, customUtdTypes total:%{public}zu.", customUtdTypes.size());
-    return customUtdTypes;
+    std::vector<TypeDescriptorCfg> customUtd;
+    utdJsonParser_.ParseStoredCustomUtdJson(jsonStr, customUtd);
+    LOG_DEBUG(UDMF_CLIENT, "CustomUtd total:%{public}zu.", customUtd.size());
+    return customUtd;
 }
 
-std::vector<TypeDescriptorCfg> CustomUtdStore::GetTypeCfgs(int32_t userId)
+std::string CustomUtdStore::GetCustomUtdPath(bool isHap, int32_t userId)
 {
-    std::string path = CUSTOM_UTD_SA_DIR + std::to_string(userId) + CUSTOM_UTD_SA_SUB_DIR;
-    std::string old_path = CUSTOM_UTD_SA_DIR + std::to_string(userId) + OLD_CUSTOM_UTD_SA_SUB_DIR;
-    std::string cfgFilePath = path;
-    if (access(path.c_str(), F_OK) != 0 && access(old_path.c_str(), F_OK) == 0) {
-        cfgFilePath = old_path;
+    if (isHap) {
+        return CUSTOM_UTD_HAP_DIR;
     }
-    cfgFilePath.append(UTD_CFG_FILE);
-    LOG_DEBUG(UDMF_CLIENT, "get utdcustom from cfg, Path:%{public}s.", cfgFilePath.c_str());
-    std::string jsonStr;
-    std::ifstream fin(cfgFilePath);
-    while (fin.good()) {
-        std::string line;
-        std::getline(fin, line);
-        jsonStr += line;
-    }
-    std::vector<TypeDescriptorCfg> customUtdTypes;
-    utdJsonParser_.ParseStoredCustomUtdJson(jsonStr, customUtdTypes);
-    LOG_DEBUG(UDMF_CLIENT, "GetTypeCfgs, customUtdTypes total:%{public}zu.", customUtdTypes.size());
-    return customUtdTypes;
+    std::string userIdStr = std::to_string(userId);
+    std::string path = std::string(CUSTOM_UTD_SA_DIR).append(userIdStr).append(CUSTOM_UTD_SA_SUB_DIR);
+    std::string oldPath = std::string(CUSTOM_UTD_SA_DIR).append(userIdStr).append(OLD_CUSTOM_UTD_SA_SUB_DIR);
+    path = (access(path.c_str(), F_OK) != 0 && access(oldPath.c_str(), F_OK) == 0) ? oldPath : path;
+    path.append(UTD_CFG_FILE);
+    return path;
 }
 
 int32_t CustomUtdStore::SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes, int32_t user)
@@ -226,6 +218,20 @@ void CustomUtdStore::ProcessUtdForSave(const CustomUtdCfgs &utdTypes, std::vecto
             customTyepCfgs.push_back(referenceType);
         }
     }
+}
+
+UtdFileInfo CustomUtdStore::GetCustomUtdInfo(bool isHap, int32_t userId)
+{
+    UtdFileInfo info = {0};
+    std::string path = GetCustomUtdPath(isHap, userId);
+    if (!std::filesystem::exists(path)) {
+        LOG_WARN(UDMF_CLIENT, "custom utd file not exist");
+        return info;
+    }
+
+    info.lastTime = std::filesystem::last_write_time(path);
+    info.size = std::filesystem::file_size(path);
+    return info;
 }
 } // namespace UDMF
 } // namespace OHOS

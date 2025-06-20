@@ -99,7 +99,7 @@ HWTEST_F(CustomUtdStoreTest, SaveTypeCfgs001, TestSize.Level1)
     EXPECT_EQ(status, E_OK);
 
     typesCfg.clear();
-    typesCfg = CustomUtdStore::GetInstance().GetTypeCfgs(USERID);
+    typesCfg = CustomUtdStore::GetInstance().GetCustomUtd(false, USERID);
     TypeDescriptorCfg type1 = *(typesCfg.begin());
     EXPECT_EQ(type1.typeId, "com.example.utdtest.document");
     EXPECT_EQ(*(type1.belongingToTypes.begin()), "com.example.utdtest2.document");
@@ -112,5 +112,67 @@ HWTEST_F(CustomUtdStoreTest, SaveTypeCfgs001, TestSize.Level1)
     EXPECT_EQ(type1.ownerBundle, "com.example.utdtest");
 
     LOG_INFO(UDMF_TEST, "SaveTypeCfgs001 end.");
+}
+
+/**
+* @tc.name: GetCustomUtdPathTest001
+* @tc.desc: GetCustomUtdPath
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdStoreTest, GetCustomUtdPathTest001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetCustomUtdPathTest001 begin.");
+
+    std::string path = CustomUtdStore::GetInstance().GetCustomUtdPath(false, USERID);
+    EXPECT_EQ(path, "/data/service/el1/1000000/utdtypes/utd/utd-adt.json");
+
+    LOG_INFO(UDMF_TEST, "GetCustomUtdPathTest001 end.");
+}
+
+/**
+* @tc.name: GetCustomUtdPathTest002
+* @tc.desc: GetCustomUtdPath
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdStoreTest, GetCustomUtdPathTest002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetCustomUtdPathTest002 begin.");
+
+    std::string path = CustomUtdStore::GetInstance().GetCustomUtdPath(true, USERID);
+    EXPECT_EQ(path, "/data/utd/utd-adt.json");
+
+    LOG_INFO(UDMF_TEST, "GetCustomUtdPathTest002 end.");
+}
+
+/**
+* @tc.name: GetCustomUtdInfoTest001
+* @tc.desc: GetCustomUtdInfo
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdStoreTest, GetCustomUtdInfoTest001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetCustomUtdInfoTest001 begin.");
+
+    UtdFileInfo info = CustomUtdStore::GetInstance().GetCustomUtdInfo(true, USERID);
+    EXPECT_EQ(info.size, 0);
+
+    LOG_INFO(UDMF_TEST, "GetCustomUtdInfoTest001 end.");
+}
+
+/**
+* @tc.name: GetCustomUtdInfoTest002
+* @tc.desc: GetCustomUtdInfo
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdStoreTest, GetCustomUtdInfoTest002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetCustomUtdInfoTest002 begin.");
+
+    UtdFileInfo info = CustomUtdStore::GetInstance().GetCustomUtdInfo(false, USERID);
+    EXPECT_EQ(info.size, strlen(TEST_DATA2) + 2);
+    auto customUtds = CustomUtdStore::GetInstance().GetCustomUtd(false, USERID);
+    EXPECT_EQ(customUtds.size(), 2);
+
+    LOG_INFO(UDMF_TEST, "GetCustomUtdInfoTest002 end.");
 }
 } // OHOS::Test
