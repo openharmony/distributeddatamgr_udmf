@@ -181,8 +181,7 @@ bool UnifiedDataHelper::SaveUDataToFile(const std::string &dataFile, UnifiedData
     }
     recordTlv.SetFile(file);
     UdmfConversion::InitValueObject(data);
-    bool status = TLVUtil::Writing(data, recordTlv, TAG::TAG_UNIFIED_DATA);
-    if (!status) {
+    if (!TLVUtil::Writing(data, recordTlv, TAG::TAG_UNIFIED_DATA)) {
         LOG_ERROR(UDMF_FRAMEWORK, "TLV Writing failed!");
         return FileClose(file, false);
     }
@@ -205,8 +204,7 @@ bool UnifiedDataHelper::LoadUDataFromFile(const std::string &dataFile, UnifiedDa
     }
     recordTlv.SetFile(file);
 
-    bool status = TLVUtil::ReadTlv(data, recordTlv, TAG::TAG_UNIFIED_DATA);
-    if (!status) {
+    if (!TLVUtil::ReadTlv(data, recordTlv, TAG::TAG_UNIFIED_DATA)) {
         LOG_ERROR(UDMF_FRAMEWORK, "TLV Reading failed!");
         return FileClose(file, false);
     }
