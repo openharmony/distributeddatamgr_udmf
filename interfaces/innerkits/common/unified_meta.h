@@ -629,6 +629,7 @@ public:
     static size_t GetDetailsSize(UDDetails &details);
     static bool API_EXPORT IsPersist(const Intention &intention);
     static bool API_EXPORT IsPersist(const std::string &intention);
+    static bool API_EXPORT IsPersist(const int32_t &visibility);
     static Intention API_EXPORT GetIntentionByString(const std::string &intention);
     static bool API_EXPORT IsValidOptions(UnifiedKey &key, const std::string &intention);
     static bool API_EXPORT IsValidOptions(UnifiedKey &key, const std::string &intention,
