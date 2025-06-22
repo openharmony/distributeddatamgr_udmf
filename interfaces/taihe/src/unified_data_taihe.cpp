@@ -41,6 +41,10 @@ UnifiedDataTaihe::UnifiedDataTaihe()
 
 void UnifiedDataTaihe::AddRecord(::taiheChannel::AllRecords const& unifiedRecord)
 {
+    if (this->value_ == nullptr) {
+        LOG_ERROR(UDMF_ANI, "Inner value is empty.");
+        return;
+    }
     switch (unifiedRecord.get_tag()) {
         case ::taiheChannel::AllRecords::tag_t::unifiedRecord: {
             auto inner =
@@ -128,6 +132,10 @@ void UnifiedDataTaihe::AddRecord(::taiheChannel::AllRecords const& unifiedRecord
 
 ::taihe::array<::taiheChannel::AllRecords> UnifiedDataTaihe::GetRecords()
 {
+    if (this->value_ == nullptr) {
+        LOG_ERROR(UDMF_ANI, "Inner value is empty.");
+        return ::taihe::array<::taiheChannel::AllRecords>();
+    }
     auto records = this->value_->GetRecords();
     std::vector<::taiheChannel::AllRecords> recordsImpls;
     for (auto &record : records) {

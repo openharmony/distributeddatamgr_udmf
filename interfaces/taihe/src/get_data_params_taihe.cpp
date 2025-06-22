@@ -24,9 +24,9 @@ ConcurrentMap<std::string, ani_fn_object> GetDataParamsTaihe::anifns;
 bool GetDataParamsTaihe::Convert2NativeValue(ani_env *env, ani_object in, GetDataParams &getDataParams, const std::string &key)
 {
     ani_ref progressIndicator;
-    auto status = env->Object_GetFieldByName_Ref(in, "progressIndicator", &progressIndicator);
+    auto status = env->Object_GetPropertyByName_Ref(in, "progressIndicator", &progressIndicator);
     if (status != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "Object_GetFieldByName_Ref failed.");
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
         return false;
     }
     ani_int progressIndicatorValue;
@@ -37,9 +37,9 @@ bool GetDataParamsTaihe::Convert2NativeValue(ani_env *env, ani_object in, GetDat
     }
     getDataParams.progressIndicator = static_cast<ProgressIndicator>(progressIndicatorValue);
     ani_ref dataProgressListener;
-    status = env->Object_GetFieldByName_Ref(in, "dataProgressListener", &dataProgressListener);
+    status = env->Object_GetPropertyByName_Ref(in, "dataProgressListener", &dataProgressListener);
     if (status != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "Object_GetFieldByName_Ref failed.");
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
         return false;
     }
     if (!SetProgressListener(env, getDataParams, static_cast<ani_fn_object>(dataProgressListener), key)) {
@@ -47,9 +47,9 @@ bool GetDataParamsTaihe::Convert2NativeValue(ani_env *env, ani_object in, GetDat
         return false;
     }
     ani_ref destUri;
-    status = env->Object_GetFieldByName_Ref(in, "destUri", &destUri);
+    status = env->Object_GetPropertyByName_Ref(in, "destUri", &destUri);
     if (status != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "Object_GetFieldByName_Ref failed.");
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
         return false;
     }
     ani_size destUriLength;
@@ -70,9 +70,9 @@ bool GetDataParamsTaihe::Convert2NativeValue(ani_env *env, ani_object in, GetDat
     getDataParams.destUri = std::string(utf8Buffer);
 
     ani_ref fileConflictOptions;
-    status = env->Object_GetFieldByName_Ref(in, "fileConflictOptions", &fileConflictOptions);
+    status = env->Object_GetPropertyByName_Ref(in, "fileConflictOptions", &fileConflictOptions);
     if (status != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "Object_GetFieldByName_Ref failed.");
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
         return false;
     }
     ani_int fileConflictOptionsValue;
@@ -96,7 +96,7 @@ bool GetDataParamsTaihe::SetProgressListener(ani_env *env, GetDataParams &getDat
         }
         ani_ref anifnTemp;
         if (ANI_OK != env->GlobalReference_Create(callback, &anifnTemp)) {
-            LOG_ERROR(UDMF_ANI, "napi_create_threadsafe_function failed.");
+            LOG_ERROR(UDMF_ANI, "GlobalReference_Create failed.");
             return false;
         }
         anifn = std::move(static_cast<ani_fn_object>(anifnTemp));
@@ -107,10 +107,13 @@ bool GetDataParamsTaihe::SetProgressListener(ani_env *env, GetDataParams &getDat
     if (status != ANI_OK || vm == nullptr) {
         LOG_ERROR(UDMF_ANI, "Get vm failed.");
     }
-    getDataParams.progressListener = [key, &vm](ProgressInfo progressInfo, std::shared_ptr<UnifiedData> data) {
+    getDataParams.progressListener = [key, vm](ProgressInfo progressInfo, std::shared_ptr<UnifiedData> data) {
         bool listenerExist = anifns.ComputeIfPresent(key, [&](const std::string &key, ani_fn_object &anifn) {
             ani_env *workerEnv = nullptr;
             ani_options aniArgs {0, nullptr};
+            if (vm == nullptr) {
+                LOG_ERROR(UDMF_ANI, "vm is null.");
+            }
             auto status = vm->AttachCurrentThread(&aniArgs, ANI_VERSION_1, &workerEnv);
             if (status != ANI_OK) {
                 LOG_ERROR(UDMF_ANI, "AttachCurrentThread failed, status=%{public}d", status);
@@ -119,16 +122,20 @@ bool GetDataParamsTaihe::SetProgressListener(ani_env *env, GetDataParams &getDat
             ani_object aniData = AniConverter::WrapUnifiedData(workerEnv, data);
             ani_object aniProgress = AniConverter::WrapProgressInfo(workerEnv, progressInfo);
             std::vector<ani_ref> listenerArgs({aniProgress, aniData});
-            status = workerEnv->FunctionalObject_Call(anifn, listenerArgs.size(), listenerArgs.data(), nullptr);
+            ani_ref result;
+            status = workerEnv->FunctionalObject_Call(anifn, listenerArgs.size(), listenerArgs.data(), &result);
             if (status != ANI_OK) {
-                LOG_ERROR(UDMF_ANI, "Call callback function failed, status=%{public}d", status);
+                LOG_ERROR(UDMF_ANI, "FunctionalObject_Call failed, status=%{public}d", status);
+                vm->DetachCurrentThread();
                 return false;
             }
             if (progressInfo.progress >= PROGRESS_ALL_FINISHED ||
                 progressInfo.progress < PROGRESS_INIT) {
                 workerEnv->GlobalReference_Delete(anifn);
+                vm->DetachCurrentThread();
                 return false;
             }
+            vm->DetachCurrentThread();
             return true;
         });
         if (!listenerExist) {

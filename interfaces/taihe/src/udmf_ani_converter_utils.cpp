@@ -65,27 +65,27 @@ ani_object AniConverter::WrapUnifiedData(ani_env *env, std::shared_ptr<UnifiedDa
 
 ani_object AniConverter::WrapProgressInfo(ani_env *env, ProgressInfo info)
 {
-    ani_object ani_obj = {};
-    ani_double ani_field_progress = (double)info.progress;
+    ani_object obj = {};
+    ani_int progress = (int)info.progress;
     ani_enum ani_field_status_cls;
     env->FindEnum("L@ohos/data/unifiedDataChannel/unifiedDataChannel/ListenerStatus;", &ani_field_status_cls);
-    ani_enum_item ani_field_status;
-    env->Enum_GetEnumItemByIndex(ani_field_status_cls, (ani_size)info.progressStatus, &ani_field_status);
+    ani_enum_item status;
+    env->Enum_GetEnumItemByIndex(ani_field_status_cls, (ani_size)info.progressStatus, &status);
     ani_class cls;
     if (ANI_OK!= env->FindClass("L@ohos/data/unifiedDataChannel/unifiedDataChannel/ProgressInfo_inner;", &cls)) {
         LOG_ERROR(UDMF_ANI, "Find class fail");
-        return ani_obj;
+        return obj;
     }
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
         LOG_ERROR(UDMF_ANI, "Find method fail");
-        return ani_obj;
+        return obj;
     }
-    if (ANI_OK != env->Object_New(cls, ctor, &ani_obj, ani_field_progress, ani_field_status)) {
+    if (ANI_OK != env->Object_New(cls, ctor, &obj, progress, status)) {
         LOG_ERROR(UDMF_ANI, "Create object fail");
-        return ani_obj;
+        return obj;
     }
-    return ani_obj;
+    return obj;
 }
 
 std::shared_ptr<UnifiedRecord> AniConverter::UnwrapUnifiedRecord(ani_env *env, ani_object object)
@@ -144,7 +144,7 @@ ani_object AniConverter::WrapSummary(ani_env *env, std::shared_ptr<Summary> summ
         return obj;
     }
 
-    env->Object_SetFieldByName_Ref(obj, "totalSize", CreateInt(env, summary->totalSize));
+    env->Object_SetFieldByName_Ref(obj, "totalSize", CreateLong(env, summary->totalSize));
     InnerWrapMapParams(env, cls, obj, summary->summary);
     return obj;
 }
