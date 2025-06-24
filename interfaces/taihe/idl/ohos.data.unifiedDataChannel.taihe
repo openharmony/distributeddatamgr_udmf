@@ -94,15 +94,15 @@ struct Options {
 
 @class
 struct Summary {
-  summary: @record Map<String, i64>;
-  totalSize: i64;
+  summary: @record Map<String, f64>;
+  totalSize: f64;
 }
 
 @ctor("Summary")
 function CreateSummary(): Summary;
 
 struct ProgressInfo {
-  progress: i32;
+  progress: f64;
   status: ListenerStatus;
 }
 
@@ -331,9 +331,9 @@ interface SystemDefinedFormInner {
   @set("details")
   SetDetails(details: @record Map<String, DetailsValue>): void;
   @get("formId")
-  GetFormId(): i32;
+  GetFormId(): f64;
   @set("formId")
-  SetFormId(formId: i32): void;
+  SetFormId(formId: f64): void;
   @get("formName")
   GetFormName(): String;
   @set("formName")
@@ -863,10 +863,10 @@ export class SystemDefinedForm extends SystemDefinedRecord {
   set details(details: Record<String, DetailsValue>) {
     this.inner.details = details;
   }
-  get formId(): int {
+  get formId(): number {
     return this.inner.formId;
   }
-  set formId(formId: int) {
+  set formId(formId: number) {
     this.inner.formId = formId;
   }
   get formName(): String {

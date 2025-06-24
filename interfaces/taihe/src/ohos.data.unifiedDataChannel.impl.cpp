@@ -31,7 +31,7 @@ namespace taiheChannel = ohos::data::unifiedDataChannel;
 
 ::taiheChannel::Summary CreateSummary()
 {
-    ::taihe::map<::taihe::string, int64_t> summary;
+    ::taihe::map<::taihe::string, double> summary;
     return {summary, 0};
 }
 
