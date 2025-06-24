@@ -132,12 +132,12 @@ void UnifiedDataTaihe::AddRecord(::taiheChannel::AllRecords const& unifiedRecord
 
 ::taihe::array<::taiheChannel::AllRecords> UnifiedDataTaihe::GetRecords()
 {
+    std::vector<::taiheChannel::AllRecords> recordsImpls;
     if (this->value_ == nullptr) {
         LOG_ERROR(UDMF_ANI, "Inner value is empty.");
-        return ::taihe::array<::taiheChannel::AllRecords>();
+        return ::taihe::array<::taiheChannel::AllRecords>(recordsImpls);
     }
     auto records = this->value_->GetRecords();
-    std::vector<::taiheChannel::AllRecords> recordsImpls;
     for (auto &record : records) {
         recordsImpls.push_back(GetRecord(record));
     }

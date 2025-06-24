@@ -33,12 +33,20 @@ std::shared_ptr<UnifiedData> AniConverter::UnwrapUnifiedData(ani_env *env, ani_o
         return nullptr;
     }
     auto unifiedDataImplPtr = reinterpret_cast<UnifiedDataTaihe*>(ptr);
+    if (unifiedDataImplPtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "UnifiedDataImplPtr is null.");
+        return nullptr;
+    }
     return unifiedDataImplPtr->value_;
 }
 
 ani_object AniConverter::WrapUnifiedData(ani_env *env, std::shared_ptr<UnifiedData> unifiedData)
 {
     ani_object obj = {};
+    if (unifiedData == nullptr) {
+        LOG_ERROR(UDMF_ANI, "UnifiedData is null.");
+        return obj;
+    }
     ani_class cls;
     if (ANI_OK!= env->FindClass("L@ohos/data/unifiedDataChannel/unifiedDataChannel/UnifiedData;", &cls)) {
         LOG_ERROR(UDMF_ANI, "Find class fail");
@@ -59,6 +67,10 @@ ani_object AniConverter::WrapUnifiedData(ani_env *env, std::shared_ptr<UnifiedDa
         return obj;
     }
     auto unifiedDataImplPtr = reinterpret_cast<UnifiedDataTaihe*>(ptr);
+    if (unifiedDataImplPtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "UnifiedDataImplPtr is null.");
+        return obj;
+    }
     unifiedDataImplPtr->value_ = unifiedData;
     return obj;
 }
@@ -96,12 +108,20 @@ std::shared_ptr<UnifiedRecord> AniConverter::UnwrapUnifiedRecord(ani_env *env, a
         return nullptr;
     }
     auto UnifiedRecordInnerImplPtr = reinterpret_cast<UnifiedRecordTaihe*>(ptr);
+    if (UnifiedRecordInnerImplPtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "UnifiedRecordInnerImplPtr is null.");
+        return nullptr;
+    }
     return UnifiedRecordInnerImplPtr->value_;
 }
 
 ani_object AniConverter::WrapUnifiedRecord(ani_env *env, std::shared_ptr<UnifiedRecord> unifiedRecord)
 {
     ani_object obj = {};
+    if (unifiedRecord == nullptr) {
+        LOG_ERROR(UDMF_ANI, "UnifiedRecord is null.");
+        return obj;
+    }
     ani_class cls;
     if (ANI_OK!= env->FindClass("L@ohos/data/unifiedDataChannel/unifiedDataChannel/UnifiedRecord;", &cls)) {
         LOG_ERROR(UDMF_ANI, "Find class fail");
@@ -122,6 +142,10 @@ ani_object AniConverter::WrapUnifiedRecord(ani_env *env, std::shared_ptr<Unified
         return obj;
     }
     auto UnifiedRecordInnerImplPtr = reinterpret_cast<UnifiedRecordTaihe*>(ptr);
+    if (UnifiedRecordInnerImplPtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "UnifiedRecordInnerImplPtr is null.");
+        return obj;
+    }
     UnifiedRecordInnerImplPtr->value_ = unifiedRecord;
     return obj;
 }
@@ -129,6 +153,10 @@ ani_object AniConverter::WrapUnifiedRecord(ani_env *env, std::shared_ptr<Unified
 ani_object AniConverter::WrapSummary(ani_env *env, std::shared_ptr<Summary> summary)
 {
     ani_object obj = {};
+    if (summary == nullptr) {
+        LOG_ERROR(UDMF_ANI, "Summary is null.");
+        return obj;
+    }
     ani_class cls;
     if (ANI_OK!= env->FindClass("L@ohos/data/unifiedDataChannel/unifiedDataChannel/Summary;", &cls)) {
         LOG_ERROR(UDMF_ANI, "Find class fail");
