@@ -57,7 +57,7 @@ union AllRecords {
 }
 
 union UnifiedDataOrNull {
-  unifiedData: UnifiedDataInner;
+  unifiedData: @sts_type("UnifiedData") Opaque;
   @null nullType;
 }
 

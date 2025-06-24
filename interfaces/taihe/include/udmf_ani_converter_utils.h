@@ -28,13 +28,15 @@ public:
 
     static ani_object WrapUnifiedData(ani_env *env, std::shared_ptr<UnifiedData> unifiedData);
 
+    static ani_object WrapProgressInfo(ani_env *env, ProgressInfo info);
+
     static std::shared_ptr<UnifiedRecord> UnwrapUnifiedRecord(ani_env *env, ani_object object);
 
     static ani_object WrapUnifiedRecord(ani_env *env, std::shared_ptr<UnifiedRecord> unifiedRecord);
 
     static ani_object WrapSummary(ani_env *env, std::shared_ptr<Summary> summary);
 
-    static GetDataParams UnwrapGetDataParams(ani_env *env, ani_object object);
+    static GetDataParams UnwrapGetDataParams(ani_env *env, ani_object object, const std::string &key);
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -20,7 +20,7 @@ namespace OHOS {
 namespace UDMF {
 
 constexpr const char* RECORD_SERIALIZE_TOOL_CLASS_NAME = "L@ohos/app/ability/Want/RecordSerializeTool;";
-constexpr const char* CLASSNAME_INT = "Lstd/core/Int;";
+constexpr const char* CLASSNAME_LONG = "Lstd/core/Long;";
 
 ani_ref WrapMapParams(ani_env *env, const std::map<std::string, int64_t> &mapParams)
 {
@@ -58,11 +58,11 @@ ani_ref WrapMapParams(ani_env *env, const std::map<std::string, int64_t> &mapPar
     return mapParamsRef;
 }
 
-ani_object CreateInt(ani_env *env, ani_int value)
+ani_object CreateLong(ani_env *env, ani_long value)
 {
     ani_class cls;
     ani_status status = ANI_ERROR;
-    if ((status = env->FindClass(CLASSNAME_INT, &cls)) != ANI_OK) {
+    if ((status = env->FindClass(CLASSNAME_LONG, &cls)) != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "FindClass status : %{public}d", status);
         return nullptr;
     }
