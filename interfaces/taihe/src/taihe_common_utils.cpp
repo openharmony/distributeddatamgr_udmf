@@ -133,7 +133,7 @@ UDDetails ConvertUDDetails(::taihe::map_view<::taihe::string, ::taihe::string> d
     return udmfDetails;
 }
 
-::taihe::map_view<::taihe::string, ::taihe::string> ConvertUDDetailsToString(const UDDetails &details)
+::taihe::map<::taihe::string, ::taihe::string> ConvertUDDetailsToString(const UDDetails &details)
 {
     ::taihe::map<::taihe::string, ::taihe::string> taiheDetails;
     for (auto &item : details) {
@@ -144,7 +144,7 @@ UDDetails ConvertUDDetails(::taihe::map_view<::taihe::string, ::taihe::string> d
             taiheDetails.emplace(::taihe::string(item.first), std::get<std::string>(item.second));
         }
     }
-    LOG_INFO(UDMF_ANI, "wjc taiheDetails size is %{public}zu", taiheDetails.size());
+    LOG_INFO(UDMF_ANI, "taiheDetails size is %{public}zu", taiheDetails.size());
     return taiheDetails;
 }
 
@@ -175,7 +175,7 @@ UDDetails ConvertUDDetailsToUnion(
     return udmfDetails;
 }
 
-::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> ConvertUDDetailsToUnion(
+::taihe::map<::taihe::string, ::taiheChannel::DetailsValue> ConvertUDDetailsToUnion(
     const UDDetails &details)
 {
     ::taihe::map<::taihe::string, ::taiheChannel::DetailsValue> taiheDetails;

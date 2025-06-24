@@ -33,6 +33,8 @@ public:
     void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
     void SetTextContent(::taihe::string_view textContent);
     ::taihe::string GetTextContent();
+    void SetTextAbstract(::taihe::string_view textAbstract);
+    ::taihe::string GetTextAbstract();
     int64_t GetInner();
 
     std::shared_ptr<PlainText> value_;

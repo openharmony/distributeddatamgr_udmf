@@ -302,6 +302,10 @@ interface PlainTextInner {
   @set("textContent")
   SetTextContent(textContent: String): void;
   @get("textContent")
+  @set("textAbstract")
+  SetTextAbstract(textAbstract: String): void;
+  @get("textAbstract")
+  GetTextAbstract(): String;
   GetTextContent(): String;
   GetInner(): i64;
 }
@@ -559,6 +563,12 @@ export class File extends UnifiedRecord {
   getType(): string {
     return this.inner.getType();
   }
+  get details(): Record<String, String> | undefined {
+    return this.inner.details;
+  }
+  set details(details: Record<String, String>) {
+    this.inner.details = details;
+  }
   get uri(): string {
     return this.inner.uri;
   }
@@ -744,6 +754,12 @@ export class PlainText extends Text {
   }
   set textContent(text: string) {
     this.inner.textContent = text;
+  }
+  get textAbstract(): string {
+    return this.inner.textAbstract;
+  }
+  set textAbstract(textAbstract: string) {
+    this.inner.textAbstract = textAbstract;
   }
   getType(): string {
     return this.inner.getType();
