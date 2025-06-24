@@ -78,7 +78,7 @@ ani_object AniConverter::WrapUnifiedData(ani_env *env, std::shared_ptr<UnifiedDa
 ani_object AniConverter::WrapProgressInfo(ani_env *env, ProgressInfo info)
 {
     ani_object obj = {};
-    ani_int progress = (int)info.progress;
+    ani_double progress = (double)info.progress;
     ani_enum ani_field_status_cls;
     env->FindEnum("L@ohos/data/unifiedDataChannel/unifiedDataChannel/ListenerStatus;", &ani_field_status_cls);
     ani_enum_item status;
