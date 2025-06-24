@@ -23,6 +23,30 @@ static constexpr int32_t PROGRESS_ALL_FINISHED = 100;
 ConcurrentMap<std::string, ani_fn_object> GetDataParamsTaihe::anifns;
 bool GetDataParamsTaihe::Convert2NativeValue(ani_env *env, ani_object in, GetDataParams &getDataParams, const std::string &key)
 {
+    if (!SetProgressIndicator(env, in, getDataParams)) {
+        LOG_ERROR(UDMF_ANI, "SetProgressIndicator failed.");
+    }
+    ani_ref dataProgressListener;
+    auto status = env->Object_GetPropertyByName_Ref(in, "dataProgressListener", &dataProgressListener);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
+        return false;
+    }
+    if (!SetProgressListener(env, getDataParams, static_cast<ani_fn_object>(dataProgressListener), key)) {
+        LOG_ERROR(UDMF_ANI, "SetProgressListener failed.");
+        return false;
+    }
+    if (!SetDestUri(env, in, getDataParams)) {
+        LOG_ERROR(UDMF_ANI, "SetDestUri failed.");
+    }
+    if (!SetFileConflictOptions(env, in, getDataParams)) {
+        LOG_ERROR(UDMF_ANI, "SetFileConflictOptions failed.");
+    }
+    return true;
+}
+
+bool GetDataParamsTaihe::SetProgressIndicator(ani_env *env, ani_object in, GetDataParams &getDataParams)
+{
     ani_ref progressIndicator;
     auto status = env->Object_GetPropertyByName_Ref(in, "progressIndicator", &progressIndicator);
     if (status != ANI_OK) {
@@ -36,18 +60,13 @@ bool GetDataParamsTaihe::Convert2NativeValue(ani_env *env, ani_object in, GetDat
         return false;
     }
     getDataParams.progressIndicator = static_cast<ProgressIndicator>(progressIndicatorValue);
-    ani_ref dataProgressListener;
-    status = env->Object_GetPropertyByName_Ref(in, "dataProgressListener", &dataProgressListener);
-    if (status != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
-        return false;
-    }
-    if (!SetProgressListener(env, getDataParams, static_cast<ani_fn_object>(dataProgressListener), key)) {
-        LOG_ERROR(UDMF_ANI, "SetProgressListener failed.");
-        return false;
-    }
+    return true;
+}
+
+bool GetDataParamsTaihe::SetDestUri(ani_env *env, ani_object in, GetDataParams &getDataParams)
+{
     ani_ref destUri;
-    status = env->Object_GetPropertyByName_Ref(in, "destUri", &destUri);
+    auto status = env->Object_GetPropertyByName_Ref(in, "destUri", &destUri);
     if (status != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
         return false;
@@ -68,9 +87,13 @@ bool GetDataParamsTaihe::Convert2NativeValue(ani_env *env, ani_object in, GetDat
     }
     utf8Buffer[bytesWritten] = '\0';
     getDataParams.destUri = std::string(utf8Buffer);
+    return true;
+}
 
+bool GetDataParamsTaihe::SetFileConflictOptions(ani_env *env, ani_object in, GetDataParams &getDataParams)
+{
     ani_ref fileConflictOptions;
-    status = env->Object_GetPropertyByName_Ref(in, "fileConflictOptions", &fileConflictOptions);
+    auto status = env->Object_GetPropertyByName_Ref(in, "fileConflictOptions", &fileConflictOptions);
     if (status != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
         return false;
@@ -88,20 +111,7 @@ bool GetDataParamsTaihe::Convert2NativeValue(ani_env *env, ani_object in, GetDat
 bool GetDataParamsTaihe::SetProgressListener(ani_env *env, GetDataParams &getDataParams,
     ani_fn_object callback, const std::string &key)
 {
-    anifns.Compute(key, [&](const std::string &key, ani_fn_object &anifn) {
-        if (anifn != nullptr) {
-            LOG_WARN(UDMF_ANI, "Listener has existed!");
-            env->GlobalReference_Delete(anifn);
-            anifn = nullptr;
-        }
-        ani_ref anifnTemp;
-        if (ANI_OK != env->GlobalReference_Create(callback, &anifnTemp)) {
-            LOG_ERROR(UDMF_ANI, "GlobalReference_Create failed.");
-            return false;
-        }
-        anifn = std::move(static_cast<ani_fn_object>(anifnTemp));
-        return true;
-    });
+    SaveCallback(env, getDataParams, callback, key);
     ani_vm *vm = nullptr;
     auto status = env->GetVM(&vm);
     if (status != ANI_OK || vm == nullptr) {
@@ -143,6 +153,24 @@ bool GetDataParamsTaihe::SetProgressListener(ani_env *env, GetDataParams &getDat
         }
     };
     return true;
+}
+
+void GetDataParamsTaihe::SaveCallback(ani_env *env, GetDataParams &getDataParams,
+    ani_fn_object callback, const std::string &key) {
+    anifns.Compute(key, [&](const std::string &key, ani_fn_object &anifn) {
+        if (anifn != nullptr) {
+            LOG_WARN(UDMF_ANI, "Listener has existed!");
+            env->GlobalReference_Delete(anifn);
+            anifn = nullptr;
+        }
+        ani_ref anifnTemp;
+        if (ANI_OK != env->GlobalReference_Create(callback, &anifnTemp)) {
+            LOG_ERROR(UDMF_ANI, "GlobalReference_Create failed.");
+            return false;
+        }
+        anifn = std::move(static_cast<ani_fn_object>(anifnTemp));
+        return true;
+    });
 }
 
 } // namespace UDMF

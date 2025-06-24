@@ -28,6 +28,11 @@ public:
     static bool Convert2NativeValue(ani_env *env, ani_object in, GetDataParams &getDataParams, const std::string &key);
 
 private:
+    static bool SetProgressIndicator(ani_env *env, ani_object in, GetDataParams &getDataParams);
+    static bool SetDestUri(ani_env *env, ani_object in, GetDataParams &getDataParams);
+    static bool SetFileConflictOptions(ani_env *env, ani_object in, GetDataParams &getDataParams);
+    static void SaveCallback(ani_env *env, GetDataParams &getDataParam,
+        ani_fn_object callback, const std::string &key);
     static bool SetProgressListener(ani_env *env, GetDataParams &getDataParam,
         ani_fn_object callback, const std::string &key);
 
