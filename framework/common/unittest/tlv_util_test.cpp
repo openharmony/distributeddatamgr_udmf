@@ -179,7 +179,7 @@ HWTEST_F(TlvUtilTest, CountBufferSize_004, TestSize.Level1)
     EXPECT_EQ(4 * sizeof(TLVHead) + sizeof(int32_t), TLVUtil::CountBufferSize(privilege, tlvObject));
 
     Runtime runtime;
-    EXPECT_EQ(20 * sizeof(TLVHead) + sizeof(bool) + sizeof(size_t) + 2 * sizeof(int64_t) + 3 * sizeof(int32_t) +
+    EXPECT_EQ(21 * sizeof(TLVHead) + sizeof(bool) + sizeof(size_t) + 2 * sizeof(int64_t) + 3 * sizeof(int32_t) +
         2 * sizeof(uint32_t),
         TLVUtil::CountBufferSize(runtime, tlvObject));
     LOG_INFO(UDMF_TEST, "CountBufferSize_004 end.");
@@ -301,6 +301,7 @@ HWTEST_F(TlvUtilTest, WritingAndReading_002, TestSize.Level1)
     runtime.dataVersion = 3;
     runtime.createPackage = "package";
     runtime.isPrivate = true;
+    runtime.appId = "appId";
 
     std::vector<uint8_t> dataBytes;
     auto tlvObject = TLVObject(dataBytes);
@@ -320,6 +321,7 @@ HWTEST_F(TlvUtilTest, WritingAndReading_002, TestSize.Level1)
     EXPECT_EQ(runtime.privileges[0].tokenId, runtimeResult.privileges[0].tokenId);
     EXPECT_EQ(runtime.privileges[1].writePermission, runtimeResult.privileges[1].writePermission);
     EXPECT_EQ(runtime.privileges[1].tokenId, runtimeResult.privileges[1].tokenId);
+    EXPECT_EQ(runtime.appId, runtimeResult.appId);
 
     LOG_INFO(UDMF_TEST, "WritingAndReading_002 end.");
 }
@@ -544,6 +546,56 @@ HWTEST_F(TlvUtilTest, WritingAndReading_005, TestSize.Level1)
     auto wantResult = std::get<std::shared_ptr<OHOS::AAFwk::Want>>(valueResult["want"]);
     EXPECT_EQ(idValue, wantResult->GetIntParam(idKey, 0));
     LOG_INFO(UDMF_TEST, "WritingAndReading_005 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_008
+ * @tc.desc: test Runtime for Writing And Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_002 begin.");
+    UnifiedKey key;
+    key.key = "123456";
+    Privilege privilege;
+    privilege.readPermission = "read";
+    privilege.tokenId = 333;
+    Privilege privilege2;
+    privilege2.writePermission = "read";
+    privilege2.tokenId = 444;
+    Runtime runtime;
+    runtime.dataStatus = DELETED;
+    runtime.key = key;
+    runtime.privileges.push_back(privilege);
+    runtime.privileges.push_back(privilege2);
+    runtime.createTime = 1;
+    runtime.dataVersion = 3;
+    runtime.createPackage = "package";
+    runtime.isPrivate = true;
+    runtime.appId = "appId";
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(runtime, tlvObject, TAG::TAG_APP_ID));
+
+    tlvObject.ResetCursor();
+    Runtime runtimeResult;
+    EXPECT_TRUE(TLVUtil::ReadTlv(runtimeResult, tlvObject, TAG::TAG_APP_ID));
+    EXPECT_EQ(runtime.key.key, runtimeResult.key.key);
+    EXPECT_EQ(runtime.key.key, runtimeResult.key.key);
+    EXPECT_EQ(runtime.dataStatus, runtimeResult.dataStatus);
+    EXPECT_EQ(runtime.createTime, runtimeResult.createTime);
+    EXPECT_EQ(runtime.dataVersion, runtimeResult.dataVersion);
+    EXPECT_EQ(runtime.createPackage, runtimeResult.createPackage);
+    EXPECT_EQ(runtime.isPrivate, runtimeResult.isPrivate);
+    EXPECT_EQ(runtime.appId, runtimeResult.appId);
+    EXPECT_EQ(runtime.privileges[0].readPermission, runtimeResult.privileges[0].readPermission);
+    EXPECT_EQ(runtime.privileges[0].tokenId, runtimeResult.privileges[0].tokenId);
+    EXPECT_EQ(runtime.privileges[1].writePermission, runtimeResult.privileges[1].writePermission);
+    EXPECT_EQ(runtime.privileges[1].tokenId, runtimeResult.privileges[1].tokenId);
+
+    LOG_INFO(UDMF_TEST, "WritingAndReading_008 end.");
 }
 
 /* *

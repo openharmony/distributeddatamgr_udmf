@@ -66,6 +66,7 @@ struct Runtime {
     uint32_t tokenId;
     std::string sdkVersion;
     Visibility visibility {};
+    std::string appId;
 };
 
 /*
