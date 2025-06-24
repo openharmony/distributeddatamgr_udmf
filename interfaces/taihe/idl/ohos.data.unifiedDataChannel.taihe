@@ -302,11 +302,11 @@ interface PlainTextInner {
   @set("textContent")
   SetTextContent(textContent: String): void;
   @get("textContent")
+  GetTextContent(): String;
   @set("textAbstract")
   SetTextAbstract(textAbstract: String): void;
   @get("textAbstract")
   GetTextAbstract(): String;
-  GetTextContent(): String;
   GetInner(): i64;
 }
 
