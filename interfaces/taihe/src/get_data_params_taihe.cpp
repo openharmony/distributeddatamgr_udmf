@@ -21,7 +21,8 @@ namespace UDMF {
 static constexpr int32_t PROGRESS_INIT = 0;
 static constexpr int32_t PROGRESS_ALL_FINISHED = 100;
 ConcurrentMap<std::string, ani_fn_object> GetDataParamsTaihe::anifns;
-bool GetDataParamsTaihe::Convert2NativeValue(ani_env *env, ani_object in, GetDataParams &getDataParams, const std::string &key)
+bool GetDataParamsTaihe::Convert2NativeValue(ani_env *env, ani_object in,
+    GetDataParams &getDataParams, const std::string &key)
 {
     if (!SetProgressIndicator(env, in, getDataParams)) {
         LOG_ERROR(UDMF_ANI, "SetProgressIndicator failed.");
@@ -156,7 +157,8 @@ bool GetDataParamsTaihe::SetProgressListener(ani_env *env, GetDataParams &getDat
 }
 
 void GetDataParamsTaihe::SaveCallback(ani_env *env, GetDataParams &getDataParams,
-    ani_fn_object callback, const std::string &key) {
+    ani_fn_object callback, const std::string &key)
+{
     anifns.Compute(key, [&](const std::string &key, ani_fn_object &anifn) {
         if (anifn != nullptr) {
             LOG_WARN(UDMF_ANI, "Listener has existed!");
