@@ -58,12 +58,14 @@ void PlainTextTaihe::SetTextContent(::taihe::string_view textContent)
     return ::taihe::string(this->value_->GetContent());
 }
 
-void PlainTextTaihe::SetTextAbstract(::taihe::string_view textAbstract) {
+void PlainTextTaihe::SetTextAbstract(::taihe::string_view textAbstract)
+{
     std::string abstract(textAbstract);
     this->value_->SetAbstract(abstract);
 }
 
-::taihe::string PlainTextTaihe::GetTextAbstract() {
+::taihe::string PlainTextTaihe::GetTextAbstract()
+{
     return ::taihe::string(this->value_->GetAbstract());
 }
 
