@@ -648,6 +648,11 @@ bool UnifiedDataUtils::IsPersist(const std::string &intention)
     return IsPersist(GetIntentionByString(intention));
 }
 
+bool UnifiedDataUtils::IsPersist(const Intention &intention)
+{
+    return intention >= UD_INTENTION_DATA_HUB && intention < UD_INTENTION_BUTT;
+}
+
 bool UnifiedDataUtils::IsFileMangerIntention(const std::string &intention)
 {
     Intention optionIntention = GetIntentionByString(intention);
