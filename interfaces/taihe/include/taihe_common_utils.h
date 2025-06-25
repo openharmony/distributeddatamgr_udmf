@@ -32,9 +32,9 @@ ValueType ConvertValueType(ani_env *env, ::taihe::string_view type,
 
 UDDetails ConvertUDDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
 
-::taihe::map_view<::taihe::string, ::taihe::string> ConvertUDDetailsToString(const UDDetails &details);
+::taihe::map<::taihe::string, ::taihe::string> ConvertUDDetailsToString(const UDDetails &details);
 
-::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> ConvertUDDetailsToUnion(
+::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> ConvertUDDetailsToUnion(
     const UDDetails &details);
 
 UDDetails ConvertUDDetailsToUnion(
