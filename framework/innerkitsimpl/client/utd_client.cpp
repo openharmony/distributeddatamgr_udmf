@@ -67,8 +67,6 @@ UtdClient &UtdClient::GetInstance()
 bool UtdClient::Init()
 {
     bool result = true;
-    std::unique_lock<std::shared_mutex> lock(utdMutex_);
-    descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
     int32_t userId = DEFAULT_USER_ID;
     bool isHap = IsHapTokenType();
     if (!isHap && GetCurrentActiveUserId(userId) != Status::E_OK) {
@@ -82,6 +80,9 @@ bool UtdClient::Init()
         customUtd = CustomUtdStore::GetInstance().GetCustomUtd(isHap, userId);
         lastLoadTime_ = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
     }
+
+    std::unique_lock<std::shared_mutex> lock(utdMutex_);
+    descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
 
     LOG_INFO(UDMF_CLIENT, "get customUtd size:%{public}zu, file size:%{public}" PRIu64,
         customUtd.size(), utdFileInfo_.size);
@@ -282,24 +283,29 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
 
 std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
 {
-    std::shared_lock<std::shared_mutex> guard(utdMutex_);
-    for (const auto &utdTypeCfg : descriptorCfgs_) {
-        for (auto mime : utdTypeCfg.mimeTypes) {
-            std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
-            if (mime == mimeType) {
-                return utdTypeCfg.typeId;
-            }
-        }
-    }
-    if (mimeType.empty() || mimeType.back() != '*') {
+    if (mimeType.empty()) {
         return "";
     }
-    std::string prefixType = mimeType.substr(0, mimeType.length() - 1);
-    for (const auto &utdTypeCfg : descriptorCfgs_) {
-        for (auto mime : utdTypeCfg.mimeTypes) {
-            std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
-            if (mime.rfind(prefixType, 0) == 0 && utdTypeCfg.belongingToTypes.size() > 0) {
-                return utdTypeCfg.belongingToTypes[0];
+    {
+        std::shared_lock<std::shared_mutex> guard(utdMutex_);
+        for (const auto &utdTypeCfg : descriptorCfgs_) {
+            for (auto mime : utdTypeCfg.mimeTypes) {
+                std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
+                if (mime == mimeType) {
+                    return utdTypeCfg.typeId;
+                }
+            }
+        }
+        if (mimeType.back() != '*') {
+            return "";
+        }
+        std::string prefixType = mimeType.substr(0, mimeType.length() - 1);
+        for (const auto &utdTypeCfg : descriptorCfgs_) {
+            for (auto mime : utdTypeCfg.mimeTypes) {
+                std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
+                if (mime.rfind(prefixType, 0) == 0 && utdTypeCfg.belongingToTypes.size() > 0) {
+                    return utdTypeCfg.belongingToTypes[0];
+                }
             }
         }
     }
@@ -354,13 +360,15 @@ std::vector<std::string> UtdClient::GetTypeIdsFromCfg(const std::string &mimeTyp
     }
     std::vector<std::string> typeIdsInCfg;
 
-    std::shared_lock<std::shared_mutex> guard(utdMutex_);
-    for (const auto &utdTypeCfg : descriptorCfgs_) {
-        for (auto mime : utdTypeCfg.mimeTypes) {
-            std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
-            if ((mime == mimeType) || (prefixMatch && mime.rfind(prefixType, 0) == 0)) {
-                typeIdsInCfg.push_back(utdTypeCfg.typeId);
-                break;
+    {
+        std::shared_lock<std::shared_mutex> guard(utdMutex_);
+        for (const auto &utdTypeCfg : descriptorCfgs_) {
+            for (auto mime : utdTypeCfg.mimeTypes) {
+                std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
+                if ((mime == mimeType) || (prefixMatch && mime.rfind(prefixType, 0) == 0)) {
+                    typeIdsInCfg.push_back(utdTypeCfg.typeId);
+                    break;
+                }
             }
         }
     }
