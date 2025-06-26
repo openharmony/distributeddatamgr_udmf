@@ -648,9 +648,9 @@ bool UnifiedDataUtils::IsPersist(const std::string &intention)
     return IsPersist(GetIntentionByString(intention));
 }
 
-bool UnifiedDataUtils::IsPersist(const Intention &intention)
+bool UnifiedDataUtils::IsPersist(const int32_t &visibility)
 {
-    return intention >= UD_INTENTION_DATA_HUB && intention < UD_INTENTION_BUTT;
+    return visibility >= static_cast<int32_t>(VISIBILITY_ALL) && visibility < static_cast<int32_t>(VISIBILITY_BUTT);
 }
 
 bool UnifiedDataUtils::IsFileMangerIntention(const std::string &intention)
