@@ -2232,6 +2232,28 @@ HWTEST_F(UtdClientTest, GetTypeIdsFromCfgtest002, TestSize.Level1)
 }
 
 /**
+* @tc.name: GetTypeIdFromCfg002
+* @tc.desc: GetTypeIdFromCfg
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetTypeIdFromCfg002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypeIdFromCfg002 begin.");
+    std::string mimeType = "";
+    UtdClient utdClient;
+    utdClient.descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
+    auto ret = utdClient.GetTypeIdFromCfg(mimeType);
+    EXPECT_EQ(ret, "");
+    mimeType = "mimeType";
+    ret = utdClient.GetTypeIdFromCfg(mimeType);
+    EXPECT_EQ(ret, "");
+    mimeType = "mimeType*";
+    ret = utdClient.GetTypeIdFromCfg(mimeType);
+    EXPECT_EQ(ret, "");
+    LOG_INFO(UDMF_TEST, "GetTypeIdFromCfg002 end.");
+}
+
+/**
 * @tc.name: IsHapTokenType001
 * @tc.desc: Normal testcase of IsHapTokenType
 * @tc.type: FUNC
