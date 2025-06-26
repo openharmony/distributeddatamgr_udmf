@@ -14,6 +14,10 @@ import("//build/ohos.gni")
 import("//foundation/distributeddatamgr/udmf/adapter/arkui_x_udmf.gni")
 import("//foundation/distributeddatamgr/udmf/udmf.gni")
 
+third_party_skia_path = "${third_party_path}/skia"
+if (udmf_feature_upgrade_skia) {
+  third_party_skia_path = "${third_party_path}/skia/m133"
+}
 config("udmf_client_config") {
   include_dirs = [
     "${udmf_interfaces_path}/innerkits/client",
@@ -69,10 +73,12 @@ config("arkui_x_udmf_config") {
     "${arkui_x_graphic_surface_path}/interfaces/inner_api/common",
     "${arkui_x_graphic_surface_path}/interfaces/inner_api/surface",
     "${arkui_x_graphic_surface_path}/interfaces/inner_api/utils",
-    "${third_party_path}/skia",
+    "${third_party_skia_path}",
   ]
-
   defines = [ "CROSS_PLATFORM" ]
+  if (udmf_feature_upgrade_skia) {
+    defines += [ "USE_M133_SKIA" ]
+  }
 }
 
 arkui_x_public_source = [
@@ -167,7 +173,7 @@ config("arkui_x_udmf_napi_config") {
     "${arkui_x_graphic_surface_path}/interfaces/inner_api/utils",
     "${arkui_x_graphic_2d_path}/utils/color_manager/export",
     "${arkui_x_graphic_2d_path}/rosen/modules/platform/ipc_core",
-    "${third_party_path}/skia",
+    "${third_party_skia_path}",
   ]
   defines = [ "CROSS_PLATFORM" ]
   if (current_os == "ios") {
@@ -182,6 +188,9 @@ ohos_source_set("arkui_x_uniformtypedescriptor") {
     "${udmf_root_path}/adapter/framework/innerkitsimpl/client",
   ]
 
+  if (udmf_feature_upgrade_skia) {
+    defines = [ "USE_M133_SKIA" ]
+  }
   sources = [
     "${udmf_framework_path}/jskitsimpl/common/napi_data_utils.cpp",
     "${udmf_framework_path}/jskitsimpl/common/napi_error_utils.cpp",
@@ -255,6 +264,9 @@ ohos_source_set("arkui_x_unifieddatachannel") {
     "${ability_runtime_cross_platform_path}/interfaces/inner_api/want:want_params_config",
   ]
 
+  if (udmf_feature_upgrade_skia) {
+    defines = [ "USE_M133_SKIA" ]
+  }
   deps = [
     ":arkui_x_udmf_data",
     "${ability_runtime_cross_platform_path}/interfaces/inner_api/want:cross_platform_want_params",
@@ -303,7 +315,9 @@ ohos_source_set("arkui_x_udmf_data_napi") {
     ":arkui_x_udmf_napi_config",
     "${ability_runtime_cross_platform_path}/interfaces/inner_api/want:want_params_config",
   ]
-
+if (udmf_feature_upgrade_skia) {
+    defines = [ "USE_M133_SKIA" ]
+  }
   deps = [
     ":arkui_x_udmf_data_inner",
     "${ability_runtime_cross_platform_path}/frameworks/js/napi/napi_common:napi_common",
