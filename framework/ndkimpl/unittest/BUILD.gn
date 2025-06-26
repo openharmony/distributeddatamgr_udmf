@@ -13,7 +13,7 @@
 import("//build/test.gni")
 import("//foundation/distributeddatamgr/udmf/udmf.gni")
 
-module_output_path = "udmf/ndkimpl"
+module_output_path = "udmf/udmf/ndkimpl"
 
 ###############################################################################
 config("module_private_config") {
