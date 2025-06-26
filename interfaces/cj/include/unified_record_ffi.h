@@ -18,20 +18,46 @@
 
 #include <cstdint>
 
-#include "ffi_remote_data.h"
 #include "cj_common_ffi.h"
-
+#include "ffi_remote_data.h"
 #include "unified_record_impl.h"
 
 namespace OHOS {
 namespace UDMF {
 extern "C" {
-    FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructor();
-    FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value);
-    FFI_EXPORT char *FfiUDMFUnifiedRecordGetType(int64_t unifiedId);
-    FFI_EXPORT CJValueType FfiUDMFUnifiedRecordGetValue(int64_t unifiedId);
+FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructor();
+FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructorwithOnlyType(const char *type);
+FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructorwithType(const char *type, CJValueType value);
+FFI_EXPORT char *FfiUDMFUnifiedRecordGetType(int64_t unifiedId);
+FFI_EXPORT CJValueType FfiUDMFUnifiedRecordGetValue(int64_t unifiedId);
+
+FFI_EXPORT void FfiUDMFFileSetUri(int64_t id, const char *uri);
+FFI_EXPORT char *FfiUDMFFileGetUri(int64_t id);
+FFI_EXPORT CRecord FfiUDMFFileGetDetails(int64_t id);
+FFI_EXPORT void FfiUDMFFileSetDetails(int64_t id, CRecord record);
+
+FFI_EXPORT char *FfiUDMFImageGetImageUri(int64_t id);
+FFI_EXPORT void FfiUDMFImageSetImageUri(int64_t id, const char *uri);
+
+FFI_EXPORT char *FfiUDMFVideoGetVideoUri(int64_t id);
+FFI_EXPORT void FfiUDMFVideoSetVideoUri(int64_t id, const char *uri);
+
+FFI_EXPORT CRecord FfiUDMFTextGetDetails(int64_t id);
+FFI_EXPORT void FfiUDMFTextSetDetails(int64_t id, CRecord record);
+
+FFI_EXPORT char *FfiUDMFHyperLinkGetUrl(int64_t id);
+FFI_EXPORT void FfiUDMFHyperLinkSetUrl(int64_t id, const char *url);
+
+FFI_EXPORT char *FfiUDMFHyperLinkGetDescription(int64_t id);
+FFI_EXPORT void FfiUDMFHyperLinkSetDescription(int64_t id, const char *description);
+
+FFI_EXPORT char *FfiUDMFPlainTextGetTextContent(int64_t id);
+FFI_EXPORT void FfiUDMFPlainTextSetTextContent(int64_t id, const char *text);
+
+FFI_EXPORT char *FfiUDMFPlainTextGetAbstract(int64_t id);
+FFI_EXPORT void FfiUDMFPlainTextSetAbstract(int64_t id, const char *abstr);
 }
-}
-}
+} // namespace UDMF
+} // namespace OHOS
 
 #endif
