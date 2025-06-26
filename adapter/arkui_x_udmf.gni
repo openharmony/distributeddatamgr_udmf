@@ -11,6 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+declare_args() {
+  udmf_feature_upgrade_skia = false
+}
 ability_runtime_cross_platform_path =
     "//foundation/appframework/ability/ability_runtime/cross_platform"
 
