@@ -38,8 +38,6 @@ bool FlexibleType::ParseFlexibleUtd(const std::string &typeId, TypeDescriptorCfg
     std::string flexibleFlag = FLEXIBLE_TYPE_FLAG;
     flexibleUtd.erase(0, flexibleFlag.size());
     std::string flexibleUtdDecode = Base32::Decode(flexibleUtd);
-
-    LOG_DEBUG(UDMF_CLIENT, "The typeId be parsed, flexibleUtdDecode: %{public}s", flexibleUtdDecode.c_str());
     if (flexibleUtdDecode.empty() || flexibleUtdDecode[0] != '?' ||
             flexibleUtdDecode.find("=") == flexibleUtdDecode.npos) {
         LOG_WARN(UDMF_CLIENT, "The typeId cannot be parsed, %{public}s ", typeId.c_str());
@@ -81,8 +79,6 @@ std::string FlexibleType::GenFlexibleUtd(const std::string &mimeType, const std:
         flexibleUtd += ":" + std::to_string(FILE_EXTENTSION) + "=" + fileExtension;
     }
     std::string encodeUtd = Base32::Encode(flexibleUtd);
-    LOG_DEBUG(UDMF_CLIENT, "FlexibleUtd typeId is: %{public}s, encodeUtd is: %{public}s",
-        flexibleUtd.c_str(), encodeUtd.c_str());
     return FLEXIBLE_TYPE_FLAG + encodeUtd;
 }
 

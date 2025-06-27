@@ -104,7 +104,6 @@ int32_t CustomUtdStore::SavaCfgFile(const std::string &jsonData, const std::stri
 
 bool CustomUtdStore::CreateDirectory(const std::string &path) const
 {
-    LOG_DEBUG(UDMF_CLIENT, "CreateDirectory start, path:%{public}s ", path.c_str());
     if (access(path.c_str(), F_OK) == 0) {
         return true;
     }
@@ -121,8 +120,7 @@ bool CustomUtdStore::CreateDirectory(const std::string &path) const
 
         if (access(subPath.c_str(), F_OK) != 0) {
             if (mkdir(subPath.c_str(), (S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) != 0) {
-                LOG_WARN(UDMF_CLIENT, "CreateDirectory, fail. path:%{public}s, subPath:%{public}s.",
-                         path.c_str(), subPath.c_str());
+                LOG_WARN(UDMF_CLIENT, "CreateDirectory, fail.");
                 return false;
             }
         }
