@@ -36,7 +36,6 @@ public:
     void API_EXPORT SetDescription(const std::string &description);
     void InitObject() override;
 
-    static bool CheckValue(const ValueType &value);
 private:
     std::string url_;
     std::string description_;

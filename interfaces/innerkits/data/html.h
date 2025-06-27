@@ -35,7 +35,6 @@ public:
     void API_EXPORT SetPlainContent(const std::string &htmlContent);
     void InitObject() override;
 
-    static bool CheckValue(const ValueType &value);
 private:
     std::string htmlContent_;
     std::string plainContent_;

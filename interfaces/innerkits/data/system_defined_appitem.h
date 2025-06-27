@@ -44,7 +44,6 @@ public:
     UDDetails API_EXPORT GetItems();
     void InitObject() override;
 
-    static bool CheckValue(const ValueType &value);
 private:
     std::string appId_;
     std::string appName_;
