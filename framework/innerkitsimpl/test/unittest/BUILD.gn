@@ -204,11 +204,36 @@ ohos_unittest("UdmfClientSaInvokeTest") {
 ohos_unittest("UdmfAsyncClientTest") {
   module_out_path = module_output_path
 
-  sources = [ "udmf_async_client_test.cpp" ]
+  configs = [ ":module_private_config" ]
 
-  deps = common_deps
+  sources = [
+    "udmf_async_client_test.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/udmf_async_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/common/progress_queue.cpp",
+    "${udmf_framework_path}/common/udmf_executor.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/progress_callback.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_notifier_stub.cpp",
+    "${udmf_framework_path}/common/udmf_copy_file.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
+    "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+  ]
+
+  deps = [
+    "${udmf_interfaces_path}/innerkits:udmf_client",
+    "${udmf_interfaces_path}/innerkits:utd_client",
+    "${udmf_interfaces_path}/ndk:libudmf"
+  ]
 
   external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
 }
 
 ohos_unittest("UdmfDelayDataTest") {
@@ -691,6 +716,21 @@ ohos_unittest("UnifiedMetaTest") {
   ]
 }
 
+ohos_unittest("unifiedKeyTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unified_key_test.cpp" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ohos_unittest("UdmfClientAbnormalTest") {
   module_out_path = module_output_path
 
@@ -774,6 +814,7 @@ group("unittest") {
     ":SystemDefinedPixelMapTest",
     ":SystemDefinedRecordTest",
     ":TextTest",
+    ":unifiedKeyTest",
     ":UdmfAsyncClientTest",
     ":UdmfClientAbnormalTest",
     ":UdmfClientFileMangerTest",
