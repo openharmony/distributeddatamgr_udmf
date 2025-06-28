@@ -16,6 +16,7 @@
       "SystemCapability.DistributedDataManager.UDMF.Core"
     ],
     "features": [
+      "udmf_feature_upgrade_skia"
     ],
     "adapted_system_type": [
       "standard"
