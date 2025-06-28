@@ -31,6 +31,7 @@
 namespace OHOS {
 namespace UDMF {
 constexpr const char *TAG = "UdmfClient::";
+constexpr const char *BUNDLE_IN_APP = "udmf.inapp.data";
 static constexpr int KEY_LEN = 32;
 using namespace OHOS::DistributedDataDfx;
 using namespace RadarReporter;
@@ -40,12 +41,28 @@ UdmfClient &UdmfClient::GetInstance()
     return instance;
 }
 
+void UdmfClient::ProcessDragIfInApp(UnifiedData &unifiedData, std::string &intentionDrag, std::string &key)
+{
+    std::string bundleName = BUNDLE_IN_APP;
+    UnifiedKey udKey = UnifiedKey(intentionDrag, bundleName, UTILS::GenerateId());
+    key = udKey.GetUnifiedKey();
+    dataCache_.Clear();
+    dataCache_.Insert(key, unifiedData);
+    LOG_INFO(UDMF_CLIENT, "SetData in app success, bundleName:%{public}s.", bundleName.c_str());
+    RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
+        BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::SUCCESS, BizState::DFX_END);
+}
+
 Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
 {
     DdsTrace trace(
         std::string(TAG) + std::string(__FUNCTION__), TraceSwitch::BYTRACE_ON | TraceSwitch::TRACE_CHAIN_ON);
     RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
         BizScene::SET_DATA, SetDataStage::SET_DATA_BEGIN, StageRes::IDLE, BizState::DFX_BEGIN);
+    if (!UnifiedDataUtils::IsValidIntention(option.intention)) {
+        LOG_ERROR(UDMF_SERVICE, "Invalid intention");
+        return E_INVALID_PARAMETERS;
+    }
     auto service = UdmfServiceClient::GetInstance();
     if (service == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
@@ -57,23 +74,16 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
         BizScene::SET_DATA, SetDataStage::SET_DATA_BEGIN, StageRes::SUCCESS);
     if (option.intention == UD_INTENTION_DRAG) {
         ShareOptions shareOption = SHARE_OPTIONS_BUTT;
-        auto status = GetAppShareOption(UD_INTENTION_MAP.at(option.intention), shareOption);
+        auto intentionDrag = UD_INTENTION_MAP.at(option.intention);
+        auto status = GetAppShareOption(intentionDrag, shareOption);
         if (status != E_NOT_FOUND && status != E_OK) {
             RadarReporterAdapter::ReportFail(std::string(__FUNCTION__),
                 BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::FAILED, status, BizState::DFX_END);
-            LOG_ERROR(UDMF_CLIENT, "get appShareOption fail, intention:%{public}s",
-                      UD_INTENTION_MAP.at(option.intention).c_str());
+            LOG_ERROR(UDMF_CLIENT, "get appShareOption fail, intention:%{public}s", intentionDrag.c_str());
             return static_cast<Status>(status);
         }
         if (shareOption == ShareOptions::IN_APP) {
-            std::string bundleName = "udmf.inapp.data";
-            UnifiedKey udKey = UnifiedKey(UD_INTENTION_MAP.at(option.intention), bundleName, UTILS::GenerateId());
-            key = udKey.GetUnifiedKey();
-            dataCache_.Clear();
-            dataCache_.Insert(key, unifiedData);
-            LOG_INFO(UDMF_CLIENT, "SetData in app success, bundleName:%{public}s.", bundleName.c_str());
-            RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
-                BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::SUCCESS, BizState::DFX_END);
+            ProcessDragIfInApp(unifiedData, intentionDrag, key);
             return E_OK;
         }
         if (unifiedData.HasType(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML))) {

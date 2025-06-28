@@ -568,4 +568,215 @@ HWTEST_F(UdmfAsyncClientTest, StartAsyncDataRetrieval010, TestSize.Level1)
     ASSERT_EQ(E_INVALID_PARAMETERS, status);
     LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval010 end.");
 }
+
+/**
+ * @tc.name: Cancel001
+ * @tc.desc: Test Normal Cancel
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfAsyncClientTest, Cancel001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Cancel001 begin.");
+    CustomOption customOption = {
+        .intention = UDMF::UD_INTENTION_DRAG
+    };
+    UnifiedData data;
+    auto obj = std::make_shared<Object>();
+    auto file = std::make_shared<Image>(UDType::IMAGE, obj);
+    file->SetUri("uri");
+    file->SetRemoteUri("remoteUri");
+    data.AddRecord(file);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(E_OK, status);
+
+    GetDataParams params;
+    QueryOption query = {
+        .intention = UD_INTENTION_DRAG,
+        .key = key
+    };
+    auto callback = [this](ProgressInfo progress, std::shared_ptr<UnifiedData> data) {
+        LOG_INFO(UDMF_TEST, "Callback begin status=%{public}d, progress=%{public}d, name=%{public}s.",
+            progress.progressStatus, progress.progress, progress.srcDevName.c_str());
+        if (data == nullptr) {
+            ASSERT_TRUE(progress.progress != 0);
+            return;
+        }
+        ASSERT_EQ(1, data->GetRecords().size());
+        LOG_INFO(UDMF_TEST, "StartAsyncDataRetrieval009 callback end.");
+    };
+    params.query = query;
+    params.progressIndicator = ProgressIndicator::DEFAULT;
+    params.progressListener = callback;
+    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
+    ASSERT_EQ(E_OK, status);
+    std::string businessUdKey = "udmf://a/b/c";
+    status = UdmfAsyncClient::GetInstance().Cancel(params.query.key);
+    ASSERT_EQ(E_OK, status);
+
+    LOG_INFO(UDMF_TEST, "Cancel001 end.");
+}
+
+/**
+ * @tc.name: Cancel002
+ * @tc.desc: Test Invalid params.
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfAsyncClientTest, Cancel002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Cancel002 begin.");
+    CustomOption customOption = {
+        .intention = UDMF::UD_INTENTION_DRAG
+    };
+    UnifiedData data;
+    auto obj = std::make_shared<Object>();
+    auto file = std::make_shared<Image>(UDType::IMAGE, obj);
+    file->SetUri("uri");
+    file->SetRemoteUri("remoteUri");
+    data.AddRecord(file);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(E_OK, status);
+
+    GetDataParams params;
+    QueryOption query = {
+        .intention = UD_INTENTION_DRAG,
+        .key = key
+    };
+    auto callback = [this](ProgressInfo progress, std::shared_ptr<UnifiedData> data) {
+        LOG_INFO(UDMF_TEST, "Callback begin status=%{public}d, progress=%{public}d, name=%{public}s.",
+            progress.progressStatus, progress.progress, progress.srcDevName.c_str());
+        if (data == nullptr) {
+            ASSERT_TRUE(progress.progress != 0);
+            return;
+        }
+        ASSERT_EQ(1, data->GetRecords().size());
+        LOG_INFO(UDMF_TEST, "Cancel002 callback end.");
+    };
+    params.query = query;
+    params.progressIndicator = ProgressIndicator::DEFAULT;
+    params.progressListener = callback;
+    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
+    ASSERT_EQ(E_OK, status);
+    std::string businessUdKey = "udmf";
+    status = UdmfAsyncClient::GetInstance().Cancel(businessUdKey);
+    ASSERT_EQ(E_ERROR, status);
+
+    LOG_INFO(UDMF_TEST, "Cancel002 end.");
+}
+
+/* *
+ * @tc.name: CancelOnSingleTask001
+ * @tc.desc: Test one data
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfAsyncClientTest, CancelOnSingleTask001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CancelOnSingleTask001 begin.");
+    CustomOption customOption = {
+        .intention = UDMF::UD_INTENTION_DRAG
+    };
+    UnifiedData data;
+    auto obj = std::make_shared<Object>();
+    auto file = std::make_shared<Image>(UDType::IMAGE, obj);
+    file->SetUri("uri");
+    file->SetRemoteUri("remoteUri");
+    data.AddRecord(file);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(E_OK, status);
+
+    GetDataParams params;
+    QueryOption query = {
+        .intention = UD_INTENTION_DRAG,
+        .key = key
+    };
+    auto callback = [this](ProgressInfo progress, std::shared_ptr<UnifiedData> data) {
+        LOG_INFO(UDMF_TEST, "Callback begin status=%{public}d, progress=%{public}d, name=%{public}s.",
+            progress.progressStatus, progress.progress, progress.srcDevName.c_str());
+        if (data == nullptr) {
+            ASSERT_TRUE(progress.progress != 0);
+            return;
+        }
+        ASSERT_EQ(1, data->GetRecords().size());
+        LOG_INFO(UDMF_TEST, "CancelOnSingleTask001 callback end.");
+    };
+    params.query = query;
+    params.progressIndicator = ProgressIndicator::DEFAULT;
+    params.progressListener = callback;
+    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
+    ASSERT_EQ(E_OK, status);
+    status = UdmfAsyncClient::GetInstance().CancelOnSingleTask();
+    ASSERT_EQ(E_ERROR, status);
+
+    LOG_INFO(UDMF_TEST, "CancelOnSingleTask001 end.");
+}
+
+/* *
+ * @tc.name: CancelOnSingleTask002
+ * @tc.desc: Test no data
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfAsyncClientTest, CancelOnSingleTask002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CancelOnSingleTask002 begin.");
+    auto status = UdmfAsyncClient::GetInstance().CancelOnSingleTask();
+    ASSERT_EQ(E_ERROR, status);
+
+    LOG_INFO(UDMF_TEST, "CancelOnSingleTask002 end.");
+}
+
+/* *
+ * @tc.name: CancelOnSingleTask003
+ * @tc.desc: Test two data
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfAsyncClientTest, CancelOnSingleTask003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CancelOnSingleTask003 begin.");
+    CustomOption customOption = {
+        .intention = UDMF::UD_INTENTION_DRAG
+    };
+    UnifiedData data;
+    auto obj = std::make_shared<Object>();
+    auto file = std::make_shared<Image>(UDType::IMAGE, obj);
+    file->SetUri("uri");
+    file->SetRemoteUri("remoteUri");
+    data.AddRecord(file);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(E_OK, status);
+
+    GetDataParams params;
+    QueryOption query = {
+        .intention = UD_INTENTION_DRAG,
+        .key = key
+    };
+    auto callback = [this](ProgressInfo progress, std::shared_ptr<UnifiedData> data) {
+        LOG_INFO(UDMF_TEST, "Callback begin status=%{public}d, progress=%{public}d, name=%{public}s.",
+            progress.progressStatus, progress.progress, progress.srcDevName.c_str());
+        if (data == nullptr) {
+            ASSERT_TRUE(progress.progress != 0);
+            return;
+        }
+        ASSERT_EQ(1, data->GetRecords().size());
+        LOG_INFO(UDMF_TEST, "CancelOnSingleTask001 callback end.");
+    };
+    params.query = query;
+    params.progressIndicator = ProgressIndicator::DEFAULT;
+    params.progressListener = callback;
+    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
+    ASSERT_EQ(E_OK, status);
+    query = {
+        .intention = UD_INTENTION_DRAG,
+        .key = "key"
+    };
+    params.query = query;
+    status = UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
+    ASSERT_EQ(E_OK, status);
+    status = UdmfAsyncClient::GetInstance().CancelOnSingleTask();
+    ASSERT_EQ(E_ERROR, status);
+
+    LOG_INFO(UDMF_TEST, "CancelOnSingleTask003 end.");
+}
 } // OHOS::Test

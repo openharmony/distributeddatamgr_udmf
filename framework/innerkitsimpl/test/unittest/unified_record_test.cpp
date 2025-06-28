@@ -143,6 +143,32 @@ HWTEST_F(UnifiedRecordTest, Constructor_002, TestSize.Level0)
 }
 
 /**
+ * @tc.name: GetDataId_001
+ * @tc.desc: Get dataId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedRecordTest, GetDataId_001, TestSize.Level0)
+{
+    UnifiedRecord record(TEXT);
+    uint32_t dataId = 1;
+    record.SetDataId(dataId);
+    auto data = record.GetDataId();
+    EXPECT_EQ(data, 1);
+}
+
+/**
+ * @tc.name: SetChannelName_001
+ * @tc.desc: Set channelName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedRecordTest, SetChannelName_001, TestSize.Level0)
+{
+    UnifiedRecord record(TEXT);
+    std::string channelName = "channelName";
+    EXPECT_NO_FATAL_FAILURE(record.SetChannelName(channelName););
+}
+
+/**
  * @tc.name: Constructor_003
  * @tc.desc: Verify the constructor.
  * @tc.type: FUNC

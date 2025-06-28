@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <mutex>
 #include "utd_common.h"
-#include "preset_type_descriptors.h"
 #include "preset_type_descriptors.h"
 #include "flexible_type.h"
 #include "type_descriptor.h"
@@ -62,9 +62,14 @@ private:
     std::string GetTypeIdFromCfg(const std::string &mimeType);
     std::vector<std::string> GetTypeIdsFromCfg(const std::string &mimeType);
     void UpdateGraph(const std::vector<TypeDescriptorCfg> &customTyepCfgs);
+    bool TryReloadCustomUtd();
 
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
     std::shared_mutex utdMutex_;
+
+    std::mutex customUtdMutex_;
+    UtdFileInfo utdFileInfo_{0};
+    int64_t lastLoadTime_{0};
 };
 } // namespace UDMF
 } // namespace OHOS

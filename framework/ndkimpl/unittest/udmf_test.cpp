@@ -3022,7 +3022,7 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedDataByOptions001, TestSize.Level1)
     int deleteRes = OH_Udmf_DeleteUnifiedData(options2, &dataArray2, &dataSize2);
     EXPECT_EQ(deleteRes, UDMF_E_OK);
     EXPECT_NE(dataArray2, nullptr);
-    EXPECT_EQ(dataSize2,2);
+    EXPECT_EQ(dataSize2, 2);
     OH_Udmf_DestroyDataArray(&dataArray, dataSize);
     OH_Udmf_DestroyDataArray(&dataArray2, dataSize2);
     OH_UdmfOptions_Destroy(options);
@@ -3456,6 +3456,24 @@ HWTEST_F(UDMFTest, OH_Udmf_UpdateUnifiedData002, TestSize.Level1)
     OH_UdsFileUri_Destroy(fileUri2);
     OH_UdmfRecord_Destroy(record2);
     OH_UdmfData_Destroy(udmfUnifiedData2);
+}
+
+/**
+ * @tc.name: OH_Udmf_UpdateUnifiedData003
+ * @tc.desc: OH_Udmf_UpdateUnifiedData with content form
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_UpdateUnifiedData003, TestSize.Level1)
+{
+    std::string uri = "https://xxx/xx/xx4.jpg";
+    OH_UdmfData *udmfUnifiedData = CreateImageDataWithFileUri(uri);
+    OH_UdmfOptions* options = nullptr;
+    int upDataRes = OH_Udmf_UpdateUnifiedData(options, udmfUnifiedData);
+    EXPECT_EQ(upDataRes, UDMF_E_INVALID_PARAM);
+    OH_UdmfOptions* options2 = OH_UdmfOptions_Create();
+    upDataRes = OH_Udmf_UpdateUnifiedData(options, udmfUnifiedData);
+    EXPECT_EQ(upDataRes, UDMF_E_INVALID_PARAM);
+    OH_UdmfOptions_Destroy(options2);
 }
 
 /**

@@ -91,17 +91,22 @@ FFI_EXPORT CArrI64 FfiUDMFQueryData(const char *intention, const char *key, int3
         LOGE("Query unified data failed!");
         return queryData;
     }
-    auto buffer = malloc(sizeof(int64_t) * unifiedDataSet.size());
-    if (buffer == nullptr) {
+    auto arr = static_cast<int64_t*>(malloc(sizeof(int64_t) * unifiedDataSet.size()));
+    if (arr == nullptr) {
         LOGE("malloc error in queryData");
         return queryData;
     }
-    auto arr = static_cast<int64_t*>(buffer);
     for (uint64_t i = 0; i < unifiedDataSet.size(); i++) {
         std::shared_ptr<UnifiedData> unifiedDataItem = std::make_shared<UnifiedData>();
+        auto cUnifiedData = FFIData::Create<CUnifiedData>();
+        if (unifiedDataItem == nullptr || cUnifiedData == nullptr) {
+            LOGE("Create unifiedData failed. Instance is null.");
+            free(arr);
+            arr = nullptr;
+            return queryData;
+        }
         unifiedDataItem->SetRecords(unifiedDataSet[i].GetRecords());
         unifiedDataItem->SetProperties(unifiedDataSet[i].GetProperties());
-        auto cUnifiedData = FFIData::Create<CUnifiedData>();
         cUnifiedData->unifiedData_ = unifiedDataItem;
         arr[i] = cUnifiedData->GetID();
     }
@@ -127,17 +132,22 @@ FFI_EXPORT CArrI64 FfiUDMFDeleteData(const char *intention, const char *key, int
         LOGE("Query unified data failed!");
         return deleteData;
     }
-    auto buffer = malloc(sizeof(int64_t) * unifiedDataSet.size());
-    if (buffer == nullptr) {
+    auto arr = static_cast<int64_t*>(malloc(sizeof(int64_t) * unifiedDataSet.size()));
+    if (arr == nullptr) {
         LOGE("malloc error in deleteData");
         return deleteData;
     }
-    auto arr = static_cast<int64_t*>(buffer);
     for (uint64_t i = 0; i < unifiedDataSet.size(); i++) {
         std::shared_ptr<UnifiedData> unifiedDataItem = std::make_shared<UnifiedData>();
+        auto cUnifiedData = FFIData::Create<CUnifiedData>();
+        if (unifiedDataItem == nullptr || cUnifiedData == nullptr) {
+            LOGE("Create unifiedData failed. Instance is null.");
+            free(arr);
+            arr = nullptr;
+            return deleteData;
+        }
         unifiedDataItem->SetRecords(unifiedDataSet[i].GetRecords());
         unifiedDataItem->SetProperties(unifiedDataSet[i].GetProperties());
-        auto cUnifiedData = FFIData::Create<CUnifiedData>();
         cUnifiedData->unifiedData_ = unifiedDataItem;
         arr[i] = cUnifiedData->GetID();
     }
@@ -153,7 +163,7 @@ FFI_EXPORT void FfiUDMFFreeStringData(char *str)
 
 FFI_EXPORT void FfiUDMFFreeArrI64Data(CArrI64* ptr)
 {
-    if (ptr == nullptr) {
+    if (ptr == nullptr || ptr->head == nullptr) {
         return;
     }
     free(ptr->head);

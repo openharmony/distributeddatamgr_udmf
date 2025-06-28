@@ -583,7 +583,7 @@ int OH_Udmf_SetUnifiedDataByOptions(OH_UdmfOptions* options, OH_UdmfData* unifie
 
 int OH_Udmf_UpdateUnifiedData(OH_UdmfOptions* options, OH_UdmfData* unifiedData)
 {
-    if (!IsUnifiedDataValid(unifiedData) || options->key.empty()) {
+    if (!IsUnifiedDataValid(unifiedData) || options == nullptr || options->key.empty()) {
         LOG_ERROR(UDMF_CAPI, "The update error, lnvaild params!");
         return UDMF_E_INVALID_PARAM;
     }

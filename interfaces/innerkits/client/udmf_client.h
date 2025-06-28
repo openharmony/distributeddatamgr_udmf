@@ -60,6 +60,7 @@ private:
     UdmfClient(const UdmfClient &obj) = delete;
     UdmfClient &operator=(const UdmfClient &obj) = delete;
     std::string GetSelfBundleName();
+    void ProcessDragIfInApp(UnifiedData &unifiedData, std::string &intentionDrag, std::string &key);
 
     ConcurrentMap<std::string, UnifiedData> dataCache_;
 };

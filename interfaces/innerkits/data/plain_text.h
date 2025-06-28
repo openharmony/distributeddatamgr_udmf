@@ -34,7 +34,6 @@ public:
     void API_EXPORT SetAbstract(const std::string &abstract);
     void InitObject() override;
 
-    static bool CheckValue(const ValueType &value);
 private:
     std::string content_;
     std::string abstract_;
