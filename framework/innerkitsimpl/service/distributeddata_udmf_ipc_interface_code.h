@@ -37,7 +37,13 @@ enum class UdmfServiceInterfaceCode : uint32_t {
     SET_DELAY_INFO,
     SET_DELAY_DATA,
     GET_DELAY_DATA,
-    HANDLE_DELAY_OBSERVER,
+    CODE_BUTT
+};
+
+enum class UdmfNotifierInterfaceCode : uint32_t {
+    CODE_HEAD = 0,
+    HANDLE_DELAY_OBSERVER = CODE_HEAD,
+    HANDLE_DELAY_DATA,
     CODE_BUTT
 };
 } // namespace OHOS::UDMF
