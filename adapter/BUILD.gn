@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Copyright (c) 2024-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -93,7 +93,6 @@ arkui_x_public_source = [
   "${udmf_framework_path}/innerkitsimpl/data/image.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/link.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/plain_text.cpp",
-  "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/system_defined_appitem.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
@@ -107,13 +106,14 @@ arkui_x_public_source = [
   "${udmf_framework_path}/common/graph.cpp",
   "${udmf_root_path}/adapter/framework/innerkitsimpl/common/unified_meta.cpp",
   "${udmf_root_path}/adapter/framework/innerkitsimpl/client/utd_client.cpp",
+  "${udmf_framework_path}/common/base32_utils.cpp",
+  "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
+  "${udmf_framework_path}/common/custom_utd_store.cpp",
+  "${udmf_root_path}/adapter/framework/innerkitsimpl/client/preset_type_descriptors.cpp",
 ]
 
 ohos_source_set("arkui_x_udmf_data") {
   sources = [
-    "${udmf_framework_path}/common/base32_utils.cpp",
-    "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
-    "${udmf_framework_path}/common/custom_utd_store.cpp",
     "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
     "${udmf_root_path}/adapter/framework/common/udmf_utils.cpp",
   ]
