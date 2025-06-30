@@ -15,8 +15,7 @@
 #include "preset_type_descriptors.h"
 namespace OHOS {
 namespace UDMF {
-constexpr const char *REFERENCE_URL = "https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/"\
-                                      "apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype";
+constexpr const char *REFERENCE_URL = " ";
 
 PresetTypeDescriptors::PresetTypeDescriptors()
 {

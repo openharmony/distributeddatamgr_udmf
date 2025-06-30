@@ -27,7 +27,6 @@ constexpr const int MAX_UTD_LENGTH = 256;
 constexpr const int MAX_FILE_EXTENSION_LENGTH = 14;
 constexpr const char *DEFAULT_ANONYMOUS = "******";
 
-
 std::string UtdClient::Anonymous(const std::string &fileExtension)
 {
     if (fileExtension.length() <= MAX_FILE_EXTENSION_LENGTH) {
@@ -48,7 +47,6 @@ UtdClient::UtdClient()
         std::thread(updateTask).detach();
     }
     LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
-
 }
 
 UtdClient::~UtdClient()
@@ -125,7 +123,7 @@ bool UtdClient::IsValidMimeType(const std::string &mimeType)
         return false;
     }
     if (mimeType.find("?") != mimeType.npos || mimeType.find(":") != mimeType.npos ||
-        mimeType.find("=") != mimeType.npos ||mimeType.find("\\") != mimeType.npos) {
+        mimeType.find("=") != mimeType.npos || mimeType.find("\\") != mimeType.npos) {
             return false;
     }
     return true;
@@ -215,28 +213,30 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
 
 Status UtdClient::IsUtd(std::string typeId, bool &result)
 {
-            if (typeId.empty() || typeId.size() > MAX_UTD_LENGTH) {
-            result = false;
-            return Status::E_INVALID_PARAMETERS;
-        }
-        if (typeId[0] == '.' || find(typeId.begin(), typeId.end(), '/') != typeId.end()) {
-            result = false;
-            return Status::E_OK;
-        }
-        constexpr const char *preSetTypeIdRegexRule =
-            R"(^(general\.|openharmony\.|org\.|com\.|macos\.|debian\.|redhat\.|io\.|de\.|net\.)[a-z0-9-\.]+(\-[a-z0-9-]+)*$)";
-        if (std::regex_match(typeId, std::regex(preSetTypeIdRegexRule))) {
-            result = true;
-            return Status::E_OK;
-        }
-        constexpr const char *customUtdRegexRule = R"(^([A-Za-z]\w*)(\.\w+)+(\.[A-Za-z\d-]+)+)";
-        if (std::regex_match(typeId, std::regex(customUtdRegexRule))) {
-            result = true;
-            return Status::E_OK;
-        }
-        result = false;
-        LOG_ERROR(UDMF_CLIENT, "is not utd, typeId:%{public}s", typeId.c_str());
+  if (typeId.empty() || typeId.size() > MAX_UTD_LENGTH) {
+    result = false;
+    return Status::E_INVALID_PARAMETERS;
+  }
+  if (typeId[0] == '.' ||
+      find(typeId.begin(), typeId.end(), '/') != typeId.end()) {
+    result = false;
     return Status::E_OK;
+  }
+  constexpr const char *preSetTypeIdRegexRule =
+      R"(^(general\.|openharmony\.|org\.|com\.|macos\.|debian\.|redhat\.|io\.|de\.|net\.)[a-z0-9-\.]+(\-[a-z0-9-]+)*$)";
+  if (std::regex_match(typeId, std::regex(preSetTypeIdRegexRule))) {
+    result = true;
+    return Status::E_OK;
+  }
+  constexpr const char *customUtdRegexRule =
+      R"(^([A-Za-z]\w*)(\.\w+)+(\.[A-Za-z\d-]+)+)";
+  if (std::regex_match(typeId, std::regex(customUtdRegexRule))) {
+    result = true;
+    return Status::E_OK;
+  }
+  result = false;
+  LOG_ERROR(UDMF_CLIENT, "is not utd, typeId:%{public}s", typeId.c_str());
+  return Status::E_OK;
 }
 
 Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &fileExtension,
