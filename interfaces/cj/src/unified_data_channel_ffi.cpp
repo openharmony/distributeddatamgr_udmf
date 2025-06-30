@@ -77,7 +77,6 @@ FFI_EXPORT int32_t FfiUDMFUpdateData(const char *key, int64_t unifiedDataId)
 FFI_EXPORT CArrI64 FfiUDMFQueryData(const char *intention, const char *key, int32_t *errCode)
 {
     *errCode = E_INVALID_PARAMETERS;
-    std::vector<UnifiedData> unifiedDataSet;
     CArrI64 queryData = { .head = nullptr, .size = 0 };
     Intention it = UnifiedDataUtils::GetIntentionByString(intention);
     if (it == UD_INTENTION_DRAG) {
@@ -85,23 +84,29 @@ FFI_EXPORT CArrI64 FfiUDMFQueryData(const char *intention, const char *key, int3
         return queryData;
     }
     QueryOption option = { .key = key, .intention = it };
+    std::vector<UnifiedData> unifiedDataSet;
     auto status = UdmfClient::GetInstance().GetBatchData(option, unifiedDataSet);
     *errCode = status;
     if (status != E_OK) {
         LOGE("Query unified data failed!");
         return queryData;
     }
-    auto buffer = malloc(sizeof(int64_t) * unifiedDataSet.size());
-    if (buffer == nullptr) {
+    auto arr = static_cast<int64_t*>(malloc(sizeof(int64_t) * unifiedDataSet.size()));
+    if (arr == nullptr) {
         LOGE("malloc error in queryData");
         return queryData;
     }
-    auto arr = static_cast<int64_t*>(buffer);
     for (uint64_t i = 0; i < unifiedDataSet.size(); i++) {
         std::shared_ptr<UnifiedData> unifiedDataItem = std::make_shared<UnifiedData>();
+        auto cUnifiedData = FFIData::Create<CUnifiedData>();
+        if (unifiedDataItem == nullptr || cUnifiedData == nullptr) {
+            LOGE("Create unifiedData failed. Instance is null.");
+            free(arr);
+            arr = nullptr;
+            return queryData;
+        }
         unifiedDataItem->SetRecords(unifiedDataSet[i].GetRecords());
         unifiedDataItem->SetProperties(unifiedDataSet[i].GetProperties());
-        auto cUnifiedData = FFIData::Create<CUnifiedData>();
         cUnifiedData->unifiedData_ = unifiedDataItem;
         arr[i] = cUnifiedData->GetID();
     }
@@ -113,7 +118,6 @@ FFI_EXPORT CArrI64 FfiUDMFQueryData(const char *intention, const char *key, int3
 FFI_EXPORT CArrI64 FfiUDMFDeleteData(const char *intention, const char *key, int32_t *errCode)
 {
     *errCode = E_INVALID_PARAMETERS;
-    std::vector<UnifiedData> unifiedDataSet;
     CArrI64 deleteData = { .head = nullptr, .size = 0 };
     Intention it = UnifiedDataUtils::GetIntentionByString(intention);
     if (it == UD_INTENTION_DRAG) {
@@ -121,23 +125,29 @@ FFI_EXPORT CArrI64 FfiUDMFDeleteData(const char *intention, const char *key, int
         return deleteData;
     }
     QueryOption option = { .key = key, .intention = it };
+    std::vector<UnifiedData> unifiedDataSet;
     auto status = UdmfClient::GetInstance().DeleteData(option, unifiedDataSet);
     *errCode = status;
     if (status != E_OK) {
         LOGE("Query unified data failed!");
         return deleteData;
     }
-    auto buffer = malloc(sizeof(int64_t) * unifiedDataSet.size());
-    if (buffer == nullptr) {
+    auto arr = static_cast<int64_t*>(malloc(sizeof(int64_t) * unifiedDataSet.size()));
+    if (arr == nullptr) {
         LOGE("malloc error in deleteData");
         return deleteData;
     }
-    auto arr = static_cast<int64_t*>(buffer);
     for (uint64_t i = 0; i < unifiedDataSet.size(); i++) {
         std::shared_ptr<UnifiedData> unifiedDataItem = std::make_shared<UnifiedData>();
+        auto cUnifiedData = FFIData::Create<CUnifiedData>();
+        if (unifiedDataItem == nullptr || cUnifiedData == nullptr) {
+            LOGE("Create unifiedData failed. Instance is null.");
+            free(arr);
+            arr = nullptr;
+            return deleteData;
+        }
         unifiedDataItem->SetRecords(unifiedDataSet[i].GetRecords());
         unifiedDataItem->SetProperties(unifiedDataSet[i].GetProperties());
-        auto cUnifiedData = FFIData::Create<CUnifiedData>();
         cUnifiedData->unifiedData_ = unifiedDataItem;
         arr[i] = cUnifiedData->GetID();
     }
@@ -153,7 +163,11 @@ FFI_EXPORT void FfiUDMFFreeStringData(char *str)
 
 FFI_EXPORT void FfiUDMFFreeArrI64Data(CArrI64* ptr)
 {
+    if (ptr == nullptr || ptr->head == nullptr) {
+        return;
+    }
     free(ptr->head);
+    ptr->head = nullptr;
 }
 }
 } // namespace UDMF

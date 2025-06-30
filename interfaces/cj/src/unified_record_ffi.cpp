@@ -16,6 +16,7 @@
 
 #include "unified_record_ffi.h"
 
+#include "udmf_log.h"
 #include "unified_record_impl.h"
 #include "utils.h"
 
@@ -24,8 +25,10 @@ using namespace OHOS::UDMF;
 
 namespace OHOS {
 namespace UDMF {
-extern "C" {
+constexpr int64_t NO_ERROR = 0;
+constexpr int64_t ERR_INIT_FAILED = -1;
 
+extern "C" {
 int64_t FfiUDMFUnifiedRecordConstructor()
 {
     auto nativeCJUnifiedRecord = FFIData::Create<CUnifiedRecord>();
@@ -75,18 +78,21 @@ char *FfiUDMFFileGetUri(int64_t id)
 {
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
+        LOGE("Get unifiedRecord failed. Instance is null.");
         return nullptr;
     }
     return instance->GetFileUri();
 }
 
-void FfiUDMFFileSetUri(int64_t id, const char *uri)
+int64_t FfiUDMFFileSetUri(int64_t id, const char *uri)
 {
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
-        return;
+        LOGE("Get unifiedRecord failed. Instance is null.");
+        return ERR_INIT_FAILED;
     }
     instance->SetFileUri(uri);
+    return NO_ERROR;
 }
 
 CRecord FfiUDMFFileGetDetails(int64_t id)
@@ -94,60 +100,73 @@ CRecord FfiUDMFFileGetDetails(int64_t id)
     CRecord ret = { .keys = { .head = nullptr, .size = 0 }, .values = { .head = nullptr, .size = 0 } };
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
+        LOGE("Get unifiedRecord failed. Instance is null.");
         return ret;
     }
     return instance->GetFileDetails();
 }
 
-void FfiUDMFFileSetDetails(int64_t id, CRecord record)
+int64_t FfiUDMFFileSetDetails(int64_t id, CRecord record)
 {
-    std::map<std::string, std::string> details;
+    if (record.keys.size != record.values.size) {
+        LOGE("Param error. The number of key and value mismatch.");
+        return ERR_INIT_FAILED;
+    }
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
-        return;
+        LOGE("Get unifiedRecord failed. Instance is null.");
+        return ERR_INIT_FAILED;
     }
+    std::map<std::string, std::string> details;
     for (int64_t i = 0; i < record.keys.size; i++) {
         std::string key{record.keys.head[i]};
         std::string value{record.values.head[i]};
         details[key] = value;
     }
     instance->SetFileDetails(details);
+    return NO_ERROR;
 }
 
 char *FfiUDMFImageGetImageUri(int64_t id)
 {
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
+        LOGE("Get unifiedRecord failed. Instance is null.");
         return nullptr;
     }
     return instance->GetImageUri();
 }
 
-void FfiUDMFImageSetImageUri(int64_t id, const char *uri)
+int64_t FfiUDMFImageSetImageUri(int64_t id, const char *uri)
 {
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
-        return;
+        LOGE("Get unifiedRecord failed. Instance is null.");
+        return ERR_INIT_FAILED;
     }
     instance->SetImageUri(uri);
+    return NO_ERROR;
 }
 
 char *FfiUDMFVideoGetVideoUri(int64_t id)
 {
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
+        LOGE("Get unifiedRecord failed. Instance is null.");
         return nullptr;
     }
     return instance->GetVideoUri();
-    }
+}
 
-    void FfiUDMFVideoSetVideoUri(int64_t id, const char *uri)
-    {
+int64_t FfiUDMFVideoSetVideoUri(int64_t id, const char *uri)
+{
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
-        return;
+        LOGE("Get unifiedRecord failed. Instance is null.");
+        return ERR_INIT_FAILED;
     }
     instance->SetVideoUri(uri);
+    return NO_ERROR;
 }
 
 CRecord FfiUDMFTextGetDetails(int64_t id)
@@ -155,96 +174,115 @@ CRecord FfiUDMFTextGetDetails(int64_t id)
     CRecord ret = { .keys = { .head = nullptr, .size = 0 }, .values = { .head = nullptr, .size = 0 } };
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
+        LOGE("Get unifiedRecord failed. Instance is null.");
         return ret;
     }
     return instance->GetTextDetails();
 }
 
-void FfiUDMFTextSetDetails(int64_t id, CRecord record)
+int64_t FfiUDMFTextSetDetails(int64_t id, CRecord record)
 {
-    std::map<std::string, std::string> details;
+    if (record.keys.size != record.values.size) {
+        LOGE("Param error. The number of key and value mismatch.");
+        return ERR_INIT_FAILED;
+    }
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
-        return;
+        LOGE("Get unifiedRecord failed. Instance is null.");
+        return ERR_INIT_FAILED;
     }
+    std::map<std::string, std::string> details;
     for (int64_t i = 0; i < record.keys.size; i++) {
         std::string key{record.keys.head[i]};
         std::string value{record.values.head[i]};
         details[key] = value;
     }
     instance->SetTextDetails(details);
+    return NO_ERROR;
 }
 
 char *FfiUDMFHyperLinkGetUrl(int64_t id)
 {
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
+        LOGE("Get unifiedRecord failed. Instance is null.");
         return nullptr;
     }
     return instance->GetHyperLinkUrl();
 }
 
-void FfiUDMFHyperLinkSetUrl(int64_t id, const char *url)
+int64_t FfiUDMFHyperLinkSetUrl(int64_t id, const char *url)
 {
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
-        return;
+        LOGE("Get unifiedRecord failed. Instance is null.");
+        return ERR_INIT_FAILED;
     }
     instance->SetHyperLinkUrl(url);
+    return NO_ERROR;
 }
 
 char *FfiUDMFHyperLinkGetDescription(int64_t id)
 {
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
+        LOGE("Get unifiedRecord failed. Instance is null.");
         return nullptr;
     }
     return instance->GetHyperLinkDescription();
 }
 
-void FfiUDMFHyperLinkSetDescription(int64_t id, const char *description)
+int64_t FfiUDMFHyperLinkSetDescription(int64_t id, const char *description)
 {
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
-        return;
+        LOGE("Get unifiedRecord failed. Instance is null.");
+        return ERR_INIT_FAILED;
     }
     instance->SetHyperLinkDescription(description);
+    return NO_ERROR;
 }
 
 char *FfiUDMFPlainTextGetTextContent(int64_t id)
 {
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
+        LOGE("Get unifiedRecord failed. Instance is null.");
         return nullptr;
     }
     return instance->GetPlainTextContent();
 }
 
-void FfiUDMFPlainTextSetTextContent(int64_t id, const char *text)
+int64_t FfiUDMFPlainTextSetTextContent(int64_t id, const char *text)
 {
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
-        return;
+        LOGE("Get unifiedRecord failed. Instance is null.");
+        return ERR_INIT_FAILED;
     }
     instance->SetPlainTextContent(text);
+    return NO_ERROR;
 }
 
 char *FfiUDMFPlainTextGetAbstract(int64_t id)
 {
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
+        LOGE("Get unifiedRecord failed. Instance is null.");
         return nullptr;
     }
     return instance->GetPlainTextAbstract();
 }
 
-void FfiUDMFPlainTextSetAbstract(int64_t id, const char *abstr)
+int64_t FfiUDMFPlainTextSetAbstract(int64_t id, const char *abstr)
 {
     auto instance = FFIData::GetData<CUnifiedRecord>(id);
     if (instance == nullptr) {
-        return;
+        LOGE("Get unifiedRecord failed. Instance is null.");
+        return ERR_INIT_FAILED;
     }
     instance->SetPlainTextAbstract(abstr);
+    return NO_ERROR;
 }
 
 FFI_EXPORT void FfiUDMFFreeCjValueType(CJValueType *val)

@@ -31,31 +31,31 @@ FFI_EXPORT int64_t FfiUDMFUnifiedRecordConstructorwithType(const char *type, CJV
 FFI_EXPORT char *FfiUDMFUnifiedRecordGetType(int64_t unifiedId);
 FFI_EXPORT CJValueType FfiUDMFUnifiedRecordGetValue(int64_t unifiedId);
 
-FFI_EXPORT void FfiUDMFFileSetUri(int64_t id, const char *uri);
+FFI_EXPORT int64_t FfiUDMFFileSetUri(int64_t id, const char *uri);
 FFI_EXPORT char *FfiUDMFFileGetUri(int64_t id);
 FFI_EXPORT CRecord FfiUDMFFileGetDetails(int64_t id);
-FFI_EXPORT void FfiUDMFFileSetDetails(int64_t id, CRecord record);
+FFI_EXPORT int64_t FfiUDMFFileSetDetails(int64_t id, CRecord record);
 
 FFI_EXPORT char *FfiUDMFImageGetImageUri(int64_t id);
-FFI_EXPORT void FfiUDMFImageSetImageUri(int64_t id, const char *uri);
+FFI_EXPORT int64_t FfiUDMFImageSetImageUri(int64_t id, const char *uri);
 
 FFI_EXPORT char *FfiUDMFVideoGetVideoUri(int64_t id);
-FFI_EXPORT void FfiUDMFVideoSetVideoUri(int64_t id, const char *uri);
+FFI_EXPORT int64_t FfiUDMFVideoSetVideoUri(int64_t id, const char *uri);
 
 FFI_EXPORT CRecord FfiUDMFTextGetDetails(int64_t id);
-FFI_EXPORT void FfiUDMFTextSetDetails(int64_t id, CRecord record);
+FFI_EXPORT int64_t FfiUDMFTextSetDetails(int64_t id, CRecord record);
 
 FFI_EXPORT char *FfiUDMFHyperLinkGetUrl(int64_t id);
-FFI_EXPORT void FfiUDMFHyperLinkSetUrl(int64_t id, const char *url);
+FFI_EXPORT int64_t FfiUDMFHyperLinkSetUrl(int64_t id, const char *url);
 
 FFI_EXPORT char *FfiUDMFHyperLinkGetDescription(int64_t id);
-FFI_EXPORT void FfiUDMFHyperLinkSetDescription(int64_t id, const char *description);
+FFI_EXPORT int64_t FfiUDMFHyperLinkSetDescription(int64_t id, const char *description);
 
 FFI_EXPORT char *FfiUDMFPlainTextGetTextContent(int64_t id);
-FFI_EXPORT void FfiUDMFPlainTextSetTextContent(int64_t id, const char *text);
+FFI_EXPORT int64_t FfiUDMFPlainTextSetTextContent(int64_t id, const char *text);
 
 FFI_EXPORT char *FfiUDMFPlainTextGetAbstract(int64_t id);
-FFI_EXPORT void FfiUDMFPlainTextSetAbstract(int64_t id, const char *abstr);
+FFI_EXPORT int64_t FfiUDMFPlainTextSetAbstract(int64_t id, const char *abstr);
 }
 } // namespace UDMF
 } // namespace OHOS
