@@ -607,7 +607,7 @@ export class ContentFormCard extends ViewPU {
             Text.lineHeight((this.lineCount === 1 ?
                 (this.formStyle.b3 ? this.formStyle.b3 :
                 this.formStyle.j2) : this.formStyle.j2) * this.cardScale);
-            Text.fontSize(this.getDescriptionFontSize());
+            Text.fontSize(this.getDescriptionFontSize() * this.cardScale);
             Text.constraintSize({
                 minWidth: this.getTextSize(TextType.DESCRIPTION, this.contentFormData?.description)
             });
@@ -943,7 +943,7 @@ export class ContentFormCard extends ViewPU {
 
     getDescriptionFontSize() {
         return this.lineCount === 1 ? (this.formStyle.a3 ? this.formStyle.a3 :
-        this.formStyle.i2) : (this.formStyle.i2 * this.cardScale);
+        this.formStyle.i2) : this.formStyle.i2;
     }
 
     rerender() {

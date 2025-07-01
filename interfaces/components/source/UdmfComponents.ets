@@ -414,7 +414,7 @@ export struct ContentFormCard {
       .lineHeight((this.lineCount === 1 ?
         (this.formStyle.maxDescriptionLineHeight ? this.formStyle.maxDescriptionLineHeight :
         this.formStyle.descriptionLineHeight) : this.formStyle.descriptionLineHeight) * this.cardScale)
-      .fontSize(this.getDescriptionFontSize())
+      .fontSize(this.getDescriptionFontSize() * this.cardScale)
       .constraintSize({ minWidth: this.getTextSize(TextType.DESCRIPTION, this.contentFormData?.description) })
       .backgroundColor(this.getTextBackground(this.contentFormData?.description))
       .borderRadius(this.contentFormData?.description ? 0 : DEFAULT_EMPTY_TEXT_RADIUS)
@@ -670,6 +670,6 @@ export struct ContentFormCard {
 
   getDescriptionFontSize(): number {
     return this.lineCount === 1 ? (this.formStyle.maxDescriptionFontSize ? this.formStyle.maxDescriptionFontSize :
-    this.formStyle.descriptionFontSize) : (this.formStyle.descriptionFontSize * this.cardScale);
+    this.formStyle.descriptionFontSize) : this.formStyle.descriptionFontSize;
   }
 }
