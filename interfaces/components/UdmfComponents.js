@@ -398,6 +398,7 @@ export class ContentFormCard extends ViewPU {
 
     initCardStyle() {
         let n2 = 1;
+        this.lineCount = 2;
         switch (this.formType) {
             case FormType.TYPE_BIG:
                 this.formStyle = a2;
@@ -614,7 +615,9 @@ export class ContentFormCard extends ViewPU {
             Text.borderRadius(this.contentFormData?.description ? 0 : j1);
             Text.onAreaChange(() => {
                 let m2 = this.controller.getLayoutManager();
-                this.lineCount = m2.getLineCount();
+                if (m2.getLineCount() === 2) {
+                    this.lineCount = 2;
+                }
             });
             Text.direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr);
             Text.maxFontScale(1);
