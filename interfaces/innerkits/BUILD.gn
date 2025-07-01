@@ -18,6 +18,7 @@ config("udmf_client_config") {
     "${udmf_interfaces_path}/innerkits/client",
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_interfaces_path}/innerkits/dynamic",
     "${udmf_interfaces_path}/innerkits/convert",
     "${udmf_interfaces_path}/ndk/data",
     "${udmf_framework_path}/common",
@@ -72,6 +73,7 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/innerkitsimpl/data/unified_html_record_process.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/video.cpp",
+    "${udmf_framework_path}/innerkitsimpl/dynamic/pixelmap_loader.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/progress_callback.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_notifier_stub.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
@@ -95,7 +97,6 @@ ohos_shared_library("udmf_client") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "hitrace:libhitracechain",
-    "image_framework:image_native",
     "ipc:ipc_core",
     "kv_store:distributeddata_mgr",
     "libuv:uv",
@@ -179,4 +180,37 @@ ohos_shared_library("utd_client") {
     ]
     external_deps += [ "selinux_adapter:librestorecon" ]
   }
+}
+
+ohos_shared_library("pixelmap_wrapper") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  include_dirs = [
+    "${udmf_interfaces_path}/innerkits/dynamic",
+    "${udmf_framework_path}/common",
+  ]
+  sources = [
+    "${udmf_framework_path}/innerkitsimpl/dynamic/pixelmap_wrapper.cpp",
+  ]
+
+  defines = [ "API_EXPORT=__attribute__((visibility (\"default\")))" ]
+
+  deps = []
+
+  external_deps = [
+    "image_framework:image_native",
+    "hilog:libhilog",
+  ]
+
+  relative_install_dir = "platformsdk"
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "udmf"
+  subsystem_name = "distributeddatamgr"
+  output_name = "pixelmap_wrapper"
+  output_extension = "so"
 }

@@ -203,6 +203,15 @@
             ],
             "header_base":"//foundation/distributeddatamgr/udmf/interfaces/ani/native/include"
           }
+        },
+	{
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:pixelmap_wrapper",
+          "header": {
+            "header_files": [
+              "pixelmap_wrapper.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/dynamic"
+          }
         }
       ],
       "test": [
