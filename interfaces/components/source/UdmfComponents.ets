@@ -242,6 +242,7 @@ export struct ContentFormCard {
 
   initCardStyle(): void {
     let widthScale = 1;
+    this.lineCount = 1;
     switch (this.formType) {
       case FormType.TYPE_BIG:
         this.formStyle = BIG_CARD_STYLE;
@@ -420,6 +421,9 @@ export struct ContentFormCard {
       .onAreaChange(() => {
         let layoutManager: LayoutManager = this.controller.getLayoutManager();
         this.lineCount = layoutManager.getLineCount();
+        if (layoutManager.getLineCount() === 2) {
+          this.lineCount = 2;
+        }
       })
       .direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr)
       .maxFontScale(1)
