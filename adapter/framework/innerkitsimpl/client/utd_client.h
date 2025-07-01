@@ -51,7 +51,7 @@ private:
     ~UtdClient();
     UtdClient(const UtdClient &obj) = delete;
     UtdClient &operator=(const UtdClient &obj) = delete;
-    bool Init();
+    void Init();
     bool IsHapTokenType();
     std::string GetCustomUtdPath();
     Status GetCurrentActiveUserId(int32_t& userId);

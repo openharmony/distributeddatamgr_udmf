@@ -26,6 +26,7 @@ namespace UDMF {
 constexpr const int MAX_UTD_LENGTH = 256;
 constexpr const int MAX_FILE_EXTENSION_LENGTH = 14;
 constexpr const char *DEFAULT_ANONYMOUS = "******";
+constexpr const char *CUSTOM_UTD_HAP_DIR = "/data/utd/utd-adt.json";
 
 std::string UtdClient::Anonymous(const std::string &fileExtension)
 {
@@ -38,15 +39,7 @@ std::string UtdClient::Anonymous(const std::string &fileExtension)
 
 UtdClient::UtdClient()
 {
-    if (!Init()) {
-        LOG_WARN(UDMF_CLIENT, "construct UtdClient failed, try again.");
-        auto updateTask = []() {
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-            UtdClient::GetInstance().Init();
-        };
-        std::thread(updateTask).detach();
-    }
-    LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
+    Init();
 }
 
 UtdClient::~UtdClient()
@@ -59,19 +52,34 @@ UtdClient &UtdClient::GetInstance()
     return *instance;
 }
 
-bool UtdClient::Init()
+std::vector<TypeDescriptorCfg> GetHapTypeCfgs()
 {
-    bool result = true;
+    LOG_DEBUG(UDMF_CLIENT, "get utdcustom from cfg, Path:%{public}s.", CUSTOM_UTD_HAP_DIR);
+    std::string jsonStr;
+    std::ifstream fin(CUSTOM_UTD_HAP_DIR);
+    while (fin.good()) {
+        std::string line;
+        std::getline(fin, line);
+        jsonStr += line;
+    }
+    std::vector<TypeDescriptorCfg> customUtdTypes;
+    CustomUtdJsonParser utdJsonParser;
+    utdJsonParser.ParseStoredCustomUtdJson(jsonStr, customUtdTypes);
+    LOG_DEBUG(UDMF_CLIENT, "GetTypeCfgs, customUtdTypes total:%{public}zu.", customUtdTypes.size());
+    return customUtdTypes;
+}
+
+void UtdClient::Init()
+{
     std::unique_lock<std::shared_mutex> lock(utdMutex_);
     descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
     std::vector<TypeDescriptorCfg> customTypes;
-    customTypes = CustomUtdStore::GetInstance().GetHapTypeCfgs();
+    customTypes = GetHapTypeCfgs();
     LOG_INFO(UDMF_CLIENT, "get customUtd, size:%{public}zu", customTypes.size());
     if (!customTypes.empty()) {
         descriptorCfgs_.insert(descriptorCfgs_.end(), customTypes.begin(), customTypes.end());
     }
     UtdGraph::GetInstance().InitUtdGraph(descriptorCfgs_);
-    return result;
 }
 
 bool UtdClient::IsHapTokenType()
@@ -79,7 +87,7 @@ bool UtdClient::IsHapTokenType()
     return true;
 }
 
-Status UtdClient::GetCurrentActiveUserId(int32_t& userId)
+Status UtdClient::GetCurrentActiveUserId(int32_t &userId)
 {
     return Status::E_OK;
 }

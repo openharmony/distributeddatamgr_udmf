@@ -12,10 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "preset_type_descriptors.h"
+
 namespace OHOS {
 namespace UDMF {
-constexpr const char *REFERENCE_URL = " ";
+constexpr const char *REFERENCE_URL = "";
 
 PresetTypeDescriptors::PresetTypeDescriptors()
 {
@@ -28,8 +30,8 @@ PresetTypeDescriptors::~PresetTypeDescriptors()
 
 PresetTypeDescriptors &PresetTypeDescriptors::GetInstance()
 {
-    static auto instance = new PresetTypeDescriptors();
-    return *instance;
+    static PresetTypeDescriptors instance;
+    return instance;
 }
 
 std::vector<TypeDescriptorCfg> &PresetTypeDescriptors::GetPresetTypes()
