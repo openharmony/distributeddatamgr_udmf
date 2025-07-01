@@ -242,6 +242,7 @@ export struct ContentFormCard {
 
   initCardStyle(): void {
     let widthScale = 1;
+    this.lineCount = 1;
     switch (this.formType) {
       case FormType.TYPE_BIG:
         this.formStyle = BIG_CARD_STYLE;
@@ -413,13 +414,16 @@ export struct ContentFormCard {
       .lineHeight((this.lineCount === 1 ?
         (this.formStyle.maxDescriptionLineHeight ? this.formStyle.maxDescriptionLineHeight :
         this.formStyle.descriptionLineHeight) : this.formStyle.descriptionLineHeight) * this.cardScale)
-      .fontSize(this.getDescriptionFontSize())
+      .fontSize(this.getDescriptionFontSize() * this.cardScale)
       .constraintSize({ minWidth: this.getTextSize(TextType.DESCRIPTION, this.contentFormData?.description) })
       .backgroundColor(this.getTextBackground(this.contentFormData?.description))
       .borderRadius(this.contentFormData?.description ? 0 : DEFAULT_EMPTY_TEXT_RADIUS)
       .onAreaChange(() => {
         let layoutManager: LayoutManager = this.controller.getLayoutManager();
         this.lineCount = layoutManager.getLineCount();
+        if (layoutManager.getLineCount() === 2) {
+          this.lineCount = 2;
+        }
       })
       .direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr)
       .maxFontScale(1)
@@ -666,6 +670,6 @@ export struct ContentFormCard {
 
   getDescriptionFontSize(): number {
     return this.lineCount === 1 ? (this.formStyle.maxDescriptionFontSize ? this.formStyle.maxDescriptionFontSize :
-    this.formStyle.descriptionFontSize) : (this.formStyle.descriptionFontSize * this.cardScale);
+    this.formStyle.descriptionFontSize) : this.formStyle.descriptionFontSize;
   }
 }

@@ -398,6 +398,7 @@ export class ContentFormCard extends ViewPU {
 
     initCardStyle() {
         let n2 = 1;
+        this.lineCount = 2;
         switch (this.formType) {
             case FormType.TYPE_BIG:
                 this.formStyle = a2;
@@ -606,7 +607,7 @@ export class ContentFormCard extends ViewPU {
             Text.lineHeight((this.lineCount === 1 ?
                 (this.formStyle.b3 ? this.formStyle.b3 :
                 this.formStyle.j2) : this.formStyle.j2) * this.cardScale);
-            Text.fontSize(this.getDescriptionFontSize());
+            Text.fontSize(this.getDescriptionFontSize() * this.cardScale);
             Text.constraintSize({
                 minWidth: this.getTextSize(TextType.DESCRIPTION, this.contentFormData?.description)
             });
@@ -614,7 +615,9 @@ export class ContentFormCard extends ViewPU {
             Text.borderRadius(this.contentFormData?.description ? 0 : j1);
             Text.onAreaChange(() => {
                 let m2 = this.controller.getLayoutManager();
-                this.lineCount = m2.getLineCount();
+                if (m2.getLineCount() === 2) {
+                    this.lineCount = 2;
+                }
             });
             Text.direction(this.isMirrorLanguageType ? Direction.Rtl : Direction.Ltr);
             Text.maxFontScale(1);
@@ -940,7 +943,7 @@ export class ContentFormCard extends ViewPU {
 
     getDescriptionFontSize() {
         return this.lineCount === 1 ? (this.formStyle.a3 ? this.formStyle.a3 :
-        this.formStyle.i2) : (this.formStyle.i2 * this.cardScale);
+        this.formStyle.i2) : this.formStyle.i2;
     }
 
     rerender() {

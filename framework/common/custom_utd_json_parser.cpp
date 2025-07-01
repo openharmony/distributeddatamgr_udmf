@@ -128,17 +128,17 @@ bool CustomUtdJsonParser::GetTypeDescriptors(const json &jsonRoot, const std::st
             return false;
         }
         for (int i = 0; i < itemNum; i++) {
-            cJSON *node = cJSON_GetArrayItem(subNode, i);
+            const cJSON *node = cJSON_GetArrayItem(subNode, i);
             TypeDescriptorCfg typeCfg;
-            typeCfg.typeId = GetStringValue(*node, TYPEID);
-            typeCfg.belongingToTypes = GetStringArrayValue(*node, BELONGINGTOTYPES);
-            typeCfg.filenameExtensions = GetStringArrayValue(*node, FILE_NAME_EXTENSTENSIONS);
-            typeCfg.mimeTypes = GetStringArrayValue(*node, MIME_TYPES);
-            typeCfg.description = GetStringValue(*node, DESCRIPTION);
-            typeCfg.referenceURL = GetStringValue(*node, REFERENCE_URL);
-            typeCfg.iconFile = GetStringValue(*node, ICON_FILE);
-            typeCfg.ownerBundle = GetStringValue(*node, OWNER);
-            std::vector<std::string> installerBundles = GetStringArrayValue(*node, INSTALLERS);
+            typeCfg.typeId = GetStringValue(node, TYPEID);
+            typeCfg.belongingToTypes = GetStringArrayValue(node, BELONGINGTOTYPES);
+            typeCfg.filenameExtensions = GetStringArrayValue(node, FILE_NAME_EXTENSTENSIONS);
+            typeCfg.mimeTypes = GetStringArrayValue(node, MIME_TYPES);
+            typeCfg.description = GetStringValue(node, DESCRIPTION);
+            typeCfg.referenceURL = GetStringValue(node, REFERENCE_URL);
+            typeCfg.iconFile = GetStringValue(node, ICON_FILE);
+            typeCfg.ownerBundle = GetStringValue(node, OWNER);
+            std::vector<std::string> installerBundles = GetStringArrayValue(node, INSTALLERS);
             typeCfg.installerBundles.insert(installerBundles.begin(), installerBundles.end());
             typesCfg.push_back(typeCfg);
         }
@@ -146,11 +146,11 @@ bool CustomUtdJsonParser::GetTypeDescriptors(const json &jsonRoot, const std::st
     return true;
 }
 
-std::string CustomUtdJsonParser::GetStringValue(const json &node, const std::string &nodeName)
+std::string CustomUtdJsonParser::GetStringValue(const json* &node, const std::string &nodeName)
 {
     std::string value;
-    if (!cJSON_IsNull(&node) && cJSON_IsObject(&node) && cJSON_HasObjectItem(&node, nodeName.c_str())) {
-        cJSON *subNode = cJSON_GetObjectItem(&node, nodeName.c_str());
+    if (!cJSON_IsNull(node) && cJSON_IsObject(node) && cJSON_HasObjectItem(node, nodeName.c_str())) {
+        cJSON *subNode = cJSON_GetObjectItem(node, nodeName.c_str());
         if (cJSON_IsString(subNode)) {
             value = cJSON_GetStringValue(subNode);
         }
@@ -158,11 +158,11 @@ std::string CustomUtdJsonParser::GetStringValue(const json &node, const std::str
     return value;
 }
 
-std::vector<std::string> CustomUtdJsonParser::GetStringArrayValue(const json &node, const std::string &nodeName)
+std::vector<std::string> CustomUtdJsonParser::GetStringArrayValue(const json* &node, const std::string &nodeName)
 {
     std::vector<std::string> values;
-    if (!cJSON_IsNull(&node) && cJSON_IsObject(&node) && cJSON_HasObjectItem(&node, nodeName.c_str())) {
-        cJSON *subNode = cJSON_GetObjectItem(&node, nodeName.c_str());
+    if (!cJSON_IsNull(node) && cJSON_IsObject(node) && cJSON_HasObjectItem(node, nodeName.c_str())) {
+        cJSON *subNode = cJSON_GetObjectItem(node, nodeName.c_str());
         if (cJSON_IsNull(subNode) || !cJSON_IsArray(subNode)) {
             return values;
         }
