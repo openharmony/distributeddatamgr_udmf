@@ -14,6 +14,7 @@
  */
 
 #define LOG_TAG "UtdClient"
+#include <fstream>
 #include <regex>
 #include <thread>
 #include "utd_client.h"
