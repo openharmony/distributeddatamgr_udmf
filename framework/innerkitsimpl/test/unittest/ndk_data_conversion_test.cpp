@@ -359,25 +359,25 @@ HWTEST_F(NdkDataConversionTest, ConvertPixelMap_003, TestSize.Level1)
     uint32_t color[35] = { 3, 7, 9, 9, 7, 6 };
     OHOS::Media::InitializationOptions opts = { { 5, 7 },
         Media::PixelFormat::ARGB_8888, Media::PixelFormat::ARGB_8888 };
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap =
-        OHOS::Media::PixelMap::Create(color, sizeof(color) / sizeof(color[0]), opts);
+    auto pixelMap = OHOS::Media::PixelMap::Create(color, sizeof(color) / sizeof(color[0]), opts);
     std::vector<uint8_t> buff;
     buff.resize(pixelMap->GetByteCount());
     auto status = pixelMap->ReadPixels(pixelMap->GetByteCount(), buff.data());
     ASSERT_EQ(status, E_OK);
-
-    std::shared_ptr<SystemDefinedPixelMap> systemDefinedPixelMap =
-        std::make_shared<SystemDefinedPixelMap>(UDType::SYSTEM_DEFINED_PIXEL_MAP, buff);
-    systemDefinedPixelMap->SetPixelMapDetails(std::move(pixelMap));
+    auto systemDefinedPixelMap = std::make_shared<SystemDefinedPixelMap>(UDType::SYSTEM_DEFINED_PIXEL_MAP, buff);
+    UDDetails uDetails = {
+        { "width", pixelMap->GetWidth() },
+        { "height", pixelMap->GetHeight() },
+        { "pixel-format", static_cast<int32_t>(pixelMap->GetPixelFormat()) },
+        { "alpha-type", static_cast<int32_t>(pixelMap->GetAlphaType()) } };
+    systemDefinedPixelMap->SetDetails(uDetails);
     UnifiedData data;
-    std::vector<std::shared_ptr<UnifiedRecord>> records = { systemDefinedPixelMap };
-    data.SetRecords(records);
+    data.AddRecord(systemDefinedPixelMap);
 
     std::string key;
     CustomOption option = { .intention = UD_INTENTION_DRAG };
     auto setRet = UdmfClient::GetInstance().SetData(option, data, key);
     EXPECT_EQ(setRet, E_OK);
-
     std::shared_ptr<UnifiedData> readData = std::make_shared<UnifiedData>();
     QueryOption query = { .key = key };
     auto getRet = UdmfClient::GetInstance().GetData(query, *readData);
@@ -397,14 +397,11 @@ HWTEST_F(NdkDataConversionTest, ConvertPixelMap_003, TestSize.Level1)
     uint32_t color2[100] = { 3, 7, 9, 9, 7, 6 };
     OHOS::Media::InitializationOptions opts2 = { { 10, 10 },
         Media::PixelFormat::ARGB_8888, Media::PixelFormat::ARGB_8888 };
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap2 =
-        OHOS::Media::PixelMap::Create(color2, sizeof(color) / sizeof(color[0]), opts2);
-
+    auto pixelMap2 = OHOS::Media::PixelMap::Create(color2, sizeof(color) / sizeof(color[0]), opts2);
     OH_PixelmapNative *ohPixelmapNative = new OH_PixelmapNative(std::move(pixelMap2));
     OH_UdsPixelMap_GetPixelMap(pixelMapUds, ohPixelmapNative);
     auto resultPixelMap = ohPixelmapNative->GetInnerPixelmap();
-    auto height = resultPixelMap->GetHeight();
-    EXPECT_EQ(height, 7);
+    EXPECT_EQ(resultPixelMap->GetHeight(), 7);
 
     OH_UdsPixelMap_Destroy(pixelMapUds);
     OH_UdmfData_Destroy(ndkData);

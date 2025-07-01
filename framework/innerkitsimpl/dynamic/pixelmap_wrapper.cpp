@@ -23,16 +23,19 @@ using namespace OHOS::UDMF;
 
 static constexpr size_t BYTES_PER_COLOR = sizeof(uint32_t);
 
-OHOS::Media::PixelMap *DecodeTlv(const unsigned char* buff, unsigned int size)
+OHOS::Media::PixelMap *DecodeTlv(const unsigned char *buff, unsigned int size)
 {
     std::vector<uint8_t> val(buff, buff + size);
     return OHOS::Media::PixelMap::DecodeTlv(val);
 }
 
-bool EncodeTlv(const OHOS::Media::PixelMap *pixelMap, unsigned char** buff, unsigned int * size)
+bool EncodeTlv(const OHOS::Media::PixelMap *pixelMap, unsigned char **buff, unsigned int *size)
 {
     std::vector<uint8_t> val;
-    bool res = pixelMap->EncodeTlv(val);
+    if (!pixelMap->EncodeTlv(val)) {
+        LOG_ERROR(UDMF_KITS_INNER, "Encode pixelMap failed");
+        return false;
+    }
     *buff = new (std::nothrow) unsigned char[val.size()];
     if (buff == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "Apply memory failed");
@@ -40,10 +43,11 @@ bool EncodeTlv(const OHOS::Media::PixelMap *pixelMap, unsigned char** buff, unsi
     }
     std::copy(val.begin(), val.end(), *buff);
     *size = val.size();
-    return res;
+    return true;
 }
 
-OHOS::Media::PixelMap *GetPixelMapFromRawData(const unsigned char* buff, unsigned int size, const PixelMapDetails details)
+OHOS::Media::PixelMap *GetPixelMapFromRawData(
+    const unsigned char *buff, unsigned int size, const PixelMapDetails details)
 {
     std::vector<uint8_t> rawData(buff, buff + size);
     OHOS::Media::InitializationOptions opts;
@@ -59,13 +63,13 @@ OHOS::Media::PixelMap *GetPixelMapFromRawData(const unsigned char* buff, unsigne
     auto pixelMap = OHOS::Media::PixelMap::Create(
         reinterpret_cast<uint32_t*>(rawData.data()), rawData.size() / BYTES_PER_COLOR, opts);
     if (pixelMap == nullptr) {
-        LOG_ERROR(UDMF_KITS_INNER, "Create PixelMap from rawData_ failed");
+        LOG_ERROR(UDMF_KITS_INNER, "Create PixelMap from rawData failed");
         return nullptr;
     }
     return pixelMap.release();
 }
 
-PixelMapDetails *ParseInfoFromPixelMap(OHOS::Media::PixelMap *pixelMap, unsigned char** buff, unsigned int * size)
+PixelMapDetails *ParseInfoFromPixelMap(OHOS::Media::PixelMap *pixelMap, unsigned char **buff, unsigned int *size)
 {
     if (pixelMap == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "PixelMap is null");
@@ -87,5 +91,5 @@ PixelMapDetails *ParseInfoFromPixelMap(OHOS::Media::PixelMap *pixelMap, unsigned
     } else {
         *size = pixelMap->GetByteCount();
     }
-    return details; // TODO DELET
+    return details; // TO BE DELETED
 }

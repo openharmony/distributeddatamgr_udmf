@@ -109,23 +109,8 @@ HWTEST_F(SystemDefinedPixelMapTest, GetPixelMapFromRawData001, TestSize.Level1)
     SystemDefinedPixelMap systemDefinedPixelMap;
     const std::vector<uint8_t> rawData;
     systemDefinedPixelMap.SetRawData(rawData);
-    std::unique_ptr<Media::PixelMap> ret = systemDefinedPixelMap.GetPixelMapFromRawData();
+    auto ret = systemDefinedPixelMap.GetPixelMapFromRawData();
     EXPECT_EQ(ret, nullptr);
     LOG_INFO(UDMF_TEST, "GetPixelMapFromRawData001 end.");
-}
-
-/**
-* @tc.name: SetRawDataFromPixels001
-* @tc.desc: Abnormal testcase of SetRawDataFromPixels, rawData_ is null
-* @tc.type: FUNC
-*/
-HWTEST_F(SystemDefinedPixelMapTest, SetRawDataFromPixels001, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "SetRawDataFromPixels001 begin.");
-    SystemDefinedPixelMap systemDefinedPixelMap;
-    const std::shared_ptr<OHOS::Media::PixelMap> pixelMap = nullptr;
-    bool ret = systemDefinedPixelMap.SetRawDataFromPixels(pixelMap);
-    EXPECT_FALSE(ret);
-    LOG_INFO(UDMF_TEST, "SetRawDataFromPixels001 end.");
 }
 } // OHOS::Test

@@ -20,14 +20,12 @@
 
 namespace OHOS::UDMF {
 extern "C" {
-
-OHOS::Media::PixelMap *DecodeTlv(const unsigned char* buff, unsigned int size);
-bool EncodeTlv(const OHOS::Media::PixelMap *pixelMap, unsigned char** buff, unsigned int * size);
-OHOS::Media::PixelMap *GetPixelMapFromRawData(const unsigned char* buff, unsigned int size, const PixelMapDetails details);
-PixelMapDetails *ParseInfoFromPixelMap(OHOS::Media::PixelMap *pixelMap, unsigned char** buff, unsigned int * size);
-
+    OHOS::Media::PixelMap *DecodeTlv(const unsigned char *buff, unsigned int size);
+    bool EncodeTlv(const OHOS::Media::PixelMap *pixelMap, unsigned char **buff, unsigned int *size);
+    OHOS::Media::PixelMap *GetPixelMapFromRawData(
+        const unsigned char *buff, unsigned int size, const PixelMapDetails details);
+    PixelMapDetails *ParseInfoFromPixelMap(OHOS::Media::PixelMap *pixelMap, unsigned char **buff, unsigned int *size);
 };
 } // OHOS::UDMF
 
-/** @} */
 #endif

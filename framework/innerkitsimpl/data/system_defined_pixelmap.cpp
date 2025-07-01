@@ -119,7 +119,7 @@ std::shared_ptr<OHOS::Media::PixelMap> SystemDefinedPixelMap::GetPixelMapFromRaw
     PixelMapDetails pixelMapDetails;
     pixelMapDetails.width = details->GetValue(PIXEL_MAP_WIDTH, pixelMapDetails.width) ? pixelMapDetails.width : -1;
     pixelMapDetails.height = details->GetValue(PIXEL_MAP_HEIGHT, pixelMapDetails.height) ? pixelMapDetails.height : -1;
-    pixelMapDetails.pixelFormat = details->GetValue(PIXEL_MAP_FORMAT, pixelMapDetails.pixelFormat) 
+    pixelMapDetails.pixelFormat = details->GetValue(PIXEL_MAP_FORMAT, pixelMapDetails.pixelFormat)
         ? pixelMapDetails.pixelFormat : static_cast<int32_t>(OHOS::Media::PixelFormat::UNKNOWN);
     PixelMapLoader loader;
     return loader.GetPixelMapFromRawData(rawData_, pixelMapDetails);

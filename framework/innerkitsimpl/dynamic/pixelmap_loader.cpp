@@ -18,8 +18,8 @@
 
 #include <dlfcn.h>
 #include <thread>
-#include "pixel_map.h"
 #include "logger.h"
+#include "pixel_map.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -47,9 +47,6 @@ PixelMapLoader::~PixelMapLoader()
     }
     auto handler = handler_;
     std::thread([handler]() {
-        if (handler == nullptr) {
-            return;
-        }
         std::this_thread::sleep_for(std::chrono::seconds(DELAY_DESTRUCTION_INTERVAL));
         dlclose(handler);
     }).detach();
@@ -90,7 +87,7 @@ bool PixelMapLoader::EncodeTlv(const std::shared_ptr<OHOS::Media::PixelMap> pixe
         return false;
     }
 
-    unsigned char* val;
+    unsigned char *val = nullptr;
     unsigned int size = 0;
     auto result = loadEncodeTlv(pixelMap.get(), &val, &size);
     if (val == nullptr) {
@@ -102,7 +99,8 @@ bool PixelMapLoader::EncodeTlv(const std::shared_ptr<OHOS::Media::PixelMap> pixe
     return result;
 }
 
-std::shared_ptr<OHOS::Media::PixelMap> PixelMapLoader::GetPixelMapFromRawData(const std::vector<uint8_t> &buff, const PixelMapDetails &details)
+std::shared_ptr<OHOS::Media::PixelMap> PixelMapLoader::GetPixelMapFromRawData(
+    const std::vector<uint8_t> &buff, const PixelMapDetails &details)
 {
     if (buff.empty()) {
         LOG_ERROR(UDMF_KITS_INNER, "buff is empty!");
@@ -120,7 +118,8 @@ std::shared_ptr<OHOS::Media::PixelMap> PixelMapLoader::GetPixelMapFromRawData(co
     return std::shared_ptr<OHOS::Media::PixelMap>(loadGetPixelMapFromRawData(buff.data(), buff.size(), details));
 }
 
-std::shared_ptr<PixelMapDetails> PixelMapLoader::ParseInfoFromPixelMap(const std::shared_ptr<OHOS::Media::PixelMap> pixelMap, std::vector<uint8_t> &buff)
+std::shared_ptr<PixelMapDetails> PixelMapLoader::ParseInfoFromPixelMap(
+    const std::shared_ptr<OHOS::Media::PixelMap> pixelMap, std::vector<uint8_t> &buff)
 {
     if (pixelMap == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "pixelMap is nullptr!");
@@ -135,7 +134,7 @@ std::shared_ptr<PixelMapDetails> PixelMapLoader::ParseInfoFromPixelMap(const std
         LOG_ERROR(UDMF_KITS_INNER, "dlsym error! msg=%{public}s", dlerror());
         return nullptr;
     }
-    unsigned char* val;
+    unsigned char *val = nullptr;
     unsigned int size = 0;
     auto details = std::shared_ptr<PixelMapDetails>(loadParseInfoFromPixelMap(pixelMap.get(), &val, &size));
     std::copy(val, val + size, std::back_inserter(buff));
@@ -144,7 +143,6 @@ std::shared_ptr<PixelMapDetails> PixelMapLoader::ParseInfoFromPixelMap(const std
         delete[] val;
     }
     return details;
-    
 }
 
 } // namespace UDMF

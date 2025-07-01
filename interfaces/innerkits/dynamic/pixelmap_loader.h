@@ -27,10 +27,11 @@ struct PixelMapDetails {
     int32_t alphaType = 0;
 };
 
-typedef OHOS::Media::PixelMap*(*LoadDecodeTlv)(const unsigned char*, unsigned int);
-typedef bool (*LoadEncodeTlv)(const OHOS::Media::PixelMap*, unsigned char**, unsigned int*);
-typedef OHOS::Media::PixelMap*(*LoadGetPixelMapFromRawData)(const unsigned char*, unsigned int, const PixelMapDetails);
-typedef PixelMapDetails*(*LoadParseInfoFromPixelMap)(OHOS::Media::PixelMap*, unsigned char**, unsigned int*);
+typedef OHOS::Media::PixelMap *(*LoadDecodeTlv)(const unsigned char *, unsigned int);
+typedef bool (*LoadEncodeTlv)(const OHOS::Media::PixelMap *, unsigned char **, unsigned int *);
+typedef OHOS::Media::PixelMap *(*LoadGetPixelMapFromRawData)(
+    const unsigned char *, unsigned int, const PixelMapDetails);
+typedef PixelMapDetails *(*LoadParseInfoFromPixelMap)(OHOS::Media::PixelMap *, unsigned char **, unsigned int *);
 
 class PixelMapLoader {
 public:
@@ -39,8 +40,10 @@ public:
 
     std::shared_ptr<OHOS::Media::PixelMap> DecodeTlv(const std::vector<uint8_t> &buff);
     bool EncodeTlv(const std::shared_ptr<OHOS::Media::PixelMap> pixelmap, std::vector<uint8_t> &buff);
-    std::shared_ptr<OHOS::Media::PixelMap> GetPixelMapFromRawData(const std::vector<uint8_t> &buff, const PixelMapDetails &details);
-    std::shared_ptr<PixelMapDetails> ParseInfoFromPixelMap(const std::shared_ptr<OHOS::Media::PixelMap> pixelMap, std::vector<uint8_t> &buff);
+    std::shared_ptr<OHOS::Media::PixelMap> GetPixelMapFromRawData(
+        const std::vector<uint8_t> &buff, const PixelMapDetails &details);
+    std::shared_ptr<PixelMapDetails> ParseInfoFromPixelMap(
+        const std::shared_ptr<OHOS::Media::PixelMap> pixelMap, std::vector<uint8_t> &buff);
 
 private:
     void *handler_;

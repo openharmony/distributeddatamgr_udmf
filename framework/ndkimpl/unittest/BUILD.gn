@@ -86,6 +86,7 @@ ohos_unittest("UdmfTest") {
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/dynamic/pixelmap_loader.cpp",
     "udmf_test.cpp",
   ]
 
