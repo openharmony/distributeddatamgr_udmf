@@ -38,8 +38,8 @@ public:
 
 private:
     bool AddJsonStringArray(const std::vector<std::string> &datas, const std::string &nodeName, json &node);
-    std::string GetStringValue(const json* &node, const std::string &nodeName);
-    std::vector<std::string> GetStringArrayValue(const json* &node, const std::string &nodeName);
+    std::string GetStringValue(const json *node, const std::string &nodeName);
+    std::vector<std::string> GetStringArrayValue(const json *node, const std::string &nodeName);
 };
 } // namespace UDMF
 } // namespace OHOS

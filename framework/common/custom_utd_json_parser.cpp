@@ -146,7 +146,7 @@ bool CustomUtdJsonParser::GetTypeDescriptors(const json &jsonRoot, const std::st
     return true;
 }
 
-std::string CustomUtdJsonParser::GetStringValue(const json* &node, const std::string &nodeName)
+std::string CustomUtdJsonParser::GetStringValue(const json *node, const std::string &nodeName)
 {
     std::string value;
     if (!cJSON_IsNull(node) && cJSON_IsObject(node) && cJSON_HasObjectItem(node, nodeName.c_str())) {
@@ -158,7 +158,7 @@ std::string CustomUtdJsonParser::GetStringValue(const json* &node, const std::st
     return value;
 }
 
-std::vector<std::string> CustomUtdJsonParser::GetStringArrayValue(const json* &node, const std::string &nodeName)
+std::vector<std::string> CustomUtdJsonParser::GetStringArrayValue(const json *node, const std::string &nodeName)
 {
     std::vector<std::string> values;
     if (!cJSON_IsNull(node) && cJSON_IsObject(node) && cJSON_HasObjectItem(node, nodeName.c_str())) {
