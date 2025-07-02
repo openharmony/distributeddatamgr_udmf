@@ -20,6 +20,7 @@ config("module_private_config") {
   include_dirs = [
     "${udmf_interfaces_path}/ndk/data",
     "${udmf_interfaces_path}/innerkits/data",
+    "${udmf_interfaces_path}/innerkits/dynamic",
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/ndkimpl/data",

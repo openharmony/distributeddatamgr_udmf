@@ -94,7 +94,7 @@ void SystemDefinedPixelMap::InitObject()
         auto object = std::get<std::shared_ptr<Object>>(value_);
         auto pixelMap = GetPixelMapFromRawData();
         if (pixelMap == nullptr) {
-            LOG_ERROR(UDMF_KITS_INNER, "Get pixelMap from rawData fail!");
+            LOG_WARN(UDMF_KITS_INNER, "Get pixelMap from rawData fail!");
             object->value_[PIXEL_MAP] = rawData_;
         } else {
             object->value_[PIXEL_MAP] = pixelMap;
@@ -107,6 +107,10 @@ void SystemDefinedPixelMap::InitObject()
 
 std::shared_ptr<OHOS::Media::PixelMap> SystemDefinedPixelMap::GetPixelMapFromRawData()
 {
+    if (rawData_.empty()) {
+        LOG_WARN(UDMF_KITS_INNER, "No RawData");
+        return nullptr;
+    }
     if (rawData_.size() % BYTES_PER_COLOR != 0) {
         LOG_ERROR(UDMF_KITS_INNER, "RawData size error, size = %{public}zu", rawData_.size());
         return nullptr;
@@ -117,12 +121,13 @@ std::shared_ptr<OHOS::Media::PixelMap> SystemDefinedPixelMap::GetPixelMapFromRaw
         return nullptr;
     }
     PixelMapDetails pixelMapDetails;
+    pixelMapDetails.rawData = std::ref(rawData_);
     pixelMapDetails.width = details->GetValue(PIXEL_MAP_WIDTH, pixelMapDetails.width) ? pixelMapDetails.width : -1;
     pixelMapDetails.height = details->GetValue(PIXEL_MAP_HEIGHT, pixelMapDetails.height) ? pixelMapDetails.height : -1;
     pixelMapDetails.pixelFormat = details->GetValue(PIXEL_MAP_FORMAT, pixelMapDetails.pixelFormat)
         ? pixelMapDetails.pixelFormat : static_cast<int32_t>(OHOS::Media::PixelFormat::UNKNOWN);
     PixelMapLoader loader;
-    return loader.GetPixelMapFromRawData(rawData_, pixelMapDetails);
+    return loader.GetPixelMapFromRawData(pixelMapDetails);
 }
 
 void SystemDefinedPixelMap::ParseInfoFromPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
@@ -132,7 +137,7 @@ void SystemDefinedPixelMap::ParseInfoFromPixelMap(std::shared_ptr<OHOS::Media::P
         return;
     }
     PixelMapLoader loader;
-    auto details = loader.ParseInfoFromPixelMap(pixelMap, rawData_);
+    auto details = loader.ParseInfoFromPixelMap(pixelMap);
     if (details == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "Parse info failed");
         return;
@@ -141,6 +146,7 @@ void SystemDefinedPixelMap::ParseInfoFromPixelMap(std::shared_ptr<OHOS::Media::P
     details_[PIXEL_MAP_HEIGHT] = details->height;
     details_[PIXEL_MAP_FORMAT] = details->pixelFormat;
     details_[PIXEL_MAP_ALPHA_TYPE] = details->alphaType;
+    rawData_ = std::move(*details->rawDataResult);
 }
 } // namespace UDMF
 } // namespace OHOS

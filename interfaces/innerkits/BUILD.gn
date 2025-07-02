@@ -211,6 +211,4 @@ ohos_shared_library("pixelmap_wrapper") {
   innerapi_tags = [ "platformsdk" ]
   part_name = "udmf"
   subsystem_name = "distributeddatamgr"
-  output_name = "pixelmap_wrapper"
-  output_extension = "so"
 }

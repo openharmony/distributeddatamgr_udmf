@@ -19,13 +19,18 @@
 #include "pixelmap_loader.h"
 
 namespace OHOS::UDMF {
+#ifdef __cplusplus
 extern "C" {
-    OHOS::Media::PixelMap *DecodeTlv(const unsigned char *buff, unsigned int size);
-    bool EncodeTlv(const OHOS::Media::PixelMap *pixelMap, unsigned char **buff, unsigned int *size);
-    OHOS::Media::PixelMap *GetPixelMapFromRawData(
-        const unsigned char *buff, unsigned int size, const PixelMapDetails details);
-    PixelMapDetails *ParseInfoFromPixelMap(OHOS::Media::PixelMap *pixelMap, unsigned char **buff, unsigned int *size);
+#endif
+
+OHOS::Media::PixelMap* DecodeTlv(const PixelMapDetails details);
+bool EncodeTlv(const OHOS::Media::PixelMap *pixelMap, PixelMapDetails *details);
+OHOS::Media::PixelMap *GetPixelMapFromRawData(const PixelMapDetails details);
+PixelMapDetails* ParseInfoFromPixelMap(OHOS::Media::PixelMap *pixelMap);
+
+#ifdef __cplusplus
 };
+#endif
 } // OHOS::UDMF
 
 #endif

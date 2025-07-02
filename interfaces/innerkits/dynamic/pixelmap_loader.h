@@ -16,6 +16,9 @@
 #ifndef PIXELMAP_LOADER
 #define PIXELMAP_LOADER
 
+#include <functional>
+#include <memory>
+#include <optional>
 #include "pixel_map.h"
 
 namespace OHOS::UDMF {
@@ -25,25 +28,26 @@ struct PixelMapDetails {
     int32_t height = 0;
     int32_t pixelFormat = 0;
     int32_t alphaType = 0;
+    // Use as an input parameter. To avoid copying, pass a reference.
+    std::optional<std::reference_wrapper<std::vector<uint8_t>>> rawData;
+    // Use as an output parameter.
+    std::optional<std::vector<uint8_t>> rawDataResult;
 };
 
-typedef OHOS::Media::PixelMap *(*LoadDecodeTlv)(const unsigned char *, unsigned int);
-typedef bool (*LoadEncodeTlv)(const OHOS::Media::PixelMap *, unsigned char **, unsigned int *);
-typedef OHOS::Media::PixelMap *(*LoadGetPixelMapFromRawData)(
-    const unsigned char *, unsigned int, const PixelMapDetails);
-typedef PixelMapDetails *(*LoadParseInfoFromPixelMap)(OHOS::Media::PixelMap *, unsigned char **, unsigned int *);
+typedef OHOS::Media::PixelMap *(*LoadDecodeTlv)(const PixelMapDetails);
+typedef bool (*LoadEncodeTlv)(const OHOS::Media::PixelMap *, PixelMapDetails *);
+typedef OHOS::Media::PixelMap *(*LoadGetPixelMapFromRawData)(const PixelMapDetails);
+typedef PixelMapDetails *(*LoadParseInfoFromPixelMap)(OHOS::Media::PixelMap *);
 
 class PixelMapLoader {
 public:
     PixelMapLoader();
     ~PixelMapLoader();
 
-    std::shared_ptr<OHOS::Media::PixelMap> DecodeTlv(const std::vector<uint8_t> &buff);
+    std::shared_ptr<OHOS::Media::PixelMap> DecodeTlv(std::vector<uint8_t> &buff);
     bool EncodeTlv(const std::shared_ptr<OHOS::Media::PixelMap> pixelmap, std::vector<uint8_t> &buff);
-    std::shared_ptr<OHOS::Media::PixelMap> GetPixelMapFromRawData(
-        const std::vector<uint8_t> &buff, const PixelMapDetails &details);
-    std::shared_ptr<PixelMapDetails> ParseInfoFromPixelMap(
-        const std::shared_ptr<OHOS::Media::PixelMap> pixelMap, std::vector<uint8_t> &buff);
+    std::shared_ptr<OHOS::Media::PixelMap> GetPixelMapFromRawData(const PixelMapDetails &details);
+    std::shared_ptr<PixelMapDetails> ParseInfoFromPixelMap(const std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
 
 private:
     void *handler_;

@@ -23,45 +23,44 @@ using namespace OHOS::UDMF;
 
 static constexpr size_t BYTES_PER_COLOR = sizeof(uint32_t);
 
-OHOS::Media::PixelMap *DecodeTlv(const unsigned char *buff, unsigned int size)
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+OHOS::Media::PixelMap *DecodeTlv(const PixelMapDetails details)
 {
-    std::vector<uint8_t> val(buff, buff + size);
-    return OHOS::Media::PixelMap::DecodeTlv(val);
+    return OHOS::Media::PixelMap::DecodeTlv(details.rawData->get());
 }
 
-bool EncodeTlv(const OHOS::Media::PixelMap *pixelMap, unsigned char **buff, unsigned int *size)
+bool EncodeTlv(const OHOS::Media::PixelMap *pixelMap, PixelMapDetails *details)
 {
-    std::vector<uint8_t> val;
-    if (!pixelMap->EncodeTlv(val)) {
-        LOG_ERROR(UDMF_KITS_INNER, "Encode pixelMap failed");
+    if (details == nullptr) {
+        LOG_ERROR(UDMF_KITS_INNER, "details is null");
         return false;
     }
-    *buff = new (std::nothrow) unsigned char[val.size()];
-    if (buff == nullptr) {
-        LOG_ERROR(UDMF_KITS_INNER, "Apply memory failed");
-        return false;
-    }
-    std::copy(val.begin(), val.end(), *buff);
-    *size = val.size();
-    return true;
+    auto &rawData = *(details->rawDataResult);
+    return pixelMap->EncodeTlv(rawData);
 }
 
-OHOS::Media::PixelMap *GetPixelMapFromRawData(
-    const unsigned char *buff, unsigned int size, const PixelMapDetails details)
+OHOS::Media::PixelMap *GetPixelMapFromRawData(const PixelMapDetails details)
 {
-    std::vector<uint8_t> rawData(buff, buff + size);
     OHOS::Media::InitializationOptions opts;
     opts.size.width = details.width;
     opts.size.height = details.height;
     opts.pixelFormat = static_cast<OHOS::Media::PixelFormat>(details.pixelFormat);
-    LOG_INFO(UDMF_KITS_INNER,
-        "PixelMap width = %{public}d, height = %{public}d, pixelFormat = %{public}d, rawData size = %{public}zu",
-        opts.size.width, opts.size.height, opts.pixelFormat, rawData.size());
+    if (!details.rawData.has_value()) {
+        return nullptr;
+    }
     // This create does not do pre-multiplication.
     opts.alphaType = OHOS::Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL;
+    LOG_INFO(UDMF_KITS_INNER,
+        "PixelMap width = %{public}d, height = %{public}d, pixelFormat = %{public}d, rawData size = %{public}zu",
+        opts.size.width, opts.size.height, opts.pixelFormat, details.
+        rawData->get().size());
     opts.srcPixelFormat = opts.pixelFormat;
     auto pixelMap = OHOS::Media::PixelMap::Create(
-        reinterpret_cast<uint32_t*>(rawData.data()), rawData.size() / BYTES_PER_COLOR, opts);
+        reinterpret_cast<const uint32_t *>(details.rawData->get().data()),
+        details.rawData->get().size() / BYTES_PER_COLOR, opts);
     if (pixelMap == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "Create PixelMap from rawData failed");
         return nullptr;
@@ -69,7 +68,7 @@ OHOS::Media::PixelMap *GetPixelMapFromRawData(
     return pixelMap.release();
 }
 
-PixelMapDetails *ParseInfoFromPixelMap(OHOS::Media::PixelMap *pixelMap, unsigned char **buff, unsigned int *size)
+PixelMapDetails *ParseInfoFromPixelMap(OHOS::Media::PixelMap *pixelMap)
 {
     if (pixelMap == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "PixelMap is null");
@@ -77,19 +76,29 @@ PixelMapDetails *ParseInfoFromPixelMap(OHOS::Media::PixelMap *pixelMap, unsigned
     }
     auto details = new (std::nothrow) PixelMapDetails;
     if (details == nullptr) {
-        LOG_ERROR(UDMF_KITS_INNER, "Apply memory failed");
+        LOG_ERROR(UDMF_KITS_INNER, "Apply memory for details failed");
         return nullptr;
     }
     details->width = pixelMap->GetWidth();
     details->height = pixelMap->GetHeight();
     details->pixelFormat = static_cast<int32_t>(pixelMap->GetPixelFormat());
     details->alphaType = static_cast<int32_t>(pixelMap->GetAlphaType());
-    auto status = pixelMap->ReadPixels(pixelMap->GetByteCount(), *buff);
+    auto length = pixelMap->GetByteCount();
+    if (length <= 0) {
+        LOG_ERROR(UDMF_KITS_INNER, "Has no length");
+        return details;
+    }
+    std::vector<uint8_t> rawData;
+    rawData.resize(length);
+    auto status = pixelMap->ReadPixels(length, rawData.data());
     if (status != OHOS::Media::SUCCESS) {
         LOG_ERROR(UDMF_KITS_INNER, "Get Pixels error, status = %{public}u", status);
-        *size = 0;
-    } else {
-        *size = pixelMap->GetByteCount();
+        return details;
     }
-    return details; // TO BE DELETED
+    details->rawDataResult.emplace(std::move(rawData));
+    return details;
 }
+
+#ifdef __cplusplus
+};
+#endif

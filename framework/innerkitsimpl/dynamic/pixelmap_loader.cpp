@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace UDMF {
 
-static constexpr const char* PIXEL_MAP_WRAPPER_SO_NAME = "libpixelmap_wrapper.so";
+static constexpr const char* PIXEL_MAP_WRAPPER_SO_NAME = "libpixelmap_wrapper.z.so";
 static constexpr const char* DECODE_TLV = "DecodeTlv";
 static constexpr const char* ENCODE_TLV = "EncodeTlv";
 static constexpr const char* GET_PIXEL_MAP_FROM_RAW_DATA = "GetPixelMapFromRawData";
@@ -53,7 +53,7 @@ PixelMapLoader::~PixelMapLoader()
     handler_ = nullptr;
 }
 
-std::shared_ptr<OHOS::Media::PixelMap> PixelMapLoader::DecodeTlv(const std::vector<uint8_t> &buff)
+std::shared_ptr<OHOS::Media::PixelMap> PixelMapLoader::DecodeTlv(std::vector<uint8_t> &buff)
 {
     if (buff.empty()) {
         LOG_ERROR(UDMF_KITS_INNER, "buff is empty!");
@@ -63,12 +63,14 @@ std::shared_ptr<OHOS::Media::PixelMap> PixelMapLoader::DecodeTlv(const std::vect
         LOG_ERROR(UDMF_KITS_INNER, "load so fail!");
         return nullptr;
     }
+    PixelMapDetails details;
+    details.rawData = std::ref(buff);
     auto loadDecodeTlv = (LoadDecodeTlv)dlsym(handler_, DECODE_TLV);
     if (loadDecodeTlv == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "dlsym error! msg=%{public}s", dlerror());
         return nullptr;
     }
-    return std::shared_ptr<OHOS::Media::PixelMap>(loadDecodeTlv(buff.data(), buff.size()));
+    return std::shared_ptr<OHOS::Media::PixelMap>(loadDecodeTlv(details));
 }
 
 bool PixelMapLoader::EncodeTlv(const std::shared_ptr<OHOS::Media::PixelMap> pixelMap, std::vector<uint8_t> &buff)
@@ -86,23 +88,19 @@ bool PixelMapLoader::EncodeTlv(const std::shared_ptr<OHOS::Media::PixelMap> pixe
         LOG_ERROR(UDMF_KITS_INNER, "dlsym error! msg=%{public}s", dlerror());
         return false;
     }
-
-    unsigned char *val = nullptr;
-    unsigned int size = 0;
-    auto result = loadEncodeTlv(pixelMap.get(), &val, &size);
-    if (val == nullptr) {
+    auto details = std::make_shared<PixelMapDetails>();
+    auto result = loadEncodeTlv(pixelMap.get(), details.get());
+    if (details->rawDataResult->empty()) {
         LOG_ERROR(UDMF_KITS_INNER, "encodeTlv fail");
         return result;
     }
-    std::copy(val, val + size, std::back_inserter(buff));
-    delete[] val;
+    buff = std::move(*details->rawDataResult);
     return result;
 }
 
-std::shared_ptr<OHOS::Media::PixelMap> PixelMapLoader::GetPixelMapFromRawData(
-    const std::vector<uint8_t> &buff, const PixelMapDetails &details)
+std::shared_ptr<OHOS::Media::PixelMap> PixelMapLoader::GetPixelMapFromRawData(const PixelMapDetails &details)
 {
-    if (buff.empty()) {
+    if (!details.rawData.has_value()) {
         LOG_ERROR(UDMF_KITS_INNER, "buff is empty!");
         return nullptr;
     }
@@ -115,18 +113,18 @@ std::shared_ptr<OHOS::Media::PixelMap> PixelMapLoader::GetPixelMapFromRawData(
         LOG_ERROR(UDMF_KITS_INNER, "dlsym error! msg=%{public}s", dlerror());
         return nullptr;
     }
-    return std::shared_ptr<OHOS::Media::PixelMap>(loadGetPixelMapFromRawData(buff.data(), buff.size(), details));
+    return std::shared_ptr<OHOS::Media::PixelMap>(loadGetPixelMapFromRawData(details));
 }
 
 std::shared_ptr<PixelMapDetails> PixelMapLoader::ParseInfoFromPixelMap(
-    const std::shared_ptr<OHOS::Media::PixelMap> pixelMap, std::vector<uint8_t> &buff)
+    const std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
 {
     if (pixelMap == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "pixelMap is nullptr!");
         return nullptr;
     }
     if (handler_ == nullptr) {
-        LOG_ERROR(UDMF_KITS_INNER, "load so fail!");
+        LOG_ERROR(UDMF_KITS_INNER, "handler_ is null");
         return nullptr;
     }
     auto loadParseInfoFromPixelMap = (LoadParseInfoFromPixelMap)dlsym(handler_, PARSE_INFO_FROM_PIXEL_MAP);
@@ -134,15 +132,7 @@ std::shared_ptr<PixelMapDetails> PixelMapLoader::ParseInfoFromPixelMap(
         LOG_ERROR(UDMF_KITS_INNER, "dlsym error! msg=%{public}s", dlerror());
         return nullptr;
     }
-    unsigned char *val = nullptr;
-    unsigned int size = 0;
-    auto details = std::shared_ptr<PixelMapDetails>(loadParseInfoFromPixelMap(pixelMap.get(), &val, &size));
-    std::copy(val, val + size, std::back_inserter(buff));
-    if (val != nullptr) {
-        LOG_INFO(UDMF_KITS_INNER, "val not null, size is %{public}d", size);
-        delete[] val;
-    }
-    return details;
+    return std::shared_ptr<PixelMapDetails>(loadParseInfoFromPixelMap(pixelMap.get()));
 }
 
 } // namespace UDMF

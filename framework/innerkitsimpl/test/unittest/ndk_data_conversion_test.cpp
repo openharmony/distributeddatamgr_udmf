@@ -359,18 +359,11 @@ HWTEST_F(NdkDataConversionTest, ConvertPixelMap_003, TestSize.Level1)
     uint32_t color[35] = { 3, 7, 9, 9, 7, 6 };
     OHOS::Media::InitializationOptions opts = { { 5, 7 },
         Media::PixelFormat::ARGB_8888, Media::PixelFormat::ARGB_8888 };
-    auto pixelMap = OHOS::Media::PixelMap::Create(color, sizeof(color) / sizeof(color[0]), opts);
-    std::vector<uint8_t> buff;
-    buff.resize(pixelMap->GetByteCount());
-    auto status = pixelMap->ReadPixels(pixelMap->GetByteCount(), buff.data());
-    ASSERT_EQ(status, E_OK);
-    auto systemDefinedPixelMap = std::make_shared<SystemDefinedPixelMap>(UDType::SYSTEM_DEFINED_PIXEL_MAP, buff);
-    UDDetails uDetails = {
-        { "width", pixelMap->GetWidth() },
-        { "height", pixelMap->GetHeight() },
-        { "pixel-format", static_cast<int32_t>(pixelMap->GetPixelFormat()) },
-        { "alpha-type", static_cast<int32_t>(pixelMap->GetAlphaType()) } };
-    systemDefinedPixelMap->SetDetails(uDetails);
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap =
+        OHOS::Media::PixelMap::Create(color, sizeof(color) / sizeof(color[0]), opts);
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMapIn = move(pixelMap);
+    auto systemDefinedPixelMap = std::make_shared<SystemDefinedPixelMap>(UDType::SYSTEM_DEFINED_PIXEL_MAP, pixelMapIn);
+
     UnifiedData data;
     data.AddRecord(systemDefinedPixelMap);
 
