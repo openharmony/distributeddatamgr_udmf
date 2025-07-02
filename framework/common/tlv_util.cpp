@@ -540,7 +540,7 @@ template <> size_t CountBufferSize(const Runtime &input, TLVObject &data)
         data.CountBasic(static_cast<int32_t>(input.dataStatus)) + data.Count(input.sourcePackage) +
         data.Count(input.createPackage) + data.Count(input.deviceId) + TLVUtil::CountBufferSize(input.key, data) +
         data.Count(input.sdkVersion) + TLVUtil::CountBufferSize(input.privileges, data) +
-        data.CountBasic(static_cast<int32_t>(input.visibility));
+        data.CountBasic(static_cast<int32_t>(input.visibility)) + data.Count(input.appId);
 }
 
 template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
@@ -588,6 +588,9 @@ template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
         return false;
     }
     if (!data.WriteBasic(TAG::TAG_VISIBILITY, static_cast<int32_t>(input.visibility))) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.appId, data, TAG::TAG_APP_ID)) {
         return false;
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
@@ -650,6 +653,9 @@ template <> bool Reading(Runtime &output, TLVObject &data, const TLVHead &head)
             case static_cast<uint16_t>(TAG::TAG_VISIBILITY):
                 result = data.ReadBasic(visibility, headItem);
                 output.visibility = static_cast<UDMF::Visibility>(visibility);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_APP_ID):
+                result = data.Read(output.appId, headItem);
                 break;
             default:
                 result = data.Skip(headItem);

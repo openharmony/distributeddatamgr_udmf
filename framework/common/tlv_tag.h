@@ -99,6 +99,7 @@ enum class TAG : uint16_t {
     TAG_SET_ITEM,
     TAG_SET_SIZE,
     TAG_VISIBILITY,
+    TAG_APP_ID,
 };
 }
 #endif //UDMF_TLV_TAG_H
