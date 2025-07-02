@@ -101,7 +101,11 @@ void DataLoadParamsNapi::CallDataLoadHandler(napi_env env, napi_value callback, 
         return;
     }
     UnifiedDataNapi *unifiedDataNapi = nullptr;
-    napi_unwrap(env, result, reinterpret_cast<void **>(&unifiedDataNapi));
+    status = napi_unwrap(env, result, reinterpret_cast<void **>(&unifiedDataNapi));
+    if (status != napi_ok || unifiedDataNapi == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_unwrap data failed, status=%{public}d", status);
+        return;
+    }
 
     auto ret = UdmfClient::GetInstance().PushDelayData(udKey, *unifiedDataNapi->value_);
     if (ret != E_OK) {
