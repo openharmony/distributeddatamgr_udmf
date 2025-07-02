@@ -210,7 +210,7 @@ HWTEST_F(UdmfDelayDataTest, UdmfDelayDataTest001, TestSize.Level1)
     };
 
     SetHapToken1();
-    auto loadHandler = [=] (const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
+    auto loadHandler = [dataLoadInfo2] (const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
         LOG_INFO(UDMF_TEST, "loadHandler begin udKey=%{public}s.", udKey.c_str());
         EXPECT_EQ(dataLoadInfo.recordCount, dataLoadInfo2.recordCount);
         EXPECT_EQ(dataLoadInfo.types, dataLoadInfo2.types);
@@ -293,7 +293,7 @@ HWTEST_F(UdmfDelayDataTest, UdmfDelayDataTest002, TestSize.Level1)
     };
 
     SetHapToken1();
-    auto loadHandler = [=] (const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
+    auto loadHandler = [dataLoadInfo2] (const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
         LOG_INFO(UDMF_TEST, "loadHandler begin udKey=%{public}s.", udKey.c_str());
         EXPECT_EQ(dataLoadInfo.recordCount, dataLoadInfo2.recordCount);
         EXPECT_EQ(dataLoadInfo.types, dataLoadInfo2.types);
@@ -372,7 +372,7 @@ HWTEST_F(UdmfDelayDataTest, UdmfDelayDataTest003, TestSize.Level1)
     };
 
     SetHapToken1();
-    auto loadHandler = [=] (const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
+    auto loadHandler = [] (const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
         LOG_INFO(UDMF_TEST, "loadHandler begin udKey=%{public}s.", udKey.c_str());
     };
     DataLoadParams dataLoadParams = {
@@ -416,7 +416,7 @@ std::string UdmfDelayDataTest::SetDataInfoTest(const std::string &key)
         .recordCount = 100,
         .types{"general.plain-text"},
     };
-    auto loadHandler = [=] (const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
+    auto loadHandler = [dataLoadInfo2] (const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
         LOG_INFO(UDMF_TEST, "loadHandler begin udKey=%{public}s.", udKey.c_str());
         EXPECT_EQ(dataLoadInfo.recordCount, dataLoadInfo2.recordCount);
         EXPECT_EQ(dataLoadInfo.types, dataLoadInfo2.types);
