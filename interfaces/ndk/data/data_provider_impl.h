@@ -23,6 +23,7 @@ struct OH_UdmfRecordProvider {
     OH_UdmfRecordProvider_GetData callback { nullptr };
     void* context { nullptr };
     UdmfData_Finalize finalize { nullptr };
+    std::mutex mutex;
 };
 
 namespace OHOS {
