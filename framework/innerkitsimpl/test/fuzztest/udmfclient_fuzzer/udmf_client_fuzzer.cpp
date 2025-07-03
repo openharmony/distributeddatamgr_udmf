@@ -653,6 +653,129 @@ void CancelAsyncDataRetrievalFuzz(FuzzedDataProvider &provider)
     UdmfAsyncClient::GetInstance().StartAsyncDataRetrieval(params);
     UdmfAsyncClient::GetInstance().Cancel(key);
 }
+
+void SyncFuzz(FuzzedDataProvider &provider)
+{
+    QueryOption query;
+    query.key = provider.ConsumeRandomLengthString();
+    query.intention = static_cast<Intention>(
+        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE, UD_INTENTION_BUTT));
+    query.tokenId = provider.ConsumeIntegral<uint32_t>();
+
+    std::vector<std::string> devices;
+    size_t devicesSize = provider.ConsumeIntegralInRange<size_t>(0, 10);
+    for (size_t i = 0; i < devicesSize; ++i) {
+        devices.push_back(provider.ConsumeRandomLengthString());
+    }
+    UdmfClient::GetInstance().Sync(query, devices);
+}
+
+void IsRemoteDataFuzz(FuzzedDataProvider &provider)
+{
+    QueryOption query;
+    query.key = provider.ConsumeRandomLengthString();
+    query.intention = static_cast<Intention>(
+        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE, UD_INTENTION_BUTT));
+    query.tokenId = provider.ConsumeIntegral<uint32_t>();
+    UdmfClient::GetInstance().IsRemoteData(query);
+}
+
+void SetAppShareOptionFuzz(FuzzedDataProvider &provider)
+{
+    Intention intention = static_cast<Intention>(
+        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE, UD_INTENTION_BUTT));
+    std::string intentionStr = UD_INTENTION_MAP[intention];
+
+    ShareOptions shareOption = static_cast<ShareOptions>(
+        provider.ConsumeIntegralInRange<int32_t>(IN_APP, SHARE_OPTIONS_BUTT));
+    UdmfClient::GetInstance().SetAppShareOption(intentionStr, shareOption);
+}
+
+void GetAppShareOptionFuzz(FuzzedDataProvider &provider)
+{
+    Intention intention = static_cast<Intention>(
+        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE, UD_INTENTION_BUTT));
+    std::string intentionStr = UD_INTENTION_MAP[intention];
+
+    ShareOptions shareOption;
+    UdmfClient::GetInstance().GetAppShareOption(intentionStr, shareOption);
+}
+
+void RemoveAppShareOptionFuzz(FuzzedDataProvider &provider)
+{
+    Intention intention = static_cast<Intention>(
+        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE, UD_INTENTION_BUTT));
+    std::string intentionStr = UD_INTENTION_MAP[intention];
+    UdmfClient::GetInstance().RemoveAppShareOption(intentionStr);
+}
+
+void GetParentTypeFuzz(FuzzedDataProvider &provider)
+{
+    Summary oldSummary;
+    Summary newSummary;
+
+    size_t fileTypesSize = provider.ConsumeIntegralInRange<size_t>(0, 10);
+    for (size_t i = 0; i < fileTypesSize; ++i) {
+        oldSummary.fileTypes.push_back(provider.ConsumeRandomLengthString());
+    }
+
+    size_t summarySize = provider.ConsumeIntegralInRange<size_t>(0, 10);
+    for (size_t i = 0; i < summarySize; ++i) {
+        std::string key = provider.ConsumeRandomLengthString();
+        int64_t value = provider.ConsumeIntegral<int64_t>();
+        oldSummary.summary[key] = value;
+    }
+    oldSummary.totalSize = provider.ConsumeIntegral<int64_t>();
+    UdmfClient::GetInstance().GetParentType(oldSummary, newSummary);
+}
+
+void SetDelayInfoFuzz(FuzzedDataProvider &provider)
+{
+    DataLoadInfo dataLoadInfo1 {
+        .sequenceKey = provider.ConsumeRandomLengthString(),
+        .types{ provider.ConsumeRandomLengthString() },
+        .recordCount = provider.ConsumeIntegral<uint32_t>(),
+    };
+    auto loadHandler = [] (const std::string &udKey, const DataLoadInfo &dataLoadInfo) {};
+    DataLoadParams dataLoadParams = {
+        .loadHandler = loadHandler,
+        .dataLoadInfo = dataLoadInfo1,
+    };
+    std::string key = provider.ConsumeRandomLengthString();
+    UdmfClient::GetInstance().SetDelayInfo(dataLoadParams, key);
+}
+
+void PushDelayDataFuzz(FuzzedDataProvider &provider)
+{
+    DataLoadInfo dataLoadInfo1{
+        .sequenceKey = provider.ConsumeRandomLengthString(),
+        .types{provider.ConsumeRandomLengthString()},
+        .recordCount = provider.ConsumeIntegral<uint32_t>(),
+    };
+    auto loadHandler = [] (const std::string &udKey, const DataLoadInfo &dataLoadInfo) {};
+    DataLoadParams dataLoadParams = {
+        .loadHandler = loadHandler,
+        .dataLoadInfo = dataLoadInfo1,
+    };
+    std::string key = provider.ConsumeRandomLengthString();
+    UdmfClient::GetInstance().SetDelayInfo(dataLoadParams, key);
+
+    auto text = std::make_shared<Text>();
+    UDDetails details;
+    std::string skey = provider.ConsumeRandomLengthString();
+    std::string svalue = provider.ConsumeRandomLengthString();
+    details.insert({skey, svalue});
+    text->SetDetails(details);
+    UnifiedData unifiedData;
+    unifiedData.AddRecord(text);
+    UdmfClient::GetInstance().PushDelayData(key, unifiedData);
+}
+
+void GetBundleNameByUdKeyFuzz(FuzzedDataProvider &provider)
+{
+    std::string key = provider.ConsumeRandomLengthString();
+    UdmfClient::GetInstance().GetBundleNameByUdKey(key);
+}
 }
 
 /* Fuzzer entry point */
@@ -680,6 +803,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::UpdateDataFuzz(provider);
     OHOS::StartAsyncDataRetrievalFuzz(provider);
     OHOS::CancelAsyncDataRetrievalFuzz(provider);
+    OHOS::SyncFuzz(provider);
+    OHOS::IsRemoteDataFuzz(provider);
+    OHOS::SetAppShareOptionFuzz(provider);
+    OHOS::GetAppShareOptionFuzz(provider);
+    OHOS::RemoveAppShareOptionFuzz(provider);
+    OHOS::GetParentTypeFuzz(provider);
+    OHOS::SetDelayInfoFuzz(provider);
+    OHOS::PushDelayDataFuzz(provider);
+    OHOS::GetBundleNameByUdKeyFuzz(provider);
     OHOS::TearDown();
     return 0;
 }
