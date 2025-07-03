@@ -716,7 +716,7 @@ ohos_unittest("UnifiedMetaTest") {
   ]
 }
 
-ohos_unittest("unifiedKeyTest") {
+ohos_unittest("UnifiedKeyTest") {
   module_out_path = module_output_path
 
   sources = [ "unified_key_test.cpp" ]
@@ -814,7 +814,7 @@ group("unittest") {
     ":SystemDefinedPixelMapTest",
     ":SystemDefinedRecordTest",
     ":TextTest",
-    ":unifiedKeyTest",
+    ":UnifiedKeyTest",
     ":UdmfAsyncClientTest",
     ":UdmfClientAbnormalTest",
     ":UdmfClientFileMangerTest",
