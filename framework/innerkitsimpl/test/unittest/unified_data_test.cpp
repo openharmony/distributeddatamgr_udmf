@@ -421,4 +421,29 @@ HWTEST_F(UnifiedDataTest, GetFileUrisTest001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "GetFileUrisTest001 end.");
 }
 
+/**
+ * @tc.name: GetDataId_001
+ * @tc.desc: Get dataId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataTest, GetDataId_001, TestSize.Level0)
+{
+    uint32_t dataId = 2;
+    UnifiedRecord record(FILE_URI, std::make_shared<Object>());
+    record.SetDataId(dataId);
+    auto getDataId = record.GetDataId();
+    EXPECT_EQ(getDataId, dataId);
+}
+
+/**
+ * @tc.name: SetChannelName_001
+ * @tc.desc: Set channelName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataTest, SetChannelName_001, TestSize.Level0)
+{
+    const std::string name = "channelName";
+    UnifiedRecord record(FILE_URI, std::make_shared<Object>());
+    EXPECT_NO_FATAL_FAILURE(record.SetChannelName(name));
+}
 } // OHOS::Test
