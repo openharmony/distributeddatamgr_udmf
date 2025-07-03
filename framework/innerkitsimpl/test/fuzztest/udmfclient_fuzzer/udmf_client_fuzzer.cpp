@@ -659,7 +659,7 @@ void SyncFuzz(FuzzedDataProvider &provider)
     QueryOption query;
     query.key = provider.ConsumeRandomLengthString();
     query.intention = static_cast<Intention>(
-        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE, UD_INTENTION_BUTT));
+        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE + 1, UD_INTENTION_BUTT - 1));
     query.tokenId = provider.ConsumeIntegral<uint32_t>();
 
     std::vector<std::string> devices;
@@ -675,16 +675,17 @@ void IsRemoteDataFuzz(FuzzedDataProvider &provider)
     QueryOption query;
     query.key = provider.ConsumeRandomLengthString();
     query.intention = static_cast<Intention>(
-        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE, UD_INTENTION_BUTT));
+        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE + 1, UD_INTENTION_BUTT - 1));
     query.tokenId = provider.ConsumeIntegral<uint32_t>();
-    UdmfClient::GetInstance().IsRemoteData(query);
+    bool res = false;
+    UdmfClient::GetInstance().IsRemoteData(query, res);
 }
 
 void SetAppShareOptionFuzz(FuzzedDataProvider &provider)
 {
     Intention intention = static_cast<Intention>(
-        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE, UD_INTENTION_BUTT));
-    std::string intentionStr = UD_INTENTION_MAP[intention];
+        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE + 1, UD_INTENTION_BUTT - 1));
+    std::string intentionStr = UD_INTENTION_MAP.at(intention);
 
     ShareOptions shareOption = static_cast<ShareOptions>(
         provider.ConsumeIntegralInRange<int32_t>(IN_APP, SHARE_OPTIONS_BUTT));
@@ -694,8 +695,8 @@ void SetAppShareOptionFuzz(FuzzedDataProvider &provider)
 void GetAppShareOptionFuzz(FuzzedDataProvider &provider)
 {
     Intention intention = static_cast<Intention>(
-        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE, UD_INTENTION_BUTT));
-    std::string intentionStr = UD_INTENTION_MAP[intention];
+        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE + 1, UD_INTENTION_BUTT - 1));
+    std::string intentionStr = UD_INTENTION_MAP.at(intention);
 
     ShareOptions shareOption;
     UdmfClient::GetInstance().GetAppShareOption(intentionStr, shareOption);
@@ -704,8 +705,8 @@ void GetAppShareOptionFuzz(FuzzedDataProvider &provider)
 void RemoveAppShareOptionFuzz(FuzzedDataProvider &provider)
 {
     Intention intention = static_cast<Intention>(
-        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE, UD_INTENTION_BUTT));
-    std::string intentionStr = UD_INTENTION_MAP[intention];
+        provider.ConsumeIntegralInRange<int32_t>(UD_INTENTION_BASE + 1, UD_INTENTION_BUTT - 1));
+    std::string intentionStr = UD_INTENTION_MAP.at(intention);
     UdmfClient::GetInstance().RemoveAppShareOption(intentionStr);
 }
 
