@@ -412,4 +412,16 @@ HWTEST_F(UnifiedRecordTest, GetEntryTest003, TestSize.Level1)
     EXPECT_TRUE(std::holds_alternative<std::monostate>(
         std::get<std::shared_ptr<Object>>(fifthValue)->value_[VALUE_TYPE]));
 }
+
+/**
+ * @tc.name: ComputeUris_001
+ * @tc.desc: Compute uri
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedRecordTest, ComputeUris_001, TestSize.Level0)
+{
+    UnifiedRecord record(TEXT);
+    const std::function<bool(UriInfo &)> action;
+    EXPECT_NO_FATAL_FAILURE(record.ComputeUris(action));
+}
 } // OHOS::Test
