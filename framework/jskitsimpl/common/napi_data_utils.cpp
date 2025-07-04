@@ -685,12 +685,24 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, DataLoadInfo &o
         NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsTypes, out.types), napi_invalid_arg);
     }
 
+    out.recordCount = 0;
     bool hasRecordCount = false;
     NAPI_CALL_BASE(env, napi_has_named_property(env, in, "recordCount", &hasRecordCount), napi_invalid_arg);
     if (hasRecordCount) {
         napi_value jsRecordCount = nullptr;
         NAPI_CALL_BASE(env, napi_get_named_property(env, in, "recordCount", &jsRecordCount), napi_invalid_arg);
-        NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsRecordCount, out.recordCount), napi_invalid_arg);
+        double count = 0;
+        NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsRecordCount, count), napi_invalid_arg);
+        if (!std::isfinite(count)) {
+            LOG_WARN(UDMF_KITS_NAPI, "recordCount is not a finite number");
+            return napi_ok;
+        }
+        count = std::floor(count);
+        if (count < 0 || count > static_cast<double>(UINT32_MAX)) {
+            LOG_WARN(UDMF_KITS_NAPI, "recordCount out of range: %{public}f", count);
+            return napi_ok;
+        }
+        out.recordCount = static_cast<uint32_t>(count);
     }
     return napi_ok;
 }
