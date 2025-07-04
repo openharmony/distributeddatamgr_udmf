@@ -70,12 +70,12 @@ std::shared_ptr<OHOS::Media::PixelMap> PixelMapLoader::DecodeTlv(std::vector<uin
         return nullptr;
     }
     if (handler_ == nullptr) {
-        LOG_ERROR(UDMF_KITS_INNER, "load so fail!");
+        LOG_ERROR(UDMF_KITS_INNER, "handler is null!");
         return nullptr;
     }
     PixelMapDetails details;
     details.rawData = std::ref(buff);
-    auto loadDecodeTlv = (LoadDecodeTlv)dlsym(handler_.get(), DECODE_TLV);
+    auto loadDecodeTlv = reinterpret_cast<LoadDecodeTlv>(dlsym(handler_.get(), DECODE_TLV));
     if (loadDecodeTlv == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "dlsym error! msg=%{public}s", dlerror());
         return nullptr;
@@ -90,10 +90,10 @@ bool PixelMapLoader::EncodeTlv(const std::shared_ptr<OHOS::Media::PixelMap> pixe
         return false;
     }
     if (handler_ == nullptr) {
-        LOG_ERROR(UDMF_KITS_INNER, "load so fail!");
+        LOG_ERROR(UDMF_KITS_INNER, "handler is null!");
         return false;
     }
-    auto loadEncodeTlv = (LoadEncodeTlv)dlsym(handler_.get(), ENCODE_TLV);
+    auto loadEncodeTlv = reinterpret_cast<LoadEncodeTlv>(dlsym(handler_.get(), ENCODE_TLV));
     if (loadEncodeTlv == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "dlsym error! msg=%{public}s", dlerror());
         return false;
@@ -115,10 +115,11 @@ std::shared_ptr<OHOS::Media::PixelMap> PixelMapLoader::GetPixelMapFromRawData(co
         return nullptr;
     }
     if (handler_ == nullptr) {
-        LOG_ERROR(UDMF_KITS_INNER, "load so fail!");
+        LOG_ERROR(UDMF_KITS_INNER, "handler is null!");
         return nullptr;
     }
-    auto loadGetPixelMapFromRawData = (LoadGetPixelMapFromRawData)dlsym(handler_.get(), GET_PIXEL_MAP_FROM_RAW_DATA);
+    auto loadGetPixelMapFromRawData = reinterpret_cast<LoadGetPixelMapFromRawData>(
+        dlsym(handler_.get(), GET_PIXEL_MAP_FROM_RAW_DATA));
     if (loadGetPixelMapFromRawData == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "dlsym error! msg=%{public}s", dlerror());
         return nullptr;
@@ -134,10 +135,11 @@ std::shared_ptr<PixelMapDetails> PixelMapLoader::ParseInfoFromPixelMap(
         return nullptr;
     }
     if (handler_ == nullptr) {
-        LOG_ERROR(UDMF_KITS_INNER, "handler_ is null");
+        LOG_ERROR(UDMF_KITS_INNER, "handler is null!");
         return nullptr;
     }
-    auto loadParseInfoFromPixelMap = (LoadParseInfoFromPixelMap)dlsym(handler_.get(), PARSE_INFO_FROM_PIXEL_MAP);
+    auto loadParseInfoFromPixelMap = reinterpret_cast<LoadParseInfoFromPixelMap>(
+        dlsym(handler_.get(), PARSE_INFO_FROM_PIXEL_MAP));
     if (loadParseInfoFromPixelMap == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "dlsym error! msg=%{public}s", dlerror());
         return nullptr;
