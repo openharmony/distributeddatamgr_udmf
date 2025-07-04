@@ -88,13 +88,12 @@ void UnifiedDataHelper::CreateDirIfNotExist(const std::string& dirPath, const mo
 {
     if (OHOS::FileExists(dirPath)) {
         if (!OHOS::ForceRemoveDirectory(dirPath)) {
-            LOG_ERROR(UDMF_FRAMEWORK, "remove dir %{public}s failed, errno: %{public}d.", dirPath.c_str(), errno);
+            LOG_ERROR(UDMF_FRAMEWORK, "remove dir failed, errno: %{public}d.", errno);
         }
     }
-    LOG_DEBUG(UDMF_FRAMEWORK, "ForceCreateDirectory, dir: %{public}s", dirPath.c_str());
     bool success = OHOS::ForceCreateDirectory(dirPath);
     if (!success) {
-        LOG_ERROR(UDMF_FRAMEWORK, "create dir %{public}s failed, errno: %{public}d.", dirPath.c_str(), errno);
+        LOG_ERROR(UDMF_FRAMEWORK, "create dir failed, errno: %{public}d.", errno);
         return;
     }
     if (mode != 0) {
@@ -176,7 +175,7 @@ bool UnifiedDataHelper::SaveUDataToFile(const std::string &dataFile, UnifiedData
 
     std::FILE *file = fopen(dataFile.c_str(), "w+");
     if (file == nullptr) {
-        LOG_ERROR(UDMF_FRAMEWORK, "failed to open file: %{public}s, errno is %{public}d", dataFile.c_str(), errno);
+        LOG_ERROR(UDMF_FRAMEWORK, "failed to open file: errno is %{public}d", errno);
         return false;
     }
     recordTlv.SetFile(file);
@@ -196,10 +195,7 @@ bool UnifiedDataHelper::LoadUDataFromFile(const std::string &dataFile, UnifiedDa
     std::string path = fileUri.GetRealPath();
     std::FILE *file = fopen(path.c_str(), "r");
     if (file == nullptr) {
-        LOG_ERROR(UDMF_FRAMEWORK, "failed to open file, error:%{public}s, srcdir:%{public}s, relPath:%{public}s",
-                  std::strerror(errno),
-                  dataFile.c_str(),
-                  path.c_str());
+        LOG_ERROR(UDMF_FRAMEWORK, "failed to open file, error:%{public}s", std::strerror(errno));
         return false;
     }
     recordTlv.SetFile(file);

@@ -66,7 +66,6 @@ void ContextBase::GetCbInfo(napi_env envi, napi_callback_info info, NapiCbInfoPa
 napi_value NapiQueue::AsyncWork(napi_env env, std::shared_ptr<ContextBase> contextBase, const std::string &name,
     NapiAsyncExecute execute, NapiAsyncComplete complete)
 {
-    LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork name = %{public}s", name.c_str());
     AsyncContext *aCtx = new (std::nothrow) AsyncContext;
     if (aCtx == nullptr) {
         LOG_ERROR(UDMF_KITS_NAPI, "aCtx is nullptr");

@@ -193,7 +193,7 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
     if (typeId.empty()) {
         if (!IsValidFileExtension(lowerFileExtension)) {
             LOG_ERROR(UDMF_CLIENT, "invalid fileExtension. fileExtension:%{public}s, belongsTo:%{public}s ",
-                      fileExtension.c_str(), belongsTo.c_str());
+                      Anonymous(fileExtension).c_str(), belongsTo.c_str());
             return Status::E_INVALID_PARAMETERS;
         }
         typeId = FlexibleType::GenFlexibleUtd("", lowerFileExtension, belongsTo);

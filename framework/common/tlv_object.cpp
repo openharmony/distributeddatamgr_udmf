@@ -131,8 +131,8 @@ size_t TLVObject::Count(const void *value)
 bool TLVObject::Write(TAG tag, const std::string &value)
 {
     if (!HasExpectBuffer(sizeof(TLVHead) + value.size())) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Has no enough buffer in tlv write. tag=%{public}hu, value=%{public}s", tag,
-            value.c_str());
+        LOG_ERROR(UDMF_FRAMEWORK, "Has no enough buffer in tlv write. tag=%{public}hu, value's size=%{public}zu", tag,
+            value.size());
         return false;
     }
     auto tlvHead = reinterpret_cast<TLVHead *>(GetStartCursor());
@@ -141,8 +141,8 @@ bool TLVObject::Write(TAG tag, const std::string &value)
     if (!value.empty()) {
         auto err = memcpy_s(tlvHead->value, value.size(), value.c_str(), value.size());
         if (err != EOK) {
-            LOG_ERROR(UDMF_FRAMEWORK, "memcpy error in tlv write. tag=%{public}hu, value=%{public}s", tag,
-                value.c_str());
+            LOG_ERROR(UDMF_FRAMEWORK, "memcpy error in tlv write. tag=%{public}hu, value's size=%{public}zu", tag,
+                value.size());
             return false;
         }
     }
