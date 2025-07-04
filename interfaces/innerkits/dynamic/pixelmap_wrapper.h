@@ -23,10 +23,10 @@ namespace OHOS::UDMF {
 extern "C" {
 #endif
 
-OHOS::Media::PixelMap* DecodeTlv(const PixelMapDetails details);
+OHOS::Media::PixelMap *DecodeTlv(const PixelMapDetails details);
 bool EncodeTlv(const OHOS::Media::PixelMap *pixelMap, PixelMapDetails *details);
 OHOS::Media::PixelMap *GetPixelMapFromRawData(const PixelMapDetails details);
-PixelMapDetails* ParseInfoFromPixelMap(OHOS::Media::PixelMap *pixelMap);
+PixelMapDetails *ParseInfoFromPixelMap(OHOS::Media::PixelMap *pixelMap);
 
 #ifdef __cplusplus
 };

@@ -42,7 +42,6 @@ typedef PixelMapDetails *(*LoadParseInfoFromPixelMap)(OHOS::Media::PixelMap *);
 class PixelMapLoader {
 public:
     PixelMapLoader();
-    ~PixelMapLoader();
 
     std::shared_ptr<OHOS::Media::PixelMap> DecodeTlv(std::vector<uint8_t> &buff);
     bool EncodeTlv(const std::shared_ptr<OHOS::Media::PixelMap> pixelmap, std::vector<uint8_t> &buff);
@@ -50,7 +49,15 @@ public:
     std::shared_ptr<PixelMapDetails> ParseInfoFromPixelMap(const std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
 
 private:
-    void *handler_;
+    class SoAutoUnloadManager {
+    public:
+        static std::shared_ptr<void> GetHandler();
+    private:
+        static inline std::weak_ptr<void> weakHandler_;
+        static inline std::mutex mutex_;
+    };
+
+    std::shared_ptr<void> handler_;
 };
 
 } // namespace OHOS::UDMF
