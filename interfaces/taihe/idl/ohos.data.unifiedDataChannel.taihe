@@ -122,7 +122,7 @@ interface UnifiedDataInner {
 
 function CreateUnifiedData(): UnifiedDataInner;
 
-function createUnifiedDataWithParams(unifiedRecord: AllRecords): UnifiedDataInner;
+function CreateUnifiedDataWithParams(unifiedRecord: AllRecords): UnifiedDataInner;
 
 @class
 interface UnifiedRecordInner {
