@@ -196,6 +196,7 @@ ohos_unittest("CopyFileTest") {
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/progress_queue.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
+    "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/progress_callback.cpp",
@@ -226,6 +227,7 @@ group("unittest") {
   testonly = true
 
   deps = [
+    ":CopyFileTest",
     ":EndianConverterTest",
     ":TlvUtilTest",
     ":UdmfTypesUtilAbnormalTest",

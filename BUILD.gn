@@ -17,6 +17,7 @@ group("udmf_packages") {
   if (is_standard_system) {
     deps = [
       "interfaces/components:udmfcomponents",
+      "interfaces/innerkits:pixelmap_wrapper",
       "interfaces/innerkits:udmf_client",
       "interfaces/innerkits:utd_client",
       "interfaces/innerkits/aipcore:aip_core_mgr_static",

@@ -18,6 +18,7 @@
 #include "tlv_util.h"
 #include "udmf_utils.h"
 #include "logger.h"
+#include "pixelmap_loader.h"
 #include "tlv_object.h"
 
 namespace OHOS {
@@ -782,7 +783,8 @@ template <> bool Reading(UriInfo &output, TLVObject &data, const TLVHead &head)
 template <> size_t CountBufferSize(const std::shared_ptr<OHOS::Media::PixelMap> &input, TLVObject &data)
 {
     std::vector<std::uint8_t> val;
-    if (!input->EncodeTlv(val)) {
+    PixelMapLoader loader;
+    if (!loader.EncodeTlv(input, val)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Encode pixelMap error when CountBufferSize");
         return 0;
     }
@@ -793,7 +795,8 @@ template <> bool Writing(const std::shared_ptr<OHOS::Media::PixelMap> &input, TL
 {
     InitWhenFirst(input, data);
     std::vector<std::uint8_t> val;
-    if (!input->EncodeTlv(val)) {
+    PixelMapLoader loader;
+    if (!loader.EncodeTlv(input, val)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Encode pixelMap error when Writing");
         return false;
     }
@@ -807,7 +810,8 @@ template <> bool Reading(std::shared_ptr<OHOS::Media::PixelMap> &output, TLVObje
         LOG_ERROR(UDMF_FRAMEWORK, "Reading u8 vector error.");
         return false;
     }
-    output = std::shared_ptr<OHOS::Media::PixelMap>(OHOS::Media::PixelMap::DecodeTlv(val));
+    PixelMapLoader loader;
+    output = loader.DecodeTlv(val);
     if (output == nullptr) {
         LOG_ERROR(UDMF_FRAMEWORK, "DecodeTlv pixelMap error when Reading.");
         return false;

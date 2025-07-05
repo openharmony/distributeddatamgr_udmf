@@ -19,6 +19,7 @@
 #include <string>
 
 #include "logger.h"
+#include "pixelmap_loader.h"
 #include "system_defined_pixelmap.h"
 
 using namespace testing::ext;
@@ -109,23 +110,172 @@ HWTEST_F(SystemDefinedPixelMapTest, GetPixelMapFromRawData001, TestSize.Level1)
     SystemDefinedPixelMap systemDefinedPixelMap;
     const std::vector<uint8_t> rawData;
     systemDefinedPixelMap.SetRawData(rawData);
-    std::unique_ptr<Media::PixelMap> ret = systemDefinedPixelMap.GetPixelMapFromRawData();
+    auto ret = systemDefinedPixelMap.GetPixelMapFromRawData();
     EXPECT_EQ(ret, nullptr);
     LOG_INFO(UDMF_TEST, "GetPixelMapFromRawData001 end.");
 }
 
 /**
-* @tc.name: SetRawDataFromPixels001
-* @tc.desc: Abnormal testcase of SetRawDataFromPixels, rawData_ is null
+* @tc.name: ParseInfoFromPixelMap001
+* @tc.desc: Abnormal testcase of ParseInfoFromPixelMap001, pixelMap is null
 * @tc.type: FUNC
 */
-HWTEST_F(SystemDefinedPixelMapTest, SetRawDataFromPixels001, TestSize.Level1)
+HWTEST_F(SystemDefinedPixelMapTest, ParseInfoFromPixelMap001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "SetRawDataFromPixels001 begin.");
+    LOG_INFO(UDMF_TEST, "ParseInfoFromPixelMap001 begin.");
     SystemDefinedPixelMap systemDefinedPixelMap;
-    const std::shared_ptr<OHOS::Media::PixelMap> pixelMap = nullptr;
-    bool ret = systemDefinedPixelMap.SetRawDataFromPixels(pixelMap);
-    EXPECT_FALSE(ret);
-    LOG_INFO(UDMF_TEST, "SetRawDataFromPixels001 end.");
+    systemDefinedPixelMap.ParseInfoFromPixelMap(nullptr);
+    EXPECT_TRUE(systemDefinedPixelMap.details_.empty());
+    LOG_INFO(UDMF_TEST, "ParseInfoFromPixelMap001 end.");
+}
+
+/**
+* @tc.name: PixelMapLoader001
+* @tc.desc: Abnormal testcase of PixelMapLoader001
+* @tc.type: FUNC
+*/
+HWTEST_F(SystemDefinedPixelMapTest, PixelMapLoader001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "PixelMapLoader001 begin.");
+    PixelMapLoader loader;
+    loader.handler_ = nullptr;
+    std::vector<uint8_t> buff(10);
+    auto ret = loader.DecodeTlv(buff);
+    EXPECT_EQ(ret, nullptr);
+    LOG_INFO(UDMF_TEST, "PixelMapLoader001 end.");
+}
+
+/**
+* @tc.name: PixelMapLoader002
+* @tc.desc: Abnormal testcase of PixelMapLoader002
+* @tc.type: FUNC
+*/
+HWTEST_F(SystemDefinedPixelMapTest, PixelMapLoader002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "PixelMapLoader002 begin.");
+    PixelMapLoader loader;
+    loader.handler_ = nullptr;
+    std::vector<uint8_t> buff;
+
+    uint32_t color[35] = { 3, 7, 9, 9, 7, 6 };
+    OHOS::Media::InitializationOptions opts = { { 5, 7 },
+        Media::PixelFormat::ARGB_8888, Media::PixelFormat::ARGB_8888 };
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap =
+        OHOS::Media::PixelMap::Create(color, sizeof(color) / sizeof(color[0]), opts);
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMapIn = move(pixelMap);
+
+    auto ret = loader.EncodeTlv(pixelMapIn, buff);
+    EXPECT_EQ(ret, false);
+    LOG_INFO(UDMF_TEST, "PixelMapLoader002 end.");
+}
+
+/**
+* @tc.name: PixelMapLoader003
+* @tc.desc: Abnormal testcase of PixelMapLoader003
+* @tc.type: FUNC
+*/
+HWTEST_F(SystemDefinedPixelMapTest, PixelMapLoader003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "PixelMapLoader003 begin.");
+    PixelMapLoader loader;
+    loader.handler_ = nullptr;
+    
+    PixelMapDetails details;
+    auto buff = std::vector<uint8_t>(10);
+    details.rawData = std::ref(buff);
+    auto ret = loader.GetPixelMapFromRawData(details);
+    EXPECT_EQ(ret, nullptr);
+    LOG_INFO(UDMF_TEST, "PixelMapLoader003 end.");
+}
+
+/**
+* @tc.name: PixelMapLoader004
+* @tc.desc: Abnormal testcase of PixelMapLoader004
+* @tc.type: FUNC
+*/
+HWTEST_F(SystemDefinedPixelMapTest, PixelMapLoader004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "PixelMapLoader004 begin.");
+    PixelMapLoader loader;
+    loader.handler_ = nullptr;
+    
+    uint32_t color[35] = { 3, 7, 9, 9, 7, 6 };
+    OHOS::Media::InitializationOptions opts = { { 5, 7 },
+        Media::PixelFormat::ARGB_8888, Media::PixelFormat::ARGB_8888 };
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap =
+        OHOS::Media::PixelMap::Create(color, sizeof(color) / sizeof(color[0]), opts);
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMapIn = move(pixelMap);
+    auto ret = loader.ParseInfoFromPixelMap(pixelMapIn);
+    EXPECT_EQ(ret, nullptr);
+    LOG_INFO(UDMF_TEST, "PixelMapLoader004 end.");
+}
+
+/**
+* @tc.name: PixelMapLoader005
+* @tc.desc: Abnormal testcase of PixelMapLoader005
+* @tc.type: FUNC
+*/
+HWTEST_F(SystemDefinedPixelMapTest, PixelMapLoader005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "PixelMapLoader005 begin.");
+    PixelMapLoader loader;
+    ASSERT_NE(loader.handler_, nullptr);
+
+    std::vector<uint8_t> buff;
+    auto ret = loader.DecodeTlv(buff);
+    EXPECT_EQ(ret, nullptr);
+    LOG_INFO(UDMF_TEST, "PixelMapLoader005 end.");
+}
+
+/**
+* @tc.name: PixelMapLoader006
+* @tc.desc: Abnormal testcase of PixelMapLoader006
+* @tc.type: FUNC
+*/
+HWTEST_F(SystemDefinedPixelMapTest, PixelMapLoader006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "PixelMapLoader006 begin.");
+    PixelMapLoader loader;
+    ASSERT_NE(loader.handler_, nullptr);
+    std::vector<uint8_t> buff;
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMapIn = nullptr;
+
+    auto ret = loader.EncodeTlv(pixelMapIn, buff);
+    EXPECT_EQ(ret, false);
+    LOG_INFO(UDMF_TEST, "PixelMapLoader006 end.");
+}
+
+/**
+* @tc.name: PixelMapLoader007
+* @tc.desc: Abnormal testcase of PixelMapLoader007
+* @tc.type: FUNC
+*/
+HWTEST_F(SystemDefinedPixelMapTest, PixelMapLoader007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "PixelMapLoader007 begin.");
+    PixelMapLoader loader;
+    ASSERT_NE(loader.handler_, nullptr);
+    
+    PixelMapDetails details;
+    details.rawData = std::nullopt;
+    auto ret = loader.GetPixelMapFromRawData(details);
+    EXPECT_EQ(ret, nullptr);
+    LOG_INFO(UDMF_TEST, "PixelMapLoader007 end.");
+}
+
+/**
+* @tc.name: PixelMapLoader008
+* @tc.desc: Abnormal testcase of PixelMapLoader008
+* @tc.type: FUNC
+*/
+HWTEST_F(SystemDefinedPixelMapTest, PixelMapLoader008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "PixelMapLoader008 begin.");
+    PixelMapLoader loader;
+    ASSERT_NE(loader.handler_, nullptr);
+
+    auto ret = loader.ParseInfoFromPixelMap(nullptr);
+    EXPECT_EQ(ret, nullptr);
+    LOG_INFO(UDMF_TEST, "PixelMapLoader008 end.");
 }
 } // OHOS::Test
