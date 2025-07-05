@@ -424,40 +424,40 @@ export class UnifiedData {
     return this.inner.getInner();
   }
   constructor() {
-    this.inner = CreateUnifiedData_inner();
+    this.inner = createUnifiedData();
   }
   constructor(inner: UnifiedDataInner) {
     this.inner = inner;
   }
   constructor(unifiedRecord: UnifiedRecord) {
     if (unifiedRecord instanceof Folder) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as Folder).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as Folder).inner);
     } else if (unifiedRecord instanceof Audio) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as Audio).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as Audio).inner);
     } else if (unifiedRecord instanceof Video) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as Video).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as Video).inner);
     } else if (unifiedRecord instanceof Image) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as Image).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as Image).inner);
     } else if (unifiedRecord instanceof PlainText) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as PlainText).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as PlainText).inner);
     } else if (unifiedRecord instanceof HTML) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as HTML).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as HTML).inner);
     } else if (unifiedRecord instanceof Hyperlink) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as Hyperlink).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as Hyperlink).inner);
     } else if (unifiedRecord instanceof SystemDefinedForm) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as SystemDefinedForm).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedForm).inner);
     } else if (unifiedRecord instanceof SystemDefinedAppItem) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as SystemDefinedAppItem).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedAppItem).inner);
     } else if (unifiedRecord instanceof SystemDefinedPixelMap) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as SystemDefinedPixelMap).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedPixelMap).inner);
     } else if (unifiedRecord instanceof Text) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as Text).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as Text).inner);
     } else if (unifiedRecord instanceof File) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as File).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as File).inner);
     } else if (unifiedRecord instanceof SystemDefinedRecord) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as SystemDefinedRecord).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedRecord).inner);
     } else if (unifiedRecord instanceof UnifiedRecord) {
-      this.inner = CreateUnifiedDataWithParams_inner((unifiedRecord as UnifiedRecord).inner);
+      this.inner = createUnifiedDataWithParams((unifiedRecord as UnifiedRecord).inner);
     }
   }
   addRecord(unifiedRecord: UnifiedRecord) {
@@ -532,14 +532,14 @@ export class UnifiedData {
 export class UnifiedRecord {
   inner: UnifiedRecordInner;
   constructor() {
-    this.inner = CreateUnifiedRecord_inner();
+    this.inner = createUnifiedRecord();
   }
   constructor(inner: UnifiedRecordInner) {
     this.inner = inner;
   }
 
   constructor(type: string, value: ValueType) {
-    this.inner = CreateUnifiedRecordWithParams_inner(type, value);
+    this.inner = createUnifiedRecordWithParams(type, value);
   }
   getType(): string {
     return this.inner.getType();
@@ -552,7 +552,7 @@ export class UnifiedRecord {
 export class File extends UnifiedRecord {
   inner: FileInner;
   constructor() {
-    this.inner = CreateUnifiedFile_inner();
+    this.inner = createUnifiedFile();
   }
   constructor(inner: FileInner) {
     this.inner = inner;
@@ -580,7 +580,7 @@ export class File extends UnifiedRecord {
 export class Folder extends File {
   inner: FolderInner;
   constructor() {
-    this.inner = CreateUnifiedFolder_inner();
+    this.inner = createUnifiedFolder();
   }
   constructor(inner: FolderInner) {
     this.inner = inner;
@@ -614,7 +614,7 @@ export class Folder extends File {
 export class Audio extends File {
   inner: AudioInner;
   constructor() {
-    this.inner = CreateUnifiedAudio_inner();
+    this.inner = createUnifiedAudio();
   }
   constructor(inner: AudioInner) {
     this.inner = inner;
@@ -648,7 +648,7 @@ export class Audio extends File {
 export class Video extends File {
   inner: VideoInner;
   constructor() {
-    this.inner = CreateUnifiedVideo_inner();
+    this.inner = createUnifiedVideo();
   }
   constructor(inner: VideoInner) {
     this.inner = inner;
@@ -682,7 +682,7 @@ export class Video extends File {
 export class Image extends File {
   inner: ImageInner;
   constructor() {
-    this.inner = CreateUnifiedImage_inner();
+    this.inner = createUnifiedImage();
   }
   constructor(inner: ImageInner) {
     this.inner = inner;
@@ -716,7 +716,7 @@ export class Image extends File {
 export class Text extends UnifiedRecord {
   inner: TextInner;
   constructor() {
-    this.inner = CreateText_inner();
+    this.inner = createText();
   }
   constructor(inner: TextInner) {
     this.inner = inner;
@@ -738,7 +738,7 @@ export class Text extends UnifiedRecord {
 export class PlainText extends Text {
   inner: PlainTextInner;
   constructor() {
-    this.inner = CreatePlainText_inner();
+    this.inner = createPlainText();
   }
   constructor(inner: PlainTextInner) {
     this.inner = inner;
@@ -772,7 +772,7 @@ export class PlainText extends Text {
 export class HTML extends Text {
   inner: HTMLInner;
   constructor() {
-    this.inner = CreateHtml_inner();
+    this.inner = createHtml();
   }
   constructor(inner: HTMLInner) {
     this.inner = inner;
@@ -806,7 +806,7 @@ export class HTML extends Text {
 export class Hyperlink extends Text {
   inner: HyperlinkInner;
   constructor() {
-    this.inner = CreateHyperlink_inner();
+    this.inner = createHyperlink();
   }
   constructor(inner: HyperlinkInner) {
     this.inner = inner;
@@ -840,7 +840,7 @@ export class Hyperlink extends Text {
 export class SystemDefinedRecord extends UnifiedRecord {
   inner: SystemDefinedRecordInner;
   constructor() {
-    this.inner = CreateSystemDefinedRecord_inner();
+    this.inner = createSystemDefinedRecord();
   }
   constructor(inner: SystemDefinedRecordInner) {
     this.inner = inner;
@@ -862,7 +862,7 @@ export class SystemDefinedRecord extends UnifiedRecord {
 export class SystemDefinedForm extends SystemDefinedRecord {
   inner: SystemDefinedFormInner;
   constructor() {
-    this.inner = CreateSystemDefinedForm_inner();
+    this.inner = createSystemDefinedForm();
   }
   constructor(inner: SystemDefinedFormInner) {
     this.inner = inner;
@@ -914,7 +914,7 @@ export class SystemDefinedForm extends SystemDefinedRecord {
 export class SystemDefinedAppItem extends SystemDefinedRecord {
   inner: SystemDefinedAppItemInner;
   constructor() {
-    this.inner = CreateSystemDefinedAppItem_inner();
+    this.inner = createSystemDefinedAppItem();
   }
   constructor(inner: SystemDefinedAppItemInner) {
     this.inner = inner;
@@ -972,7 +972,7 @@ export class SystemDefinedAppItem extends SystemDefinedRecord {
 export class SystemDefinedPixelMap extends SystemDefinedRecord {
   inner: SystemDefinedPixelMapInner;
   constructor() {
-    this.inner = CreateSystemDefinedPixelMap_inner();
+    this.inner = createSystemDefinedPixelMap();
   }
   constructor(inner: SystemDefinedPixelMapInner) {
     this.inner = inner;
@@ -1000,7 +1000,7 @@ export class SystemDefinedPixelMap extends SystemDefinedRecord {
 export function insertData(options: Options, data: UnifiedData): Promise<string> {
 return new Promise<string>((resolve, reject): void => {
     taskpool.execute((): string => {
-        return InsertDataSync_inner(options, data.inner);
+        return insertDataSync(options, data.inner);
     })
     .then((ret: NullishType): void => {
         resolve(ret as string);
@@ -1012,7 +1012,7 @@ return new Promise<string>((resolve, reject): void => {
 }
 export function insertData(options: Options, data: UnifiedData, callback: AsyncCallback<string>): void {
 taskpool.execute((): string => {
-    return InsertDataSync_inner(options, data.inner);
+    return insertDataSync(options, data.inner);
 })
 .then((ret: NullishType): void => {
     callback(new BusinessError(), ret as string);
@@ -1026,7 +1026,7 @@ taskpool.execute((): string => {
 export function queryData(options: Options): Promise<Array<UnifiedData>> {
     return new Promise<Array<UnifiedData>>((resolve, reject): void => {
         taskpool.execute((): Array<UnifiedData> => {
-            let dataArray = QueryDataSync_inner(options);
+            let dataArray = queryDataSync(options);
             let arr: Array<UnifiedData> = new Array<UnifiedData>();
             for (let i = 0; i < dataArray.length; i++ ) {
               arr.push(new UnifiedData(dataArray[i]))
@@ -1043,7 +1043,7 @@ export function queryData(options: Options): Promise<Array<UnifiedData>> {
 }
 export function queryData(options: Options, callback: AsyncCallback<Array<UnifiedData>>): void {
     taskpool.execute((): Array<UnifiedData> => {
-        let dataArray = QueryDataSync_inner(options);
+        let dataArray = queryDataSync(options);
         let arr: Array<UnifiedData> = new Array<UnifiedData>();
         for (let i = 0; i < dataArray.length; i++ ) {
           arr.push(new UnifiedData(dataArray[i]))
