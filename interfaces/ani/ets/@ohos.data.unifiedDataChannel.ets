@@ -55,11 +55,7 @@ type ValueType = number | string | boolean | image.PixelMap | Want | ArrayBuffer
         static { loadLibrary("unifieddatachannel_ani") }
 
         constructor(type?: string, value?: ValueType) {
-            if (type == undefined || value == undefined) {
-                this.init("default", 0)
-            } else {
-                this.init(type, value)
-            }
+            this.init(type, value);
             this.registerCleaner();
         }
 
@@ -71,22 +67,18 @@ type ValueType = number | string | boolean | image.PixelMap | Want | ArrayBuffer
             this.fzAgent.unregister();
         }
         setNativePtr(context: long) {
-            this.nativePtr = context
+            this.nativePtr = context;
         }
 
         private fzAgent: FinalizationAgent<UnifiedRecord>;
-        native init(type: string, value: ValueType): void;
+        native init(type?: string, value?: ValueType): void;
         private nativePtr: long = 0;
     }
 
     export class UnifiedData {
         static { loadLibrary("unifieddatachannel_ani") }
         constructor(record?: UnifiedRecord) {
-            if (record == undefined) {
-                this.initData(new UnifiedRecord("default", 0))
-            } else {
-                this.initData(record)
-            }
+            this.initData(record);
             this.registerCleaner();
         }
 
@@ -97,7 +89,7 @@ type ValueType = number | string | boolean | image.PixelMap | Want | ArrayBuffer
         unregisterCleaner(): void {
             this.fzAgent.unregister();
         }
-        native initData(record: UnifiedRecord): void;
+        native initData(record?: UnifiedRecord): void;
         native getRecords(): Array<UnifiedRecord>;
 
         getNativePtr(): long {

@@ -89,7 +89,7 @@ static UDMF::ValueType ParseANIRecordValueType(ani_env *env, const std::string t
 
 UnifiedRecordHolder::UnifiedRecordHolder(ani_env *env, const std::string type, ani_object unionValue)
 {
-    if (type == "default") {
+    if (type.empty() && unionValue == nullptr) {
         object_ = std::make_shared<UnifiedRecord>();
         return;
     }
@@ -187,12 +187,27 @@ static void UnifiedRecodeValueTypeConstructor([[maybe_unused]] ani_env *env, [[m
     ani_string descriptor, ani_object unionValue)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "[ANI] enter UnifiedRecodeValueTypeConstructor");
-
+    if (env == nullptr) {
+        return;
+    }
     ani_ref saveRemote = nullptr;
     env->GlobalReference_Create(reinterpret_cast<ani_ref>(object), &saveRemote);
 
-    auto type = AniStringUtils::ToStd(env, static_cast<ani_string>(descriptor));
-    auto objectRemoteHolder = new UnifiedRecordHolder(env, type, unionValue);
+    ani_boolean isUndefined;
+    if (ANI_OK != env->Reference_IsUndefined(descriptor, &isUndefined)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "Reference_IsUndefined failed");
+        return;
+    }
+    UnifiedRecordHolder *objectRemoteHolder = nullptr;
+    if (isUndefined) {
+        objectRemoteHolder = new(std::nothrow) UnifiedRecordHolder(env, "", nullptr);
+    } else {
+        auto type = AniStringUtils::ToStd(env, static_cast<ani_string>(descriptor));
+        objectRemoteHolder = new(std::nothrow) UnifiedRecordHolder(env, type, unionValue);
+    }
+    if (objectRemoteHolder == nullptr) {
+        return;
+    }
     objectRemoteHolder->Set(saveRemote);
     AniObjectUtils::Wrap<UnifiedRecordHolder>(env, object, objectRemoteHolder);
 }
@@ -201,12 +216,26 @@ static void UnifiedDataConstructor([[maybe_unused]] ani_env *env, [[maybe_unused
     ani_object recordObj)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "[ANI] enter UnifiedDataConstructor ");
-    auto recoderHolder = AniObjectUtils::Unwrap<UnifiedRecordHolder>(env, recordObj);
+    if (env == nullptr) {
+        return;
+    }
+    ani_boolean isUndefined;
+    if (ANI_OK != env->Reference_IsUndefined(recordObj, &isUndefined)) {
+        LOG_ERROR(UDMF_KITS_NAPI, "Reference_IsUndefined failed");
+        return;
+    }
+    UnifiedRecordHolder *recoderHolder = nullptr;
+    if (!isUndefined) {
+        recoderHolder = AniObjectUtils::Unwrap<UnifiedRecordHolder>(env, recordObj);
+    }
 
     ani_ref saveRemote = nullptr;
     env->GlobalReference_Create(reinterpret_cast<ani_ref>(object), &saveRemote);
 
-    auto objectHolder = new UnifiedDataHolder(recoderHolder);
+    auto objectHolder = new(std::nothrow) UnifiedDataHolder(recoderHolder);
+    if (objectHolder == nullptr) {
+        return;
+    }
     objectHolder->Set(saveRemote);
     AniObjectUtils::Wrap<UnifiedDataHolder>(env, object, objectHolder);
 }
