@@ -89,7 +89,7 @@ static UDMF::ValueType ParseANIRecordValueType(ani_env *env, const std::string t
 
 UnifiedRecordHolder::UnifiedRecordHolder(ani_env *env, const std::string type, ani_object unionValue)
 {
-    if (type == "default") {
+    if (type.empty() && unionValue == nullptr) {
         object_ = std::make_shared<UnifiedRecord>();
         return;
     }
@@ -197,6 +197,23 @@ static void UnifiedRecodeValueTypeConstructor([[maybe_unused]] ani_env *env, [[m
     AniObjectUtils::Wrap<UnifiedRecordHolder>(env, object, objectRemoteHolder);
 }
 
+static void UnifiedRecodeConstructor([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "[ANI] enter UnifiedRecodeConstructor");
+    if (env == nullptr) {
+        return;
+    }
+    ani_ref saveRemote = nullptr;
+    env->GlobalReference_Create(reinterpret_cast<ani_ref>(object), &saveRemote);
+
+    auto objectRemoteHolder = new UnifiedRecordHolder(env, "", nullptr);
+    if (objectRemoteHolder == nullptr) {
+        return;
+    }
+    objectRemoteHolder->Set(saveRemote);
+    AniObjectUtils::Wrap<UnifiedRecordHolder>(env, object, objectRemoteHolder);
+}
+
 static void UnifiedDataConstructor([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
     ani_object recordObj)
 {
@@ -207,6 +224,23 @@ static void UnifiedDataConstructor([[maybe_unused]] ani_env *env, [[maybe_unused
     env->GlobalReference_Create(reinterpret_cast<ani_ref>(object), &saveRemote);
 
     auto objectHolder = new UnifiedDataHolder(recoderHolder);
+    objectHolder->Set(saveRemote);
+    AniObjectUtils::Wrap<UnifiedDataHolder>(env, object, objectHolder);
+}
+
+static void initDataWithOutRecordConstructor([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "[ANI] enter initDataWithOutRecordConstructor");
+    if (env == nullptr) {
+        return;
+    }
+    ani_ref saveRemote = nullptr;
+    env->GlobalReference_Create(reinterpret_cast<ani_ref>(object), &saveRemote);
+
+    auto objectHolder = new UnifiedDataHolder(nullptr);
+    if (objectHolder == nullptr) {
+        return;
+    }
     objectHolder->Set(saveRemote);
     AniObjectUtils::Wrap<UnifiedDataHolder>(env, object, objectHolder);
 }
@@ -310,6 +344,7 @@ static ani_status LoadUnifiedRecord(ani_env *env, ani_namespace &ns)
 
     std::array methods = {
         ani_native_function {"init", nullptr, reinterpret_cast<void *>(UnifiedRecodeValueTypeConstructor)},
+        ani_native_function {"initRecordWithOutTypeValue", nullptr, reinterpret_cast<void *>(UnifiedRecodeConstructor)},
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(unifiedRecordClass, methods.data(), methods.size())) {
@@ -334,6 +369,8 @@ static ani_status LoadUnifiedData(ani_env *env, ani_namespace &ns)
 
     std::array datamethods = {
         ani_native_function {"initData", nullptr, reinterpret_cast<void *>(UnifiedDataConstructor)},
+        ani_native_function {"initDataWithOutRecord", nullptr,
+            reinterpret_cast<void *>(initDataWithOutRecordConstructor)},
         ani_native_function {"getRecords", nullptr, reinterpret_cast<void *>(GetRecords)},
     };
 
