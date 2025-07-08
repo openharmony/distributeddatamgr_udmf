@@ -62,7 +62,7 @@ describe('UdmfIntelligenceJsTest', function () {
      * @tc.type Function
      */
   it('intelligenceApiTest0100', 0, async function (done) {
-    console.info(TAG + 'intelligenceApiTest0100 start')
+    console.info(TAG + 'intelligenceApiTest0100 start');
     let text =
       '日常生活中，我们对接触到的事物，会产生一个不假思索地看法，或者说直觉性的认知.百科全书里这样解释道“ 认知包括感觉、知觉、记忆、思维、想象和语言等。';
     let config = {
@@ -208,7 +208,7 @@ describe('UdmfIntelligenceJsTest', function () {
             data.loadModel()
               .then(() => {
                 console.info(TAG + 'loadModel success result 0500:');
-                data.releaseModel()
+                data.releaseModel();
                 done();
               });
           });
@@ -306,7 +306,6 @@ describe('UdmfIntelligenceJsTest', function () {
           console.info(TAG + 'getEmbedding promise result:' + err.code);
           expect(err.code).assertEqual(801);
           done();
-
         });
     }
   });
@@ -332,7 +331,7 @@ describe('UdmfIntelligenceJsTest', function () {
               let ret = dataSize > 0;
               expect(ret).assertEqual(true);
               done();
-            })
+            });
         });
     } else {
       intelligence.getTextEmbeddingModel(textConfig)
