@@ -14,7 +14,7 @@
  */
 
 import { describe, beforeAll, beforeEach, afterEach, afterAll, it, expect } from 'deccjsunit/index';
-import intelligence from '@ohos.data.intelligence'
+import intelligence from '@ohos.data.intelligence';
 import deviceInfo from '@ohos.deviceInfo';
 
 const TAG = ['Intelligence_Test'];
@@ -139,7 +139,7 @@ describe('UdmfIntelligenceJsTest', function () {
       intelligence.getImageEmbeddingModel(imageConfig)
         .then((data) => {
           console.info(TAG + 'get result:' + data);
-          let ret = false
+          let ret = false;
           if (data != null) {
             ret = true;
           }
