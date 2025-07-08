@@ -43,7 +43,7 @@ struct TypeDescriptorCfg {
 
 struct UtdFileInfo {
     uint64_t size;
-    std::filesystem::file_time_type lastTime;
+    int64_t lastTime;
 };
 
 // UTD data category

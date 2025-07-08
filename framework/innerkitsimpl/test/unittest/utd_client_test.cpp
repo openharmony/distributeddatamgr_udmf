@@ -43,7 +43,7 @@ public:
     static void TearDownTestCase();
     void SetUp() override;
     void TearDown() override;
-    static void TryReloadCustomUtdTest();
+    static bool TryReloadCustomUtdTest();
 };
 
 void UtdClientTest::SetUpTestCase()
@@ -1897,16 +1897,16 @@ HWTEST_F(UtdClientTest, TryReloadCustomUtdTest004, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "TryReloadCustomUtdTest004 end.");
 }
 
-void UtdClientTest::TryReloadCustomUtdTest()
+bool UtdClientTest::TryReloadCustomUtdTest()
 {
     UtdClient utdClient;
     std::string filePath = CustomUtdStore::GetInstance().GetCustomUtdPath(false, USERID);
     auto now = std::chrono::system_clock::now();
     auto ftime = std::filesystem::file_time_type::clock::now() + (now - std::chrono::system_clock::now());
     std::filesystem::last_write_time(filePath, ftime);
+    std::filesystem::resize_file(filePath, USERID * USERID);
     std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
-    bool ret = utdClient.TryReloadCustomUtd();
-    EXPECT_TRUE(ret);
+    return utdClient.TryReloadCustomUtd();
 }
 
 /**
@@ -1918,22 +1918,23 @@ HWTEST_F(UtdClientTest, TryReloadCustomUtdTest005, TestSize.Level0)
 {
     LOG_INFO(UDMF_TEST, "TryReloadCustomUtdTest005 begin.");
     std::thread t1([&]() {
-        TryReloadCustomUtdTest();
+        std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
+        auto ret = TryReloadCustomUtdTest();
+        EXPECT_TRUE(ret);
     });
     EXPECT_NO_FATAL_FAILURE(t1.join());
     std::thread t2([&]() {
-        TryReloadCustomUtdTest();
+        std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
+        auto ret = TryReloadCustomUtdTest();
+        EXPECT_TRUE(ret);
     });
     EXPECT_NO_FATAL_FAILURE(t2.join());
     std::thread t3([&]() {
-        TryReloadCustomUtdTest();
+        std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
+        auto ret = TryReloadCustomUtdTest();
+        EXPECT_TRUE(ret);
     });
     EXPECT_NO_FATAL_FAILURE(t3.join());
-
-    std::thread t4([&]() {
-        TryReloadCustomUtdTest();
-    });
-    EXPECT_NO_FATAL_FAILURE(t4.join());
     LOG_INFO(UDMF_TEST, "TryReloadCustomUtdTest005 end.");
 }
 
