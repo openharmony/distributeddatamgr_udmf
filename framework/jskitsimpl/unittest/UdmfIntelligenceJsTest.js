@@ -17,41 +17,41 @@ import { describe, beforeAll, beforeEach, afterEach, afterAll, it, expect } from
 import intelligence from '@ohos.data.intelligence'
 import deviceInfo from '@ohos.deviceInfo';
 
-const TAG = ["Intelligence_Test"];
+const TAG = ['Intelligence_Test'];
 
 let textConfig = {
   version: intelligence.ModelVersion.BASIC_MODEL,
   isNpuAvailable: false,
-  cachePath: "test"
-}
+  cachePath: 'test'
+};
 
 let imageConfig = {
   version: intelligence.ModelVersion.BASIC_MODEL,
   isNpuAvailable: false,
-  cachePath: "image"
-}
+  cachePath: 'image'
+};
 
 let currentDeviceIsPc = false;
 
 describe('UdmfIntelligenceJsTest', function () {
 
   beforeAll(async () => {
-    console.info(TAG + "beforeAll");
+    console.info(TAG + 'beforeAll');
     let deviceTypeInfo = deviceInfo.deviceType;
     currentDeviceIsPc = deviceTypeInfo === '2in1' ? true : false;
-    console.info(TAG + "the value of the deviceType is : " + deviceInfo.deviceType);
-  })
+    console.info(TAG + 'the value of the deviceType is : ' + deviceInfo.deviceType);
+  });
   beforeEach(async () => {
-    console.info(TAG + "beforeEach");
-  })
+    console.info(TAG + 'beforeEach');
+  });
   afterEach(async () => {
-    console.info(TAG + "afterEach");
-  })
+    console.info(TAG + 'afterEach');
+  });
   afterAll(async () => {
-    console.info(TAG + "afterAll");
-  })
+    console.info(TAG + 'afterAll');
+  });
 
-  console.info("*************intelligence Test begin**************");
+  console.info('*************intelligence Test begin**************');
   let retArray = [401, 801, 313000000];
 
 
@@ -62,9 +62,9 @@ describe('UdmfIntelligenceJsTest', function () {
      * @tc.type Function
      */
   it('intelligenceApiTest0100', 0, async function (done) {
-    console.info(TAG + "intelligenceApiTest0100 start")
+    console.info(TAG + 'intelligenceApiTest0100 start')
     let text =
-      "日常生活中，我们对接触到的事物，会产生一个不假思索地看法，或者说直觉性的认知.百科全书里这样解释道“ 认知包括感觉、知觉、记忆、思维、想象和语言等。";
+      '日常生活中，我们对接触到的事物，会产生一个不假思索地看法，或者说直觉性的认知.百科全书里这样解释道“ 认知包括感觉、知觉、记忆、思维、想象和语言等。';
     let config = {
       size: 50,
       overlapRatio: 0.5
@@ -72,24 +72,24 @@ describe('UdmfIntelligenceJsTest', function () {
     if (currentDeviceIsPc) {
       await intelligence.splitText(text, config)
         .then((data) => {
-          console.info(TAG + "get result:" + data);
+          console.info(TAG + 'get result:' + data);
           let dataSize = data.length;
           let ret = dataSize > 0;
           expect(ret).assertEqual(true);
           done();
-        })
+        });
     } else {
       await intelligence.splitText(text, config)
         .then((data) => {
-          console.info(TAG + "get result:" + data);
+          console.info(TAG + 'get result:' + data);
           expect().assertFail();
           done();
         })
         .catch((err) => {
-          console.info(TAG + "get promise result:" + err.code);
+          console.info(TAG + 'get promise result:' + err.code);
           expect(err.code).assertEqual(801);
           done();
-        })
+        });
     }
   });
 
@@ -100,32 +100,32 @@ describe('UdmfIntelligenceJsTest', function () {
      * @tc.type Function
      */
   it('intelligenceApiTest0200', 0, async function (done) {
-    console.info(TAG + "intelligenceApiTest0200 start");
+    console.info(TAG + 'intelligenceApiTest0200 start');
     if (currentDeviceIsPc) {
       intelligence.getTextEmbeddingModel(textConfig)
         .then((data) => {
-          console.info(TAG + "get result" + data);
+          console.info(TAG + 'get result' + data);
           let ret = false;
           if (data != null) {
             ret = true;
           }
           expect(ret).assertEqual(true);
           done();
-        })
+        });
     } else {
       intelligence.getTextEmbeddingModel(textConfig)
         .then((data) => {
-          console.info(TAG + "get result" + data);
+          console.info(TAG + 'get result' + data);
           expect().assertFail();
           done();
         })
         .catch((err) => {
-          console.info(TAG + "get promise result:" + err.code);
+          console.info(TAG + 'get promise result:' + err.code);
           expect(err.code).assertEqual(801);
           done();
-        })
+        });
     }
-  })
+  });
 
   /**
    * @tc.name intelligenceApiTest0300
@@ -134,32 +134,32 @@ describe('UdmfIntelligenceJsTest', function () {
    * @tc.type Function
    */
   it('intelligenceApiTest0300', 0, async function (done) {
-    console.info(TAG + "intelligenceApiTest0300 start");
+    console.info(TAG + 'intelligenceApiTest0300 start');
     if (currentDeviceIsPc) {
       intelligence.getImageEmbeddingModel(imageConfig)
         .then((data) => {
-          console.info(TAG + "get result:" + data);
+          console.info(TAG + 'get result:' + data);
           let ret = false
           if (data != null) {
             ret = true;
           }
           expect(ret).assertEqual(true);
           done();
-        })
+        });
     } else {
       intelligence.getImageEmbeddingModel(imageConfig)
         .then((data) => {
-          console.info(TAG + "get result:" + data);
+          console.info(TAG + 'get result:' + data);
           expect().assertFail();
           done();
         })
         .catch((err) => {
-          console.info(TAG + "get promise result:" + err.code);
+          console.info(TAG + 'get promise result:' + err.code);
           expect(err.code).assertEqual(801);
           done();
-        })
+        });
     }
-  })
+  });
 
   /**
    * @tc.name intelligenceApiTest0400
@@ -168,29 +168,29 @@ describe('UdmfIntelligenceJsTest', function () {
    * @tc.type Function
    */
   it('intelligenceApiTest0400', 0, async function (done) {
-    console.info(TAG + "intelligenceApiTest0400 start");
+    console.info(TAG + 'intelligenceApiTest0400 start');
     if (currentDeviceIsPc) {
       intelligence.getTextEmbeddingModel(textConfig)
         .then((data) => {
-          console.info(TAG + "get result:" + data);
+          console.info(TAG + 'get result:' + data);
           data.loadModel()
             .then(() => {
-              console.info(TAG + "get loadMldel result 0400:");
+              console.info(TAG + 'get loadMldel result 0400:');
               done();
-            })
-        })
+            });
+        });
     } else {
       intelligence.getTextEmbeddingModel(textConfig)
         .then((data) => {
-          console.info(TAG + "get result:" + data);
+          console.info(TAG + 'get result:' + data);
           expect().assertFail();
         })
         .catch((err) => {
           expect(err.code).assertEqual(801);
           done();
-        })
+        });
     }
-  })
+  });
 
   /**
    * @tc.name intelligenceApiTest0500
@@ -199,39 +199,38 @@ describe('UdmfIntelligenceJsTest', function () {
    * @tc.type Function
    */
   it('intelligenceApiTest0500', 0, async function (done) {
-    console.info(TAG + "intelligenceApiTest0500 start");
+    console.info(TAG + 'intelligenceApiTest0500 start');
     if (currentDeviceIsPc) {
       try {
         intelligence.getTextEmbeddingModel(textConfig)
           .then((data) => {
-            console.info(TAG + "get result:" + data);
+            console.info(TAG + 'get result:' + data);
             data.loadModel()
               .then(() => {
-                console.info(TAG + "loadModel success result 0500:");
+                console.info(TAG + 'loadModel success result 0500:');
                 data.releaseModel()
                 done();
-              })
-          })
-
+              });
+          });
       } catch (err) {
-        console.info(TAG + "intelligenceApiTest0500 is fail:");
+        console.info(TAG + 'intelligenceApiTest0500 is fail:');
         expect().assertFail();
         done();
       }
     } else {
       intelligence.getTextEmbeddingModel(textConfig)
         .then((data) => {
-          console.info(TAG + "get result:" + data);
+          console.info(TAG + 'get result:' + data);
           expect().assertFail();
           done();
         })
         .catch((err) => {
-          console.info(TAG + "get result" + err.code);
+          console.info(TAG + 'get result' + err.code);
           expect(err.code).assertEqual(801);
           done();
-        })
+        });
     }
-  })
+  });
 
   /**
    * @tc.name intelligenceApiTest0600
@@ -240,36 +239,36 @@ describe('UdmfIntelligenceJsTest', function () {
    * @tc.type Function
    */
   it('intelligenceApiTest0600', 0, async function (done) {
-    console.info(TAG + "intelligenceApiTest0600 start");
+    console.info(TAG + 'intelligenceApiTest0600 start');
     if (currentDeviceIsPc) {
       intelligence.getTextEmbeddingModel(textConfig)
         .then((data) => {
-          console.info(TAG + "get result:" + data);
+          console.info(TAG + 'get result:' + data);
           data.releaseModel()
             .then(() => {
-              console.info(TAG + "releaseModel result 0600:");
+              console.info(TAG + 'releaseModel result 0600:');
               expect().assertFail();
               done();
             })
             .catch((err) => {
-              console.info(TAG + "getEmbedding result" + err.code);
+              console.info(TAG + 'getEmbedding result' + err.code);
               expect(err.code).assertEqual(31300000);
               done();
-            })
-        })
+            });
+        });
     } else {
       intelligence.getTextEmbeddingModel(textConfig)
         .then((data) => {
-          console.info(TAG + "get result:" + data);
+          console.info(TAG + 'get result:' + data);
           expect().assertFail();
         })
         .catch((err) => {
-          console.info(TAG + "loadModel promise result:" + err.code);
+          console.info(TAG + 'loadModel promise result:' + err.code);
           expect(err.code).assertEqual(801);
           done();
-        })
+        });
     }
-  })
+  });
 
   /**
    * @tc.name intelligenceApiTest0700
@@ -278,39 +277,39 @@ describe('UdmfIntelligenceJsTest', function () {
    * @tc.type Function
    */
   it('intelligenceApiTest0700', 0, async function (done) {
-    console.info(TAG + "intelligenceApiTest0700 start");
+    console.info(TAG + 'intelligenceApiTest0700 start');
     if (currentDeviceIsPc) {
       intelligence.getTextEmbeddingModel(textConfig)
         .then((data) => {
-          console.info(TAG + "get result:" + data);
+          console.info(TAG + 'get result:' + data);
           data.getEmbedding('123')
             .then((loadData) => {
-              console.info(TAG + "getEmbedding result:" + loadData);
+              console.info(TAG + 'getEmbedding result:' + loadData);
               let dataSize = loadData.length;
               let ret = dataSize > 0;
               expect().assertFail();
               done();
             })
             .catch((err) => {
-              console.info(TAG + "getEmbedding result" + err.code);
+              console.info(TAG + 'getEmbedding result' + err.code);
               expect(err.code).assertEqual(31300000);
               done();
-            })
-        })
+            });
+        });
     } else {
       intelligence.getTextEmbeddingModel(textConfig)
         .then((data) => {
-          console.info(TAG + "get result:" + data);
+          console.info(TAG + 'get result:' + data);
           expect().assertFail();
         })
         .catch((err) => {
-          console.info(TAG + "getEmbedding promise result:" + err.code);
+          console.info(TAG + 'getEmbedding promise result:' + err.code);
           expect(err.code).assertEqual(801);
           done();
 
-        })
+        });
     }
-  })
+  });
 
   /**
    * @tc.name intelligenceApiTest0800
@@ -319,36 +318,36 @@ describe('UdmfIntelligenceJsTest', function () {
    * @tc.type Function
    */
   it('intelligenceApiTest0800', 0, async function (done) {
-    console.info(TAG + "intelligenceApiTest0800 start");
+    console.info(TAG + 'intelligenceApiTest0800 start');
     if (currentDeviceIsPc) {
       intelligence.getTextEmbeddingModel(textConfig)
         .then(async (data) => {
-          console.info(TAG + "get result:" + data);
+          console.info(TAG + 'get result:' + data);
           await data.loadModel();
           let text = 'text';
           data.getEmbedding(text)
             .then((loadData) => {
-              console.info(TAG + "getEmbedding result 0800 :" + loadData);
+              console.info(TAG + 'getEmbedding result 0800 :' + loadData);
               let dataSize = loadData.length;
               let ret = dataSize > 0;
               expect(ret).assertEqual(true);
               done();
             })
-        })
+        });
     } else {
       intelligence.getTextEmbeddingModel(textConfig)
         .then((data) => {
-          console.info(TAG + "get result:" + data);
+          console.info(TAG + 'get result:' + data);
           expect().assertFail();
           done();
         })
         .catch((err) => {
-          console.info(TAG + "getEmbedding promise result:" + err.code);
+          console.info(TAG + 'getEmbedding promise result:' + err.code);
           expect(err.code).assertEqual(801);
           done();
-        })
+        });
     }
-  })
+  });
 
   /**
    * @tc.name intelligenceApiTest0900
@@ -357,36 +356,36 @@ describe('UdmfIntelligenceJsTest', function () {
    * @tc.type Function
    */
   it('intelligenceApiTest0900', 0, async function (done) {
-    console.info(TAG + "intelligenceApiTest0900 start");
+    console.info(TAG + 'intelligenceApiTest0900 start');
     if (currentDeviceIsPc) {
       intelligence.getTextEmbeddingModel(textConfig)
         .then(async (data) => {
-          console.info(TAG + "get result: " + data);
+          console.info(TAG + 'get result: ' + data);
           await data.loadModel();
           let batchTexts = ['11', '22', '33'];
           data.getEmbedding(batchTexts)
             .then((loadData) => {
-              console.info(TAG + "getEmbedding result 0900: " + loadData);
+              console.info(TAG + 'getEmbedding result 0900: ' + loadData);
               let dataSize = loadData.length;
               let ret = dataSize > 0;
               expect(ret).assertEqual(true);
               done();
-            })
-        })
+            });
+        });
     } else {
       intelligence.getTextEmbeddingModel(textConfig)
         .then((data) => {
-          console.info(TAG + "get result: " + data);
+          console.info(TAG + 'get result: ' + data);
           expect().assertFail();
           done();
         })
         .catch((err) => {
-          console.info(TAG + "getEmbedding promise result: " + err.code);
+          console.info(TAG + 'getEmbedding promise result: ' + err.code);
           expect(err.code).assertEqual(801);
           done();
-        })
+        });
     }
-  })
+  });
 
   /**
    * @tc.name intelligenceApiTest1000
@@ -395,38 +394,38 @@ describe('UdmfIntelligenceJsTest', function () {
    * @tc.type Function
    */
   it('intelligenceApiTest1000', 0, async function (done) {
-    console.info(TAG + "intelligenceApiTest1000 start");
+    console.info(TAG + 'intelligenceApiTest1000 start');
     if (currentDeviceIsPc) {
       try {
         intelligence.getImageEmbeddingModel(imageConfig)
           .then((data) => {
-            console.info(TAG + "get result :" + data);
+            console.info(TAG + 'get result :' + data);
             data.loadModel()
               .then(() => {
-                console.info(TAG + "loadModel result 1000 :");
+                console.info(TAG + 'loadModel result 1000 :');
                 data.releaseModel();
                 done();
-              })
-          })
+              });
+          });
       } catch (err) {
-        console.info(TAG + "intelligenceApiTest1000 is fail:");
+        console.info(TAG + 'intelligenceApiTest1000 is fail:');
         expect().assertFail();
         done();
       }
     } else {
       intelligence.getImageEmbeddingModel(imageConfig)
         .then((data) => {
-          console.info(TAG + "get result :" + data);
+          console.info(TAG + 'get result :' + data);
           expect().assertFail();
           done();
         })
         .catch((err) => {
-          console.info(TAG + "get promise result" + err.code);
+          console.info(TAG + 'get promise result' + err.code);
           expect(err.code).assertEqual(801);
           done();
-        })
+        });
     }
-  })
+  });
 
   /**
    * @tc.name intelligenceApiTest1100
@@ -435,37 +434,37 @@ describe('UdmfIntelligenceJsTest', function () {
    * @tc.type Function
    */
   it('intelligenceApiTest1100', 0, async function (done) {
-    console.info(TAG + "intelligenceApiTest1100 start");
+    console.info(TAG + 'intelligenceApiTest1100 start');
     if (currentDeviceIsPc) {
       intelligence.getImageEmbeddingModel(imageConfig)
         .then((data) => {
-          console.info(TAG + "get result :" + data);
+          console.info(TAG + 'get result :' + data);
           data.releaseModel()
             .then(() => {
-              console.info(TAG + "releaseModel result 1100 :");
+              console.info(TAG + 'releaseModel result 1100 :');
               expect().assertFail();
               done();
             })
             .catch((err) => {
-              console.info(TAG + "getEmbedding result" + err.code);
+              console.info(TAG + 'getEmbedding result' + err.code);
               expect(err.code).assertEqual(31300000);
               done();
-            })
-        })
+            });
+        });
     } else {
       intelligence.getImageEmbeddingModel(imageConfig)
         .then((data) => {
-          console.info(TAG + "get result :" + data);
+          console.info(TAG + 'get result :' + data);
           expect().assertFail();
           done();
         })
         .catch((err) => {
-          console.info(TAG + "get promise result" + err.code);
+          console.info(TAG + 'get promise result' + err.code);
           expect(err.code).assertEqual(801);
           done();
-        })
+        });
     }
-  })
+  });
 
   /**
    * @tc.name intelligenceApiTest1200
@@ -474,36 +473,36 @@ describe('UdmfIntelligenceJsTest', function () {
    * @tc.type Function
    */
   it('intelligenceApiTest1200', 0, async function (done) {
-    console.info(TAG + "intelligenceApiTest1200 start");
+    console.info(TAG + 'intelligenceApiTest1200 start');
     if (currentDeviceIsPc) {
       intelligence.getImageEmbeddingModel(imageConfig)
         .then(async (data) => {
-          console.info(TAG + "get result :" + data);
+          console.info(TAG + 'get result :' + data);
           await data.loadModel();
           data.getEmbedding('111.jpg')
             .then((loadData) => {
-              console.info(TAG + "getEmbedding result 1200 :" + loadData);
+              console.info(TAG + 'getEmbedding result 1200 :' + loadData);
               expect().assertFail();
               done();
             })
             .catch((err) => {
-              console.error("Failed to get Embedding and code is " + err.code);
+              console.error('Failed to get Embedding and code is ' + err.code);
               expect(err.code).assertEqual(31300000);
               done();
-            })
-        })
+            });
+        });
     } else {
       intelligence.getImageEmbeddingModel(imageConfig)
         .then((data) => {
-          console.info(TAG + "get result :" + data);
+          console.info(TAG + 'get result :' + data);
           expect().assertFail();
           done();
         })
         .catch((err) => {
-          console.info(TAG + "get promise result" + err.code);
+          console.info(TAG + 'get promise result' + err.code);
           expect(err.code).assertEqual(801);
           done();
-        })
+        });
     }
-  })
+  });
 });
