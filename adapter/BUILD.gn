@@ -74,6 +74,7 @@ config("arkui_x_udmf_config") {
     "${arkui_x_graphic_surface_path}/interfaces/inner_api/surface",
     "${arkui_x_graphic_surface_path}/interfaces/inner_api/utils",
     "${third_party_skia_path}",
+    "${udmf_interfaces_path}/innerkits/dynamic",
   ]
   defines = [ "CROSS_PLATFORM" ]
   if (udmf_feature_upgrade_skia) {
@@ -83,6 +84,7 @@ config("arkui_x_udmf_config") {
 
 arkui_x_public_source = [
   "${udmf_framework_path}/innerkitsimpl/client/getter_system.cpp",
+  "${udmf_framework_path}/innerkitsimpl/dynamic/pixelmap_loader.cpp",
   "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
@@ -315,7 +317,7 @@ ohos_source_set("arkui_x_udmf_data_napi") {
     ":arkui_x_udmf_napi_config",
     "${ability_runtime_cross_platform_path}/interfaces/inner_api/want:want_params_config",
   ]
-if (udmf_feature_upgrade_skia) {
+  if (udmf_feature_upgrade_skia) {
     defines = [ "USE_M133_SKIA" ]
   }
   deps = [
