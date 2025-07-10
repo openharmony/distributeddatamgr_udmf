@@ -296,9 +296,15 @@ std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
                 }
             }
         }
-        if (mimeType.back() != '*') {
-            return "";
+    }
+    if (mimeType.back() != '*') {
+        if (TryReloadCustomUtd()) {
+            return GetTypeIdFromCfg(mimeType);
         }
+        return "";
+    }
+    {
+        std::shared_lock<std::shared_mutex> guard(utdMutex_);
         std::string prefixType = mimeType.substr(0, mimeType.length() - 1);
         for (const auto &utdTypeCfg : descriptorCfgs_) {
             for (auto mime : utdTypeCfg.mimeTypes) {
