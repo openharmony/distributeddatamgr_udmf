@@ -2254,6 +2254,30 @@ HWTEST_F(UtdClientTest, GetTypeIdFromCfg002, TestSize.Level1)
 }
 
 /**
+* @tc.name: GetTypeIdFromCfg003
+* @tc.desc: GetTypeIdFromCfg
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetTypeIdFromCfg003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypeIdFromCfg003 begin.");
+    const std::string mimeType = "mimeType";
+    UtdClient utdClient;
+    utdClient.descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
+    std::string ret = utdClient.GetTypeIdFromCfg(mimeType);
+    EXPECT_EQ(ret, "");
+    std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
+    std::string filePath = CustomUtdStore::GetInstance().GetCustomUtdPath(false, USERID);
+    auto now = std::chrono::system_clock::now();
+    auto ftime = std::filesystem::file_time_type::clock::now() + (now - std::chrono::system_clock::now());
+    std::filesystem::last_write_time(filePath, ftime);
+
+    ret = utdClient.GetTypeIdFromCfg(mimeType);
+    EXPECT_EQ(ret, "");
+    LOG_INFO(UDMF_TEST, "GetTypeIdFromCfg003 end.");
+}
+
+/**
 * @tc.name: IsHapTokenType001
 * @tc.desc: Normal testcase of IsHapTokenType
 * @tc.type: FUNC
