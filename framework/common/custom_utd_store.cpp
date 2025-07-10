@@ -221,18 +221,15 @@ void CustomUtdStore::ProcessUtdForSave(const CustomUtdCfgs &utdTypes, std::vecto
 UtdFileInfo CustomUtdStore::GetCustomUtdInfo(bool isHap, int32_t userId)
 {
     UtdFileInfo info = {0};
-#ifndef CROSS_PLATFORM
     std::string path = GetCustomUtdPath(isHap, userId);
-    if (!std::filesystem::exists(path)) {
+    struct stat fileStat;
+    if (stat(path.c_str(), &fileStat) != 0) {
         LOG_WARN(UDMF_CLIENT, "custom utd file not exist");
         return info;
     }
 
-    info.lastTime = std::filesystem::last_write_time(path);
-    info.size = std::filesystem::file_size(path);
-#else
-    LOG_ERROR(UDMF_CLIENT, "CROSS_PLATFORM not support");
-#endif
+    info.lastTime = fileStat.st_mtime;
+    info.size = fileStat.st_size;
     return info;
 }
 } // namespace UDMF
