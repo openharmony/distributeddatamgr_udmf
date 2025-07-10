@@ -429,9 +429,9 @@ HWTEST_F(UnifiedDataTest, GetFileUrisTest001, TestSize.Level1)
 HWTEST_F(UnifiedDataTest, GetDataId_001, TestSize.Level0)
 {
     uint32_t dataId = 2;
-    UnifiedRecord record(FILE_URI, std::make_shared<Object>());
-    record.SetDataId(dataId);
-    auto getDataId = record.GetDataId();
+    UnifiedData unifiedData;
+    unifiedData.SetDataId(dataId);
+    auto getDataId = unifiedData.GetDataId();
     EXPECT_EQ(getDataId, dataId);
 }
 
@@ -443,7 +443,7 @@ HWTEST_F(UnifiedDataTest, GetDataId_001, TestSize.Level0)
 HWTEST_F(UnifiedDataTest, SetChannelName_001, TestSize.Level0)
 {
     const std::string name = "channelName";
-    UnifiedRecord record(FILE_URI, std::make_shared<Object>());
-    EXPECT_NO_FATAL_FAILURE(record.SetChannelName(name));
+    UnifiedData unifiedData;
+    EXPECT_NO_FATAL_FAILURE(unifiedData.SetChannelName(name));
 }
 } // OHOS::Test
