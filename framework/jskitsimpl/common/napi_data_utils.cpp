@@ -677,20 +677,16 @@ napi_status NapiDataUtils::SetValue(napi_env env, const DataLoadInfo &in, napi_v
 napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, DataLoadInfo &out)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> DataLoadInfo");
-    bool hasTypes = false;
-    NAPI_CALL_BASE(env, napi_has_named_property(env, in, "types", &hasTypes), napi_invalid_arg);
-    if (hasTypes) {
-        napi_value jsTypes = nullptr;
-        NAPI_CALL_BASE(env, napi_get_named_property(env, in, "types", &jsTypes), napi_invalid_arg);
+    napi_value jsTypes = nullptr;
+    NAPI_CALL_BASE(env, GetOptionalNamedProperty(env, in, "types", jsTypes), napi_invalid_arg);
+    if (jsTypes != nullptr) {
         NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsTypes, out.types), napi_invalid_arg);
     }
 
     out.recordCount = 0;
-    bool hasRecordCount = false;
-    NAPI_CALL_BASE(env, napi_has_named_property(env, in, "recordCount", &hasRecordCount), napi_invalid_arg);
-    if (hasRecordCount) {
-        napi_value jsRecordCount = nullptr;
-        NAPI_CALL_BASE(env, napi_get_named_property(env, in, "recordCount", &jsRecordCount), napi_invalid_arg);
+    napi_value jsRecordCount = nullptr;
+    NAPI_CALL_BASE(env, GetOptionalNamedProperty(env, in, "recordCount", jsRecordCount), napi_invalid_arg);
+    if (jsRecordCount != nullptr) {
         double count = 0;
         NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsRecordCount, count), napi_invalid_arg);
         if (!std::isfinite(count)) {
@@ -787,6 +783,31 @@ napi_value NapiDataUtils::DefineClass(napi_env env, const std::string &name,
         LOG_DEBUG(UDMF_KITS_NAPI, "save constructor to data.distributeddata.%{public}s", propName.c_str());
     }
     return constructor;
+}
+
+napi_status NapiDataUtils::GetOptionalNamedProperty(napi_env env, napi_value &obj, const std::string &key,
+    napi_value &napiValue)
+{
+    bool hasKey = false;
+    napi_status status = napi_has_named_property(env, obj, key.c_str(), &hasKey);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_has_named_property failed, name = %{public}s", key.c_str());
+        return napi_generic_failure;
+    }
+    if (!hasKey) {
+        napiValue = nullptr;
+        return napi_ok;
+    }
+    status = napi_get_named_property(env, obj, key.c_str(), &napiValue);
+    if (status != napi_ok || napiValue == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_get_named_property failed, name = %{public}s", key.c_str());
+        return napi_generic_failure;
+    }
+    if (IsNull(env, napiValue)) {
+        napiValue = nullptr;
+        return napi_ok;
+    }
+    return napi_ok;
 }
 } // namespace UDMF
 } // namespace OHOS

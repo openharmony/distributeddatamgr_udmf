@@ -88,8 +88,87 @@ napi_value UnifiedDataNapi::New(napi_env env, napi_callback_info info)
     if (uRecord) {
         uData->value_->AddRecord(uRecord->value_);
     }
+    auto status = napi_coerce_to_native_binding_object(
+        env, ctxt->self, DetachUnifiedData, AttachUnifiedData, uData, nullptr);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_coerce_to_native_binding_object failed!");
+    }
     ASSERT_CALL(env, napi_wrap(env, ctxt->self, uData, Destructor, nullptr, nullptr), uData);
     return ctxt->self;
+}
+
+napi_value UnifiedDataNapi::AttachUnifiedData(napi_env env, void *value, void *)
+{
+    if (value == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "Invalid value.");
+        return nullptr;
+    }
+    auto *data = static_cast<UnifiedDataNapi *>(value);
+    napi_value jsData = nullptr;
+    auto status = napi_create_object(env, &jsData);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_create_object failed!");
+        delete data;
+        return nullptr;
+    }
+    napi_property_descriptor properties[] = {
+        DECLARE_NAPI_FUNCTION("addRecord", AddRecord),
+        DECLARE_NAPI_FUNCTION("getRecords", GetRecords),
+        DECLARE_NAPI_FUNCTION("hasType", HasType),
+        DECLARE_NAPI_FUNCTION("getTypes", GetTypes),
+        DECLARE_NAPI_GETTER_SETTER("properties", GetProperties, SetProperties),
+    };
+    status = napi_define_properties(env, jsData, sizeof(properties) / sizeof(properties[0]), properties);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_define_properties failed!");
+        delete data;
+        return nullptr;
+    }
+    status = napi_coerce_to_native_binding_object(
+        env, jsData, DetachUnifiedData, AttachUnifiedData, value, nullptr);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_coerce_to_native_binding_object failed!");
+        delete data;
+        return nullptr;
+    }
+    status = napi_wrap(env, jsData, value, Destructor, nullptr, nullptr);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_wrap failed!");
+        delete data;
+        return nullptr;
+    }
+    return jsData;
+}
+
+void* UnifiedDataNapi::DetachUnifiedData(napi_env env, void *value, void *)
+{
+    if (value == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "Invalid value.");
+        return nullptr;
+    }
+    auto *origin = static_cast<UnifiedDataNapi *>(value);
+    auto result = new (std::nothrow) UnifiedDataNapi();
+    if (result == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "Memory allocation failed.");
+        return nullptr;
+    }
+    result->value_ = origin->value_;
+
+    int argc = 0;
+    napi_value argv[0] = {};
+    UnifiedDataPropertiesNapi* propertiesNapi = nullptr;
+    result->propertyRef_ = NewWithRef(env, argc, argv, reinterpret_cast<void **>(&propertiesNapi),
+        UnifiedDataPropertiesNapi::Constructor(env));
+    if (propertiesNapi == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "new UnifiedDataPropertiesNapi failed!");
+        if (result->propertyRef_ != nullptr) {
+            napi_delete_reference(env, result->propertyRef_);
+        }
+        delete result;
+        return nullptr;
+    }
+    propertiesNapi->value_ = origin->value_->GetProperties();
+    return result;
 }
 
 void UnifiedDataNapi::Destructor(napi_env env, void *data, void *hint)
