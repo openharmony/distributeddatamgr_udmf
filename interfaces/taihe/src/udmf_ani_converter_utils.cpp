@@ -43,10 +43,6 @@ std::shared_ptr<UnifiedData> AniConverter::UnwrapUnifiedData(ani_env *env, ani_o
 ani_object AniConverter::WrapUnifiedData(ani_env *env, std::shared_ptr<UnifiedData> unifiedData)
 {
     ani_object obj = {};
-    if (unifiedData == nullptr) {
-        LOG_ERROR(UDMF_ANI, "UnifiedData is null.");
-        return obj;
-    }
     ani_class cls;
     if (ANI_OK!= env->FindClass("L@ohos/data/unifiedDataChannel/unifiedDataChannel/UnifiedData;", &cls)) {
         LOG_ERROR(UDMF_ANI, "Find class fail");
