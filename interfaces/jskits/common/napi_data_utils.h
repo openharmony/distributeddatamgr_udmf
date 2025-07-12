@@ -135,6 +135,9 @@ public:
     static napi_value DefineClass(napi_env env, const std::string &name, const napi_property_descriptor *properties,
         size_t count, napi_callback newcb);
 
+    static napi_status GetOptionalNamedProperty(napi_env env, napi_value &obj, const std::string &key,
+        napi_value &napiValue);
+
 private:
     enum {
         /* std::map<key, value> to js::tuple<key, value> */
