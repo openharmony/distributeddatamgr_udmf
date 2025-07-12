@@ -792,7 +792,7 @@ napi_status NapiDataUtils::GetOptionalNamedProperty(napi_env env, napi_value &ob
     napi_status status = napi_has_named_property(env, obj, key.c_str(), &hasKey);
     if (status != napi_ok) {
         LOG_ERROR(UDMF_KITS_NAPI, "napi_has_named_property failed, name = %{public}s", key.c_str());
-        return napi_generic_failure;
+        return status;
     }
     if (!hasKey) {
         napiValue = nullptr;
