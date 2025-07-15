@@ -229,7 +229,7 @@ UtdFileInfo CustomUtdStore::GetCustomUtdInfo(bool isHap, int32_t userId)
     }
 
     info.lastTime = fileStat.st_mtime;
-    info.size = fileStat.st_size;
+    info.size = static_cast<uint64_t>(fileStat.st_size);
     return info;
 }
 } // namespace UDMF
