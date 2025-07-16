@@ -19,8 +19,8 @@
 namespace OHOS {
 namespace UDMF {
 
-constexpr const char* RECORD_SERIALIZE_TOOL_CLASS_NAME = "L@ohos/app/ability/Want/RecordSerializeTool;";
-constexpr const char* CLASSNAME_LONG = "Lstd/core/Long;";
+constexpr const char* RECORD_SERIALIZE_TOOL_CLASS_NAME = "@ohos.app.ability.Want.RecordSerializeTool";
+constexpr const char* CLASSNAME_LONG = "std.core.Long";
 
 ani_ref WrapMapParams(ani_env *env, const std::map<std::string, int64_t> &mapParams)
 {
@@ -67,7 +67,7 @@ ani_object CreateLong(ani_env *env, ani_long value)
         return nullptr;
     }
     ani_method ctor;
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "Class_FindMethod status : %{public}d", status);
         return nullptr;
     }
