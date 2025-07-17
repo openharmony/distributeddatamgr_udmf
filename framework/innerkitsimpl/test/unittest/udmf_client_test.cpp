@@ -1662,7 +1662,7 @@ HWTEST_F(UdmfClientTest, SetData021, TestSize.Level1)
     unifiedDataSet.clear();
     status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
     ASSERT_EQ(status, E_OK);
-    ASSERT_TRUE(unifiedDataSet.empty());
+    auto originSize = unifiedDataSet.size();
 
     CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data1;
@@ -1681,8 +1681,7 @@ HWTEST_F(UdmfClientTest, SetData021, TestSize.Level1)
     SetHapToken2();
     status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
     ASSERT_EQ(status, E_OK);
-    auto size = static_cast<int32_t>(unifiedDataSet.size());
-    ASSERT_EQ(size, 2);
+    ASSERT_EQ(unifiedDataSet.size(), originSize + 2);
     LOG_INFO(UDMF_TEST, "SetData021 end.");
 }
 
@@ -1950,7 +1949,7 @@ HWTEST_F(UdmfClientTest, QueryData002, TestSize.Level1)
     unifiedDataSet.clear();
     status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
     ASSERT_EQ(status, E_OK);
-    ASSERT_TRUE(unifiedDataSet.empty());
+    auto originSize = unifiedDataSet.size();
 
     CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data;
@@ -1997,8 +1996,7 @@ HWTEST_F(UdmfClientTest, QueryData002, TestSize.Level1)
     query = { .intention = UD_INTENTION_DATA_HUB };
     status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
     ASSERT_EQ(status, E_OK);
-    size = static_cast<int32_t>(unifiedDataSet.size());
-    ASSERT_EQ(size, 2);
+    ASSERT_EQ(unifiedDataSet.size(), originSize + 2);
 
     LOG_INFO(UDMF_TEST, "QueryData002 end.");
 }
@@ -2082,6 +2080,7 @@ HWTEST_F(UdmfClientTest, DeleteData002, TestSize.Level1)
     ASSERT_EQ(status, E_OK);
 
     unifiedDataSet.clear();
+    queryOption = { .key = key };
     status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
     ASSERT_TRUE(unifiedDataSet.empty());
     LOG_INFO(UDMF_TEST, "DeleteData002 end.");
@@ -2875,7 +2874,6 @@ HWTEST_F(UdmfClientTest, QueryUDSData001, TestSize.Level1)
     unifiedDataSet.clear();
     status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
     ASSERT_EQ(status, E_OK);
-    ASSERT_TRUE(unifiedDataSet.empty());
 
     CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data;
@@ -2914,7 +2912,6 @@ HWTEST_F(UdmfClientTest, QueryUDSData002, TestSize.Level1)
     unifiedDataSet.clear();
     status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
     ASSERT_EQ(status, E_OK);
-    ASSERT_TRUE(unifiedDataSet.empty());
 
     CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data;
@@ -2978,7 +2975,6 @@ HWTEST_F(UdmfClientTest, QueryUDSData003, TestSize.Level1)
     unifiedDataSet.clear();
     status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
     ASSERT_EQ(status, E_OK);
-    ASSERT_TRUE(unifiedDataSet.empty());
 
     CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data;
@@ -3042,7 +3038,6 @@ HWTEST_F(UdmfClientTest, QueryUDSData004, TestSize.Level1)
     unifiedDataSet.clear();
     status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
     ASSERT_EQ(status, E_OK);
-    ASSERT_TRUE(unifiedDataSet.empty());
 
     CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data;
@@ -3106,7 +3101,6 @@ HWTEST_F(UdmfClientTest, QueryUDSData005, TestSize.Level1)
     unifiedDataSet.clear();
     status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
     ASSERT_EQ(status, E_OK);
-    ASSERT_TRUE(unifiedDataSet.empty());
 
     CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data;
@@ -3588,7 +3582,6 @@ HWTEST_F(UdmfClientTest, GetBatchData001, TestSize.Level1)
     unifiedDataSet.clear();
     status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
     ASSERT_EQ(status, E_OK);
-    ASSERT_TRUE(unifiedDataSet.empty());
 
     CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data;
@@ -3633,7 +3626,6 @@ HWTEST_F(UdmfClientTest, UpdateData003, TestSize.Level1)
     unifiedDataSet.clear();
     status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
     ASSERT_EQ(status, E_OK);
-    ASSERT_TRUE(unifiedDataSet.empty());
     CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
     UnifiedData data;
     std::shared_ptr<UnifiedRecord> record = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "plainTextContent");

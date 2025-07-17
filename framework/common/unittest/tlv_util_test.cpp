@@ -1050,6 +1050,7 @@ HWTEST_F(TlvUtilTest, Writing_002, TestSize.Level1)
     input.timestamp = 0;
     bool ret = TLVUtil::Writing(input, data, tag);
     EXPECT_FALSE(ret);
+    fclose(file);
 }
 
 /* *
