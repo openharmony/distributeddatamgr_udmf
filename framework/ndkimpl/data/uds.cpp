@@ -158,7 +158,6 @@ OH_UdsPlainText* OH_UdsPlainText_Create()
 void OH_UdsPlainText_Destroy(OH_UdsPlainText* pThis)
 {
     if (pThis != nullptr && pThis->cid == NdkStructId::UDS_PLAIN_TEXT_STRUCT_ID) {
-        std::lock_guard<std::mutex> lock(pThis->mutex);
         delete pThis;
     }
 }
@@ -211,7 +210,6 @@ OH_UdsHyperlink* OH_UdsHyperlink_Create()
 void OH_UdsHyperlink_Destroy(OH_UdsHyperlink* pThis)
 {
     if (pThis != nullptr && pThis->cid == NdkStructId::UDS_HYPERLINK_STRUCT_ID) {
-        std::lock_guard<std::mutex> lock(pThis->mutex);
         delete pThis;
     }
 }
@@ -264,7 +262,6 @@ OH_UdsHtml* OH_UdsHtml_Create()
 void OH_UdsHtml_Destroy(OH_UdsHtml* pThis)
 {
     if (pThis != nullptr && pThis->cid == NdkStructId::UDS_HTML_STRUCT_ID) {
-        std::lock_guard<std::mutex> lock(pThis->mutex);
         delete pThis;
     }
 }
@@ -321,7 +318,6 @@ OH_UdsAppItem* OH_UdsAppItem_Create()
 void OH_UdsAppItem_Destroy(OH_UdsAppItem* pThis)
 {
     if (pThis != nullptr && pThis->cid == NdkStructId::UDS_APP_ITEM_STRUCT_ID) {
-        std::lock_guard<std::mutex> lock(pThis->mutex);
         delete pThis;
     }
 }
@@ -426,7 +422,6 @@ OH_UdsFileUri* OH_UdsFileUri_Create()
 void OH_UdsFileUri_Destroy(OH_UdsFileUri* pThis)
 {
     if (pThis != nullptr && pThis->cid == NdkStructId::UDS_FILE_URI_STRUCT_ID) {
-        std::lock_guard<std::mutex> lock(pThis->mutex);
         delete pThis;
     }
 }
@@ -478,7 +473,6 @@ OH_UdsPixelMap* OH_UdsPixelMap_Create()
 void OH_UdsPixelMap_Destroy(OH_UdsPixelMap* pThis)
 {
     if (pThis != nullptr && pThis->cid == NdkStructId::UDS_PIXEL_MAP_STRUCT_ID) {
-        std::lock_guard<std::mutex> lock(pThis->mutex);
         delete pThis;
     }
 }
@@ -533,7 +527,6 @@ int OH_UdsArrayBuffer_Destroy(OH_UdsArrayBuffer* buffer)
         LOG_ERROR(UDMF_CAPI, "Param is invalid.");
         return UDMF_E_INVALID_PARAM;
     }
-    std::lock_guard<std::mutex> lock(buffer->mutex);
     delete buffer;
     return UDMF_E_OK;
 }
@@ -586,7 +579,6 @@ OH_UdsContentForm* OH_UdsContentForm_Create()
 void OH_UdsContentForm_Destroy(OH_UdsContentForm* pThis)
 {
     if (pThis != nullptr && pThis->cid == NdkStructId::UDS_CONTENT_FORM_STRUCT_ID) {
-        std::lock_guard<std::mutex> lock(pThis->mutex);
         delete pThis;
     }
 }

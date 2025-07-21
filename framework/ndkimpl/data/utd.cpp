@@ -146,7 +146,6 @@ void OH_Utd_Destroy(OH_Utd* pThis)
         LOG_ERROR(UDMF_CAPI, "Failed to Destroy UTD, because pThis maybe nullptr or non-UTD struct ptr.");
         return;
     }
-    std::lock_guard<std::mutex> lock(pThis->mutex);
     DestroyArrayPtr(pThis->belongingToTypes, pThis->belongingToTypesCount);
     DestroyArrayPtr(pThis->filenameExtensions, pThis->filenameExtensionsCount);
     DestroyArrayPtr(pThis->mimeTypes, pThis->mimeTypeCount);

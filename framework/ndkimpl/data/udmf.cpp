@@ -147,9 +147,11 @@ void OH_UdmfData_Destroy(OH_UdmfData* data)
     if (data == nullptr) {
         return;
     }
-    std::lock_guard<std::mutex> lock(data->mutex);
-    NdkDataConversion::DestroyStringArray(data->typesArray, data->typesCount);
-    DestroyUnifiedRecordArray(data->records, data->recordsCount);
+    {
+        std::lock_guard<std::mutex> lock(data->mutex);
+        NdkDataConversion::DestroyStringArray(data->typesArray, data->typesCount);
+        DestroyUnifiedRecordArray(data->records, data->recordsCount);
+    }
     delete data;
 }
 
@@ -344,7 +346,6 @@ OH_UdmfOptions* OH_UdmfOptions_Create()
 void OH_UdmfOptions_Destroy(OH_UdmfOptions* pThis)
 {
     if (pThis != nullptr) {
-        std::lock_guard<std::mutex> lock(pThis->mutex);
         delete pThis;
         pThis = nullptr;
     }
@@ -671,12 +672,14 @@ void OH_UdmfRecord_Destroy(OH_UdmfRecord* record)
     if (record == nullptr) {
         return;
     }
-    std::lock_guard<std::mutex> lock(record->mutex);
-    if (record->recordData != nullptr) {
-        delete[] record->recordData;
-        record->recordData = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(record->mutex);
+        if (record->recordData != nullptr) {
+            delete[] record->recordData;
+            record->recordData = nullptr;
+        }
+        NdkDataConversion::DestroyStringArray(record->typesArray, record->typesCount);
     }
-    NdkDataConversion::DestroyStringArray(record->typesArray, record->typesCount);
     delete record;
 }
 
@@ -992,7 +995,6 @@ OH_UdmfProperty* OH_UdmfProperty_Create(OH_UdmfData* data)
 void OH_UdmfProperty_Destroy(OH_UdmfProperty* properties)
 {
     if (properties != nullptr) {
-        std::lock_guard<std::mutex> lock(properties->mutex);
         delete properties;
     }
 }
@@ -1106,7 +1108,6 @@ int OH_UdmfRecordProvider_Destroy(OH_UdmfRecordProvider* provider)
     if (provider == nullptr) {
         return UDMF_E_INVALID_PARAM;
     }
-    std::lock_guard<std::mutex> lock(provider->mutex);
     if (provider->context != nullptr && provider->finalize != nullptr) {
         (provider->finalize)(provider->context);
         LOG_INFO(UDMF_CAPI, "free context finished");
