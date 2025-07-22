@@ -16,7 +16,9 @@
 #include "udmf_executor.h"
 
 namespace OHOS::UDMF {
-UdmfExecutor::UdmfExecutor(size_t max, size_t min): executor_(max, min) {};
+static constexpr const char *EXECUTOR_MASK = "TaskExecutor_UDMF";
+
+UdmfExecutor::UdmfExecutor(size_t max, size_t min): executor_(max, min, EXECUTOR_MASK) {};
 
 UdmfTaskId UdmfExecutor::Schedule(UdmfDuration delay, UdmfTask task)
 {
