@@ -16,11 +16,13 @@
 #include "udmf_executor.h"
 
 namespace OHOS::UDMF {
+static constexpr const char EXECUTOR_NAME = "TaskExecutor_UDMF";
+
 UdmfExecutor::UdmfExecutor(size_t max, size_t min): executor_(max, min) {};
 
 UdmfTaskId UdmfExecutor::Schedule(UdmfDuration delay, UdmfTask task)
 {
-    return executor_.Schedule(delay, task);
+    return executor_.Schedule(delay, task, EXECUTOR_NAME);
 }
 
 bool UdmfExecutor::Remove(UdmfTaskId taskId, bool wait)
