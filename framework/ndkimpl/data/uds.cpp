@@ -115,7 +115,7 @@ template <typename T> bool UdsObject::HasObjectKey(const char* paramName)
     }
     auto it = obj->value_.find(paramName);
     if (it == obj->value_.end() || !std::holds_alternative<T>(it->second)) {
-        LOG_ERROR(UDMF_CAPI, "Don't have property %{public}s.", paramName);
+        LOG_ERROR(UDMF_CAPI, "Don't have property paramName");
         return false;
     }
     return true;

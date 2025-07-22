@@ -731,7 +731,7 @@ static int GetValueFromUint8Array(OH_UdmfRecord *record, const char *typeId, Val
     }
     auto err = memcpy_s(record->recordData, record->recordDataLen, recordValue.data(), record->recordDataLen);
     if (err != EOK) {
-        LOG_ERROR(UDMF_CAPI, "memcpy error! type:%{public}s", typeId);
+        LOG_ERROR(UDMF_CAPI, "memcpy error!");
         return UDMF_ERR;
     }
     record->lastType = const_cast<char*>(typeId);
@@ -745,7 +745,7 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* record, const char* typeId, uns
     }
     std::lock_guard<std::mutex> lock(record->mutex);
     if (!record->record_->HasType(typeId)) {
-        LOG_ERROR(UDMF_CAPI, "no type:%{public}s", typeId);
+        LOG_ERROR(UDMF_CAPI, "not has typeId");
         return UDMF_E_INVALID_PARAM;
     }
     if (record->lastType == typeId && record->recordData != nullptr) {
@@ -762,7 +762,7 @@ int OH_UdmfRecord_GetGeneralEntry(OH_UdmfRecord* record, const char* typeId, uns
     }
     auto result = GetValueFromUint8Array(record, typeId, value);
     if (result != UDMF_E_OK) {
-        LOG_ERROR(UDMF_CAPI, "Get value from valueType failed. typeId: %{public}s, result: %{public}d", typeId, result);
+        LOG_ERROR(UDMF_CAPI, "Get value from valueType failed. result: %{public}d", result);
         return result;
     }
     *count = record->recordDataLen;

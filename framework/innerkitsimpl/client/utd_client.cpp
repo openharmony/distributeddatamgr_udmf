@@ -27,19 +27,8 @@
 namespace OHOS {
 namespace UDMF {
 constexpr const int MAX_UTD_LENGTH = 256;
-constexpr const int MAX_FILE_EXTENSION_LENGTH = 14;
-constexpr const char *DEFAULT_ANONYMOUS = "******";
 constexpr const int64_t RELOAD_INTERVAL = 10;
 using namespace std::chrono;
-
-std::string UtdClient::Anonymous(const std::string &fileExtension)
-{
-    if (fileExtension.length() <= MAX_FILE_EXTENSION_LENGTH) {
-        return fileExtension;
-    }
-
-    return (fileExtension.substr(0, MAX_FILE_EXTENSION_LENGTH) + DEFAULT_ANONYMOUS);
-}
 
 UtdClient::UtdClient()
 {
@@ -100,13 +89,11 @@ Status UtdClient::GetTypeDescriptor(const std::string &typeId, std::shared_ptr<T
         for (const auto &utdTypeCfg : descriptorCfgs_) {
             if (utdTypeCfg.typeId == typeId) {
                 descriptor = std::make_shared<TypeDescriptor>(utdTypeCfg);
-                LOG_DEBUG(UDMF_CLIENT, "get descriptor success. %{public}s ", typeId.c_str());
                 return Status::E_OK;
             }
         }
     }
     if (typeId.find(FLEXIBLE_TYPE_FLAG) != typeId.npos) {
-        LOG_DEBUG(UDMF_CLIENT, "get flexible descriptor. %{public}s ", typeId.c_str());
         return GetFlexibleTypeDescriptor(typeId, descriptor);
     }
     if (TryReloadCustomUtd()) {
@@ -145,7 +132,7 @@ Status UtdClient::GetFlexibleTypeDescriptor(const std::string &typeId, std::shar
 {
     TypeDescriptorCfg flexibleTypeDescriptorCfg;
     if (!FlexibleType::ParseFlexibleUtd(typeId, flexibleTypeDescriptorCfg)) {
-        LOG_ERROR(UDMF_CLIENT, "ParseFlexibleUtd failed, invalid typeId: %{public}s", typeId.c_str());
+        LOG_ERROR(UDMF_CLIENT, "ParseFlexibleUtd failed, invalid typeId");
         return Status::E_ERROR;
     }
     descriptor = std::make_shared<TypeDescriptor>(flexibleTypeDescriptorCfg);
@@ -158,8 +145,7 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
     std::string lowerFileExtension = fileExtension;
     std::transform(lowerFileExtension.begin(), lowerFileExtension.end(), lowerFileExtension.begin(), ::tolower);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
-        LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. fileExtension:%{public}s, belongsTo:%{public}s ",
-                  fileExtension.c_str(), belongsTo.c_str());
+        LOG_ERROR(UDMF_CLIENT, "invalid belongsTo.");
         if (TryReloadCustomUtd()) {
             return GetUniformDataTypeByFilenameExtension(fileExtension, typeId, belongsTo);
         }
@@ -192,8 +178,7 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
     }
     if (typeId.empty()) {
         if (!IsValidFileExtension(lowerFileExtension)) {
-            LOG_ERROR(UDMF_CLIENT, "invalid fileExtension. fileExtension:%{public}s, belongsTo:%{public}s ",
-                      Anonymous(fileExtension).c_str(), belongsTo.c_str());
+            LOG_ERROR(UDMF_CLIENT, "invalid fileExtension.");
             return Status::E_INVALID_PARAMETERS;
         }
         typeId = FlexibleType::GenFlexibleUtd("", lowerFileExtension, belongsTo);
@@ -205,16 +190,14 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
     std::vector<std::string> &typeIds, const std::string &belongsTo)
 {
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
-        LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. fileExtension:%{public}s, belongsTo:%{public}s ",
-            fileExtension.c_str(), belongsTo.c_str());
+        LOG_ERROR(UDMF_CLIENT, "invalid belongsTo.");
         if (TryReloadCustomUtd()) {
             return GetUniformDataTypesByFilenameExtension(fileExtension, typeIds, belongsTo);
         }
         return Status::E_INVALID_PARAMETERS;
     }
     if (!IsValidFileExtension(fileExtension)) {
-        LOG_ERROR(UDMF_CLIENT, "invalid fileExtension. fileExtension:%{public}s, belongsTo:%{public}s ",
-            Anonymous(fileExtension).c_str(), belongsTo.c_str());
+        LOG_ERROR(UDMF_CLIENT, "invalid fileExtension.");
         return Status::E_INVALID_PARAMETERS;
     }
 
@@ -257,8 +240,7 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
     std::string lowerMimeType = mimeType;
     std::transform(lowerMimeType.begin(), lowerMimeType.end(), lowerMimeType.begin(), ::tolower);
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
-        LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. mimeType:%{public}s, belongsTo:%{public}s ",
-                  mimeType.c_str(), belongsTo.c_str());
+        LOG_ERROR(UDMF_CLIENT, "invalid belongsTo.");
         if (TryReloadCustomUtd()) {
             return GetUniformDataTypeByMIMEType(mimeType, typeId, belongsTo);
         }
@@ -272,8 +254,7 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
     }
     if (typeId.empty()) {
         if (!IsValidMimeType(mimeType)) {
-            LOG_ERROR(UDMF_CLIENT, "invalid mimeType. mimeType:%{public}s, belongsTo:%{public}s ",
-                      mimeType.c_str(), belongsTo.c_str());
+            LOG_ERROR(UDMF_CLIENT, "invalid mimeType.");
             return Status::E_INVALID_PARAMETERS;
         }
         typeId = FlexibleType::GenFlexibleUtd(lowerMimeType, "", belongsTo);
@@ -325,16 +306,14 @@ Status UtdClient::GetUniformDataTypesByMIMEType(const std::string &mimeType, std
     const std::string &belongsTo)
 {
     if (belongsTo != DEFAULT_TYPE_ID && !UtdGraph::GetInstance().IsValidType(belongsTo)) {
-        LOG_ERROR(UDMF_CLIENT, "invalid belongsTo. mimeType:%{public}s, belongsTo:%{public}s ",
-            mimeType.c_str(), belongsTo.c_str());
+        LOG_ERROR(UDMF_CLIENT, "invalid belongsTo.");
         if (TryReloadCustomUtd()) {
             return GetUniformDataTypesByMIMEType(mimeType, typeIds, belongsTo);
         }
         return Status::E_INVALID_PARAMETERS;
     }
     if (!IsValidMimeType(mimeType)) {
-        LOG_ERROR(UDMF_CLIENT, "invalid mimeType. mimeType:%{public}s, belongsTo:%{public}s ",
-            mimeType.c_str(), belongsTo.c_str());
+        LOG_ERROR(UDMF_CLIENT, "invalid mimeType.");
         return Status::E_INVALID_PARAMETERS;
     }
 
@@ -408,11 +387,11 @@ Status UtdClient::IsUtd(std::string typeId, bool &result)
         }
         result = false;
     } catch (...) {
-        LOG_ERROR(UDMF_CLIENT, "exception, typeId:%{public}s", typeId.c_str());
+        LOG_ERROR(UDMF_CLIENT, "throw error");
         result = false;
         return Status::E_ERROR;
     }
-    LOG_ERROR(UDMF_CLIENT, "is not utd, typeId:%{public}s", typeId.c_str());
+    LOG_ERROR(UDMF_CLIENT, "is not utd");
     return Status::E_OK;
 }
 

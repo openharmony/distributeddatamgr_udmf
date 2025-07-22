@@ -91,10 +91,9 @@ int32_t CustomUtdStore::SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &custo
 int32_t CustomUtdStore::SavaCfgFile(const std::string &jsonData, const std::string &cfgFilePath)
 {
     std::ofstream ofs;
-    LOG_DEBUG(UDMF_CLIENT, "set cfg start, path:%{public}s ", cfgFilePath.c_str());
     ofs.open(cfgFilePath, 0x02);
     if (!ofs.is_open()) {
-        LOG_ERROR(UDMF_CLIENT, "open cfg failed, path:%{public}s", cfgFilePath.c_str());
+        LOG_ERROR(UDMF_CLIENT, "open cfg failed");
     }
     ofs << jsonData << std::endl;
     ofs.close();

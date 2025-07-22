@@ -115,7 +115,7 @@ bool Graph::DfsUnconnectedGraph(Action action)
 bool Graph::IsValidType(const std::string &node)
 {
     if (typeIdIndex_.find(node) == typeIdIndex_.end()) {
-        LOG_ERROR(UDMF_CLIENT, "invalid typeId. typeId:%{public}s ", node.c_str());
+        LOG_ERROR(UDMF_CLIENT, "invalid typeId");
         return false;
     }
     return true;

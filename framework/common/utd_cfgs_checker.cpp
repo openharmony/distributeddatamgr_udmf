@@ -60,15 +60,13 @@ bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string
 #endif
         for (auto declarationType: typeCfgs.first) {
             if (!std::regex_match(declarationType.typeId, std::regex(bundleName + TYPE_ID_REGEX))) {
-                LOG_ERROR(UDMF_CLIENT, "Declaration typeId check failed, id: %{public}s, bundleName: %{public}s.",
-                    declarationType.typeId.c_str(), bundleName.c_str());
+                LOG_ERROR(UDMF_CLIENT, "Declaration typeId check failed, bundleName: %{public}s", bundleName.c_str());
                 return false;
             }
         }
         for (auto referenceTypes: typeCfgs.second) {
             if (!std::regex_match(referenceTypes.typeId, std::regex(TYPE_ID_REGEX))) {
-                LOG_ERROR(UDMF_CLIENT, "Reference typeId check failed, id: %{public}s, bundleName: %{public}s.",
-                    referenceTypes.typeId.c_str(), bundleName.c_str());
+                LOG_ERROR(UDMF_CLIENT, "Reference typeId check failed, bundleName: %{public}s", bundleName.c_str());
                 return false;
             }
         }
@@ -93,8 +91,7 @@ bool UtdCfgsChecker::CheckTypesOptions(CustomUtdCfgs &typeCfgs, const std::strin
     for (TypeDescriptorCfg &typeCfg : inputTypeCfgs) {
         for (std::string filenames : typeCfg.filenameExtensions) {
             if (filenames.size() <= 1 || filenames[0] != FILE_EXTENSION_PREFIX) {
-                LOG_ERROR(UDMF_CLIENT, "Extension not valid, extension: %{public}s, bundleName: %{public}s.",
-                    filenames.c_str(), bundleName.c_str());
+                LOG_ERROR(UDMF_CLIENT, "Extension not valid, bundleName: %{public}s.", bundleName.c_str());
                 return false;
             }
         }
@@ -104,8 +101,7 @@ bool UtdCfgsChecker::CheckTypesOptions(CustomUtdCfgs &typeCfgs, const std::strin
         }
         for (std::string mimeType : typeCfg.mimeTypes) {
             if (mimeType.empty()) {
-                LOG_ERROR(UDMF_CLIENT, "mimeType can not be an empty string, typeId: %{public}s.",
-                    typeCfg.typeId.c_str());
+                LOG_ERROR(UDMF_CLIENT, "mimeType can not be an empty string");
                 return false;
             }
         }
@@ -162,13 +158,11 @@ bool UtdCfgsChecker::CheckBelongingToTypes(const std::vector<TypeDescriptorCfg> 
     for (auto &inputCfg : typeCfgs) {
         for (std::string belongingToType : inputCfg.belongingToTypes) {
             if (belongingToType.empty()) {
-                LOG_ERROR(UDMF_CLIENT, "BelongingToType can not be an empty string, typeId: %{public}s.",
-                    inputCfg.typeId.c_str());
+                LOG_ERROR(UDMF_CLIENT, "BelongingToType can not be an empty string");
                 return false;
             }
             if (inputCfg.typeId == belongingToType) {
-                LOG_ERROR(UDMF_CLIENT, "TypeId cannot equals belongingToType, typeId: %{public}s.",
-                    inputCfg.typeId.c_str());
+                LOG_ERROR(UDMF_CLIENT, "TypeId cannot equals belongingToType");
                 return false;
             }
             if (find(typeIds.begin(), typeIds.end(), belongingToType) == typeIds.end()) {

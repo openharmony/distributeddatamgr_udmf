@@ -34,8 +34,7 @@ int32_t ProgressSignalStub::OnRemoteRequest(uint32_t code,
         return E_ERROR;
     }
     pid_t pid = IPCSkeleton::GetCallingPid();
-    pid_t uid = IPCSkeleton::GetCallingUid();
-    LOG_INFO(UDMF_SERVICE, "CallingPid=%{public}d, CallingUid=%{public}d, code=%{public}u", pid, uid, code);
+    LOG_INFO(UDMF_SERVICE, "CallingPid=%{public}d, code=%{public}u", pid, code);
     HandleProgressSignalValue(data);
     return E_OK;
 }

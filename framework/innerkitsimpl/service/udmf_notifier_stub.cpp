@@ -29,7 +29,7 @@ namespace UDMF {
 int32_t UdmfNotifierStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    LOG_DEBUG(UDMF_SERVICE, "code:%{public}u callingPid:%{public}u", code, IPCSkeleton::GetCallingPid());
+    LOG_INFO(UDMF_SERVICE, "code:%{public}u callingPid:%{public}u", code, IPCSkeleton::GetCallingPid());
     std::u16string local = GetDescriptor();
     std::u16string remote = data.ReadInterfaceToken();
     if (local != remote) {
@@ -60,7 +60,7 @@ void UdmfNotifierClient::HandleDelayObserver(const std::string &key, const DataL
 int32_t DelayDataCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    LOG_DEBUG(UDMF_SERVICE, "code:%{public}u callingPid:%{public}u", code, IPCSkeleton::GetCallingPid());
+    LOG_INFO(UDMF_SERVICE, "code:%{public}u callingPid:%{public}u", code, IPCSkeleton::GetCallingPid());
     std::u16string local = GetDescriptor();
     std::u16string remote = data.ReadInterfaceToken();
     if (local != remote) {
