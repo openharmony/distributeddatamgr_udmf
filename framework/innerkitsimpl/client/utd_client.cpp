@@ -171,7 +171,10 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
         for (const auto &utdTypeCfg : descriptorCfgs_) {
             for (auto fileEx : utdTypeCfg.filenameExtensions) {
                 std::transform(fileEx.begin(), fileEx.end(), fileEx.begin(), ::tolower);
-                if (fileEx == lowerFileExtension) {
+                if (fileEx == lowerFileExtension &&
+                    (belongsTo == DEFAULT_TYPE_ID ||
+                     belongsTo == utdTypeCfg.typeId ||
+                     UtdGraph::GetInstance().IsLowerLevelType(belongsTo, utdTypeCfg.typeId))) {
                     typeId = utdTypeCfg.typeId;
                     found = true;
                     break;
@@ -184,11 +187,6 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
     }
     if (typeId.empty() && TryReloadCustomUtd()) {
         return GetUniformDataTypeByFilenameExtension(fileExtension, typeId, belongsTo);
-    }
-    // the find typeId is not belongsTo to the belongsTo.
-    if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
-        !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
-        typeId = "";
     }
     if (typeId.empty()) {
         if (!IsValidFileExtension(lowerFileExtension)) {
@@ -264,11 +262,14 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
         }
         return Status::E_INVALID_PARAMETERS;
     }
-    typeId = GetTypeIdFromCfg(lowerMimeType);
-    // the find typeId is not belongsTo to the belongsTo.
-    if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
-        !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
-        typeId = "";
+    typeId.clear();
+    std::vector<std::string> typeIdsInCfg = GetTypeIdsFromCfg(lowerMimeType);
+    for (const auto &typeIdInCfg : typeIdsInCfg) {
+        if (belongsTo == DEFAULT_TYPE_ID || belongsTo == typeIdInCfg ||
+            UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeIdInCfg)) {
+            typeId = typeIdInCfg;
+            break;
+        }
     }
     if (typeId.empty()) {
         if (!IsValidMimeType(mimeType)) {
