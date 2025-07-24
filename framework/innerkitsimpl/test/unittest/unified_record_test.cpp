@@ -88,7 +88,6 @@ HWTEST_F(UnifiedRecordTest, GetValue001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "GetValue001 end.");
 }
 
-
 /**
  * @tc.name: Constructor_001
  * @tc.desc: Verify the constructor.
