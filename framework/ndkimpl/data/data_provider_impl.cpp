@@ -42,7 +42,7 @@ ValueType DataProviderImpl::GetValueByType(const std::string &utdId)
     auto value = (innerProvider_->callback)(innerProvider_->context, utdId.c_str());
     if (value == nullptr) {
         LOG_ERROR(
-            UDMF_CAPI, "get empty data when execute custom callback function, utdId is %{public}s", utdId.c_str());
+            UDMF_CAPI, "get empty data when execute custom callback function");
         return std::monostate();
     }
     UdsObject* object = static_cast<UdsObject *>(value);

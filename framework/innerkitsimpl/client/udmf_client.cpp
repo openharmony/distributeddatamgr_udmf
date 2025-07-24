@@ -353,8 +353,6 @@ Status UdmfClient::GetParentType(Summary &oldSummary, Summary &newSummary)
             UnifiedDataUtils::MergeSummary(tmpSummary, summaryKey, item.first, item.second);
         } else {
             auto type = UnifiedDataUtils::IsFileSubType(item.first);
-            LOG_DEBUG(UDMF_CLIENT, "convert beforeType=%{public}s, afterType=%{public}s",
-                item.first.c_str(), type.c_str());
             UnifiedDataUtils::MergeSummary(tmpSummary, summaryKey, type, item.second);
         }
     }

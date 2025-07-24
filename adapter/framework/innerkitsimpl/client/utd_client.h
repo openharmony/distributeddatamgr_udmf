@@ -61,7 +61,6 @@ private:
     std::string GetTypeIdFromCfg(const std::string &mimeType);
     std::vector<std::string> GetTypeIdsFromCfg(const std::string &mimeType);
     void SubscribeUtdChange();
-    std::string Anonymous(const std::string &fileExtension);
 
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
     std::shared_ptr<UtdChangeSubscriber> subscriber_;

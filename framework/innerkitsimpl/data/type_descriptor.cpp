@@ -59,8 +59,6 @@ bool TypeDescriptor::CmpFlexibleTypeLevel(const std::string higherLevelTypeId, b
             }
         }
     }
-    LOG_INFO(UDMF_CLIENT, "The current utd[%{public}s] belongings is not belong[] %{public}s,",
-             typeId_.c_str(), higherLevelTypeId.c_str());
     return false;
 }
 
@@ -73,7 +71,7 @@ Status TypeDescriptor::BelongsTo(const std::string &typeId, bool &checkResult)
     checkResult = false;
     bool isFlexibleType = typeId.find(FLEXIBLE_TYPE_FLAG) != typeId_.npos;
     if (!UtdGraph::GetInstance().IsValidType(typeId) && !isFlexibleType) {
-        LOG_ERROR(UDMF_CLIENT, "invalid para. %{public}s,", typeId.c_str());
+        LOG_ERROR(UDMF_CLIENT, "invalid para");
         return Status::E_INVALID_PARAMETERS;
     }
 
@@ -91,7 +89,7 @@ Status TypeDescriptor::IsLowerLevelType(const std::string &typeId, bool &checkRe
     checkResult = false;
     bool isFlexibleType = typeId.find(FLEXIBLE_TYPE_FLAG) != typeId_.npos;
     if (!UtdGraph::GetInstance().IsValidType(typeId) && !isFlexibleType) {
-        LOG_ERROR(UDMF_CLIENT, "invalid para. %{public}s,", typeId.c_str());
+        LOG_ERROR(UDMF_CLIENT, "invalid para");
         return Status::E_INVALID_PARAMETERS;
     }
     if (isFlexibleType_) {
@@ -111,7 +109,7 @@ Status TypeDescriptor::IsHigherLevelType(const std::string &typeId, bool &checkR
     checkResult = false;
     bool isFlexibleType = typeId.find(FLEXIBLE_TYPE_FLAG) != typeId_.npos;
     if (!UtdGraph::GetInstance().IsValidType(typeId) && !isFlexibleType) {
-        LOG_ERROR(UDMF_CLIENT, "invalid para. %{public}s,", typeId.c_str());
+        LOG_ERROR(UDMF_CLIENT, "invalid para");
         return Status::E_INVALID_PARAMETERS;
     }
     if (isFlexibleType_) {  // flexibleType cannot be other type height level.

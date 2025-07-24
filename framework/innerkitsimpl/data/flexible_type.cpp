@@ -40,7 +40,7 @@ bool FlexibleType::ParseFlexibleUtd(const std::string &typeId, TypeDescriptorCfg
     std::string flexibleUtdDecode = Base32::Decode(flexibleUtd);
     if (flexibleUtdDecode.empty() || flexibleUtdDecode[0] != '?' ||
             flexibleUtdDecode.find("=") == flexibleUtdDecode.npos) {
-        LOG_WARN(UDMF_CLIENT, "The typeId cannot be parsed, %{public}s ", typeId.c_str());
+        LOG_WARN(UDMF_CLIENT, "The typeId cannot be parsed");
         return false;
     }
     std::vector<std::string> flexibleTypeAttrs = StrSplit(flexibleUtdDecode, ":");
@@ -50,7 +50,7 @@ bool FlexibleType::ParseFlexibleUtd(const std::string &typeId, TypeDescriptorCfg
             continue;
         }
         if (attrkv[1].length() > MAX_TYPE_SIZE) {
-            LOG_ERROR(UDMF_CLIENT, "Attribute too long, attribute: %{public}s", attr.c_str());
+            LOG_ERROR(UDMF_CLIENT, "Attribute too long");
             return false;
         }
         std::string attrName = attrkv[0];
