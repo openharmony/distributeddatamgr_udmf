@@ -2426,7 +2426,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionWithBelongsTo001, T
     std::string filenameExtension = ".ts";
     std::string utdType;
     std::string blongsToType = "invalid_type";
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, utdType, blongsToType);
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(
+        filenameExtension, utdType, blongsToType);
     EXPECT_EQ(status, E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionWithBelongsTo001 end.");
 }
@@ -2442,7 +2443,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionWithBelongsTo002, T
     std::string filenameExtension = ".ts";
     std::string utdType;
     std::string blongsToType = "general.video";
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, utdType, blongsToType);
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(
+        filenameExtension, utdType, blongsToType);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(utdType, "general.ts");
 
@@ -2465,7 +2467,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionWithBelongsTo003, T
     std::string filenameExtension = ".ts";
     std::string utdType;
     std::string blongsToType = "general.media";
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, utdType, blongsToType);
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(
+        filenameExtension, utdType, blongsToType);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(utdType, "general.ts");
 
@@ -2488,7 +2491,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionWithBelongsTo004, T
     std::string filenameExtension = ".ts";
     std::string utdType;
     std::string blongsToType = "general.java-script";
-    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, utdType, blongsToType);
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(
+        filenameExtension, utdType, blongsToType);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(utdType.compare(0, std::string(FLEXIBLE_TYPE_FLAG).size(), FLEXIBLE_TYPE_FLAG), 0);
 
