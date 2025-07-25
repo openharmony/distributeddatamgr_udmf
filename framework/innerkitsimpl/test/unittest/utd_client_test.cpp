@@ -2404,14 +2404,14 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeWithBelongsTo004, TestSize.L
     std::string blongsToType = "general.source-code";
     auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, utdType, blongsToType);
     EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(utdType.compare(0, FLEXIBLE_TYPE_FLAG.size(), FLEXIBLE_TYPE_FLAG), 0);
+    EXPECT_EQ(utdType.compare(0, std::string(FLEXIBLE_TYPE_FLAG).size(), FLEXIBLE_TYPE_FLAG), 0);
 
     mimeType = "video/mp2t";
     utdType = "";
     blongsToType = "general.source-code";
     status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, utdType, blongsToType);
     EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(utdType.compare(0, FLEXIBLE_TYPE_FLAG.size(), FLEXIBLE_TYPE_FLAG), 0);
+    EXPECT_EQ(utdType.compare(0, std::string(FLEXIBLE_TYPE_FLAG).size(), FLEXIBLE_TYPE_FLAG), 0);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeWithBelongsTo004 end.");
 }
 
@@ -2490,13 +2490,13 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionWithBelongsTo004, T
     std::string blongsToType = "general.java-script";
     auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, utdType, blongsToType);
     EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(utdType.compare(0, FLEXIBLE_TYPE_FLAG.size(), FLEXIBLE_TYPE_FLAG), 0);
+    EXPECT_EQ(utdType.compare(0, std::string(FLEXIBLE_TYPE_FLAG).size(), FLEXIBLE_TYPE_FLAG), 0);
 
     utdType = "";
     blongsToType = "general.audio";
     status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, utdType, blongsToType);
     EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(utdType.compare(0, FLEXIBLE_TYPE_FLAG.size(), FLEXIBLE_TYPE_FLAG), 0);
+    EXPECT_EQ(utdType.compare(0, std::string(FLEXIBLE_TYPE_FLAG).size(), FLEXIBLE_TYPE_FLAG), 0);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionWithBelongsTo004 end.");
 }
 
@@ -2521,7 +2521,6 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix003, TestSize.Level1
     std::string blongsToType = "general.ebook";
     status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, currType, blongsToType);
     EXPECT_EQ(status, E_OK);
-    std::shared_ptr<TypeDescriptor> descriptor;
     status = UtdClient::GetInstance().GetTypeDescriptor(currType, descriptor);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(descriptor->GetTypeId(), "general.ebook");

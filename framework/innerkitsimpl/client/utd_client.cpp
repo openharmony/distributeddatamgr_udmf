@@ -288,7 +288,7 @@ std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType, const std::
     }
     if (mimeType.back() != '*') {
         if (TryReloadCustomUtd()) {
-            return GetTypeIdFromCfg(mimeType);
+            return GetTypeIdFromCfg(mimeType, belongsTo);
         }
         return "";
     }
