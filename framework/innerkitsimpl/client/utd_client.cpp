@@ -157,7 +157,7 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
         for (const auto &utdTypeCfg : descriptorCfgs_) {
             for (auto fileEx : utdTypeCfg.filenameExtensions) {
                 std::transform(fileEx.begin(), fileEx.end(), fileEx.begin(), ::tolower);
-                if (fileEx == lowerFileExtension) {
+                if (fileEx == lowerFileExtension && IsBelongingType(belongsTo, utdTypeCfg.typeId)) {
                     typeId = utdTypeCfg.typeId;
                     found = true;
                     break;
@@ -170,11 +170,6 @@ Status UtdClient::GetUniformDataTypeByFilenameExtension(const std::string &fileE
     }
     if (typeId.empty() && TryReloadCustomUtd()) {
         return GetUniformDataTypeByFilenameExtension(fileExtension, typeId, belongsTo);
-    }
-    // the find typeId is not belongsTo to the belongsTo.
-    if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
-        !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
-        typeId = "";
     }
     if (typeId.empty()) {
         if (!IsValidFileExtension(lowerFileExtension)) {
@@ -222,8 +217,7 @@ Status UtdClient::GetUniformDataTypesByFilenameExtension(const std::string &file
     typeIds.clear();
     for (const auto &typeId : typeIdsInCfg) {
         // the find typeId is not belongsTo to the belongsTo.
-        if (belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
-            !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
+        if (!IsBelongingType(belongsTo, typeId)) {
             continue;
         }
         typeIds.emplace_back(typeId);
@@ -246,12 +240,7 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
         }
         return Status::E_INVALID_PARAMETERS;
     }
-    typeId = GetTypeIdFromCfg(lowerMimeType);
-    // the find typeId is not belongsTo to the belongsTo.
-    if (!typeId.empty() && belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
-        !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
-        typeId = "";
-    }
+    typeId = GetTypeIdFromCfg(lowerMimeType, belongsTo);
     if (typeId.empty()) {
         if (!IsValidMimeType(mimeType)) {
             LOG_ERROR(UDMF_CLIENT, "invalid mimeType.");
@@ -262,7 +251,7 @@ Status UtdClient::GetUniformDataTypeByMIMEType(const std::string &mimeType, std:
     return Status::E_OK;
 }
 
-std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
+std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType, const std::string &belongsTo)
 {
     if (mimeType.empty()) {
         return "";
@@ -272,7 +261,7 @@ std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
         for (const auto &utdTypeCfg : descriptorCfgs_) {
             for (auto mime : utdTypeCfg.mimeTypes) {
                 std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
-                if (mime == mimeType) {
+                if (mime == mimeType && IsBelongingType(belongsTo, utdTypeCfg.typeId)) {
                     return utdTypeCfg.typeId;
                 }
             }
@@ -280,7 +269,7 @@ std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
     }
     if (mimeType.back() != '*') {
         if (TryReloadCustomUtd()) {
-            return GetTypeIdFromCfg(mimeType);
+            return GetTypeIdFromCfg(mimeType, belongsTo);
         }
         return "";
     }
@@ -290,7 +279,8 @@ std::string UtdClient::GetTypeIdFromCfg(const std::string &mimeType)
         for (const auto &utdTypeCfg : descriptorCfgs_) {
             for (auto mime : utdTypeCfg.mimeTypes) {
                 std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
-                if (mime.rfind(prefixType, 0) == 0 && utdTypeCfg.belongingToTypes.size() > 0) {
+                if (mime.rfind(prefixType, 0) == 0 && utdTypeCfg.belongingToTypes.size() > 0
+                    && IsBelongingType(belongsTo, utdTypeCfg.typeId)) {
                     return utdTypeCfg.belongingToTypes[0];
                 }
             }
@@ -323,8 +313,7 @@ Status UtdClient::GetUniformDataTypesByMIMEType(const std::string &mimeType, std
     typeIds.clear();
     for (const auto &typeId : typeIdsInCfg) {
         // the find typeId is not belongsTo to the belongsTo.
-        if (belongsTo != DEFAULT_TYPE_ID && belongsTo != typeId &&
-            !UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId)) {
+        if (!IsBelongingType(belongsTo, typeId)) {
             continue;
         }
         typeIds.emplace_back(typeId);
@@ -502,6 +491,13 @@ bool UtdClient::TryReloadCustomUtd()
         return true;
     }
     return false;
+}
+
+bool UtdClient::IsBelongingType(const std::string &belongsTo, const std::string &typeId) const
+{
+    return belongsTo == DEFAULT_TYPE_ID ||
+           belongsTo == typeId ||
+           UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId);
 }
 } // namespace UDMF
 } // namespace OHOS
