@@ -59,10 +59,11 @@ private:
     bool IsValidFileExtension(const std::string &fileExtension);
     bool IsValidMimeType(const std::string &mimeType);
     Status GetFlexibleTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
-    std::string GetTypeIdFromCfg(const std::string &mimeType);
+    std::string GetTypeIdFromCfg(const std::string &mimeType, const std::string &belongsTo = DEFAULT_TYPE_ID);
     std::vector<std::string> GetTypeIdsFromCfg(const std::string &mimeType);
     void UpdateGraph(const std::vector<TypeDescriptorCfg> &customTyepCfgs);
     bool TryReloadCustomUtd();
+    bool IsBelongingType(const std::string &belongsTo, const std::string &typeId) const;
 
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
     std::shared_mutex utdMutex_;
