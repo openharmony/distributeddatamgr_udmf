@@ -37,6 +37,7 @@ using namespace OHOS;
 namespace OHOS::Test {
 constexpr const int64_t SLEEP_INTERVAL = 12;
 constexpr const int32_t USERID = 100;
+constexpr const char *FLEXIBLE_TYPE_FLAG = "flex.z";
 class UtdClientTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -2324,5 +2325,214 @@ HWTEST_F(UtdClientTest, IsHapTokenType001, TestSize.Level1)
     bool ret = utdClient.IsHapTokenType();
     EXPECT_TRUE(ret);
     LOG_INFO(UDMF_TEST, "IsHapTokenType001 end.");
+}
+
+/**
+* @tc.name: GetUniformDataTypeByMIMETypeWithBelongsTo001
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType with belongsTo
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeWithBelongsTo001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeWithBelongsTo001 begin.");
+    std::string mimeType = "video/mp2ts";
+    std::string utdType;
+    std::string blongsToType = "invalid_type";
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, utdType, blongsToType);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeWithBelongsTo001 end.");
+}
+
+/**
+* @tc.name: GetUniformDataTypeByMIMETypeWithBelongsTo002
+* @tc.desc: Normal testcase of GetUniformDataTypeByMIMEType with belongsTo
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeWithBelongsTo002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeWithBelongsTo002 begin.");
+    std::string mimeType = "video/mp2ts";
+    std::string utdType;
+    std::string blongsToType = "general.video";
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, utdType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(utdType, "general.ts");
+
+    mimeType = "video/mp2t";
+    utdType = "";
+    blongsToType = "general.video";
+    status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, utdType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(utdType, "general.ts");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeWithBelongsTo002 end.");
+}
+
+/**
+* @tc.name: GetUniformDataTypeByMIMETypeWithBelongsTo003
+* @tc.desc: Normal testcase of GetUniformDataTypeByMIMEType with higher belongsTo
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeWithBelongsTo003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeWithBelongsTo003 begin.");
+    std::string mimeType = "video/mp2ts";
+    std::string utdType;
+    std::string blongsToType = "general.media";
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, utdType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(utdType, "general.ts");
+
+    mimeType = "video/mp2t";
+    utdType = "";
+    blongsToType = "general.object";
+    status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, utdType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(utdType, "general.ts");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeWithBelongsTo003 end.");
+}
+
+/**
+* @tc.name: GetUniformDataTypeByMIMETypeWithBelongsTo004
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType with belongsTo
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeWithBelongsTo004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeWithBelongsTo004 begin.");
+    std::string mimeType = "video/mp2ts";
+    std::string utdType;
+    std::string blongsToType = "general.source-code";
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, utdType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(utdType.compare(0, FLEXIBLE_TYPE_FLAG.size(), FLEXIBLE_TYPE_FLAG), 0);
+
+    mimeType = "video/mp2t";
+    utdType = "";
+    blongsToType = "general.source-code";
+    status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, utdType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(utdType.compare(0, FLEXIBLE_TYPE_FLAG.size(), FLEXIBLE_TYPE_FLAG), 0);
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeWithBelongsTo004 end.");
+}
+
+/**
+* @tc.name: GetUniformDataTypeByFilenameExtensionWithBelongsTo001
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension with belongsTo
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionWithBelongsTo001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionWithBelongsTo001 begin.");
+    std::string filenameExtension = ".ts";
+    std::string utdType;
+    std::string blongsToType = "invalid_type";
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, utdType, blongsToType);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionWithBelongsTo001 end.");
+}
+
+/**
+* @tc.name: GetUniformDataTypeByFilenameExtensionWithBelongsTo002
+* @tc.desc: Normal testcase of GetUniformDataTypeByFilenameExtension with belongsTo
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionWithBelongsTo002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionWithBelongsTo002 begin.");
+    std::string filenameExtension = ".ts";
+    std::string utdType;
+    std::string blongsToType = "general.video";
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, utdType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(utdType, "general.ts");
+
+    utdType = "";
+    blongsToType = "general.source-code";
+    status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, utdType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(utdType, "general.type-script");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionWithBelongsTo002 end.");
+}
+
+/**
+* @tc.name: GetUniformDataTypeByFilenameExtensionWithBelongsTo003
+* @tc.desc: Normal testcase of GetUniformDataTypeByFilenameExtension with higher belongsTo
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionWithBelongsTo003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionWithBelongsTo003 begin.");
+    std::string filenameExtension = ".ts";
+    std::string utdType;
+    std::string blongsToType = "general.media";
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, utdType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(utdType, "general.ts");
+
+    utdType = "";
+    blongsToType = "general.text";
+    status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, utdType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(utdType, "general.type-script");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionWithBelongsTo003 end.");
+}
+
+/**
+* @tc.name: GetUniformDataTypeByFilenameExtensionWithBelongsTo004
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension with belongsTo
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionWithBelongsTo004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionWithBelongsTo004 begin.");
+    std::string filenameExtension = ".ts";
+    std::string utdType;
+    std::string blongsToType = "general.java-script";
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, utdType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(utdType.compare(0, FLEXIBLE_TYPE_FLAG.size(), FLEXIBLE_TYPE_FLAG), 0);
+
+    utdType = "";
+    blongsToType = "general.audio";
+    status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(filenameExtension, utdType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(utdType.compare(0, FLEXIBLE_TYPE_FLAG.size(), FLEXIBLE_TYPE_FLAG), 0);
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionWithBelongsTo004 end.");
+}
+
+/**
+* @tc.name: GetUniformDataTypeByMIMETypeByPrefix003
+* @tc.desc: normal testcase of GetUniformDataTypeByMIMEType by prefix.
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix003 begin.");
+    std::string mimeType = "application/vnd.*";
+    std::string currType;
+    auto status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, currType);
+    EXPECT_EQ(status, E_OK);
+    std::shared_ptr<TypeDescriptor> descriptor;
+    status = UtdClient::GetInstance().GetTypeDescriptor(currType, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), "general.ebook");
+
+    currType = "";
+    std::string blongsToType = "general.ebook";
+    status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, currType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    std::shared_ptr<TypeDescriptor> descriptor;
+    status = UtdClient::GetInstance().GetTypeDescriptor(currType, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), "general.ebook");
+
+    currType = "";
+    blongsToType = "general.media";
+    status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, currType, blongsToType);
+    EXPECT_EQ(status, E_OK);
+    status = UtdClient::GetInstance().GetTypeDescriptor(currType, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), "general.image");
+    LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix003 end.");
 }
 } // OHOS::Test
