@@ -239,6 +239,9 @@ template <typename T> bool Writing(const std::vector<T> &input, TLVObject &data,
 
 template <typename T> bool Reading(std::vector<T> &output, TLVObject &data, const TLVHead &head)
 {
+    if (head.len > data.GetTotal() - data.GetCursor()) {
+        return false;
+    }
     auto endCursor = data.GetCursor() + head.len;
     while (data.GetCursor() < endCursor) {
         TLVHead itemHead{};
@@ -295,6 +298,9 @@ template <typename T, typename R> bool Writing(const std::map<T, R> &input, TLVO
 
 template <typename T, typename R> bool Reading(std::map<T, R> &output, TLVObject &data, const TLVHead &head)
 {
+    if (head.len > data.GetTotal() - data.GetCursor()) {
+        return false;
+    }
     auto endCursor = data.GetCursor() + head.len;
     while (data.GetCursor() < endCursor) {
         TLVHead headPair{};
@@ -397,6 +403,9 @@ bool ReadVariant(TLVObject &data, uint32_t step, uint32_t index, _OutTp &value, 
 
 template <typename... _Types> bool Reading(std::variant<_Types...> &output, TLVObject &data, const TLVHead &head)
 {
+    if (head.len > data.GetTotal() - data.GetCursor()) {
+        return false;
+    }
     uint32_t index = 0;
     auto endCursor = data.GetCursor() + head.len;
     while (data.GetCursor() < endCursor) {
@@ -442,6 +451,9 @@ template <typename T> bool Writing(const std::set<T> &input, TLVObject &data, TA
 
 template <typename T> bool Reading(std::set<T> &output, TLVObject &data, const TLVHead &head)
 {
+    if (head.len > data.GetTotal() - data.GetCursor()) {
+        return false;
+    }
     auto endCursor = data.GetCursor() + head.len;
     while (data.GetCursor() < endCursor) {
         TLVHead itemHead{};
