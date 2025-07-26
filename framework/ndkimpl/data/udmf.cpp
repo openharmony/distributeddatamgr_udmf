@@ -653,6 +653,10 @@ void OH_Udmf_DestroyDataArray(OH_UdmfData** dataArray, unsigned int dataSize)
         LOG_ERROR(UDMF_CAPI, "The DestroyDataArray error, invaild params!");
         return;
     }
+    for (unsigned int i = 0; i < dataSize; ++i) {
+        NdkDataConversion::DestroyStringArray((*dataArray)[i].typesArray, (*dataArray)[i].typesCount);
+        DestroyUnifiedRecordArray((*dataArray)[i].records, (*dataArray)[i].recordsCount);
+    }
     delete[] *dataArray;
     *dataArray = nullptr;
 }
