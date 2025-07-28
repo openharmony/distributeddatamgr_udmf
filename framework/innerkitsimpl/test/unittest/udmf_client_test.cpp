@@ -3726,10 +3726,10 @@ HWTEST_F(UdmfClientTest, GetParentType001, TestSize.Level1)
         { "general.png", 10 },
         { "general.html", 10 },
         { "general.jpeg", 10 },
-        { "general.avi", 10},
-        { "com.adobe.pdf", 10},
-        { "general.text", 10}
-        { "aabbcc", 10}
+        { "general.avi", 10 },
+        { "com.adobe.pdf", 10 },
+        { "general.text", 10 },
+        { "aabbcc", 10 }
     };
     oldSummary.summary = std::move(sumMap);
     oldSummary.totalSize = 80;
