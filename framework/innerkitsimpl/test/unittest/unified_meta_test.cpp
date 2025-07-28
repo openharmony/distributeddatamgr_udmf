@@ -833,5 +833,9 @@ HWTEST_F(UnifiedMetaTest, GetBelongsToFileType, TestSize.Level1)
     utdId = "com.adobe.pdf";
     fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
     EXPECT_EQ(fileType, "general.file");
+
+    utdId = "com.adobe.pdf";
+    fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
+    EXPECT_EQ(fileType, "general.file");
 }
 } // OHOS::Test
