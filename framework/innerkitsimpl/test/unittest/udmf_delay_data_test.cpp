@@ -496,7 +496,7 @@ HWTEST_F(UdmfDelayDataTest, UdmfDelayDataTest005, TestSize.Level1)
     EXPECT_NO_FATAL_FAILURE(t1.join());
     EXPECT_NO_FATAL_FAILURE(t2.join());
     EXPECT_NO_FATAL_FAILURE(t3.join());
-    
+
     LOG_INFO(UDMF_TEST, "UdmfDelayDataTest005 end.");
 }
 
