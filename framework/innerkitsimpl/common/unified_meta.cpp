@@ -736,8 +736,8 @@ std::string UnifiedDataUtils::GetBelongsToFileType(const std::string &utdId)
     }
     std::shared_ptr<TypeDescriptor> descriptor;
     UtdClient::GetInstance().GetTypeDescriptor(utdId, descriptor);
-    if (descriptor == nullptr || descriptor->GetFilenameExtensions().empty()) {
-        LOG_INFO(UDMF_FRAMEWORK, "The descriptor is null or the file extensions is empty");
+    if (descriptor == nullptr) {
+        LOG_INFO(UDMF_FRAMEWORK, "The descriptor is null");
         return "";
     }
     for (const auto &type : FILE_SUB_TYPES) {
