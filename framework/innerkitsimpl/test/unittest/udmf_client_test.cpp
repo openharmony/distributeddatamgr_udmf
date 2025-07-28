@@ -3947,6 +3947,59 @@ HWTEST_F(UdmfClientTest, IsAppropriateType002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: IsAppropriateType002
+ * @tc.desc: test SetData with invalid intention
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, IsAppropriateType003, TestSize.Level1)
+{
+    Summary totalSummary;
+    std::map<std::string, int64_t> specificSummary = {
+        { "general.html", 10 }
+    };
+    std::map<std::string, int64_t> summary = {
+        { "general.html", 10 }
+    };
+    std::map<std::string, std::vector<int32_t>> summaryFormat = {
+        { "general.html", { Uds_Type::UDS_HTML } }
+    };
+    totalSummary.summary = summary;
+    totalSummary.specificSummary = specificSummary;
+    totalSummary.summaryFormat = summaryFormat;
+    totalSummary.version = 1;
+    totalSummary.totalSize = 30;
+
+    std::vector<std::string> allowTypes = { "general.html" };
+    bool isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_TRUE(isAppropriate);
+
+    allowTypes = { "general.file" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_FALSE(isAppropriate);
+
+    allowTypes = { "general.file-uri" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_FALSE(isAppropriate);
+
+    allowTypes = { "general.image" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_FALSE(isAppropriate);
+
+    totalSummary.version = 0;
+    allowTypes = { "general.html" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_TRUE(isAppropriate);
+
+    allowTypes = { "general.file-uri" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_FALSE(isAppropriate);
+
+    allowTypes = { "general.image" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_FALSE(isAppropriate);
+}
+
+/**
 * @tc.name: GetSummary006
 * @tc.desc: Get summary data for entries
 * @tc.type: FUNC

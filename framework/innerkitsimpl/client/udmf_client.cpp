@@ -450,7 +450,7 @@ bool UdmfClient::CheckFileUtdType(const Summary &summary, const std::vector<std:
 {
     std::set<std::string> fileUtdTypes;
     for (const auto &[type, formats] : summary.summaryFormat) {
-        if (!type.empty() || std::find(formats.begin(), formats.end(), Uds_Type::UDS_FILE_URI) != formats.end()) {
+        if (!type.empty() && std::find(formats.begin(), formats.end(), Uds_Type::UDS_FILE_URI) != formats.end()) {
             fileUtdTypes.emplace(type);
         }
         if (fileUtdTypes.size() > FILE_TYPES_MAX_SIZE) {
