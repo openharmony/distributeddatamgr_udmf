@@ -730,8 +730,8 @@ bool UnifiedDataUtils::IsValidOptionsNonDrag(UnifiedKey &key, const std::string 
 
 std::string UnifiedDataUtils::GetBelongsToFileType(const std::string &utdId)
 {
-    if (utdId.empty()) {
-        LOG_ERROR(UDMF_FRAMEWORK, "The utdId is empty");
+    if (utdId.empty() || utdId == "general.html" || utdId == "general.plain-text") {
+        LOG_ERROR(UDMF_FRAMEWORK, "The utdId is empty or the utdId is general.html or general.plain-text");
         return "";
     }
     std::shared_ptr<TypeDescriptor> descriptor;
