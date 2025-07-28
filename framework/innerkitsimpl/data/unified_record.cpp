@@ -233,7 +233,7 @@ std::set<std::string> UnifiedRecord::GetUtdIds() const
     return utdIds;
 }
 
-std::set<std::string> UnifiedRecord::GetUtdIdsWithAddFileType(const bool isSpecific) const
+std::set<std::string> UnifiedRecord::GetUtdIdsWithAddFileType(bool isSpecific) const
 {
     std::set<std::string> utdIds;
     if (!utdId2_.empty()) {
@@ -396,7 +396,7 @@ void UnifiedRecord::ComputeUris(const std::function<bool(UriInfo &)> &action)
     }
 }
 
-void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri, const bool isSpecific) const
+void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri, bool isSpecific) const
 {
     if (fileUri == nullptr) {
         return;

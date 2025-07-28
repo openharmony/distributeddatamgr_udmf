@@ -1036,6 +1036,5 @@ template <> bool API_EXPORT Reading(DataLoadInfo &output, TLVObject &data, const
     }
     return true;
 }
-
 } // namespace TLVUtil
 } // namespace OHOS

@@ -571,7 +571,7 @@ enum Intention : int32_t {
     UD_INTENTION_BUTT,
 };
 
-static const std::unordered_map<int32_t, std::string> UD_INTENTION_MAP {
+static const std::map<int32_t, std::string> UD_INTENTION_MAP {
     { UD_INTENTION_DRAG, "drag" },
     { UD_INTENTION_DATA_HUB, "DataHub" },
     { UD_INTENTION_SYSTEM_SHARE, "SystemShare" },
@@ -579,11 +579,11 @@ static const std::unordered_map<int32_t, std::string> UD_INTENTION_MAP {
     { UD_INTENTION_MENU, "Menu" },
 };
 
-static const std::unordered_map<int32_t, std::string> UD_SYSTEM_INTENTION_MAP {
+static const std::map<int32_t, std::string> UD_SYSTEM_INTENTION_MAP {
     { UD_INTENTION_DRAG, "Drag" },
 };
 
-static const std::unordered_map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
+static const std::map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
     { UD_INTENTION_DATA_HUB, "DATA_HUB" },
     { UD_INTENTION_DRAG, "DRAG" },
     { UD_INTENTION_SYSTEM_SHARE, "SYSTEM_SHARE" },
@@ -598,7 +598,7 @@ enum Visibility : int32_t {
     VISIBILITY_BUTT,
 };
 
-static const std::unordered_map<int32_t, std::string> UD_VISIBILITY_MAP {
+static const std::map<int32_t, std::string> UD_VISIBILITY_MAP {
     { VISIBILITY_ALL, "ALL" },
     { VISIBILITY_OWN_PROCESS, "OWN_PROCESS" },
 };
@@ -615,7 +615,7 @@ enum Uds_Type : int32_t {
     UDS_OTHER
 };
 
-static const std::unordered_map<std::string, Uds_Type> UDS_UTD_TYPE_MAP {
+static const std::map<std::string, Uds_Type> UDS_UTD_TYPE_MAP {
     { "general.plain-text", Uds_Type::UDS_PLAIN_TEXT },
     { "general.hyperlink", Uds_Type::UDS_HYPERLINK },
     { "general.html", Uds_Type::UDS_HTML },

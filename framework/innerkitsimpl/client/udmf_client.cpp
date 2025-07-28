@@ -433,17 +433,9 @@ std::string UdmfClient::GetBundleNameByUdKey(const std::string &key)
 
 bool UdmfClient::IsAppropriateType(const Summary &summary, const std::vector<std::string> &allowTypes)
 {
-    std::unordered_map<std::string, int> summaryTypesCount;
-    for (const auto &[type, size] : summary.summary) {
-        summaryTypesCount[type]++;
-    }
-    std::unordered_map<std::string, int> specificTypesCount;
-    for (const auto &[type, size] : summary.specificSummary) {
-        specificTypesCount[type]++;
-    }
     for (const auto &allowType : allowTypes) {
-        if (summaryTypesCount.find(allowType) != summaryTypesCount.end()
-            || specificTypesCount.find(allowType) != specificTypesCount.end()) {
+        if (summary.summary.find(allowType) != summary.summary.end()
+            || summary.specificSummary.find(allowType) != summary.specificSummary.end()) {
             return true;
         }
     }
@@ -462,6 +454,7 @@ bool UdmfClient::CheckFileUtdType(const Summary &summary, const std::vector<std:
             fileUtdTypes.emplace(type);
         }
         if (fileUtdTypes.size() > FILE_TYPES_MAX_SIZE) {
+            LOG_WARN(UDMF_CLIENT, "Exceeding the maximum size");
             break;
         }
     }
@@ -489,6 +482,7 @@ bool UdmfClient::CheckFileUtdType(const Summary &summary, const std::vector<std:
             }
         }
     }
+    LOG_INFO(UDMF_CLIENT, "Not appropriate type");
     return false;
 }
 } // namespace UDMF

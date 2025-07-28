@@ -731,11 +731,13 @@ bool UnifiedDataUtils::IsValidOptionsNonDrag(UnifiedKey &key, const std::string 
 std::string UnifiedDataUtils::GetBelongsToFileType(const std::string &utdId)
 {
     if (utdId.empty()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "The utdId is empty");
         return "";
     }
     std::shared_ptr<TypeDescriptor> descriptor;
     UtdClient::GetInstance().GetTypeDescriptor(utdId, descriptor);
-    if (descriptor == nullptr) {
+    if (descriptor == nullptr || descriptor->GetFilenameExtensions().empty()) {
+        LOG_INFO(UDMF_FRAMEWORK, "The descriptor is null or the file extensions is empty");
         return "";
     }
     for (const auto &type : FILE_SUB_TYPES) {
@@ -745,6 +747,11 @@ std::string UnifiedDataUtils::GetBelongsToFileType(const std::string &utdId)
             return type;
         }
     }
+    if (!descriptor->GetFilenameExtensions().empty()) {
+        LOG_INFO(UDMF_FRAMEWORK, "The type descriptor has file extensions");
+        return "general.file";
+    }
+    LOG_INFO(UDMF_FRAMEWORK, "Return empty");
     return "";
 }
 
