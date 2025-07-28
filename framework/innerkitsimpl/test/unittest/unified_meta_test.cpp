@@ -652,7 +652,6 @@ HWTEST_F(UnifiedMetaTest, GetValueSize001, TestSize.Level1)
     EXPECT_EQ(ret, (std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value))->GetByteCount());
 }
 
-
 /**
 * @tc.name: GetValueSize002
 * @tc.desc: Normal testcase of GetValueSize
