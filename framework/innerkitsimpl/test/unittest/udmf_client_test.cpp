@@ -1307,12 +1307,12 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     EXPECT_EQ(summary.totalSize, size);
     EXPECT_EQ(summary.summary["general.text"], text->GetSize());
     EXPECT_EQ(summary.summary["general.plain-text"], plainText->GetSize());
-    EXPECT_EQ(summary.summary["general.file"], file->GetSize());
+    EXPECT_EQ(summary.summary["general.file"], file->GetSize() + record8->GetSize());
     EXPECT_EQ(summary.summary["general.image"], image->GetSize());
     EXPECT_EQ(summary.summary["SystemDefinedType"], systemDefinedRecord->GetSize());
     EXPECT_EQ(summary.summary["openharmony.form"], systemDefinedForm->GetSize());
     EXPECT_EQ(summary.summary["ApplicationDefinedType"], applicationDefinedRecord->GetSize());
-    EXPECT_EQ(summary.summary["abcdefg"], record8->GetSize());
+    EXPECT_EQ(summary.summary["abcdefg"], 0);
     EXPECT_EQ(summary.summary["general.png"], record9->GetSize());
 
     LOG_INFO(UDMF_TEST, "GetSummary001 end.");
@@ -3720,90 +3720,26 @@ HWTEST_F(UdmfClientTest, SetData036, TestSize.Level1)
 HWTEST_F(UdmfClientTest, GetParentType001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetParentType001 begin.");
-
-    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
-    UnifiedData data;
-    std::string key;
-    auto obj = std::make_shared<Object>();
-    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
-    obj->value_[FILE_TYPE] = "general.file";
-    obj->value_[FILE_URI_PARAM] = "http://file.com";
-    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
-    auto obj1 = std::make_shared<Object>();
-    obj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
-    obj1->value_[FILE_TYPE] = "general.image";
-    obj1->value_[FILE_URI_PARAM] = "http://image.com";
-    auto record1 = std::make_shared<UnifiedRecord>(FILE_URI, obj1);
-    auto obj2 = std::make_shared<Object>();
-    obj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
-    obj2->value_[FILE_TYPE] = "general.png";
-    obj2->value_[FILE_URI_PARAM] = "http://png.com";
-    auto record2 = std::make_shared<UnifiedRecord>(FILE_URI, obj2);
-    data.AddRecord(record);
-    data.AddRecord(record1);
-    data.AddRecord(record2);
-    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
-    ASSERT_EQ(status, E_OK);
-    QueryOption option2 = { .key = key };
-    Summary summary;
-    status = UdmfClient::GetInstance().GetSummary(option2, summary);
-    ASSERT_EQ(status, E_OK);
-    EXPECT_EQ(summary.fileTypes.size(), data.GetRecords().size());
+    Summary oldSummary;
+    std::map<std::string, int64_t> sumMap = {
+        { "general.file", 10 },
+        { "general.png", 10 },
+        { "general.html", 10 },
+        { "general.jpeg", 10 },
+        { "general.avi", 10},
+        { "aabbcc", 10}
+    };
+    oldSummary.summary = std::move(sumMap);
+    oldSummary.totalSize = 60;
     Summary newSummary;
-    status = UdmfClient::GetInstance().GetParentType(summary, newSummary);
-    ASSERT_EQ(status, E_OK);
-    EXPECT_EQ(newSummary.summary["general.file"], record->GetSize());
-    EXPECT_EQ(newSummary.summary["general.image"], record1->GetSize() + record2->GetSize());
-    EXPECT_EQ(newSummary.totalSize, record->GetSize() + record1->GetSize() + record2->GetSize());
-
-    LOG_INFO(UDMF_TEST, "GetParentType001 end.");
-}
-
-/**
-* @tc.name: GetParentType002
-* @tc.desc: test Summary fileType
-* @tc.type: FUNC
-*/
-HWTEST_F(UdmfClientTest, GetParentType002, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "GetParentType002 start.");
-
-    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
-    UnifiedData data;
-    std::string key;
-    auto obj = std::make_shared<Object>();
-    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
-    obj->value_[FILE_TYPE] = "general.file";
-    obj->value_[FILE_URI_PARAM] = "http://file.com";
-    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
-    auto obj1 = std::make_shared<Object>();
-    obj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
-    obj1->value_[FILE_TYPE] = "general.html";
-    obj1->value_[FILE_URI_PARAM] = "http://html-content.com";
-    auto record1 = std::make_shared<UnifiedRecord>(FILE_URI, obj1);
-    auto obj2 = std::make_shared<Object>();
-    obj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
-    obj2->value_[FILE_TYPE] = "general.png";
-    obj2->value_[FILE_URI_PARAM] = "http://png.com";
-    auto record2 = std::make_shared<UnifiedRecord>(FILE_URI, obj2);
-    data.AddRecord(record);
-    data.AddRecord(record1);
-    data.AddRecord(record2);
-    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
-    ASSERT_EQ(status, E_OK);
-    QueryOption option2 = { .key = key };
-    Summary summary;
-    status = UdmfClient::GetInstance().GetSummary(option2, summary);
-    ASSERT_EQ(status, E_OK);
-    EXPECT_EQ(summary.fileTypes.size(), data.GetRecords().size());
-    Summary newSummary;
-    status = UdmfClient::GetInstance().GetParentType(summary, newSummary);
-    ASSERT_EQ(status, E_OK);
-    EXPECT_EQ(newSummary.summary["general.file"], record->GetSize() + record1->GetSize());
-    EXPECT_EQ(newSummary.summary["general.image"], record2->GetSize());
-    EXPECT_EQ(newSummary.totalSize, record->GetSize() + record1->GetSize() + record2->GetSize());
-
-    LOG_INFO(UDMF_TEST, "GetParentType002 end.");
+    auto ret = UdmfClient::GetInstance().GetParentType(oldSummary, newSummary);
+    ASSERT_EQ(ret, E_OK);
+    EXPECT_EQ(newSummary.totalSize, 60);
+    EXPECT_EQ(newSummary.summary["general.file"], 10);
+    EXPECT_EQ(newSummary.summary["general.image"], 20);
+    EXPECT_EQ(newSummary.summary["general.html"], 10);
+    EXPECT_EQ(newSummary.summary["general.video"], 10);
+    EXPECT_EQ(newSummary.summary["aabbcc"], 10);
 }
 
 /**
@@ -3911,5 +3847,179 @@ HWTEST_F(UdmfClientTest, SetData0024, TestSize.Level1)
 
     auto ret = UdmfClient::GetInstance().SetData(option, unifiedData, key);
     EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
+}
+
+/**
+ * @tc.name: IsAppropriateType001
+ * @tc.desc: test SetData with invalid intention
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, IsAppropriateType001, TestSize.Level1)
+{
+    Summary totalSummary;
+    std::map<std::string, int64_t> specificSummary = {
+        { "general.png", 10 },
+        { "general.jpg", 10 },
+        { "general.html", 10 }
+    };
+    std::map<std::string, int64_t> summary = {
+        { "general.image", 20 },
+        { "general.html", 10 }
+    };
+    std::map<std::string, std::vector<int32_t>> summaryFormat = {
+        { "general.png", { Uds_Type::UDS_FILE_URI } },
+        { "general.jpg", { Uds_Type::UDS_FILE_URI } },
+        { "general.html", { Uds_Type::UDS_HTML } }
+    };
+    totalSummary.summary = summary;
+    totalSummary.specificSummary = specificSummary;
+    totalSummary.summaryFormat = summaryFormat;
+    totalSummary.version = 1;
+    totalSummary.totalSize = 30;
+
+    std::vector<std::string> allowTypes = { "general.image" };
+    bool isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_TRUE(isAppropriate);
+
+    allowTypes = { "general.hyperlink" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_FALSE(isAppropriate);
+
+    allowTypes = { "general.html" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_TRUE(isAppropriate);
+}
+
+/**
+ * @tc.name: IsAppropriateType002
+ * @tc.desc: test SetData with invalid intention
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, IsAppropriateType002, TestSize.Level1)
+{
+    Summary totalSummary;
+    std::map<std::string, int64_t> specificSummary = {
+        { "general.html", 10 }
+    };
+    std::map<std::string, int64_t> summary = {
+        { "general.html", 10 }
+    };
+    std::map<std::string, std::vector<int32_t>> summaryFormat = {
+        { "general.html", { Uds_Type::UDS_FILE_URI } }
+    };
+    totalSummary.summary = summary;
+    totalSummary.specificSummary = specificSummary;
+    totalSummary.summaryFormat = summaryFormat;
+    totalSummary.version = 1;
+    totalSummary.totalSize = 30;
+
+    std::vector<std::string> allowTypes = { "general.html" };
+    bool isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_TRUE(isAppropriate);
+
+    allowTypes = { "general.file" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_TRUE(isAppropriate);
+
+    allowTypes = { "general.file-uri" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_TRUE(isAppropriate);
+
+    allowTypes = { "general.image" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_FALSE(isAppropriate);
+
+    totalSummary.version = 0;
+    allowTypes = { "general.html" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_TRUE(isAppropriate);
+
+    allowTypes = { "general.file-uri" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_FALSE(isAppropriate);
+
+    allowTypes = { "general.image" };
+    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
+    EXPECT_FALSE(isAppropriate);
+}
+
+/**
+* @tc.name: GetSummary006
+* @tc.desc: Get summary data for entries
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetSummary006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary006 begin.");
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+
+    auto record = std::make_shared<Html>("content1", "content2");
+    auto size0 = record->GetSize();
+
+    auto folder = Folder("uri");
+    folder.SetDetails(details);
+    folder.InitObject();
+    record->AddEntry(folder.GetUtdId2(), folder.GetOriginValue());
+
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "http://demo.com";
+    obj->value_[FILE_TYPE] = "general.html";
+    auto size3 = ObjectUtils::GetValueSize(obj, false);
+    record->AddEntry("general.file-uri", obj);
+
+    data.AddRecord(record);
+
+    std::shared_ptr<Object> obj1 = std::make_shared<Object>();
+    obj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj1->value_[FILE_URI_PARAM] = "http://demo.com";
+    obj1->value_[FILE_TYPE] = "general.plain-text";
+    auto size4 = ObjectUtils::GetValueSize(obj1, false);
+    auto record1 = std::make_shared<UnifiedRecord>(FILE_URI, obj1);
+    data.AddRecord(record1);
+
+    std::shared_ptr<Object> obj2 = std::make_shared<Object>();
+    obj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj2->value_[FILE_URI_PARAM] = "http://demo.com";
+    obj2->value_[FILE_TYPE] = "general.png";
+    auto size5 = ObjectUtils::GetValueSize(obj2, false);
+    auto record2 = std::make_shared<UnifiedRecord>(FILE_URI, obj2);
+    data.AddRecord(record2);
+
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+
+    ASSERT_EQ(status, E_OK);
+    EXPECT_EQ(summary.summary["general.html"], size0);
+    EXPECT_EQ(summary.summary["general.folder"], 0);
+    EXPECT_EQ(summary.summary["general.file"], size3 + size4);
+    EXPECT_EQ(summary.summary["general.image"], size5);
+
+    EXPECT_EQ(summary.specificSummary["general.html"], size0 + size3);
+    EXPECT_EQ(summary.specificSummary["general.folder"], 0);
+    EXPECT_EQ(summary.specificSummary["general.plain-text"], size4);
+    EXPECT_EQ(summary.specificSummary["general.png"], size5);
+    EXPECT_EQ(summary.totalSize, record->GetSize() + record1->GetSize() + record2->GetSize());
+
+    EXPECT_EQ(summary.version, 1);
+    auto htmlFormat = summary.summaryFormat["general.html"];
+    EXPECT_TRUE(std::find(htmlFormat.begin(), htmlFormat.end(), Uds_Type::UDS_FILE_URI) != htmlFormat.end());
+    EXPECT_TRUE(std::find(htmlFormat.begin(), htmlFormat.end(), Uds_Type::UDS_HTML) != htmlFormat.end());
+
+    auto textFormat = summary.summaryFormat["general.plain-text"];
+    EXPECT_TRUE(std::find(textFormat.begin(), textFormat.end(), Uds_Type::UDS_FILE_URI) != textFormat.end());
+
+    auto pngFormat = summary.summaryFormat["general.png"];
+    EXPECT_TRUE(std::find(pngFormat.begin(), pngFormat.end(), Uds_Type::UDS_FILE_URI) != pngFormat.end());
+    LOG_INFO(UDMF_TEST, "GetSummary006 end.");
 }
 } // OHOS::Test

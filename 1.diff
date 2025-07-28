@@ -1,0 +1,1017 @@
+diff --git a/framework/common/tlv_tag.h b/framework/common/tlv_tag.h
+index f176033..6cef709 100644
+--- a/framework/common/tlv_tag.h
++++ b/framework/common/tlv_tag.h
+@@ -100,6 +100,9 @@ enum class TAG : uint16_t {
+     TAG_SET_SIZE,
+     TAG_VISIBILITY,
+     TAG_APP_ID,
++    TAG_SUMMARY_SPECIFIC_SUMMARY,
++    TAG_SUMMARY_SUMMARY_FORMAT,
++    TAG_SUMMARY_VERSION,
+ };
+ }
+ #endif //UDMF_TLV_TAG_H
+diff --git a/framework/common/tlv_util.cpp b/framework/common/tlv_util.cpp
+index 7514492..10c7adf 100644
+--- a/framework/common/tlv_util.cpp
++++ b/framework/common/tlv_util.cpp
+@@ -915,7 +915,8 @@ template <> bool Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &
+ template <> size_t CountBufferSize(const Summary &input, TLVObject &data)
+ {
+     return data.CountHead() + CountBufferSize(input.summary, data) + data.CountBasic(input.totalSize) +
+-        CountBufferSize(input.fileTypes, data);
++        CountBufferSize(input.specificSummary, data) + CountBufferSize(input.summaryFormat, data) +
++        data.CountBasic(input.version);
+ }
+ 
+ template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
+@@ -929,7 +930,13 @@ template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
+     if (!data.WriteBasic(TAG::TAG_SUMMARY_SIZE, input.totalSize)) {
+         return false;
+     }
+-    if (!TLVUtil::Writing(input.fileTypes, data, TAG::TAG_SUMMARY_FILE_TYPES)) {
++    if (!TLVUtil::Writing(input.specificSummary, data, TAG::TAG_SUMMARY_SPECIFIC_SUMMARY)) {
++        return false;
++    }
++    if (!TLVUtil::Writing(input.summaryFormat, data, TAG::TAG_SUMMARY_SUMMARY_FORMAT)) {
++        return false;
++    }
++    if (!data.WriteBasic(TAG::TAG_SUMMARY_VERSION, input.version)) {
+         return false;
+     }
+     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
+@@ -954,8 +961,18 @@ template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
+                     return false;
+                 }
+                 break;
+-            case static_cast<uint16_t>(TAG::TAG_SUMMARY_FILE_TYPES):
+-                if (!TLVUtil::Reading(output.fileTypes, data, headItem)) {
++            case static_cast<uint16_t>(TAG::TAG_SUMMARY_SPECIFIC_SUMMARY):
++                if (!TLVUtil::Reading(output.specificSummary, data, headItem)) {
++                    return false;
++                }
++                break;
++            case static_cast<uint16_t>(TAG::TAG_SUMMARY_SUMMARY_FORMAT):
++                if (!TLVUtil::Reading(output.summaryFormat, data, headItem)) {
++                    return false;
++                }
++                break;
++            case static_cast<uint16_t>(TAG::TAG_SUMMARY_VERSION):
++                if (!data.ReadBasic(output.version, headItem)) {
+                     return false;
+                 }
+                 break;
+@@ -1019,5 +1036,6 @@ template <> bool API_EXPORT Reading(DataLoadInfo &output, TLVObject &data, const
+     }
+     return true;
+ }
++
+ } // namespace TLVUtil
+ } // namespace OHOS
+diff --git a/framework/common/udmf_types_util.cpp b/framework/common/udmf_types_util.cpp
+index 3769f96..c77dc33 100644
+--- a/framework/common/udmf_types_util.cpp
++++ b/framework/common/udmf_types_util.cpp
+@@ -104,13 +104,15 @@ bool Unmarshalling(std::vector<UnifiedData> &output, MessageParcel &parcel)
+ template<>
+ bool Marshalling(const Summary &input, MessageParcel &parcel)
+ {
+-    return ITypesUtil::Marshal(parcel, input.summary, input.fileTypes, input.totalSize);
++    return ITypesUtil::Marshal(parcel, input.summary, input.totalSize, input.specificSummary,
++        input.summaryFormat, input.version);
+ }
+ 
+ template<>
+ bool Unmarshalling(Summary &output, MessageParcel &parcel)
+ {
+-    return ITypesUtil::Unmarshal(parcel, output.summary, output.fileTypes, output.totalSize);
++    return ITypesUtil::Unmarshal(parcel, output.summary, output.totalSize, output.specificSummary,
++        output.summaryFormat, output.version);
+ }
+ 
+ template<>
+@@ -281,5 +283,6 @@ bool Unmarshalling(DataLoadInfo &output, MessageParcel &parcel)
+     }
+     return true;
+ }
++
+ } // namespace ITypesUtil
+ } // namespace OHOS
+\ No newline at end of file
+diff --git a/framework/innerkitsimpl/client/udmf_client.cpp b/framework/innerkitsimpl/client/udmf_client.cpp
+index bb01c8d..3a7df59 100644
+--- a/framework/innerkitsimpl/client/udmf_client.cpp
++++ b/framework/innerkitsimpl/client/udmf_client.cpp
+@@ -27,12 +27,16 @@
+ #include "udmf_notifier_stub.h"
+ #include "unified_data_helper.h"
+ #include "unified_html_record_process.h"
++#include "utd_client.h"
+ 
+ namespace OHOS {
+ namespace UDMF {
+ constexpr const char *TAG = "UdmfClient::";
+ constexpr const char *BUNDLE_IN_APP = "udmf.inapp.data";
+ static constexpr int KEY_LEN = 32;
++static constexpr int FILE_TYPES_MAX_SIZE = 1024;
++static constexpr std::initializer_list<std::string_view> FILE_TOP_TYPES = { "general.file-uri", "general.file" };
++static constexpr int WITH_SUMMARY_FORMAT_VER = 1;
+ using namespace OHOS::DistributedDataDfx;
+ using namespace RadarReporter;
+ UdmfClient &UdmfClient::GetInstance()
+@@ -338,25 +342,21 @@ Status UdmfClient::GetDataFromCache(const QueryOption &query, UnifiedData &unifi
+ 
+ Status UdmfClient::GetParentType(Summary &oldSummary, Summary &newSummary)
+ {
+-    newSummary = oldSummary;
+-    if (oldSummary.fileTypes.empty()) {
+-        LOG_ERROR(UDMF_CLIENT, "fileTypes is empty.");
+-        return E_OK;
+-    }
+     std::map<std::string, int64_t> tmpSummary;
+-    auto types = oldSummary.fileTypes;
+-    std::set<std::string> summaryKey;
+-    for (auto item : oldSummary.summary) {
+-        // This type does not belong to the basic file types or is not a file type.
+-        if (UnifiedDataUtils::IsFilterFileType(item.first) ||
+-            (std::find(types.begin(), types.end(), item.first) == types.end())) {
+-            UnifiedDataUtils::MergeSummary(tmpSummary, summaryKey, item.first, item.second);
++    for (const auto &[type, size] : oldSummary.summary) {
++        std::string fileType = UnifiedDataUtils::GetBelongsToFileType(type);
++        if (fileType.empty()) {
++            tmpSummary[type] = size;
++            continue;
++        }
++        if (tmpSummary.find(fileType) != tmpSummary.end()) {
++            tmpSummary[fileType] += size;
+         } else {
+-            auto type = UnifiedDataUtils::IsFileSubType(item.first);
+-            UnifiedDataUtils::MergeSummary(tmpSummary, summaryKey, type, item.second);
++            tmpSummary[fileType] = size;
+         }
+     }
+-    newSummary.summary = tmpSummary;
++    newSummary.summary = std::move(tmpSummary);
++    newSummary.totalSize = oldSummary.totalSize;
+     return E_OK;
+ }
+ 
+@@ -431,5 +431,65 @@ std::string UdmfClient::GetBundleNameByUdKey(const std::string &key)
+     return udkey.bundleName;
+ }
+ 
++bool UdmfClient::IsAppropriateType(const Summary &summary, const std::vector<std::string> &allowTypes)
++{
++    std::unordered_map<std::string, int> summaryTypesCount;
++    for (const auto &[type, size] : summary.summary) {
++        summaryTypesCount[type]++;
++    }
++    std::unordered_map<std::string, int> specificTypesCount;
++    for (const auto &[type, size] : summary.specificSummary) {
++        specificTypesCount[type]++;
++    }
++    for (const auto &allowType : allowTypes) {
++        if (summaryTypesCount.find(allowType) != summaryTypesCount.end()
++            || specificTypesCount.find(allowType) != specificTypesCount.end()) {
++            return true;
++        }
++    }
++    if (summary.version < WITH_SUMMARY_FORMAT_VER) {
++        return false;
++    }
++    // when the summary format version is greater than 0, we need to check the file type
++    return CheckFileUtdType(summary, allowTypes);
++}
++
++bool UdmfClient::CheckFileUtdType(const Summary &summary, const std::vector<std::string> &allowTypes)
++{
++    std::set<std::string> fileUtdTypes;
++    for (const auto &[type, formats] : summary.summaryFormat) {
++        if (!type.empty() || std::find(formats.begin(), formats.end(), Uds_Type::UDS_FILE_URI) != formats.end()) {
++            fileUtdTypes.emplace(type);
++        }
++        if (fileUtdTypes.size() > FILE_TYPES_MAX_SIZE) {
++            break;
++        }
++    }
++    for (const auto &type : allowTypes) {
++        if (std::find(FILE_TOP_TYPES.begin(), FILE_TOP_TYPES.end(), type) != FILE_TOP_TYPES.end()) {
++            // If the supported file type falls into, return true when the file is included
++            if (!fileUtdTypes.empty()) {
++                return true;
++            }
++            continue;
++        }
++        if (!UnifiedDataUtils::IsFilterFileType(type)) {
++            continue;
++        }
++        for (const auto &fileUtdType : fileUtdTypes) {
++            std::shared_ptr<TypeDescriptor> descriptor;
++            UtdClient::GetInstance().GetTypeDescriptor(fileUtdType, descriptor);
++            if (descriptor == nullptr) {
++                continue;
++            }
++            bool isSpecificType = false;
++            descriptor->BelongsTo(type, isSpecificType);
++            if (isSpecificType) {
++                return true;
++            }
++        }
++    }
++    return false;
++}
+ } // namespace UDMF
+ } // namespace OHOS
+\ No newline at end of file
+diff --git a/framework/innerkitsimpl/common/unified_meta.cpp b/framework/innerkitsimpl/common/unified_meta.cpp
+index cf4b677..e6d39ab 100644
+--- a/framework/innerkitsimpl/common/unified_meta.cpp
++++ b/framework/innerkitsimpl/common/unified_meta.cpp
+@@ -516,10 +516,8 @@ static constexpr std::initializer_list<std::string_view> NOT_NEED_COUNT_VALUE_LI
+     FILE_TYPE
+ };
+ 
+-static const std::string FILE_TYPE_STR = "general.file";
+-
+-static const std::set<std::string> FILE_SUB_TYPES = {
+-    "general.image", "general.video", "general.audio", "general.folder" };
++static const std::initializer_list<std::string> FILE_SUB_TYPES = {
++    "general.image", "general.video", "general.audio", "general.folder", "general.file" };
+ 
+ namespace UtdUtils {
+ bool IsValidUtdId(const std::string &utdId)
+@@ -730,6 +728,31 @@ bool UnifiedDataUtils::IsValidOptionsNonDrag(UnifiedKey &key, const std::string
+     return false;
+ }
+ 
++std::string UnifiedDataUtils::GetBelongsToFileType(const std::string &utdId)
++{
++    if (utdId.empty()) {
++        return "";
++    }
++    std::shared_ptr<TypeDescriptor> descriptor;
++    UtdClient::GetInstance().GetTypeDescriptor(utdId, descriptor);
++    if (descriptor == nullptr) {
++        return "";
++    }
++    for (const auto &type : FILE_SUB_TYPES) {
++        bool isSpecificType = false;
++        descriptor->BelongsTo(type, isSpecificType);
++        if (isSpecificType) {
++            return type;
++        }
++    }
++    return "";
++}
++
++bool UnifiedDataUtils::IsFilterFileType(const std::string &type)
++{
++    return std::find(FILE_SUB_TYPES.begin(), FILE_SUB_TYPES.end(), type) != FILE_SUB_TYPES.end();
++}
++
+ std::shared_ptr<Object> ObjectUtils::ConvertToObject(UDDetails &details)
+ {
+     Object object;
+@@ -836,57 +859,13 @@ void ObjectUtils::ProcessFileUriType(UDType &utdType, ValueType &value)
+     utdType = FILE;
+     std::string fileType;
+     if (fileUri->GetValue(FILE_TYPE, fileType)) {
+-        std::shared_ptr<TypeDescriptor> descriptor;
+-        UtdClient::GetInstance().GetTypeDescriptor(fileType, descriptor);
+-        if (descriptor == nullptr) {
++        std::string fileTypeStr = UnifiedDataUtils::GetBelongsToFileType(fileType);
++        if (fileTypeStr.empty()) {
+             return;
+         }
+-        bool isFileType = false;
+-        for (const auto &fileSub : FILE_SUB_TYPES) {
+-            descriptor->BelongsTo(fileSub, isFileType);
+-            if (isFileType) {
+-                utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileSub));
+-                LOG_INFO(UDMF_FRAMEWORK, "Change type to %{public}s", fileSub.c_str());
+-                return;
+-            }
+-        }
+-    }
+-}
+-
+-bool UnifiedDataUtils::IsFilterFileType(const std::string &type)
+-{
+-    auto iter = FILE_SUB_TYPES.find(type);
+-    if (iter != FILE_SUB_TYPES.end()) {
+-        return true;
+-    }
+-    return false;
+-}
+-
+-std::string UnifiedDataUtils::IsFileSubType(const std::string &type)
+-{
+-    std::shared_ptr<TypeDescriptor> descriptor;
+-    auto status = UtdClient::GetInstance().GetTypeDescriptor(type, descriptor);
+-    if (status != E_OK || descriptor == nullptr) {
+-        return FILE_TYPE_STR;
+-    }
+-    bool isFileType = false;
+-    for (const auto &fileSub : FILE_SUB_TYPES) {
+-        descriptor->BelongsTo(fileSub, isFileType);
+-        if (isFileType) {
+-            return fileSub;
+-        }
+-    }
+-    return FILE_TYPE_STR;
+-}
+-
+-void UnifiedDataUtils::MergeSummary(std::map<std::string, int64_t> &summary,
+-    std::set<std::string> &summaryKey, const std::string &key, int64_t value)
+-{
+-    if (summaryKey.find(key) == summaryKey.end()) {
+-        summaryKey.insert(key);
+-        summary[key] = value;
+-    } else {
+-        summary[key] += value;
++        utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileTypeStr));
++        LOG_INFO(UDMF_FRAMEWORK, "Change type to %{public}s", fileTypeStr.c_str());
++        return;
+     }
+ }
+ } // namespace UDMF
+diff --git a/framework/innerkitsimpl/data/unified_data.cpp b/framework/innerkitsimpl/data/unified_data.cpp
+index c8fc29e..eaa0909 100755
+--- a/framework/innerkitsimpl/data/unified_data.cpp
++++ b/framework/innerkitsimpl/data/unified_data.cpp
+@@ -21,8 +21,6 @@ namespace OHOS {
+ namespace UDMF {
+ static const std::set<std::string> FILE_TYPES = {
+     "general.file", "general.image", "general.video", "general.audio", "general.folder", "general.file-uri" };
+-static const std::set<std::string> FILE_SUB_TYPES = {
+-    "general.image", "general.video", "general.audio", "general.folder" };
+ static constexpr const char *RECORDS_TANSFER_TAG = "records_to_entries_data_format";
+ UnifiedData::UnifiedData()
+ {
+@@ -132,8 +130,7 @@ bool UnifiedData::HasHigherFileType(const std::string &type) const
+     if (types.find(type) != types.end()) {
+         return true;
+     }
+-    auto subTypesIter = FILE_SUB_TYPES.find(type);
+-    if (subTypesIter == FILE_SUB_TYPES.end()) {
++    if (!UnifiedDataUtils::IsFilterFileType(type)) {
+         return false;
+     }
+     for (auto it = types.begin(); it != types.end(); ++it) {
+@@ -273,7 +270,7 @@ std::set<std::string> UnifiedData::GetTypIds() const
+ {
+     std::set<std::string> types;
+     for (const auto &record : records_) {
+-        std::set<std::string> recordTypes = record->GetUtdIdsWithAddFileType();
++        std::set<std::string> recordTypes = record->GetUtdIdsWithAddFileType(true);
+         types.insert(recordTypes.begin(), recordTypes.end());
+     }
+     return types;
+diff --git a/framework/innerkitsimpl/data/unified_data_helper.cpp b/framework/innerkitsimpl/data/unified_data_helper.cpp
+index 1955932..2d804ab 100644
+--- a/framework/innerkitsimpl/data/unified_data_helper.cpp
++++ b/framework/innerkitsimpl/data/unified_data_helper.cpp
+@@ -26,6 +26,7 @@
+ #include "udmf_conversion.h"
+ #include "udmf_meta.h"
+ #include "udmf_utils.h"
++#include "utd_client.h"
+ 
+ namespace OHOS {
+ namespace UDMF {
+@@ -36,7 +37,7 @@ static constexpr int64_t MAX_SA_DRAG_RECORD_SIZE  = 15 * 1024 * 1024 + 512 * 102
+ constexpr const char *TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/udata";
+ constexpr const char *TEMP_UNIFIED_DATA_SUFFIX = ".ud";
+ constexpr const char *TEMP_UNIFIED_DATA_FLAG = "temp_udmf_file_flag";
+-
++static constexpr int WITH_SUMMARY_FORMAT_VER = 1;
+ std::string UnifiedDataHelper::rootPath_ = "";
+ 
+ void UnifiedDataHelper::SetRootPath(const std::string &rootPath)
+@@ -103,11 +104,10 @@ void UnifiedDataHelper::CreateDirIfNotExist(const std::string& dirPath, const mo
+ 
+ void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
+ {
+-    std::set<std::string> fileTypes;
+     for (const auto &record : data.GetRecords()) {
+-        CalRecordSummary(*record->GetEntries(), summary, fileTypes);
++        CalRecordSummary(*record->GetEntries(), summary);
+     }
+-    summary.fileTypes.insert(summary.fileTypes.end(), fileTypes.begin(), fileTypes.end());
++    summary.version = WITH_SUMMARY_FORMAT_VER;
+ }
+ 
+ void UnifiedDataHelper::GetSummaryFromLoadInfo(const DataLoadInfo &dataLoadInfo, Summary &summary)
+@@ -274,15 +274,21 @@ void UnifiedDataHelper::ProcessTypeId(const ValueType &value, std::string &typeI
+     }
+ }
+ 
+-void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry,
+-    Summary &summary, std::set<std::string> &fileTypes)
++void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry, Summary &summary)
+ {
+     for (const auto &[utdId, value] : entry) {
+         auto typeId = utdId;
+         auto valueSize = ObjectUtils::GetValueSize(value, false);
+         ProcessTypeId(value, typeId);
+-        if (typeId != utdId) {
+-            fileTypes.insert(typeId);
++        auto specificIter = summary.specificSummary.find(typeId);
++        if (specificIter == summary.specificSummary.end()) {
++            summary.specificSummary[typeId] = valueSize;
++        } else {
++            summary.specificSummary[typeId] += valueSize;
++        }
++        FillSummaryFormat(typeId, utdId, summary);
++        if (utdId == GENERAL_FILE_URI) {
++            UpgradeToParentType(typeId);
+         }
+         auto it = summary.summary.find(typeId);
+         if (it == summary.summary.end()) {
+@@ -294,5 +300,29 @@ void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry
+     }
+ }
+ 
++void UnifiedDataHelper::FillSummaryFormat(const std::string &type, const std::string &utdId, Summary &summary)
++{
++    Uds_Type udsType = Uds_Type::UDS_OTHER;
++    auto find = UDS_UTD_TYPE_MAP.find(utdId);
++    if (find != UDS_UTD_TYPE_MAP.end()) {
++        udsType = find->second;
++    }
++    if (summary.summaryFormat.find(type) != summary.summaryFormat.end()) {
++        summary.summaryFormat[type].emplace_back(udsType);
++    } else {
++        summary.summaryFormat[type] = { udsType };
++    }
++}
++
++void UnifiedDataHelper::UpgradeToParentType(std::string &typeId)
++{
++    std::string fileType = UnifiedDataUtils::GetBelongsToFileType(typeId);
++    if (!fileType.empty()) {
++        typeId = fileType;
++        return;
++    }
++    typeId = "general.file"; // When utdId is general.file-uri, the default parent type is general.file.
++}
++
+ } // namespace UDMF
+ } // namespace OHOS
+\ No newline at end of file
+diff --git a/framework/innerkitsimpl/data/unified_record.cpp b/framework/innerkitsimpl/data/unified_record.cpp
+index 5f4a9dd..aa760a6 100644
+--- a/framework/innerkitsimpl/data/unified_record.cpp
++++ b/framework/innerkitsimpl/data/unified_record.cpp
+@@ -24,8 +24,6 @@ namespace OHOS {
+ namespace UDMF {
+ static constexpr UDType FILE_TYPES[] = {FILE, AUDIO, FOLDER, IMAGE, VIDEO};
+ static constexpr const char *FILE_SCHEME = "file";
+-static const std::set<std::string> FILE_SUB_TYPES = {
+-    "general.image", "general.video", "general.audio", "general.folder" };
+ static constexpr UDType UDC_RECORDS[] = {APPLICATION_DEFINED_RECORD, AUDIO, FILE, FOLDER, HTML, IMAGE, HYPERLINK,
+     PLAIN_TEXT, SYSTEM_DEFINED_APP_ITEM, SYSTEM_DEFINED_FORM, SYSTEM_DEFINED_PIXEL_MAP, SYSTEM_DEFINED_RECORD,
+     TEXT, VIDEO};
+@@ -235,21 +233,21 @@ std::set<std::string> UnifiedRecord::GetUtdIds() const
+     return utdIds;
+ }
+ 
+-std::set<std::string> UnifiedRecord::GetUtdIdsWithAddFileType() const
++std::set<std::string> UnifiedRecord::GetUtdIdsWithAddFileType(const bool isSpecific) const
+ {
+     std::set<std::string> utdIds;
+     if (!utdId2_.empty()) {
+         utdIds.emplace(utdId2_);
+         if (utdId2_ == GENERAL_FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+             auto fileUri = std::get<std::shared_ptr<Object>>(value_);
+-            AddFileUriType(utdIds, fileUri);
++            AddFileUriType(utdIds, fileUri, isSpecific);
+         }
+     }
+     for (const auto& [key, value] : *entries_) {
+         utdIds.emplace(key);
+         if (key == GENERAL_FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value)) {
+             auto fileUri = std::get<std::shared_ptr<Object>>(value);
+-            AddFileUriType(utdIds, fileUri);
++            AddFileUriType(utdIds, fileUri, isSpecific);
+         }
+     }
+     return utdIds;
+@@ -398,7 +396,7 @@ void UnifiedRecord::ComputeUris(const std::function<bool(UriInfo &)> &action)
+     }
+ }
+ 
+-void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri) const
++void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri, const bool isSpecific) const
+ {
+     if (fileUri == nullptr) {
+         return;
+@@ -407,7 +405,14 @@ void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds, const std::sha
+     if (fileUri->GetValue(UNIFORM_DATA_TYPE, uniformDataType) && uniformDataType == GENERAL_FILE_URI) {
+         std::string fileType;
+         if (fileUri->GetValue(FILE_TYPE, fileType) && !fileType.empty()) {
+-            utdIds.emplace(fileType);
++            if (isSpecific) {
++                utdIds.emplace(fileType);
++                return;
++            }
++            std::string fileTypeStr = UnifiedDataUtils::GetBelongsToFileType(fileType);
++            if (!fileTypeStr.empty()) {
++                utdIds.emplace(fileTypeStr);
++            }
+         }
+     }
+ }
+diff --git a/framework/innerkitsimpl/test/fuzztest/udmfclient_fuzzer/udmf_client_fuzzer.cpp b/framework/innerkitsimpl/test/fuzztest/udmfclient_fuzzer/udmf_client_fuzzer.cpp
+index 60f93c3..11e4639 100644
+--- a/framework/innerkitsimpl/test/fuzztest/udmfclient_fuzzer/udmf_client_fuzzer.cpp
++++ b/framework/innerkitsimpl/test/fuzztest/udmfclient_fuzzer/udmf_client_fuzzer.cpp
+@@ -715,11 +715,6 @@ void GetParentTypeFuzz(FuzzedDataProvider &provider)
+     Summary oldSummary;
+     Summary newSummary;
+ 
+-    size_t fileTypesSize = provider.ConsumeIntegralInRange<size_t>(0, 10);
+-    for (size_t i = 0; i < fileTypesSize; ++i) {
+-        oldSummary.fileTypes.push_back(provider.ConsumeRandomLengthString());
+-    }
+-
+     size_t summarySize = provider.ConsumeIntegralInRange<size_t>(0, 10);
+     for (size_t i = 0; i < summarySize; ++i) {
+         std::string key = provider.ConsumeRandomLengthString();
+diff --git a/framework/innerkitsimpl/test/unittest/udmf_client_test.cpp b/framework/innerkitsimpl/test/unittest/udmf_client_test.cpp
+index 842ac8c..82860a7 100644
+--- a/framework/innerkitsimpl/test/unittest/udmf_client_test.cpp
++++ b/framework/innerkitsimpl/test/unittest/udmf_client_test.cpp
+@@ -1307,12 +1307,12 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
+     EXPECT_EQ(summary.totalSize, size);
+     EXPECT_EQ(summary.summary["general.text"], text->GetSize());
+     EXPECT_EQ(summary.summary["general.plain-text"], plainText->GetSize());
+-    EXPECT_EQ(summary.summary["general.file"], file->GetSize());
++    EXPECT_EQ(summary.summary["general.file"], file->GetSize() + record8->GetSize());
+     EXPECT_EQ(summary.summary["general.image"], image->GetSize());
+     EXPECT_EQ(summary.summary["SystemDefinedType"], systemDefinedRecord->GetSize());
+     EXPECT_EQ(summary.summary["openharmony.form"], systemDefinedForm->GetSize());
+     EXPECT_EQ(summary.summary["ApplicationDefinedType"], applicationDefinedRecord->GetSize());
+-    EXPECT_EQ(summary.summary["abcdefg"], record8->GetSize());
++    EXPECT_EQ(summary.summary["abcdefg"], 0);
+     EXPECT_EQ(summary.summary["general.png"], record9->GetSize());
+ 
+     LOG_INFO(UDMF_TEST, "GetSummary001 end.");
+@@ -3720,90 +3720,26 @@ HWTEST_F(UdmfClientTest, SetData036, TestSize.Level1)
+ HWTEST_F(UdmfClientTest, GetParentType001, TestSize.Level1)
+ {
+     LOG_INFO(UDMF_TEST, "GetParentType001 begin.");
+-
+-    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+-    UnifiedData data;
+-    std::string key;
+-    auto obj = std::make_shared<Object>();
+-    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+-    obj->value_[FILE_TYPE] = "general.file";
+-    obj->value_[FILE_URI_PARAM] = "http://file.com";
+-    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+-    auto obj1 = std::make_shared<Object>();
+-    obj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+-    obj1->value_[FILE_TYPE] = "general.image";
+-    obj1->value_[FILE_URI_PARAM] = "http://image.com";
+-    auto record1 = std::make_shared<UnifiedRecord>(FILE_URI, obj1);
+-    auto obj2 = std::make_shared<Object>();
+-    obj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+-    obj2->value_[FILE_TYPE] = "general.png";
+-    obj2->value_[FILE_URI_PARAM] = "http://png.com";
+-    auto record2 = std::make_shared<UnifiedRecord>(FILE_URI, obj2);
+-    data.AddRecord(record);
+-    data.AddRecord(record1);
+-    data.AddRecord(record2);
+-    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+-    ASSERT_EQ(status, E_OK);
+-    QueryOption option2 = { .key = key };
+-    Summary summary;
+-    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+-    ASSERT_EQ(status, E_OK);
+-    EXPECT_EQ(summary.fileTypes.size(), data.GetRecords().size());
+-    Summary newSummary;
+-    status = UdmfClient::GetInstance().GetParentType(summary, newSummary);
+-    ASSERT_EQ(status, E_OK);
+-    EXPECT_EQ(newSummary.summary["general.file"], record->GetSize());
+-    EXPECT_EQ(newSummary.summary["general.image"], record1->GetSize() + record2->GetSize());
+-    EXPECT_EQ(newSummary.totalSize, record->GetSize() + record1->GetSize() + record2->GetSize());
+-
+-    LOG_INFO(UDMF_TEST, "GetParentType001 end.");
+-}
+-
+-/**
+-* @tc.name: GetParentType002
+-* @tc.desc: test Summary fileType
+-* @tc.type: FUNC
+-*/
+-HWTEST_F(UdmfClientTest, GetParentType002, TestSize.Level1)
+-{
+-    LOG_INFO(UDMF_TEST, "GetParentType002 start.");
+-
+-    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+-    UnifiedData data;
+-    std::string key;
+-    auto obj = std::make_shared<Object>();
+-    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+-    obj->value_[FILE_TYPE] = "general.file";
+-    obj->value_[FILE_URI_PARAM] = "http://file.com";
+-    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+-    auto obj1 = std::make_shared<Object>();
+-    obj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+-    obj1->value_[FILE_TYPE] = "general.html";
+-    obj1->value_[FILE_URI_PARAM] = "http://html-content.com";
+-    auto record1 = std::make_shared<UnifiedRecord>(FILE_URI, obj1);
+-    auto obj2 = std::make_shared<Object>();
+-    obj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+-    obj2->value_[FILE_TYPE] = "general.png";
+-    obj2->value_[FILE_URI_PARAM] = "http://png.com";
+-    auto record2 = std::make_shared<UnifiedRecord>(FILE_URI, obj2);
+-    data.AddRecord(record);
+-    data.AddRecord(record1);
+-    data.AddRecord(record2);
+-    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+-    ASSERT_EQ(status, E_OK);
+-    QueryOption option2 = { .key = key };
+-    Summary summary;
+-    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+-    ASSERT_EQ(status, E_OK);
+-    EXPECT_EQ(summary.fileTypes.size(), data.GetRecords().size());
++    Summary oldSummary;
++    std::map<std::string, int64_t> sumMap = {
++        { "general.file", 10 },
++        { "general.png", 10 },
++        { "general.html", 10 },
++        { "general.jpeg", 10 },
++        { "general.avi", 10},
++        { "aabbcc", 10}
++    };
++    oldSummary.summary = std::move(sumMap);
++    oldSummary.totalSize = 60;
+     Summary newSummary;
+-    status = UdmfClient::GetInstance().GetParentType(summary, newSummary);
+-    ASSERT_EQ(status, E_OK);
+-    EXPECT_EQ(newSummary.summary["general.file"], record->GetSize() + record1->GetSize());
+-    EXPECT_EQ(newSummary.summary["general.image"], record2->GetSize());
+-    EXPECT_EQ(newSummary.totalSize, record->GetSize() + record1->GetSize() + record2->GetSize());
+-
+-    LOG_INFO(UDMF_TEST, "GetParentType002 end.");
++    auto ret = UdmfClient::GetInstance().GetParentType(oldSummary, newSummary);
++    ASSERT_EQ(ret, E_OK);
++    EXPECT_EQ(newSummary.totalSize, 60);
++    EXPECT_EQ(newSummary.summary["general.file"], 10);
++    EXPECT_EQ(newSummary.summary["general.image"], 20);
++    EXPECT_EQ(newSummary.summary["general.html"], 10);
++    EXPECT_EQ(newSummary.summary["general.video"], 10);
++    EXPECT_EQ(newSummary.summary["aabbcc"], 10);
+ }
+ 
+ /**
+@@ -3912,4 +3848,178 @@ HWTEST_F(UdmfClientTest, SetData0024, TestSize.Level1)
+     auto ret = UdmfClient::GetInstance().SetData(option, unifiedData, key);
+     EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
+ }
++
++/**
++ * @tc.name: IsAppropriateType001
++ * @tc.desc: test SetData with invalid intention
++ * @tc.type: FUNC
++ */
++HWTEST_F(UdmfClientTest, IsAppropriateType001, TestSize.Level1)
++{
++    Summary totalSummary;
++    std::map<std::string, int64_t> specificSummary = {
++        { "general.png", 10 },
++        { "general.jpg", 10 },
++        { "general.html", 10 }
++    };
++    std::map<std::string, int64_t> summary = {
++        { "general.image", 20 },
++        { "general.html", 10 }
++    };
++    std::map<std::string, std::vector<int32_t>> summaryFormat = {
++        { "general.png", { Uds_Type::UDS_FILE_URI } },
++        { "general.jpg", { Uds_Type::UDS_FILE_URI } },
++        { "general.html", { Uds_Type::UDS_HTML } }
++    };
++    totalSummary.summary = summary;
++    totalSummary.specificSummary = specificSummary;
++    totalSummary.summaryFormat = summaryFormat;
++    totalSummary.version = 1;
++    totalSummary.totalSize = 30;
++
++    std::vector<std::string> allowTypes = { "general.image" };
++    bool isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
++    EXPECT_TRUE(isAppropriate);
++
++    allowTypes = { "general.hyperlink" };
++    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
++    EXPECT_FALSE(isAppropriate);
++
++    allowTypes = { "general.html" };
++    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
++    EXPECT_TRUE(isAppropriate);
++}
++
++/**
++ * @tc.name: IsAppropriateType002
++ * @tc.desc: test SetData with invalid intention
++ * @tc.type: FUNC
++ */
++HWTEST_F(UdmfClientTest, IsAppropriateType002, TestSize.Level1)
++{
++    Summary totalSummary;
++    std::map<std::string, int64_t> specificSummary = {
++        { "general.html", 10 }
++    };
++    std::map<std::string, int64_t> summary = {
++        { "general.html", 10 }
++    };
++    std::map<std::string, std::vector<int32_t>> summaryFormat = {
++        { "general.html", { Uds_Type::UDS_FILE_URI } }
++    };
++    totalSummary.summary = summary;
++    totalSummary.specificSummary = specificSummary;
++    totalSummary.summaryFormat = summaryFormat;
++    totalSummary.version = 1;
++    totalSummary.totalSize = 30;
++
++    std::vector<std::string> allowTypes = { "general.html" };
++    bool isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
++    EXPECT_TRUE(isAppropriate);
++
++    allowTypes = { "general.file" };
++    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
++    EXPECT_TRUE(isAppropriate);
++
++    allowTypes = { "general.file-uri" };
++    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
++    EXPECT_TRUE(isAppropriate);
++
++    allowTypes = { "general.image" };
++    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
++    EXPECT_FALSE(isAppropriate);
++
++    totalSummary.version = 0;
++    allowTypes = { "general.html" };
++    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
++    EXPECT_TRUE(isAppropriate);
++
++    allowTypes = { "general.file-uri" };
++    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
++    EXPECT_FALSE(isAppropriate);
++
++    allowTypes = { "general.image" };
++    isAppropriate = UdmfClient::GetInstance().IsAppropriateType(totalSummary, allowTypes);
++    EXPECT_FALSE(isAppropriate);
++}
++
++/**
++* @tc.name: GetSummary006
++* @tc.desc: Get summary data for entries
++* @tc.type: FUNC
++*/
++HWTEST_F(UdmfClientTest, GetSummary006, TestSize.Level1)
++{
++    LOG_INFO(UDMF_TEST, "GetSummary006 begin.");
++    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
++    UnifiedData data;
++    std::string key;
++
++    UDDetails details;
++    details.insert({ "udmf_key", "udmf_value" });
++
++    auto record = std::make_shared<Html>("content1", "content2");
++    auto size0 = record->GetSize();
++
++    auto folder = Folder("uri");
++    folder.SetDetails(details);
++    folder.InitObject();
++    record->AddEntry(folder.GetUtdId2(), folder.GetOriginValue());
++
++    std::shared_ptr<Object> obj = std::make_shared<Object>();
++    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
++    obj->value_[FILE_URI_PARAM] = "http://demo.com";
++    obj->value_[FILE_TYPE] = "general.html";
++    auto size3 = ObjectUtils::GetValueSize(obj, false);
++    record->AddEntry("general.file-uri", obj);
++
++    data.AddRecord(record);
++
++    std::shared_ptr<Object> obj1 = std::make_shared<Object>();
++    obj1->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
++    obj1->value_[FILE_URI_PARAM] = "http://demo.com";
++    obj1->value_[FILE_TYPE] = "general.plain-text";
++    auto size4 = ObjectUtils::GetValueSize(obj1, false);
++    auto record1 = std::make_shared<UnifiedRecord>(FILE_URI, obj1);
++    data.AddRecord(record1);
++
++    std::shared_ptr<Object> obj2 = std::make_shared<Object>();
++    obj2->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
++    obj2->value_[FILE_URI_PARAM] = "http://demo.com";
++    obj2->value_[FILE_TYPE] = "general.png";
++    auto size5 = ObjectUtils::GetValueSize(obj2, false);
++    auto record2 = std::make_shared<UnifiedRecord>(FILE_URI, obj2);
++    data.AddRecord(record2);
++
++    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
++    ASSERT_EQ(status, E_OK);
++
++    QueryOption option2 = { .key = key };
++    Summary summary;
++    status = UdmfClient::GetInstance().GetSummary(option2, summary);
++
++    ASSERT_EQ(status, E_OK);
++    EXPECT_EQ(summary.summary["general.html"], size0);
++    EXPECT_EQ(summary.summary["general.folder"], 0);
++    EXPECT_EQ(summary.summary["general.file"], size3 + size4);
++    EXPECT_EQ(summary.summary["general.image"], size5);
++
++    EXPECT_EQ(summary.specificSummary["general.html"], size0 + size3);
++    EXPECT_EQ(summary.specificSummary["general.folder"], 0);
++    EXPECT_EQ(summary.specificSummary["general.plain-text"], size4);
++    EXPECT_EQ(summary.specificSummary["general.png"], size5);
++    EXPECT_EQ(summary.totalSize, record->GetSize() + record1->GetSize() + record2->GetSize());
++
++    EXPECT_EQ(summary.version, 1);
++    auto htmlFormat = summary.summaryFormat["general.html"];
++    EXPECT_TRUE(std::find(htmlFormat.begin(), htmlFormat.end(), Uds_Type::UDS_FILE_URI) != htmlFormat.end());
++    EXPECT_TRUE(std::find(htmlFormat.begin(), htmlFormat.end(), Uds_Type::UDS_HTML) != htmlFormat.end());
++
++    auto textFormat = summary.summaryFormat["general.plain-text"];
++    EXPECT_TRUE(std::find(textFormat.begin(), textFormat.end(), Uds_Type::UDS_FILE_URI) != textFormat.end());
++
++    auto pngFormat = summary.summaryFormat["general.png"];
++    EXPECT_TRUE(std::find(pngFormat.begin(), pngFormat.end(), Uds_Type::UDS_FILE_URI) != pngFormat.end());
++    LOG_INFO(UDMF_TEST, "GetSummary006 end.");
++}
+ } // OHOS::Test
+\ No newline at end of file
+diff --git a/framework/ndkimpl/data/udmf.cpp b/framework/ndkimpl/data/udmf.cpp
+index 66040f2..e0ac0dd 100644
+--- a/framework/ndkimpl/data/udmf.cpp
++++ b/framework/ndkimpl/data/udmf.cpp
+@@ -50,8 +50,6 @@ static const std::map<std::string, UDType> FILE_TYPES = {
+     { UDMF_META_IMAGE, UDType::IMAGE },
+     { UDMF_META_VIDEO, UDType::VIDEO }
+ };
+-static const std::set<std::string> FILE_SUB_TYPES = {
+-    "general.image", "general.video", "general.audio", "general.folder" };
+ 
+ static const std::map<Udmf_Intention, Intention> VAILD_INTENTIONS = {
+     { UDMF_INTENTION_DRAG, Intention::UD_INTENTION_DRAG },
+@@ -199,7 +197,7 @@ char** OH_UdmfRecord_GetTypes(OH_UdmfRecord* record, unsigned int* count)
+         *count = record->typesCount;
+         return record->typesArray;
+     }
+-    auto types = record->record_->GetUtdIdsWithAddFileType();
++    auto types = record->record_->GetUtdIdsWithAddFileType(false);
+     std::vector<std::string> typeLabels {types.begin(), types.end()};
+     AddFileUriTypeIfContains(typeLabels);
+     record->typesArray = NdkDataConversion::StrVectorToTypesArray(typeLabels);
+@@ -838,17 +836,9 @@ int OH_UdmfRecord_AddFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
+             {  AddUds<Folder>(record, fileUri, UDType::FOLDER); }},
+     };
+     int32_t utdId = UDType::FILE;
+-    std::shared_ptr<TypeDescriptor> descriptor;
+-    UtdClient::GetInstance().GetTypeDescriptor(*fileType, descriptor);
+-    if (descriptor != nullptr) {
+-        bool isFileType = false;
+-        for (const auto &fileSub : FILE_SUB_TYPES) {
+-            descriptor->BelongsTo(fileSub, isFileType);
+-            if (isFileType) {
+-                utdId = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileSub));
+-                break;
+-            }
+-        }
++    std::string subFileType = UnifiedDataUtils::GetBelongsToFileType(*fileType);
++    if (!subFileType.empty()) {
++        utdId = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(subFileType));
+     }
+     addFileUriFuncs[static_cast<UDType>(utdId)](record, fileUri);
+     return UDMF_E_OK;
+diff --git a/interfaces/innerkits/client/udmf_client.h b/interfaces/innerkits/client/udmf_client.h
+index 7ed1a3f..47c88d3 100644
+--- a/interfaces/innerkits/client/udmf_client.h
++++ b/interfaces/innerkits/client/udmf_client.h
+@@ -53,6 +53,7 @@ public:
+     Status GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
+         sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData);
+     std::string API_EXPORT GetBundleNameByUdKey(const std::string &key);
++    bool API_EXPORT IsAppropriateType(const Summary &summary, const std::vector<std::string> &allowTypes);
+ 
+ private:
+     UdmfClient() = default;
+@@ -61,6 +62,7 @@ private:
+     UdmfClient &operator=(const UdmfClient &obj) = delete;
+     std::string GetSelfBundleName();
+     void ProcessDragIfInApp(UnifiedData &unifiedData, std::string &intentionDrag, std::string &key);
++    bool CheckFileUtdType(const Summary &summary, const std::vector<std::string> &allowTypes);
+ 
+     ConcurrentMap<std::string, UnifiedData> dataCache_;
+ };
+diff --git a/interfaces/innerkits/common/unified_meta.h b/interfaces/innerkits/common/unified_meta.h
+index 6b0f5b5..1b26054 100644
+--- a/interfaces/innerkits/common/unified_meta.h
++++ b/interfaces/innerkits/common/unified_meta.h
+@@ -603,6 +603,29 @@ static const std::unordered_map<int32_t, std::string> UD_VISIBILITY_MAP {
+     { VISIBILITY_OWN_PROCESS, "OWN_PROCESS" },
+ };
+ 
++enum Uds_Type : int32_t {
++    UDS_PLAIN_TEXT,
++    UDS_HYPERLINK,
++    UDS_HTML,
++    UDS_APP_ITEM,
++    UDS_CONTENT_FORM,
++    UDS_FORM,
++    UDS_FILE_URI,
++    UDS_PIXEL_MAP,
++    UDS_OTHER
++};
++
++static const std::unordered_map<std::string, Uds_Type> UDS_UTD_TYPE_MAP {
++    { "general.plain-text", Uds_Type::UDS_PLAIN_TEXT },
++    { "general.hyperlink", Uds_Type::UDS_HYPERLINK },
++    { "general.html", Uds_Type::UDS_HTML },
++    { "openharmony.app-item", Uds_Type::UDS_APP_ITEM },
++    { "general.content-form", Uds_Type::UDS_CONTENT_FORM },
++    { "openharmony.form", Uds_Type::UDS_FORM },
++    { "general.file-uri", Uds_Type::UDS_FILE_URI },
++    { "openharmony.pixel-map", Uds_Type::UDS_PIXEL_MAP },
++};
++
+ enum ShareOptions : int32_t {
+     IN_APP,
+     CROSS_APP,
+@@ -637,10 +660,8 @@ public:
+     static bool IsFileMangerIntention(const std::string &intention);
+     static std::string FindIntentionMap(const Intention &queryintention);
+     static bool IsValidOptionsNonDrag(UnifiedKey &key, const std::string &intention);
+-    static std::string IsFileSubType(const std::string &type);
++    static std::string GetBelongsToFileType(const std::string &utdId);
+     static bool IsFilterFileType(const std::string &type);
+-    static void MergeSummary(std::map<std::string, int64_t> &summary,
+-        std::set<std::string> &summaryKey, const std::string &key, int64_t value);
+ };
+ 
+ struct Object;
+diff --git a/interfaces/innerkits/common/unified_types.h b/interfaces/innerkits/common/unified_types.h
+index ab79eed..8b7a6f1 100644
+--- a/interfaces/innerkits/common/unified_types.h
++++ b/interfaces/innerkits/common/unified_types.h
+@@ -34,7 +34,11 @@ enum DataStatus : int32_t {
+ 
+ struct Summary {
+     std::map<std::string, int64_t> summary;
+-    std::vector<std::string> fileTypes;
++    std::map<std::string, int64_t> specificSummary;
++    std::map<std::string, std::vector<int32_t>> summaryFormat;
++    // If version value is 1, it means it contains the format variable;
++    // otherwise(not set or 0), it means it does not contain.
++    int32_t version;
+     int64_t totalSize;
+ };
+ 
+diff --git a/interfaces/innerkits/data/unified_data_helper.h b/interfaces/innerkits/data/unified_data_helper.h
+index d93a6a8..5d76a3e 100644
+--- a/interfaces/innerkits/data/unified_data_helper.h
++++ b/interfaces/innerkits/data/unified_data_helper.h
+@@ -35,11 +35,12 @@ private:
+     static void CreateDirIfNotExist(const std::string& dirPath, const mode_t& mode);
+     static bool SaveUDataToFile(const std::string &dataFile, UnifiedData &data);
+     static bool LoadUDataFromFile(const std::string &dataFile, UnifiedData &data);
+-    static void CalRecordSummary(std::map<std::string, ValueType> &entries,
+-        Summary &summary, std::set<std::string> &fileTypes);
++    static void CalRecordSummary(std::map<std::string, ValueType> &entries, Summary &summary);
++    static void FillSummaryFormat(const std::string &utdId, const std::string &specificType, Summary &summary);
+     static void ProcessTypeId(const ValueType &value, std::string &typeId);
+     static std::string GetRootPath();
+     static bool FileClose(std::FILE *file, bool status);
++    static void UpgradeToParentType(std::string &typeId);
+ 
+ private:
+     static std::string rootPath_;
+diff --git a/interfaces/innerkits/data/unified_record.h b/interfaces/innerkits/data/unified_record.h
+index f5f4fa1..928cf9b 100644
+--- a/interfaces/innerkits/data/unified_record.h
++++ b/interfaces/innerkits/data/unified_record.h
+@@ -51,7 +51,7 @@ public:
+ 
+     void API_EXPORT SetUtdId(const std::string &utdId);
+     std::set<std::string> API_EXPORT GetUtdIds() const;
+-    std::set<std::string> API_EXPORT GetUtdIdsWithAddFileType() const;
++    std::set<std::string> API_EXPORT GetUtdIdsWithAddFileType(const bool isSpecific) const;
+     std::string API_EXPORT GetUtdId() const;
+     void API_EXPORT SetUtdId2(const std::string &utdId);
+     std::string API_EXPORT GetUtdId2() const;
+@@ -87,7 +87,7 @@ protected:
+     std::string utdId2_;
+     ValueType value_;
+ private:
+-    void AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri) const;
++    void AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri, const bool isSpecific) const;
+     
+     std::string uid_; // unique identifier
+     std::shared_ptr<std::map<std::string, ValueType>> entries_ = std::make_shared<std::map<std::string, ValueType>>();

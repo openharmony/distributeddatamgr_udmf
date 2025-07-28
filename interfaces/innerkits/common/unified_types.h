@@ -34,7 +34,11 @@ enum DataStatus : int32_t {
 
 struct Summary {
     std::map<std::string, int64_t> summary;
-    std::vector<std::string> fileTypes;
+    std::map<std::string, int64_t> specificSummary;
+    std::map<std::string, std::vector<int32_t>> summaryFormat;
+    // If version value is 1, it means it contains the format variable;
+    // otherwise(not set or 0), it means it does not contain.
+    int32_t version;
     int64_t totalSize;
 };
 

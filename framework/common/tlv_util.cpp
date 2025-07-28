@@ -915,7 +915,8 @@ template <> bool Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &
 template <> size_t CountBufferSize(const Summary &input, TLVObject &data)
 {
     return data.CountHead() + CountBufferSize(input.summary, data) + data.CountBasic(input.totalSize) +
-        CountBufferSize(input.fileTypes, data);
+        CountBufferSize(input.specificSummary, data) + CountBufferSize(input.summaryFormat, data) +
+        data.CountBasic(input.version);
 }
 
 template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
@@ -929,7 +930,13 @@ template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
     if (!data.WriteBasic(TAG::TAG_SUMMARY_SIZE, input.totalSize)) {
         return false;
     }
-    if (!TLVUtil::Writing(input.fileTypes, data, TAG::TAG_SUMMARY_FILE_TYPES)) {
+    if (!TLVUtil::Writing(input.specificSummary, data, TAG::TAG_SUMMARY_SPECIFIC_SUMMARY)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.summaryFormat, data, TAG::TAG_SUMMARY_SUMMARY_FORMAT)) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_SUMMARY_VERSION, input.version)) {
         return false;
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
@@ -954,8 +961,18 @@ template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
                     return false;
                 }
                 break;
-            case static_cast<uint16_t>(TAG::TAG_SUMMARY_FILE_TYPES):
-                if (!TLVUtil::Reading(output.fileTypes, data, headItem)) {
+            case static_cast<uint16_t>(TAG::TAG_SUMMARY_SPECIFIC_SUMMARY):
+                if (!TLVUtil::Reading(output.specificSummary, data, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_SUMMARY_SUMMARY_FORMAT):
+                if (!TLVUtil::Reading(output.summaryFormat, data, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_SUMMARY_VERSION):
+                if (!data.ReadBasic(output.version, headItem)) {
                     return false;
                 }
                 break;
@@ -1019,5 +1036,6 @@ template <> bool API_EXPORT Reading(DataLoadInfo &output, TLVObject &data, const
     }
     return true;
 }
+
 } // namespace TLVUtil
 } // namespace OHOS

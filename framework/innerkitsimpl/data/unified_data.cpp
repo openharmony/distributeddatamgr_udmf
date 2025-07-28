@@ -21,8 +21,6 @@ namespace OHOS {
 namespace UDMF {
 static const std::set<std::string> FILE_TYPES = {
     "general.file", "general.image", "general.video", "general.audio", "general.folder", "general.file-uri" };
-static const std::set<std::string> FILE_SUB_TYPES = {
-    "general.image", "general.video", "general.audio", "general.folder" };
 static constexpr const char *RECORDS_TANSFER_TAG = "records_to_entries_data_format";
 UnifiedData::UnifiedData()
 {
@@ -132,8 +130,7 @@ bool UnifiedData::HasHigherFileType(const std::string &type) const
     if (types.find(type) != types.end()) {
         return true;
     }
-    auto subTypesIter = FILE_SUB_TYPES.find(type);
-    if (subTypesIter == FILE_SUB_TYPES.end()) {
+    if (!UnifiedDataUtils::IsFilterFileType(type)) {
         return false;
     }
     for (auto it = types.begin(); it != types.end(); ++it) {
@@ -273,7 +270,7 @@ std::set<std::string> UnifiedData::GetTypIds() const
 {
     std::set<std::string> types;
     for (const auto &record : records_) {
-        std::set<std::string> recordTypes = record->GetUtdIdsWithAddFileType();
+        std::set<std::string> recordTypes = record->GetUtdIdsWithAddFileType(true);
         types.insert(recordTypes.begin(), recordTypes.end());
     }
     return types;
