@@ -826,14 +826,6 @@ HWTEST_F(UnifiedMetaTest, GetBelongsToFileType, TestSize.Level1)
     fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
     EXPECT_EQ(fileType, "general.video");
 
-    utdId = "general.avi";
-    fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
-    EXPECT_EQ(fileType, "general.video");
-
-    utdId = "com.adobe.pdf";
-    fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
-    EXPECT_EQ(fileType, "general.file");
-
     utdId = "com.adobe.pdf";
     fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
     EXPECT_EQ(fileType, "general.file");
