@@ -396,7 +396,8 @@ void UnifiedRecord::ComputeUris(const std::function<bool(UriInfo &)> &action)
     }
 }
 
-void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri, bool isSpecific) const
+void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds,
+    const std::shared_ptr<Object> &fileUri, bool isSpecific) const
 {
     if (fileUri == nullptr) {
         return;
