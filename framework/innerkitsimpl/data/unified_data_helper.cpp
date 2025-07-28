@@ -26,6 +26,7 @@
 #include "udmf_conversion.h"
 #include "udmf_meta.h"
 #include "udmf_utils.h"
+#include "utd_client.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -36,7 +37,7 @@ static constexpr int64_t MAX_SA_DRAG_RECORD_SIZE  = 15 * 1024 * 1024 + 512 * 102
 constexpr const char *TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/udata";
 constexpr const char *TEMP_UNIFIED_DATA_SUFFIX = ".ud";
 constexpr const char *TEMP_UNIFIED_DATA_FLAG = "temp_udmf_file_flag";
-
+static constexpr int WITH_SUMMARY_FORMAT_VER = 1;
 std::string UnifiedDataHelper::rootPath_ = "";
 
 void UnifiedDataHelper::SetRootPath(const std::string &rootPath)
@@ -103,11 +104,10 @@ void UnifiedDataHelper::CreateDirIfNotExist(const std::string& dirPath, const mo
 
 void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
 {
-    std::set<std::string> fileTypes;
     for (const auto &record : data.GetRecords()) {
-        CalRecordSummary(*record->GetEntries(), summary, fileTypes);
+        CalRecordSummary(*record->GetEntries(), summary);
     }
-    summary.fileTypes.insert(summary.fileTypes.end(), fileTypes.begin(), fileTypes.end());
+    summary.version = WITH_SUMMARY_FORMAT_VER;
 }
 
 void UnifiedDataHelper::GetSummaryFromLoadInfo(const DataLoadInfo &dataLoadInfo, Summary &summary)
@@ -274,15 +274,21 @@ void UnifiedDataHelper::ProcessTypeId(const ValueType &value, std::string &typeI
     }
 }
 
-void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry,
-    Summary &summary, std::set<std::string> &fileTypes)
+void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry, Summary &summary)
 {
     for (const auto &[utdId, value] : entry) {
         auto typeId = utdId;
         auto valueSize = ObjectUtils::GetValueSize(value, false);
         ProcessTypeId(value, typeId);
-        if (typeId != utdId) {
-            fileTypes.insert(typeId);
+        auto specificIter = summary.specificSummary.find(typeId);
+        if (specificIter == summary.specificSummary.end()) {
+            summary.specificSummary[typeId] = valueSize;
+        } else {
+            summary.specificSummary[typeId] += valueSize;
+        }
+        FillSummaryFormat(typeId, utdId, summary);
+        if (utdId == GENERAL_FILE_URI) {
+            UpgradeToParentType(typeId);
         }
         auto it = summary.summary.find(typeId);
         if (it == summary.summary.end()) {
@@ -292,6 +298,30 @@ void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry
         }
         summary.totalSize += valueSize;
     }
+}
+
+void UnifiedDataHelper::FillSummaryFormat(const std::string &type, const std::string &utdId, Summary &summary)
+{
+    Uds_Type udsType = Uds_Type::UDS_OTHER;
+    auto find = UDS_UTD_TYPE_MAP.find(utdId);
+    if (find != UDS_UTD_TYPE_MAP.end()) {
+        udsType = find->second;
+    }
+    if (summary.summaryFormat.find(type) != summary.summaryFormat.end()) {
+        summary.summaryFormat[type].emplace_back(udsType);
+    } else {
+        summary.summaryFormat[type] = { udsType };
+    }
+}
+
+void UnifiedDataHelper::UpgradeToParentType(std::string &typeId)
+{
+    std::string fileType = UnifiedDataUtils::GetBelongsToFileType(typeId);
+    if (!fileType.empty()) {
+        typeId = fileType;
+        return;
+    }
+    typeId = "general.file"; // When utdId is general.file-uri, the default parent type is general.file.
 }
 
 } // namespace UDMF

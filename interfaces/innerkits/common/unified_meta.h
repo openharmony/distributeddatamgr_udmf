@@ -571,7 +571,7 @@ enum Intention : int32_t {
     UD_INTENTION_BUTT,
 };
 
-static const std::unordered_map<int32_t, std::string> UD_INTENTION_MAP {
+static const std::map<int32_t, std::string> UD_INTENTION_MAP {
     { UD_INTENTION_DRAG, "drag" },
     { UD_INTENTION_DATA_HUB, "DataHub" },
     { UD_INTENTION_SYSTEM_SHARE, "SystemShare" },
@@ -579,11 +579,11 @@ static const std::unordered_map<int32_t, std::string> UD_INTENTION_MAP {
     { UD_INTENTION_MENU, "Menu" },
 };
 
-static const std::unordered_map<int32_t, std::string> UD_SYSTEM_INTENTION_MAP {
+static const std::map<int32_t, std::string> UD_SYSTEM_INTENTION_MAP {
     { UD_INTENTION_DRAG, "Drag" },
 };
 
-static const std::unordered_map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
+static const std::map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
     { UD_INTENTION_DATA_HUB, "DATA_HUB" },
     { UD_INTENTION_DRAG, "DRAG" },
     { UD_INTENTION_SYSTEM_SHARE, "SYSTEM_SHARE" },
@@ -598,9 +598,32 @@ enum Visibility : int32_t {
     VISIBILITY_BUTT,
 };
 
-static const std::unordered_map<int32_t, std::string> UD_VISIBILITY_MAP {
+static const std::map<int32_t, std::string> UD_VISIBILITY_MAP {
     { VISIBILITY_ALL, "ALL" },
     { VISIBILITY_OWN_PROCESS, "OWN_PROCESS" },
+};
+
+enum Uds_Type : int32_t {
+    UDS_PLAIN_TEXT,
+    UDS_HYPERLINK,
+    UDS_HTML,
+    UDS_APP_ITEM,
+    UDS_CONTENT_FORM,
+    UDS_FORM,
+    UDS_FILE_URI,
+    UDS_PIXEL_MAP,
+    UDS_OTHER
+};
+
+static const std::map<std::string, Uds_Type> UDS_UTD_TYPE_MAP {
+    { "general.plain-text", Uds_Type::UDS_PLAIN_TEXT },
+    { "general.hyperlink", Uds_Type::UDS_HYPERLINK },
+    { "general.html", Uds_Type::UDS_HTML },
+    { "openharmony.app-item", Uds_Type::UDS_APP_ITEM },
+    { "general.content-form", Uds_Type::UDS_CONTENT_FORM },
+    { "openharmony.form", Uds_Type::UDS_FORM },
+    { "general.file-uri", Uds_Type::UDS_FILE_URI },
+    { "openharmony.pixel-map", Uds_Type::UDS_PIXEL_MAP },
 };
 
 enum ShareOptions : int32_t {
@@ -637,10 +660,8 @@ public:
     static bool IsFileMangerIntention(const std::string &intention);
     static std::string FindIntentionMap(const Intention &queryintention);
     static bool IsValidOptionsNonDrag(UnifiedKey &key, const std::string &intention);
-    static std::string IsFileSubType(const std::string &type);
+    static std::string GetBelongsToFileType(const std::string &utdId);
     static bool IsFilterFileType(const std::string &type);
-    static void MergeSummary(std::map<std::string, int64_t> &summary,
-        std::set<std::string> &summaryKey, const std::string &key, int64_t value);
 };
 
 struct Object;

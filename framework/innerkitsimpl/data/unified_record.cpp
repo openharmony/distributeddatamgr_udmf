@@ -24,8 +24,6 @@ namespace OHOS {
 namespace UDMF {
 static constexpr UDType FILE_TYPES[] = {FILE, AUDIO, FOLDER, IMAGE, VIDEO};
 static constexpr const char *FILE_SCHEME = "file";
-static const std::set<std::string> FILE_SUB_TYPES = {
-    "general.image", "general.video", "general.audio", "general.folder" };
 static constexpr UDType UDC_RECORDS[] = {APPLICATION_DEFINED_RECORD, AUDIO, FILE, FOLDER, HTML, IMAGE, HYPERLINK,
     PLAIN_TEXT, SYSTEM_DEFINED_APP_ITEM, SYSTEM_DEFINED_FORM, SYSTEM_DEFINED_PIXEL_MAP, SYSTEM_DEFINED_RECORD,
     TEXT, VIDEO};
@@ -235,21 +233,21 @@ std::set<std::string> UnifiedRecord::GetUtdIds() const
     return utdIds;
 }
 
-std::set<std::string> UnifiedRecord::GetUtdIdsWithAddFileType() const
+std::set<std::string> UnifiedRecord::GetUtdIdsWithAddFileType(bool isSpecific) const
 {
     std::set<std::string> utdIds;
     if (!utdId2_.empty()) {
         utdIds.emplace(utdId2_);
         if (utdId2_ == GENERAL_FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value_)) {
             auto fileUri = std::get<std::shared_ptr<Object>>(value_);
-            AddFileUriType(utdIds, fileUri);
+            AddFileUriType(utdIds, fileUri, isSpecific);
         }
     }
     for (const auto& [key, value] : *entries_) {
         utdIds.emplace(key);
         if (key == GENERAL_FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value)) {
             auto fileUri = std::get<std::shared_ptr<Object>>(value);
-            AddFileUriType(utdIds, fileUri);
+            AddFileUriType(utdIds, fileUri, isSpecific);
         }
     }
     return utdIds;
@@ -398,7 +396,8 @@ void UnifiedRecord::ComputeUris(const std::function<bool(UriInfo &)> &action)
     }
 }
 
-void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri) const
+void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds,
+    const std::shared_ptr<Object> &fileUri, bool isSpecific) const
 {
     if (fileUri == nullptr) {
         return;
@@ -407,7 +406,14 @@ void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds, const std::sha
     if (fileUri->GetValue(UNIFORM_DATA_TYPE, uniformDataType) && uniformDataType == GENERAL_FILE_URI) {
         std::string fileType;
         if (fileUri->GetValue(FILE_TYPE, fileType) && !fileType.empty()) {
-            utdIds.emplace(fileType);
+            if (isSpecific) {
+                utdIds.emplace(fileType);
+                return;
+            }
+            std::string fileTypeStr = UnifiedDataUtils::GetBelongsToFileType(fileType);
+            if (!fileTypeStr.empty()) {
+                utdIds.emplace(fileTypeStr);
+            }
         }
     }
 }

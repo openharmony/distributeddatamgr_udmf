@@ -27,12 +27,16 @@
 #include "udmf_notifier_stub.h"
 #include "unified_data_helper.h"
 #include "unified_html_record_process.h"
+#include "utd_client.h"
 
 namespace OHOS {
 namespace UDMF {
 constexpr const char *TAG = "UdmfClient::";
 constexpr const char *BUNDLE_IN_APP = "udmf.inapp.data";
 static constexpr int KEY_LEN = 32;
+static constexpr int FILE_TYPES_MAX_SIZE = 1024;
+static constexpr std::initializer_list<std::string_view> FILE_TOP_TYPES = { "general.file-uri", "general.file" };
+static constexpr int WITH_SUMMARY_FORMAT_VER = 1;
 using namespace OHOS::DistributedDataDfx;
 using namespace RadarReporter;
 UdmfClient &UdmfClient::GetInstance()
@@ -338,25 +342,21 @@ Status UdmfClient::GetDataFromCache(const QueryOption &query, UnifiedData &unifi
 
 Status UdmfClient::GetParentType(Summary &oldSummary, Summary &newSummary)
 {
-    newSummary = oldSummary;
-    if (oldSummary.fileTypes.empty()) {
-        LOG_ERROR(UDMF_CLIENT, "fileTypes is empty.");
-        return E_OK;
-    }
     std::map<std::string, int64_t> tmpSummary;
-    auto types = oldSummary.fileTypes;
-    std::set<std::string> summaryKey;
-    for (auto item : oldSummary.summary) {
-        // This type does not belong to the basic file types or is not a file type.
-        if (UnifiedDataUtils::IsFilterFileType(item.first) ||
-            (std::find(types.begin(), types.end(), item.first) == types.end())) {
-            UnifiedDataUtils::MergeSummary(tmpSummary, summaryKey, item.first, item.second);
+    for (const auto &[type, size] : oldSummary.summary) {
+        std::string fileType = UnifiedDataUtils::GetBelongsToFileType(type);
+        if (fileType.empty()) {
+            tmpSummary[type] = size;
+            continue;
+        }
+        if (tmpSummary.find(fileType) != tmpSummary.end()) {
+            tmpSummary[fileType] += size;
         } else {
-            auto type = UnifiedDataUtils::IsFileSubType(item.first);
-            UnifiedDataUtils::MergeSummary(tmpSummary, summaryKey, type, item.second);
+            tmpSummary[fileType] = size;
         }
     }
-    newSummary.summary = tmpSummary;
+    newSummary.summary = std::move(tmpSummary);
+    newSummary.totalSize = oldSummary.totalSize;
     return E_OK;
 }
 
@@ -431,5 +431,59 @@ std::string UdmfClient::GetBundleNameByUdKey(const std::string &key)
     return udkey.bundleName;
 }
 
+bool UdmfClient::IsAppropriateType(const Summary &summary, const std::vector<std::string> &allowTypes)
+{
+    for (const auto &allowType : allowTypes) {
+        if (summary.summary.find(allowType) != summary.summary.end()
+            || summary.specificSummary.find(allowType) != summary.specificSummary.end()) {
+            return true;
+        }
+    }
+    if (summary.version < WITH_SUMMARY_FORMAT_VER) {
+        return false;
+    }
+    // when the summary format version is greater than 0, we need to check the file type
+    return CheckFileUtdType(summary, allowTypes);
+}
+
+bool UdmfClient::CheckFileUtdType(const Summary &summary, const std::vector<std::string> &allowTypes)
+{
+    std::set<std::string> fileUtdTypes;
+    for (const auto &[type, formats] : summary.summaryFormat) {
+        if (!type.empty() || std::find(formats.begin(), formats.end(), Uds_Type::UDS_FILE_URI) != formats.end()) {
+            fileUtdTypes.emplace(type);
+        }
+        if (fileUtdTypes.size() > FILE_TYPES_MAX_SIZE) {
+            LOG_WARN(UDMF_CLIENT, "Exceeding the maximum size");
+            break;
+        }
+    }
+    for (const auto &type : allowTypes) {
+        if (std::find(FILE_TOP_TYPES.begin(), FILE_TOP_TYPES.end(), type) != FILE_TOP_TYPES.end()) {
+            // If the supported file type falls into, return true when the file is included
+            if (!fileUtdTypes.empty()) {
+                return true;
+            }
+            continue;
+        }
+        if (!UnifiedDataUtils::IsFilterFileType(type)) {
+            continue;
+        }
+        for (const auto &fileUtdType : fileUtdTypes) {
+            std::shared_ptr<TypeDescriptor> descriptor;
+            UtdClient::GetInstance().GetTypeDescriptor(fileUtdType, descriptor);
+            if (descriptor == nullptr) {
+                continue;
+            }
+            bool isSpecificType = false;
+            descriptor->BelongsTo(type, isSpecificType);
+            if (isSpecificType) {
+                return true;
+            }
+        }
+    }
+    LOG_INFO(UDMF_CLIENT, "Not appropriate type");
+    return false;
+}
 } // namespace UDMF
 } // namespace OHOS

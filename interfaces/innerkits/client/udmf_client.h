@@ -53,6 +53,7 @@ public:
     Status GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
         sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData);
     std::string API_EXPORT GetBundleNameByUdKey(const std::string &key);
+    bool API_EXPORT IsAppropriateType(const Summary &summary, const std::vector<std::string> &allowTypes);
 
 private:
     UdmfClient() = default;
@@ -61,6 +62,7 @@ private:
     UdmfClient &operator=(const UdmfClient &obj) = delete;
     std::string GetSelfBundleName();
     void ProcessDragIfInApp(UnifiedData &unifiedData, std::string &intentionDrag, std::string &key);
+    bool CheckFileUtdType(const Summary &summary, const std::vector<std::string> &allowTypes);
 
     ConcurrentMap<std::string, UnifiedData> dataCache_;
 };

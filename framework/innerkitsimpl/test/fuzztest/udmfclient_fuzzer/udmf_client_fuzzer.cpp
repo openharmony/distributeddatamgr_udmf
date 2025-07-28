@@ -715,11 +715,6 @@ void GetParentTypeFuzz(FuzzedDataProvider &provider)
     Summary oldSummary;
     Summary newSummary;
 
-    size_t fileTypesSize = provider.ConsumeIntegralInRange<size_t>(0, 10);
-    for (size_t i = 0; i < fileTypesSize; ++i) {
-        oldSummary.fileTypes.push_back(provider.ConsumeRandomLengthString());
-    }
-
     size_t summarySize = provider.ConsumeIntegralInRange<size_t>(0, 10);
     for (size_t i = 0; i < summarySize; ++i) {
         std::string key = provider.ConsumeRandomLengthString();

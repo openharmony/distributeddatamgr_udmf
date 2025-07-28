@@ -50,8 +50,6 @@ static const std::map<std::string, UDType> FILE_TYPES = {
     { UDMF_META_IMAGE, UDType::IMAGE },
     { UDMF_META_VIDEO, UDType::VIDEO }
 };
-static const std::set<std::string> FILE_SUB_TYPES = {
-    "general.image", "general.video", "general.audio", "general.folder" };
 
 static const std::map<Udmf_Intention, Intention> VAILD_INTENTIONS = {
     { UDMF_INTENTION_DRAG, Intention::UD_INTENTION_DRAG },
@@ -199,7 +197,7 @@ char** OH_UdmfRecord_GetTypes(OH_UdmfRecord* record, unsigned int* count)
         *count = record->typesCount;
         return record->typesArray;
     }
-    auto types = record->record_->GetUtdIdsWithAddFileType();
+    auto types = record->record_->GetUtdIdsWithAddFileType(false);
     std::vector<std::string> typeLabels {types.begin(), types.end()};
     AddFileUriTypeIfContains(typeLabels);
     record->typesArray = NdkDataConversion::StrVectorToTypesArray(typeLabels);
@@ -838,17 +836,9 @@ int OH_UdmfRecord_AddFileUri(OH_UdmfRecord* record, OH_UdsFileUri* fileUri)
             {  AddUds<Folder>(record, fileUri, UDType::FOLDER); }},
     };
     int32_t utdId = UDType::FILE;
-    std::shared_ptr<TypeDescriptor> descriptor;
-    UtdClient::GetInstance().GetTypeDescriptor(*fileType, descriptor);
-    if (descriptor != nullptr) {
-        bool isFileType = false;
-        for (const auto &fileSub : FILE_SUB_TYPES) {
-            descriptor->BelongsTo(fileSub, isFileType);
-            if (isFileType) {
-                utdId = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileSub));
-                break;
-            }
-        }
+    std::string subFileType = UnifiedDataUtils::GetBelongsToFileType(*fileType);
+    if (!subFileType.empty()) {
+        utdId = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(subFileType));
     }
     addFileUriFuncs[static_cast<UDType>(utdId)](record, fileUri);
     return UDMF_E_OK;

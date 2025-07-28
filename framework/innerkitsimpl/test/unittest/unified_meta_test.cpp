@@ -786,4 +786,48 @@ HWTEST_F(UnifiedMetaTest, IsFileMangerIntention, TestSize.Level1)
     bool ret4 = UnifiedDataUtils::IsFileMangerIntention(intentionSystemShare);
     EXPECT_TRUE(ret4);
 }
+
+/**
+* @tc.name: IsFileMangerIntention
+* @tc.desc: IsFileMangerIntention testcase
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, GetBelongsToFileType, TestSize.Level1)
+{
+    std::string utdId = "";
+    std::string fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
+    EXPECT_TRUE(fileType.empty());
+
+    utdId = "general.html";
+    fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
+    EXPECT_TRUE(fileType.empty());
+
+    utdId = "general.plain-text";
+    fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
+    EXPECT_TRUE(fileType.empty());
+
+    utdId = "general.text";
+    fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
+    EXPECT_TRUE(fileType.empty());
+
+    utdId = "aaccss";
+    fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
+    EXPECT_TRUE(fileType.empty());
+
+    utdId = "general.file";
+    fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
+    EXPECT_EQ(fileType, "general.file");
+
+    utdId = "general.image";
+    fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
+    EXPECT_EQ(fileType, "general.image");
+
+    utdId = "general.avi";
+    fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
+    EXPECT_EQ(fileType, "general.video");
+
+    utdId = "com.adobe.pdf";
+    fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
+    EXPECT_EQ(fileType, "general.file");
+}
 } // OHOS::Test

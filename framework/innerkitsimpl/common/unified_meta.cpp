@@ -516,10 +516,8 @@ static constexpr std::initializer_list<std::string_view> NOT_NEED_COUNT_VALUE_LI
     FILE_TYPE
 };
 
-static const std::string FILE_TYPE_STR = "general.file";
-
-static const std::set<std::string> FILE_SUB_TYPES = {
-    "general.image", "general.video", "general.audio", "general.folder" };
+static const std::initializer_list<std::string> FILE_SUB_TYPES = {
+    "general.image", "general.video", "general.audio", "general.folder", "general.file" };
 
 namespace UtdUtils {
 bool IsValidUtdId(const std::string &utdId)
@@ -730,6 +728,38 @@ bool UnifiedDataUtils::IsValidOptionsNonDrag(UnifiedKey &key, const std::string 
     return false;
 }
 
+std::string UnifiedDataUtils::GetBelongsToFileType(const std::string &utdId)
+{
+    if (utdId.empty() || utdId == "general.html" || utdId == "general.plain-text") {
+        LOG_ERROR(UDMF_FRAMEWORK, "The utdId is empty or the utdId is general.html or general.plain-text");
+        return "";
+    }
+    std::shared_ptr<TypeDescriptor> descriptor;
+    UtdClient::GetInstance().GetTypeDescriptor(utdId, descriptor);
+    if (descriptor == nullptr) {
+        LOG_INFO(UDMF_FRAMEWORK, "The descriptor is null");
+        return "";
+    }
+    for (const auto &type : FILE_SUB_TYPES) {
+        bool isSpecificType = false;
+        descriptor->BelongsTo(type, isSpecificType);
+        if (isSpecificType) {
+            return type;
+        }
+    }
+    if (!descriptor->GetFilenameExtensions().empty()) {
+        LOG_INFO(UDMF_FRAMEWORK, "The type descriptor has file extensions");
+        return "general.file";
+    }
+    LOG_INFO(UDMF_FRAMEWORK, "Return empty");
+    return "";
+}
+
+bool UnifiedDataUtils::IsFilterFileType(const std::string &type)
+{
+    return std::find(FILE_SUB_TYPES.begin(), FILE_SUB_TYPES.end(), type) != FILE_SUB_TYPES.end();
+}
+
 std::shared_ptr<Object> ObjectUtils::ConvertToObject(UDDetails &details)
 {
     Object object;
@@ -836,57 +866,13 @@ void ObjectUtils::ProcessFileUriType(UDType &utdType, ValueType &value)
     utdType = FILE;
     std::string fileType;
     if (fileUri->GetValue(FILE_TYPE, fileType)) {
-        std::shared_ptr<TypeDescriptor> descriptor;
-        UtdClient::GetInstance().GetTypeDescriptor(fileType, descriptor);
-        if (descriptor == nullptr) {
+        std::string fileTypeStr = UnifiedDataUtils::GetBelongsToFileType(fileType);
+        if (fileTypeStr.empty()) {
             return;
         }
-        bool isFileType = false;
-        for (const auto &fileSub : FILE_SUB_TYPES) {
-            descriptor->BelongsTo(fileSub, isFileType);
-            if (isFileType) {
-                utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileSub));
-                LOG_INFO(UDMF_FRAMEWORK, "Change type to %{public}s", fileSub.c_str());
-                return;
-            }
-        }
-    }
-}
-
-bool UnifiedDataUtils::IsFilterFileType(const std::string &type)
-{
-    auto iter = FILE_SUB_TYPES.find(type);
-    if (iter != FILE_SUB_TYPES.end()) {
-        return true;
-    }
-    return false;
-}
-
-std::string UnifiedDataUtils::IsFileSubType(const std::string &type)
-{
-    std::shared_ptr<TypeDescriptor> descriptor;
-    auto status = UtdClient::GetInstance().GetTypeDescriptor(type, descriptor);
-    if (status != E_OK || descriptor == nullptr) {
-        return FILE_TYPE_STR;
-    }
-    bool isFileType = false;
-    for (const auto &fileSub : FILE_SUB_TYPES) {
-        descriptor->BelongsTo(fileSub, isFileType);
-        if (isFileType) {
-            return fileSub;
-        }
-    }
-    return FILE_TYPE_STR;
-}
-
-void UnifiedDataUtils::MergeSummary(std::map<std::string, int64_t> &summary,
-    std::set<std::string> &summaryKey, const std::string &key, int64_t value)
-{
-    if (summaryKey.find(key) == summaryKey.end()) {
-        summaryKey.insert(key);
-        summary[key] = value;
-    } else {
-        summary[key] += value;
+        utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(fileTypeStr));
+        LOG_INFO(UDMF_FRAMEWORK, "Change type to %{public}s", fileTypeStr.c_str());
+        return;
     }
 }
 } // namespace UDMF

@@ -51,7 +51,7 @@ public:
 
     void API_EXPORT SetUtdId(const std::string &utdId);
     std::set<std::string> API_EXPORT GetUtdIds() const;
-    std::set<std::string> API_EXPORT GetUtdIdsWithAddFileType() const;
+    std::set<std::string> API_EXPORT GetUtdIdsWithAddFileType(bool isSpecific) const;
     std::string API_EXPORT GetUtdId() const;
     void API_EXPORT SetUtdId2(const std::string &utdId);
     std::string API_EXPORT GetUtdId2() const;
@@ -87,7 +87,7 @@ protected:
     std::string utdId2_;
     ValueType value_;
 private:
-    void AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri) const;
+    void AddFileUriType(std::set<std::string> &utdIds, const std::shared_ptr<Object> &fileUri, bool isSpecific) const;
     
     std::string uid_; // unique identifier
     std::shared_ptr<std::map<std::string, ValueType>> entries_ = std::make_shared<std::map<std::string, ValueType>>();

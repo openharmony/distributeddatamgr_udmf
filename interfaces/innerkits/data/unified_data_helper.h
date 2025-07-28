@@ -35,11 +35,12 @@ private:
     static void CreateDirIfNotExist(const std::string& dirPath, const mode_t& mode);
     static bool SaveUDataToFile(const std::string &dataFile, UnifiedData &data);
     static bool LoadUDataFromFile(const std::string &dataFile, UnifiedData &data);
-    static void CalRecordSummary(std::map<std::string, ValueType> &entries,
-        Summary &summary, std::set<std::string> &fileTypes);
+    static void CalRecordSummary(std::map<std::string, ValueType> &entries, Summary &summary);
+    static void FillSummaryFormat(const std::string &utdId, const std::string &specificType, Summary &summary);
     static void ProcessTypeId(const ValueType &value, std::string &typeId);
     static std::string GetRootPath();
     static bool FileClose(std::FILE *file, bool status);
+    static void UpgradeToParentType(std::string &typeId);
 
 private:
     static std::string rootPath_;
