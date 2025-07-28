@@ -283,6 +283,5 @@ bool Unmarshalling(DataLoadInfo &output, MessageParcel &parcel)
     }
     return true;
 }
-
 } // namespace ITypesUtil
 } // namespace OHOS

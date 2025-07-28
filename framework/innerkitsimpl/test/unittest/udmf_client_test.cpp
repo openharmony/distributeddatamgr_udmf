@@ -3727,19 +3727,22 @@ HWTEST_F(UdmfClientTest, GetParentType001, TestSize.Level1)
         { "general.html", 10 },
         { "general.jpeg", 10 },
         { "general.avi", 10},
+        { "com.adobe.pdf", 10},
+        { "general.text", 10}
         { "aabbcc", 10}
     };
     oldSummary.summary = std::move(sumMap);
-    oldSummary.totalSize = 60;
+    oldSummary.totalSize = 80;
     Summary newSummary;
     auto ret = UdmfClient::GetInstance().GetParentType(oldSummary, newSummary);
     ASSERT_EQ(ret, E_OK);
-    EXPECT_EQ(newSummary.totalSize, 60);
-    EXPECT_EQ(newSummary.summary["general.file"], 10);
+    EXPECT_EQ(newSummary.totalSize, 80);
+    EXPECT_EQ(newSummary.summary["general.file"], 20);
     EXPECT_EQ(newSummary.summary["general.image"], 20);
     EXPECT_EQ(newSummary.summary["general.html"], 10);
     EXPECT_EQ(newSummary.summary["general.video"], 10);
     EXPECT_EQ(newSummary.summary["aabbcc"], 10);
+    EXPECT_EQ(newSummary.summary["general.text"], 10);
 }
 
 /**
