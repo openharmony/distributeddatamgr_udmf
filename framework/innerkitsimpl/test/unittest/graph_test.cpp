@@ -282,7 +282,7 @@ HWTEST_F(GraphTest, DfsHasData001, TestSize.Level1)
     for (uint32_t i = 0; i < edges.size(); i++) {
         graph.AddEdge(edges[i][0], edges[i][1]);
     }
-    
+
     bool isFind = false;
     graph.Dfs(TestNodes::POINT_A, [&](uint32_t currNode) -> bool {
         if (currNode == TestNodes::POINT_H) {

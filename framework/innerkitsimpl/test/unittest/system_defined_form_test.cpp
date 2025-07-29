@@ -149,5 +149,4 @@ HWTEST_F(SystemDefinedFormTest, SystemDefinedFormGetItem001, TestSize.Level1)
     EXPECT_EQ(std::get<std::string>(details[MODULE]), "module");
     LOG_INFO(UDMF_TEST, "SystemDefinedFormGetItem001 end.");
 }
-
 } // OHOS::Test

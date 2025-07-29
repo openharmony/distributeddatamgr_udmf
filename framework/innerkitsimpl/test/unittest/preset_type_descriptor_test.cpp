@@ -66,5 +66,4 @@ HWTEST_F(PresetTypeDescriptorsTest, TestDoubleInit, TestSize.Level1)
     EXPECT_EQ(sizeSecond, sizeFirst);
     LOG_INFO(UDMF_TEST, "TestDoubleInit end.");
 }
-
 } // OHOS::Test
