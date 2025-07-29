@@ -1165,4 +1165,88 @@ HWTEST_F(TlvUtilTest, WritingDataLoadInfo002, TestSize.Level1) {
     }
     LOG_INFO(UDMF_TEST, "WritingDataLoadInfo002 end.");
 }
+
+/* *
+ * @tc.name: Reading_008
+ * @tc.desc: test Reading fun
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Reading_008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Reading_008 begin.");
+    UnifiedKey uKey;
+    UnifiedData uData;
+    UnifiedDataProperties uProperties;
+    UnifiedRecord uRecord;
+    Runtime rTime;
+    Privilege privilege;
+    UriInfo uInfo;
+    Summary summary;
+    DataLoadInfo loadInfo;
+    std::vector<std::uint8_t> buffer = { 1, 2 };
+    TLVObject data(buffer);
+    TLVHead head;
+    head.len = data.GetTotal() - data.GetCursor() + 1;
+    auto result = TLVUtil::Reading(uKey, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(uData, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(uProperties, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(uRecord, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(rTime, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(privilege, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(uInfo, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(summary, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(loadInfo, data, head);
+    EXPECT_FALSE(result);
+    LOG_INFO(UDMF_TEST, "Reading_008 end.");
+}
+
+/* *
+ * @tc.name: Reading_009
+ * @tc.desc: test Reading fun
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Reading_009, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Reading_009 begin.");
+    UnifiedKey uKey;
+    UnifiedData uData;
+    UnifiedDataProperties uProperties;
+    UnifiedRecord uRecord;
+    Runtime rTime;
+    Privilege privilege;
+    UriInfo uInfo;
+    Summary summary;
+    DataLoadInfo loadInfo;
+    std::vector<std::uint8_t> buffer = { 1, 2 };
+    TLVObject data(buffer);
+    TLVHead head;
+    head.len = data.GetTotal() - data.GetCursor() - 1;
+    auto result = TLVUtil::Reading(uKey, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(uData, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(uProperties, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(uRecord, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(rTime, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(privilege, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(uInfo, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(summary, data, head);
+    EXPECT_FALSE(result);
+    result = TLVUtil::Reading(loadInfo, data, head);
+    EXPECT_FALSE(result);
+    LOG_INFO(UDMF_TEST, "Reading_009 end.");
+}
 }

@@ -196,6 +196,10 @@ template <> bool Writing(const UnifiedKey &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(UnifiedKey &output, TLVObject &data, const TLVHead &head)
 {
+    if (head.len > data.GetTotal() - data.GetCursor()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
+        return false;
+    }
     auto endCursor = data.GetCursor() + head.len;
     while (data.GetCursor() < endCursor) {
         TLVHead headItem{};
@@ -255,6 +259,10 @@ template <> bool Writing(const UnifiedData &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(UnifiedData &output, TLVObject &data, const TLVHead &head)
 {
+    if (head.len > data.GetTotal() - data.GetCursor()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
+        return false;
+    }
     auto endCursor = data.GetCursor() + head.len;
     while (data.GetCursor() < endCursor) {
         TLVHead headItem{};
@@ -318,6 +326,10 @@ template <> bool Writing(const UnifiedDataProperties &input, TLVObject &data, TA
 
 template <> bool Reading(UnifiedDataProperties &output, TLVObject &data, const TLVHead &head)
 {
+    if (head.len > data.GetTotal() - data.GetCursor()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
+        return false;
+    }
     auto endCursor = data.GetCursor() + head.len;
     while (data.GetCursor() < endCursor) {
         TLVHead headItem{};
@@ -469,6 +481,10 @@ template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &head)
 {
+    if (head.len > data.GetTotal() - data.GetCursor()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
+        return false;
+    }
     auto endCursor = data.GetCursor() + head.len;
     UDType dataType;
     std::string uid;
@@ -599,6 +615,10 @@ template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(Runtime &output, TLVObject &data, const TLVHead &head)
 {
+    if (head.len > data.GetTotal() - data.GetCursor()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
+        return false;
+    }
     auto endCursor = data.GetCursor() + head.len;
     while (data.GetCursor() < endCursor) {
         TLVHead headItem{};
@@ -693,6 +713,10 @@ template <> bool Writing(const Privilege &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(Privilege &output, TLVObject &data, const TLVHead &head)
 {
+    if (head.len > data.GetTotal() - data.GetCursor()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
+        return false;
+    }
     auto endCursor = data.GetCursor() + head.len;
     while (data.GetCursor() < endCursor) {
         TLVHead headItem{};
@@ -750,6 +774,10 @@ template <> bool Writing(const UriInfo &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(UriInfo &output, TLVObject &data, const TLVHead &head)
 {
+    if (head.len > data.GetTotal() - data.GetCursor()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
+        return false;
+    }
     auto endCursor = data.GetCursor() + head.len;
     while (data.GetCursor() < endCursor) {
         TLVHead headItem{};
@@ -944,6 +972,10 @@ template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
 {
+    if (head.len > data.GetTotal() - data.GetCursor()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
+        return false;
+    }
     auto endCursor = data.GetCursor() + head.len;
     while (data.GetCursor() < endCursor) {
         TLVHead headItem{};
@@ -1008,6 +1040,10 @@ template <> bool API_EXPORT Writing(const DataLoadInfo &input, TLVObject &data, 
 
 template <> bool API_EXPORT Reading(DataLoadInfo &output, TLVObject &data, const TLVHead &head)
 {
+    if (head.len > data.GetTotal() - data.GetCursor()) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
+        return false;
+    }
     auto endCursor = data.GetCursor() + head.len;
     while (data.GetCursor() < endCursor) {
         TLVHead headItem{};
