@@ -44,12 +44,12 @@ ani_object AniConverter::WrapUnifiedData(ani_env *env, std::shared_ptr<UnifiedDa
 {
     ani_object obj = {};
     ani_class cls;
-    if (ANI_OK!= env->FindClass("L@ohos/data/unifiedDataChannel/unifiedDataChannel/UnifiedData;", &cls)) {
+    if (ANI_OK!= env->FindClass("@ohos.data.unifiedDataChannel.unifiedDataChannel.UnifiedData", &cls)) {
         LOG_ERROR(UDMF_ANI, "Find class fail");
         return obj;
     }
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         LOG_ERROR(UDMF_ANI, "Find method fail");
         return obj;
     }
@@ -76,11 +76,11 @@ ani_object AniConverter::WrapProgressInfo(ani_env *env, ProgressInfo info)
     ani_object obj = {};
     ani_double progress = (double)info.progress;
     ani_enum ani_field_status_cls;
-    env->FindEnum("L@ohos/data/unifiedDataChannel/unifiedDataChannel/ListenerStatus;", &ani_field_status_cls);
+    env->FindEnum("@ohos.data.unifiedDataChannel.unifiedDataChannel.ListenerStatus", &ani_field_status_cls);
     ani_enum_item status;
     env->Enum_GetEnumItemByIndex(ani_field_status_cls, (ani_size)info.progressStatus, &status);
     ani_class cls;
-    if (ANI_OK!= env->FindClass("L@ohos/data/unifiedDataChannel/unifiedDataChannel/ProgressInfo_inner;", &cls)) {
+    if (ANI_OK!= env->FindClass("@ohos.data.unifiedDataChannel.unifiedDataChannel.ProgressInfo_inner", &cls)) {
         LOG_ERROR(UDMF_ANI, "Find class fail");
         return obj;
     }
@@ -119,12 +119,12 @@ ani_object AniConverter::WrapUnifiedRecord(ani_env *env, std::shared_ptr<Unified
         return obj;
     }
     ani_class cls;
-    if (ANI_OK!= env->FindClass("L@ohos/data/unifiedDataChannel/unifiedDataChannel/UnifiedRecord;", &cls)) {
+    if (ANI_OK!= env->FindClass("@ohos.data.unifiedDataChannel.unifiedDataChannel.UnifiedRecord", &cls)) {
         LOG_ERROR(UDMF_ANI, "Find class fail");
         return obj;
     }
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         LOG_ERROR(UDMF_ANI, "Find method fail");
         return obj;
     }
@@ -154,12 +154,12 @@ ani_object AniConverter::WrapSummary(ani_env *env, std::shared_ptr<Summary> summ
         return obj;
     }
     ani_class cls;
-    if (ANI_OK!= env->FindClass("L@ohos/data/unifiedDataChannel/unifiedDataChannel/Summary;", &cls)) {
+    if (ANI_OK!= env->FindClass("@ohos.data.unifiedDataChannel.unifiedDataChannel.Summary", &cls)) {
         LOG_ERROR(UDMF_ANI, "Find class fail");
         return obj;
     }
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         LOG_ERROR(UDMF_ANI, "Find method fail");
         return obj;
     }
