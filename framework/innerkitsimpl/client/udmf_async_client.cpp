@@ -16,6 +16,7 @@
 
 #include "udmf_async_client.h"
 
+#include <sys/time.h>
 #include "dataobs_mgr_client.h"
 #include "logger.h"
 #include "plain_text.h"
@@ -36,6 +37,8 @@ static constexpr int32_t START_ABILITY_INTERVAL = 500;
 static constexpr int32_t READ_PROGRESS_INTERVAL = 100;
 static constexpr int32_t SYNC_INTERVAL = 200;
 static constexpr int32_t MAX_SYNC_TIMES = 14;
+static constexpr uint64_t SEC_TO_MILLISEC = 1000;
+static constexpr uint64_t MICROSEC_TO_MILLISEC = 1000;
 
 static std::unordered_map<Status, int32_t> STATUS_MAP = {
     { E_INVALID_PARAMETERS, ListenerStatus::INVALID_PARAMETERS },
@@ -170,7 +173,12 @@ Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
         Clear(businessUdKey);
         return E_ERROR;
     }
-    sptr<IRemoteObject> callback = new ProgressSignalCallback();
+    sptr<IRemoteObject> callback = new (std::nothrow) ProgressSignalCallback();
+    if (callback == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Create ProgressSignalCallback failed");
+        Clear(businessUdKey);
+        return E_ERROR;
+    }
     auto obsMgrClient = AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
         LOG_ERROR(UDMF_CLIENT, "Get DataObsMgrClient failed");
@@ -304,6 +312,7 @@ Status UdmfAsyncClient::SetProgressData(const std::string &businessUdKey)
     auto obj = std::make_shared<Object>();
     auto progressRecord = std::make_shared<PlainText>(UDType::PLAIN_TEXT, obj);
     progressRecord->SetContent(std::to_string(PROGRESS_INIT));
+    progressRecord->SetAbstract(std::to_string(GetCurrentTimeMillis()));
     UnifiedData progressData;
     progressData.AddRecord(progressRecord);
     auto status = serviceClient->SetData(cusomOption, progressData, progressKey);
@@ -334,6 +343,7 @@ Status UdmfAsyncClient::UpdateProgressData(const std::string &progressUdKey, con
     } else {
         progressRecord->SetContent(std::to_string(progressInfo.progress));
     }
+    progressRecord->SetAbstract(std::to_string(GetCurrentTimeMillis()));
     UnifiedData progressData;
     progressData.AddRecord(progressRecord);
     auto status = serviceClient->UpdateData(queryOption, progressData);
@@ -442,5 +452,13 @@ bool UdmfAsyncClient::IsParamValid(const GetDataParams &params)
 void UdmfAsyncClient::PushTaskToExecutor(UdmfTask task)
 {
     udmfExecutor.Execute(std::move(task));
+}
+
+uint64_t UdmfAsyncClient::GetCurrentTimeMillis(void)
+{
+    struct timeval tv = { 0, 0 };
+    gettimeofday(&tv, nullptr);
+    return (static_cast<uint64_t>(tv.tv_sec) * SEC_TO_MILLISEC +
+        static_cast<uint64_t>(tv.tv_usec) / MICROSEC_TO_MILLISEC);
 }
 } // namespace OHOS::UDMF
