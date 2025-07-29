@@ -454,7 +454,7 @@ void UdmfAsyncClient::PushTaskToExecutor(UdmfTask task)
     udmfExecutor.Execute(std::move(task));
 }
 
-uint64_t UdmfAsyncClient::GetCurrentTimeMillis(void)
+uint64_t UdmfAsyncClient::GetCurrentTimeMillis()
 {
     struct timeval tv = { 0, 0 };
     gettimeofday(&tv, nullptr);
