@@ -12,22 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "unified_record_taihe.h"
-#include "taihe/runtime.hpp"
+
+#define LOG_TAG "UDMF_TAIHE_UNIFIEDRECORD"
+
 #include "ani_common_want.h"
-#include "pixel_map_taihe_ani.h"
-#include "taihe_common_utils.h"
-#include "plain_text.h"
-#include "html.h"
-#include "link.h"
-#include "image.h"
-#include "video.h"
+#include "application_defined_record.h"
 #include "audio.h"
 #include "folder.h"
+#include "html.h"
+#include "image.h"
+#include "link.h"
+#include "logger.h"
+#include "pixel_map_taihe_ani.h"
+#include "plain_text.h"
 #include "system_defined_appitem.h"
 #include "system_defined_form.h"
 #include "system_defined_pixelmap.h"
-#include "application_defined_record.h"
+#include "taihe_common_utils.h"
+#include "taihe/runtime.hpp"
+#include "unified_record_taihe.h"
+#include "video.h"
+
 namespace OHOS {
 namespace UDMF {
 UnifiedRecordTaihe::UnifiedRecordTaihe()
@@ -35,7 +40,7 @@ UnifiedRecordTaihe::UnifiedRecordTaihe()
     this->value_ = std::make_shared<UnifiedRecord>();
 }
 
-UnifiedRecordTaihe::UnifiedRecordTaihe(::taihe::string_view type,
+UnifiedRecordTaihe::UnifiedRecordTaihe(const ::taihe::string_view &type,
     ::taiheChannel::ValueType const& value)
 {
     ValueType valueType = ConvertValueType(::taihe::get_env(), type, value);

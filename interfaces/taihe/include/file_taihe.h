@@ -16,9 +16,9 @@
 #ifndef UDMF_FILE_TAIHE_H
 #define UDMF_FILE_TAIHE_H
 
+#include "file.h"
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
-#include "file.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
@@ -29,11 +29,10 @@ public:
 
     ::taihe::string GetType();
     taiheChannel::ValueType GetValue();
-
     ::taihe::string GetUri();
-    void SetUri(::taihe::string_view uri);
+    void SetUri(const ::taihe::string_view &uri);
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
+    void SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details);
     int64_t GetInner();
 
     std::shared_ptr<File> value_;

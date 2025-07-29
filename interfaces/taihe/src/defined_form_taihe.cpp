@@ -40,7 +40,7 @@ SystemDefinedFormTaihe::SystemDefinedFormTaihe()
 }
 
 void SystemDefinedFormTaihe::SetDetails(
-    ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details)
+    const ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> &details)
 {
     UDDetails udmfDetails = ConvertUDDetailsToUnion(details);
     this->value_->SetDetails(udmfDetails);
@@ -61,7 +61,7 @@ void SystemDefinedFormTaihe::SetFormId(double formId)
     return ::taihe::string(this->value_->GetFormName());
 }
 
-void SystemDefinedFormTaihe::SetFormName(::taihe::string_view formName)
+void SystemDefinedFormTaihe::SetFormName(const::taihe::string_view &formName)
 {
     std::string name(formName);
     this->value_->SetFormName(name);
@@ -72,7 +72,7 @@ void SystemDefinedFormTaihe::SetFormName(::taihe::string_view formName)
     return ::taihe::string(this->value_->GetBundleName());
 }
 
-void SystemDefinedFormTaihe::SetBundleName(::taihe::string_view bundleName)
+void SystemDefinedFormTaihe::SetBundleName(const::taihe::string_view &bundleName)
 {
     std::string name(bundleName);
     this->value_->SetBundleName(name);
@@ -83,7 +83,7 @@ void SystemDefinedFormTaihe::SetBundleName(::taihe::string_view bundleName)
     return ::taihe::string(this->value_->GetAbilityName());
 }
 
-void SystemDefinedFormTaihe::SetAbilityName(::taihe::string_view abilityName)
+void SystemDefinedFormTaihe::SetAbilityName(const::taihe::string_view &abilityName)
 {
     std::string name(abilityName);
     this->value_->SetAbilityName(name);
@@ -94,7 +94,7 @@ void SystemDefinedFormTaihe::SetAbilityName(::taihe::string_view abilityName)
     return ::taihe::string(this->value_->GetModule());
 }
 
-void SystemDefinedFormTaihe::SetModule(::taihe::string_view module)
+void SystemDefinedFormTaihe::SetModule(const::taihe::string_view &module)
 {
     std::string mudule(module);
     this->value_->SetModule(mudule);

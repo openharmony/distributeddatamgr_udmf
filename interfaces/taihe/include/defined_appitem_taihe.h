@@ -27,23 +27,23 @@ namespace UDMF {
 class SystemDefinedAppItemTaihe {
 public:
     SystemDefinedAppItemTaihe();
+
     ::taihe::string GetType();
     taiheChannel::ValueType GetValue();
     ::taihe::optional<::taihe::map<::taihe::string, taiheChannel::DetailsValue>> GetDetails();
-
-    void SetDetails(::taihe::map_view<::taihe::string, taiheChannel::DetailsValue> details);
+    void SetDetails(const ::taihe::map_view<::taihe::string, taiheChannel::DetailsValue> &details);
     ::taihe::string GetAppId();
-    void SetAppId(::taihe::string_view appId);
+    void SetAppId(const ::taihe::string_view &appId);
     ::taihe::string GetAppName();
-    void SetAppName(::taihe::string_view appName);
+    void SetAppName(const ::taihe::string_view &appName);
     ::taihe::string GetAppIconId();
-    void SetAppIconId(::taihe::string_view appIconId);
+    void SetAppIconId(const ::taihe::string_view &appIconId);
     ::taihe::string GetAppLabelId();
-    void SetAppLabelId(::taihe::string_view appLabelId);
+    void SetAppLabelId(const ::taihe::string_view &appLabelId);
     ::taihe::string GetBundleName();
-    void SetBundleName(::taihe::string_view bundleName);
+    void SetBundleName(const ::taihe::string_view &bundleName);
     ::taihe::string GetAbilityName();
-    void SetAbilityName(::taihe::string_view abilityName);
+    void SetAbilityName(const ::taihe::string_view &abilityName);
     int64_t GetInner();
 
     std::shared_ptr<SystemDefinedAppItem> value_;

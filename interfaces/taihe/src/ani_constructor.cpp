@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "taihe/runtime.hpp"
 #include "ohos.data.unifiedDataChannel.ani.hpp"
 #include "ohos.data.uniformTypeDescriptor.ani.hpp"
+#include "taihe/runtime.hpp"
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {

@@ -30,7 +30,7 @@ public:
     ::taihe::string GetType();
     ::taiheChannel::ValueType GetValue();
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
+    void SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details);
     int64_t GetInner();
 
     std::shared_ptr<Text> value_;

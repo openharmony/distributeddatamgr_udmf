@@ -84,6 +84,7 @@ taihe_shared_library("udmf_taihe_native") {
     "src/unified_data_taihe.cpp",
     "src/unified_record_taihe.cpp",
     "src/get_data_params_taihe.cpp",
+    "src/application_defined_record_taihe.cpp",
   ]
   deps = [
     ":run_udmf_taihe",

@@ -26,13 +26,10 @@ namespace UDMF {
 class UnifiedRecordTaihe {
 public:
     UnifiedRecordTaihe();
-
-    UnifiedRecordTaihe(::taihe::string_view type, ::taiheChannel::ValueType const& value);
+    UnifiedRecordTaihe(const ::taihe::string_view &type, ::taiheChannel::ValueType const& value);
 
     ::taihe::string GetType();
-
     ::taiheChannel::ValueType GetValue();
-
     int64_t GetInner();
 
     std::shared_ptr<UnifiedRecord> value_;

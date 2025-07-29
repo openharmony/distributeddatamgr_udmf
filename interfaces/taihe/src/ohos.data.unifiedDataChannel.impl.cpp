@@ -12,9 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #define LOG_TAG "UDMF_DATA_CHANNEL_TAIHE"
+
+#include "logger.h"
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
+#include "plain_text.h"
 #include "stdexcept"
 #include "taihe_common_utils.h"
 #include "taihe/runtime.hpp"
@@ -22,8 +26,6 @@
 #include "unified_data.h"
 #include "unified_data_taihe.h"
 #include "unified_record.h"
-#include "plain_text.h"
-#include "logger.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -92,4 +94,3 @@ namespace taiheChannel = ohos::data::unifiedDataChannel;
 TH_EXPORT_CPP_API_CreateSummary(OHOS::UDMF::CreateSummary);
 TH_EXPORT_CPP_API_InsertDataSync(OHOS::UDMF::InsertDataSync);
 TH_EXPORT_CPP_API_QueryDataSync(OHOS::UDMF::QueryDataSync);
-// NOLINTEND

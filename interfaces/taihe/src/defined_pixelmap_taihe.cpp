@@ -40,7 +40,7 @@ SystemDefinedPixelMapTaihe::SystemDefinedPixelMapTaihe()
 }
 
 void SystemDefinedPixelMapTaihe::SetDetails(
-    ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details)
+    const ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> &details)
 {
     UDDetails udmfDetails = ConvertUDDetailsToUnion(details);
     this->value_->SetDetails(udmfDetails);
@@ -53,7 +53,7 @@ void SystemDefinedPixelMapTaihe::SetDetails(
         ::taihe::array<uint8_t>(rawData));
 }
 
-void SystemDefinedPixelMapTaihe::SetRawData(::taihe::array_view<uint8_t> rawData)
+void SystemDefinedPixelMapTaihe::SetRawData(const ::taihe::array_view<uint8_t> &rawData)
 {
     if (rawData.size() == 0) {
         return;

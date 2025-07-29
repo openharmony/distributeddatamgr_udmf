@@ -15,6 +15,7 @@
 
 #include "plain_text_taihe.h"
 #include "taihe_common_utils.h"
+
 namespace OHOS {
 namespace UDMF {
 PlainTextTaihe::PlainTextTaihe()
@@ -38,7 +39,7 @@ PlainTextTaihe::PlainTextTaihe()
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void PlainTextTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void PlainTextTaihe::SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details)
 {
     if (details.size() == 0) {
         return;
@@ -47,7 +48,7 @@ void PlainTextTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::stri
     this->value_->SetDetails(udmfDetails);
 }
 
-void PlainTextTaihe::SetTextContent(::taihe::string_view textContent)
+void PlainTextTaihe::SetTextContent(const ::taihe::string_view &textContent)
 {
     std::string content(textContent);
     this->value_->SetContent(content);
@@ -58,7 +59,7 @@ void PlainTextTaihe::SetTextContent(::taihe::string_view textContent)
     return ::taihe::string(this->value_->GetContent());
 }
 
-void PlainTextTaihe::SetTextAbstract(::taihe::string_view textAbstract)
+void PlainTextTaihe::SetTextAbstract(const ::taihe::string_view &textAbstract)
 {
     std::string abstract(textAbstract);
     this->value_->SetAbstract(abstract);

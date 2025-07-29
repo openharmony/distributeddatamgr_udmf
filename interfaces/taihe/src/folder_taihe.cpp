@@ -15,6 +15,7 @@
 
 #include "folder_taihe.h"
 #include "taihe_common_utils.h"
+
 namespace OHOS {
 namespace UDMF {
 FolderTaihe::FolderTaihe()
@@ -37,7 +38,7 @@ FolderTaihe::FolderTaihe()
     return ::taihe::string(this->value_->GetUri());
 }
 
-void FolderTaihe::SetUri(::taihe::string_view uri)
+void FolderTaihe::SetUri(const ::taihe::string_view &uri)
 {
     std::string uriStr(uri);
     this->value_->SetUri(uriStr);
@@ -49,7 +50,7 @@ void FolderTaihe::SetUri(::taihe::string_view uri)
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void FolderTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void FolderTaihe::SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details)
 {
     if (details.size() == 0) {
         return;
@@ -63,7 +64,7 @@ void FolderTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string>
     return ::taihe::string(this->value_->GetUri());
 }
 
-void FolderTaihe::SetFolderUri(::taihe::string_view folderUri)
+void FolderTaihe::SetFolderUri(const ::taihe::string_view &folderUri)
 {
     std::string folderUriStr(folderUri);
     this->value_->SetUri(folderUriStr);

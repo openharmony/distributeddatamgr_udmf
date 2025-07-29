@@ -12,15 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #define LOG_TAG "UDMF_ANI_CONVERTER_UTILS"
-#include "udmf_ani_converter_utils.h"
+
 #include "ani_common_utils.h"
+#include "get_data_params_taihe.h"
 #include "logger.h"
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
+#include "udmf_ani_converter_utils.h"
 #include "unified_data_taihe.h"
 #include "unified_record_taihe.h"
-#include "get_data_params_taihe.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -179,7 +181,6 @@ GetDataParams AniConverter::UnwrapGetDataParams(ani_env *env, ani_object object,
     GetDataParamsTaihe::Convert2NativeValue(env, object, params, key);
     return params;
 }
-
 
 } // namespace UDMF
 } // namespace OHOS

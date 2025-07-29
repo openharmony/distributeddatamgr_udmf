@@ -12,7 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #define LOG_TAG "UDMF_ANI_COMMON_UTILS_H"
+
 #include "ani_common_utils.h"
 #include "logger.h"
 
@@ -95,8 +97,8 @@ bool SetFieldRef(ani_env *env, ani_class cls, ani_object object, const std::stri
     return true;
 }
 
-bool InnerWrapMapParams(ani_env* env, ani_class mapCls, ani_object mapObject,
-    const std::map<std::string, int64_t> mapParams)
+bool InnerWrapMapParams(ani_env *env, ani_class mapCls, ani_object mapObject,
+    const std::map<std::string, int64_t> &mapParams)
 {
     ani_ref mapParamsRef = WrapMapParams(env, mapParams);
     if (mapParamsRef == nullptr) {

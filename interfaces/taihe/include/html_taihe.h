@@ -16,9 +16,9 @@
 #ifndef UDMF_HTML_TAIHE_H
 #define UDMF_HTML_TAIHE_H
 
+#include "html.h"
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
-#include "html.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
@@ -26,13 +26,14 @@ namespace UDMF {
 class HtmlTaihe {
 public:
     HtmlTaihe();
+
     ::taihe::string GetType();
     ::taiheChannel::ValueType GetValue();
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
-    void SetHtmlContent(::taihe::string_view htmlContent);
+    void SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details);
+    void SetHtmlContent(const ::taihe::string_view &htmlContent);
     ::taihe::string GetHtmlContent();
-    void SetPlainContent(::taihe::string_view plainContent);
+    void SetPlainContent(const ::taihe::string_view &plainContent);
     ::taihe::string GetPlainContent();
     int64_t GetInner();
 

@@ -13,32 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_HYPERLINK_TAIHE_H
-#define UDMF_HYPERLINK_TAIHE_H
+#ifndef UDMF_APPLICATION_TAIHE_H
+#define UDMF_APPLICATION_TAIHE_H
 
-#include "link.h"
+#include "application_defined_record.h"
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
 namespace UDMF {
-class HyperlinkTaihe {
+class ApplicationDefinedRecordTaihe {
 public:
-    HyperlinkTaihe();
+    ApplicationDefinedRecordTaihe();
 
     ::taihe::string GetType();
-    ::taiheChannel::ValueType GetValue();
-    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
-    void SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details);
-    void SetUrl(const ::taihe::string_view &url);
-    ::taihe::string GetUrl();
-    void SetDescription(const ::taihe::string_view &description);
-    ::taihe::string GetDescription();
+    ::ohos::data::unifiedDataChannel::ValueType GetValue();
+    ::taihe::string GetApplicationDefinedType();
+    void SetApplicationDefinedType(const ::taihe::string_view &applicationDefinedType);
+    ::taihe::optional<::taihe::array<uint8_t>> GetRawData();
+    void SetRawData(const ::taihe::array_view<uint8_t> &rawData);
     int64_t GetInner();
 
-    std::shared_ptr<Link> value_;
+    std::shared_ptr<ApplicationDefinedRecord> value_;
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_HYPERLINK_TAIHE_H
+#endif // UDMF_APPLICATION_TAIHE_H

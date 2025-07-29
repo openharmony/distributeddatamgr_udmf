@@ -16,27 +16,22 @@
 #ifndef UDMF_TAIHE_COMMON_UTILS_H
 #define UDMF_TAIHE_COMMON_UTILS_H
 
-#include "unified_meta.h"
+#include "ani.h"
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
-#include "ani.h"
+#include "unified_meta.h"
+
 namespace OHOS {
 namespace UDMF {
 static constexpr int PARAMETERSERROR = 401;
 Intention ConvertIntention(::ohos::data::unifiedDataChannel::Intention value);
-
-ValueType ConvertValueType(ani_env *env, ::taihe::string_view type,
+ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,
     ::ohos::data::unifiedDataChannel::ValueType const& value);
-
 ::ohos::data::unifiedDataChannel::ValueType ConvertValueType(const ValueType &value);
-
-UDDetails ConvertUDDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
-
+UDDetails ConvertUDDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details);
 ::taihe::map<::taihe::string, ::taihe::string> ConvertUDDetailsToString(const UDDetails &details);
-
 ::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> ConvertUDDetailsToUnion(
     const UDDetails &details);
-
 UDDetails ConvertUDDetailsToUnion(
     const ::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> &details);
 

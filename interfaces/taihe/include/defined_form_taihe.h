@@ -29,19 +29,18 @@ public:
 
     ::taihe::string GetType();
     taiheChannel::ValueType GetValue();
-
     ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> GetDetails();
-    void SetDetails(::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details);
+    void SetDetails(const ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> &details);
     double GetFormId();
     void SetFormId(double formId);
     ::taihe::string GetFormName();
-    void SetFormName(::taihe::string_view formName);
+    void SetFormName(const ::taihe::string_view &formName);
     ::taihe::string GetBundleName();
-    void SetBundleName(::taihe::string_view bundleName);
+    void SetBundleName(const ::taihe::string_view &bundleName);
     ::taihe::string GetAbilityName();
-    void SetAbilityName(::taihe::string_view abilityName);
+    void SetAbilityName(const ::taihe::string_view &abilityName);
     ::taihe::string GetModule();
-    void SetModule(::taihe::string_view module);
+    void SetModule(const ::taihe::string_view &module);
     int64_t GetInner();
 
     std::shared_ptr<SystemDefinedForm> value_;

@@ -15,6 +15,7 @@
 
 #include "video_taihe.h"
 #include "taihe_common_utils.h"
+
 namespace OHOS {
 namespace UDMF {
 VideoTaihe::VideoTaihe()
@@ -37,7 +38,7 @@ VideoTaihe::VideoTaihe()
     return ::taihe::string(this->value_->GetUri());
 }
 
-void VideoTaihe::SetUri(::taihe::string_view uri)
+void VideoTaihe::SetUri(const ::taihe::string_view &uri)
 {
     std::string uriStr(uri);
     this->value_->SetUri(uriStr);
@@ -49,7 +50,7 @@ void VideoTaihe::SetUri(::taihe::string_view uri)
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void VideoTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void VideoTaihe::SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details)
 {
     if (details.size() == 0) {
         return;
@@ -63,7 +64,7 @@ void VideoTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> 
     return ::taihe::string(this->value_->GetUri());
 }
 
-void VideoTaihe::SetVideoUri(::taihe::string_view videoUri)
+void VideoTaihe::SetVideoUri(const ::taihe::string_view &videoUri)
 {
     std::string videoUriStr(videoUri);
     this->value_->SetUri(videoUriStr);
