@@ -67,8 +67,10 @@ int64_t ApplicationDefinedRecordTaihe::GetInner()
 } // namespace UDMF
 } // namespace OHOS
 
-::ohos::data::unifiedDataChannel::ApplicationDefinedRecordInner createApplicationDefinedRecord() {
-    return taihe::make_holder<OHOS::UDMF::ApplicationDefinedRecordTaihe, ::ohos::data::unifiedDataChannel::ApplicationDefinedRecordInner>();
+::ohos::data::unifiedDataChannel::ApplicationDefinedRecordInner createApplicationDefinedRecord()
+{
+    return taihe::make_holder<OHOS::UDMF::ApplicationDefinedRecordTaihe,
+        ::ohos::data::unifiedDataChannel::ApplicationDefinedRecordInner>();
 }
 
 TH_EXPORT_CPP_API_createApplicationDefinedRecord(createApplicationDefinedRecord);
