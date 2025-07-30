@@ -35,6 +35,7 @@ static constexpr size_t MIN_THREADS = 0;
 
 static constexpr int32_t START_ABILITY_INTERVAL = 500;
 static constexpr int32_t READ_PROGRESS_INTERVAL = 100;
+static constexpr int32_t UPDATA_TIMESTAMP_INTERVAL = 1000;
 static constexpr int32_t SYNC_INTERVAL = 200;
 static constexpr int32_t MAX_SYNC_TIMES = 14;
 static constexpr uint64_t SEC_TO_MILLISEC = 1000;
@@ -130,6 +131,7 @@ Status UdmfAsyncClient::ProgressTask(const std::string &businessUdKey)
             return status;
         }
     }
+    auto lastUpdateTime = std::chrono::steady_clock::now();
     while (asyncHelper->lastProgress >= PROGRESS_INIT && asyncHelper->lastProgress < PROGRESS_ALL_FINISHED) {
         auto pair = asyncHelper->progressQueue.Poll();
         if (!pair.first) {
@@ -137,13 +139,18 @@ Status UdmfAsyncClient::ProgressTask(const std::string &businessUdKey)
             continue;
         }
         auto progressInfo = pair.second;
-        if (progressInfo->progress >= PROGRESS_INIT && progressInfo->progress <= asyncHelper->lastProgress) {
+        if (progressInfo->progress >= PROGRESS_INIT && progressInfo->progress < asyncHelper->lastProgress) {
             continue;
         }
-        asyncHelper->lastProgress = progressInfo->progress;
         if (asyncHelper->progressIndicator == ProgressIndicator::DEFAULT) {
-            UpdateProgressData(asyncHelper->processKey, *progressInfo);
+            auto now = std::chrono::steady_clock::now();
+            auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastUpdateTime).count();
+            if (progressInfo->progress != asyncHelper->lastProgress || elapsedMs > UPDATA_TIMESTAMP_INTERVAL) {
+                UpdateProgressData(asyncHelper->processKey, *progressInfo);
+                lastUpdateTime = now;
+            }
         }
+        asyncHelper->lastProgress = progressInfo->progress;
     }
     Clear(businessUdKey);
     return E_OK;
