@@ -3791,4 +3791,35 @@ HWTEST_F(UDMFTest, OH_Udmf_SetAndGetUnifiedDataByOptions005, TestSize.Level1)
     OH_UdmfOptions_Destroy(options1);
     OH_UdmfData_Destroy(udmfUnifiedData);
 }
+
+/**
+ * @tc.name: DestroyUnifiedRecordArray001
+ * @tc.desc: test DestroyUnifiedRecordArray
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, DestroyUnifiedRecordArray001, TestSize.Level1)
+{
+    OH_UdmfData *unifiedData = OH_UdmfData_Create();
+    EXPECT_NE(unifiedData, nullptr);
+    std::shared_ptr<Object> object = std::make_shared<Object>();
+    std::map<std::string, ValueType> map;
+    map["uniformDataType"] = UtdUtils::GetUtdIdFromUtdEnum(UDType::PLAIN_TEXT);
+    map["textContent"] = "content";
+    map["abstract"] = "abstract";
+    object->value_ = map;
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<PlainText>(PLAIN_TEXT, object);
+    std::vector<std::shared_ptr<UnifiedRecord>> recordVec = { record };
+    unifiedData->records = nullptr;
+    unifiedData->unifiedData_->SetRecords(recordVec);
+    unsigned int recordCount = 0;
+    OH_UdmfRecord **getRecords = OH_UdmfData_GetRecords(unifiedData, &recordCount);
+    EXPECT_EQ(recordCount, 1);
+    EXPECT_EQ(unifiedData->recordsCount, 1);
+    EXPECT_NE(getRecords[0], nullptr);
+    getRecords[0]->recordDataLen = 1;
+    getRecords[0]->recordData = new (std::nothrow) unsigned char[getRecords[0]->recordDataLen];
+    unifiedData->records = getRecords;
+    OH_UdmfData_Destroy(unifiedData);
+    EXPECT_EQ(unifiedData->recordsCount, 0);
+}
 }

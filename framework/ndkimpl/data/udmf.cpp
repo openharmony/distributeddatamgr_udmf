@@ -65,6 +65,11 @@ static void DestroyUnifiedRecordArray(OH_UdmfRecord**& records, unsigned int& co
     }
     for (unsigned int i = 0; i < count; i++) {
         if (records[i] != nullptr) {
+            if (records[i]->recordData != nullptr) {
+                delete records[i]->recordData;
+                records[i]->recordData = nullptr;
+            }
+            NdkDataConversion::DestroyStringArray(records[i]->typesArray, records[i]->typesCount);
             delete records[i];
             records[i] = nullptr;
         }
