@@ -478,7 +478,7 @@ export class UnifiedData {
       this.inner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedRecord).inner);
     } else if (unifiedRecord instanceof ApplicationDefinedRecord) {
       this.inner = createUnifiedDataWithParams((unifiedRecord as ApplicationDefinedRecord).inner);
-    }else if (unifiedRecord instanceof UnifiedRecord) {
+    } else if (unifiedRecord instanceof UnifiedRecord) {
       this.inner = createUnifiedDataWithParams((unifiedRecord as UnifiedRecord).inner);
     }
   }
@@ -511,7 +511,7 @@ export class UnifiedData {
       this.inner.addRecord((unifiedRecord as SystemDefinedRecord).inner);
     } else if (unifiedRecord instanceof ApplicationDefinedRecord) {
       this.inner.addRecord((unifiedRecord as ApplicationDefinedRecord).inner);
-    }else if (unifiedRecord instanceof UnifiedRecord) {
+    } else if (unifiedRecord instanceof UnifiedRecord) {
       this.inner.addRecord((unifiedRecord as UnifiedRecord).inner);
     }
   }
