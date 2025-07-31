@@ -12,10 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #define LOG_TAG "GetDataParamsTaihe"
+
 #include "get_data_params_taihe.h"
-#include "udmf_ani_converter_utils.h"
 #include "logger.h"
+#include "udmf_ani_converter_utils.h"
+
 namespace OHOS {
 namespace UDMF {
 static constexpr int32_t PROGRESS_INIT = 0;

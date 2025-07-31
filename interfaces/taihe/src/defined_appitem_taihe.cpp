@@ -40,7 +40,7 @@ SystemDefinedAppItemTaihe::SystemDefinedAppItemTaihe()
 }
 
 void SystemDefinedAppItemTaihe::SetDetails(
-    ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details)
+    const ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> &details)
 {
     UDDetails udmfDetails = ConvertUDDetailsToUnion(details);
     this->value_->SetDetails(udmfDetails);
@@ -51,7 +51,7 @@ void SystemDefinedAppItemTaihe::SetDetails(
     return ::taihe::string(this->value_->GetAppId());
 }
 
-void SystemDefinedAppItemTaihe::SetAppId(::taihe::string_view appId)
+void SystemDefinedAppItemTaihe::SetAppId(const ::taihe::string_view &appId)
 {
     std::string appIdStr(appId);
     this->value_->SetAppId(appIdStr);
@@ -62,7 +62,7 @@ void SystemDefinedAppItemTaihe::SetAppId(::taihe::string_view appId)
     return ::taihe::string(this->value_->GetAppName());
 }
 
-void SystemDefinedAppItemTaihe::SetAppName(::taihe::string_view appName)
+void SystemDefinedAppItemTaihe::SetAppName(const ::taihe::string_view &appName)
 {
     std::string appNameStr(appName);
     this->value_->SetAppName(appNameStr);
@@ -73,7 +73,7 @@ void SystemDefinedAppItemTaihe::SetAppName(::taihe::string_view appName)
     return ::taihe::string(this->value_->GetAppIconId());
 }
 
-void SystemDefinedAppItemTaihe::SetAppIconId(::taihe::string_view appIconId)
+void SystemDefinedAppItemTaihe::SetAppIconId(const ::taihe::string_view &appIconId)
 {
     std::string appIconIdStr(appIconId);
     this->value_->SetAppIconId(appIconIdStr);
@@ -84,7 +84,7 @@ void SystemDefinedAppItemTaihe::SetAppIconId(::taihe::string_view appIconId)
     return ::taihe::string(this->value_->GetAppLabelId());
 }
 
-void SystemDefinedAppItemTaihe::SetAppLabelId(::taihe::string_view appLabelId)
+void SystemDefinedAppItemTaihe::SetAppLabelId(const ::taihe::string_view &appLabelId)
 {
     std::string appLabelIdStr(appLabelId);
     this->value_->SetAppLabelId(appLabelIdStr);
@@ -95,7 +95,7 @@ void SystemDefinedAppItemTaihe::SetAppLabelId(::taihe::string_view appLabelId)
     return ::taihe::string(this->value_->GetBundleName());
 }
 
-void SystemDefinedAppItemTaihe::SetBundleName(::taihe::string_view bundleName)
+void SystemDefinedAppItemTaihe::SetBundleName(const ::taihe::string_view &bundleName)
 {
     std::string bundleNameStr(bundleName);
     this->value_->SetBundleName(bundleNameStr);
@@ -106,7 +106,7 @@ void SystemDefinedAppItemTaihe::SetBundleName(::taihe::string_view bundleName)
     return ::taihe::string(this->value_->GetAbilityName());
 }
 
-void SystemDefinedAppItemTaihe::SetAbilityName(::taihe::string_view abilityName)
+void SystemDefinedAppItemTaihe::SetAbilityName(const ::taihe::string_view &abilityName)
 {
     std::string abilityNameStr(abilityName);
     this->value_->SetAbilityName(abilityNameStr);

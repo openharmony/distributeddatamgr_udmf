@@ -13,24 +13,26 @@
  * limitations under the License.
  */
 #define LOG_TAG "UDMF_DATA_TAIHE"
-#include "unified_data_taihe.h"
-#include "unified_record_taihe.h"
-#include "file_taihe.h"
-#include "folder_taihe.h"
+
+#include "application_defined_record_taihe.h"
 #include "audio_taihe.h"
-#include "video_taihe.h"
-#include "image_taihe.h"
-#include "text_taihe.h"
-#include "plain_text_taihe.h"
-#include "html_taihe.h"
-#include "hyperlink_taihe.h"
-#include "defined_form_taihe.h"
 #include "defined_appitem_taihe.h"
+#include "defined_form_taihe.h"
 #include "defined_pixelmap_taihe.h"
 #include "defined_record_taihe.h"
+#include "file_taihe.h"
+#include "folder_taihe.h"
+#include "html_taihe.h"
+#include "hyperlink_taihe.h"
+#include "image_taihe.h"
+#include "logger.h"
+#include "plain_text_taihe.h"
 #include "taihe_common_utils.h"
 #include "taihe/runtime.hpp"
-#include "logger.h"
+#include "text_taihe.h"
+#include "unified_data_taihe.h"
+#include "unified_record_taihe.h"
+#include "video_taihe.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -120,6 +122,12 @@ void UnifiedDataTaihe::AddRecord(::taiheChannel::AllRecords const& unifiedRecord
         case ::taiheChannel::AllRecords::tag_t::systemDefinedPixelMap: {
             auto inner = reinterpret_cast<SystemDefinedPixelMapTaihe*>(
                 unifiedRecord.get_systemDefinedPixelMap_ref()->GetInner());
+            this->value_->AddRecord(inner->value_);
+            break;
+        }
+        case ::taiheChannel::AllRecords::tag_t::applicationDefinedRecord: {
+            auto inner = reinterpret_cast<ApplicationDefinedRecordTaihe*>(
+                unifiedRecord.get_applicationDefinedRecord_ref()->GetInner());
             this->value_->AddRecord(inner->value_);
             break;
         }
@@ -240,6 +248,16 @@ void UnifiedDataTaihe::AddRecord(::taiheChannel::AllRecords const& unifiedRecord
             return ::taiheChannel::AllRecords::make_systemDefinedPixelMap(
                 systemDefinedPixelMapTaihe);
         }
+        case APPLICATION_DEFINED_RECORD: {
+            auto applicationDefinedRecordTaihe = taihe::make_holder<ApplicationDefinedRecordTaihe,
+                ::taiheChannel::ApplicationDefinedRecordInner>();
+            auto applicationDefinedRecordTaihePtr =
+                reinterpret_cast<ApplicationDefinedRecordTaihe*>(applicationDefinedRecordTaihe->GetInner());
+            applicationDefinedRecordTaihePtr->value_ =
+                std::static_pointer_cast<ApplicationDefinedRecord>(in);
+            return ::taiheChannel::AllRecords::make_applicationDefinedRecord(
+                applicationDefinedRecordTaihe);
+        }
         default:
             auto recordImpl = taihe::make_holder<UnifiedRecordTaihe,
                 ::taiheChannel::UnifiedRecordInner>();
@@ -341,6 +359,12 @@ int64_t UnifiedDataTaihe::GetInner()
         case ::taiheChannel::AllRecords::tag_t::systemDefinedPixelMap: {
             auto inner = reinterpret_cast<OHOS::UDMF::SystemDefinedPixelMapTaihe*>(
                 unifiedRecord.get_systemDefinedPixelMap_ref()->GetInner());
+            unifiedDataImpl->value_->AddRecord(inner->value_);
+            break;
+        }
+        case ::taiheChannel::AllRecords::tag_t::applicationDefinedRecord: {
+            auto inner = reinterpret_cast<OHOS::UDMF::ApplicationDefinedRecordTaihe*>(
+                unifiedRecord.get_applicationDefinedRecord_ref()->GetInner());
             unifiedDataImpl->value_->AddRecord(inner->value_);
             break;
         }

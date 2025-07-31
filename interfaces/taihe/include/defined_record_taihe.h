@@ -29,9 +29,8 @@ public:
 
     ::taihe::string GetType();
     ::taiheChannel::ValueType GetValue();
-
     ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> GetDetails();
-    void SetDetails(::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details);
+    void SetDetails(const ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> &details);
     int64_t GetInner();
 
     std::shared_ptr<SystemDefinedRecord> value_;

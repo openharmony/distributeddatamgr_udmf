@@ -55,6 +55,7 @@ union AllRecords {
   systemDefinedForm: SystemDefinedFormInner;
   systemDefinedAppItem: SystemDefinedAppItemInner;
   systemDefinedPixelMap: SystemDefinedPixelMapInner;
+  applicationDefinedRecord: ApplicationDefinedRecordInner;
   unifiedRecord: UnifiedRecordInner;
 }
 
@@ -415,6 +416,23 @@ interface SystemDefinedPixelMapInner {
 
 function CreateSystemDefinedPixelMap(): SystemDefinedPixelMapInner;
 
+@class
+interface ApplicationDefinedRecordInner {
+  GetType(): String;
+  GetValue(): ValueType;
+  @get("applicationDefinedType")
+  GetApplicationDefinedType(): String;
+  @set("applicationDefinedType")
+  SetApplicationDefinedType(applicationDefinedType: String): void;
+  @get("rawData")
+  GetRawData(): Optional<@typedarray Array<u8>>;
+  @set("rawData")
+  SetRawData(rawData: @typedarray Array<u8>): void;
+  GetInner(): i64;
+}
+
+function createApplicationDefinedRecord(): ApplicationDefinedRecordInner;
+
 function InsertDataSync(options: Options, data: UnifiedDataInner): String;
 function QueryDataSync(options: Options): Array<UnifiedDataInner>;
 
@@ -458,6 +476,8 @@ export class UnifiedData {
       this.inner = createUnifiedDataWithParams((unifiedRecord as File).inner);
     } else if (unifiedRecord instanceof SystemDefinedRecord) {
       this.inner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedRecord).inner);
+    } else if (unifiedRecord instanceof ApplicationDefinedRecord) {
+      this.inner = createUnifiedDataWithParams((unifiedRecord as ApplicationDefinedRecord).inner);
     } else if (unifiedRecord instanceof UnifiedRecord) {
       this.inner = createUnifiedDataWithParams((unifiedRecord as UnifiedRecord).inner);
     }
@@ -489,6 +509,8 @@ export class UnifiedData {
       this.inner.addRecord((unifiedRecord as File).inner);
     } else if (unifiedRecord instanceof SystemDefinedRecord) {
       this.inner.addRecord((unifiedRecord as SystemDefinedRecord).inner);
+    } else if (unifiedRecord instanceof ApplicationDefinedRecord) {
+      this.inner.addRecord((unifiedRecord as ApplicationDefinedRecord).inner);
     } else if (unifiedRecord instanceof UnifiedRecord) {
       this.inner.addRecord((unifiedRecord as UnifiedRecord).inner);
     }
@@ -525,6 +547,8 @@ export class UnifiedData {
         arr.push(new SystemDefinedAppItem(records[i] as SystemDefinedAppItemInner));
       } else if (records[i] instanceof SystemDefinedPixelMapInner) {
         arr.push(new SystemDefinedPixelMap(records[i] as SystemDefinedPixelMapInner));
+      } else if (records[i] instanceof ApplicationDefinedRecordInner) {
+        arr.push(new ApplicationDefinedRecord(records[i] as ApplicationDefinedRecordInner));
       }
     }
     return arr;
@@ -990,6 +1014,34 @@ export class SystemDefinedPixelMap extends SystemDefinedRecord {
   }
   set details(details: Record<String, DetailsValue>) {
     this.inner.details = details;
+  }
+  get rawData(): Uint8Array | undefined {
+    return this.inner.rawData;
+  }
+  set rawData(rawData: Uint8Array) {
+    this.inner.rawData = rawData;
+  }
+}
+
+export class ApplicationDefinedRecord extends UnifiedRecord {
+  inner: ApplicationDefinedRecordInner;
+  constructor() {
+    this.inner = createApplicationDefinedRecord();
+  }
+  constructor(inner: ApplicationDefinedRecordInner) {
+    this.inner = inner;
+  }
+  getType(): string {
+    return this.inner.getType();
+  }
+  getValue(): ValueType {
+    return this.inner.getValue();
+  }
+  get applicationDefinedType(): String {
+    return this.inner.applicationDefinedType;
+  }
+  set applicationDefinedType(applicationDefinedType: String) {
+    this.inner.applicationDefinedType = applicationDefinedType;
   }
   get rawData(): Uint8Array | undefined {
     return this.inner.rawData;

@@ -15,6 +15,7 @@
 
 #include "file_taihe.h"
 #include "taihe_common_utils.h"
+
 namespace OHOS {
 namespace UDMF {
 FileTaihe::FileTaihe()
@@ -37,7 +38,7 @@ FileTaihe::FileTaihe()
     return ::taihe::string(this->value_->GetUri());
 }
 
-void FileTaihe::SetUri(::taihe::string_view uri)
+void FileTaihe::SetUri(const ::taihe::string_view &uri)
 {
     std::string uriStr(uri);
     this->value_->SetUri(uriStr);
@@ -49,7 +50,7 @@ void FileTaihe::SetUri(::taihe::string_view uri)
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void FileTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void FileTaihe::SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details)
 {
     if (details.size() == 0) {
         return;

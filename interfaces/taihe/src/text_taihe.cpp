@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "text_taihe.h"
 #include "taihe_common_utils.h"
+#include "text_taihe.h"
+
 namespace OHOS {
 namespace UDMF {
 TextTaihe::TextTaihe()
@@ -38,7 +39,7 @@ TextTaihe::TextTaihe()
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void TextTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void TextTaihe::SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details)
 {
     if (details.size() == 0) {
         return;

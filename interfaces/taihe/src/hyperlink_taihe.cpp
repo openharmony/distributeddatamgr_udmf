@@ -15,6 +15,7 @@
 
 #include "hyperlink_taihe.h"
 #include "taihe_common_utils.h"
+
 namespace OHOS {
 namespace UDMF {
 HyperlinkTaihe::HyperlinkTaihe()
@@ -38,7 +39,7 @@ HyperlinkTaihe::HyperlinkTaihe()
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void HyperlinkTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void HyperlinkTaihe::SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details)
 {
     if (details.size() == 0) {
         return;
@@ -47,7 +48,7 @@ void HyperlinkTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::stri
     this->value_->SetDetails(udmfDetails);
 }
 
-void HyperlinkTaihe::SetUrl(::taihe::string_view url)
+void HyperlinkTaihe::SetUrl(const ::taihe::string_view &url)
 {
     std::string urlStr(url);
     this->value_->SetUrl(urlStr);
@@ -58,7 +59,7 @@ void HyperlinkTaihe::SetUrl(::taihe::string_view url)
     return ::taihe::string(this->value_->GetUrl());
 }
 
-void HyperlinkTaihe::SetDescription(::taihe::string_view description)
+void HyperlinkTaihe::SetDescription(const ::taihe::string_view &description)
 {
     std::string desc(description);
     this->value_->SetDescription(desc);

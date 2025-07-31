@@ -30,10 +30,10 @@ public:
     ::taihe::string GetType();
     ::taiheChannel::ValueType GetValue();
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
-    void SetTextContent(::taihe::string_view textContent);
+    void SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details);
+    void SetTextContent(const ::taihe::string_view &textContent);
     ::taihe::string GetTextContent();
-    void SetTextAbstract(::taihe::string_view textAbstract);
+    void SetTextAbstract(const ::taihe::string_view &textAbstract);
     ::taihe::string GetTextAbstract();
     int64_t GetInner();
 

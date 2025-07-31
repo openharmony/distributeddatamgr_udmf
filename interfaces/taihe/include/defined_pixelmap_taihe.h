@@ -29,11 +29,10 @@ public:
 
     ::taihe::string GetType();
     ::taiheChannel::ValueType GetValue();
-
     ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> GetDetails();
-    void SetDetails(::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details);
+    void SetDetails(const ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> &details);
     ::taihe::optional<::taihe::array<uint8_t>> GetRawData();
-    void SetRawData(::taihe::array_view<uint8_t> rawData);
+    void SetRawData(const ::taihe::array_view<uint8_t> &rawData);
     int64_t GetInner();
 
     std::shared_ptr<SystemDefinedPixelMap> value_;

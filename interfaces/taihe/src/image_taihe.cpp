@@ -15,6 +15,7 @@
 
 #include "image_taihe.h"
 #include "taihe_common_utils.h"
+
 namespace OHOS {
 namespace UDMF {
 ImageTaihe::ImageTaihe()
@@ -37,7 +38,7 @@ ImageTaihe::ImageTaihe()
     return ::taihe::string(this->value_->GetUri());
 }
 
-void ImageTaihe::SetUri(::taihe::string_view uri)
+void ImageTaihe::SetUri(const ::taihe::string_view &uri)
 {
     std::string uriStr(uri);
     this->value_->SetUri(uriStr);
@@ -49,7 +50,7 @@ void ImageTaihe::SetUri(::taihe::string_view uri)
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void ImageTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void ImageTaihe::SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details)
 {
     if (details.size() == 0) {
         return;
@@ -63,7 +64,7 @@ void ImageTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> 
     return ::taihe::string(this->value_->GetUri());
 }
 
-void ImageTaihe::SetImageUri(::taihe::string_view imageUri)
+void ImageTaihe::SetImageUri(const ::taihe::string_view &imageUri)
 {
     std::string imageUriStr(imageUri);
     this->value_->SetUri(imageUriStr);

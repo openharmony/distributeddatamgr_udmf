@@ -15,6 +15,7 @@
 
 #include "defined_record_taihe.h"
 #include "taihe_common_utils.h"
+
 namespace OHOS {
 namespace UDMF {
 SystemDefinedRecordTaihe::SystemDefinedRecordTaihe()
@@ -39,7 +40,7 @@ SystemDefinedRecordTaihe::SystemDefinedRecordTaihe()
 }
 
 void SystemDefinedRecordTaihe::SetDetails(
-    ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> details)
+    const::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> &details)
 {
     UDDetails udmfDetails = ConvertUDDetailsToUnion(details);
     this->value_->SetDetails(udmfDetails);

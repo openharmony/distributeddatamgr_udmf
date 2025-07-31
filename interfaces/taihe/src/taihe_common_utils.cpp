@@ -12,13 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #define LOG_TAG "UDMF_TAIHE_COMMON_UTILS_H"
-#include "taihe_common_utils.h"
 
 #include "ani_common_want.h"
+#include "logger.h"
 #include "pixel_map_taihe_ani.h"
 #include "taihe/runtime.hpp"
-#include "logger.h"
+#include "taihe_common_utils.h"
+
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
 namespace UDMF {
@@ -32,7 +34,7 @@ OHOS::UDMF::Intention ConvertIntention(::taiheChannel::Intention value)
     }
 }
 
-ValueType ConvertValueType(ani_env *env, ::taihe::string_view type,
+ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,
     ::taiheChannel::ValueType const& value)
 {
     ValueType valueType = nullptr;
@@ -121,7 +123,7 @@ ValueType ConvertValueType(ani_env *env, ::taihe::string_view type,
     return ::taiheChannel::ValueType::make_nullType();
 }
 
-UDDetails ConvertUDDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+UDDetails ConvertUDDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details)
 {
     UDDetails udmfDetails;
     for (auto &item : details) {

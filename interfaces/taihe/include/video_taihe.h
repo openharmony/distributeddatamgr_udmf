@@ -29,13 +29,12 @@ public:
 
     ::taihe::string GetType();
     ::taiheChannel::ValueType GetValue();
-
     ::taihe::string GetUri();
-    void SetUri(::taihe::string_view uri);
+    void SetUri(const ::taihe::string_view &uri);
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
-    void SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details);
+    void SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details);
     ::taihe::string GetVideoUri();
-    void SetVideoUri(::taihe::string_view videoUri);
+    void SetVideoUri(const ::taihe::string_view &videoUri);
     int64_t GetInner();
 
     std::shared_ptr<Video> value_;

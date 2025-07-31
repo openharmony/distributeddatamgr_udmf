@@ -28,11 +28,8 @@ public:
     UnifiedDataTaihe();
 
     void AddRecord(::taiheChannel::AllRecords const& unifiedRecord);
-
     ::taihe::array<::taiheChannel::AllRecords> GetRecords();
-
     ::taiheChannel::AllRecords GetRecord(std::shared_ptr<UnifiedRecord> in);
-
     int64_t GetInner();
 
     std::shared_ptr<UnifiedData> value_;

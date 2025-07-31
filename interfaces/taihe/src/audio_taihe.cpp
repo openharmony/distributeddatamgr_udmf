@@ -38,7 +38,7 @@ AudioTaihe::AudioTaihe()
     return ::taihe::string(this->value_->GetUri());
 }
 
-void AudioTaihe::SetUri(::taihe::string_view uri)
+void AudioTaihe::SetUri(const ::taihe::string_view &uri)
 {
     std::string uriStr(uri);
     this->value_->SetUri(uriStr);
@@ -50,7 +50,7 @@ void AudioTaihe::SetUri(::taihe::string_view uri)
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void AudioTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void AudioTaihe::SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details)
 {
     if (details.size() == 0) {
         return;
@@ -64,7 +64,7 @@ void AudioTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> 
     return ::taihe::string(this->value_->GetUri());
 }
 
-void AudioTaihe::SetAudioUri(::taihe::string_view audioUri)
+void AudioTaihe::SetAudioUri(const ::taihe::string_view &audioUri)
 {
     std::string audioUriStr(audioUri);
     this->value_->SetUri(audioUriStr);

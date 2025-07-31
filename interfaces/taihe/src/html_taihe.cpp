@@ -15,6 +15,7 @@
 
 #include "html_taihe.h"
 #include "taihe_common_utils.h"
+
 namespace OHOS {
 namespace UDMF {
 HtmlTaihe::HtmlTaihe()
@@ -38,7 +39,7 @@ HtmlTaihe::HtmlTaihe()
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
-void HtmlTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> details)
+void HtmlTaihe::SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details)
 {
     if (details.size() == 0) {
         return;
@@ -47,7 +48,7 @@ void HtmlTaihe::SetDetails(::taihe::map_view<::taihe::string, ::taihe::string> d
     this->value_->SetDetails(udmfDetails);
 }
 
-void HtmlTaihe::SetHtmlContent(::taihe::string_view htmlContent)
+void HtmlTaihe::SetHtmlContent(const ::taihe::string_view &htmlContent)
 {
     std::string content(htmlContent);
     this->value_->SetHtmlContent(content);
@@ -58,7 +59,7 @@ void HtmlTaihe::SetHtmlContent(::taihe::string_view htmlContent)
     return ::taihe::string(this->value_->GetHtmlContent());
 }
 
-void HtmlTaihe::SetPlainContent(::taihe::string_view plainContent)
+void HtmlTaihe::SetPlainContent(const ::taihe::string_view &plainContent)
 {
     std::string content(plainContent);
     this->value_->SetPlainContent(content);

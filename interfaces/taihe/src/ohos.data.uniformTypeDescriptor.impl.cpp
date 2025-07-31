@@ -13,14 +13,13 @@
  * limitations under the License.
  */
 
-#include "ohos.data.uniformTypeDescriptor.impl.hpp"
-
 #include "napi_error_utils.h"
+#include "ohos.data.uniformTypeDescriptor.impl.hpp"
 #include "ohos.data.uniformTypeDescriptor.proj.hpp"
 #include "stdexcept"
+#include "taihe_common_utils.h"
 #include "taihe/runtime.hpp"
 #include "utd_client.h"
-#include "taihe_common_utils.h"
 
 using namespace taihe;
 using namespace ohos::data::uniformTypeDescriptor;
@@ -28,7 +27,7 @@ using namespace ohos::data::uniformTypeDescriptor;
 namespace OHOS {
 namespace UDMF {
 
-::taihe::string GetUniformDataTypeByFilenameExtension(::taihe::string_view filenameExtension,
+::taihe::string GetUniformDataTypeByFilenameExtension(const ::taihe::string_view &filenameExtension,
     ::taihe::optional_view<::taihe::string> belongsTo)
 {
     std::string fileName(filenameExtension);
