@@ -727,6 +727,38 @@ bool UnifiedDataUtils::IsValidOptionsNonDrag(UnifiedKey &key, const std::string 
     return false;
 }
 
+std::string UnifiedDataUtils::GetBelongsToFileType(const std::string &utdId)
+{
+    if (utdId.empty() || utdId == "general.html" || utdId == "general.plain-text") {
+        LOG_ERROR(UDMF_FRAMEWORK, "The utdId is empty or the utdId is general.html or general.plain-text");
+        return "";
+    }
+    std::shared_ptr<TypeDescriptor> descriptor;
+    UtdClient::GetInstance().GetTypeDescriptor(utdId, descriptor);
+    if (descriptor == nullptr) {
+        LOG_INFO(UDMF_FRAMEWORK, "The descriptor is null");
+        return "";
+    }
+    for (const auto &type : FILE_SUB_TYPES) {
+        bool isSpecificType = false;
+        descriptor->BelongsTo(type, isSpecificType);
+        if (isSpecificType) {
+            return type;
+        }
+    }
+    if (!descriptor->GetFilenameExtensions().empty()) {
+        LOG_INFO(UDMF_FRAMEWORK, "The type descriptor has file extensions");
+        return "general.file";
+    }
+    LOG_INFO(UDMF_FRAMEWORK, "Return empty");
+    return "";
+}
+
+bool UnifiedDataUtils::IsFilterFileType(const std::string &type)
+{
+    return std::find(FILE_SUB_TYPES.begin(), FILE_SUB_TYPES.end(), type) != FILE_SUB_TYPES.end();
+}
+
 std::shared_ptr<Object> ObjectUtils::ConvertToObject(UDDetails &details)
 {
     Object object;
