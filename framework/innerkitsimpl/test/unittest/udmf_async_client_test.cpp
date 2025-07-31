@@ -779,4 +779,57 @@ HWTEST_F(UdmfAsyncClientTest, CancelOnSingleTask003, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "CancelOnSingleTask003 end.");
 }
+
+HWTEST_F(UdmfAsyncClientTest, UpdateOnSameProgressAfterInterval, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "UpdateOnSameProgressAfterInterval begin.");
+    std::string businessUdKey = "udmf://a/b/c";
+    GetDataParams params;
+    params.progressIndicator = ProgressIndicator::DEFAULT;
+    params.query.key = businessUdKey;
+    UdmfAsyncClient::GetInstance().RegisterAsyncHelper(params);
+    std::thread pushThread([&]() {
+        auto &asyncHelper = UdmfAsyncClient::GetInstance().asyncHelperMap_.at(businessUdKey);
+        for (uint32_t i = 0; i < 10; ++i) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            ProgressInfo sameProgress;
+            sameProgress.progress = 20;
+            asyncHelper->progressQueue.PushBack(sameProgress);
+        }
+        auto processKey = asyncHelper->processKey;
+        std::vector<UnifiedData> unifiedDataSet;
+        QueryOption query;
+        query.key = processKey;
+        auto ret = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+        EXPECT_EQ(ret, E_OK);
+        ASSERT_EQ(unifiedDataSet.size(), 1);
+        auto record = unifiedDataSet[0].GetRecordAt(0);
+        EXPECT_EQ(record->GetType(), UDType::PLAIN_TEXT);
+        auto plainText = std::static_pointer_cast<PlainText>(record);
+        auto ts1 = plainText->GetAbstract();
+        for (uint32_t i = 0; i < 30; ++i) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            ProgressInfo sameProgress;
+            sameProgress.progress = 20;
+            asyncHelper->progressQueue.PushBack(sameProgress);
+        }
+        unifiedDataSet.clear();
+        ret = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+        EXPECT_EQ(ret, E_OK);
+        ASSERT_EQ(unifiedDataSet.size(), 1);
+        record = unifiedDataSet[0].GetRecordAt(0);
+        EXPECT_EQ(record->GetType(), UDType::PLAIN_TEXT);
+        plainText = std::static_pointer_cast<PlainText>(record);
+        auto ts2 = plainText->GetAbstract();
+        EXPECT_TRUE(ts2 > ts1);
+        ProgressInfo sameProgress;
+        sameProgress.progress = 100;
+        asyncHelper->progressQueue.PushBack(sameProgress);
+    });
+    auto ret = UdmfAsyncClient::GetInstance().ProgressTask(businessUdKey);
+    EXPECT_EQ(ret, E_OK);
+    pushThread.join();
+    LOG_INFO(UDMF_TEST, "UpdateOnSameProgressAfterInterval end.");
+}
+
 } // OHOS::Test

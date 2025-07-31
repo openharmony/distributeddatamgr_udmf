@@ -51,6 +51,7 @@ private:
     Status Clear(const std::string &businessUdKey);
     Status ProcessUnifiedData(std::unique_ptr<AsyncHelper> &asyncHelper);
     bool IsParamValid(const GetDataParams &params);
+    uint64_t GetCurrentTimeMillis();
 
     std::map<std::string, std::unique_ptr<AsyncHelper>> asyncHelperMap_;
     std::mutex mutex_;
