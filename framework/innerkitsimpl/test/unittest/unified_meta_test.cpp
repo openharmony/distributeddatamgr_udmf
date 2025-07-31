@@ -584,6 +584,11 @@ HWTEST_F(UnifiedMetaTest, IsValidQuery001, TestSize.Level1)
     EXPECT_FALSE(ret5);
 }
 
+/**
+* @tc.name: IsValidOptions002
+* @tc.desc: Abnormal testcase of IsValidOptions, intention is empty
+* @tc.type: FUNC
+*/
 HWTEST_F(UnifiedMetaTest, IsValidOptions002, TestSize.Level1)
 {
     UnifiedKey key;
