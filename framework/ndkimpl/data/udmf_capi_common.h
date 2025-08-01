@@ -54,11 +54,11 @@ struct OH_Utd {
     const int64_t cid = UTD_STRUCT_ID;
     std::mutex mutex;
     std::string typeId;
-    const char** belongingToTypes {nullptr};
+    const char **belongingToTypes {nullptr};
     unsigned int belongingToTypesCount {0};
-    const char** filenameExtensions {nullptr};
+    const char **filenameExtensions {nullptr};
     unsigned int filenameExtensionsCount {0};
-    const char** mimeTypes {nullptr};
+    const char **mimeTypes {nullptr};
     unsigned int mimeTypeCount {0};
     std::string description;
     std::string referenceURL;

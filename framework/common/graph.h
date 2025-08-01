@@ -26,12 +26,12 @@ namespace OHOS {
 namespace UDMF {
 struct EdgeNode {
     uint32_t adjIndex {0};
-    EdgeNode* next {nullptr};
+    EdgeNode *next {nullptr};
 };
 
 struct VertexNode {
     uint32_t value {0};
-    EdgeNode* firstEdge {nullptr};
+    EdgeNode *firstEdge {nullptr};
 };
 class Graph {
 public:
