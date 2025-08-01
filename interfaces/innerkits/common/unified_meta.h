@@ -541,9 +541,9 @@ enum UDType : int32_t {
 };
 
 struct UtdType {
-    int32_t UtdEnum;
-    const char *UtdEnumName;
-    const char *UtdId;
+    int32_t UtdEnum {0};
+    const char *UtdEnumName {nullptr};
+    const char *UtdId {nullptr};
 };
 
 namespace UtdUtils {
@@ -593,7 +593,7 @@ static const std::map<int32_t, std::string> JS_UD_INTENTION_NAME_MAP {
 };
 
 enum Visibility : int32_t {
-    VISIBILITY_ALL,
+    VISIBILITY_ALL = 0,
     VISIBILITY_OWN_PROCESS,
     VISIBILITY_BUTT,
 };
@@ -604,7 +604,7 @@ static const std::map<int32_t, std::string> UD_VISIBILITY_MAP {
 };
 
 enum Uds_Type : int32_t {
-    UDS_PLAIN_TEXT,
+    UDS_PLAIN_TEXT = 0,
     UDS_HYPERLINK,
     UDS_HTML,
     UDS_APP_ITEM,
@@ -627,15 +627,15 @@ static const std::map<std::string, Uds_Type> UDS_UTD_TYPE_MAP {
 };
 
 enum ShareOptions : int32_t {
-    IN_APP,
+    IN_APP = 0,
     CROSS_APP,
     CROSS_DEVICE,
     SHARE_OPTIONS_BUTT,
 };
 
 struct AppShareOption {
-    int32_t enumNum;
-    const char *enumStr;
+    int32_t enumNum {0};
+    const char *enumStr {nullptr};
 };
 
 namespace ShareOptionsUtil {
@@ -680,7 +680,7 @@ struct Object {
         return false;
     }
 
-    std::map<std::string, ValueType> value_;
+    std::map<std::string, ValueType> value_ {};
 };
 
 namespace ObjectUtils {

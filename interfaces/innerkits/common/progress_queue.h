@@ -39,7 +39,7 @@ public:
 private:
     bool cancelFlag_ = false;
     bool clearableFlag_ = true;
-    std::queue<ProgressInfo> queue_;
+    std::queue<ProgressInfo> queue_ {};
     mutable std::mutex mutex_;
 };
 

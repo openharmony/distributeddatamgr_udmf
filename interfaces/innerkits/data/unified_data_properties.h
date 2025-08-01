@@ -24,8 +24,8 @@ public:
     std::string tag;
     AAFwk::WantParams extras;
     ShareOptions shareOptions = CROSS_DEVICE;
-    std::int64_t timestamp;
-    bool isRemote;
+    std::int64_t timestamp {0};
+    bool isRemote {false};
 };
 } // namespace UDMF
 } // namespace OHOS

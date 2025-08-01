@@ -35,7 +35,7 @@ public:
     void InitObject() override;
 
 protected:
-    UDDetails details_;
+    UDDetails details_ {};
 };
 } // namespace UDMF
 } // namespace OHOS

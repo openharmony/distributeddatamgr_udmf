@@ -36,7 +36,7 @@ private:
     std::shared_ptr<Media::PixelMap> GetPixelMapFromRawData();
     void ParseInfoFromPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
 
-    std::vector<uint8_t> rawData_;
+    std::vector<uint8_t> rawData_ {};
 };
 } // namespace UDMF
 } // namespace OHOS

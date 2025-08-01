@@ -38,7 +38,7 @@ public:
     void InitObject() override;
 protected:
     std::string applicationDefinedType;
-    std::vector<uint8_t> rawData_;
+    std::vector<uint8_t> rawData_ {};
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -64,12 +64,12 @@ private:
     bool TryReloadCustomUtd();
     bool IsBelongingType(const std::string &belongsTo, const std::string &typeId) const;
 
-    std::vector<TypeDescriptorCfg> descriptorCfgs_;
+    std::vector<TypeDescriptorCfg> descriptorCfgs_ {};
     std::shared_mutex utdMutex_;
 
     std::mutex customUtdMutex_;
-    UtdFileInfo utdFileInfo_{0};
-    int64_t lastLoadTime_{0};
+    UtdFileInfo utdFileInfo_;
+    int64_t lastLoadTime_ {0};
 };
 } // namespace UDMF
 } // namespace OHOS

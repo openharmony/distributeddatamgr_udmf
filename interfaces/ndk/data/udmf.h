@@ -63,7 +63,7 @@ typedef enum Udmf_Intention {
     /**
      * @brief The intention is drag.
      */
-    UDMF_INTENTION_DRAG,
+    UDMF_INTENTION_DRAG = 0,
     /**
      * @brief The intention is pasteboard.
      */
@@ -103,7 +103,7 @@ typedef enum Udmf_ShareOption {
     /**
      * @brief Invalid share option.
      */
-    SHARE_OPTIONS_INVALID,
+    SHARE_OPTIONS_INVALID = 0,
     /**
      * @brief Allowed to be used in the same application on this device.
      */
@@ -155,7 +155,7 @@ typedef enum Udmf_Visibility {
     /**
      * @brief The visibility level that specifies that any hap or native can be obtained.
      */
-    UDMF_ALL,
+    UDMF_ALL = 0,
 
     /**
      * @brief The visibility level that specifies that only data providers can be obtained.

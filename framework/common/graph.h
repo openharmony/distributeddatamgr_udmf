@@ -25,13 +25,13 @@
 namespace OHOS {
 namespace UDMF {
 struct EdgeNode {
-    uint32_t adjIndex;
-    EdgeNode* next;
+    uint32_t adjIndex {0};
+    EdgeNode* next {nullptr};
 };
 
 struct VertexNode {
-    uint32_t value;
-    EdgeNode* firstEdge;
+    uint32_t value {0};
+    EdgeNode* firstEdge {nullptr};
 };
 class Graph {
 public:
@@ -46,10 +46,10 @@ public:
     int32_t GetIndex(const std::string &node);
     bool IsDAG();
 private:
-    uint32_t vertexNum_;
-    std::vector<VertexNode> adjList_;  // Adjacency List
-    std::vector<uint32_t> visited_;    // Determine whether the vertex has been accessed, index=vertex value
-    std::map<std::string, uint32_t> typeIdIndex_;
+    uint32_t vertexNum_ {0};
+    std::vector<VertexNode> adjList_ {};  // Adjacency List
+    std::vector<uint32_t> visited_ {};    // Determine whether the vertex has been accessed, index=vertex value
+    std::map<std::string, uint32_t> typeIdIndex_ {};
 };
 } // namespace UDMF
 } // namespace OHOS

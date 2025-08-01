@@ -53,7 +53,7 @@ private:
     bool IsParamValid(const GetDataParams &params);
     uint64_t GetCurrentTimeMillis();
 
-    std::map<std::string, std::unique_ptr<AsyncHelper>> asyncHelperMap_;
+    std::map<std::string, std::unique_ptr<AsyncHelper>> asyncHelperMap_{};
     std::mutex mutex_;
 };
 } // namespace
