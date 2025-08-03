@@ -33,25 +33,25 @@ enum DataStatus : int32_t {
 };
 
 struct Summary {
-    std::map<std::string, int64_t> summary;
-    std::map<std::string, int64_t> specificSummary;
-    std::map<std::string, std::vector<int32_t>> summaryFormat;
+    std::map<std::string, int64_t> summary {};
+    std::map<std::string, int64_t> specificSummary {};
+    std::map<std::string, std::vector<int32_t>> summaryFormat {};
     // If version value is 1, it means it contains the format variable;
     // otherwise(not set or 0), it means it does not contain.
-    int32_t version;
-    int64_t totalSize;
+    int32_t version {1};
+    int64_t totalSize {0};
 };
 
 struct Privilege {
-    uint32_t tokenId;
+    uint32_t tokenId {0};
     std::string readPermission;
     std::string writePermission;
 };
 
 struct Runtime {
     UnifiedKey key;
-    bool isPrivate {};
-    std::vector<Privilege> privileges;
+    bool isPrivate {false};
+    std::vector<Privilege> privileges{};
     // time when the data is created
     time_t createTime {};
     // name of the package for creating data
@@ -59,15 +59,15 @@ struct Runtime {
     // current data status
     DataStatus dataStatus { WORKING };
     // current data version
-    std::int32_t dataVersion {};
+    std::int32_t dataVersion {0};
     // time when the data is last modified
     time_t lastModifiedTime {};
     // time when data is written to the udmf
     std::string createPackage;
     // device ID of the data source
     std::string deviceId;
-    std::uint32_t recordTotalNum {};
-    uint32_t tokenId;
+    std::uint32_t recordTotalNum {0};
+    uint32_t tokenId {0};
     std::string sdkVersion;
     Visibility visibility {};
     std::string appId;
@@ -88,7 +88,7 @@ struct CustomOption {
 struct QueryOption {
     std::string key;
     Intention intention {};
-    uint32_t  tokenId {};
+    uint32_t tokenId {0};
 };
 
 enum AsyncTaskStatus : uint32_t {
@@ -111,8 +111,8 @@ struct AsyncProcessInfo {
 };
 
 struct ProgressInfo {
-    int32_t progress = 0;
-    int32_t progressStatus;
+    int32_t progress {0};
+    int32_t progressStatus {0};
     Status errorCode;
     std::string srcDevName;
 };
@@ -126,8 +126,8 @@ struct UriInfo {
 
 struct DataLoadInfo {
     std::string sequenceKey;
-    std::set<std::string> types;
-    uint32_t recordCount;
+    std::set<std::string> types {};
+    uint32_t recordCount {0};
 };
 
 using LoadHandler = std::function<void(const std::string &udKey, const DataLoadInfo &dataLoadInfo)>;
@@ -138,7 +138,7 @@ struct DataLoadParams {
 };
 
 struct DelayGetDataInfo {
-    uint32_t tokenId;
+    uint32_t tokenId {0};
 #ifndef CROSS_PLATFORM
     sptr<IRemoteObject> dataCallback;
 #endif

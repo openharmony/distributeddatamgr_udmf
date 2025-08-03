@@ -72,7 +72,7 @@ private:
     uint32_t recordId_ = 0;
     std::string channelName_;
     std::shared_ptr<Runtime> runtime_;
-    std::vector<std::shared_ptr<UnifiedRecord>> records_;
+    std::vector<std::shared_ptr<UnifiedRecord>> records_ {};
     std::shared_ptr<UnifiedDataProperties> properties_;
     std::string sdkVersion_;
 };

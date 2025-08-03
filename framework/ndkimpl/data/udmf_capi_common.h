@@ -54,12 +54,12 @@ struct OH_Utd {
     const int64_t cid = UTD_STRUCT_ID;
     std::mutex mutex;
     std::string typeId;
-    const char** belongingToTypes{nullptr};
-    unsigned int belongingToTypesCount{0};
-    const char** filenameExtensions{nullptr};
-    unsigned int filenameExtensionsCount{0};
-    const char** mimeTypes{nullptr};
-    unsigned int mimeTypeCount{0};
+    const char **belongingToTypes {nullptr};
+    unsigned int belongingToTypesCount {0};
+    const char **filenameExtensions {nullptr};
+    unsigned int filenameExtensionsCount {0};
+    const char **mimeTypes {nullptr};
+    unsigned int mimeTypeCount {0};
     std::string description;
     std::string referenceURL;
     std::string iconFile;
@@ -93,21 +93,21 @@ struct OH_UdsContentForm : public UdsObject {
 struct OH_UdmfRecord {
     const int64_t cid = UDMF_UNIFIED_RECORD_STRUCT_ID;
     std::shared_ptr<OHOS::UDMF::UnifiedRecord> record_;
-    unsigned char *recordData{nullptr};
-    unsigned int recordDataLen{0};
-    char **typesArray{nullptr};
-    unsigned int typesCount{0};
-    char *lastType{nullptr};
+    unsigned char *recordData {nullptr};
+    unsigned int recordDataLen {0};
+    char **typesArray {nullptr};
+    unsigned int typesCount {0};
+    char *lastType {nullptr};
     std::mutex mutex;
 };
 
 struct OH_UdmfData {
     const int64_t cid = UDMF_UNIFIED_DATA_STRUCT_ID;
     std::shared_ptr<OHOS::UDMF::UnifiedData> unifiedData_;
-    char **typesArray{nullptr};
-    unsigned int typesCount{0};
-    OH_UdmfRecord **records{nullptr};
-    unsigned int recordsCount{0};
+    char **typesArray {nullptr};
+    unsigned int typesCount {0};
+    OH_UdmfRecord **records {nullptr};
+    unsigned int recordsCount {0};
     std::mutex mutex;
 };
 
@@ -124,9 +124,9 @@ struct OH_Udmf_ProgressInfo {
 };
 
 struct OH_UdmfDataLoadInfo {
-    char **typesArray{nullptr};
-    unsigned int typesCount{0};
-    unsigned int recordsCount{0};
+    char **typesArray {nullptr};
+    unsigned int typesCount {0};
+    unsigned int recordsCount {0};
 };
 
 struct OH_UdmfGetDataParams {

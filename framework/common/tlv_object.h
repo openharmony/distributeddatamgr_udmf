@@ -26,8 +26,8 @@ namespace OHOS {
 namespace UDMF {
 #pragma pack(1)
 struct TLVHead {
-    uint16_t tag;
-    uint32_t len;
+    uint16_t tag {0};
+    uint32_t len {0};
     std::uint8_t value[0];
 };
 #pragma pack()
@@ -83,10 +83,10 @@ private:
     void PrepareBufferForFile(size_t size);
     std::uint8_t *GetStartCursor();
 
-    std::size_t total_ = 0;
-    std::size_t cursor_ = 0;
-    std::vector<std::uint8_t> *buffer_;
-    std::FILE *file_ = nullptr;
+    std::size_t total_ {0};
+    std::size_t cursor_ {0};
+    std::vector<std::uint8_t> *buffer_ {nullptr};
+    std::FILE *file_ {nullptr};
 };
 
 template <typename T> size_t TLVObject::CountBasic(const T &value)

@@ -33,7 +33,7 @@ public:
     OH_UdmfRecordProvider* GetInnerProvider();
     ValueType GetValueByType(const std::string &utdId) override;
 private:
-    OH_UdmfRecordProvider* innerProvider_;
+    OH_UdmfRecordProvider* innerProvider_ {nullptr};
 };
 
 } // namespace UDMF

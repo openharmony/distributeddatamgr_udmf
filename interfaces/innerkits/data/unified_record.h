@@ -91,7 +91,7 @@ private:
     
     std::string uid_; // unique identifier
     std::shared_ptr<std::map<std::string, ValueType>> entries_ = std::make_shared<std::map<std::string, ValueType>>();
-    std::vector<UriInfo> uris_;
+    std::vector<UriInfo> uris_ {};
     uint32_t dataId_ = 0;
     uint32_t recordId_ = 0;
     std::string channelName_;

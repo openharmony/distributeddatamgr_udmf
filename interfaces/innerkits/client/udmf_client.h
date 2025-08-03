@@ -64,7 +64,7 @@ private:
     void ProcessDragIfInApp(UnifiedData &unifiedData, std::string &intentionDrag, std::string &key);
     bool CheckFileUtdType(const Summary &summary, const std::vector<std::string> &allowTypes);
 
-    ConcurrentMap<std::string, UnifiedData> dataCache_;
+    ConcurrentMap<std::string, UnifiedData> dataCache_ {};
 };
 } // namespace UDMF
 } // namespace OHOS

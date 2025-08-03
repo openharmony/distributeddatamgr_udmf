@@ -49,9 +49,9 @@ private:
     bool CmpFlexibleTypeLevel(const std::string higherLevelTypeId, bool isFlexibleType);
 
     std::string typeId_;
-    std::vector<std::string> belongingToTypes_;
-    std::vector<std::string> filenameExtensions_;
-    std::vector<std::string> mimeTypes_;
+    std::vector<std::string> belongingToTypes_ {};
+    std::vector<std::string> filenameExtensions_ {};
+    std::vector<std::string> mimeTypes_ {};
     std::string description_;
     std::string referenceURL_;
     std::string iconFile_;

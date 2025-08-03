@@ -26,14 +26,14 @@ struct TypeDescriptorCfg;
 using CustomUtdCfgs = std::pair<std::vector<TypeDescriptorCfg>, std::vector<TypeDescriptorCfg>>;
 struct TypeDescriptorCfg {
     std::string typeId;
-    std::vector<std::string> belongingToTypes;
-    std::vector<std::string> filenameExtensions;
-    std::vector<std::string> mimeTypes;
+    std::vector<std::string> belongingToTypes {};
+    std::vector<std::string> filenameExtensions {};
+    std::vector<std::string> mimeTypes {};
     std::string description;
     std::string referenceURL;
     std::string iconFile;
     std::string ownerBundle;
-    std::set<std::string> installerBundles;
+    std::set<std::string> installerBundles {};
 
     bool operator==(const TypeDescriptorCfg &typeDescriptor) const
     {
@@ -42,8 +42,8 @@ struct TypeDescriptorCfg {
 };
 
 struct UtdFileInfo {
-    uint64_t size;
-    int64_t lastTime;
+    uint64_t size = 0;
+    int64_t lastTime = 0;
 };
 
 // UTD data category

@@ -31,7 +31,7 @@ private:
     PresetTypeDescriptors(const PresetTypeDescriptors &obj) = delete;
     PresetTypeDescriptors &operator=(const PresetTypeDescriptors &obj) = delete;
     void InitDescriptors();
-    std::vector<TypeDescriptorCfg> typeDescriptors_;
+    std::vector<TypeDescriptorCfg> typeDescriptors_ {};
     mutable std::recursive_mutex mutex_;
 };
 } // namespace UDMF
