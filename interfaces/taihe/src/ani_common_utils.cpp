@@ -69,17 +69,17 @@ ani_object CreateDouble(ani_env *env, double value)
     ani_class doubleCls;
     ani_status status = ANI_ERROR;
     if ((status = env->FindClass(CLASSNAME_DOUBLE, &doubleCls)) != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "status : %{public}d", status);
+        LOG_ERROR(UDMF_ANI, "FindClass status : %{public}d", status);
         return nullptr;
     }
     ani_method doubleCtor;
     if ((status = env->Class_FindMethod(doubleCls, "<ctor>", "d:", &doubleCtor)) != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "status : %{public}d", status);
+        LOG_ERROR(UDMF_ANI, "Class_FindMethod status : %{public}d", status);
         return nullptr;
     }
     ani_object doubleObj;
     if ((status = env->Object_New(doubleCls, doubleCtor, &doubleObj, static_cast<ani_double>(value))) != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "status : %{public}d", status);
+        LOG_ERROR(UDMF_ANI, "Object_New status : %{public}d", status);
         return nullptr;
     }
     return doubleObj;
