@@ -169,17 +169,17 @@ ani_object AniConverter::WrapSummary(ani_env *env, std::shared_ptr<Summary> summ
         LOG_ERROR(UDMF_ANI, "Create object fail");
         return obj;
     }
-    ani_ref doubleObj = CreateDouble(env, summary->totalSize);
+    ani_object doubleObj = CreateDouble(env, summary->totalSize);
     if (doubleObj == nullptr) {
         LOG_ERROR(UDMF_ANI, "CreateDouble faild");
         return nullptr;
     }
     ani_double param_value;
-    if (ANI_OK ! == env->Object_CallMethodByName_Double(doubleObj, "unboxed", ":D", &param_value)) {
+    if (ANI_OK != env->Object_CallMethodByName_Double(doubleObj, "unboxed", ":D", &param_value)) {
         LOG_ERROR(UDMF_ANI, "Unbox Double failed");
         return nullptr;
     }
-    if (ANI_OK ! == env->Object_SetFieldByName_Double(obj, "totalSize", param_value)) {
+    if (ANI_OK != env->Object_SetFieldByName_Double(obj, "totalSize", param_value)) {
         LOG_ERROR(UDMF_ANI, "Set Field failed");
         return nullptr;
     }
