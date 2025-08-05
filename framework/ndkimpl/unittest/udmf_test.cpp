@@ -43,6 +43,7 @@ using namespace OHOS::Security::AccessToken;
 using namespace OHOS::UDMF;
 
 namespace OHOS::Test {
+static constexpr uint64_t MAX_TYPES_COUNT = 10 * 1024;
 class UDMFTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -1399,7 +1400,7 @@ HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider001, TestSize.Level1)
 
 /**
  * @tc.name: OH_UdmfRecord_SetProvider002
- * @tc.desc: invalid parameters testcase of OH_UdmfRecord_SetProvider
+ * @tc.desc: valid parameters testcase of OH_UdmfRecord_SetProvider
  * @tc.type: FUNC
  */
 HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider002, TestSize.Level1)
@@ -1418,6 +1419,39 @@ HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider002, TestSize.Level1)
 
     int res = OH_UdmfRecord_SetProvider(record, types, 3, provider);
     EXPECT_EQ(res, UDMF_E_OK);
+    OH_UdmfRecordProvider_Destroy(provider);
+}
+
+/**
+ * @tc.name: OH_UdmfRecord_SetProvider003
+ * @tc.desc: invalid parameters testcase of OH_UdmfRecord_SetProvider
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider003, TestSize.Level1)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
+    char content[] = "hello world";
+    OH_UdsPlainText_SetContent(plainText, content);
+    OH_UdmfRecord_AddPlainText(record, plainText);
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    EXPECT_NE(provider, nullptr);
+    int num = 1;
+    void* context = &num;
+    OH_UdmfRecordProvider_SetData(provider, context, GetDataCallbackFunc, FinalizeFunc);
+    const char* types[3] = { "general.plain-text", "general.hyperlink", "general.html" };
+
+    int res = OH_UdmfRecord_SetProvider(record, types, MAX_TYPES_COUNT + 1, provider);
+    EXPECT_EQ(res, UDMF_E_INVALID_PARAM);
+
+    res = OH_UdmfRecord_SetProvider(record, types, 0, provider);
+    EXPECT_EQ(res, UDMF_E_INVALID_PARAM);
+
+    res = OH_UdmfRecord_SetProvider(record, nullptr, MAX_TYPES_COUNT + 1, provider);
+    EXPECT_EQ(res, UDMF_E_INVALID_PARAM);
+
+    res = OH_UdmfRecord_SetProvider(record, types, 3, nullptr);
+    EXPECT_EQ(res, UDMF_E_INVALID_PARAM);
     OH_UdmfRecordProvider_Destroy(provider);
 }
 

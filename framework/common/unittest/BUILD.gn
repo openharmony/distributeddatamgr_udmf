@@ -25,6 +25,7 @@ config("module_private_config") {
     "${udmf_interfaces_path}/innerkits/data",
     "${udmf_framework_path}/common/unittest/mock/include",
     "${udmf_framework_path}/innerkitsimpl/client/",
+    "mock/",
   ]
 }
 
@@ -83,6 +84,31 @@ ohos_unittest("UdmfTypesUtilTest") {
   deps = common_deps
 
   external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("UdmfTypesUtilMockTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "mock/message_parcel_mock.cpp",
+    "udmf_types_util_mock_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  external_deps += [
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+  ]
 
   defines = [
     "private=public",
@@ -231,6 +257,7 @@ group("unittest") {
     ":EndianConverterTest",
     ":TlvUtilTest",
     ":UdmfTypesUtilAbnormalTest",
+    ":UdmfTypesUtilMockTest",
     ":UdmfTypesUtilTest",
     ":UtdCfgsCheckerTest",
   ]

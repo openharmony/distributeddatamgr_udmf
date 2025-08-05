@@ -43,6 +43,7 @@ using namespace OHOS::UDMF;
 
 static constexpr uint64_t MAX_RECORDS_COUNT = 4 * 1024 * 1024;
 static constexpr uint64_t MAX_KEY_STRING_LEN = 1 * 1024 * 1024;
+static constexpr uint64_t MAX_TYPES_COUNT = 10 * 1024;
 static const std::map<std::string, UDType> FILE_TYPES = {
     { UDMF_META_GENERAL_FILE, UDType::FILE },
     { UDMF_META_AUDIO, UDType::AUDIO },
@@ -1134,7 +1135,8 @@ int OH_UdmfRecordProvider_SetData(OH_UdmfRecordProvider* provider, void* context
 int OH_UdmfRecord_SetProvider(OH_UdmfRecord* record, const char* const* types, unsigned int count,
     OH_UdmfRecordProvider* provider)
 {
-    if (!IsUnifiedRecordValid(record) || types == nullptr || count == 0 || provider == nullptr) {
+    if (!IsUnifiedRecordValid(record) || types == nullptr || count == 0
+        || count > MAX_TYPES_COUNT || provider == nullptr) {
         return UDMF_E_INVALID_PARAM;
     }
     std::shared_ptr<DataProviderImpl> providerBox = std::make_shared<DataProviderImpl>();

@@ -22,6 +22,7 @@
 namespace OHOS {
 namespace ITypesUtil {
 using namespace UDMF;
+static constexpr int32_t NORMAL_MAX_PARCEL_SIZE = 128 * 1024 * 1024;
 template<>
 bool Marshalling(const UnifiedData &input, MessageParcel &parcel)
 {
@@ -42,9 +43,11 @@ bool Marshalling(const UnifiedData &input, MessageParcel &parcel)
 template<>
 bool Unmarshalling(UnifiedData &output, MessageParcel &parcel)
 {
+    auto dataSize = parcel.GetDataSize();
     auto size = parcel.ReadInt32();
-    if (size <= 0 || size > UnifiedData::MAX_DATA_SIZE) {
-        LOG_ERROR(UDMF_SERVICE, "UnifiedData is empty or too large!");
+    if (size <= 0 || size > UnifiedData::MAX_DATA_SIZE || dataSize > NORMAL_MAX_PARCEL_SIZE) {
+        LOG_ERROR(UDMF_SERVICE,
+            "UnifiedData is empty or too large, dataSize is %{public}d, size is %{public}d", dataSize, size);
         return false;
     }
     auto rawData = parcel.ReadRawData(size);
@@ -82,9 +85,11 @@ bool Marshalling(const std::vector<UnifiedData> &input, MessageParcel &parcel)
 template<>
 bool Unmarshalling(std::vector<UnifiedData> &output, MessageParcel &parcel)
 {
+    auto dataSize = parcel.GetDataSize();
     auto size = parcel.ReadInt32();
-    if (size <= 0 || size > UnifiedData::MAX_DATA_SIZE) {
-        LOG_ERROR(UDMF_SERVICE, "UnifiedDataSet is empty or too large!");
+    if (size <= 0 || size > UnifiedData::MAX_DATA_SIZE || dataSize > NORMAL_MAX_PARCEL_SIZE) {
+        LOG_ERROR(UDMF_SERVICE,
+            "UnifiedDataList is empty or too large, dataSize is %{public}d, size is %{public}d", dataSize, size);
         return false;
     }
     const uint8_t *rawData = reinterpret_cast<const uint8_t *>(parcel.ReadRawData(size));
@@ -111,6 +116,11 @@ bool Marshalling(const Summary &input, MessageParcel &parcel)
 template<>
 bool Unmarshalling(Summary &output, MessageParcel &parcel)
 {
+    auto dataSize = parcel.GetDataSize();
+    if (dataSize <= 0 || dataSize > NORMAL_MAX_PARCEL_SIZE) {
+        LOG_ERROR(UDMF_SERVICE, "UnifiedData is empty or too large, dataSize is %{public}d", dataSize);
+        return false;
+    }
     return ITypesUtil::Unmarshal(parcel, output.summary, output.totalSize, output.specificSummary,
         output.summaryFormat, output.version);
 }
@@ -124,6 +134,11 @@ bool Marshalling(const Privilege &input, MessageParcel &parcel)
 template<>
 bool Unmarshalling(Privilege &output, MessageParcel &parcel)
 {
+    auto size = parcel.GetDataSize();
+    if (size <= 0 || size > NORMAL_MAX_PARCEL_SIZE) {
+        LOG_ERROR(UDMF_SERVICE, "Privilege is empty or too large, dataSize is %{public}d", size);
+        return false;
+    }
     return ITypesUtil::Unmarshal(parcel, output.tokenId, output.readPermission, output.writePermission);
 }
 
@@ -136,6 +151,11 @@ bool Marshalling(const CustomOption &input, MessageParcel &parcel)
 template<>
 bool Unmarshalling(CustomOption &output, MessageParcel &parcel)
 {
+    auto size = parcel.GetDataSize();
+    if (size <= 0 || size > NORMAL_MAX_PARCEL_SIZE) {
+        LOG_ERROR(UDMF_SERVICE, "CustomOption is empty or too large, dataSize is %{public}d", size);
+        return false;
+    }
     return ITypesUtil::Unmarshal(parcel, output.intention, output.visibility);
 }
 
@@ -148,6 +168,11 @@ bool Marshalling(const QueryOption &input, MessageParcel &parcel)
 template<>
 bool Unmarshalling(QueryOption &output, MessageParcel &parcel)
 {
+    auto size = parcel.GetDataSize();
+    if (size <= 0 || size > NORMAL_MAX_PARCEL_SIZE) {
+        LOG_ERROR(UDMF_SERVICE, "QueryOption is empty or too large, dataSize is %{public}d", size);
+        return false;
+    }
     return ITypesUtil::Unmarshal(parcel, output.key, output.intention);
 }
 
@@ -161,6 +186,11 @@ bool Marshalling(const UDType &input, MessageParcel &parcel)
 template<>
 bool Unmarshalling(UDType &output, MessageParcel &parcel)
 {
+    auto size = parcel.GetDataSize();
+    if (size <= 0 || size > NORMAL_MAX_PARCEL_SIZE) {
+        LOG_ERROR(UDMF_FRAMEWORK, "UDType is empty or too large, dataSize is %{public}d", size);
+        return false;
+    }
     int32_t type;
     if (!ITypesUtil::Unmarshal(parcel, type)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal UDType failed!");
@@ -184,6 +214,11 @@ bool Marshalling(const Intention &input, MessageParcel &parcel)
 template<>
 bool Unmarshalling(Intention &output, MessageParcel &parcel)
 {
+    auto size = parcel.GetDataSize();
+    if (size <= 0 || size > NORMAL_MAX_PARCEL_SIZE) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Intention is empty or too large, dataSize is %{public}d", size);
+        return false;
+    }
     int32_t intention;
     if (!ITypesUtil::Unmarshal(parcel, intention)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal Intention failed!");
@@ -207,6 +242,11 @@ bool Marshalling(const Visibility &input, MessageParcel &parcel)
 template<>
 bool Unmarshalling(Visibility &output, MessageParcel &parcel)
 {
+    auto size = parcel.GetDataSize();
+    if (size <= 0 || size > NORMAL_MAX_PARCEL_SIZE) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Visibility is empty or too large, dataSize is %{public}d", size);
+        return false;
+    }
     int32_t visibility;
     if (!ITypesUtil::Unmarshal(parcel, visibility)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Unmarshal Visibility failed!");
@@ -232,6 +272,11 @@ bool Marshalling(const AsyncProcessInfo &input, MessageParcel &parcel)
 template<>
 bool Unmarshalling(AsyncProcessInfo &output, MessageParcel &parcel)
 {
+    auto size = parcel.GetDataSize();
+    if (size <= 0 || size > NORMAL_MAX_PARCEL_SIZE) {
+        LOG_ERROR(UDMF_FRAMEWORK, "AsyncProcessInfo is empty or too large, dataSize is %{public}d", size);
+        return false;
+    }
     uint32_t syncStatus;
     uint32_t permStatus;
     if (!ITypesUtil::Unmarshal(parcel, syncStatus, permStatus, output.srcDevName, output.syncFinished, output.syncTotal,
@@ -270,6 +315,12 @@ template<>
 bool Unmarshalling(DataLoadInfo &output, MessageParcel &parcel)
 {
     auto size = parcel.ReadInt32();
+    auto dataSize = parcel.GetDataSize();
+    if (size <= 0 || size > NORMAL_MAX_PARCEL_SIZE || dataSize > NORMAL_MAX_PARCEL_SIZE) {
+        LOG_ERROR(UDMF_SERVICE,
+            "DataLoadInfo is empty or too large, dataSize is %{public}d, size is %{public}d", dataSize, size);
+        return false;
+    }
     const uint8_t *rawData = reinterpret_cast<const uint8_t *>(parcel.ReadRawData(size));
     if (rawData == nullptr) {
         LOG_ERROR(UDMF_SERVICE, "RawData is null!");
