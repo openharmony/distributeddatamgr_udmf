@@ -1400,7 +1400,7 @@ HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider001, TestSize.Level1)
 
 /**
  * @tc.name: OH_UdmfRecord_SetProvider002
- * @tc.desc: invalid parameters testcase of OH_UdmfRecord_SetProvider
+ * @tc.desc: valid parameters testcase of OH_UdmfRecord_SetProvider
  * @tc.type: FUNC
  */
 HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider002, TestSize.Level1)
@@ -1424,7 +1424,7 @@ HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider002, TestSize.Level1)
 
 /**
  * @tc.name: OH_UdmfRecord_SetProvider003
- * @tc.desc: valid parameters testcase of OH_UdmfRecord_SetProvider
+ * @tc.desc: invalid parameters testcase of OH_UdmfRecord_SetProvider
  * @tc.type: FUNC
  */
 HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider003, TestSize.Level1)
@@ -1451,7 +1451,7 @@ HWTEST_F(UDMFTest, OH_UdmfRecord_SetProvider003, TestSize.Level1)
     EXPECT_EQ(res, UDMF_E_INVALID_PARAM);
 
     res = OH_UdmfRecord_SetProvider(record, types, 3, nullptr);
-    EXPECT_EQ(res, UDMF_E_OK);
+    EXPECT_EQ(res, UDMF_E_INVALID_PARAM);
     OH_UdmfRecordProvider_Destroy(provider);
 }
 
