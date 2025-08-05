@@ -317,7 +317,8 @@ bool Unmarshalling(DataLoadInfo &output, MessageParcel &parcel)
     auto size = parcel.ReadInt32();
     auto dataSize = parcel.GetDataSize();
     if (size <= 0 || size > NORMAL_MAX_PARCEL_SIZE || dataSize > NORMAL_MAX_PARCEL_SIZE) {
-        LOG_ERROR(UDMF_SERVICE, "DataLoadInfo is empty or too large, dataSize is %{public}d, size is %{public}d", dataSize, size);
+        LOG_ERROR(UDMF_SERVICE,
+            "DataLoadInfo is empty or too large, dataSize is %{public}d, size is %{public}d", dataSize, size);
         return false;
     }
     const uint8_t *rawData = reinterpret_cast<const uint8_t *>(parcel.ReadRawData(size));
