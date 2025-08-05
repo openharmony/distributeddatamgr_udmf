@@ -43,7 +43,7 @@ using namespace OHOS::UDMF;
 
 static constexpr uint64_t MAX_RECORDS_COUNT = 4 * 1024 * 1024;
 static constexpr uint64_t MAX_KEY_STRING_LEN = 1 * 1024 * 1024;
-static constexpr uint64_t MAX_TYPES_COUNT = 1 * 1024 * 1024;
+static constexpr uint64_t MAX_TYPES_COUNT = 10 * 1024;
 static const std::map<std::string, UDType> FILE_TYPES = {
     { UDMF_META_GENERAL_FILE, UDType::FILE },
     { UDMF_META_AUDIO, UDType::AUDIO },

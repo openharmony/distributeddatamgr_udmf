@@ -43,7 +43,7 @@ using namespace OHOS::Security::AccessToken;
 using namespace OHOS::UDMF;
 
 namespace OHOS::Test {
-static constexpr uint64_t MAX_TYPES_COUNT = 1 * 1024 * 1024;
+static constexpr uint64_t MAX_TYPES_COUNT = 10 * 1024;
 class UDMFTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
