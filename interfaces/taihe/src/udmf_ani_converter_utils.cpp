@@ -82,7 +82,7 @@ ani_object AniConverter::WrapProgressInfo(ani_env *env, ProgressInfo info)
     ani_enum_item status;
     env->Enum_GetEnumItemByIndex(ani_field_status_cls, (ani_size)info.progressStatus, &status);
     ani_class cls;
-    if (ANI_OK!= env->FindClass("@ohos.data.unifiedDataChannel.unifiedDataChannel.ProgressInfo_inner", &cls)) {
+    if (ANI_OK!= env->FindClass("@ohos.data.unifiedDataChannel.unifiedDataChannel.ProgressInfoInner", &cls)) {
         LOG_ERROR(UDMF_ANI, "Find class fail");
         return obj;
     }
