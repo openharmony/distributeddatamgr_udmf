@@ -1116,11 +1116,7 @@ export function queryData(options: Options, callback: AsyncCallback<Array<Unifie
 class ProgressInfoInner implements ProgressInfo {
     progress: double;
     status: ListenerStatus;
-    constructor(
-        progress: double,
-        status: ListenerStatus,
-    )
-    {
+    constructor(progress: double, status: ListenerStatus) {
         this.progress = progress;
         this.status = status;
     }
