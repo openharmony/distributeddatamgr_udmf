@@ -651,8 +651,6 @@ napi_value TextEmbeddingNapi::StringType(napi_env env, napi_value args, napi_val
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "TransJsToStr failed");
         return nullptr;
     }
-
-    AIP_HILOGI("string Arg: %{public}s", strArg.c_str());
     if (!GetEmbeddingStringAsyncExecution(env, deferred, strArg)) {
         ThrowIntelligenceErr(env, INNER_ERROR, "GetEmbeddingStringAsyncExecution failed");
         return nullptr;
