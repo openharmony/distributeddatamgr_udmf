@@ -171,7 +171,7 @@ ani_object AniConverter::WrapSummary(ani_env *env, std::shared_ptr<Summary> summ
     }
     ani_object longObj = CreateLong(env, summary->totalSize);
     if (longObj == nullptr) {
-        LOG_ERROR(UDMF_ANI, "CreateDouble faild");
+        LOG_ERROR(UDMF_ANI, "CreateLong faild");
         return nullptr;
     }
     ani_long param_value;
