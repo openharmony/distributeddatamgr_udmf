@@ -70,6 +70,8 @@ private:
     std::mutex customUtdMutex_;
     UtdFileInfo utdFileInfo_;
     int64_t lastLoadTime_ {0};
+
+    std::mutex updateUtdMutex_;
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -413,6 +413,7 @@ void UtdClient::InstallCustomUtds(const std::string &bundleName, const std::stri
         return;
     }
     LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+    std::lock_guard<std::mutex> lock(updateUtdMutex_);
     std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, user);
     if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user, customTyepCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
@@ -436,6 +437,7 @@ void UtdClient::UninstallCustomUtds(const std::string &bundleName, int32_t user)
         return;
     }
     LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
+    std::lock_guard<std::mutex> lock(updateUtdMutex_);
     std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, user);
     if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user, customTyepCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
