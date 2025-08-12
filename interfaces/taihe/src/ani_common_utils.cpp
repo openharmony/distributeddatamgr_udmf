@@ -69,17 +69,17 @@ ani_object CreateLong(ani_env *env, int64_t value)
     ani_class longCls;
     ani_status status = ANI_ERROR;
     if ((status = env->FindClass(CLASSNAME_LONG, &longCls)) != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "status : %{public}d", status);
+        LOG_ERROR(UDMF_ANI, "FindClass status : %{public}d", status);
         return nullptr;
     }
     ani_method longCtor;
     if ((status = env->Class_FindMethod(longCls, "<ctor>", "J:V", &longCtor)) != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "status : %{public}d", status);
+        LOG_ERROR(UDMF_ANI, "Class_FindMethod status : %{public}d", status);
         return nullptr;
     }
     ani_object longObj;
     if ((status = env->Object_New(longCls, longCtor, &longObj, value)) != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "status : %{public}d", status);
+        LOG_ERROR(UDMF_ANI, "Object_New status : %{public}d", status);
         return nullptr;
     }
     return longObj;
