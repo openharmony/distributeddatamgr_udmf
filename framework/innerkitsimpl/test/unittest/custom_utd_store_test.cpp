@@ -175,4 +175,222 @@ HWTEST_F(CustomUtdStoreTest, GetCustomUtdInfoTest002, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "GetCustomUtdInfoTest002 end.");
 }
+
+/**
+* @tc.name: ParseStoredCustomUtdJson001
+* @tc.desc: empty json
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdStoreTest, ParseStoredCustomUtdJson001, TestSize.Level1) {
+    LOG_INFO(UDMF_TEST, "ParseStoredCustomUtdJson001 begin.");
+    CustomUtdJsonParser parser;
+    std::vector<TypeDescriptorCfg> typesCfg;
+    bool ret = parser.ParseStoredCustomUtdJson("", typesCfg);
+
+    EXPECT_FALSE(ret);
+    EXPECT_TRUE(typesCfg.empty());
+    LOG_INFO(UDMF_TEST, "ParseStoredCustomUtdJson001 end.");
+}
+
+/**
+* @tc.name: ParseStoredCustomUtdJson002
+* @tc.desc: Invalid Format
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdStoreTest, ParseStoredCustomUtdJson002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseStoredCustomUtdJson002 begin.");
+    const std::string invalidJson = R"({
+        "UniformDataTypeDeclarations": []
+    )"; // syntax error
+
+    CustomUtdJsonParser parser;
+    std::vector<TypeDescriptorCfg> typesCfg;
+    bool ret = parser.ParseStoredCustomUtdJson(invalidJson, typesCfg);
+
+    EXPECT_FALSE(ret);
+    EXPECT_TRUE(typesCfg.empty());
+    LOG_INFO(UDMF_TEST, "ParseStoredCustomUtdJson002 end.");
+}
+
+/**
+* @tc.name: ParseStoredCustomUtdJson003
+* @tc.desc: invalid json
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdStoreTest, ParseStoredCustomUtdJson003, TestSize.Level1) {
+    LOG_INFO(UDMF_TEST, "ParseStoredCustomUtdJson003 begin.");
+    CustomUtdJsonParser parser;
+    std::vector<TypeDescriptorCfg> typesCfg;
+    std::string invalidJson = "{invalid_json}";
+    EXPECT_FALSE(parser.ParseStoredCustomUtdJson(invalidJson, typesCfg));
+    EXPECT_TRUE(typesCfg.empty());
+    LOG_INFO(UDMF_TEST, "ParseStoredCustomUtdJson003 end.");
+}
+
+/**
+* @tc.name: ParseStoredCustomUtdJson004
+* @tc.desc: root not object
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdStoreTest, ParseStoredCustomUtdJson004, TestSize.Level1) {
+    LOG_INFO(UDMF_TEST, "ParseStoredCustomUtdJson004 begin.");
+    const std::string rootArrayJson = R"([
+        { "TypeId": "com.example.custom.image" }
+    ])";
+
+    CustomUtdJsonParser parser;
+    std::vector<TypeDescriptorCfg> typesCfg;
+    bool ret = parser.ParseStoredCustomUtdJson(rootArrayJson, typesCfg);
+
+    EXPECT_FALSE(ret);
+    EXPECT_TRUE(typesCfg.empty());
+    LOG_INFO(UDMF_TEST, "ParseStoredCustomUtdJson004 end.");
+}
+
+/**
+* @tc.name: ParseStoredCustomUtdJson005
+* @tc.desc: valid json
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdStoreTest, ParseStoredCustomUtdJson005, TestSize.Level1) {
+    LOG_INFO(UDMF_TEST, "ParseStoredCustomUtdJson005 begin.");
+
+    const std::string validJson = R"({
+        "CustomUTDs": [
+            {
+                "TypeId": "com.example.custom.image",
+                "BelongingToTypes": ["general.image"],
+                "FilenameExtensions": [".img", ".pic"],
+                "MIMETypes": ["application/img", "application/pic"],
+                "Description": "Custom image type",
+                "ReferenceURL": ""
+            }
+        ]
+    })";
+
+    CustomUtdJsonParser parser;
+    std::vector<TypeDescriptorCfg> typesCfg;
+    bool ret = parser.ParseStoredCustomUtdJson(validJson, typesCfg);
+
+    EXPECT_TRUE(ret);
+    ASSERT_EQ(typesCfg.size(), 1u);
+    EXPECT_EQ(typesCfg[0].typeId, "com.example.custom.image");
+    EXPECT_EQ(typesCfg[0].belongingToTypes.size(), 1u);
+    EXPECT_EQ(typesCfg[0].belongingToTypes[0], "general.image");
+
+    LOG_INFO(UDMF_TEST, "ParseStoredCustomUtdJson005 end.");
+}
+
+/**
+ * @tc.name: ParseUserCustomUtdJsonTest001
+ * @tc.desc: parse a valid JSON containing declarations and references.
+ * @tc.type: FUNC
+ */
+HWTEST_F(CustomUtdStoreTest, ParseUserCustomUtdJsonTest001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseUserCustomUtdJsonTest001 begin.");
+    const char *testJson = R"({
+        "UniformDataTypeDeclarations": [
+            {
+                "TypeId": "com.example.thread.image",
+                "BelongingToTypes": ["general.image"],
+                "FilenameExtensions": [".myImage", ".khImage"],
+                "MIMETypes": ["application/myImage", "application/khImage"],
+                "Description": "My Image.",
+                "ReferenceURL": ""
+            }
+        ],
+        "ReferenceUniformDataTypeDeclarations": [
+            {
+                "TypeId": "com.example.thread.audio",
+                "BelongingToTypes": ["general.audio"],
+                "FilenameExtensions": [".myAudio", ".khAudio"],
+                "MIMETypes": ["application/myAudio", "application/khAudio"],
+                "Description": "My audio.",
+                "ReferenceURL": ""
+            }
+        ]
+    })";
+
+    std::vector<TypeDescriptorCfg> declarations;
+    std::vector<TypeDescriptorCfg> references;
+
+    CustomUtdJsonParser parser;
+    bool result = parser.ParseUserCustomUtdJson(testJson, declarations, references);
+
+    EXPECT_TRUE(result);
+    EXPECT_EQ(declarations.size(), 1);
+    EXPECT_EQ(references.size(), 1);
+
+    EXPECT_EQ(declarations[0].typeId, "com.example.thread.image");
+    EXPECT_EQ(references[0].typeId, "com.example.thread.audio");
+    LOG_INFO(UDMF_TEST, "ParseUserCustomUtdJsonTest001 end.");
+}
+
+/**
+ * @tc.name: ParseUserCustomUtdJsonTest002
+ * @tc.desc: Verify ParseUserCustomUtdJson returns false when given empty JSON string.
+ * @tc.type: FUNC
+ */
+HWTEST_F(CustomUtdStoreTest, ParseUserCustomUtdJsonTest002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseUserCustomUtdJsonTest002 begin.");
+    std::vector<TypeDescriptorCfg> declarations;
+    std::vector<TypeDescriptorCfg> references;
+
+    CustomUtdJsonParser parser;
+    bool result = parser.ParseUserCustomUtdJson("", declarations, references);
+
+    EXPECT_FALSE(result);
+    EXPECT_TRUE(declarations.empty());
+    EXPECT_TRUE(references.empty());
+    LOG_INFO(UDMF_TEST, "ParseUserCustomUtdJsonTest002 end.");
+}
+
+/**
+ * @tc.name: ParseUserCustomUtdJsonTest003
+ * @tc.desc: Verify ParseUserCustomUtdJson returns false for invalid JSON format.
+ * @tc.type: FUNC
+ */
+HWTEST_F(CustomUtdStoreTest, ParseUserCustomUtdJsonTest003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseUserCustomUtdJsonTest003 begin.");
+    const char *invalidJson = R"({ "UniformDataTypeDeclarations": [ )";
+
+    std::vector<TypeDescriptorCfg> declarations;
+    std::vector<TypeDescriptorCfg> references;
+
+    CustomUtdJsonParser parser;
+    bool result = parser.ParseUserCustomUtdJson(invalidJson, declarations, references);
+
+    EXPECT_FALSE(result);
+    EXPECT_TRUE(declarations.empty());
+    EXPECT_TRUE(references.empty());
+    LOG_INFO(UDMF_TEST, "ParseUserCustomUtdJsonTest003 end.");
+}
+
+/**
+ * @tc.name: ParseUserCustomUtdJsonTest004
+ * @tc.desc: Verify ParseUserCustomUtdJson returns false for invalid JSON format.
+ * @tc.type: FUNC
+ */
+HWTEST_F(CustomUtdStoreTest, ParseUserCustomUtdJsonTest004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseUserCustomUtdJsonTest004 begin.");
+    const char *invalidJson = R"([
+        { "TypeId": "com.example.custom.image" }
+    ])";
+
+    std::vector<TypeDescriptorCfg> declarations;
+    std::vector<TypeDescriptorCfg> references;
+
+    CustomUtdJsonParser parser;
+    bool result = parser.ParseUserCustomUtdJson(invalidJson, declarations, references);
+
+    EXPECT_FALSE(result);
+    EXPECT_TRUE(declarations.empty());
+    EXPECT_TRUE(references.empty());
+    LOG_INFO(UDMF_TEST, "ParseUserCustomUtdJsonTest004 end.");
+}
 } // OHOS::Test

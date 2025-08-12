@@ -38,7 +38,7 @@ public:
 private:
     CustomUtdStore();
     ~CustomUtdStore();
-    int32_t SavaCfgFile(const std::string &jsonData, const std::string &cfgFilePath);
+    int32_t SaveCfgFile(const std::string &jsonData, const std::string &cfgFilePath);
     bool CreateDirectory(const std::string &path) const;
     static void ProcessUtdForSave(const CustomUtdCfgs &utdTypes, std::vector<TypeDescriptorCfg> &customTyepCfgs,
         const std::string &bundleName);

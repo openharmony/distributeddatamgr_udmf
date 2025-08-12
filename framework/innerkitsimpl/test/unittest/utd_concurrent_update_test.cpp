@@ -63,7 +63,7 @@ void UtdConcurrentUpdateTest::TearDown()
 {
 }
 
-const std::string kTestJsonStr = R"({
+static constexpr const char *K_TEST_JSON_STR = R"({
     "UniformDataTypeDeclarations": [
         {
             "TypeId": "com.example.thread.image",
@@ -93,7 +93,7 @@ void UtdConcurrentUpdateTest::SetNativeToken(const std::string &processName)
 std::string ReplaceThread(const std::string& jsonStr, const std::string& newThreadId)
 {
     std::string result = jsonStr;
-    std::string target = "thread";
+    std::string target = "com.example.thread";
     size_t pos = 0;
     while ((pos = result.find(target, pos)) != std::string::npos) {
         result.replace(pos, target.length(), newThreadId);
@@ -109,14 +109,19 @@ std::string ReplaceThread(const std::string& jsonStr, const std::string& newThre
 */
 HWTEST_F(UtdConcurrentUpdateTest, MultiThreadUpdate001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "MultiThreadUpdate001 begin.");
+    const int numThreads = 8;
+    for (int i = 1; i <= numThreads; ++i) {
+        UtdClient::GetInstance().UninstallCustomUtds("com.example.thread" + std::to_string(i), USERID);
+    }
+    std::vector<TypeDescriptorCfg> prevCustomTypeCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, USERID);
+    size_t prevSize = prevCustomTypeCfgs.size();
     
-    auto worker = [&](int threadId) {
-        const std::string bundleName = "com.example.thread" + std::to_string(threadId);
-        auto jsonStr = ReplaceThread(kTestJsonStr, bundleName);
-        const int trials = 49;
-        for (int i = 0; i < trials; ++i) {
-            bool op = (i % 2 == 0);
+    const int trials = 50;
+    for (int i = 0; i < trials; ++i) {
+        bool op = (i % 2 == 0);
+        auto worker = [op](int threadId) {
+            const std::string bundleName = "com.example.thread" + std::to_string(threadId);
+            auto jsonStr = ReplaceThread(K_TEST_JSON_STR, bundleName);
             if (op) {
                 UtdClient::GetInstance().InstallCustomUtds(bundleName, jsonStr, USERID);
                 LOG_INFO(UDMF_CLIENT, "Thread %{public}d Install done", threadId);
@@ -124,28 +129,34 @@ HWTEST_F(UtdConcurrentUpdateTest, MultiThreadUpdate001, TestSize.Level1)
                 UtdClient::GetInstance().UninstallCustomUtds(bundleName, USERID);
                 LOG_INFO(UDMF_CLIENT, "Thread %{public}d Uninstall done", threadId);
             }
+        };
+        std::vector<std::thread> threads;
+        for (int j = 1; j <= numThreads; ++j) {
+            threads.emplace_back(worker, j);
         }
-    };
+        for (auto &t : threads) {
+            t.join();
+        }
 
-    const int numThreads = 8;
-    std::vector<std::thread> threads;
-    for (int i = 0; i < numThreads; ++i) {
-        threads.emplace_back(worker, i);
+        auto customTypeCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, USERID);
+        if (op) {
+            EXPECT_EQ(customTypeCfgs.size(), numThreads * 2 + prevSize);
+        } else {
+            EXPECT_EQ(customTypeCfgs.size(), prevSize);
+        }
+        for (const auto &cfg : customTypeCfgs) {
+            if (std::find(prevCustomTypeCfgs.begin(), prevCustomTypeCfgs.end(), cfg) == prevCustomTypeCfgs.end()) {
+                EXPECT_TRUE(cfg.typeId.find("com.example.thread") != std::string::npos);
+                EXPECT_TRUE(cfg.belongingToTypes.size() > 0);
+                EXPECT_TRUE(cfg.filenameExtensions.size() > 0);
+                EXPECT_TRUE(cfg.mimeTypes.size() > 0);
+            }
+        }
     }
-    for (auto &t : threads) {
-        t.join();
+    for (int i = 1; i <= numThreads; ++i) {
+        UtdClient::GetInstance().UninstallCustomUtds("com.example.thread" + std::to_string(i), USERID);
     }
-
-    std::vector<TypeDescriptorCfg> customTypeCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, USERID);
-    EXPECT_EQ(customTypeCfgs.size(), numThreads * 2);
-    std::set<TypeDescriptorCfg> uniqueTypeIds(CustomUtdCfgs.begin(), CustomUtdCfgs.end());
-    EXPECT_EQ(uniqueTypeIds.size(), customTypeCfgs.size());
-    for (const auto &cfg : customTypeCfgs) {
-        EXPECT_TRUE(cfg.typeId.find("com.example.thread") != std::string::npos);
-        EXPECT_TRUE(cfg.belongingToTypes.size() > 0);
-        EXPECT_TRUE(cfg.filenameExtensions.size() > 0);
-        EXPECT_TRUE(cfg.mimeTypes.size() > 0);
-    }
-    LOG_INFO(UDMF_TEST, "MultiThreadUpdate001 end.");
+    auto customTypeCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, USERID);
+    EXPECT_EQ(customTypeCfgs.size(), prevSize);
 };
 } // namespace OHOS::Test

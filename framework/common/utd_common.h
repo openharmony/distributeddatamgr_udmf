@@ -47,7 +47,7 @@ struct UtdFileInfo {
 };
 
 // UTD data category
-constexpr const char* UTD_CUSTOM_DECLAEEARION = "UniformDataTypeDeclarations";
+constexpr const char* UTD_CUSTOM_DECLARATION = "UniformDataTypeDeclarations";
 constexpr const char* UTD_CUSTOM_REFERENCE = "ReferenceUniformDataTypeDeclarations";
 
 constexpr const char* UTD_CUSTOM = "CustomUTDs";

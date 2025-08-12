@@ -58,6 +58,7 @@ enum Status : int32_t {
     E_IDEMPOTENT_ERROR,
     E_COPY_CANCELED,
     E_DB_CORRUPTED,
+    E_JSON_CONVERT_FAILED,
     E_BUTT,
 };
 

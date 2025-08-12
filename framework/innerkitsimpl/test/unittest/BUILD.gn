@@ -301,9 +301,6 @@ ohos_unittest("UtdConcurrentUpdateTest") {
     "${udmf_framework_path}/innerkitsimpl/data/flexible_type.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/type_descriptor.cpp",
-    "custom_utd_json_parser_test.cpp",
-    "custom_utd_store_test.cpp",
-    "graph_test.cpp",
     "utd_concurrent_update_test.cpp",
   ]
 

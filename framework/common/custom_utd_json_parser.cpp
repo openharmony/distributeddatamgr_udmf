@@ -44,8 +44,19 @@ bool CustomUtdJsonParser::ParseStoredCustomUtdJson(const std::string &jsonData,
     }
 
     cJSON* jsonRoot = cJSON_Parse(jsonData.c_str());
-    if (jsonRoot != NULL && cJSON_IsObject(jsonRoot)) {
-        GetTypeDescriptors(*jsonRoot, UTD_CUSTOM, typesCfg);
+    if (jsonRoot == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Failed to parse JSON: invalid format");
+        return false;
+    }
+    if (!cJSON_IsObject(jsonRoot)) {
+        LOG_ERROR(UDMF_CLIENT, "Parsed JSON root is not an object");
+        cJSON_Delete(jsonRoot);
+        return false;
+    }
+    if (!GetTypeDescriptors(*jsonRoot, UTD_CUSTOM, typesCfg)) {
+        LOG_ERROR(UDMF_CLIENT, "Failed to get type descriptors");
+        cJSON_Delete(jsonRoot);
+        return false;
     }
     cJSON_Delete(jsonRoot);
     return true;
@@ -60,12 +71,23 @@ bool CustomUtdJsonParser::ParseUserCustomUtdJson(const std::string &jsonData,
     }
     // parse utd-adt.json to TypeDescriptorCfg obj
     cJSON* jsonRoot = cJSON_Parse(jsonData.c_str());
-    if (jsonRoot != NULL && cJSON_IsObject(jsonRoot)) {
-        GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_DECLAEEARION, typesDeclarations);
-        GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_REFERENCE, typesReference);
+    if (jsonRoot == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Parse failed: invalid JSON format.");
+        return false;
+    }
+    if (!cJSON_IsObject(jsonRoot)) {
+        LOG_ERROR(UDMF_CLIENT, "Parsed JSON root is not an object");
+        cJSON_Delete(jsonRoot);
+        return false;
+    }
+    if (!GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_DECLARATION, typesDeclarations) ||
+        !GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_REFERENCE, typesReference)) {
+        LOG_ERROR(UDMF_CLIENT, "Failed to get type descriptors");
+        cJSON_Delete(jsonRoot);
+        return false;
     }
     cJSON_Delete(jsonRoot);
-    LOG_DEBUG(UDMF_CLIENT, "DeclarationsSize:%{public}zu, ReferenceSize:%{public}zu",
+    LOG_INFO(UDMF_CLIENT, "DeclarationsSize:%{public}zu, ReferenceSize:%{public}zu",
         typesDeclarations.size(), typesReference.size());
     return true;
 }
