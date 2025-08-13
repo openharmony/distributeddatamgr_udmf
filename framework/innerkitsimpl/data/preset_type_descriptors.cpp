@@ -74,7 +74,7 @@ void PresetTypeDescriptors::InitDescriptors()
             cJSON_Delete(jsonRoot);
             return;
         }
-        utdJsonParser.GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_DECLAEEARION, typeDescriptors_);
+        utdJsonParser.GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_DECLARATION, typeDescriptors_);
     }
     cJSON_Delete(jsonRoot);
     LOG_INFO(UDMF_CLIENT, "Preset type descriptors init success, utd size is %{public}zu", typeDescriptors_.size());

@@ -15,6 +15,7 @@
 #define LOG_TAG "CustomUtdStore"
 #include "custom_utd_store.h"
 #include <fstream>
+#include <sstream>
 #include <sys/stat.h>
 #include "logger.h"
 #include "preset_type_descriptors.h"
@@ -51,15 +52,25 @@ std::vector<TypeDescriptorCfg> CustomUtdStore::GetCustomUtd(bool isHap, int32_t 
     std::string path = GetCustomUtdPath(isHap, userId);
     LOG_DEBUG(UDMF_CLIENT, "get utdcustom from cfg");
 
-    std::string jsonStr;
-    std::ifstream fin(path);
-    while (fin.good()) {
-        std::string line;
-        std::getline(fin, line);
-        jsonStr += line;
-    }
     std::vector<TypeDescriptorCfg> customUtd;
-    utdJsonParser_.ParseStoredCustomUtdJson(jsonStr, customUtd);
+    std::ifstream fin(path);
+    if (!fin.is_open()) {
+        LOG_ERROR(UDMF_CLIENT, "Failed to open custom utd file, errno=%{public}d", errno);
+        return customUtd;
+    }
+
+    std::ostringstream buffer;
+    buffer << fin.rdbuf();
+    if (fin.fail() && !fin.eof()) {
+        LOG_ERROR(UDMF_CLIENT, "Error reading file, errno=%{public}d", errno);
+        return customUtd;
+    }
+
+    std::string jsonStr = buffer.str();
+    if (!utdJsonParser_.ParseStoredCustomUtdJson(jsonStr, customUtd)) {
+        LOG_ERROR(UDMF_CLIENT, "Failed to parse custom utd json");
+        customUtd.clear();
+    }
     LOG_DEBUG(UDMF_CLIENT, "CustomUtd total:%{public}zu.", customUtd.size());
     return customUtd;
 }
@@ -81,24 +92,34 @@ int32_t CustomUtdStore::SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &custo
 {
     LOG_DEBUG(UDMF_CLIENT, "customUtdTypes total:%{public}zu.", customUtdTypes.size());
     std::string jsonData;
-    std::string cfgFileDir = CUSTOM_UTD_SA_DIR + std::to_string(user) + CUSTOM_UTD_SA_SUB_DIR;
-    if (utdJsonParser_.ConvertUtdCfgsToJson(customUtdTypes, jsonData) && CreateDirectory(cfgFileDir)) {
-        SavaCfgFile(jsonData, cfgFileDir.append(UTD_CFG_FILE));
+    if (!utdJsonParser_.ConvertUtdCfgsToJson(customUtdTypes, jsonData)) {
+        LOG_ERROR(UDMF_CLIENT, "ConvertUtdCfgsToJson failed");
+        return E_JSON_CONVERT_FAILED;
     }
-    return 0;
+    std::string cfgFileDir = CUSTOM_UTD_SA_DIR + std::to_string(user) + CUSTOM_UTD_SA_SUB_DIR;
+    if (!CreateDirectory(cfgFileDir)) {
+        LOG_ERROR(UDMF_CLIENT, "CreateDirectory failed");
+        return E_FS_ERROR;
+    }
+    return SaveCfgFile(jsonData, cfgFileDir + UTD_CFG_FILE);
 }
 
-int32_t CustomUtdStore::SavaCfgFile(const std::string &jsonData, const std::string &cfgFilePath)
+int32_t CustomUtdStore::SaveCfgFile(const std::string &jsonData, const std::string &cfgFilePath)
 {
     std::ofstream ofs;
     ofs.open(cfgFilePath, 0x02);
     if (!ofs.is_open()) {
         LOG_ERROR(UDMF_CLIENT, "open cfg failed");
+        return E_FS_ERROR;
     }
     ofs << jsonData << std::endl;
+    if (!ofs.good()) {
+        LOG_ERROR(UDMF_CLIENT, "write cfg failed");
+        return E_FS_ERROR;
+    }
     ofs.close();
     LOG_DEBUG(UDMF_CLIENT, "set cfg end.");
-    return 0;
+    return E_OK;
 }
 
 bool CustomUtdStore::CreateDirectory(const std::string &path) const
@@ -131,7 +152,7 @@ bool CustomUtdStore::CreateDirectory(const std::string &path) const
 #endif
         return true;
     }
-
+    LOG_ERROR(UDMF_CLIENT, "CreateDirectory fail.");
     return false;
 }
 
