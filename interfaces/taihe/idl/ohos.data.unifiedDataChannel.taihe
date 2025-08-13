@@ -26,7 +26,9 @@ static { loadLibrary("udmf_taihe_native.z") }
 """)
 
 union ValueType {
-  number: f64;
+  intType: i32;
+  longType: i64;
+  doubleType: f64;
   string: String;
   boolean: bool;
   ArrayBuffer: @arraybuffer Array<u8>;
@@ -36,7 +38,9 @@ union ValueType {
 }
 
 union DetailsValue {
-  number: f64;
+  intType: i32;
+  longType: i64;
+  doubleType: f64;
   string: String;
   Uint8Array: @typedarray Array<u8>;
 }
@@ -97,15 +101,15 @@ struct Options {
 
 @class
 struct Summary {
-  summary: @record Map<String, f64>;
-  totalSize: f64;
+  summary: @record Map<String, i64>;
+  totalSize: i64;
 }
 
 @ctor("Summary")
 function CreateSummary(): Summary;
 
 struct ProgressInfo {
-  progress: f64;
+  progress: i32;
   status: ListenerStatus;
 }
 
@@ -338,9 +342,9 @@ interface SystemDefinedFormInner {
   @set("details")
   SetDetails(details: @record Map<String, DetailsValue>): void;
   @get("formId")
-  GetFormId(): f64;
+  GetFormId(): i32;
   @set("formId")
-  SetFormId(formId: f64): void;
+  SetFormId(formId: i32): void;
   @get("formName")
   GetFormName(): String;
   @set("formName")
@@ -905,10 +909,10 @@ export class SystemDefinedForm extends SystemDefinedRecord {
   set details(details: Record<String, DetailsValue>) {
     this.inner.details = details;
   }
-  get formId(): number {
+  get formId(): int {
     return this.inner.formId;
   }
-  set formId(formId: number) {
+  set formId(formId: int) {
     this.inner.formId = formId;
   }
   get formName(): String {
@@ -1114,9 +1118,9 @@ export function queryData(options: Options, callback: AsyncCallback<Array<Unifie
 }
 
 class ProgressInfoInner implements ProgressInfo {
-    progress: double;
+    progress: int;
     status: ListenerStatus;
-    constructor(progress: double, status: ListenerStatus) {
+    constructor(progress: int, status: ListenerStatus) {
         this.progress = progress;
         this.status = status;
     }

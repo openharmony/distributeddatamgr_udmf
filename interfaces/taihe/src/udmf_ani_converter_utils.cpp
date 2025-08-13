@@ -76,7 +76,7 @@ ani_object AniConverter::WrapUnifiedData(ani_env *env, std::shared_ptr<UnifiedDa
 ani_object AniConverter::WrapProgressInfo(ani_env *env, ProgressInfo info)
 {
     ani_object obj = {};
-    ani_double progress = (double)info.progress;
+    ani_int progress = info.progress;
     ani_enum ani_field_status_cls;
     env->FindEnum("@ohos.data.unifiedDataChannel.unifiedDataChannel.ListenerStatus", &ani_field_status_cls);
     ani_enum_item status;
@@ -169,17 +169,17 @@ ani_object AniConverter::WrapSummary(ani_env *env, std::shared_ptr<Summary> summ
         LOG_ERROR(UDMF_ANI, "Create object fail");
         return obj;
     }
-    ani_object doubleObj = CreateDouble(env, summary->totalSize);
-    if (doubleObj == nullptr) {
-        LOG_ERROR(UDMF_ANI, "CreateDouble faild");
+    ani_object longObj = CreateLong(env, summary->totalSize);
+    if (longObj == nullptr) {
+        LOG_ERROR(UDMF_ANI, "CreateLong faild");
         return nullptr;
     }
-    ani_double param_value;
-    if (ANI_OK != env->Object_CallMethodByName_Double(doubleObj, "unboxed", ":D", &param_value)) {
-        LOG_ERROR(UDMF_ANI, "Unbox Double failed");
+    ani_long param_value;
+    if (ANI_OK != env->Object_CallMethodByName_Long(longObj, "unboxed", ":l", &param_value)) {
+        LOG_ERROR(UDMF_ANI, "Unbox Long failed");
         return nullptr;
     }
-    if (ANI_OK != env->Object_SetFieldByName_Double(obj, "totalSize", param_value)) {
+    if (ANI_OK != env->Object_SetFieldByName_Long(obj, "totalSize", param_value)) {
         LOG_ERROR(UDMF_ANI, "Set Field failed");
         return nullptr;
     }

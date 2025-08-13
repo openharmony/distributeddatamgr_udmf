@@ -39,8 +39,14 @@ ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,
 {
     ValueType valueType = nullptr;
     switch (value.get_tag()) {
-        case taiheChannel::ValueType::tag_t::number:
-            valueType = value.get_number_ref();
+        case taiheChannel::ValueType::tag_t::intType:
+            valueType = value.get_intType_ref();
+            break;
+        case taiheChannel::ValueType::tag_t::longType:
+            valueType = value.get_longType_ref();
+            break;
+        case taiheChannel::ValueType::tag_t::doubleType:
+            valueType = value.get_doubleType_ref();
             break;
         case taiheChannel::ValueType::tag_t::string:
             valueType = std::string(value.get_string_ref());
@@ -79,13 +85,13 @@ ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,
 ::taiheChannel::ValueType ConvertValueType(const ValueType &value)
 {
     if (std::holds_alternative<double>(value)) {
-        return ::taiheChannel::ValueType::make_number(std::get<double>(value));
+        return ::taiheChannel::ValueType::make_doubleType(std::get<double>(value));
     }
     if (std::holds_alternative<int32_t>(value)) {
-        return ::taiheChannel::ValueType::make_number(std::get<int32_t>(value));
+        return ::taiheChannel::ValueType::make_intType(std::get<int32_t>(value));
     }
     if (std::holds_alternative<int64_t>(value)) {
-        return ::taiheChannel::ValueType::make_number(std::get<int64_t>(value));
+        return ::taiheChannel::ValueType::make_longType(std::get<int64_t>(value));
     }
     if (std::holds_alternative<bool>(value)) {
         return ::taiheChannel::ValueType::make_boolean(std::get<bool>(value));
@@ -160,8 +166,14 @@ UDDetails ConvertUDDetailsToUnion(
         }
         UDVariant value;
         switch (item.second.get_tag()) {
-            case taiheChannel::DetailsValue::tag_t::number:
-                value = item.second.get_number_ref();
+            case taiheChannel::DetailsValue::tag_t::intType:
+                value = item.second.get_intType_ref();
+                break;
+            case taiheChannel::DetailsValue::tag_t::longType:
+                value = item.second.get_longType_ref();
+                break;
+            case taiheChannel::DetailsValue::tag_t::doubleType:
+                value = item.second.get_doubleType_ref();
                 break;
             case taiheChannel::DetailsValue::tag_t::string:
                 value = std::string(item.second.get_string_ref());
@@ -185,10 +197,19 @@ UDDetails ConvertUDDetailsToUnion(
         if (item.first.empty()) {
             continue;
         }
-        if (std::holds_alternative<double>(item.second) || std::holds_alternative<int32_t>(item.second)
-            || std::holds_alternative<int64_t>(item.second)) {
+        if (std::holds_alternative<double>(item.second)) {
             taiheDetails.emplace(::taihe::string(item.first),
-                ::taiheChannel::DetailsValue::make_number(std::get<double>(item.second)));
+                ::taiheChannel::DetailsValue::make_doubleType(std::get<double>(item.second)));
+            continue;
+        }
+        if (std::holds_alternative<int64_t>(item.second)) {
+            taiheDetails.emplace(::taihe::string(item.first),
+                ::taiheChannel::DetailsValue::make_longType(std::get<int64_t>(item.second)));
+            continue;
+        }
+        if (std::holds_alternative<int32_t>(item.second)) {
+            taiheDetails.emplace(::taihe::string(item.first),
+                ::taiheChannel::DetailsValue::make_intType(std::get<int32_t>(item.second)));
             continue;
         }
         if (std::holds_alternative<std::string>(item.second)) {

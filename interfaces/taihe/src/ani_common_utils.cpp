@@ -22,7 +22,7 @@ namespace OHOS {
 namespace UDMF {
 
 constexpr const char* RECORD_SERIALIZE_TOOL_CLASS_NAME = "@ohos.app.ability.Want.RecordSerializeTool";
-constexpr const char* CLASSNAME_DOUBLE = "std.core.Double";
+constexpr const char* CLASSNAME_LONG = "std.core.Long";
 
 ani_ref WrapMapParams(ani_env *env, const std::map<std::string, int64_t> &mapParams)
 {
@@ -60,29 +60,29 @@ ani_ref WrapMapParams(ani_env *env, const std::map<std::string, int64_t> &mapPar
     return mapParamsRef;
 }
 
-ani_object CreateDouble(ani_env *env, double value)
+ani_object CreateLong(ani_env *env, int64_t value)
 {
     if (env == nullptr) {
-        LOG_ERROR(UDMF_ANI, "CreateDouble fail, env is nullptr");
+        LOG_ERROR(UDMF_ANI, "CreateLong fail, env is nullptr");
         return nullptr;
     }
-    ani_class doubleCls;
+    ani_class longCls;
     ani_status status = ANI_ERROR;
-    if ((status = env->FindClass(CLASSNAME_DOUBLE, &doubleCls)) != ANI_OK) {
+    if ((status = env->FindClass(CLASSNAME_LONG, &longCls)) != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "FindClass status : %{public}d", status);
         return nullptr;
     }
-    ani_method doubleCtor;
-    if ((status = env->Class_FindMethod(doubleCls, "<ctor>", "d:", &doubleCtor)) != ANI_OK) {
+    ani_method longCtor;
+    if ((status = env->Class_FindMethod(longCls, "<ctor>", "J:V", &longCtor)) != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "Class_FindMethod status : %{public}d", status);
         return nullptr;
     }
-    ani_object doubleObj;
-    if ((status = env->Object_New(doubleCls, doubleCtor, &doubleObj, static_cast<ani_double>(value))) != ANI_OK) {
+    ani_object longObj;
+    if ((status = env->Object_New(longCls, longCtor, &longObj, value)) != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "Object_New status : %{public}d", status);
         return nullptr;
     }
-    return doubleObj;
+    return longObj;
 }
 
 bool SetFieldRef(ani_env *env, ani_class cls, ani_object object, const std::string &fieldName, ani_ref value)
