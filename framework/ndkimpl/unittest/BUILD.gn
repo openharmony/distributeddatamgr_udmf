@@ -39,6 +39,7 @@ common_external_deps = [
   "access_token:libnativetoken",
   "access_token:libtoken_setproc",
   "c_utils:utils",
+  "hilog:libhilog",
   "image_framework:image",
   "image_framework:image_native",
   "image_framework:pixelmap",
