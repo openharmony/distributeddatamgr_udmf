@@ -57,6 +57,7 @@ ohos_shared_library("unifieddatachannel_ani") {
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_ani",
+    "ipc:ipc_single",
     "runtime_core:ani",
   ]
 
