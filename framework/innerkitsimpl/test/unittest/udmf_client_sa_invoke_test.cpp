@@ -207,7 +207,6 @@ HWTEST_F(UdmfClientSaInvokeTest, SetData003, TestSize.Level1)
     data.AddRecord(pixelMap2);
     data.AddRecord(pixelMap3);
     data.AddRecord(pixelMap4);
-    LOG_ERROR(UDMF_TEST, "data size = %{public}lld.", data.GetSize());
     std::string key;
     auto status = UdmfClient::GetInstance().SetData(option, data, key);
     ASSERT_EQ(E_OK, status);

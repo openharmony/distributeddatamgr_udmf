@@ -98,6 +98,7 @@ ohos_shared_library("udmf_client") {
     "hitrace:hitrace_meter",
     "hitrace:libhitracechain",
     "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
     "kv_store:distributeddata_mgr",
     "libuv:uv",
     "samgr:samgr_proxy",
