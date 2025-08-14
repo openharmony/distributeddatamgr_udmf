@@ -225,6 +225,7 @@ ohos_static_library("udmf_js_common") {
     "ability_runtime:abilitykit_native",
     "ability_runtime:napi_common",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "napi:ace_napi",
   ]
   public_external_deps = [ "image_framework:image" ]
@@ -263,6 +264,7 @@ ohos_shared_library("intelligence_napi") {
     "ability_runtime:napi_base_context",
     "c_utils:utils",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "napi:ace_napi",
   ]
 

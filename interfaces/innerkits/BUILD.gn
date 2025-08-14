@@ -204,6 +204,7 @@ ohos_shared_library("pixelmap_wrapper") {
 
   external_deps = [
     "image_framework:image_native",
+    "ipc:ipc_single",
     "hilog:libhilog",
   ]
 
