@@ -27,6 +27,8 @@
 #include "udmf_capi_common.h"
 #include "udmf_meta.h"
 
+#include <fuzzer/FuzzedDataProvider.h>
+
 using namespace OHOS;
 using namespace OHOS::Security::AccessToken;
 using namespace OHOS::UDMF;
@@ -105,9 +107,9 @@ void SetHapToken()
     SetSelfTokenID(tokenId);
 }
 
-void SetUnifiedDataFuzz(const uint8_t *data, size_t size)
+void SetUnifiedDataFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
     OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
     OH_UdmfRecord *record = OH_UdmfRecord_Create();
     OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
@@ -125,9 +127,9 @@ void SetUnifiedDataFuzz(const uint8_t *data, size_t size)
     OH_UdmfData_Destroy(udmfUnifiedData);
 }
 
-void GetUnifiedDataFuzz(const uint8_t *data, size_t size)
+void GetUnifiedDataFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
     OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
     OH_UdmfRecord *record = OH_UdmfRecord_Create();
     OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
@@ -150,9 +152,9 @@ void GetUnifiedDataFuzz(const uint8_t *data, size_t size)
     OH_Udmf_DestroyDataArray(&dataArray, dataSize);
 }
 
-void UpdataUnifiedDataFuzz(const uint8_t *data, size_t size)
+void UpdataUnifiedDataFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
     OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
     OH_UdmfRecord *record = OH_UdmfRecord_Create();
     OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
@@ -165,7 +167,7 @@ void UpdataUnifiedDataFuzz(const uint8_t *data, size_t size)
     char key[UDMF_KEY_BUFFER_LEN];
     OH_Udmf_SetUnifiedDataByOptions(options, udmfUnifiedData, key, UDMF_KEY_BUFFER_LEN);
 
-    std::string svalue(data, data + size);
+    std::string svalue = provider.ConsumeRandomLengthString();
     OH_UdmfData *udmfUnifiedData2 = OH_UdmfData_Create();
     OH_UdmfRecord *record2 = OH_UdmfRecord_Create();
     OH_UdsFileUri *fileUri2 = OH_UdsFileUri_Create();
@@ -187,9 +189,9 @@ void UpdataUnifiedDataFuzz(const uint8_t *data, size_t size)
     OH_UdmfData_Destroy(udmfUnifiedData2);
 }
 
-void DeleteUnifiedDataFuzz(const uint8_t *data, size_t size)
+void DeleteUnifiedDataFuzz(FuzzedDataProvider &provider)
 {
-    std::string skey(data, data + size);
+    std::string skey = provider.ConsumeRandomLengthString();
     OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
     OH_UdmfRecord *record = OH_UdmfRecord_Create();
     OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
@@ -212,7 +214,7 @@ void DeleteUnifiedDataFuzz(const uint8_t *data, size_t size)
     OH_Udmf_DestroyDataArray(&dataArray, dataSize);
 }
 
-void SetAndGetVisibilityFuzz(const uint8_t *data, size_t size)
+void SetAndGetVisibilityFuzz(FuzzedDataProvider &provider)
 {
     OH_UdmfOptions* options = OH_UdmfOptions_Create();
     Udmf_Visibility testVisibility = Udmf_Visibility::UDMF_ALL;
@@ -231,12 +233,13 @@ void SetAndGetVisibilityFuzz(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
+    FuzzedDataProvider provider(data, size);
     OHOS::SetUpTestCase();
-    OHOS::SetUnifiedDataFuzz(data, size);
-    OHOS::GetUnifiedDataFuzz(data, size);
-    OHOS::UpdataUnifiedDataFuzz(data, size);
-    OHOS::DeleteUnifiedDataFuzz(data, size);
-    OHOS::SetAndGetVisibilityFuzz(data, size);
+    OHOS::SetUnifiedDataFuzz(provider);
+    OHOS::GetUnifiedDataFuzz(provider);
+    OHOS::UpdataUnifiedDataFuzz(provider);
+    OHOS::DeleteUnifiedDataFuzz(provider);
+    OHOS::SetAndGetVisibilityFuzz(provider);
     OHOS::TearDown();
     return 0;
 }
