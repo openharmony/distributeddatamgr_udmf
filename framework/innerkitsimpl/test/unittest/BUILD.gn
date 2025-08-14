@@ -237,6 +237,8 @@ ohos_unittest("UdmfAsyncClientTest") {
     "private=public",
     "protected=public",
   ]
+
+  use_exceptions = true
 }
 
 ohos_unittest("UdmfDelayDataTest") {
