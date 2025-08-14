@@ -46,12 +46,12 @@ void SystemDefinedFormTaihe::SetDetails(
     this->value_->SetDetails(udmfDetails);
 }
 
-int32_t SystemDefinedFormTaihe::GetFormId()
+double SystemDefinedFormTaihe::GetFormId()
 {
     return this->value_->GetFormId();
 }
 
-void SystemDefinedFormTaihe::SetFormId(int32_t formId)
+void SystemDefinedFormTaihe::SetFormId(double formId)
 {
     this->value_->SetFormId(formId);
 }

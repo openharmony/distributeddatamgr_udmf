@@ -31,8 +31,8 @@ public:
     taiheChannel::ValueType GetValue();
     ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> GetDetails();
     void SetDetails(const ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> &details);
-    int32_t GetFormId();
-    void SetFormId(int32_t formId);
+    double GetFormId();
+    void SetFormId(double formId);
     ::taihe::string GetFormName();
     void SetFormName(const ::taihe::string_view &formName);
     ::taihe::string GetBundleName();

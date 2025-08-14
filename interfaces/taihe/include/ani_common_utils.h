@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace UDMF {
 ani_ref WrapMapParams(ani_env *env, const std::map<std::string, int64_t> &mapParams);
-ani_object CreateLong(ani_env *env, int64_t value);
+ani_object CreateDouble(ani_env *env, double value);
 bool SetFieldRef(ani_env *env, ani_class cls, ani_object object, const std::string &fieldName, ani_ref value);
 bool InnerWrapMapParams(ani_env *env, ani_class wantCls, ani_object wantObject,
     const std::map<std::string, int64_t> &mapParams);
