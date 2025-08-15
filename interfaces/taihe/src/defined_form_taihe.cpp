@@ -33,6 +33,7 @@ SystemDefinedFormTaihe::SystemDefinedFormTaihe(std::shared_ptr<SystemDefinedForm
 {
     this->value_ = value;
 }
+
 ::taihe::string SystemDefinedFormTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
@@ -128,7 +129,7 @@ int64_t SystemDefinedFormTaihe::GetInner()
         LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
         return taihe::make_holder<SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>();
     }
-    auto formNapi = reinterpret_cast<OHOS::UDMF::SystemDefinedFormNapi *>(nativePtr);
+    auto formNapi = reinterpret_cast<SystemDefinedFormNapi *>(nativePtr);
     if (formNapi == nullptr || formNapi->value_ == nullptr) {
         LOG_ERROR(UDMF_ANI, "cast SystemDefinedForm failed");
         return taihe::make_holder<SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>();

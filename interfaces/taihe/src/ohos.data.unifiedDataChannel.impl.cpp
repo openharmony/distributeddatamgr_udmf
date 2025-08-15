@@ -91,17 +91,18 @@ namespace taiheChannel = ohos::data::unifiedDataChannel;
     return ::taihe::array<::taiheChannel::UnifiedDataInner>(dataImpls);
 }
 
-::taiheChannel::Summary SummaryTransferStaticImpl(uintptr_t input) {
+::taiheChannel::Summary SummaryTransferStaticImpl(uintptr_t input)
+{
     ani_object esValue = reinterpret_cast<ani_object>(input);
     void *nativePtr = nullptr;
     ::taihe::map<::taihe::string, int64_t> summary;
     if (!arkts_esvalue_unwrap(taihe::get_env(), esValue, &nativePtr) || nativePtr == nullptr) {
-        LOG_INFO(UDMF_ANI, "unwrap esvalue failed");
+        LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
         return {summary, 0};
     }
     auto summaryNapi = reinterpret_cast<OHOS::UDMF::SummaryNapi *>(nativePtr);
     if (summaryNapi == nullptr || summaryNapi->value_ == nullptr) {
-        LOG_INFO(UDMF_ANI, "cast summary failed");
+        LOG_ERROR(UDMF_ANI, "cast summary failed");
         return {summary, 0};
     }
     for (const auto &item : summaryNapi->value_->summary) {
@@ -110,7 +111,8 @@ namespace taiheChannel = ohos::data::unifiedDataChannel;
     return {summary, summaryNapi->value_->totalSize};
 }
 
-uintptr_t SummaryTransferDynamicImpl(::taiheChannel::Summary const& input) {
+uintptr_t SummaryTransferDynamicImpl(::taiheChannel::Summary const& input)
+{
     return 0;
 }
 } // namespace UDMF

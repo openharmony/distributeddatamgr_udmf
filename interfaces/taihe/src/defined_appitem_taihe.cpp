@@ -33,6 +33,7 @@ SystemDefinedAppItemTaihe::SystemDefinedAppItemTaihe(std::shared_ptr<SystemDefin
 {
     this->value_ = value;
 }
+
 ::taihe::string SystemDefinedAppItemTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
@@ -140,7 +141,7 @@ int64_t SystemDefinedAppItemTaihe::GetInner()
         LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
         return taihe::make_holder<SystemDefinedAppItemTaihe, ::taiheChannel::SystemDefinedAppItemInner>();
     }
-    auto appItemNapi = reinterpret_cast<OHOS::UDMF::SystemDefinedAppItemNapi *>(nativePtr);
+    auto appItemNapi = reinterpret_cast<SystemDefinedAppItemNapi *>(nativePtr);
     if (appItemNapi == nullptr || appItemNapi->value_ == nullptr) {
         LOG_ERROR(UDMF_ANI, "cast SystemDefinedAppItem failed");
         return taihe::make_holder<SystemDefinedAppItemTaihe, ::taiheChannel::SystemDefinedAppItemInner>();

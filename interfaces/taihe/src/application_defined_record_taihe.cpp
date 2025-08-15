@@ -33,6 +33,7 @@ ApplicationDefinedRecordTaihe::ApplicationDefinedRecordTaihe(std::shared_ptr<App
 {
     this->value_ = value;
 }
+
 ::taihe::string ApplicationDefinedRecordTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
@@ -88,7 +89,7 @@ int64_t ApplicationDefinedRecordTaihe::GetInner()
         LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
         return taihe::make_holder<ApplicationDefinedRecordTaihe, ::taiheChannel::ApplicationDefinedRecordInner>();
     }
-    auto appNapi = reinterpret_cast<OHOS::UDMF::ApplicationDefinedRecordNapi *>(nativePtr);
+    auto appNapi = reinterpret_cast<ApplicationDefinedRecordNapi *>(nativePtr);
     if (appNapi == nullptr || appNapi->value_ == nullptr) {
         LOG_ERROR(UDMF_ANI, "cast ApplicationDefinedRecord failed");
         return taihe::make_holder<ApplicationDefinedRecordTaihe, ::taiheChannel::ApplicationDefinedRecordInner>();

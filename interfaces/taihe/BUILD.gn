@@ -96,6 +96,7 @@ taihe_shared_library("udmf_taihe_native") {
     "ability_base:want",
     "ability_runtime:abilitykit_native",
     "ability_runtime:ani_common",
+    "ability_runtime:napi_common",
     "image_framework:image_taihe",
     "hilog:libhilog",
     "runtime_core:ani_helpers",

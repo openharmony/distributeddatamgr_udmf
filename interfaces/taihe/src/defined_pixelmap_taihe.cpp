@@ -108,3 +108,5 @@ uintptr_t SystemDefinedPixelMapTransferDynamicImpl(::taiheChannel::weak::SystemD
 } // namespace OHOS
 
 TH_EXPORT_CPP_API_CreateSystemDefinedPixelMap(OHOS::UDMF::CreateSystemDefinedPixelMap);
+TH_EXPORT_CPP_API_SystemDefinedPixelMapTransferStaticImpl(OHOS::UDMF::SystemDefinedPixelMapTransferStaticImpl);
+TH_EXPORT_CPP_API_SystemDefinedPixelMapTransferDynamicImpl(OHOS::UDMF::SystemDefinedPixelMapTransferDynamicImpl);

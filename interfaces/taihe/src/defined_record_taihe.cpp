@@ -75,7 +75,7 @@ int64_t SystemDefinedRecordTaihe::GetInner()
         LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
         return taihe::make_holder<SystemDefinedRecordTaihe, ::taiheChannel::SystemDefinedRecordInner>();
     }
-    auto recordNapi = reinterpret_cast<OHOS::UDMF::SystemDefinedRecordNapi *>(nativePtr);
+    auto recordNapi = reinterpret_cast<SystemDefinedRecordNapi *>(nativePtr);
     if (recordNapi == nullptr || recordNapi->value_ == nullptr) {
         LOG_ERROR(UDMF_ANI, "cast SystemDefinedRecord failed");
         return taihe::make_holder<SystemDefinedRecordTaihe, ::taiheChannel::SystemDefinedRecordInner>();
