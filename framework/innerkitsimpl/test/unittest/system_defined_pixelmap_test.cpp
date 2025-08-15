@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <gtest/gtest.h>
 #include <string>
+#include <sstream>
 
 #include "logger.h"
 #include "pixelmap_loader.h"
@@ -27,7 +28,10 @@ using namespace OHOS::UDMF;
 using namespace OHOS;
 namespace OHOS::Test {
 using namespace std;
-
+static constexpr const char* PIXEL_MAP_WIDTH = "width";
+static constexpr const char* PIXEL_MAP_HEIGHT = "height";
+static constexpr const char* PIXEL_MAP_FORMAT = "pixel-format";
+static constexpr const char* PIXEL_MAP_ALPHA_TYPE = "alpha-type";
 class SystemDefinedPixelMapTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -113,6 +117,71 @@ HWTEST_F(SystemDefinedPixelMapTest, GetPixelMapFromRawData001, TestSize.Level1)
     auto ret = systemDefinedPixelMap.GetPixelMapFromRawData();
     EXPECT_EQ(ret, nullptr);
     LOG_INFO(UDMF_TEST, "GetPixelMapFromRawData001 end.");
+}
+
+/**
+* @tc.name: GetPixelMapFromRawData002
+* @tc.desc: Abnormal testcase of GetPixelMapFromRawData, rawData_ is wrong
+* @tc.type: FUNC
+*/
+HWTEST_F(SystemDefinedPixelMapTest, GetPixelMapFromRawData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetPixelMapFromRawData002 begin.");
+    
+    std::vector<uint8_t> rawData;
+    for (int i = 0; i < 4 * 1024 * 1024; i++) {
+        rawData.emplace_back(1);
+    }
+    SystemDefinedPixelMap systemDefinedPixelMap;
+    UDDetails details = {
+        {PIXEL_MAP_WIDTH, (int32_t)5},
+        {PIXEL_MAP_HEIGHT, (int32_t)7},
+        {PIXEL_MAP_FORMAT, (int32_t)Media::PixelFormat::ARGB_8888},
+        {PIXEL_MAP_ALPHA_TYPE, (int32_t)Media::PixelFormat::ARGB_8888}
+    };
+    systemDefinedPixelMap.SetRawData(rawData);
+    systemDefinedPixelMap.SetDetails(details);
+    auto ret = systemDefinedPixelMap.GetPixelMapFromRawData();
+    EXPECT_EQ(ret, nullptr);
+    LOG_INFO(UDMF_TEST, "GetPixelMapFromRawData002 end.");
+}
+
+/**
+* @tc.name: GetPixelMapFromRawData003
+* @tc.desc: Abnormal testcase of GetPixelMapFromRawData, rawData_ is null
+* @tc.type: FUNC
+*/
+HWTEST_F(SystemDefinedPixelMapTest, GetPixelMapFromRawData003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetPixelMapFromRawData002 begin.");
+
+    uint32_t color[35] = { 3, 7, 9, 9, 7, 6 };
+    OHOS::Media::InitializationOptions opts = { { 5, 7 },
+        Media::PixelFormat::ARGB_8888, Media::PixelFormat::ARGB_8888 };
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap =
+        OHOS::Media::PixelMap::Create(color, sizeof(color) / sizeof(color[0]), opts);
+    auto length = pixelMap->GetByteCount();
+    std::vector<uint8_t> rawData;
+    rawData.resize(length);
+    pixelMap->ReadPixels(length, rawData.data());
+    SystemDefinedPixelMap systemDefinedPixelMap;
+    UDDetails details = {
+        {PIXEL_MAP_WIDTH, (int32_t)5},
+        {PIXEL_MAP_HEIGHT, (int32_t)7},
+        {PIXEL_MAP_FORMAT, (int32_t)Media::PixelFormat::ARGB_8888},
+        {PIXEL_MAP_ALPHA_TYPE, (int32_t)Media::PixelFormat::ARGB_8888}
+    };
+    systemDefinedPixelMap.SetRawData(rawData);
+    systemDefinedPixelMap.SetDetails(details);
+    auto getPixelMap = systemDefinedPixelMap.GetPixelMapFromRawData();
+    auto getLength = getPixelMap->GetByteCount();
+    EXPECT_EQ(length, getLength);
+    std::vector<uint8_t> getRawData;
+    getPixelMap->ReadPixels(length, getRawData.data());
+    for (int32_t i = 0; i < getLength; ++i) {
+        EXPECT_EQ(getRawData[i], rawData[i]);
+    }
+    LOG_INFO(UDMF_TEST, "GetPixelMapFromRawData003 end.");
 }
 
 /**

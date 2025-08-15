@@ -29,7 +29,9 @@ static constexpr const char* DECODE_TLV = "DecodeTlv";
 static constexpr const char* ENCODE_TLV = "EncodeTlv";
 static constexpr const char* GET_PIXEL_MAP_FROM_RAW_DATA = "GetPixelMapFromRawData";
 static constexpr const char* PARSE_INFO_FROM_PIXEL_MAP = "ParseInfoFromPixelMap";
-static constexpr const int DELAY_DESTRUCTION_INTERVAL = 10;
+
+std::weak_ptr<void> PixelMapLoader::SoAutoUnloadManager::weakHandler_;
+std::mutex PixelMapLoader::SoAutoUnloadManager::mutex_;
 
 std::shared_ptr<void> PixelMapLoader::SoAutoUnloadManager::GetHandler()
 {
@@ -38,17 +40,15 @@ std::shared_ptr<void> PixelMapLoader::SoAutoUnloadManager::GetHandler()
     if (realHandler != nullptr) {
         return realHandler;
     }
-    void* rawHandler = dlopen(PIXEL_MAP_WRAPPER_SO_NAME, RTLD_LAZY);
+    void *rawHandler = dlopen(PIXEL_MAP_WRAPPER_SO_NAME, RTLD_LAZY);
     if (rawHandler == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "dlopen error! msg=%{public}s", dlerror());
         return nullptr;
     }
-    auto deleter = [](void* h) {
-        std::thread([h]() {
-            std::this_thread::sleep_for(std::chrono::seconds(DELAY_DESTRUCTION_INTERVAL));
-            std::lock_guard<std::mutex> lock(mutex_);
+    auto deleter = [](void *h) {
+        if (h != nullptr) {
             dlclose(h);
-        }).detach();
+        }
     };
     auto sp = std::shared_ptr<void>(rawHandler, deleter);
     weakHandler_ = sp;
@@ -59,7 +59,7 @@ PixelMapLoader::PixelMapLoader()
 {
     handler_ = SoAutoUnloadManager::GetHandler();
     if (handler_ == nullptr) {
-        LOG_ERROR(UDMF_KITS_INNER, "load so fail! msg=%{public}s", dlerror());
+        LOG_ERROR(UDMF_KITS_INNER, "handler is null!");
     }
 }
 
@@ -80,7 +80,16 @@ std::shared_ptr<OHOS::Media::PixelMap> PixelMapLoader::DecodeTlv(std::vector<uin
         LOG_ERROR(UDMF_KITS_INNER, "dlsym error! msg=%{public}s", dlerror());
         return nullptr;
     }
-    return std::shared_ptr<OHOS::Media::PixelMap>(loadDecodeTlv(details));
+
+    OHOS::Media::PixelMap *raw = loadDecodeTlv(details);
+    if (raw == nullptr) {
+        LOG_ERROR(UDMF_KITS_INNER, "pixelMap is null!");
+        return nullptr;
+    }
+    auto deleter = [handler = handler_](OHOS::Media::PixelMap *p) {
+        delete p;
+    };
+    return std::shared_ptr<OHOS::Media::PixelMap>(raw, deleter);
 }
 
 bool PixelMapLoader::EncodeTlv(const std::shared_ptr<OHOS::Media::PixelMap> pixelMap, std::vector<uint8_t> &buff)
@@ -99,6 +108,7 @@ bool PixelMapLoader::EncodeTlv(const std::shared_ptr<OHOS::Media::PixelMap> pixe
         return false;
     }
     auto details = std::make_shared<PixelMapDetails>();
+    details->rawDataResult.emplace();
     auto result = loadEncodeTlv(pixelMap.get(), details.get());
     if (details->rawDataResult->empty()) {
         LOG_ERROR(UDMF_KITS_INNER, "encodeTlv fail");
@@ -124,7 +134,15 @@ std::shared_ptr<OHOS::Media::PixelMap> PixelMapLoader::GetPixelMapFromRawData(co
         LOG_ERROR(UDMF_KITS_INNER, "dlsym error! msg=%{public}s", dlerror());
         return nullptr;
     }
-    return std::shared_ptr<OHOS::Media::PixelMap>(loadGetPixelMapFromRawData(details));
+    OHOS::Media::PixelMap *raw = loadGetPixelMapFromRawData(details);
+    if (raw == nullptr) {
+        LOG_ERROR(UDMF_KITS_INNER, "pixelMap is null!");
+        return nullptr;
+    }
+    auto deleter = [handler = handler_](OHOS::Media::PixelMap *p) {
+        delete p;
+    };
+    return std::shared_ptr<OHOS::Media::PixelMap>(raw, deleter);
 }
 
 std::shared_ptr<PixelMapDetails> PixelMapLoader::ParseInfoFromPixelMap(

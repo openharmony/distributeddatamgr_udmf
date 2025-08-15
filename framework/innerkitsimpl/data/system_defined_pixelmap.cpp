@@ -146,6 +146,10 @@ void SystemDefinedPixelMap::ParseInfoFromPixelMap(std::shared_ptr<OHOS::Media::P
     details_[PIXEL_MAP_HEIGHT] = details->height;
     details_[PIXEL_MAP_FORMAT] = details->pixelFormat;
     details_[PIXEL_MAP_ALPHA_TYPE] = details->alphaType;
+    if (!details->rawDataResult.has_value()) {
+        LOG_ERROR(UDMF_KITS_INNER, "No rawData");
+        return;
+    }
     rawData_ = std::move(*details->rawDataResult);
 }
 } // namespace UDMF

@@ -53,8 +53,8 @@ private:
     public:
         static std::shared_ptr<void> GetHandler();
     private:
-        static inline std::weak_ptr<void> weakHandler_;
-        static inline std::mutex mutex_;
+        static std::weak_ptr<void> weakHandler_;
+        static std::mutex mutex_;
     };
 
     std::shared_ptr<void> handler_;
