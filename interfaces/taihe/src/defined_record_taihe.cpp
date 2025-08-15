@@ -13,14 +13,25 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "UDMF_DEFINED_RECORD"
+
 #include "defined_record_taihe.h"
+#include "interop_js/arkts_esvalue.h"
+#include "logger.h"
+#include "system_defined_record_napi.h"
 #include "taihe_common_utils.h"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace UDMF {
 SystemDefinedRecordTaihe::SystemDefinedRecordTaihe()
 {
     this->value_ = std::make_shared<SystemDefinedRecord>();
+}
+
+SystemDefinedRecordTaihe::SystemDefinedRecordTaihe(std::shared_ptr<SystemDefinedRecord> value)
+{
+    this->value_ = value;
 }
 
 ::taihe::string SystemDefinedRecordTaihe::GetType()
@@ -50,13 +61,35 @@ int64_t SystemDefinedRecordTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
-} // namespace UDMF
-} // namespace OHOS
 
 ::taiheChannel::SystemDefinedRecordInner CreateSystemDefinedRecord()
 {
-    return taihe::make_holder<OHOS::UDMF::SystemDefinedRecordTaihe,
-        ::taiheChannel::SystemDefinedRecordInner>();
+    return taihe::make_holder<SystemDefinedRecordTaihe, ::taiheChannel::SystemDefinedRecordInner>();
 }
 
-TH_EXPORT_CPP_API_CreateSystemDefinedRecord(CreateSystemDefinedRecord);
+::taiheChannel::SystemDefinedRecordInner SystemDefinedRecordTransferStaticImpl(uintptr_t input)
+{
+    ani_object esValue = reinterpret_cast<ani_object>(input);
+    void *nativePtr = nullptr;
+    if (!arkts_esvalue_unwrap(taihe::get_env(), esValue, &nativePtr) || nativePtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
+        return taihe::make_holder<SystemDefinedRecordTaihe, ::taiheChannel::SystemDefinedRecordInner>();
+    }
+    auto recordNapi = reinterpret_cast<OHOS::UDMF::SystemDefinedRecordNapi *>(nativePtr);
+    if (recordNapi == nullptr || recordNapi->value_ == nullptr) {
+        LOG_ERROR(UDMF_ANI, "cast SystemDefinedRecord failed");
+        return taihe::make_holder<SystemDefinedRecordTaihe, ::taiheChannel::SystemDefinedRecordInner>();
+    }
+    return taihe::make_holder<SystemDefinedRecordTaihe, ::taiheChannel::SystemDefinedRecordInner>(recordNapi->value_);
+}
+
+uintptr_t SystemDefinedRecordTransferDynamicImpl(::taiheChannel::weak::SystemDefinedRecordInner input)
+{
+    return 0;
+}
+} // namespace UDMF
+} // namespace OHOS
+
+TH_EXPORT_CPP_API_CreateSystemDefinedRecord(OHOS::UDMF::CreateSystemDefinedRecord);
+TH_EXPORT_CPP_API_SystemDefinedRecordTransferStaticImpl(OHOS::UDMF::SystemDefinedRecordTransferStaticImpl);
+TH_EXPORT_CPP_API_SystemDefinedRecordTransferDynamicImpl(OHOS::UDMF::SystemDefinedRecordTransferDynamicImpl);

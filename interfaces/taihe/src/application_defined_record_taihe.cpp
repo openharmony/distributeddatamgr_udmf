@@ -13,8 +13,14 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "UDMF_DEFINED_APPLICATION"
+
+#include "application_defined_record_napi.h"
 #include "application_defined_record_taihe.h"
+#include "interop_js/arkts_esvalue.h"
+#include "logger.h"
 #include "taihe_common_utils.h"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace UDMF {
@@ -23,6 +29,10 @@ ApplicationDefinedRecordTaihe::ApplicationDefinedRecordTaihe()
     this->value_ = std::make_shared<ApplicationDefinedRecord>();
 }
 
+ApplicationDefinedRecordTaihe::ApplicationDefinedRecordTaihe(std::shared_ptr<ApplicationDefinedRecord> value)
+{
+    this->value_ = value;
+}
 ::taihe::string ApplicationDefinedRecordTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
@@ -64,13 +74,36 @@ int64_t ApplicationDefinedRecordTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
+
+::taiheChannel::ApplicationDefinedRecordInner createApplicationDefinedRecord()
+{
+    return taihe::make_holder<ApplicationDefinedRecordTaihe, ::taiheChannel::ApplicationDefinedRecordInner>();
+}
+
+::taiheChannel::ApplicationDefinedRecordInner ApplicationDefinedRecordTransferStaticImpl(uintptr_t input)
+{
+    ani_object esValue = reinterpret_cast<ani_object>(input);
+    void *nativePtr = nullptr;
+    if (!arkts_esvalue_unwrap(taihe::get_env(), esValue, &nativePtr) || nativePtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
+        return taihe::make_holder<ApplicationDefinedRecordTaihe, ::taiheChannel::ApplicationDefinedRecordInner>();
+    }
+    auto appNapi = reinterpret_cast<OHOS::UDMF::ApplicationDefinedRecordNapi *>(nativePtr);
+    if (appNapi == nullptr || appNapi->value_ == nullptr) {
+        LOG_ERROR(UDMF_ANI, "cast ApplicationDefinedRecord failed");
+        return taihe::make_holder<ApplicationDefinedRecordTaihe, ::taiheChannel::ApplicationDefinedRecordInner>();
+    }
+    return taihe::make_holder<ApplicationDefinedRecordTaihe,
+        ::taiheChannel::ApplicationDefinedRecordInner>(appNapi->value_);
+}
+
+uintptr_t ApplicationDefinedRecordTransferDynamicImpl(::taiheChannel::weak::ApplicationDefinedRecordInner input)
+{
+    return 0;
+}
 } // namespace UDMF
 } // namespace OHOS
 
-::ohos::data::unifiedDataChannel::ApplicationDefinedRecordInner createApplicationDefinedRecord()
-{
-    return taihe::make_holder<OHOS::UDMF::ApplicationDefinedRecordTaihe,
-        ::ohos::data::unifiedDataChannel::ApplicationDefinedRecordInner>();
-}
-
-TH_EXPORT_CPP_API_createApplicationDefinedRecord(createApplicationDefinedRecord);
+TH_EXPORT_CPP_API_createApplicationDefinedRecord(OHOS::UDMF::createApplicationDefinedRecord);
+TH_EXPORT_CPP_API_ApplicationDefinedRecordTransferStaticImpl(OHOS::UDMF::ApplicationDefinedRecordTransferStaticImpl);
+TH_EXPORT_CPP_API_ApplicationDefinedRecordTransferDynamicImpl(OHOS::UDMF::ApplicationDefinedRecordTransferDynamicImpl);

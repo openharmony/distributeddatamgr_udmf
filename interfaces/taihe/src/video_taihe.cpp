@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "video_taihe.h"
 #include "taihe_common_utils.h"
+#include "video_taihe.h"
 
 namespace OHOS {
 namespace UDMF {

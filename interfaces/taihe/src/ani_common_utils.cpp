@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "UDMF_ANI_COMMON_UTILS_H"
+#define LOG_TAG "UDMF_ANI_COMMON_UTILS"
 
 #include "ani_common_utils.h"
 #include "logger.h"

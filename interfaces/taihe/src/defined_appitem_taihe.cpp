@@ -13,8 +13,14 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "UDMF_DEFINED_APPITEM"
+
 #include "defined_appitem_taihe.h"
+#include "interop_js/arkts_esvalue.h"
+#include "logger.h"
+#include "system_defined_appitem_napi.h"
 #include "taihe_common_utils.h"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace UDMF {
@@ -23,6 +29,10 @@ SystemDefinedAppItemTaihe::SystemDefinedAppItemTaihe()
     this->value_ = std::make_shared<SystemDefinedAppItem>();
 }
 
+SystemDefinedAppItemTaihe::SystemDefinedAppItemTaihe(std::shared_ptr<SystemDefinedAppItem> value)
+{
+    this->value_ = value;
+}
 ::taihe::string SystemDefinedAppItemTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
@@ -116,13 +126,36 @@ int64_t SystemDefinedAppItemTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
-} // namespace UDMF
-} // namespace OHOS
 
 ::taiheChannel::SystemDefinedAppItemInner CreateSystemDefinedAppItem()
 {
-    return taihe::make_holder<OHOS::UDMF::SystemDefinedAppItemTaihe,
-        ::taiheChannel::SystemDefinedAppItemInner>();
+    return taihe::make_holder<SystemDefinedAppItemTaihe, ::taiheChannel::SystemDefinedAppItemInner>();
 }
 
-TH_EXPORT_CPP_API_CreateSystemDefinedAppItem(CreateSystemDefinedAppItem);
+::taiheChannel::SystemDefinedAppItemInner SystemDefinedAppItemTransferStaticImpl(uintptr_t input)
+{
+    ani_object esValue = reinterpret_cast<ani_object>(input);
+    void *nativePtr = nullptr;
+    if (!arkts_esvalue_unwrap(taihe::get_env(), esValue, &nativePtr) || nativePtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
+        return taihe::make_holder<SystemDefinedAppItemTaihe, ::taiheChannel::SystemDefinedAppItemInner>();
+    }
+    auto appItemNapi = reinterpret_cast<OHOS::UDMF::SystemDefinedAppItemNapi *>(nativePtr);
+    if (appItemNapi == nullptr || appItemNapi->value_ == nullptr) {
+        LOG_ERROR(UDMF_ANI, "cast SystemDefinedAppItem failed");
+        return taihe::make_holder<SystemDefinedAppItemTaihe, ::taiheChannel::SystemDefinedAppItemInner>();
+    }
+    return taihe::make_holder<SystemDefinedAppItemTaihe,
+        ::taiheChannel::SystemDefinedAppItemInner>(appItemNapi->value_);
+}
+
+uintptr_t SystemDefinedAppItemTransferDynamicImpl(::taiheChannel::weak::SystemDefinedAppItemInner input)
+{
+    return 0;
+}
+} // namespace UDMF
+} // namespace OHOS
+
+TH_EXPORT_CPP_API_CreateSystemDefinedAppItem(OHOS::UDMF::CreateSystemDefinedAppItem);
+TH_EXPORT_CPP_API_SystemDefinedAppItemTransferStaticImpl(OHOS::UDMF::SystemDefinedAppItemTransferStaticImpl);
+TH_EXPORT_CPP_API_SystemDefinedAppItemTransferDynamicImpl(OHOS::UDMF::SystemDefinedAppItemTransferDynamicImpl);

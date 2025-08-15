@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "UDMF_TAIHE_COMMON_UTILS_H"
+#define LOG_TAG "UDMF_TAIHE_COMMON_UTILS"
 
 #include "ani_common_want.h"
 #include "logger.h"

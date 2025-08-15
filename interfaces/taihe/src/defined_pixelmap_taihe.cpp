@@ -13,14 +13,25 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "UDMF_DEFINED_PIXELMAP"
+
 #include "defined_pixelmap_taihe.h"
+#include "interop_js/arkts_esvalue.h"
+#include "logger.h"
+#include "system_defined_pixelmap_napi.h"
 #include "taihe_common_utils.h"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace UDMF {
 SystemDefinedPixelMapTaihe::SystemDefinedPixelMapTaihe()
 {
     this->value_ = std::make_shared<SystemDefinedPixelMap>();
+}
+
+SystemDefinedPixelMapTaihe::SystemDefinedPixelMapTaihe(std::shared_ptr<SystemDefinedPixelMap> value)
+{
+    this->value_ = value;
 }
 
 ::taihe::string SystemDefinedPixelMapTaihe::GetType()
@@ -66,13 +77,34 @@ int64_t SystemDefinedPixelMapTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
-} // namespace UDMF
-} // namespace OHOS
 
 ::taiheChannel::SystemDefinedPixelMapInner CreateSystemDefinedPixelMap()
 {
-    return taihe::make_holder<OHOS::UDMF::SystemDefinedPixelMapTaihe,
-        ::taiheChannel::SystemDefinedPixelMapInner>();
+    return taihe::make_holder<SystemDefinedPixelMapTaihe, ::taiheChannel::SystemDefinedPixelMapInner>();
 }
 
-TH_EXPORT_CPP_API_CreateSystemDefinedPixelMap(CreateSystemDefinedPixelMap);
+::taiheChannel::SystemDefinedPixelMapInner SystemDefinedPixelMapTransferStaticImpl(uintptr_t input)
+{
+    ani_object esValue = reinterpret_cast<ani_object>(input);
+    void *nativePtr = nullptr;
+    if (!arkts_esvalue_unwrap(taihe::get_env(), esValue, &nativePtr) || nativePtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
+        return taihe::make_holder<SystemDefinedPixelMapTaihe, ::taiheChannel::SystemDefinedPixelMapInner>();
+    }
+    auto pixelMapNapi = reinterpret_cast<OHOS::UDMF::SystemDefinedPixelMapNapi *>(nativePtr);
+    if (pixelMapNapi == nullptr || pixelMapNapi->value_ == nullptr) {
+        LOG_ERROR(UDMF_ANI, "cast SystemDefinedPixelMap failed");
+        return taihe::make_holder<SystemDefinedPixelMapTaihe, ::taiheChannel::SystemDefinedPixelMapInner>();
+    }
+    return taihe::make_holder<SystemDefinedPixelMapTaihe,
+        ::taiheChannel::SystemDefinedPixelMapInner>(pixelMapNapi->value_);
+}
+
+uintptr_t SystemDefinedPixelMapTransferDynamicImpl(::taiheChannel::weak::SystemDefinedPixelMapInner input)
+{
+    return 0;
+}
+} // namespace UDMF
+} // namespace OHOS
+
+TH_EXPORT_CPP_API_CreateSystemDefinedPixelMap(OHOS::UDMF::CreateSystemDefinedPixelMap);

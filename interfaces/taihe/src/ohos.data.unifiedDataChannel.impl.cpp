@@ -15,11 +15,13 @@
 
 #define LOG_TAG "UDMF_DATA_CHANNEL_TAIHE"
 
+#include "interop_js/arkts_esvalue.h"
 #include "logger.h"
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "plain_text.h"
 #include "stdexcept"
+#include "summary_napi.h"
 #include "taihe_common_utils.h"
 #include "taihe/runtime.hpp"
 #include "udmf_client.h"
@@ -88,9 +90,34 @@ namespace taiheChannel = ohos::data::unifiedDataChannel;
     }
     return ::taihe::array<::taiheChannel::UnifiedDataInner>(dataImpls);
 }
+
+::taiheChannel::Summary SummaryTransferStaticImpl(uintptr_t input) {
+    ani_object esValue = reinterpret_cast<ani_object>(input);
+    void *nativePtr = nullptr;
+    ::taihe::map<::taihe::string, int64_t> summary;
+    if (!arkts_esvalue_unwrap(taihe::get_env(), esValue, &nativePtr) || nativePtr == nullptr) {
+        LOG_INFO(UDMF_ANI, "unwrap esvalue failed");
+        return {summary, 0};
+    }
+    auto summaryNapi = reinterpret_cast<OHOS::UDMF::SummaryNapi *>(nativePtr);
+    if (summaryNapi == nullptr || summaryNapi->value_ == nullptr) {
+        LOG_INFO(UDMF_ANI, "cast summary failed");
+        return {summary, 0};
+    }
+    for (const auto &item : summaryNapi->value_->summary) {
+        summary.emplace(::taihe::string(item.first), item.second);
+    }
+    return {summary, summaryNapi->value_->totalSize};
+}
+
+uintptr_t SummaryTransferDynamicImpl(::taiheChannel::Summary const& input) {
+    return 0;
+}
 } // namespace UDMF
 } // namespace OHOS
 
 TH_EXPORT_CPP_API_CreateSummary(OHOS::UDMF::CreateSummary);
 TH_EXPORT_CPP_API_InsertDataSync(OHOS::UDMF::InsertDataSync);
 TH_EXPORT_CPP_API_QueryDataSync(OHOS::UDMF::QueryDataSync);
+TH_EXPORT_CPP_API_SummaryTransferStaticImpl(OHOS::UDMF::SummaryTransferStaticImpl);
+TH_EXPORT_CPP_API_SummaryTransferDynamicImpl(OHOS::UDMF::SummaryTransferDynamicImpl);

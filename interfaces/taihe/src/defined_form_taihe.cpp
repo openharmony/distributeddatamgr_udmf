@@ -13,8 +13,14 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "UDMF_DEFINED_FORM"
+
 #include "defined_form_taihe.h"
+#include "interop_js/arkts_esvalue.h"
+#include "logger.h"
+#include "system_defined_form_napi.h"
 #include "taihe_common_utils.h"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace UDMF {
@@ -23,6 +29,10 @@ SystemDefinedFormTaihe::SystemDefinedFormTaihe()
     this->value_ = std::make_shared<SystemDefinedForm>();
 }
 
+SystemDefinedFormTaihe::SystemDefinedFormTaihe(std::shared_ptr<SystemDefinedForm> value)
+{
+    this->value_ = value;
+}
 ::taihe::string SystemDefinedFormTaihe::GetType()
 {
     return ::taihe::string(UtdUtils::GetUtdIdFromUtdEnum(this->value_->GetType()));
@@ -104,12 +114,35 @@ int64_t SystemDefinedFormTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
-} // namespace UDMF
-} // namespace OHOS
 
 ::taiheChannel::SystemDefinedFormInner CreateSystemDefinedForm()
 {
-    return taihe::make_holder<OHOS::UDMF::SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>();
+    return taihe::make_holder<SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>();
 }
 
-TH_EXPORT_CPP_API_CreateSystemDefinedForm(CreateSystemDefinedForm);
+::taiheChannel::SystemDefinedFormInner SystemDefinedFormTransferStaticImpl(uintptr_t input)
+{
+    ani_object esValue = reinterpret_cast<ani_object>(input);
+    void *nativePtr = nullptr;
+    if (!arkts_esvalue_unwrap(taihe::get_env(), esValue, &nativePtr) || nativePtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
+        return taihe::make_holder<SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>();
+    }
+    auto formNapi = reinterpret_cast<OHOS::UDMF::SystemDefinedFormNapi *>(nativePtr);
+    if (formNapi == nullptr || formNapi->value_ == nullptr) {
+        LOG_ERROR(UDMF_ANI, "cast SystemDefinedForm failed");
+        return taihe::make_holder<SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>();
+    }
+    return taihe::make_holder<SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>(formNapi->value_);
+}
+
+uintptr_t SystemDefinedFormTransferDynamicImpl(::taiheChannel::weak::SystemDefinedFormInner input)
+{
+    return 0;
+}
+} // namespace UDMF
+} // namespace OHOS
+
+TH_EXPORT_CPP_API_CreateSystemDefinedForm(OHOS::UDMF::CreateSystemDefinedForm);
+TH_EXPORT_CPP_API_SystemDefinedFormTransferStaticImpl(OHOS::UDMF::SystemDefinedFormTransferStaticImpl);
+TH_EXPORT_CPP_API_SystemDefinedFormTransferDynamicImpl(OHOS::UDMF::SystemDefinedFormTransferDynamicImpl);

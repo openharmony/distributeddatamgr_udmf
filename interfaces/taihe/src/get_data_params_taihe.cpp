@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "GetDataParamsTaihe"
+#define LOG_TAG "GET_DDATA_PARAMS_TAIHE"
 
 #include "get_data_params_taihe.h"
 #include "logger.h"
