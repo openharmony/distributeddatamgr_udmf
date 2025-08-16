@@ -41,8 +41,9 @@ std::shared_ptr<void> PixelMapLoader::SoAutoUnloadManager::GetHandler()
             return real;
         }
     }
-
+    LOG_INFO(UDMF_KITS_INNER, "dlopen start");
     void *rawHandler = dlopen(PIXEL_MAP_WRAPPER_SO_NAME, RTLD_NOW);
+    LOG_INFO(UDMF_KITS_INNER, "dlopen end");
     if (rawHandler == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "dlopen error! msg=%{public}s", dlerror());
         return nullptr;
