@@ -234,7 +234,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension003, TestSize.Level
 
 /**
 * @tc.name: GetUniformDataTypeByFilenameExtension004
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension, para empty string, return E_INVALID_PARAMETERS
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension,
+* para empty string, return E_INVALID_PARAMETERS
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension004, TestSize.Level1)
@@ -412,7 +413,8 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType005, TestSize.Level1)
 
 /**
 * @tc.name: GetUniformDataTypeByMIMEType006
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType, para empty string, return E_INVALID_PARAMETERS
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType,
+* para empty string, return E_INVALID_PARAMETERS
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType006, TestSize.Level1)
