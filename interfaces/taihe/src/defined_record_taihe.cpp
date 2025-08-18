@@ -15,8 +15,11 @@
 
 #define LOG_TAG "UDMF_DEFINED_RECORD"
 
+#include <dlfcn.h>
+
 #include "defined_record_taihe.h"
 #include "interop_js/arkts_esvalue.h"
+#include "interop_js/arkts_interop_js_api.h"
 #include "logger.h"
 #include "system_defined_record_napi.h"
 #include "taihe_common_utils.h"
@@ -24,6 +27,7 @@
 
 namespace OHOS {
 namespace UDMF {
+using CreateRecordInstance = void (*)(napi_env, std::shared_ptr<SystemDefinedRecord>, napi_value);
 SystemDefinedRecordTaihe::SystemDefinedRecordTaihe()
 {
     this->value_ = std::make_shared<SystemDefinedRecord>();
@@ -85,7 +89,42 @@ int64_t SystemDefinedRecordTaihe::GetInner()
 
 uintptr_t SystemDefinedRecordTransferDynamicImpl(::taiheChannel::weak::SystemDefinedRecordInner input)
 {
-    return 0;
+    auto recordPtr = input->GetInner();
+    auto recordInnerPtr = reinterpret_cast<SystemDefinedRecordTaihe *>(recordPtr);
+    if (recordInnerPtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "cast native pointer failed");
+        return 0;
+    }
+    std::shared_ptr<SystemDefinedRecord> systemDefinedRecord = recordInnerPtr->value_;
+    recordInnerPtr = nullptr;
+    napi_env jsenv;
+    if (!arkts_napi_scope_open(taihe::get_env(), &jsenv)) {
+        LOG_ERROR(UDMF_ANI, "arkts_napi_scope_open failed");
+        return 0;
+    }
+    auto handle = dlopen("libudmf_data_napi.z.so", RTLD_NOW);
+    if (handle == nullptr) {
+        LOG_ERROR(UDMF_ANI, "dlopen failed");
+        arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
+        return 0;
+    }
+    auto newInstance = reinterpret_cast<CreateRecordInstance>(dlsym(handle, "NewInstance"));
+    if (newInstance == nullptr) {
+        LOG_ERROR(UDMF_ANI, "dlsym get func failed, %{public}s", dlerror());
+        arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
+        return 0;
+    }
+    napi_value instance = nullptr;
+    newInstance(jsenv, systemDefinedRecord, instance);
+    dlclose(handle);
+    if (instance == nullptr) {
+        LOG_ERROR(UDMF_ANI, "instance is nullptr");
+        arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
+        return 0;
+    }
+    uintptr_t result = 0;
+    arkts_napi_scope_close_n(jsenv, 1, &instance, reinterpret_cast<ani_ref*>(&result));
+    return result;
 }
 } // namespace UDMF
 } // namespace OHOS
