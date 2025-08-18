@@ -35,24 +35,32 @@ std::mutex PixelMapLoader::SoAutoUnloadManager::mutex_;
 
 std::shared_ptr<void> PixelMapLoader::SoAutoUnloadManager::GetHandler()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    auto realHandler = weakHandler_.lock();
-    if (realHandler != nullptr) {
-        return realHandler;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (auto real = weakHandler_.lock()) {
+            return real;
+        }
     }
-    void *rawHandler = dlopen(PIXEL_MAP_WRAPPER_SO_NAME, RTLD_LAZY);
+    LOG_INFO(UDMF_KITS_INNER, "dlopen start");
+    void *rawHandler = dlopen(PIXEL_MAP_WRAPPER_SO_NAME, RTLD_NOW);
     if (rawHandler == nullptr) {
         LOG_ERROR(UDMF_KITS_INNER, "dlopen error! msg=%{public}s", dlerror());
         return nullptr;
     }
+
     auto deleter = [](void *h) {
-        if (h != nullptr) {
-            dlclose(h);
-        }
+        if (h) dlclose(h);
     };
-    auto sp = std::shared_ptr<void>(rawHandler, deleter);
-    weakHandler_ = sp;
-    return sp;
+    std::shared_ptr<void> sp(rawHandler, deleter);
+
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (auto existed = weakHandler_.lock()) {
+            return existed;
+        }
+        weakHandler_ = sp;
+        return sp;
+    }
 }
 
 PixelMapLoader::PixelMapLoader()
