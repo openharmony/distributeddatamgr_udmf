@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace UDMF {
-using CreatePixelMapInstance = void (*)(napi_env, std::shared_ptr<SystemDefinedPixelMap>, napi_value);
+using CreateInstance = napi_value (*)(napi_env, std::shared_ptr<SystemDefinedPixelMap>);
 SystemDefinedPixelMapTaihe::SystemDefinedPixelMapTaihe()
 {
     this->value_ = std::make_shared<SystemDefinedPixelMap>();
@@ -95,7 +95,7 @@ int64_t SystemDefinedPixelMapTaihe::GetInner()
         LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
         return taihe::make_holder<SystemDefinedPixelMapTaihe, ::taiheChannel::SystemDefinedPixelMapInner>();
     }
-    auto pixelMapNapi = reinterpret_cast<OHOS::UDMF::SystemDefinedPixelMapNapi *>(nativePtr);
+    auto pixelMapNapi = reinterpret_cast<SystemDefinedPixelMapNapi *>(nativePtr);
     if (pixelMapNapi == nullptr || pixelMapNapi->value_ == nullptr) {
         LOG_ERROR(UDMF_ANI, "cast SystemDefinedPixelMap failed");
         return taihe::make_holder<SystemDefinedPixelMapTaihe, ::taiheChannel::SystemDefinedPixelMapInner>();
@@ -119,20 +119,20 @@ uintptr_t SystemDefinedPixelMapTransferDynamicImpl(::taiheChannel::weak::SystemD
         LOG_ERROR(UDMF_ANI, "arkts_napi_scope_open failed");
         return 0;
     }
-    auto handle = dlopen("libudmf_data_napi.z.so", RTLD_NOW);
+    auto handle = dlopen(NEWINSTANCE_LIB.c_str(), RTLD_NOW);
     if (handle == nullptr) {
         LOG_ERROR(UDMF_ANI, "dlopen failed");
         arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
         return 0;
     }
-    auto newInstance = reinterpret_cast<CreatePixelMapInstance>(dlsym(handle, "NewInstance"));
+    CreateInstance newInstance = reinterpret_cast<CreateInstance>(dlsym(handle, "GetEtsSysPixelMap"));
     if (newInstance == nullptr) {
         LOG_ERROR(UDMF_ANI, "dlsym get func failed, %{public}s", dlerror());
         arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
+        dlclose(handle);
         return 0;
     }
-    napi_value instance = nullptr;
-    newInstance(jsenv, systemDefinedPixelMap, instance);
+    napi_value instance = newInstance(jsenv, systemDefinedPixelMap);
     dlclose(handle);
     if (instance == nullptr) {
         LOG_ERROR(UDMF_ANI, "instance is nullptr");

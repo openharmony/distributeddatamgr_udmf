@@ -24,6 +24,7 @@
 namespace OHOS {
 namespace UDMF {
 static constexpr int PARAMETERSERROR = 401;
+static const std::string NEWINSTANCE_LIB = "libudmf_data_napi.z.so";
 Intention ConvertIntention(::ohos::data::unifiedDataChannel::Intention value);
 ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,
     ::ohos::data::unifiedDataChannel::ValueType const& value);

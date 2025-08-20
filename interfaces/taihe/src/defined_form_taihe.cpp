@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace UDMF {
-using CreateFormInstance = void (*)(napi_env, std::shared_ptr<SystemDefinedForm>, napi_value);
+using CreateInstance = napi_value (*)(napi_env, std::shared_ptr<SystemDefinedForm>);
 SystemDefinedFormTaihe::SystemDefinedFormTaihe()
 {
     this->value_ = std::make_shared<SystemDefinedForm>();
@@ -156,20 +156,20 @@ uintptr_t SystemDefinedFormTransferDynamicImpl(::taiheChannel::weak::SystemDefin
         LOG_ERROR(UDMF_ANI, "arkts_napi_scope_open failed");
         return 0;
     }
-    auto handle = dlopen("libudmf_data_napi.z.so", RTLD_NOW);
+    auto handle = dlopen(NEWINSTANCE_LIB.c_str(), RTLD_NOW);
     if (handle == nullptr) {
         LOG_ERROR(UDMF_ANI, "dlopen failed");
         arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
         return 0;
     }
-    auto newInstance = reinterpret_cast<CreateFormInstance>(dlsym(handle, "NewInstance"));
+    CreateInstance newInstance = reinterpret_cast<CreateInstance>(dlsym(handle, "GetEtsSysForm"));
     if (newInstance == nullptr) {
         LOG_ERROR(UDMF_ANI, "dlsym get func failed, %{public}s", dlerror());
         arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
+        dlclose(handle);
         return 0;
     }
-    napi_value instance = nullptr;
-    newInstance(jsenv, systemDefinedForm, instance);
+    napi_value instance = newInstance(jsenv, systemDefinedForm);
     dlclose(handle);
     if (instance == nullptr) {
         LOG_ERROR(UDMF_ANI, "instance is nullptr");

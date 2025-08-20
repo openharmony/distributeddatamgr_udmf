@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace UDMF {
-using CreateAppItemInstance = void (*)(napi_env, std::shared_ptr<SystemDefinedAppItem>, napi_value);
+using CreateInstance = napi_value (*)(napi_env, std::shared_ptr<SystemDefinedAppItem>);
 SystemDefinedAppItemTaihe::SystemDefinedAppItemTaihe()
 {
     this->value_ = std::make_shared<SystemDefinedAppItem>();
@@ -162,27 +162,27 @@ uintptr_t SystemDefinedAppItemTransferDynamicImpl(::taiheChannel::weak::SystemDe
         LOG_ERROR(UDMF_ANI, "cast native pointer failed");
         return 0;
     }
-    std::shared_ptr<SystemDefinedAppItem> systemDefinedAppItem= recordInnerPtr->value_;
+    std::shared_ptr<SystemDefinedAppItem> systemDefinedAppItem = recordInnerPtr->value_;
     recordInnerPtr = nullptr;
     napi_env jsenv;
     if (!arkts_napi_scope_open(taihe::get_env(), &jsenv)) {
         LOG_ERROR(UDMF_ANI, "arkts_napi_scope_open failed");
         return 0;
     }
-    auto handle = dlopen("libudmf_data_napi.z.so", RTLD_NOW);
+    auto handle = dlopen(NEWINSTANCE_LIB.c_str(), RTLD_NOW);
     if (handle == nullptr) {
         LOG_ERROR(UDMF_ANI, "dlopen failed");
         arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
         return 0;
     }
-    auto newInstance = reinterpret_cast<CreateAppItemInstance>(dlsym(handle, "NewInstance"));
+    CreateInstance newInstance = reinterpret_cast<CreateInstance>(dlsym(handle, "GetEtsSysAppItem"));
     if (newInstance == nullptr) {
         LOG_ERROR(UDMF_ANI, "dlsym get func failed, %{public}s", dlerror());
         arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
+        dlclose(handle);
         return 0;
     }
-    napi_value instance = nullptr;
-    newInstance(jsenv, systemDefinedAppItem, instance);
+    napi_value instance = newInstance(jsenv, systemDefinedAppItem);
     dlclose(handle);
     if (instance == nullptr) {
         LOG_ERROR(UDMF_ANI, "instance is nullptr");

@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace UDMF {
-using CreateRecordInstance = void (*)(napi_env, std::shared_ptr<SystemDefinedRecord>, napi_value);
+using CreateInstance = napi_value (*)(napi_env, std::shared_ptr<SystemDefinedRecord>);
 SystemDefinedRecordTaihe::SystemDefinedRecordTaihe()
 {
     this->value_ = std::make_shared<SystemDefinedRecord>();
@@ -102,20 +102,20 @@ uintptr_t SystemDefinedRecordTransferDynamicImpl(::taiheChannel::weak::SystemDef
         LOG_ERROR(UDMF_ANI, "arkts_napi_scope_open failed");
         return 0;
     }
-    auto handle = dlopen("libudmf_data_napi.z.so", RTLD_NOW);
+    auto handle = dlopen(NEWINSTANCE_LIB.c_str(), RTLD_NOW);
     if (handle == nullptr) {
         LOG_ERROR(UDMF_ANI, "dlopen failed");
         arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
         return 0;
     }
-    auto newInstance = reinterpret_cast<CreateRecordInstance>(dlsym(handle, "NewInstance"));
+    CreateInstance newInstance = reinterpret_cast<CreateInstance>(dlsym(handle, "GetEtsSysRecord"));
     if (newInstance == nullptr) {
         LOG_ERROR(UDMF_ANI, "dlsym get func failed, %{public}s", dlerror());
         arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
+        dlclose(handle);
         return 0;
     }
-    napi_value instance = nullptr;
-    newInstance(jsenv, systemDefinedRecord, instance);
+    napi_value instance = newInstance(jsenv, systemDefinedRecord);
     dlclose(handle);
     if (instance == nullptr) {
         LOG_ERROR(UDMF_ANI, "instance is nullptr");
