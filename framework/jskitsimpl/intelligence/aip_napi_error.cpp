@@ -57,15 +57,16 @@ constexpr ErrCodeMapping NATIVE_ERR_CODE2TS_ERR_CODE[] = {
     { NATIVE_SUMMARY_E_INVALID_RESULT, RAG_E_RAG_COMMON_ERROR },
     { NATIVE_SUMMARY_E_INVALID_OUTPUT, RAG_E_RAG_COMMON_ERROR },
 
-    { NATIVE_RAG_E_CONFIG_ERROR, PARAM_EXCEPTION },
+    { NATIVE_RAG_E_CONFIG_ERROR, RAG_E_RAG_PARAM_ERROR },
     { NATIVE_RAG_E_INSTANCE_EXIST, RAG_E_RAG_ALREADY_EXISTS },
-    { NATIVE_RAG_E_INVALID_INPUT, PARAM_EXCEPTION },
-    { NATIVE_RAG_E_QUERY_LENGTH_EXCEED, PARAM_EXCEPTION },
+    { NATIVE_RAG_E_INVALID_INPUT, RAG_E_RAG_PARAM_ERROR },
+    { NATIVE_RAG_E_QUERY_LENGTH_EXCEED, RAG_E_RAG_PARAM_ERROR },
     { NATIVE_RAG_E_STREAM_BUSY, RAG_E_RAG_BUSY },
     { NATIVE_RAG_E_INSTANCE_NOT_EXIST, RAG_E_RAG_ALREADY_CLOSED },
     { NATIVE_RAG_E_PROMPT_ERROR, RAG_E_RAG_COMMON_ERROR },
-    { NATIVE_RAG_E_LLM_ERROR, RAG_E_LLM_LOAD_FAILED },
+    { NATIVE_RAG_E_LLM_ERROR, RAG_E_LLM_REQUEST_FAILED },
     { NATIVE_RAG_E_LLM_OCCUPIED, RAG_E_LLM_BUSY },
+    { NATIVE_RAG_E_LLM_LOAD_FAILED, RAG_E_LLM_LOAD_FAILED },
     { NATIVE_RAG_E_LLM_TIMEOUT, RAG_E_LLM_TIMEOUT },
     { NATIVE_RAG_E_LLM_OUTPUT_INVALID, RAG_E_LLM_OUTPUT_INVALID },
     { NATIVE_RAG_E_RETRIEVER_TIMEOUT, RAG_E_RAG_TIMEOUT },
@@ -116,6 +117,7 @@ constexpr ErrMessage ERROR_MESSAGES [] = {
     { RAG_E_RAG_COMMON_ERROR, "Inner error." },
     { RAG_E_LLM_TIMEOUT, "A timeout occurred when calling the LLM." },
     { RAG_E_LLM_LOAD_FAILED, "A loading failure occurred when calling the LLM." },
+    { RAG_E_LLM_REQUEST_FAILED, "A request failure occurred when calling the LLM." },
     { RAG_E_LLM_BUSY, "The LLM chat is busy." },
     { RAG_E_LLM_OUTPUT_INVALID, "The output of LLM chat is invalid." },
     { RAG_E_RAG_ALREADY_EXISTS, "The RAG session is already exists." },
@@ -123,6 +125,7 @@ constexpr ErrMessage ERROR_MESSAGES [] = {
     { RAG_E_RAG_ALREADY_CLOSED, "Already closed." },
     { RAG_E_RAG_USER_CANCEL, "User has canceled the stream run." },
     { RAG_E_RAG_TIMEOUT, "A timeout occurred in the session." },
+    { RAG_E_RAG_PARAM_ERROR, "Params check failed." },
 };
 
 int32_t ConvertErrCodeNative2Ts(int32_t nativeErrCode)
