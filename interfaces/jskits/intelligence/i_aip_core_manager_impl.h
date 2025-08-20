@@ -39,12 +39,6 @@ public:
     int32_t GetImageEmbedding(std::string uri, std::vector<float> &results) override;
     int32_t SplitText(std::string text, int32_t size, float overlap, std::vector<std::string> &results) override;
 
-    int32_t CreateRAGSession(const ContextParam &contex, const ConfigStruct &config) override;
-    int32_t RAGSessionStreamRun(const std::string &question, const OptionStruct &option,
-        std::function<void(const StreamStruct&, int32_t)> callback) override;
-    int32_t ReleaseRAGSession() override;
-    int32_t RAGSessionRun(const std::string &query, const OptionStruct &runOption, AnswerStruct &answer) override;
-
     bool CheckDeviceType() override;
 };
 } // namespace DataIntelligence

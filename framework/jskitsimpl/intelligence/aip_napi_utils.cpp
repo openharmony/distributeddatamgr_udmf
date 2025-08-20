@@ -23,7 +23,6 @@
 #include "aip_log.h"
 #include "hilog/log_c.h"
 #include "js_native_api_types.h"
-#include "rag_chatllm_impl.h"
 
 #undef LOG_TAG
 #define LOG_TAG "AipNapiUtils"
@@ -865,47 +864,6 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, Inve
     return napi_ok;
 }
 
-napi_status AipNapiUtils::Convert2Value(napi_env env, napi_value in, napi_ref &out)
-{
-    napi_status status = napi_create_reference(env, in, 1, &out);
-    if (status != napi_ok) {
-        AIP_HILOGE("Failed to convert the chat2.");
-    }
-    return status;
-}
-
-napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, std::shared_ptr<IChatLLM> &out)
-{
-    napi_value streamChatNapi;
-    napi_ref streamChatRef = nullptr;
-    napi_status status = napi_get_named_property(env, in, "streamChat", &streamChatNapi);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to get the field streamChat.", napi_invalid_arg);
-
-    status = Convert2Value(env, streamChatNapi, streamChatRef);
-    if (status != napi_ok) {
-        AIP_HILOGW("Failed to convert the streamChat.");
-        return napi_ok;
-    }
-    out = std::make_shared<ChatLLM>(env, streamChatRef);
-    return napi_ok;
-}
-
-napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, LLMStreamAnswer &out)
-{
-    napi_value isFinishedNapi;
-    napi_status status = napi_get_named_property(env, in, "isFinished", &isFinishedNapi);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to get the field isFinished.", napi_invalid_arg);
-    status = Convert2Value(env, isFinishedNapi, out.isFinished);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field isFinished.", napi_invalid_arg);
-
-    napi_value chunkNapi;
-    status = napi_get_named_property(env, in, "chunk", &chunkNapi);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to get the field chunk.", napi_invalid_arg);
-    status = Convert2Value(env, chunkNapi, out.chunk);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field chunk.", napi_invalid_arg);
-    return napi_ok;
-}
-
 static napi_status ConvertRerankChannelParams(napi_env env, const napi_value &in, RerankParamsStruct &out)
 {
     napi_value parametersNapi;
@@ -1200,42 +1158,6 @@ napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, napi
     return napi_ok;
 }
 
-napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, OptionStruct &out)
-{
-    napi_value answerWithRetrievalItemNapi;
-    napi_status status = napi_get_named_property(env, in, "answerWithRetrievalItem", &answerWithRetrievalItemNapi);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to get the field answerWithRetrievalItem.", napi_invalid_arg);
-
-    status = Convert2Value(env, answerWithRetrievalItemNapi, out.answerWithRetrievalItem);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field answerWithRetrievalItem.", napi_invalid_arg);
-    return napi_ok;
-}
-
-napi_status AipNapiUtils::Convert2Value(napi_env env, const napi_value &in, ConfigStruct &out)
-{
-    napi_value llmNapi;
-    napi_status status = napi_get_named_property(env, in, "llm", &llmNapi);
-    if (status == napi_ok) {
-        status = Convert2Value(env, llmNapi, out.chatLLM);
-        if (status != napi_ok) {
-            AIP_HILOGW("Failed to convert the field llm. status: %{public}d", status);
-        }
-    }
-    napi_value retrieverNapi;
-    status = napi_get_named_property(env, in, "retrievalConfig", &retrieverNapi);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to get the field retrievalConfig.", napi_invalid_arg);
-    status = Convert2Value(env, retrieverNapi, out.retriever);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field retriever.", napi_invalid_arg);
-    napi_value conditionNapi;
-    status = napi_get_named_property(env, in, "retrievalCondition", &conditionNapi);
-    if (status == napi_ok) {
-        status = Convert2Value(env, conditionNapi, out.condition);
-        LOG_ERROR_RETURN(status == napi_ok, "Failed to convert the field condition.", napi_invalid_arg);
-    }
-
-    return napi_ok;
-}
-
 napi_status AipNapiUtils::Convert2JSValue(napi_env env, const std::vector<uint8_t> &in, napi_value &out)
 {
     void *native = nullptr;
@@ -1342,49 +1264,6 @@ napi_status AipNapiUtils::Convert2JSValue(napi_env env, const DataIntelligence::
     Convert2JSValue(env, in.similarityLevel, jsSimilarityLevel);
     napi_set_named_property(env, out, "similarityLevel", jsSimilarityLevel);
 
-    return napi_ok;
-}
-
-napi_status AipNapiUtils::Convert2JSValue(napi_env env, const AnswerStruct &in, napi_value &out)
-{
-    napi_status status = napi_create_object(env, &out);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to create napi object of AnswerStruct.", napi_invalid_arg);
-
-    napi_value answerStr = nullptr;
-    status = Convert2JSValue(env, in.chunk, answerStr);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to convert chunk to napi_value.", napi_invalid_arg);
-
-    status = napi_set_named_property(env, out, "chunk", answerStr);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to set chunk to object of AnswerStruct.", napi_invalid_arg);
-
-    napi_value data = nullptr;
-    status = Convert2JSValue(env, in.data, data);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to convert data to napi_value.", napi_invalid_arg);
-
-    status = napi_set_named_property(env, out, "data", data);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to set data to object of AnswerStruct.", napi_invalid_arg);
-
-    return napi_ok;
-}
-
-napi_status AipNapiUtils::Convert2JSValue(napi_env env, const StreamStruct &in, napi_value &out)
-{
-    napi_status status = napi_create_object(env, &out);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to get create napi object of StreamStruct.", napi_invalid_arg);
-
-    napi_value isFinishedNapi;
-    status = Convert2JSValue(env, in.isFinished, isFinishedNapi);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to convert isFinished to napi_value.", napi_invalid_arg);
-
-    status = napi_set_named_property(env, out, "isFinished", isFinishedNapi);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to set isFinished to object of StreamStruct.", napi_invalid_arg);
-
-    napi_value answerNapi;
-    status = Convert2JSValue(env, in.answer, answerNapi);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to convert answer to napi_value.", napi_invalid_arg);
-
-    status = napi_set_named_property(env, out, "answer", answerNapi);
-    LOG_ERROR_RETURN(status == napi_ok, "Failed to set answer to object of StreamStruct.", napi_invalid_arg);
     return napi_ok;
 }
 
