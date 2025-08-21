@@ -113,6 +113,7 @@ namespace taiheChannel = ohos::data::unifiedDataChannel;
 
 uintptr_t SummaryTransferDynamicImpl(::taiheChannel::Summary const& input)
 {
+    // 待实现
     return 0;
 }
 } // namespace UDMF
