@@ -20,7 +20,6 @@
 #include <variant>
 
 #include "i_aip_core_manager.h"
-#include "rag_chatllm_impl.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
@@ -61,7 +60,6 @@ public:
     static napi_status Convert2Value(napi_env env, napi_value in, double &out);
     static napi_status Convert2Value(napi_env env, napi_value in, std::string &out);
     static napi_status Convert2Value(napi_env env, napi_value in, std::vector<float> &out);
-    static napi_status Convert2Value(napi_env env, napi_value in, napi_ref &out);
 
     template <typename T>
     struct is_shared_ptr : std::false_type {};
@@ -122,10 +120,6 @@ public:
     static napi_status Convert2Value(napi_env env, const napi_value &in, CryptoParam &cryptoParam);
     static napi_status Convert2Value(napi_env env, const napi_value &in, ContextParam &context);
     static napi_status Convert2Value(napi_env env, const napi_value &in, napi_value &out);
-    static napi_status Convert2Value(napi_env env, const napi_value &in, OptionStruct &out);
-    static napi_status Convert2Value(napi_env env, const napi_value &in, ConfigStruct &out);
-    static napi_status Convert2Value(napi_env env, const napi_value &in, std::shared_ptr<IChatLLM> &out);
-    static napi_status Convert2Value(napi_env env, const napi_value &in, LLMStreamAnswer &out);
 
     static napi_status Convert2JSValue(napi_env env, const std::vector<uint8_t> &in, napi_value &out);
     static napi_status Convert2JSValue(napi_env env, const std::vector<float> &in, napi_value &out);
@@ -138,8 +132,6 @@ public:
     static napi_status Convert2JSValue(napi_env env, const DataIntelligence::RetrievalResponseStruct &in,
         napi_value &out);
     static napi_status Convert2JSValue(napi_env env, const DataIntelligence::ItemInfoStruct &in, napi_value &out);
-    static napi_status Convert2JSValue(napi_env env, const AnswerStruct &in, napi_value &out);
-    static napi_status Convert2JSValue(napi_env env, const StreamStruct &in, napi_value &out);
     static napi_status Convert2JSValue(napi_env env, const std::map<std::string, FieldType> &in, napi_value &out);
     static napi_status Convert2JSValue(napi_env env,
         const std::map<int32_t, std::map<std::string, RecallScoreStruct>> &in, napi_value &out);
