@@ -663,16 +663,8 @@ HWTEST_F(UdmfDelayDataTest, OH_UdmfDataLoadParams_Create_Destroy_001, TestSize.L
     OH_UdmfDataLoadParams* params = OH_UdmfDataLoadParams_Create();
     EXPECT_NE(params, nullptr);
     OH_UdmfDataLoadParams_Destroy(params);
-}
-
-/**
- * @tc.name: OH_UdmfDataLoadParams_Destroy_Null_001
- * @tc.desc: Test destroy OH_UdmfDataLoadParams with null pointer
- * @tc.type: FUNC
- */
-HWTEST_F(UdmfDelayDataTest, OH_UdmfDataLoadParams_Destroy_Null_001, TestSize.Level0)
-{
-    OH_UdmfDataLoadParams_Destroy(nullptr);
+    OH_UdmfDataLoadParams* paramsTest = nullptr;
+    OH_UdmfDataLoadParams_Destroy(paramsTest);
 }
 
 /**

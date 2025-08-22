@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace UDMF {
-constexpr int CONVERSION_RULES = 10;
+constexpr int BASE_DECIMAL = 10;
 int32_t ProgressSignalStub::OnRemoteRequest(uint32_t code,
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -46,11 +46,18 @@ void ProgressSignalCallback::HandleProgressSignalValue(MessageParcel &data)
 
     char* end = nullptr;
     errno = 0;
-    cancelStatus = std::strtoul(signalValue.c_str(), &end, CONVERSION_RULES);
+    uint32_t convertResult = std::strtoul(signalValue.c_str(), &end, BASE_DECIMAL);
     if (errno == ERANGE || end == signalValue || *end != '\0') {
         LOG_ERROR(UDMF_CLIENT, "Failed to convert signalValue, signalValue=%{public}s", signalValue.c_str());
         return;
     }
+
+    if (convertResult > INT32_MAX) {
+        LOG_ERROR(UDMF_CLIENT, "Signal value exceeds int32_t range, convertResult=%{public}u", convertResult);
+        return;
+    }
+
+    cancelStatus = static_cast<int32_t>(convertResult);
 
     switch (cancelStatus) {
         case NORMAL_PASTE:
