@@ -42,7 +42,7 @@ private:
 };
 
 extern "C" {
-    napi_value GetEtsSummary(napi_env env, std::shared_ptr<Summary> appItem);
+    napi_value GetEtsSummary(napi_env env, std::shared_ptr<Summary> summary);
 }
 } // namespace UDMF
 } // namespace OHOS
