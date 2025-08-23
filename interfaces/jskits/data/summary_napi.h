@@ -40,6 +40,10 @@ private:
     static napi_value GetSummary(napi_env env, napi_callback_info info);
     static napi_value GetTotal(napi_env env, napi_callback_info info);
 };
+
+extern "C" {
+    napi_value GetEtsSummary(napi_env env, std::shared_ptr<Summary> appItem);
+}
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_SUMMARY_NAPI_H

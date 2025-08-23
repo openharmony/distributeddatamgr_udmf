@@ -97,7 +97,7 @@ int64_t SystemDefinedPixelMapTaihe::GetInner()
     }
     auto pixelMapNapi = reinterpret_cast<SystemDefinedPixelMapNapi *>(nativePtr);
     if (pixelMapNapi == nullptr || pixelMapNapi->value_ == nullptr) {
-        LOG_ERROR(UDMF_ANI, "cast SystemDefinedPixelMap failed");
+        LOG_ERROR(UDMF_ANI, "cast SystemDefinedPixelMapNapi failed");
         return taihe::make_holder<SystemDefinedPixelMapTaihe, ::taiheChannel::SystemDefinedPixelMapInner>();
     }
     return taihe::make_holder<SystemDefinedPixelMapTaihe,
@@ -106,20 +106,20 @@ int64_t SystemDefinedPixelMapTaihe::GetInner()
 
 uintptr_t SystemDefinedPixelMapTransferDynamicImpl(::taiheChannel::weak::SystemDefinedPixelMapInner input)
 {
-    auto recordPtr = input->GetInner();
-    auto recordInnerPtr = reinterpret_cast<SystemDefinedPixelMapTaihe *>(recordPtr);
-    if (recordInnerPtr == nullptr) {
+    auto pixelMapPtr = input->GetInner();
+    auto pixelMapInnerPtr = reinterpret_cast<SystemDefinedPixelMapTaihe *>(pixelMapPtr);
+    if (pixelMapInnerPtr == nullptr) {
         LOG_ERROR(UDMF_ANI, "cast native pointer failed");
         return 0;
     }
-    std::shared_ptr<SystemDefinedPixelMap> systemDefinedPixelMap = recordInnerPtr->value_;
-    recordInnerPtr = nullptr;
+    std::shared_ptr<SystemDefinedPixelMap> systemDefinedPixelMap = pixelMapInnerPtr->value_;
+    pixelMapInnerPtr = nullptr;
     napi_env jsenv;
     if (!arkts_napi_scope_open(taihe::get_env(), &jsenv)) {
         LOG_ERROR(UDMF_ANI, "arkts_napi_scope_open failed");
         return 0;
     }
-    auto handle = dlopen(NEWINSTANCE_LIB.c_str(), RTLD_NOW);
+    auto handle = dlopen(NEW_INSTANCE_LIB.c_str(), RTLD_NOW);
     if (handle == nullptr) {
         LOG_ERROR(UDMF_ANI, "dlopen failed");
         arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);

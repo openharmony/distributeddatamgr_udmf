@@ -147,7 +147,7 @@ int64_t SystemDefinedAppItemTaihe::GetInner()
     }
     auto appItemNapi = reinterpret_cast<SystemDefinedAppItemNapi *>(nativePtr);
     if (appItemNapi == nullptr || appItemNapi->value_ == nullptr) {
-        LOG_ERROR(UDMF_ANI, "cast SystemDefinedAppItem failed");
+        LOG_ERROR(UDMF_ANI, "cast SystemDefinedAppItemNapi failed");
         return taihe::make_holder<SystemDefinedAppItemTaihe, ::taiheChannel::SystemDefinedAppItemInner>();
     }
     return taihe::make_holder<SystemDefinedAppItemTaihe,
@@ -156,20 +156,20 @@ int64_t SystemDefinedAppItemTaihe::GetInner()
 
 uintptr_t SystemDefinedAppItemTransferDynamicImpl(::taiheChannel::weak::SystemDefinedAppItemInner input)
 {
-    auto recordPtr = input->GetInner();
-    auto recordInnerPtr = reinterpret_cast<SystemDefinedAppItemTaihe *>(recordPtr);
-    if (recordInnerPtr == nullptr) {
+    auto applicationPtr = input->GetInner();
+    auto applicationInnerPtr = reinterpret_cast<SystemDefinedAppItemTaihe *>(applicationPtr);
+    if (applicationInnerPtr == nullptr) {
         LOG_ERROR(UDMF_ANI, "cast native pointer failed");
         return 0;
     }
-    std::shared_ptr<SystemDefinedAppItem> systemDefinedAppItem = recordInnerPtr->value_;
-    recordInnerPtr = nullptr;
+    std::shared_ptr<SystemDefinedAppItem> systemDefinedAppItem = applicationInnerPtr->value_;
+    applicationInnerPtr = nullptr;
     napi_env jsenv;
     if (!arkts_napi_scope_open(taihe::get_env(), &jsenv)) {
         LOG_ERROR(UDMF_ANI, "arkts_napi_scope_open failed");
         return 0;
     }
-    auto handle = dlopen(NEWINSTANCE_LIB.c_str(), RTLD_NOW);
+    auto handle = dlopen(NEW_INSTANCE_LIB.c_str(), RTLD_NOW);
     if (handle == nullptr) {
         LOG_ERROR(UDMF_ANI, "dlopen failed");
         arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);

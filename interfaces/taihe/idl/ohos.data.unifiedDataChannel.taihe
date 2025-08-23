@@ -100,9 +100,16 @@ struct Options {
 }
 
 @class
-struct Summary {
-  summary: @record Map<String, i64>;
-  totalSize: i64;
+interface Summary {
+  @get("totalSize")
+  GetTotalSize(): i64;
+  @set("totalSize")
+  SetTotalSize(totalSize: i64): void;
+  @get("summary")
+  GetSummary(): @record Map<String, i64>;
+  @set("summary")
+  SetSummary(summary: @record Map<String, i64>): void;
+  GetInner(): i64;
 }
 
 @ctor("Summary")
@@ -1056,29 +1063,30 @@ export class ApplicationDefinedRecord extends UnifiedRecord {
 }
 
 export function insertData(options: Options, data: UnifiedData): Promise<string> {
-return new Promise<string>((resolve, reject): void => {
+    return new Promise<string>((resolve, reject): void => {
+        taskpool.execute((): string => {
+            return insertDataSync(options, data.inner);
+        })
+        .then((ret: NullishType): void => {
+            resolve(ret as string);
+        })
+        .catch((ret: NullishType): void => {
+            reject(ret as Error);
+        });
+    });
+}
+
+export function insertData(options: Options, data: UnifiedData, callback: AsyncCallback<string>): void {
     taskpool.execute((): string => {
         return insertDataSync(options, data.inner);
     })
     .then((ret: NullishType): void => {
-        resolve(ret as string);
+        callback(new BusinessError(), ret as string);
     })
     .catch((ret: NullishType): void => {
-        reject(ret as Error);
+        let data: string;
+        callback(ret as BusinessError, data);
     });
-});
-}
-export function insertData(options: Options, data: UnifiedData, callback: AsyncCallback<string>): void {
-taskpool.execute((): string => {
-    return insertDataSync(options, data.inner);
-})
-.then((ret: NullishType): void => {
-    callback(new BusinessError(), ret as string);
-})
-.catch((ret: NullishType): void => {
-    let data: string;
-    callback(ret as BusinessError, data);
-});
 }
 
 export function queryData(options: Options): Promise<Array<UnifiedData>> {
@@ -1099,6 +1107,7 @@ export function queryData(options: Options): Promise<Array<UnifiedData>> {
         });
     });
 }
+
 export function queryData(options: Options, callback: AsyncCallback<Array<UnifiedData>>): void {
     taskpool.execute((): Array<UnifiedData> => {
         let dataArray = queryDataSync(options);

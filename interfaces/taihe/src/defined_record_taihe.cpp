@@ -81,7 +81,7 @@ int64_t SystemDefinedRecordTaihe::GetInner()
     }
     auto recordNapi = reinterpret_cast<SystemDefinedRecordNapi *>(nativePtr);
     if (recordNapi == nullptr || recordNapi->value_ == nullptr) {
-        LOG_ERROR(UDMF_ANI, "cast SystemDefinedRecord failed");
+        LOG_ERROR(UDMF_ANI, "cast SystemDefinedRecordNapi failed");
         return taihe::make_holder<SystemDefinedRecordTaihe, ::taiheChannel::SystemDefinedRecordInner>();
     }
     return taihe::make_holder<SystemDefinedRecordTaihe, ::taiheChannel::SystemDefinedRecordInner>(recordNapi->value_);
@@ -102,7 +102,7 @@ uintptr_t SystemDefinedRecordTransferDynamicImpl(::taiheChannel::weak::SystemDef
         LOG_ERROR(UDMF_ANI, "arkts_napi_scope_open failed");
         return 0;
     }
-    auto handle = dlopen(NEWINSTANCE_LIB.c_str(), RTLD_NOW);
+    auto handle = dlopen(NEW_INSTANCE_LIB.c_str(), RTLD_NOW);
     if (handle == nullptr) {
         LOG_ERROR(UDMF_ANI, "dlopen failed");
         arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
