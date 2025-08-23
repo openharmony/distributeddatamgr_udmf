@@ -156,14 +156,14 @@ int64_t SystemDefinedAppItemTaihe::GetInner()
 
 uintptr_t SystemDefinedAppItemTransferDynamicImpl(::taiheChannel::weak::SystemDefinedAppItemInner input)
 {
-    auto applicationPtr = input->GetInner();
-    auto applicationInnerPtr = reinterpret_cast<SystemDefinedAppItemTaihe *>(applicationPtr);
-    if (applicationInnerPtr == nullptr) {
+    auto appItemPtr = input->GetInner();
+    auto appItemInnerPtr = reinterpret_cast<SystemDefinedAppItemTaihe *>(appItemPtr);
+    if (appItemInnerPtr == nullptr) {
         LOG_ERROR(UDMF_ANI, "cast native pointer failed");
         return 0;
     }
-    std::shared_ptr<SystemDefinedAppItem> systemDefinedAppItem = applicationInnerPtr->value_;
-    applicationInnerPtr = nullptr;
+    std::shared_ptr<SystemDefinedAppItem> systemDefinedAppItem = appItemInnerPtr->value_;
+    appItemInnerPtr = nullptr;
     napi_env jsenv;
     if (!arkts_napi_scope_open(taihe::get_env(), &jsenv)) {
         LOG_ERROR(UDMF_ANI, "arkts_napi_scope_open failed");

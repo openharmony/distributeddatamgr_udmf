@@ -56,7 +56,7 @@ void SummaryTaihe::SetTotalSize(int64_t totalSize)
         if (item.first.empty()) {
             continue;
         }
-        summary.emplace(std::string(item.first), item.second);
+        summary.emplace(::taihe::string(item.first), item.second);
     }
     return summary;
 }
@@ -84,14 +84,13 @@ int64_t SummaryTaihe::GetInner()
 {
     ani_object esValue = reinterpret_cast<ani_object>(input);
     void *nativePtr = nullptr;
-    ::taihe::map<::taihe::string, int64_t> summary;
     if (!arkts_esvalue_unwrap(taihe::get_env(), esValue, &nativePtr) || nativePtr == nullptr) {
         LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
         return taihe::make_holder<SummaryTaihe, ::taiheChannel::Summary>();
     }
     auto summaryNapi = reinterpret_cast<OHOS::UDMF::SummaryNapi *>(nativePtr);
     if (summaryNapi == nullptr || summaryNapi->value_ == nullptr) {
-        LOG_ERROR(UDMF_ANI, "cast summary failed");
+        LOG_ERROR(UDMF_ANI, "cast SummaryNapi failed");
         return taihe::make_holder<SummaryTaihe, ::taiheChannel::Summary>();
     }
     return taihe::make_holder<SummaryTaihe, ::taiheChannel::Summary>(summaryNapi->value_);

@@ -36,7 +36,6 @@ public:
 
     std::shared_ptr<Summary> value_;
 };
-
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_SUMMARY_H

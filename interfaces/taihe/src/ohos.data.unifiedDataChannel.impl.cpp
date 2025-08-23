@@ -15,13 +15,11 @@
 
 #define LOG_TAG "UDMF_DATA_CHANNEL_TAIHE"
 
-#include "interop_js/arkts_esvalue.h"
 #include "logger.h"
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "plain_text.h"
 #include "stdexcept"
-#include "summary_napi.h"
 #include "taihe_common_utils.h"
 #include "taihe/runtime.hpp"
 #include "udmf_client.h"
