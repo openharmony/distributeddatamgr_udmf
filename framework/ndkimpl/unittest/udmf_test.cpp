@@ -1663,7 +1663,6 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetPrimaryPlainText003, TestSize.Level1)
     OH_UdmfRecord *record2 = OH_UdmfRecord_Create();
     OH_UdmfRecord_AddPlainText(record2, plainText);
 
-
     OH_UdsPlainText *plainText2 = OH_UdsPlainText_Create();
     OH_UdsPlainText_SetContent(plainText2, helloWorld2);
     OH_UdmfRecord* record3 = OH_UdmfRecord_Create();
@@ -1908,6 +1907,7 @@ HWTEST_F(UDMFTest, OH_UdmfData_GetRecord002, TestSize.Level1)
     OH_UdmfData_AddRecord(data3, record);
     OH_UdmfRecord *result9 = OH_UdmfData_GetRecord(data3, 0);
     EXPECT_NE(result9, nullptr);
+
     OH_UdsPlainText *plainText2 = OH_UdsPlainText_Create();
     OH_UdmfRecord_GetPlainText(result9, plainText2);
     auto content = OH_UdsPlainText_GetContent(plainText2);
