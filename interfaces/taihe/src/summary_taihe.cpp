@@ -76,7 +76,8 @@ int64_t SummaryTaihe::GetInner()
     return reinterpret_cast<int64_t>(this);
 }
 
-::taiheChannel::Summary CreateSummary() {
+::taiheChannel::Summary CreateSummary()
+{
     return taihe::make_holder<SummaryTaihe, ::taiheChannel::Summary>();
 }
 
