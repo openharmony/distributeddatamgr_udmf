@@ -44,11 +44,6 @@ int64_t SummaryTaihe::GetTotalSize()
     return this->value_->totalSize;
 }
 
-void SummaryTaihe::SetTotalSize(int64_t totalSize)
-{
-    this->value_->totalSize = totalSize;
-}
-
 ::taihe::map<::taihe::string, int64_t> SummaryTaihe::GetSummary()
 {
     ::taihe::map<::taihe::string, int64_t> summary;
@@ -59,16 +54,6 @@ void SummaryTaihe::SetTotalSize(int64_t totalSize)
         summary.emplace(::taihe::string(item.first), item.second);
     }
     return summary;
-}
-
-void SummaryTaihe::SetSummary(::taihe::map_view<::taihe::string, int64_t> summary)
-{
-    for (auto &item : summary) {
-        if (item.first.empty()) {
-            continue;
-        }
-        this->value_->summary.insert(std::make_pair(::taihe::string(item.first), item.second));
-    }
 }
 
 int64_t SummaryTaihe::GetInner()

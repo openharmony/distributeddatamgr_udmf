@@ -103,12 +103,8 @@ struct Options {
 interface Summary {
   @get("totalSize")
   GetTotalSize(): i64;
-  @set("totalSize")
-  SetTotalSize(totalSize: i64): void;
   @get("summary")
   GetSummary(): @record Map<String, i64>;
-  @set("summary")
-  SetSummary(summary: @record Map<String, i64>): void;
   GetInner(): i64;
 }
 
