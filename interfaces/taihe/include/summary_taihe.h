@@ -13,31 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef UDMF_APPLICATION_TAIHE_H
-#define UDMF_APPLICATION_TAIHE_H
+#ifndef UDMF_SUMMARY_H
+#define UDMF_SUMMARY_H
 
-#include "application_defined_record.h"
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
+#include "unified_types.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
 namespace UDMF {
-class ApplicationDefinedRecordTaihe {
+class SummaryTaihe {
 public:
-    ApplicationDefinedRecordTaihe();
-    ApplicationDefinedRecordTaihe(std::shared_ptr<ApplicationDefinedRecord> value);
+    SummaryTaihe();
+    SummaryTaihe(std::shared_ptr<Summary> value);
 
-    ::taihe::string GetType();
-    ::ohos::data::unifiedDataChannel::ValueType GetValue();
-    ::taihe::string GetApplicationDefinedType();
-    void SetApplicationDefinedType(const ::taihe::string_view &applicationDefinedType);
-    ::taihe::optional<::taihe::array<uint8_t>> GetRawData();
-    void SetRawData(const ::taihe::array_view<uint8_t> &rawData);
+    int64_t GetTotalSize();
+    ::taihe::map<::taihe::string, int64_t> GetSummary();
     int64_t GetInner();
 
-    std::shared_ptr<ApplicationDefinedRecord> value_;
+    std::shared_ptr<Summary> value_;
 };
 } // namespace UDMF
 } // namespace OHOS
-#endif // UDMF_APPLICATION_TAIHE_H
+#endif // UDMF_SUMMARY_H

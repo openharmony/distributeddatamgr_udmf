@@ -146,5 +146,14 @@ napi_value ApplicationDefinedRecordNapi::SetRawData(napi_env env, napi_callback_
     record->value_->SetRawData(rawData);
     return nullptr;
 }
+
+extern "C" {
+    napi_value GetEtsAppRecord(napi_env env, std::shared_ptr<ApplicationDefinedRecord> appRecord)
+    {
+        napi_value instance = nullptr;
+        ApplicationDefinedRecordNapi::NewInstance(env, appRecord, instance);
+        return instance;
+    }
+}
 } // namespace UDMF
 } // namespace OHOS

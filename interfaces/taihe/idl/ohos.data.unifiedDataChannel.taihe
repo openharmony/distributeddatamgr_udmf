@@ -100,9 +100,12 @@ struct Options {
 }
 
 @class
-struct Summary {
-  summary: @record Map<String, i64>;
-  totalSize: i64;
+interface Summary {
+  @get("totalSize")
+  GetTotalSize(): i64;
+  @get("summary")
+  GetSummary(): @record Map<String, i64>;
+  GetInner(): i64;
 }
 
 @ctor("Summary")
@@ -1056,29 +1059,30 @@ export class ApplicationDefinedRecord extends UnifiedRecord {
 }
 
 export function insertData(options: Options, data: UnifiedData): Promise<string> {
-return new Promise<string>((resolve, reject): void => {
+    return new Promise<string>((resolve, reject): void => {
+        taskpool.execute((): string => {
+            return insertDataSync(options, data.inner);
+        })
+        .then((ret: NullishType): void => {
+            resolve(ret as string);
+        })
+        .catch((ret: NullishType): void => {
+            reject(ret as Error);
+        });
+    });
+}
+
+export function insertData(options: Options, data: UnifiedData, callback: AsyncCallback<string>): void {
     taskpool.execute((): string => {
         return insertDataSync(options, data.inner);
     })
     .then((ret: NullishType): void => {
-        resolve(ret as string);
+        callback(new BusinessError(), ret as string);
     })
     .catch((ret: NullishType): void => {
-        reject(ret as Error);
+        let data: string;
+        callback(ret as BusinessError, data);
     });
-});
-}
-export function insertData(options: Options, data: UnifiedData, callback: AsyncCallback<string>): void {
-taskpool.execute((): string => {
-    return insertDataSync(options, data.inner);
-})
-.then((ret: NullishType): void => {
-    callback(new BusinessError(), ret as string);
-})
-.catch((ret: NullishType): void => {
-    let data: string;
-    callback(ret as BusinessError, data);
-});
 }
 
 export function queryData(options: Options): Promise<Array<UnifiedData>> {
@@ -1099,6 +1103,7 @@ export function queryData(options: Options): Promise<Array<UnifiedData>> {
         });
     });
 }
+
 export function queryData(options: Options, callback: AsyncCallback<Array<UnifiedData>>): void {
     taskpool.execute((): Array<UnifiedData> => {
         let dataArray = queryDataSync(options);
@@ -1125,4 +1130,75 @@ class ProgressInfoInner implements ProgressInfo {
         this.status = status;
     }
 }
+
+export function summaryTransferStatic(input: Any): object {
+    return summaryTransferStaticImpl(ESValue.wrap(input));
+}
+
+export function summaryTransferDynamic(input: object): Any {
+    return summaryTransferDynamicImpl(input as Summary);
+}
+
+export function systemDefinedFormTransferStatic(input: Any): object {
+    let formInner = systemDefinedFormTransferStaticImpl(ESValue.wrap(input));
+    return new SystemDefinedForm(formInner as SystemDefinedFormInner);
+}
+
+export function systemDefinedFormTransferDynamic(input: object): Any {
+    return systemDefinedFormTransferDynamicImpl((input as SystemDefinedForm).inner);
+}
+
+export function systemDefinedRecordTransferStatic(input: Any): object {
+    let recordInner = systemDefinedRecordTransferStaticImpl(ESValue.wrap(input));
+    return new SystemDefinedRecord(recordInner as SystemDefinedRecordInner);
+}
+
+export function systemDefinedRecordTransferDynamic(input: object): Any {
+    return systemDefinedRecordTransferDynamicImpl((input as SystemDefinedRecord).inner);
+}
+
+export function systemDefinedAppItemTransferStatic(input: Any): object {
+    let appItemInner = systemDefinedAppItemTransferStaticImpl(ESValue.wrap(input));
+    return new SystemDefinedAppItem(appItemInner as SystemDefinedAppItemInner);
+}
+
+export function systemDefinedAppItemTransferDynamic(input: object): Any {
+    return systemDefinedAppItemTransferDynamicImpl((input as SystemDefinedAppItem).inner);
+}
+
+export function systemDefinedPixelMapTransferStatic(input: Any): object {
+    let pixelMapInner = systemDefinedPixelMapTransferStaticImpl(ESValue.wrap(input));
+    return new SystemDefinedPixelMap(pixelMapInner as SystemDefinedPixelMapInner);
+}
+
+export function systemDefinedPixelMapTransferDynamic(input: object): Any {
+    return systemDefinedPixelMapTransferDynamicImpl((input as SystemDefinedPixelMap).inner);
+}
+
+export function applicationDefinedRecordTransferStatic(input: Any): object {
+    let appInner = applicationDefinedRecordTransferStaticImpl(ESValue.wrap(input));
+    return new ApplicationDefinedRecord(appInner as ApplicationDefinedRecordInner);
+}
+
+export function applicationDefinedRecordTransferDynamic(input: object): Any {
+    return applicationDefinedRecordTransferDynamicImpl((input as ApplicationDefinedRecord).inner);
+}
 """)
+
+function SummaryTransferStaticImpl(input: @sts_type("ESValue") Opaque): Summary;
+function SummaryTransferDynamicImpl(input: Summary): @sts_type("Any") Opaque;
+
+function SystemDefinedFormTransferStaticImpl(input: @sts_type("ESValue") Opaque): SystemDefinedFormInner;
+function SystemDefinedFormTransferDynamicImpl(input: SystemDefinedFormInner): @sts_type("Any") Opaque;
+
+function SystemDefinedRecordTransferStaticImpl(input: @sts_type("ESValue") Opaque): SystemDefinedRecordInner;
+function SystemDefinedRecordTransferDynamicImpl(input: SystemDefinedRecordInner): @sts_type("Any") Opaque;
+
+function SystemDefinedAppItemTransferStaticImpl(input: @sts_type("ESValue") Opaque): SystemDefinedAppItemInner;
+function SystemDefinedAppItemTransferDynamicImpl(input: SystemDefinedAppItemInner): @sts_type("Any") Opaque;
+
+function SystemDefinedPixelMapTransferStaticImpl(input: @sts_type("ESValue") Opaque): SystemDefinedPixelMapInner;
+function SystemDefinedPixelMapTransferDynamicImpl(input: SystemDefinedPixelMapInner): @sts_type("Any") Opaque;
+
+function ApplicationDefinedRecordTransferStaticImpl(input: @sts_type("ESValue") Opaque): ApplicationDefinedRecordInner;
+function ApplicationDefinedRecordTransferDynamicImpl(input: ApplicationDefinedRecordInner): @sts_type("Any") Opaque;
