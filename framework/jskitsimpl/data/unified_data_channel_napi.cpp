@@ -172,7 +172,7 @@ napi_value UnifiedDataChannelNapi::UpdateData(napi_env env, napi_callback_info i
         QueryOption option = { .key = ctxt->key };
         auto status = UdmfClient::GetInstance().UpdateData(option, *(ctxt->unifiedData));
         if (status == E_INVALID_PARAMETERS) {
-            ASSERT_WITH_ERRCODE(ctxt, status == E_OK, E_INVALID_PARAMETERS, "UpdataData failed!");
+            ASSERT_WITH_ERRCODE(ctxt, status == E_OK, E_INVALID_PARAMETERS, "UpdateData failed!");
         }
     };
     return NapiQueue::AsyncWork(env, ctxt, std::string(__FUNCTION__), execute);
