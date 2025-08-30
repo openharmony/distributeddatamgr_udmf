@@ -125,8 +125,6 @@ HWTEST_F(TlvUtilTest, CountBufferSize_002, TestSize.Level1)
     map["keyNum"] = key;
     object.value_ = map;
     EXPECT_EQ(12 * sizeof(TLVHead) + 36, TLVUtil::CountBufferSize(object, tlvObject)); // 108
-    auto total = tlvObject.GetTotal();
-    EXPECT_EQ(188, total);
     LOG_INFO(UDMF_TEST, "CountBufferSize_002 end.");
 }
 

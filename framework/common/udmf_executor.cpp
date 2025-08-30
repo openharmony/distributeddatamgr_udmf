@@ -16,7 +16,7 @@
 #include "udmf_executor.h"
 
 namespace OHOS::UDMF {
-static constexpr const char *EXECUTOR_MASK = "TaskExecutor_UDMF";
+static constexpr const char *EXECUTOR_MASK = "EXECUTOR_UDMF";
 
 UdmfExecutor::UdmfExecutor(size_t max, size_t min): executor_(max, min, EXECUTOR_MASK) {};
 
