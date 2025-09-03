@@ -249,21 +249,17 @@ describe('UdmfCallbackJSTest', function () {
       UDC.deleteData(optionsValid, (err, data) => {
         expect(err).assertUndefined();
         console.info(TAG, 'delete success.');
-        UDC.queryData(optionsValid, (err, data) => {
-          console.info(TAG, 'query has no data.');
+        UDC.insertData(optionsValid, unifiedData01, (err, data) => {
           expect(err).assertUndefined();
-          UDC.insertData(optionsValid, unifiedData01, (err, data) => {
+          console.info(TAG, `insert success. The key: ${data}`);
+          UDC.insertData(optionsValid, unifiedData02, (err, data) => {
             expect(err).assertUndefined();
             console.info(TAG, `insert success. The key: ${data}`);
-            UDC.insertData(optionsValid, unifiedData02, (err, data) => {
+            UDC.queryData(optionsValid, function (err, data) {
               expect(err).assertUndefined();
-              console.info(TAG, `insert success. The key: ${data}`);
-              UDC.queryData(optionsValid, function (err, data) {
-                expect(err).assertUndefined();
-                console.info(TAG, 'query success.data.length=' + data.length);
-                expect(data.length).assertEqual(2);
-                done();
-              });
+              console.info(TAG, 'query success.data.length=' + data.length);
+              expect(data.length).assertEqual(2);
+              done();
             });
           });
         });

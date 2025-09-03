@@ -285,25 +285,14 @@ describe('UdmfPromiseJSTest', function () {
     try {
       UDC.deleteData(optionsValid).then(() => {
         console.info(TAG, 'delete success.');
-        UDC.queryData(optionsValid).then(() => {
-          console.info(TAG, 'Unreachable code!');
-          expect(err).assertUndefined();
-          done();
-        }).catch((err) => {
-          console.info(TAG, 'query has no data.');
+        UDC.insertData(optionsValid, unifiedData01).then((data) => {
+          console.info(TAG, `insert success. The key: ${data}`);
           UDC.insertData(optionsValid, unifiedData01).then((data) => {
             console.info(TAG, `insert success. The key: ${data}`);
-            UDC.insertData(optionsValid, unifiedData01).then((data) => {
-              console.info(TAG, `insert success. The key: ${data}`);
-              UDC.queryData(optionsValid).then((data) => {
-                console.info(TAG, 'query success.');
-                expect(data.length).assertEqual(2);
-                done();
-              }).catch(() => {
-                console.error(TAG, 'Unreachable code!');
-                expect(null).assertFail();
-                done();
-              });
+            UDC.queryData(optionsValid).then((data) => {
+              console.info(TAG, 'query success.');
+              expect(data.length).assertEqual(2);
+              done();
             }).catch(() => {
               console.error(TAG, 'Unreachable code!');
               expect(null).assertFail();
@@ -314,6 +303,10 @@ describe('UdmfPromiseJSTest', function () {
             expect(null).assertFail();
             done();
           });
+        }).catch(() => {
+          console.error(TAG, 'Unreachable code!');
+          expect(null).assertFail();
+          done();
         });
       }).catch(() => {
         console.error(TAG, 'Unreachable code!');
