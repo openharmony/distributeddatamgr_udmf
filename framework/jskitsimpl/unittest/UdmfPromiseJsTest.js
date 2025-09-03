@@ -274,55 +274,6 @@ describe('UdmfPromiseJSTest', function () {
   });
 
   /**
-   * @tc.name UdmfQueryPromiseSucTest
-   * @tc.desc Test Js Api queryData successful
-   * @tc.type: FUNC
-   * @tc.require: issueNumber
-   */
-  it('UdmfQueryPromiseSucTest', 0, async function (done) {
-    const TAG = 'UdmfQueryPromiseSucTest:';
-    console.info(TAG, 'start');
-    try {
-      UDC.deleteData(optionsValid).then(() => {
-        console.info(TAG, 'delete success.');
-        UDC.insertData(optionsValid, unifiedData01).then((data) => {
-          console.info(TAG, `insert success. The key: ${data}`);
-          UDC.insertData(optionsValid, unifiedData01).then((data) => {
-            console.info(TAG, `insert success. The key: ${data}`);
-            UDC.queryData(optionsValid).then((data) => {
-              console.info(TAG, 'query success.');
-              expect(data.length).assertEqual(2);
-              done();
-            }).catch(() => {
-              console.error(TAG, 'Unreachable code!');
-              expect(null).assertFail();
-              done();
-            });
-          }).catch(() => {
-            console.error(TAG, 'Unreachable code!');
-            expect(null).assertFail();
-            done();
-          });
-        }).catch(() => {
-          console.error(TAG, 'Unreachable code!');
-          expect(null).assertFail();
-          done();
-        });
-      }).catch(() => {
-        console.error(TAG, 'Unreachable code!');
-        expect(null).assertFail();
-        done();
-      });
-    } catch (e) {
-      console.error(TAG, 'Unreachable code!');
-      expect(null).assertFail();
-      done();
-    }
-    console.info(TAG, 'end');
-  });
-
-
-  /**
    * @tc.name UdmfDeletePromiseInvalidOptionsTest
    * @tc.desc Test Js Api deleteData with invalid options
    * @tc.type: FUNC

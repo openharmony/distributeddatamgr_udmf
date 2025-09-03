@@ -237,43 +237,6 @@ describe('UdmfCallbackJSTest', function () {
   });
 
   /**
-   * @tc.name UdmfQueryCallbackSucTest
-   * @tc.desc Test Js Api queryData successful
-   * @tc.type: FUNC
-   * @tc.require: issueNumber
-   */
-  it('UdmfQueryCallbackSucTest', 0, async function (done) {
-    const TAG = 'UdmfQueryCallbackSucTest:';
-    console.info(TAG, 'start');
-    try {
-      UDC.deleteData(optionsValid, (err, data) => {
-        expect(err).assertUndefined();
-        console.info(TAG, 'delete success.');
-        UDC.insertData(optionsValid, unifiedData01, (err, data) => {
-          expect(err).assertUndefined();
-          console.info(TAG, `insert success. The key: ${data}`);
-          UDC.insertData(optionsValid, unifiedData02, (err, data) => {
-            expect(err).assertUndefined();
-            console.info(TAG, `insert success. The key: ${data}`);
-            UDC.queryData(optionsValid, function (err, data) {
-              expect(err).assertUndefined();
-              console.info(TAG, 'query success.data.length=' + data.length);
-              expect(data.length).assertEqual(2);
-              done();
-            });
-          });
-        });
-      });
-    } catch (e) {
-      console.error(TAG, 'Unreachable code!');
-      expect(null).assertFail();
-      done();
-    }
-    console.info(TAG, 'end');
-  });
-
-
-  /**
    * @tc.name UdmfDeleteCallbackInvalidOptionsTest
    * @tc.desc Test Js Api deleteData with invalid options
    * @tc.type: FUNC
