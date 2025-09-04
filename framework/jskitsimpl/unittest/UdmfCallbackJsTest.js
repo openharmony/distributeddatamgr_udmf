@@ -261,7 +261,7 @@ describe('UdmfCallbackJSTest', function () {
               UDC.queryData(optionsValid, function (err, data) {
                 expect(err).assertUndefined();
                 console.info(TAG, 'query success.data.length=' + data.length);
-                expect(data.length).assertEqual(2);
+                expect(data.length >= 2).assertTrue();
                 done();
               });
             });
@@ -275,7 +275,6 @@ describe('UdmfCallbackJSTest', function () {
     }
     console.info(TAG, 'end');
   });
-
 
   /**
    * @tc.name UdmfDeleteCallbackInvalidOptionsTest

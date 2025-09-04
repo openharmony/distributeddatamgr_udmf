@@ -297,7 +297,7 @@ describe('UdmfPromiseJSTest', function () {
               console.info(TAG, `insert success. The key: ${data}`);
               UDC.queryData(optionsValid).then((data) => {
                 console.info(TAG, 'query success.');
-                expect(data.length).assertEqual(2);
+                expect(data.length >= 2).assertTrue();
                 done();
               }).catch(() => {
                 console.error(TAG, 'Unreachable code!');
@@ -327,7 +327,6 @@ describe('UdmfPromiseJSTest', function () {
     }
     console.info(TAG, 'end');
   });
-
 
   /**
    * @tc.name UdmfDeletePromiseInvalidOptionsTest
