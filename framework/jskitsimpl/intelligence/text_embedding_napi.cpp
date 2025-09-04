@@ -145,7 +145,7 @@ static napi_value StartInit(napi_env env, napi_value exports, struct TextEmbeddi
 napi_value TextEmbeddingNapi::Init(napi_env env, napi_value exports)
 {
     AIP_HILOGD("Enter");
-    if (!AipNapiUtils::LoadAlgoLibrary(AIP_MANAGER_PATH, textAipCoreMgrHandle_, true)) {
+    if (!AipNapiUtils::LoadAlgoLibrary(AIP_MANAGER_PATH, textAipCoreMgrHandle_)) {
         AIP_HILOGE("LoadAlgoLibrary failed");
     }
 

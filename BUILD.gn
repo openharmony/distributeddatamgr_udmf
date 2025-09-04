@@ -22,7 +22,6 @@ group("udmf_packages") {
       "interfaces/innerkits:utd_client",
       "interfaces/innerkits/aipcore:aip_core_mgr_static",
       "interfaces/jskits:intelligence_napi",
-      "interfaces/jskits:rag_napi",
       "interfaces/jskits:udmf_data_napi",
       "interfaces/jskits:unifieddatachannel_napi",
       "interfaces/jskits:uniformtypedescriptor_napi",
