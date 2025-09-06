@@ -326,4 +326,23 @@ HWTEST_F(UdmfTypesUtilTest, Unmarshalling010, TestSize.Level1)
     }
     LOG_INFO(UDMF_TEST, "Unmarshalling010 end.");
 }
+
+/**
+* @tc.name: Unmarshalling011
+* @tc.desc: Normal testcase of Unmarshalling
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Unmarshalling011, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Unmarshalling011 begin.");
+    Visibility input = Visibility::VISIBILITY_OWN_PROCESS;
+
+    MessageParcel parcel;
+    ITypesUtil::Marshalling(input, parcel);
+    Visibility output;
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(input, output);
+    LOG_INFO(UDMF_TEST, "Unmarshalling011 end.");
+}
 } // OHOS::Test
