@@ -271,7 +271,7 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::map<std::s
     return napi_invalid_arg;
 }
 
-napi_status NapiDataUtils::SetValue(napi_env env, const std::map<std::string, int64_t> &in, napi_value &out)
+napi_status NapiDataUtils::SetValueToArray(napi_env env, const std::map<std::string, int64_t> &in, napi_value &out)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "napi_value <- std::map<std::string, int64_t> ");
     napi_status status = napi_create_array_with_length(env, in.size(), &out);
@@ -806,6 +806,17 @@ napi_status NapiDataUtils::GetOptionalNamedProperty(napi_env env, napi_value &ob
     if (IsNull(env, napiValue)) {
         napiValue = nullptr;
         return napi_ok;
+    }
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::SetValue(napi_env env, const std::map<std::string, int64_t> &in, napi_value &out)
+{
+    NAPI_CALL_BASE(env, napi_create_object(env, &out), napi_invalid_arg);
+    for (const auto &[key, value] : in) {
+        napi_value jsProValue = nullptr;
+        NAPI_CALL_BASE(env, SetValue(env, value, jsProValue), napi_invalid_arg);
+        NAPI_CALL_BASE(env, napi_set_named_property(env, out, key.c_str(), jsProValue), napi_invalid_arg);
     }
     return napi_ok;
 }
