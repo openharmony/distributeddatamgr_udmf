@@ -17,7 +17,7 @@ import I18n from '@ohos.i18n';
 import image from '@ohos.multimedia.image';
 import uniformDataStruct from '@ohos.data.uniformDataStruct';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { display } from '@kit.ArkUI';
+import { AnimatorResult } from '@kit.ArkUI';
 
 export enum FormType {
   TYPE_BIG = 0,
@@ -82,7 +82,6 @@ const TITLE_FONT_COLOR: string = '#ff182431';
 const DESCRIPTION_FONT_COLOR: string = '#99182431';
 const DEFAULT_MID_IMAGE_HEIGHT: number = 72; // 4x2卡片，图片默认高度
 const DEFAULT_SMALL_IMAGE_HEIGHT: number = 59; // 2x1卡片，图片默认高度
-const DEFAULT_DENSITY: number = 3.25;
 
 interface CardStyle {
   thumbWidth: number,
@@ -190,12 +189,14 @@ export struct ContentFormCard {
   @State appImage: image.PixelMap | undefined = undefined;
   @State lineCount: number = 1;
   @State isMirrorLanguageType: boolean = false;
+  private backAnimator: AnimatorResult | undefined = undefined;
+  private widthEnd: number = 0;
   private handleOnClick: () => void = () => {
   };
 
   aboutToAppear(): void {
     this.initSystemLanguage();
-    this.initCardStyle();
+    this.initCardStyle(this.formWidth, this.formHeight);
     this.createPixelMap();
   }
 
@@ -203,6 +204,7 @@ export struct ContentFormCard {
     this.contentFormData = undefined;
     this.thumbImage = undefined;
     this.appImage = undefined;
+    this.backAnimator = undefined;
   }
 
   formTypeChange(): void {
@@ -217,11 +219,57 @@ export struct ContentFormCard {
         this.formWidth = DEFAULT_SMALL_CARD_WIDTH;
         break;
     }
-    this.initCardStyle();
+    this.initCardStyle(this.formWidth, NaN);
+  }
+
+  initAnimator() {
+    this.backAnimator = this.getUIContext().createAnimator({
+      duration: 300,
+      easing: "friction",
+      delay: 0,
+      fill: "forwards",
+      direction: "normal",
+      iterations: 1,
+      begin: this.cardWidth,
+      end: this.widthEnd
+    });
+    this.backAnimator.onFrame = (value: number) => {
+      this.initCardStyle(value, NaN);
+    }
   }
 
   formSizeChange(): void {
-    this.initCardStyle();
+    this.updateWidthEndValue();
+    if (this.widthEnd === this.cardWidth) {
+      return;
+    }
+    this.initAnimator();
+    this.backAnimator?.play();
+  }
+
+  updateWidthEndValue(): void {
+    let scale = 1;
+    let defaultWidth = DEFAULT_SMALL_CARD_WIDTH;
+    switch (this.formType) {
+      case FormType.TYPE_BIG:
+        scale = this.formWidth ? (this.formWidth / DEFAULT_BIG_CARD_SIZE) : this.formHeight / DEFAULT_BIG_CARD_SIZE;
+        defaultWidth = DEFAULT_BIG_CARD_SIZE;
+        break;
+      case FormType.TYPE_MID:
+        scale = this.formWidth ? (this.formWidth / DEFAULT_MID_CARD_WIDTH) : this.formHeight / DEFAULT_MID_CARD_HEIGHT;
+        defaultWidth = DEFAULT_MID_CARD_WIDTH;
+        break;
+      default:
+        scale = this.formWidth ? (this.formWidth / DEFAULT_SMALL_CARD_WIDTH) : this.formHeight / DEFAULT_SMALL_CARD_HEIGHT;
+        break;
+    }
+    let minScale = this.formType === FormType.TYPE_SMALL ? SMALL_MIN_CARD_SCALE : MIN_CARD_SCALE;
+    if (scale > MAX_CARD_SCALE) {
+      scale = MAX_CARD_SCALE;
+    } else if (scale < minScale) {
+      scale = minScale;
+    }
+    this.widthEnd = scale * defaultWidth;
   }
 
   initCardScale(widthScale: number, defaultWidth: number, defaultHeight: number): void {
@@ -240,26 +288,44 @@ export struct ContentFormCard {
       `cardWidth: ${this.cardWidth}, cardHeight: ${this.cardHeight}`);
   }
 
-  initCardStyle(): void {
-    let widthScale = 1;
-    this.lineCount = 1;
+  initCardStyle(curWidth: number, curHeight: number): void {
+    let scale = 1;
+    if (this.lineCount !== 2) {
+      this.lineCount = 1;
+    }
+    let defaultWidth = DEFAULT_SMALL_CARD_WIDTH;
+    let defaultHeight = DEFAULT_SMALL_CARD_HEIGHT;
     switch (this.formType) {
       case FormType.TYPE_BIG:
         this.formStyle = BIG_CARD_STYLE;
-        widthScale = this.formWidth ? this.formWidth / DEFAULT_BIG_CARD_SIZE : 1;
-        this.initCardScale(widthScale, DEFAULT_BIG_CARD_SIZE, DEFAULT_BIG_CARD_SIZE);
+        defaultWidth = DEFAULT_BIG_CARD_SIZE;
+        defaultHeight = DEFAULT_BIG_CARD_SIZE;
+        if (curHeight) {
+          scale = curHeight / DEFAULT_BIG_CARD_SIZE;
+        } else {
+          scale = curWidth ? curWidth / DEFAULT_BIG_CARD_SIZE : 1;
+        }
         break;
       case FormType.TYPE_MID:
         this.formStyle = MID_CARD_STYLE;
-        widthScale = this.formWidth ? this.formWidth / DEFAULT_MID_CARD_WIDTH : 1;
-        this.initCardScale(widthScale, DEFAULT_MID_CARD_WIDTH, DEFAULT_MID_CARD_HEIGHT);
+        defaultWidth = DEFAULT_MID_CARD_WIDTH;
+        defaultHeight = DEFAULT_MID_CARD_HEIGHT;
+        if (curHeight) {
+          scale = curHeight / DEFAULT_MID_CARD_HEIGHT;
+        } else {
+          scale = curWidth ? curWidth / DEFAULT_MID_CARD_WIDTH : 1;
+        }
         break;
       default:
         this.formStyle = SMALL_CARD_STYLE;
-        widthScale = this.formWidth ? this.formWidth / DEFAULT_SMALL_CARD_WIDTH : 1;
-        this.initCardScale(widthScale, DEFAULT_SMALL_CARD_WIDTH, DEFAULT_SMALL_CARD_HEIGHT);
+        if (curHeight) {
+          scale = curHeight / DEFAULT_SMALL_CARD_HEIGHT;
+        } else {
+          scale = curWidth ? curWidth / DEFAULT_SMALL_CARD_WIDTH : 1;
+        }
         break;
     }
+    this.initCardScale(scale, defaultWidth, defaultHeight);
   }
 
   @Styles
