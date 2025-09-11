@@ -102,18 +102,6 @@ size_t TLVObject::Count(const std::vector<uint8_t> &value)
     return size;
 }
 
-size_t TLVObject::Count(const OHOS::AAFwk::Want &value)
-{
-    Parcel parcel;
-    if (!value.Marshalling(parcel)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Marshalling want error when Count");
-        return 0;
-    }
-    auto size = sizeof(TLVHead) + parcel.GetDataSize();
-    total_ += size;
-    return size;
-}
-
 size_t TLVObject::Count(const std::monostate &value)
 {
     auto size = sizeof(TLVHead);
@@ -201,65 +189,6 @@ bool TLVObject::Read(std::vector<uint8_t> &value, const TLVHead &head)
     std::vector<uint8_t> buff(startCursor, startCursor + head.len);
     value = std::move(buff);
     cursor_ += head.len;
-    return true;
-}
-
-bool TLVObject::Write(TAG tag, const OHOS::AAFwk::Want &value)
-{
-    Parcel parcel;
-    if (!value.Marshalling(parcel)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Marshalling want error in tlv write. tag=%{public}hu", tag);
-        return false;
-    }
-    auto size = parcel.GetDataSize();
-    auto buffer = parcel.GetData();
-
-    if (!HasExpectBuffer(sizeof(TLVHead) + size)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Has no enough buffer in tlv write want. tag=%{public}hu", tag);
-        return false;
-    }
-    auto tlvHead = reinterpret_cast<TLVHead *>(GetStartCursor());
-    tlvHead->tag = HostToNet(static_cast<uint16_t>(tag));
-    tlvHead->len = HostToNet(static_cast<uint32_t>(size));
-    if (size != 0) {
-        auto err = memcpy_s(tlvHead->value, size, reinterpret_cast<const void *>(buffer), size);
-        if (err != EOK) {
-            LOG_ERROR(UDMF_FRAMEWORK, "memcpy error in tlv write want. tag=%{public}hu", tag);
-            return false;
-        }
-    }
-    cursor_ += sizeof(TLVHead) + size;
-    return SaveBufferToFile();
-}
-
-bool TLVObject::Read(OHOS::AAFwk::Want &value, const TLVHead &head)
-{
-    if (!HasExpectBuffer(head.len)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Has no enough buffer in tlv read want. tag=%{public}hu", head.tag);
-        return false;
-    }
-    if (!LoadBufferFormFile(head.len)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "LoadBufferFormFile error in tlv read want. tag=%{public}hu", head.tag);
-        return false;
-    }
-    auto startCursor = GetStartCursor();
-    std::vector<uint8_t> buff(startCursor, startCursor + head.len);
-
-    auto buffer = (uintptr_t)(buff.data() + cursor_);
-    cursor_ += head.len;
-
-    Parcel parcel;
-    if (!parcel.ParseFrom(buffer, head.len)) {
-        LOG_ERROR(UDMF_FRAMEWORK, "ParseFrom error in tlv read want. tag=%{public}hu", head.tag);
-        return false;
-    }
-    auto want = AAFwk::Want::Unmarshalling(parcel);
-    if (want == nullptr) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Unmarshalling want error in tlv read. tag=%{public}hu", head.tag);
-        return false;
-    }
-    value = *want;
-    delete want;
     return true;
 }
 

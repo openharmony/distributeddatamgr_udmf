@@ -47,19 +47,16 @@ public:
 
     size_t Count(const std::string &value);
     size_t Count(const std::vector<uint8_t> &value);
-    size_t Count(const OHOS::AAFwk::Want &value);
     size_t Count(const std::monostate &value);
     size_t Count(const void *value);
 
     bool Write(TAG tag, const std::string &value);
     bool Write(TAG tag, const std::vector<uint8_t> &value);
-    bool Write(TAG tag, const OHOS::AAFwk::Want &value);
     bool Write(TAG tag, const std::monostate &value);
     bool Write(TAG tag, const void *value);
 
     bool Read(std::string &value, const TLVHead &head);
     bool Read(std::vector<uint8_t> &value, const TLVHead &head);
-    bool Read(OHOS::AAFwk::Want &value, const TLVHead &head);
     bool Read(std::monostate &value, const TLVHead &head);
     bool Read(void *value, const TLVHead &head);
 

@@ -79,11 +79,6 @@ size_t TLVObject::Count(const std::vector<uint8_t> &value)
     return sizeof(TLVHead);
 }
 
-size_t TLVObject::Count(const OHOS::AAFwk::Want &value)
-{
-    return sizeof(TLVHead);
-}
-
 size_t TLVObject::Count(const std::monostate &value)
 {
     return sizeof(TLVHead);
@@ -111,16 +106,6 @@ bool TLVObject::Write(TAG tag, const std::vector<uint8_t> &value)
 
 
 bool TLVObject::Read(std::vector<uint8_t> &value, const TLVHead &head)
-{
-    return true;
-}
-
-bool TLVObject::Write(TAG tag, const OHOS::AAFwk::Want &value)
-{
-    return true;
-}
-
-bool TLVObject::Read(OHOS::AAFwk::Want &value, const TLVHead &head)
 {
     return true;
 }
