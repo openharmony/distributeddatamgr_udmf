@@ -961,12 +961,12 @@ int OH_UdmfRecord_GetPixelMap(OH_UdmfRecord* record, OH_UdsPixelMap* pixelMap)
 
 int OH_UdmfRecord_GetArrayBuffer(OH_UdmfRecord* record, const char* type, OH_UdsArrayBuffer* buffer)
 {
-    unsigned int size = 0;
-    unsigned char *entry;
     if (record == nullptr || type == nullptr || buffer == nullptr) {
         LOG_ERROR(UDMF_CAPI, "Param is invalid.");
         return UDMF_E_INVALID_PARAM;
     }
+    unsigned int size = 0;
+    unsigned char *entry;
     int ret = OH_UdmfRecord_GetGeneralEntry(record, type, &entry, &size);
     if (ret != UDMF_E_OK) {
         LOG_ERROR(UDMF_CAPI, "OH_UdmfRecord_GetGeneralEntry ret: %{public}d.", ret);
@@ -1163,11 +1163,19 @@ int OH_UdmfRecord_SetProvider(OH_UdmfRecord* record, const char* const* types, u
 
 int OH_UdmfProgressInfo_GetProgress(OH_Udmf_ProgressInfo* progressInfo)
 {
+    if (progressInfo == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "progressInfo is nullptr");
+        return UDMF_E_INVALID_PARAM;
+    }
     return progressInfo->progress;
 }
 
 int OH_UdmfProgressInfo_GetStatus(OH_Udmf_ProgressInfo* progressInfo)
 {
+    if (progressInfo == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "progressInfo is nullptr");
+        return UDMF_E_INVALID_PARAM;
+    }
     return progressInfo->status;
 }
 
@@ -1191,7 +1199,7 @@ void OH_UdmfGetDataParams_Destroy(OH_UdmfGetDataParams* pThis)
 
 void OH_UdmfGetDataParams_SetDestUri(OH_UdmfGetDataParams* params, const char* destUri)
 {
-    if (destUri == nullptr) {
+    if (params == nullptr || destUri == nullptr) {
         return;
     }
     params->destUri = std::string(destUri);
