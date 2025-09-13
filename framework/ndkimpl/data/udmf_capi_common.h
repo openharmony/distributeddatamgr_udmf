@@ -97,7 +97,7 @@ struct OH_UdmfRecord {
     unsigned int recordDataLen {0};
     char **typesArray {nullptr};
     unsigned int typesCount {0};
-    char *lastType {nullptr};
+    std::string lastType;
     std::mutex mutex;
 };
 

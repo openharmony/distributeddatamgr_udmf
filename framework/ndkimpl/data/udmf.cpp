@@ -963,6 +963,10 @@ int OH_UdmfRecord_GetArrayBuffer(OH_UdmfRecord* record, const char* type, OH_Uds
 {
     unsigned int size = 0;
     unsigned char *entry;
+    if (record == nullptr || type == nullptr || buffer == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Param is invalid.");
+        return UDMF_E_INVALID_PARAM;
+    }
     int ret = OH_UdmfRecord_GetGeneralEntry(record, type, &entry, &size);
     if (ret != UDMF_E_OK) {
         LOG_ERROR(UDMF_CAPI, "OH_UdmfRecord_GetGeneralEntry ret: %{public}d.", ret);
