@@ -44,6 +44,7 @@ using namespace OHOS::UDMF;
 
 namespace OHOS::Test {
 static constexpr uint64_t MAX_TYPES_COUNT = 10 * 1024;
+static constexpr const char *TEST_DATA = "/data/utd/destUri";
 class UDMFTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -1527,8 +1528,135 @@ HWTEST_F(UDMFTest, OH_Udmf_BuildRecordByOpenHarmonyArrayBuffer002, TestSize.Leve
     int buildRes7 = OH_UdmfRecord_GetArrayBuffer(record2, type2, buffer2);
     EXPECT_EQ(buildRes7, UDMF_E_INVALID_PARAM);
 
+    int buildRes8 = OH_UdmfRecord_GetArrayBuffer(record2, type2, nullptr);
+    EXPECT_EQ(buildRes8, UDMF_E_INVALID_PARAM);
+
     OH_UdmfRecord_Destroy(record2);
     OH_UdsArrayBuffer_Destroy(buffer2);
+}
+
+/**
+ * @tc.name: OH_UdmfProgressInfo_GetProgress001
+ * @tc.desc: test OH_UdmfProgressInfo_GetProgress with invalid param
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfProgressInfo_GetProgress001, TestSize.Level0)
+{
+    OH_Udmf_ProgressInfo *progressInfo = nullptr;
+    int progress = OH_UdmfProgressInfo_GetProgress(progressInfo);
+    EXPECT_EQ(progress, UDMF_E_INVALID_PARAM);
+}
+
+/**
+ * @tc.name: OH_UdmfProgressInfo_GetStatus001
+ * @tc.desc: test OH_UdmfProgressInfo_GetStatus with invalid param
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfProgressInfo_GetStatus001, TestSize.Level0)
+{
+    OH_Udmf_ProgressInfo *progressInfo = nullptr;
+    int status = OH_UdmfProgressInfo_GetStatus(progressInfo);
+    EXPECT_EQ(status, UDMF_E_INVALID_PARAM);
+}
+
+/**
+ * @tc.name: OH_UdmfGetDataParams_SetDestUri001
+ * @tc.desc: test OH_UdmfGetDataParams_SetDestUri with invalid param
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfGetDataParams_SetDestUri001, TestSize.Level0)
+{
+    OH_UdmfGetDataParams *params1 = OH_UdmfGetDataParams_Create();
+    const char *destUri1 = nullptr;
+    EXPECT_NO_FATAL_FAILURE(OH_UdmfGetDataParams_SetDestUri(params1, destUri1));
+
+    OH_UdmfGetDataParams *params2 = nullptr;
+    const char *destUri2 = TEST_DATA;
+    EXPECT_NO_FATAL_FAILURE(OH_UdmfGetDataParams_SetDestUri(params2, destUri2));
+
+    EXPECT_NO_FATAL_FAILURE(OH_UdmfGetDataParams_SetDestUri(params1, destUri2));
+
+    EXPECT_NO_FATAL_FAILURE(OH_UdmfGetDataParams_SetDestUri(params2, destUri1));
+
+    OH_UdmfGetDataParams_Destroy(params1);
+}
+
+/**
+ * @tc.name: OH_UdsContentForm_GetThumbData001
+ * @tc.desc: test OH_UdsContentForm_GetThumbData
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdsContentForm_GetThumbData001, TestSize.Level0)
+{
+    OH_UdsContentForm *contentForm1 = OH_UdsContentForm_Create();
+    unsigned char** thumbData1 = new unsigned char*[3];
+    unsigned int test;
+    unsigned int* len1 = &test;
+    int result1 = OH_UdsContentForm_GetThumbData(contentForm1, thumbData1, len1);
+    EXPECT_NE(result1, UDMF_E_INVALID_PARAM);
+
+    unsigned int* len2 = nullptr;
+    int result2 = OH_UdsContentForm_GetThumbData(contentForm1, thumbData1, len2);
+    EXPECT_EQ(result2, UDMF_E_INVALID_PARAM);
+
+    OH_UdsContentForm *contentForm2 = nullptr;
+    int result3 = OH_UdsContentForm_GetThumbData(contentForm2, thumbData1, len1);
+    EXPECT_EQ(result3, UDMF_E_INVALID_PARAM);
+
+    unsigned char** thumbData2 = nullptr;
+    int result4 = OH_UdsContentForm_GetThumbData(contentForm2, thumbData2, len1);
+    EXPECT_EQ(result4, UDMF_E_INVALID_PARAM);
+
+    int result5 = OH_UdsContentForm_GetThumbData(contentForm2, thumbData2, len2);
+    EXPECT_EQ(result5, UDMF_E_INVALID_PARAM);
+
+    int result6 = OH_UdsContentForm_GetThumbData(contentForm2, thumbData2, len2);
+    EXPECT_EQ(result6, UDMF_E_INVALID_PARAM);
+
+    int result7 = OH_UdsContentForm_GetThumbData(contentForm1, thumbData2, len1);
+    EXPECT_EQ(result7, UDMF_E_INVALID_PARAM);
+
+    OH_UdsContentForm_Destroy(contentForm1);
+    delete[] thumbData1;
+}
+
+/**
+ * @tc.name: OH_UdsContentForm_GetAppIcon001
+ * @tc.desc: test OH_UdsContentForm_GetAppIcon
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdsContentForm_GetAppIcon001, TestSize.Level0)
+{
+    OH_UdsContentForm *contentForm1 = OH_UdsContentForm_Create();
+    unsigned char** appIcon1 = new unsigned char*[3];
+    unsigned int test;
+    unsigned int* len1 = &test;
+    int result1 = OH_UdsContentForm_GetAppIcon(contentForm1, appIcon1, len1);
+    EXPECT_NE(result1, UDMF_E_INVALID_PARAM);
+
+    unsigned int* len2 = nullptr;
+    int result2 = OH_UdsContentForm_GetAppIcon(contentForm1, appIcon1, len2);
+    EXPECT_EQ(result2, UDMF_E_INVALID_PARAM);
+
+    OH_UdsContentForm *contentForm2 = nullptr;
+    int result3 = OH_UdsContentForm_GetAppIcon(contentForm2, appIcon1, len1);
+    EXPECT_EQ(result3, UDMF_E_INVALID_PARAM);
+
+    unsigned char** appIcon2 = nullptr;
+    int result4 = OH_UdsContentForm_GetAppIcon(contentForm2, appIcon2, len1);
+    EXPECT_EQ(result4, UDMF_E_INVALID_PARAM);
+
+    int result5 = OH_UdsContentForm_GetAppIcon(contentForm2, appIcon2, len2);
+    EXPECT_EQ(result5, UDMF_E_INVALID_PARAM);
+
+    int result6 = OH_UdsContentForm_GetAppIcon(contentForm2, appIcon2, len2);
+    EXPECT_EQ(result6, UDMF_E_INVALID_PARAM);
+
+    int result7 = OH_UdsContentForm_GetAppIcon(contentForm1, appIcon2, len1);
+    EXPECT_EQ(result7, UDMF_E_INVALID_PARAM);
+
+    OH_UdsContentForm_Destroy(contentForm1);
+    delete[] appIcon1;
 }
 
 /**

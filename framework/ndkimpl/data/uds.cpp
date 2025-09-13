@@ -589,7 +589,9 @@ const char* OH_UdsContentForm_GetType(OH_UdsContentForm* pThis)
 
 int OH_UdsContentForm_GetThumbData(OH_UdsContentForm* pThis, unsigned char** thumbData, unsigned int* len)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID)) {
+    if (thumbData == nullptr || len == nullptr ||
+        IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID)) {
+        LOG_ERROR(UDMF_CAPI, "Param is invalid.");
         return UDMF_E_INVALID_PARAM;
     }
     return GetUdsUint8Value(pThis, THUMB_DATA, THUMB_DATA_LENGTH, thumbData, len);
@@ -607,7 +609,8 @@ const char* OH_UdsContentForm_GetTitle(OH_UdsContentForm* pThis)
 
 int OH_UdsContentForm_GetAppIcon(OH_UdsContentForm* pThis, unsigned char** appIcon, unsigned int* len)
 {
-    if (IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID)) {
+    if (appIcon == nullptr || len == nullptr || IsInvalidUdsObjectPtr(pThis, NdkStructId::UDS_CONTENT_FORM_STRUCT_ID)) {
+        LOG_ERROR(UDMF_CAPI, "Param is invalid.");
         return UDMF_E_INVALID_PARAM;
     }
     return GetUdsUint8Value(pThis, APP_ICON, APP_ICON_LENGTH, appIcon, len);
