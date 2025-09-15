@@ -70,8 +70,10 @@ std::vector<std::string> UnifiedRecord::GetTypes() const
 
 void UnifiedRecord::SetType(const UDType &type)
 {
+    auto utdId = UtdUtils::GetUtdIdFromUtdEnum(type);
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     dataType_ = type;
-    utdId_ = UtdUtils::GetUtdIdFromUtdEnum(type);
+    utdId_ = utdId;
     utdId2_ = utdId_;
 }
 
@@ -103,6 +105,7 @@ ValueType UnifiedRecord::GetValue()
 
 void UnifiedRecord::SetValue(const ValueType &value)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     value_ = value;
 }
 
@@ -206,6 +209,7 @@ std::shared_ptr<std::map<std::string, ValueType>> UnifiedRecord::GetInnerEntries
 
 void UnifiedRecord::SetInnerEntries(std::shared_ptr<std::map<std::string, ValueType>> entries)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     entries_ = entries;
 }
 
@@ -255,6 +259,7 @@ std::set<std::string> UnifiedRecord::GetUtdIdsWithAddFileType(bool isSpecific) c
 
 void UnifiedRecord::SetUtdId(const std::string& utdId)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     utdId_ = utdId;
     utdId2_ = utdId;
 }
@@ -266,6 +271,7 @@ std::string UnifiedRecord::GetUtdId() const
 
 void UnifiedRecord::SetUtdId2(const std::string& utdId)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     utdId2_ = utdId;
 }
 
