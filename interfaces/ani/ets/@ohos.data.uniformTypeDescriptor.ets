@@ -14,6 +14,6 @@
  */
 
  export default namespace uniformTypeDescriptor {
-    loadLibrary("uniformTypeDescriptor_ani")
+    loadLibraryWithPermissionCheck("uniformTypeDescriptor_ani", "@ohos.data.uniformTypeDescriptor")
     export native function getUniformDataTypeByFilenameExtension(filenameExtension: string, belongsTo?: string): string;
  }
