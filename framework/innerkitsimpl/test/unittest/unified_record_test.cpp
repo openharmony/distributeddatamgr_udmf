@@ -46,8 +46,8 @@ public:
     static void AllocHapToken1();
     void SetHapToken1();
 
-    static constexpr int USER_ID = 100;
-    static constexpr int INST_INDEX = 0;
+    static constexpr int userId = 100;
+    static constexpr int instIndex = 0;
 };
 
 void UnifiedRecordTest::SetUpTestCase()
@@ -57,7 +57,7 @@ void UnifiedRecordTest::SetUpTestCase()
 
 void UnifiedRecordTest::TearDownTestCase()
 {
-    auto tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo1", INST_INDEX);
+    auto tokenId = AccessTokenKit::GetHapTokenID(userId, "ohos.test.demo1", instIndex);
     AccessTokenKit::DeleteToken(tokenId);
 }
 
@@ -78,9 +78,9 @@ void UnifiedRecordTest::TearDown()
 void UnifiedRecordTest::AllocHapToken1()
 {
     HapInfoParams info = {
-        .userID = USER_ID,
+        .userID = userId,
         .bundleName = "ohos.test.demo1",
-        .instIndex = INST_INDEX,
+        .instIndex = instIndex,
         .appIDDesc = "ohos.test.demo1"
     };
 
@@ -115,7 +115,7 @@ void UnifiedRecordTest::AllocHapToken1()
 
 void UnifiedRecordTest::SetHapToken1()
 {
-    auto tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo1", INST_INDEX);
+    auto tokenId = AccessTokenKit::GetHapTokenID(userId, "ohos.test.demo1", instIndex);
     SetSelfTokenID(tokenId);
 }
 
