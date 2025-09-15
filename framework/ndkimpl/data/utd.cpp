@@ -61,11 +61,18 @@ static const char** CreateStrArrByVector(const std::vector<std::string>& paramVe
     }
     for (unsigned int i = 0; i < size; i++) {
         charPtr[i] = new (std::nothrow) char[paramVector[i].size() + 1];
-        if (charPtr[i] == nullptr ||
-            strcpy_s(charPtr[i], paramVector[i].size() + 1, paramVector[i].c_str()) != UDMF_E_OK) {
-            LOG_ERROR(UDMF_CAPI, "obtain the memory error, or str copy error!");
+        if (charPtr[i] == nullptr) {
+            LOG_ERROR(UDMF_CAPI, "Allocate memory fail!");
             const char** arrayPtr = const_cast<const char**>(charPtr);
-            DestroyArrayPtr(arrayPtr, size);
+            DestroyArrayPtr(arrayPtr, i);
+            *count = 0;
+            return nullptr;
+        }
+        if (strcpy_s(charPtr[i], paramVector[i].size() + 1, paramVector[i].c_str()) != UDMF_E_OK) {
+            LOG_ERROR(UDMF_CAPI, "String copy fail!");
+            const char** arrayPtr = const_cast<const char**>(charPtr);
+            unsigned int allocatedSize = i + 1;
+            DestroyArrayPtr(arrayPtr, allocatedSize);
             *count = 0;
             return nullptr;
         }
