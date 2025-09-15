@@ -141,7 +141,7 @@ bool UdmfCopyFile::CopyFile(const std::string &srcUri, const std::string &destFi
         fileSize = totalFileSize;
         HandleProgress(srcUri, destFileUri, context, processSize);
     };
-    auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->Copy(srcUri, destFileUri, listener);
+    auto ret = Storage::DistributedFile::FileCopyManager::GetInstance().Copy(srcUri, destFileUri, listener);
     if (ret == DFS_CANCEL_STATUS) {
         context.status = E_COPY_CANCELED;
         return false;
@@ -163,7 +163,7 @@ void UdmfCopyFile::HandleProgress(const std::string &srcUri, const std::string &
     if (context.asyncHelper->progressQueue.IsCancel()) {
         LOG_INFO(UDMF_CLIENT, "Cancel copy.");
         std::thread([&]() {
-            auto ret = Storage::DistributedFile::FileCopyManager::GetInstance()->Cancel(srcUri, destFileUri);
+            auto ret = Storage::DistributedFile::FileCopyManager::GetInstance().Cancel(srcUri, destFileUri);
             if (ret != E_OK) {
                 LOG_ERROR(UDMF_CLIENT, "Cancel failed. errno=%{public}d", ret);
                 context.status = E_COPY_FILE_FAILED;
