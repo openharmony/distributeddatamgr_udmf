@@ -543,7 +543,7 @@ HWTEST_F(UdmfClientTest, SetData006, TestSize.Level1)
 
     auto file2 = static_cast<File *>(record2.get());
     ASSERT_NE(file2, nullptr);
-    EXPECT_EQ(file1->GetRemoteUri(), file2->GetRemoteUri());
+    EXPECT_EQ(file2->GetRemoteUri(), "");
     CompareDetails(file2->GetDetails());
 
     GetEmptyData(option2);
@@ -590,7 +590,7 @@ HWTEST_F(UdmfClientTest, SetData007, TestSize.Level1)
 
     auto image2 = static_cast<Image *>(record2.get());
     ASSERT_NE(image2, nullptr);
-    EXPECT_EQ(image1->GetRemoteUri(), image2->GetRemoteUri());
+    EXPECT_EQ(image2->GetRemoteUri(), "");
 
     GetEmptyData(option2);
 
@@ -636,7 +636,7 @@ HWTEST_F(UdmfClientTest, SetData008, TestSize.Level1)
 
     auto video2 = static_cast<Video *>(record2.get());
     ASSERT_NE(video2, nullptr);
-    EXPECT_EQ(video1->GetRemoteUri(), video2->GetRemoteUri());
+    EXPECT_EQ(video2->GetRemoteUri(), "");
 
     GetEmptyData(option2);
 
@@ -682,7 +682,7 @@ HWTEST_F(UdmfClientTest, SetData009, TestSize.Level1)
 
     auto audio2 = static_cast<Audio *>(record2.get());
     ASSERT_NE(audio2, nullptr);
-    EXPECT_EQ(audio1->GetRemoteUri(), audio2->GetRemoteUri());
+    EXPECT_EQ(audio2->GetRemoteUri(), "");
 
     GetEmptyData(option2);
 
@@ -728,7 +728,7 @@ HWTEST_F(UdmfClientTest, SetData010, TestSize.Level1)
 
     auto folder2 = static_cast<Folder *>(record2.get());
     ASSERT_NE(folder2, nullptr);
-    EXPECT_EQ(folder1->GetRemoteUri(), folder2->GetRemoteUri());
+    EXPECT_EQ(folder2->GetRemoteUri(), "");
 
     GetEmptyData(option2);
 
@@ -1248,13 +1248,11 @@ HWTEST_F(UdmfClientTest, GetSummary001, TestSize.Level1)
     auto file = std::make_shared<File>();
     file->SetDetails(details);
     file->SetUri("uri");
-    file->SetRemoteUri("remoteUri");
     data.AddRecord(file);
 
     auto image = std::make_shared<Image>();
     file->SetDetails(details);
     image->SetUri("uri");
-    image->SetRemoteUri("remoteUri");
     data.AddRecord(image);
 
     auto systemDefinedRecord = std::make_shared<SystemDefinedRecord>();
@@ -1596,7 +1594,7 @@ HWTEST_F(UdmfClientTest, GetSelfData001, TestSize.Level1)
 
     auto file2 = static_cast<File *>(record2.get());
     ASSERT_NE(file2, nullptr);
-    EXPECT_EQ(file1->GetRemoteUri(), file2->GetRemoteUri());
+    EXPECT_EQ(file2->GetRemoteUri(), "");
     CompareDetails(file2->GetDetails());
 
     GetEmptyData(option2);
@@ -1639,7 +1637,7 @@ HWTEST_F(UdmfClientTest, GetSelfData002, TestSize.Level1)
 
     auto file2 = static_cast<File *>(record2.get());
     ASSERT_NE(file2, nullptr);
-    EXPECT_EQ(file1->GetRemoteUri(), file2->GetRemoteUri());
+    EXPECT_EQ(file2->GetRemoteUri(), "");
     CompareDetails(file2->GetDetails());
 
     GetEmptyData(option2);
