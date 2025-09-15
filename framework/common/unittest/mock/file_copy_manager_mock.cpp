@@ -32,6 +32,12 @@ namespace OHOS {
 namespace Storage {
 namespace DistributedFile {
 
+FileCopyManager &FileCopyManager::GetInstance()
+{
+    static FileCopyManager instance;
+    return instance;
+}
+
 int32_t FileCopyManager::Copy(const std::string &srcUri, const std::string &destUri, ProcessCallback &processCallback)
 {
     return 0;
