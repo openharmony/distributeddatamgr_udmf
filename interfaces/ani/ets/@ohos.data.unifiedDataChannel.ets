@@ -19,7 +19,7 @@ type ValueType = number | string | boolean | image.PixelMap | Want | ArrayBuffer
 
  export default namespace unifiedDataChannel {
     export class Cleaner {
-        static { loadLibrary("unifieddatachannel_ani") }
+        static { loadLibraryWithPermissionCheck("unifieddatachannel_ani", "@ohos.data.unifiedDataChannel") }
         static callback(cleaner: Cleaner): void {
             cleaner.clean()
         }
@@ -52,7 +52,7 @@ type ValueType = number | string | boolean | image.PixelMap | Want | ArrayBuffer
 
     let finalizer = new FinalizationRegistry<Cleaner>(Cleaner.callback)
     export class UnifiedRecord {
-        static { loadLibrary("unifieddatachannel_ani") }
+        static { loadLibraryWithPermissionCheck("unifieddatachannel_ani", "@ohos.data.unifiedDataChannel") }
 
         constructor(type?: string, value?: ValueType) {
             if (type == undefined) {
@@ -81,7 +81,7 @@ type ValueType = number | string | boolean | image.PixelMap | Want | ArrayBuffer
     }
 
     export class UnifiedData {
-        static { loadLibrary("unifieddatachannel_ani") }
+        static { loadLibraryWithPermissionCheck("unifieddatachannel_ani", "@ohos.data.unifiedDataChannel") }
         constructor(record?: UnifiedRecord) {
             if (record == undefined) {
                 this.initDataWithOutRecord();
