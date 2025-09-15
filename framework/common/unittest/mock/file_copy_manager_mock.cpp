@@ -31,13 +31,6 @@
 namespace OHOS {
 namespace Storage {
 namespace DistributedFile {
-std::shared_ptr<FileCopyManager> FileCopyManager::instance_ = nullptr;
-
-std::shared_ptr<FileCopyManager> FileCopyManager::GetInstance()
-{
-    static auto instance = std::make_shared<FileCopyManager>();
-    return instance;
-}
 
 int32_t FileCopyManager::Copy(const std::string &srcUri, const std::string &destUri, ProcessCallback &processCallback)
 {
