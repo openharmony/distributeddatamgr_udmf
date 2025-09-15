@@ -86,6 +86,7 @@ bool IsInvalidUdsObjectByType(const UdsObject* pThis, const UDType& type)
         case CONTENT_FORM:
             return IsInvalidUdsObjectPtr(pThis, UDS_CONTENT_FORM_STRUCT_ID);
         default:
+            return false;
     }
 }
 

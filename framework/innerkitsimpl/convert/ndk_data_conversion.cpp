@@ -66,7 +66,8 @@ char** NdkDataConversion::StrVectorToTypesArray(const std::vector<std::string>& 
         }
         if (strcpy_s(typesArray[i], strLen, strVector[i].c_str()) != EOK) {
             LOG_ERROR(UDMF_CAPI, "String copy failed");
-            DestroyStringArray(typesArray, i + 1);
+            unsigned int allocatedSize = i + 1;
+            DestroyStringArray(typesArray, allocatedSize);
             return nullptr;
         }
     }
