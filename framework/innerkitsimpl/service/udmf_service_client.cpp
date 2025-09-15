@@ -15,6 +15,7 @@
 #define LOG_TAG "UdmfServiceClient"
 #include "udmf_service_client.h"
 
+#include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "datamgr_service_proxy.h"
 #include "system_ability_definition.h"
@@ -115,7 +116,7 @@ int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedDat
         LOG_ERROR(UDMF_SERVICE, "UnifiedData is invalid.");
         return E_INVALID_PARAMETERS;
     }
-    bool isSaInvoke = UTILS::IsTokenNative();
+    bool isSaInvoke = UTILS::IsTokenNative(IPCSkeleton::GetSelfTokenID());
     if (isSaInvoke && unifiedData.HasFileType()) {
         LOG_ERROR(UDMF_SERVICE, "The setting data initiated by the SA cannot contain the file type");
         return E_INVALID_PARAMETERS;

@@ -52,9 +52,8 @@ std::string GenerateId()
     return idStr.str();
 }
 
-bool IsTokenNative()
+bool IsTokenNative(uint32_t tokenId)
 {
-    uint32_t tokenId = IPCSkeleton::GetSelfTokenID();
     if (tokenId == 0) {
         return false;
     }

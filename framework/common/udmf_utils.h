@@ -27,7 +27,7 @@ std::vector<uint8_t> Random(int32_t len, int32_t minimum = 0,
 std::string API_EXPORT GenerateId();
 std::string GetSdkVersionByToken(uint32_t tokenId);
 std::string GetCurrentSdkVersion();
-bool API_EXPORT IsTokenNative();
+bool API_EXPORT IsTokenNative(uint32_t tokenId);
 bool API_EXPORT IsNativeCallingToken();
 std::string API_EXPORT GetSequenceKey(const std::string &udKey);
 
