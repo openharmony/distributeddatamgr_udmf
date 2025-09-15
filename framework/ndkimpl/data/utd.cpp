@@ -26,7 +26,7 @@ using namespace OHOS::UDMF;
 
 static constexpr const int32_t MAX_UTD_SIZE = 50;
 
-typedef Status (UtdClient::*GetUtdByConditionPtr)(const std::string&, std::string&, std::string);
+typedef Status (UtdClient::*GetUtdsByConditionPtr)(const std::string&, std::vector<std::string>&, const std::string&);
 
 static void DestroyArrayPtr(const char** &arrayPtr, unsigned int& count)
 {
@@ -86,31 +86,23 @@ static bool IsUtdInvalid(OH_Utd* pThis)
     return pThis == nullptr || pThis->cid != NdkStructId::UTD_STRUCT_ID;
 }
 
-static const char** GetTypesByCondition(const char* condition, unsigned int* count, GetUtdByConditionPtr funcPtr)
+static const char** GetTypesByCondition(const char* condition, unsigned int* count, GetUtdsByConditionPtr funcPtr)
 {
     if (condition == nullptr || count == nullptr || funcPtr == nullptr) {
         return nullptr;
     }
-    std::string typeIdStr;
-    Status result = (UtdClient::GetInstance().*funcPtr)(condition, typeIdStr, DEFAULT_TYPE_ID);
-    if (result != Status::E_OK || typeIdStr.empty()) {
+    std::vector<std::string> typeIdStrs;
+    Status result = (UtdClient::GetInstance().*funcPtr)(condition, typeIdStrs, DEFAULT_TYPE_ID);
+    if (result != Status::E_OK || typeIdStrs.empty()) {
         LOG_ERROR(UDMF_CAPI, "Failed to obtain typeId by invoking the native function.");
         return nullptr;
     }
-    auto typeId = new (std::nothrow) char[typeIdStr.size() + 1];
-    if (typeId == nullptr) {
-        LOG_ERROR(UDMF_CAPI, "obtain typeId's memory error!");
+    char** typesArray = CreateStrArrByVector(typeIdStrs, count);
+    if (typesArray == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "typesArray memory error");
         return nullptr;
     }
-    if (strcpy_s(typeId, typeIdStr.size() + 1, typeIdStr.c_str()) != UDMF_E_OK) {
-        LOG_ERROR(UDMF_CAPI, "str copy error!");
-        delete[] typeId;
-        return nullptr;
-    }
-    *count = 1;
-    auto typeIds = new char* [*count];
-    typeIds[0] = typeId;
-    return const_cast<const char**>(typeIds);
+    return const_cast<const char**>(typesArray);
 }
 
 OH_Utd* OH_Utd_Create(const char* typeId)

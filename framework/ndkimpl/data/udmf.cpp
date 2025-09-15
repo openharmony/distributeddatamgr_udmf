@@ -733,6 +733,9 @@ static int GetValueFromUint8Array(OH_UdmfRecord *record, const char *typeId, Val
         LOG_INFO(UDMF_CAPI, "data size exceeds maximum size");
         return UDMF_ERR;
     }
+    if (record->recordData != nullptr) {
+        delete[] record->recordData;
+    }
     record->recordData = new (std::nothrow) unsigned char[record->recordDataLen];
     if (record->recordData == nullptr) {
         return UDMF_ERR;
@@ -1319,6 +1322,9 @@ void OH_UdmfDataLoadInfo_SetType(OH_UdmfDataLoadInfo* dataLoadInfo, const char* 
     }
     types.insert(type);
     std::vector<std::string> typeLabels {types.begin(), types.end()};
+    if (dataLoadInfo->typesArray != nullptr) {
+        NdkDataConversion::DestroyStringArray(dataLoadInfo->typesArray, dataLoadInfo->typesCount);
+    }
     dataLoadInfo->typesArray = NdkDataConversion::StrVectorToTypesArray(typeLabels);
     dataLoadInfo->typesCount = typeLabels.size();
 }

@@ -80,6 +80,7 @@ Status DataParamsConversion::GetDataLoaderParams(const OH_UdmfDataLoadParams &nd
             .recordsCount = dataLoadInfo.recordCount,
         };
         OH_UdmfData *data = ndkDataParams.dataLoadHandler(&ndkDataLoadInfo);
+        NdkDataConversion::DestroyStringArray(ndkDataLoadInfo.typesArray, ndkDataLoadInfo.typesCount);
         if (data == nullptr || data->unifiedData_ == nullptr) {
             LOG_ERROR(UDMF_CAPI, "Data is null");
             return;
