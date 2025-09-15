@@ -90,9 +90,6 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
             ProcessDragIfInApp(unifiedData, intentionDrag, key);
             return E_OK;
         }
-        if (unifiedData.HasType(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML))) {
-            UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(unifiedData);
-        }
     }
     int32_t ret = service->SetData(option, unifiedData, key);
     if (ret != E_OK) {

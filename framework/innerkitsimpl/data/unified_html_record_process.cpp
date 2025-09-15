@@ -119,6 +119,7 @@ void UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(UnifiedData &unifiedData)
         if (record == nullptr) {
             continue;
         }
+        record->ClearUris();
         if (!record->HasType(utdId)) {
             continue;
         }
