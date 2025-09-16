@@ -56,8 +56,7 @@ static const std::map<Udmf_Intention, Intention> VAILD_INTENTIONS = {
     { UDMF_INTENTION_DRAG, Intention::UD_INTENTION_DRAG },
     { UDMF_INTENTION_SYSTEM_SHARE, Intention::UD_INTENTION_SYSTEM_SHARE },
     { UDMF_INTENTION_PICKER, Intention::UD_INTENTION_PICKER },
-    { UDMF_INTENTION_MENU, Intention::UD_INTENTION_MENU },
-    { UDMF_INTENTION_DATA_HUB, Intention::UD_INTENTION_DATA_HUB }
+    { UDMF_INTENTION_MENU, Intention::UD_INTENTION_MENU }
 };
 
 static void DestroyUnifiedRecordArray(OH_UdmfRecord**& records, unsigned int& count)
