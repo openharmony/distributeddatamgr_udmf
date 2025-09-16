@@ -97,12 +97,12 @@ static const char** GetTypesByCondition(const char* condition, unsigned int* cou
         LOG_ERROR(UDMF_CAPI, "Failed to obtain typeId by invoking the native function.");
         return nullptr;
     }
-    char** typesArray = CreateStrArrByVector(typeIdStrs, count);
+    auto typesArray = CreateStrArrByVector(typeIdStrs, count);
     if (typesArray == nullptr) {
         LOG_ERROR(UDMF_CAPI, "typesArray memory error");
         return nullptr;
     }
-    return const_cast<const char**>(typesArray);
+    return typesArray;
 }
 
 OH_Utd* OH_Utd_Create(const char* typeId)
@@ -194,12 +194,12 @@ const char** OH_Utd_GetMimeTypes(OH_Utd* pThis, unsigned int* count)
 
 const char** OH_Utd_GetTypesByFilenameExtension(const char* extension, unsigned int* count)
 {
-    return GetTypesByCondition(extension, count, &UtdClient::GetUniformDataTypeByFilenameExtension);
+    return GetTypesByCondition(extension, count, &UtdClient::GetUniformDataTypesByFilenameExtension);
 }
 
 const char** OH_Utd_GetTypesByMimeType(const char* mimeType, unsigned int* count)
 {
-    return GetTypesByCondition(mimeType, count, &UtdClient::GetUniformDataTypeByMIMEType);
+    return GetTypesByCondition(mimeType, count, &UtdClient::GetUniformDataTypesByMIMEType);
 }
 
 bool OH_Utd_BelongsTo(const char* srcTypeId, const char* destTypeId)
