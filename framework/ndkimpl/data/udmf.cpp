@@ -95,7 +95,8 @@ static OH_UdmfRecord** CreateUnifiedDataRecordsArray(OH_UdmfData* unifiedData,
     for (unsigned int i = 0; i < size; i++) {
         result[i] = new (std::nothrow) OH_UdmfRecord;
         if (result[i] == nullptr) {
-            DestroyUnifiedRecordArray(result, i);
+            unsigned int allocatedSize = i;
+            DestroyUnifiedRecordArray(result, allocatedSize);
             return nullptr;
         }
         result[i]->record_ = records[i];

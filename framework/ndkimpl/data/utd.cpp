@@ -64,7 +64,8 @@ static const char** CreateStrArrByVector(const std::vector<std::string>& paramVe
         if (charPtr[i] == nullptr) {
             LOG_ERROR(UDMF_CAPI, "Allocate memory fail!");
             const char** arrayPtr = const_cast<const char**>(charPtr);
-            DestroyArrayPtr(arrayPtr, i);
+            unsigned int allocatedSize = i;
+            DestroyArrayPtr(arrayPtr, allocatedSize);
             *count = 0;
             return nullptr;
         }
