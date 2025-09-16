@@ -149,6 +149,9 @@ void UdmfConversion::ConvertRecordToSubclass(std::vector<UnifiedData> &datas)
 void UdmfConversion::InitValueObject(UnifiedData &data)
 {
     for (auto &record : data.GetRecords()) {
+        if (record == nullptr) {
+            continue;
+        }
         record->InitObject();
     }
 }

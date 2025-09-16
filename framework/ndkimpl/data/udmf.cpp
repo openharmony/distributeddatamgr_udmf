@@ -94,7 +94,8 @@ static OH_UdmfRecord** CreateUnifiedDataRecordsArray(OH_UdmfData* unifiedData,
     for (unsigned int i = 0; i < size; i++) {
         result[i] = new (std::nothrow) OH_UdmfRecord;
         if (result[i] == nullptr) {
-            DestroyUnifiedRecordArray(result, size);
+            unsigned int allocatedSize = i;
+            DestroyUnifiedRecordArray(result, allocatedSize);
             return nullptr;
         }
         result[i]->record_ = records[i];
@@ -504,6 +505,7 @@ int OH_Udmf_GetUnifiedDataByOptions(OH_UdmfOptions* options, OH_UdmfData** dataA
     *dataArray = new (std::nothrow) OH_UdmfData[*dataSize];
     if (*dataArray == nullptr) {
         LOG_ERROR(UDMF_CAPI, "New dataArray error");
+        *dataSize = 0;
         return UDMF_ERR;
     }
     for (unsigned int i = 0; i < *dataSize; i++) {
@@ -701,7 +703,7 @@ int OH_UdmfRecord_AddGeneralEntry(OH_UdmfRecord* record, const char* typeId,
     std::vector<uint8_t> recordValue(entry, entry + count);
     auto obj = std::make_shared<Object>();
     obj->value_[UNIFORM_DATA_TYPE] = typeId;
-    obj->value_[ARRAY_BUFFER] = recordValue;
+    obj->value_[ARRAY_BUFFER] = std::move(recordValue);
     obj->value_[ARRAY_BUFFER_LENGTH] = static_cast<int>(recordValue.size());
     if (record->record_->GetType() == UD_BUTT) {
         record->record_ = std::make_shared<ApplicationDefinedRecord>(APPLICATION_DEFINED_RECORD, obj);

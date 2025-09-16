@@ -47,22 +47,27 @@ char** NdkDataConversion::StrVectorToTypesArray(const std::vector<std::string>& 
     }
     char** typesArray = new (std::nothrow) char* [vectorSize];
     if (typesArray == nullptr) {
-        LOG_ERROR(UDMF_CAPI, "create types array failed!, vectorSize: %{public}d, MAX_RECORDS_COUNT: %{public}" PRIu64,
+        LOG_ERROR(UDMF_CAPI, "Create types array failed!, vectorSize: %{public}d, MAX_RECORDS_COUNT: %{public}" PRIu64,
             vectorSize, MAX_RECORDS_COUNT);
         return nullptr;
     }
     for (unsigned int i = 0; i < vectorSize; ++i) {
         unsigned int strLen = strVector[i].length() + 1;
         if (strLen > MAX_KEY_STRING_LEN) {
-            LOG_INFO(UDMF_CAPI, "string exceeds maximum length, length is %{public}d", strLen);
-            DestroyStringArray(typesArray, vectorSize);
+            LOG_INFO(UDMF_CAPI, "String exceeds maximum length, length is %{public}d", strLen);
+            DestroyStringArray(typesArray, i);
             return nullptr;
         }
         typesArray[i] = new (std::nothrow) char[strLen];
-        if (typesArray[i] == nullptr ||
-            (strcpy_s(typesArray[i], strLen, strVector[i].c_str())) != EOK) {
-            LOG_ERROR(UDMF_CAPI, "string copy failed");
-            DestroyStringArray(typesArray, vectorSize);
+        if (typesArray[i] == nullptr) {
+            LOG_ERROR(UDMF_CAPI, "Allocate memory failed");
+            DestroyStringArray(typesArray, i);
+            return nullptr;
+        }
+        if (strcpy_s(typesArray[i], strLen, strVector[i].c_str()) != EOK) {
+            LOG_ERROR(UDMF_CAPI, "String copy failed");
+            unsigned int allocatedSize = i + 1;
+            DestroyStringArray(typesArray, allocatedSize);
             return nullptr;
         }
     }

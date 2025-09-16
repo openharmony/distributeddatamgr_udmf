@@ -315,17 +315,6 @@ Status UdmfClient::RemoveAppShareOption(const std::string &intention)
     return static_cast<Status>(ret);
 }
 
-std::string UdmfClient::GetSelfBundleName()
-{
-    uint32_t tokenId = IPCSkeleton::GetSelfTokenID();
-    Security::AccessToken::HapTokenInfo hapInfo;
-    if (Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapInfo)
-        != Security::AccessToken::AccessTokenKitRet::RET_SUCCESS) {
-        return "";
-    }
-    return hapInfo.bundleName;
-}
-
 Status UdmfClient::GetDataFromCache(const QueryOption &query, UnifiedData &unifiedData)
 {
     auto it = dataCache_.Find(query.key);
@@ -335,26 +324,6 @@ Status UdmfClient::GetDataFromCache(const QueryOption &query, UnifiedData &unifi
         return E_OK;
     }
     return E_NOT_FOUND;
-}
-
-Status UdmfClient::GetParentType(Summary &oldSummary, Summary &newSummary)
-{
-    std::map<std::string, int64_t> tmpSummary;
-    for (const auto &[type, size] : oldSummary.summary) {
-        std::string fileType = UnifiedDataUtils::GetBelongsToFileType(type);
-        if (fileType.empty()) {
-            tmpSummary[type] = size;
-            continue;
-        }
-        if (tmpSummary.find(fileType) != tmpSummary.end()) {
-            tmpSummary[fileType] += size;
-        } else {
-            tmpSummary[fileType] = size;
-        }
-    }
-    newSummary.summary = std::move(tmpSummary);
-    newSummary.totalSize = oldSummary.totalSize;
-    return E_OK;
 }
 
 Status UdmfClient::SetDelayInfo(const DataLoadParams &dataLoadParams, std::string &key)

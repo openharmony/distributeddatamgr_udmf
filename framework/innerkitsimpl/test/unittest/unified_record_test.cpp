@@ -18,18 +18,20 @@
 #include <thread>
 #include <gtest/gtest.h>
 #include <string>
-
+#include "accesstoken_kit.h"
 #include "application_defined_record.h"
 #include "file.h"
 #include "html.h"
 #include "image.h"
 #include "logger.h"
 #include "plain_text.h"
+#include "token_setproc.h"
 #include "udmf_capi_common.h"
 #include "udmf_client.h"
 #include "unified_record.h"
 
 using namespace testing::ext;
+using namespace OHOS::Security::AccessToken;
 using namespace OHOS::UDMF;
 using namespace OHOS;
 namespace OHOS::Test {
@@ -41,22 +43,80 @@ public:
     static void TearDownTestCase();
     void SetUp() override;
     void TearDown() override;
+    static void AllocHapToken1();
+    void SetHapToken1();
+
+    static constexpr int userId = 100;
+    static constexpr int instIndex = 0;
 };
 
 void UnifiedRecordTest::SetUpTestCase()
 {
+    AllocHapToken1();
 }
 
 void UnifiedRecordTest::TearDownTestCase()
 {
+    auto tokenId = AccessTokenKit::GetHapTokenID(userId, "ohos.test.demo1", instIndex);
+    AccessTokenKit::DeleteToken(tokenId);
 }
 
 void UnifiedRecordTest::SetUp()
 {
+    SetHapToken1();
 }
 
 void UnifiedRecordTest::TearDown()
 {
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    query = { .intention = Intention::UD_INTENTION_DRAG };
+    UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+}
+
+void UnifiedRecordTest::AllocHapToken1()
+{
+    HapInfoParams info = {
+        .userID = userId,
+        .bundleName = "ohos.test.demo1",
+        .instIndex = instIndex,
+        .appIDDesc = "ohos.test.demo1"
+    };
+
+    HapPolicyParams policy = {
+        .apl = APL_NORMAL,
+        .domain = "test.domain",
+        .permList = {
+            {
+                .permissionName = "ohos.permission.test",
+                .bundleName = "ohos.test.demo1",
+                .grantMode = 1,
+                .availableLevel = APL_NORMAL,
+                .label = "label",
+                .labelId = 1,
+                .description = "test1",
+                .descriptionId = 1
+            }
+        },
+        .permStateList = {
+            {
+                .permissionName = "ohos.permission.test",
+                .isGeneral = true,
+                .resDeviceID = { "local" },
+                .grantStatus = { PermissionState::PERMISSION_GRANTED },
+                .grantFlags = { 1 }
+            }
+        }
+    };
+    auto tokenID = AccessTokenKit::AllocHapToken(info, policy);
+    SetSelfTokenID(tokenID.tokenIDEx);
+}
+
+void UnifiedRecordTest::SetHapToken1()
+{
+    auto tokenId = AccessTokenKit::GetHapTokenID(userId, "ohos.test.demo1", instIndex);
+    SetSelfTokenID(tokenId);
 }
 
 /**

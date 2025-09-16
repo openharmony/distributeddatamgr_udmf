@@ -83,6 +83,8 @@ bool IsInvalidUdsObjectByType(const UdsObject* pThis, const UDType& type)
             return IsInvalidUdsObjectPtr(pThis, UDS_FILE_URI_STRUCT_ID);
         case SYSTEM_DEFINED_PIXEL_MAP:
             return IsInvalidUdsObjectPtr(pThis, UDS_PIXEL_MAP_STRUCT_ID);
+        case CONTENT_FORM:
+            return IsInvalidUdsObjectPtr(pThis, UDS_CONTENT_FORM_STRUCT_ID);
         default:
             return false;
     }
@@ -465,7 +467,7 @@ OH_UdsPixelMap* OH_UdsPixelMap_Create()
     }
     pixelMap->obj = std::make_shared<Object>();
     pixelMap->obj->value_[UNIFORM_DATA_TYPE] = UDMF_META_OPENHARMONY_PIXEL_MAP;
-    pixelMap->obj->value_[PIXEL_MAP] = std::make_shared<OHOS::Media::PixelMap>();
+    pixelMap->obj->value_[PIXEL_MAP] = std::shared_ptr<OHOS::Media::PixelMap>();
     return pixelMap;
 }
 

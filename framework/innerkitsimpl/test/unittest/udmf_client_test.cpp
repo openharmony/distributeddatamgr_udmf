@@ -3166,20 +3166,6 @@ HWTEST_F(UdmfClientTest, QueryUDSData005, TestSize.Level1)
 }
 
 /**
-* @tc.name: GetSelfBundleName001
-* @tc.desc: Nrmal testcase of GetSelfBundleName
-* @tc.type: FUNC
-*/
-HWTEST_F(UdmfClientTest, GetSelfBundleName001, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "GetSelfBundleName001 begin.");
-    UdmfClient udmfClient;
-    std::string ret = udmfClient.GetSelfBundleName();
-    EXPECT_NE(ret, "");
-    LOG_INFO(UDMF_TEST, "GetSelfBundleName001 end.");
-}
-
-/**
 * @tc.name: GetSummary004
 * @tc.desc: Get summary data for entries
 * @tc.type: FUNC
@@ -3708,39 +3694,6 @@ HWTEST_F(UdmfClientTest, SetData036, TestSize.Level1)
     EXPECT_EQ(uris.size(), 0);
 
     LOG_INFO(UDMF_TEST, "SetData036 end.");
-}
-
-/**
-* @tc.name: GetParentType001
-* @tc.desc: test Summary fileType
-* @tc.type: FUNC
-*/
-HWTEST_F(UdmfClientTest, GetParentType001, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "GetParentType001 begin.");
-    Summary oldSummary;
-    std::map<std::string, int64_t> sumMap = {
-        { "general.file", 10 },
-        { "general.png", 10 },
-        { "general.html", 10 },
-        { "general.jpeg", 10 },
-        { "general.avi", 10 },
-        { "com.adobe.pdf", 10 },
-        { "general.text", 10 },
-        { "aabbcc", 10 }
-    };
-    oldSummary.summary = std::move(sumMap);
-    oldSummary.totalSize = 80;
-    Summary newSummary;
-    auto ret = UdmfClient::GetInstance().GetParentType(oldSummary, newSummary);
-    ASSERT_EQ(ret, E_OK);
-    EXPECT_EQ(newSummary.totalSize, 80);
-    EXPECT_EQ(newSummary.summary["general.file"], 20);
-    EXPECT_EQ(newSummary.summary["general.image"], 20);
-    EXPECT_EQ(newSummary.summary["general.html"], 10);
-    EXPECT_EQ(newSummary.summary["general.video"], 10);
-    EXPECT_EQ(newSummary.summary["aabbcc"], 10);
-    EXPECT_EQ(newSummary.summary["general.text"], 10);
 }
 
 /**
