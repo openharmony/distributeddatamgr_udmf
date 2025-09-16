@@ -218,6 +218,9 @@ bool UnifiedData::HasFileType() const
 bool UnifiedData::HasUriInfo() const
 {
     for (auto record : records_) {
+        if (record == nullptr) {
+            return false;
+        }
         if (!record->GetUris().empty()) {
             return true;
         }
@@ -228,6 +231,9 @@ bool UnifiedData::HasUriInfo() const
 void UnifiedData::ClearUriInfo() const
 {
     for (auto record : records_) {
+        if (record == nullptr) {
+            return;
+        }
         record->ClearUris();
     }
 }

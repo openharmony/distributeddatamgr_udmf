@@ -875,6 +875,9 @@ template <> bool Reading(std::shared_ptr<std::map<std::string, ValueType>> &outp
 
 template <> size_t CountBufferSize(const std::shared_ptr<OHOS::AAFwk::Want> &input, TLVObject &data)
 {
+    if (input == nullptr) {
+        return 0;
+    }
     Parcel parcel;
     if (!input->Marshalling(parcel)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Marshalling want error when Count");
@@ -887,6 +890,9 @@ template <> size_t CountBufferSize(const std::shared_ptr<OHOS::AAFwk::Want> &inp
 
 template <> bool Writing(const std::shared_ptr<OHOS::AAFwk::Want> &input, TLVObject &data, TAG tag)
 {
+    if (input == nullptr) {
+        return 0;
+    }
     InitWhenFirst(input, data);
     Parcel parcel;
     if (!input->Marshalling(parcel)) {
