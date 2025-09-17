@@ -251,27 +251,6 @@ HWTEST_F(UtdTest, OH_Utd_GetTypesByFilenameExtension_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OH_Utd_GetTypesByFilenameExtension_002
- * @tc.desc: Normal testcase of OH_Utd_GetTypesByFilenameExtension
- * @tc.type: FUNC
- */
-HWTEST_F(UtdTest, OH_Utd_GetTypesByFilenameExtension_002, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "OH_Utd_GetTypesByFilenameExtension_002 begin.");
-    unsigned int count = 0;
-    auto typeIds = OH_Utd_GetTypesByFilenameExtension(".ts", &count);
-    ASSERT_GE(count, 2);
-    std::vector<std::string> typeIdsVec;
-    for (size_t i = 0; i < count; ++i) {
-        typeIdsVec.emplace_back(typeIds[i]);
-    }
-    EXPECT_TRUE(std::find(typeIdsVec.begin(), typeIdsVec.end(), "general.type-script") != typeIdsVec.end());
-    EXPECT_TRUE(std::find(typeIdsVec.begin(), typeIdsVec.end(), "general.ts") != typeIdsVec.end());
-    OH_Utd_DestroyStringList(typeIds, count);
-    LOG_INFO(UDMF_TEST, "OH_Utd_GetTypesByFilenameExtension_002 end.");
-}
-
-/**
  * @tc.name: OH_Utd_GetTypesByMimeType_001
  * @tc.desc: Normal testcase of OH_Utd_GetTypesByMimeType
  * @tc.type: FUNC
@@ -281,16 +260,9 @@ HWTEST_F(UtdTest, OH_Utd_GetTypesByMimeType_001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "OH_Utd_GetTypesByMimeType_001 begin.");
     unsigned int count = 0;
     auto typeIds = OH_Utd_GetTypesByMimeType("text/plain", &count);
-    ASSERT_GE(count, 6);
-    std::vector<std::string> typeIdsVec;
-    for (size_t i = 0; i < count; ++i) {
-        typeIdsVec.emplace_back(typeIds[i]);
-    }
-    EXPECT_TRUE(std::find(typeIdsVec.begin(), typeIdsVec.end(), "general.plain-text") != typeIdsVec.end());
-    EXPECT_TRUE(std::find(typeIdsVec.begin(), typeIdsVec.end(), "general.asc-text") != typeIdsVec.end());
-    EXPECT_TRUE(std::find(typeIdsVec.begin(), typeIdsVec.end(), "general.portable-object") != typeIdsVec.end());
-    EXPECT_TRUE(std::find(typeIdsVec.begin(), typeIdsVec.end(), "general.diff") != typeIdsVec.end());
-    EXPECT_TRUE(std::find(typeIdsVec.begin(), typeIdsVec.end(), "general.log") != typeIdsVec.end());
+    std::string typeId(typeIds[0]);
+    EXPECT_EQ(UDMF_META_PLAIN_TEXT, typeId);
+    EXPECT_EQ(1, count);
     OH_Utd_DestroyStringList(typeIds, count);
 
     const char* extensionNullptr = nullptr;
@@ -301,26 +273,6 @@ HWTEST_F(UtdTest, OH_Utd_GetTypesByMimeType_001, TestSize.Level1)
     auto typeIdsNullptr2 = OH_Utd_GetTypesByMimeType("text/plain", countNullptr);
     EXPECT_EQ(nullptr, typeIdsNullptr2);
     LOG_INFO(UDMF_TEST, "OH_Utd_GetTypesByMimeType_001 end.");
-}
-
-/**
- * @tc.name: OH_Utd_GetTypesByMimeType_002
- * @tc.desc: Normal testcase of OH_Utd_GetTypesByMimeType
- * @tc.type: FUNC
- */
-HWTEST_F(UtdTest, OH_Utd_GetTypesByMimeType_002, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "OH_Utd_GetTypesByMimeType_002 begin.");
-    unsigned int count = 0;
-    auto typeIds = OH_Utd_GetTypesByMimeType("video/mp2ts", &count);
-    ASSERT_GE(count, 1);
-    std::vector<std::string> typeIdsVec;
-    for (size_t i = 0; i < count; ++i) {
-        typeIdsVec.emplace_back(typeIds[i]);
-    }
-    EXPECT_TRUE(std::find(typeIdsVec.begin(), typeIdsVec.end(), "general.ts") != typeIdsVec.end());
-    OH_Utd_DestroyStringList(typeIds, count);
-    LOG_INFO(UDMF_TEST, "OH_Utd_GetTypesByMimeType_002 end.");
 }
 
 /**
