@@ -133,8 +133,6 @@ void UdmfClientInnerTest::SetHapToken1()
     SetSelfTokenID(tokenId);
 }
 
-
-
 /**
 * @tc.name: GetEntryTest001
 * @tc.desc: Test set a UDC data, then get data with GetEntry function.
