@@ -380,7 +380,6 @@ Status UtdClient::IsUtd(std::string typeId, bool &result)
         result = false;
         return Status::E_ERROR;
     }
-    LOG_ERROR(UDMF_CLIENT, "is not utd");
     return Status::E_OK;
 }
 

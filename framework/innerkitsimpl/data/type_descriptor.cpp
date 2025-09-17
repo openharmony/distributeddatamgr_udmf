@@ -46,7 +46,6 @@ TypeDescriptor::~TypeDescriptor()
 bool TypeDescriptor::CmpFlexibleTypeLevel(const std::string higherLevelTypeId, bool isFlexibleType)
 {
     if (belongingToTypes_.empty()) {
-        LOG_WARN(UDMF_CLIENT, "The current utd belongings is empty. %{public}s,", typeId_.c_str());
         return false;
     }
     if (std::find(belongingToTypes_.begin(), belongingToTypes_.end(), higherLevelTypeId) != belongingToTypes_.end()) {
