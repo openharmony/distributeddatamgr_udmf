@@ -122,9 +122,15 @@ bool CustomUtdJsonParser::ConvertUtdCfgsToJson(const std::vector<TypeDescriptorC
     }
     cJSON_AddItemToObject(root, UTD_CUSTOM, CustomUTDs);
 
-    jsonData = cJSON_Print(root);
+    char* jsonCStr = cJSON_Print(root);
+    if (jsonCStr == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "cJSON_Print failed.");
+        cJSON_Delete(root);
+        return false;
+    }
+    jsonData = jsonCStr;
+    cJSON_free(static_cast<void*>(jsonCStr));
     cJSON_Delete(root);
-    LOG_DEBUG(UDMF_CLIENT, "ConvertUtdCfgsToJson, jsonData size: %{public}zu.", jsonData.length());
     return true;
 }
 
