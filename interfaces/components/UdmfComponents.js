@@ -146,7 +146,7 @@ const c2 = {
     t3: 4
 };
 
-export class i extends ViewPU {
+export class ContentFormCard extends ViewPU {
     constructor(parent, params, __localStorage, elmtId = -1, paramsLambda = undefined, extraInfo) {
         super(parent, __localStorage, elmtId, extraInfo);
         if (typeof paramsLambda === "function") {
