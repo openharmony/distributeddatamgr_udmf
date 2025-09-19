@@ -885,6 +885,29 @@ ohos_unittest("UdmfClientInnerTest") {
   ]
 }
 
+ohos_unittest("UdmfConversionTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "udmf_conversion_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  use_exceptions = true
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
@@ -915,6 +938,7 @@ group("unittest") {
     ":UdmfClientSaInvokeTest",
     ":UdmfClientSystemHapTest",
     ":UdmfClientTest",
+    ":UdmfConversionTest",
     ":UdmfDelayDataTest",
     ":UnifiedDataHelperTest",
     ":UnifiedDataTest",

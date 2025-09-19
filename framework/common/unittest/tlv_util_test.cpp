@@ -547,6 +547,22 @@ HWTEST_F(TlvUtilTest, WritingAndReading_005, TestSize.Level1)
 }
 
 /* *
+ * @tc.name: WritingAndReading_009
+ * @tc.desc: Abnormal test of Writing Want, input is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_009, TestSize.Level1) {
+    LOG_INFO(UDMF_TEST, "WritingAndReading_009 begin.");
+    std::shared_ptr<OHOS::AAFwk::Want> input = nullptr;
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    auto result = TLVUtil::Writing(input, tlvObject, TAG::TAG_DATA_LOAD_INFO);
+    EXPECT_FALSE(result);
+    LOG_INFO(UDMF_TEST, "WritingAndReading_009 end.");
+}
+
+/* *
  * @tc.name: WritingAndReading_008
  * @tc.desc: test Runtime for Writing And Reading
  * @tc.type: FUNC
@@ -1078,6 +1094,34 @@ HWTEST_F(TlvUtilTest, CountBufferSize_006, TestSize.Level1)
     TLVObject data(buffer);
     size_t ret = TLVUtil::CountBufferSize(input, data);
     EXPECT_EQ(ret, data.CountHead());
+}
+
+/* *
+ * @tc.name: CountBufferSize_007
+ * @tc.desc: Abnormal test of CountBufferSize, input is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, CountBufferSize_007, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::AAFwk::Want> input = nullptr;
+    std::vector<std::uint8_t> buffer = { 1, 2 };
+    TLVObject data(buffer);
+    size_t ret = TLVUtil::CountBufferSize(input, data);
+    EXPECT_EQ(ret, 0);
+}
+
+/* *
+ * @tc.name: CountBufferSize_008
+ * @tc.desc: Normal test of CountBufferSize
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, CountBufferSize_008, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::AAFwk::Want> input = std::make_shared<OHOS::AAFwk::Want>();
+    std::vector<std::uint8_t> buffer = { 1, 2 };
+    TLVObject data(buffer);
+    size_t ret = TLVUtil::CountBufferSize(input, data);
+    EXPECT_NE(ret, 0);
 }
 
 /* *

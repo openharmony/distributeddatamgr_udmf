@@ -249,6 +249,23 @@ ohos_unittest("CopyFileTest") {
   use_exceptions = true
 }
 
+ohos_unittest("TlvObjectTest") {
+  module_out_path = module_output_path
+
+  sources = [ "tlv_object_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
@@ -256,6 +273,7 @@ group("unittest") {
   deps = [
     ":CopyFileTest",
     ":EndianConverterTest",
+    ":TlvObjectTest",
     ":TlvUtilTest",
     ":UdmfTypesUtilAbnormalTest",
     ":UdmfTypesUtilMockTest",
