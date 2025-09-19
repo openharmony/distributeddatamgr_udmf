@@ -16,9 +16,8 @@
 if (!("finalizeConstruction" in ViewPU.prototype)) {
     Reflect.set(ViewPU.prototype, "finalizeConstruction", () => { });
 }
-
 let image = requireNapi('multimedia.image');
-let i = requireNapi('i18n');
+let j = requireNapi('i18n');
 
 export var FormType;
 (function (FormType) {
@@ -147,7 +146,7 @@ const c2 = {
     t3: 4
 };
 
-export class ContentFormCard extends ViewPU {
+export class i extends ViewPU {
     constructor(parent, params, __localStorage, elmtId = -1, paramsLambda = undefined, extraInfo) {
         super(parent, __localStorage, elmtId, extraInfo);
         if (typeof paramsLambda === "function") {
