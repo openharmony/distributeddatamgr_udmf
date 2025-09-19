@@ -17,7 +17,7 @@ if (!("finalizeConstruction" in ViewPU.prototype)) {
     Reflect.set(ViewPU.prototype, "finalizeConstruction", () => { });
 }
 
-let image = requireNapi('multimedia.image');	
+let image = requireNapi('multimedia.image');
 let j = requireNapi('i18n');
 
 export var FormType;
