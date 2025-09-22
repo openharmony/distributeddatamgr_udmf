@@ -113,6 +113,10 @@ void UdmfCopyFile::UpdateUriInfo(const std::string &destUri, const std::shared_p
 
 bool UdmfCopyFile::HandleRecord(const std::shared_ptr<UnifiedRecord> &record, CopyContext &context)
 {
+    if (record == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "record is nullptr.");
+        return false;
+    }
     std::string srcUri;
     if (!record->HasFileType(srcUri) && !record->HasType(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML))) {
         context.processedData->AddRecord(record);

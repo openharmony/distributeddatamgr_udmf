@@ -137,7 +137,7 @@ HWTEST_F(CopyFileTest, GetFileName002, TestSize.Level1)
 * @tc.desc: HandleRecord Should Add To Processed Data For Non FileType
 * @tc.type: FUNC
 */
-HWTEST_F(CopyFileTest, HandleRecord, TestSize.Level1)
+HWTEST_F(CopyFileTest, HandleRecord001, TestSize.Level1)
 {
     auto record = std::make_shared<UnifiedRecord>();
     auto helper = std::make_unique<AsyncHelper>();
@@ -147,4 +147,17 @@ HWTEST_F(CopyFileTest, HandleRecord, TestSize.Level1)
     ASSERT_EQ(context.processedData->GetRecords().size(), 1);
 }
 
+/**
+* @tc.name: HandleRecord
+* @tc.desc: Abnormal test of HandleRecord
+* @tc.type: FUNC
+*/
+HWTEST_F(CopyFileTest, HandleRecord002, TestSize.Level1)
+{
+    auto record = nullptr;
+    auto helper = std::make_unique<AsyncHelper>();
+    UdmfCopyFile::CopyContext context(helper);
+    bool result = UdmfCopyFile::GetInstance().HandleRecord(record, context);
+    ASSERT_FALSE(result);
+}
 } // OHOS::Test

@@ -446,4 +446,39 @@ HWTEST_F(UnifiedDataTest, SetChannelName_001, TestSize.Level0)
     UnifiedData unifiedData;
     EXPECT_NO_FATAL_FAILURE(unifiedData.SetChannelName(name));
 }
+
+/**
+ * @tc.name: HasUriInfo_001
+ * @tc.desc: Abnormal test of HasUriInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataTest, HasUriInfo_001, TestSize.Level0)
+{
+    UnifiedData unifiedData;
+    unifiedData.records_ = {nullptr};
+    bool ret = unifiedData.HasUriInfo();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: ClearUriInfo_001
+ * @tc.desc: Abnormal test of ClearUriInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataTest, ClearUriInfo_001, TestSize.Level0)
+{
+    UnifiedData unifiedData;
+    unifiedData.records_ = {nullptr, std::make_shared<UnifiedRecord>()};
+    unifiedData.records_[1]->uris_ = {
+        {
+            .oriUri = "http://1111/a.img",
+            .authUri = "http://1111/b.img",
+            .dfsUri = "http://1111/c.img",
+        }
+    };
+    unifiedData.ClearUriInfo();
+    EXPECT_FALSE(unifiedData.records_[1]->uris_[0].oriUri.empty());
+    EXPECT_FALSE(unifiedData.records_[1]->uris_[0].authUri.empty());
+    EXPECT_FALSE(unifiedData.records_[1]->uris_[0].dfsUri.empty());
+}
 } // OHOS::Test

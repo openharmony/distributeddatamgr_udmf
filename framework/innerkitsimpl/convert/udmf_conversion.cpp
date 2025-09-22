@@ -53,6 +53,9 @@ void UdmfConversion::SetValueWhenNotUds(std::shared_ptr<UnifiedRecord> record)
 
 void UdmfConversion::ConvertRecordToSubclass(std::shared_ptr<UnifiedRecord> &record)
 {
+    if (record == nullptr) {
+        return;
+    }
     auto type = record->GetType();
     auto value = record->GetOriginValue();
     auto uid = record->GetUid();

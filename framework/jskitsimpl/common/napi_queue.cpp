@@ -103,6 +103,10 @@ napi_value NapiQueue::AsyncWork(napi_env env, std::shared_ptr<ContextBase> conte
 void NapiQueue::GenerateOutput(ContextBase *ctxt)
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "GenerateOutput start");
+    if (ctxt == nullptr) {
+        LOG_ERROR(UDMF_KITS_NAPI, "ctxt is nullptr");
+        return;
+    }
     napi_value result[RESULT_ALL] = { nullptr };
     LOG_DEBUG(UDMF_KITS_NAPI, "GenerateOutput ctxt->status = %{public}d", ctxt->status);
     if (ctxt->status == napi_ok) {

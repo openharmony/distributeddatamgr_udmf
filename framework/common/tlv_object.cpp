@@ -29,6 +29,9 @@ TLVObject::TLVObject(std::vector<std::uint8_t> &buffer)
 
 void TLVObject::SetFile(std::FILE *file)
 {
+    if (file == nullptr) {
+        return;
+    }
     file_ = file;
     if (fseek(file_, 0, SEEK_END) != 0) {
         LOG_ERROR(UDMF_SERVICE, "fseek to end error!");
