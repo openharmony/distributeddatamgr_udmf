@@ -62,9 +62,13 @@ std::vector<std::string> UnifiedRecord::GetTypes() const
 {
     std::vector<std::string> types;
     for (auto it = entries_->begin(); it != entries_->end(); it++) {
-        types.push_back(it->first);
+        if (!it->first.empty()) {
+            types.push_back(it->first);
+        }
     }
-    types.push_back(utdId2_);
+    if (!utdId2_.empty()) {
+        types.push_back(utdId2_);
+    }
     return types;
 }
 
