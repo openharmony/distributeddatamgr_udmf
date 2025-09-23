@@ -477,8 +477,6 @@ HWTEST_F(UnifiedDataTest, ClearUriInfo_001, TestSize.Level0)
         }
     };
     unifiedData.ClearUriInfo();
-    EXPECT_FALSE(unifiedData.records_[1]->uris_[0].oriUri.empty());
-    EXPECT_FALSE(unifiedData.records_[1]->uris_[0].authUri.empty());
-    EXPECT_FALSE(unifiedData.records_[1]->uris_[0].dfsUri.empty());
+    EXPECT_TRUE(unifiedData.records_[1]->uris_.empty());
 }
 } // OHOS::Test

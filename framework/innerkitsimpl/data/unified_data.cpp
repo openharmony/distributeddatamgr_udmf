@@ -219,7 +219,7 @@ bool UnifiedData::HasUriInfo() const
 {
     for (auto record : records_) {
         if (record == nullptr) {
-            return false;
+            continue;
         }
         if (!record->GetUris().empty()) {
             return true;
@@ -232,7 +232,7 @@ void UnifiedData::ClearUriInfo() const
 {
     for (auto record : records_) {
         if (record == nullptr) {
-            return;
+            continue;
         }
         record->ClearUris();
     }
