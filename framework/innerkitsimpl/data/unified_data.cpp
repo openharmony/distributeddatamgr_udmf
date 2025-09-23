@@ -108,7 +108,10 @@ std::vector<std::string> UnifiedData::GetTypesLabels() const
 {
     std::vector<std::string> types;
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
-        types.push_back(UtdUtils::GetUtdIdFromUtdEnum(record->GetType()));
+        auto type = UtdUtils::GetUtdIdFromUtdEnum(record->GetType());
+        if (!type.empty()) {
+            types.push_back(type);
+        }
     }
     return types;
 }

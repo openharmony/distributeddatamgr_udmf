@@ -2859,6 +2859,22 @@ HWTEST_F(UdmfClientTest, GetTypesLabels001, TestSize.Level1)
 }
 
 /**
+* @tc.name: GetTypesLabels002
+* @tc.desc: test GetTypesLabels
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetTypesLabels002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypesLabels002 begin.");
+    UnifiedData data;
+    std::vector<std::shared_ptr<UnifiedRecord>> records = {std::make_shared<UnifiedRecord>()};
+    records[0]->dataType_ = static_cast<UDType>(UD_BUTT + 1);
+    data.AddRecords(records);
+
+    ASSERT_TRUE(data.GetTypesLabels().empty());
+}
+
+/**
 * @tc.name: QueryUDSData001
 * @tc.desc: QueryUDSData001
 * @tc.type: FUNC
