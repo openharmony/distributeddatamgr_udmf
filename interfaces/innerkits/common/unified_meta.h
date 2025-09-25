@@ -65,6 +65,7 @@ constexpr const char* APP_ICON_LENGTH = "appIconLen";
 constexpr const char* LINK_URL = "linkUrl";
 constexpr const char* APPLICATION_DEFINED_RECORD_MARK = "applicationDefinedRecordMark";
 constexpr const char* GENERAL_FILE_URI = "general.file-uri";
+constexpr const char* PERMISSION_POLICY = "permission-policy";
 
 enum UDType : int32_t {
     ENTITY = 0,
@@ -631,6 +632,12 @@ enum ShareOptions : int32_t {
     CROSS_APP,
     CROSS_DEVICE,
     SHARE_OPTIONS_BUTT,
+};
+
+enum PermissionPolicy : int32_t {
+    ONLY_READ = 0,
+    READ_WRITE,
+    PERMISSION_POLICY_BUTT,
 };
 
 struct AppShareOption {
