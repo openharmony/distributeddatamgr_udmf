@@ -47,6 +47,6 @@ group("fuzztest") {
 
   deps = [
     "framework/innerkitsimpl/test/fuzztest:fuzztest",
-    "framework/ndkimpl/udmf_fuzzer:fuzztest",
+    "framework/ndkimpl/test/udmf_fuzzer:fuzztest",
   ]
 }
