@@ -176,7 +176,7 @@ HWTEST_F(SystemDefinedPixelMapTest, GetPixelMapFromRawData003, TestSize.Level1)
     auto getPixelMap = systemDefinedPixelMap.GetPixelMapFromRawData();
     auto getLength = getPixelMap->GetByteCount();
     EXPECT_EQ(length, getLength);
-    std::vector<uint8_t> getRawData;
+    std::vector<uint8_t> getRawData(getLength);
     getPixelMap->ReadPixels(length, getRawData.data());
     for (int32_t i = 0; i < getLength; ++i) {
         EXPECT_EQ(getRawData[i], rawData[i]);
