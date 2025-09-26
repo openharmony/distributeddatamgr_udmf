@@ -102,7 +102,7 @@ void SetNativeToken()
         .dcaps = nullptr,
         .perms = nullptr,
         .acls = nullptr,
-        .processName = "msdp_sa",
+        .processName = "msdp",
         .aplStr = "system_core",
     };
     auto tokenId = GetAccessTokenId(&infoInstance);

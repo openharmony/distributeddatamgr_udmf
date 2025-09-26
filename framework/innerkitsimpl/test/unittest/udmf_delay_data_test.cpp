@@ -184,7 +184,7 @@ void UdmfDelayDataTest::AddPrivilege(QueryOption &option)
     privilege.tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo2", 0);
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
-    SetNativeToken("msdp_sa");
+    SetNativeToken("msdp");
     auto status = UdmfClient::GetInstance().AddPrivilege(option, privilege);
     ASSERT_EQ(status, E_OK);
 }
