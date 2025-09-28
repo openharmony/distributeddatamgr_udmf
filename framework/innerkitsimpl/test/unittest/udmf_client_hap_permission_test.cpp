@@ -188,7 +188,7 @@ void UdmfClientHapPermissionTest::AddPrivilege(QueryOption &option)
     privilege.tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo22", INST_INDEX);
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
-    SetNativeToken("msdp_sa");
+    SetNativeToken("msdp");
     auto status = UdmfClient::GetInstance().AddPrivilege(option, privilege);
     ASSERT_EQ(status, E_OK);
 }

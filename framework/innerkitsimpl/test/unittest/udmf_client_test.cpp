@@ -206,7 +206,7 @@ void UdmfClientTest::AddPrivilege(QueryOption &option)
     privilege.tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo2", INST_INDEX);
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
-    SetNativeToken("msdp_sa");
+    SetNativeToken("msdp");
     auto status = UdmfClient::GetInstance().AddPrivilege(option, privilege);
     ASSERT_EQ(status, E_OK);
 }
@@ -217,7 +217,7 @@ void UdmfClientTest::AddPrivilege1(QueryOption &option)
     privilege.tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.demo1", INST_INDEX);
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
-    SetNativeToken("msdp_sa");
+    SetNativeToken("msdp");
     auto status = UdmfClient::GetInstance().AddPrivilege(option, privilege);
     ASSERT_EQ(status, E_OK);
 }
@@ -1392,7 +1392,7 @@ HWTEST_F(UdmfClientTest, AddPrivilege001, TestSize.Level1)
     privilege.tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo2", 0);
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
-    SetNativeToken("msdp_sa");
+    SetNativeToken("msdp");
     status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
     ASSERT_EQ(status, E_OK);
 
@@ -1474,7 +1474,7 @@ HWTEST_F(UdmfClientTest, AddPrivilege003, TestSize.Level1)
     privilege.tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo2", 0);
     privilege.readPermission = "readPermission";
     privilege.writePermission = "writePermission";
-    SetNativeToken("msdp_sa");
+    SetNativeToken("msdp");
     status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
     ASSERT_EQ(status, E_NO_PERMISSION);
     LOG_INFO(UDMF_TEST, "AddPrivilege003 end.");
@@ -1538,7 +1538,7 @@ HWTEST_F(UdmfClientTest, AddPrivilege005, TestSize.Level1)
     privilege.tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.test.demo2", 0);
     privilege.readPermission = "readAndKeep";
     privilege.writePermission = "writePermission";
-    SetNativeToken("msdp_sa");
+    SetNativeToken("msdp");
     status = UdmfClient::GetInstance().AddPrivilege(option2, privilege);
     ASSERT_EQ(status, E_OK);
 

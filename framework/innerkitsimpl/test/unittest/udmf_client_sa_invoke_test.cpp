@@ -54,7 +54,7 @@ void UdmfClientSaInvokeTest::SetUpTestCase()
 
 void UdmfClientSaInvokeTest::TearDownTestCase()
 {
-    auto tokenId = AccessTokenKit::GetNativeTokenId("msdp_sa");
+    auto tokenId = AccessTokenKit::GetNativeTokenId("msdp");
     AccessTokenKit::DeleteToken(tokenId);
 }
 
@@ -65,7 +65,7 @@ void UdmfClientSaInvokeTest::TearDown() {}
 
 void UdmfClientSaInvokeTest::SetHapToken()
 {
-    auto tokenId = AccessTokenKit::GetNativeTokenId("msdp_sa");
+    auto tokenId = AccessTokenKit::GetNativeTokenId("msdp");
     SetSelfTokenID(tokenId);
 }
 
