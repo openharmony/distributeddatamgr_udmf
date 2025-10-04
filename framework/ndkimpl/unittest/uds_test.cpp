@@ -1121,4 +1121,409 @@ HWTEST_F(UdsTest, OH_UdsContentForm_SetAndGetParm_001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "OH_UdsContentForm_SetAndGetParm_001 end.");
 }
 
+/**
+ * @tc.name: OH_UdsDetails_HasKey_001
+ * @tc.desc: Normal testcase of OH_UdsDetails_HasKey interface
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsDetails_HasKey_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsDetails_HasKey_001 begin.");
+    auto details = OH_UdsDetails_Create();
+    ASSERT_NE(details, nullptr);
+    EXPECT_EQ(details->details_.size(), 0);
+    auto result = OH_UdsDetails_SetValue(details, "detailsKey", "detailsValue");
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details->details_.size(), 1);
+    EXPECT_FALSE(OH_UdsDetails_HasKey(nullptr, "detailsKey"));
+    EXPECT_FALSE(OH_UdsDetails_HasKey(details, nullptr));
+    EXPECT_FALSE(OH_UdsDetails_HasKey(details, "unkownKey"));
+    EXPECT_TRUE(OH_UdsDetails_HasKey(details, "detailsKey"));
+    OH_UdsDetails_Destroy(nullptr);
+    OH_UdsDetails_Destroy(details);
+    LOG_INFO(UDMF_TEST, "OH_UdsDetails_HasKey_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsDetails_Remove_001
+ * @tc.desc: Normal testcase of OH_UdsDetails_Remove interface
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsDetails_Remove_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsDetails_Remove_001 begin.");
+    auto details = OH_UdsDetails_Create();
+    ASSERT_NE(details, nullptr);
+    EXPECT_EQ(details->details_.size(), 0);
+    auto result = OH_UdsDetails_SetValue(details, "detailsKey", "detailsValue");
+    EXPECT_EQ(result, UDMF_E_OK);
+    result = OH_UdsDetails_SetValue(details, "detailsKey1", "detailsValue1");
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details->details_.size(), 2);
+    result = OH_UdsDetails_Remove(nullptr, nullptr);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    result = OH_UdsDetails_Remove(details, nullptr);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    result = OH_UdsDetails_Remove(details, "details");
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details->details_.size(), 2);
+    result = OH_UdsDetails_Remove(details, "detailsKey");
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details->details_.size(), 1);
+    EXPECT_TRUE(details->isUpdate);
+    OH_UdsDetails_Destroy(details);
+    LOG_INFO(UDMF_TEST, "OH_UdsDetails_Remove_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsDetails_Clear_001
+ * @tc.desc: Normal testcase of OH_UdsDetails_Clear interface
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsDetails_Clear_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsDetails_Clear_001 begin.");
+    auto details = OH_UdsDetails_Create();
+    ASSERT_NE(details, nullptr);
+    EXPECT_EQ(details->details_.size(), 0);
+    auto result = OH_UdsDetails_SetValue(details, "detailsKey", "detailsValue");
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details->details_.size(), 1);
+    result = OH_UdsDetails_Clear(nullptr);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    result = OH_UdsDetails_Clear(details);
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details->details_.size(), 0);
+    EXPECT_TRUE(details->isUpdate);
+    OH_UdsDetails_Destroy(details);
+    LOG_INFO(UDMF_TEST, "OH_UdsDetails_Clear_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsDetails_SetValue_001
+ * @tc.desc: Normal testcase of OH_UdsDetails_SetValue interface
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsDetails_SetValue_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsDetails_SetValue_001 begin.");
+    auto details = OH_UdsDetails_Create();
+    ASSERT_NE(details, nullptr);
+    EXPECT_EQ(details->details_.size(), 0);
+    auto result = OH_UdsDetails_SetValue(nullptr, nullptr, nullptr);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    result = OH_UdsDetails_SetValue(details, nullptr, nullptr);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    result = OH_UdsDetails_SetValue(details, "detailsKey", nullptr);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    result = OH_UdsDetails_SetValue(details, "", "detailsValue");
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    result = OH_UdsDetails_SetValue(details, "detailsKey", "detailsValue");
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details->details_.size(), 1);
+    EXPECT_TRUE(details->isUpdate);
+    OH_UdsDetails_Destroy(details);
+    LOG_INFO(UDMF_TEST, "OH_UdsDetails_SetValue_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsDetails_GetValue_001
+ * @tc.desc: Normal testcase of OH_UdsDetails_GetValue interface
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsDetails_GetValue_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsDetails_GetValue_001 begin.");
+    auto details = OH_UdsDetails_Create();
+    ASSERT_NE(details, nullptr);
+    EXPECT_EQ(details->details_.size(), 0);
+    auto result = OH_UdsDetails_SetValue(details, "detailsKey", "detailsValue");
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details->details_.size(), 1);
+    auto ret = OH_UdsDetails_GetValue(nullptr, nullptr);
+    EXPECT_EQ(ret, nullptr);
+    ret = OH_UdsDetails_GetValue(details, nullptr);
+    EXPECT_EQ(ret, nullptr);
+    ret = OH_UdsDetails_GetValue(details, "details");
+    EXPECT_EQ(ret, nullptr);
+    ret = OH_UdsDetails_GetValue(details, "detailsKey");
+    EXPECT_NE(ret, nullptr);
+    EXPECT_EQ(std::string(ret), "detailsValue");
+    result = OH_UdsDetails_SetValue(details, "detailsKey", "detailsValueRepeate");
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details->details_.size(), 1);
+    ret = OH_UdsDetails_GetValue(details, "detailsKey");
+    EXPECT_NE(ret, nullptr);
+    EXPECT_EQ(std::string(ret), "detailsValueRepeate");
+    OH_UdsDetails_Destroy(details);
+    LOG_INFO(UDMF_TEST, "OH_UdsDetails_GetValue_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsDetails_GetAllKeys_001
+ * @tc.desc: Normal testcase of OH_UdsDetails_GetAllKeys interface
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsDetails_GetAllKeys_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsDetails_GetAllKeys_001 begin.");
+    auto details = OH_UdsDetails_Create();
+    ASSERT_NE(details, nullptr);
+    EXPECT_EQ(details->details_.size(), 0);
+    auto result = OH_UdsDetails_SetValue(details, "detailsKey", "detailsValue");
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details->details_.size(), 1);
+    unsigned int count = 0;
+    char **keys1 = OH_UdsDetails_GetAllKeys(nullptr, &count);
+    EXPECT_EQ(keys1, nullptr);
+    char **keys2 = OH_UdsDetails_GetAllKeys(details, nullptr);
+    EXPECT_EQ(keys2, nullptr);
+    char **keys3 = OH_UdsDetails_GetAllKeys(details, &count);
+    ASSERT_NE(keys3, nullptr);
+    EXPECT_EQ(strcmp(keys3[0], "detailsKey"), 0);
+    EXPECT_EQ(count, 1);
+    char **keys4 = OH_UdsDetails_GetAllKeys(details, &count);
+    ASSERT_NE(keys4, nullptr);
+    EXPECT_FALSE(details->isUpdate);
+    result = OH_UdsDetails_SetValue(details, "detailsKey1", "detailsValue1");
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_TRUE(details->isUpdate);
+    char **keys5 = OH_UdsDetails_GetAllKeys(details, &count);
+    ASSERT_NE(keys5, nullptr);
+    EXPECT_EQ(strcmp(keys5[0], "detailsKey"), 0);
+    EXPECT_EQ(strcmp(keys5[1], "detailsKey1"), 0);
+    EXPECT_EQ(count, 2);
+    EXPECT_FALSE(details->isUpdate);
+    details->details_.insert_or_assign("", "testValue");
+    details->keysArray = nullptr;
+    char **keys6 = OH_UdsDetails_GetAllKeys(details, &count);
+    ASSERT_NE(keys6, nullptr);
+    EXPECT_EQ(count, 2);
+    EXPECT_FALSE(details->isUpdate);
+    OH_UdsDetails_Destroy(details);
+    LOG_INFO(UDMF_TEST, "OH_UdsDetails_GetAllKeys_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsPlainText_SetDetails_001
+ * @tc.desc: Normal testcase of OH_UdsPlainText_SetDetails interface
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsPlainText_SetDetails_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsPlainText_SetDetails_001 begin.");
+    auto result = OH_UdsPlainText_SetDetails(nullptr, nullptr);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    result = OH_UdsPlainText_GetDetails(nullptr, nullptr);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    auto plainText = OH_UdsPlainText_Create();
+    ASSERT_NE(plainText, nullptr);
+    result = OH_UdsPlainText_SetDetails(plainText, nullptr);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    result = OH_UdsPlainText_GetDetails(plainText, nullptr);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    auto details = OH_UdsDetails_Create();
+    ASSERT_NE(details, nullptr);
+    EXPECT_EQ(details->details_.size(), 0);
+    details->details_.insert_or_assign("", "empty");
+    details->details_.insert_or_assign("plainTextKey", "plainTextValue");
+    result = OH_UdsPlainText_SetDetails(nullptr, details);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    result = OH_UdsPlainText_GetDetails(nullptr, details);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    result = OH_UdsPlainText_SetDetails(plainText, details);
+    EXPECT_EQ(result, UDMF_E_OK);
+    auto details1 = OH_UdsDetails_Create();
+    ASSERT_NE(details1, nullptr);
+    EXPECT_EQ(details1->details_.size(), 0);
+    result = OH_UdsPlainText_GetDetails(plainText, details1);
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details1->details_.size(), 1);
+    unsigned int count = 0;
+    char **keys = OH_UdsDetails_GetAllKeys(details1, &count);
+    ASSERT_NE(keys, nullptr);
+    EXPECT_EQ(strcmp(keys[0], "plainTextKey"), 0);
+    EXPECT_EQ(count, 1);
+    OH_UdsDetails_Destroy(details);
+    OH_UdsDetails_Destroy(details1);
+    OH_UdsPlainText_Destroy(plainText);
+    LOG_INFO(UDMF_TEST, "OH_UdsPlainText_SetDetails_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsHyperlink_SetDetails_001
+ * @tc.desc: Normal testcase of OH_UdsHyperlink_SetDetails interface
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsHyperlink_SetDetails_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsHyperlink_SetDetails_001 begin.");
+    auto hyperlink = OH_UdsHyperlink_Create();
+    ASSERT_NE(hyperlink, nullptr);
+    auto details = OH_UdsDetails_Create();
+    ASSERT_NE(details, nullptr);
+    EXPECT_EQ(details->details_.size(), 0);
+    auto result = OH_UdsHyperlink_GetDetails(hyperlink, details);
+    EXPECT_EQ(result, UDMF_E_INVALID_PARAM);
+    auto details1 = OH_UdsDetails_Create();
+    ASSERT_NE(details1, nullptr);
+    EXPECT_EQ(details1->details_.size(), 0);
+    result = OH_UdsDetails_SetValue(details1, "hyperlinkKey", "hyperlinkValue");
+    EXPECT_EQ(result, UDMF_E_OK);
+    result = OH_UdsHyperlink_SetDetails(hyperlink, details1);
+    EXPECT_EQ(result, UDMF_E_OK);
+    details->details_.clear();
+    EXPECT_EQ(details->details_.size(), 0);
+    result = OH_UdsHyperlink_GetDetails(hyperlink, details);
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details->details_.size(), 1);
+    unsigned int count = 0;
+    char **keys = OH_UdsDetails_GetAllKeys(details, &count);
+    ASSERT_NE(keys, nullptr);
+    EXPECT_EQ(strcmp(keys[0], "hyperlinkKey"), 0);
+    EXPECT_EQ(count, 1);
+    OH_UdsDetails_Destroy(details);
+    OH_UdsDetails_Destroy(details1);
+    OH_UdsHyperlink_Destroy(hyperlink);
+    LOG_INFO(UDMF_TEST, "OH_UdsHyperlink_SetDetails_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsHtml_SetDetails_001
+ * @tc.desc: Normal testcase of OH_UdsHtml_SetDetails interface
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsHtml_SetDetails_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsHtml_SetDetails_001 begin.");
+    auto html = OH_UdsHtml_Create();
+    ASSERT_NE(html, nullptr);
+    auto details = OH_UdsDetails_Create();
+    ASSERT_NE(details, nullptr);
+    EXPECT_EQ(details->details_.size(), 0);
+    auto result = OH_UdsDetails_SetValue(details, "htmlKey", "htmlValue");
+    EXPECT_EQ(result, UDMF_E_OK);
+    result = OH_UdsDetails_SetValue(details, "htmlKey1", "htmlValue1");
+    EXPECT_EQ(result, UDMF_E_OK);
+    result = OH_UdsHtml_SetDetails(html, details);
+    EXPECT_EQ(result, UDMF_E_OK);
+    auto details1 = OH_UdsDetails_Create();
+    ASSERT_NE(details1, nullptr);
+    EXPECT_EQ(details1->details_.size(), 0);
+    result = OH_UdsHtml_GetDetails(html, details1);
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details1->details_.size(), 2);
+    unsigned int count = 0;
+    char **keys = OH_UdsDetails_GetAllKeys(details1, &count);
+    ASSERT_NE(keys, nullptr);
+    EXPECT_EQ(strcmp(keys[0], "htmlKey"), 0);
+    EXPECT_EQ(strcmp(keys[1], "htmlKey1"), 0);
+    EXPECT_EQ(count, 2);
+    OH_UdsDetails_Destroy(details);
+    OH_UdsDetails_Destroy(details1);
+    OH_UdsHtml_Destroy(html);
+    LOG_INFO(UDMF_TEST, "OH_UdsHtml_SetDetails_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsAppItem_SetDetails_001
+ * @tc.desc: Normal testcase of OH_UdsAppItem_SetDetails interface
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsAppItem_SetDetails_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsAppItem_SetDetails_001 begin.");
+    auto appItem = OH_UdsAppItem_Create();
+    ASSERT_NE(appItem, nullptr);
+    auto details = OH_UdsDetails_Create();
+    ASSERT_NE(details, nullptr);
+    EXPECT_EQ(details->details_.size(), 0);
+    auto result = OH_UdsDetails_SetValue(details, "appItemKey", "appItemValue");
+    EXPECT_EQ(result, UDMF_E_OK);
+    result = OH_UdsAppItem_SetDetails(appItem, details);
+    EXPECT_EQ(result, UDMF_E_OK);
+    auto details1 = OH_UdsDetails_Create();
+    ASSERT_NE(details1, nullptr);
+    EXPECT_EQ(details1->details_.size(), 0);
+    result = OH_UdsAppItem_GetDetails(appItem, details1);
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details1->details_.size(), 1);
+    unsigned int count = 0;
+    char **keys = OH_UdsDetails_GetAllKeys(details1, &count);
+    ASSERT_NE(keys, nullptr);
+    EXPECT_EQ(strcmp(keys[0], "appItemKey"), 0);
+    EXPECT_EQ(count, 1);
+    OH_UdsDetails_Destroy(details);
+    OH_UdsDetails_Destroy(details1);
+    OH_UdsAppItem_Destroy(appItem);
+    LOG_INFO(UDMF_TEST, "OH_UdsAppItem_SetDetails_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsFileUri_SetDetails_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_SetDetails interface
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_SetDetails_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsFileUri_SetDetails_001 begin.");
+    auto fileUri = OH_UdsFileUri_Create();
+    ASSERT_NE(fileUri, nullptr);
+    auto details = OH_UdsDetails_Create();
+    ASSERT_NE(details, nullptr);
+    EXPECT_EQ(details->details_.size(), 0);
+    auto result = OH_UdsDetails_SetValue(details, "fileUriKey", "fileUriValue");
+    EXPECT_EQ(result, UDMF_E_OK);
+    result = OH_UdsFileUri_SetDetails(fileUri, details);
+    EXPECT_EQ(result, UDMF_E_OK);
+    auto details1 = OH_UdsDetails_Create();
+    ASSERT_NE(details1, nullptr);
+    EXPECT_EQ(details1->details_.size(), 0);
+    result = OH_UdsFileUri_GetDetails(fileUri, details1);
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details1->details_.size(), 1);
+    unsigned int count = 0;
+    char **keys = OH_UdsDetails_GetAllKeys(details1, &count);
+    ASSERT_NE(keys, nullptr);
+    EXPECT_EQ(strcmp(keys[0], "fileUriKey"), 0);
+    EXPECT_EQ(count, 1);
+    OH_UdsDetails_Destroy(details);
+    OH_UdsDetails_Destroy(details1);
+    OH_UdsFileUri_Destroy(fileUri);
+    LOG_INFO(UDMF_TEST, "OH_UdsFileUri_SetDetails_001 end.");
+}
+
+/**
+ * @tc.name: OH_UdsPixelMap_SetDetails_001
+ * @tc.desc: Normal testcase of OH_UdsPixelMap_SetDetails interface
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsPixelMap_SetDetails_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "OH_UdsPixelMap_SetDetails_001 begin.");
+    auto pixelMap = OH_UdsPixelMap_Create();
+    ASSERT_NE(pixelMap, nullptr);
+    auto details = OH_UdsDetails_Create();
+    ASSERT_NE(details, nullptr);
+    EXPECT_EQ(details->details_.size(), 0);
+    auto result = OH_UdsDetails_SetValue(details, "pixelMapKey", "pixelMapValue");
+    EXPECT_EQ(result, UDMF_E_OK);
+    result = OH_UdsPixelMap_SetDetails(pixelMap, details);
+    EXPECT_EQ(result, UDMF_E_OK);
+    auto details1 = OH_UdsDetails_Create();
+    ASSERT_NE(details1, nullptr);
+    EXPECT_EQ(details1->details_.size(), 0);
+    result = OH_UdsPixelMap_GetDetails(pixelMap, details1);
+    EXPECT_EQ(result, UDMF_E_OK);
+    EXPECT_EQ(details1->details_.size(), 1);
+    unsigned int count = 0;
+    char **keys = OH_UdsDetails_GetAllKeys(details1, &count);
+    ASSERT_NE(keys, nullptr);
+    EXPECT_EQ(strcmp(keys[0], "pixelMapKey"), 0);
+    EXPECT_EQ(count, 1);
+    OH_UdsDetails_Destroy(details);
+    OH_UdsDetails_Destroy(details1);
+    OH_UdsPixelMap_Destroy(pixelMap);
+    LOG_INFO(UDMF_TEST, "OH_UdsPixelMap_SetDetails_001 end.");
+}
 }

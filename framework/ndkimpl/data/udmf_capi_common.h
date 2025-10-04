@@ -148,6 +148,14 @@ struct OH_UdmfOptions {
     Udmf_Visibility visibility {};
 };
 
+struct OH_UdsDetails {
+    std::map<std::string, std::string> details_;
+    char **keysArray {nullptr};
+    unsigned int keysCount {0};
+    bool isUpdate {false};
+    std::mutex mutex;
+};
+
 bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid);
 
 bool IsInvalidUdsObjectByType(const UdsObject* pThis, const OHOS::UDMF::UDType& type);

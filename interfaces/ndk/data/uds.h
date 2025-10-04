@@ -108,6 +108,13 @@ struct OH_PixelmapNative;
 typedef struct OH_UdsArrayBuffer OH_UdsArrayBuffer;
 
 /**
+ * @brief Describes the key-value object of UDS data.
+ *
+ * @since 22
+ */
+typedef struct OH_UdsDetails OH_UdsDetails;
+
+/**
  * @brief Creation a pointer to the instance of the {@link OH_UdsPlainText}.
  *
  * @return If the operation is successful, a pointer to the instance of the {@link OH_UdsPlainText}
@@ -157,6 +164,19 @@ const char* OH_UdsPlainText_GetContent(OH_UdsPlainText* pThis);
 const char* OH_UdsPlainText_GetAbstract(OH_UdsPlainText* pThis);
 
 /**
+ * @brief Get details from the {@link OH_UdsPlainText}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsPlainText}.
+ * @param details Represents a pointer to an instance of {@link OH_UdsDetails}. The pointer cannot be null.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsPlainText OH_UdsDetails Udmf_ErrCode
+ * @since 22
+ */
+int OH_UdsPlainText_GetDetails(OH_UdsPlainText* pThis, OH_UdsDetails* details);
+
+/**
  * @brief Set content to the {@link OH_UdsPlainText}.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsPlainText}.
@@ -181,6 +201,19 @@ int OH_UdsPlainText_SetContent(OH_UdsPlainText* pThis, const char* content);
  * @since 12
  */
 int OH_UdsPlainText_SetAbstract(OH_UdsPlainText* pThis, const char* abstract);
+
+/**
+ * @brief Set details to the {@link OH_UdsPlainText}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsPlainText}.
+ * @param details Represents a pointer to an instance of {@link OH_UdsDetails}. The pointer cannot be null.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsPlainText OH_UdsDetails Udmf_ErrCode
+ * @since 22
+ */
+int OH_UdsPlainText_SetDetails(OH_UdsPlainText* pThis, const OH_UdsDetails* details);
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdsHyperlink}.
@@ -232,6 +265,19 @@ const char* OH_UdsHyperlink_GetUrl(OH_UdsHyperlink* pThis);
 const char* OH_UdsHyperlink_GetDescription(OH_UdsHyperlink* pThis);
 
 /**
+ * @brief Get details from the {@link OH_UdsHyperlink}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsHyperlink}.
+ * @param details Represents a pointer to an instance of {@link OH_UdsDetails}. The pointer cannot be null.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsHyperlink OH_UdsDetails Udmf_ErrCode
+ * @since 22
+ */
+int OH_UdsHyperlink_GetDetails(OH_UdsHyperlink* pThis, OH_UdsDetails* details);
+
+/**
  * @brief Set url to the {@link OH_UdsHyperlink}.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsHyperlink}.
@@ -256,6 +302,19 @@ int OH_UdsHyperlink_SetUrl(OH_UdsHyperlink* pThis, const char* url);
  * @since 12
  */
 int OH_UdsHyperlink_SetDescription(OH_UdsHyperlink* pThis, const char* description);
+
+/**
+ * @brief Set details to the {@link OH_UdsHyperlink}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsHyperlink}.
+ * @param details Represents a pointer to an instance of {@link OH_UdsDetails}. The pointer cannot be null.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @since 22
+ * @see OH_UdsHyperlink OH_UdsDetails Udmf_ErrCode
+ */
+int OH_UdsHyperlink_SetDetails(OH_UdsHyperlink* pThis, const OH_UdsDetails* details);
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdsHtml}.
@@ -307,6 +366,19 @@ const char* OH_UdsHtml_GetContent(OH_UdsHtml* pThis);
 const char* OH_UdsHtml_GetPlainContent(OH_UdsHtml* pThis);
 
 /**
+ * @brief Get details from the {@link OH_UdsHtml}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsHtml}.
+ * @param details Represents a pointer to an instance of {@link OH_UdsDetails}. The pointer cannot be null.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @since 22
+ * @see OH_UdsHtml OH_UdsDetails Udmf_ErrCode
+ */
+int OH_UdsHtml_GetDetails(OH_UdsHtml* pThis, OH_UdsDetails* details);
+
+/**
  * @brief Set content to the {@link OH_UdsHtml}.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsHtml}.
@@ -331,6 +403,19 @@ int OH_UdsHtml_SetContent(OH_UdsHtml* pThis, const char* content);
  * @since 12
  */
 int OH_UdsHtml_SetPlainContent(OH_UdsHtml* pThis, const char* plainContent);
+
+/**
+ * @brief Set details to the {@link OH_UdsHtml}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsHtml}.
+ * @param details Represents a pointer to an instance of {@link OH_UdsDetails}. The pointer cannot be null.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @since 22
+ * @see OH_UdsHtml OH_UdsDetails Udmf_ErrCode
+ */
+int OH_UdsHtml_SetDetails(OH_UdsHtml* pThis, const OH_UdsDetails* details);
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdsAppItem}.
@@ -422,6 +507,19 @@ const char* OH_UdsAppItem_GetBundleName(OH_UdsAppItem* pThis);
 const char* OH_UdsAppItem_GetAbilityName(OH_UdsAppItem* pThis);
 
 /**
+ * @brief Get details from the {@link OH_UdsAppItem}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsAppItem}.
+ * @param details Represents a pointer to an instance of {@link OH_UdsDetails}. The pointer cannot be null.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @since 22
+ * @see OH_UdsAppItem OH_UdsDetails Udmf_ErrCode
+ */
+int OH_UdsAppItem_GetDetails(OH_UdsAppItem* pThis, OH_UdsDetails* details);
+
+/**
  * @brief Set application id to the {@link OH_UdsAppItem}.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsAppItem}.
@@ -500,6 +598,19 @@ int OH_UdsAppItem_SetBundleName(OH_UdsAppItem* pThis, const char* bundleName);
 int OH_UdsAppItem_SetAbilityName(OH_UdsAppItem* pThis, const char* abilityName);
 
 /**
+ * @brief Set details to the {@link OH_UdsAppItem}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsAppItem}.
+ * @param details Represents a pointer to an instance of {@link OH_UdsDetails}. The pointer cannot be null.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsAppItem OH_UdsDetails Udmf_ErrCode
+ * @since 22
+ */
+int OH_UdsAppItem_SetDetails(OH_UdsAppItem* pThis, const OH_UdsDetails* details);
+
+/**
  * @brief Creation a pointer to the instance of the {@link OH_UdsFileUri}.
  *
  * @return If the operation is successful, a pointer to the instance of the {@link OH_UdsFileUri}
@@ -549,6 +660,19 @@ const char* OH_UdsFileUri_GetFileUri(OH_UdsFileUri* pThis);
 const char* OH_UdsFileUri_GetFileType(OH_UdsFileUri* pThis);
 
 /**
+ * @brief Get details from the {@link OH_UdsFileUri}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsFileUri}.
+ * @param details Represents a pointer to an instance of {@link OH_UdsDetails}. The pointer cannot be null.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @since 22
+ * @see OH_UdsFileUri OH_UdsDetails Udmf_ErrCode
+ */
+int OH_UdsFileUri_GetDetails(OH_UdsFileUri* pThis, OH_UdsDetails* details);
+
+/**
  * @brief Set file uri to the {@link OH_UdsFileUri}.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsFileUri}.
@@ -575,10 +699,23 @@ int OH_UdsFileUri_SetFileUri(OH_UdsFileUri* pThis, const char* fileUri);
 int OH_UdsFileUri_SetFileType(OH_UdsFileUri* pThis, const char* fileType);
 
 /**
+ * @brief Set details to the {@link OH_UdsFileUri}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsFileUri}.
+ * @param details Represents a pointer to an instance of {@link OH_UdsDetails}. The pointer cannot be null.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsFileUri OH_UdsDetails Udmf_ErrCode
+ * @since 22
+ */
+int OH_UdsFileUri_SetDetails(OH_UdsFileUri* pThis, const OH_UdsDetails* details);
+
+/**
  * @brief Creation a pointer to the instance of the {@link OH_UdsPixelMap}.
  *
  * @return If the operation is successful, a pointer to the instance of the {@link OH_UdsPixelMap}
- * structure is returned. If the operation is failed, nullptr is returned.
+ * structure is returned. If the memory is not enough, nullptr is returned.
  * @see OH_UdsPixelMap
  * @since 13
  */
@@ -614,6 +751,19 @@ const char* OH_UdsPixelMap_GetType(OH_UdsPixelMap* pThis);
 void OH_UdsPixelMap_GetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelmapNative);
 
 /**
+ * @brief Get details from the {@link OH_UdsPixelMap}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsPixelMap}.
+ * @param details Represents a pointer to an instance of {@link OH_UdsDetails}. The pointer cannot be null.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @since 22
+ * @see OH_UdsPixelMap OH_UdsDetails Udmf_ErrCode
+ */
+int OH_UdsPixelMap_GetDetails(OH_UdsPixelMap* pThis, OH_UdsDetails* details);
+
+/**
  * @brief Set pixel map to the {@link OH_UdsPixelMap}.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdsPixelMap}.
@@ -625,6 +775,19 @@ void OH_UdsPixelMap_GetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelm
  * @since 13
  */
 int OH_UdsPixelMap_SetPixelMap(OH_UdsPixelMap* pThis, OH_PixelmapNative* pixelmapNative);
+
+/**
+ * @brief Set details to the {@link OH_UdsPixelMap}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsPixelMap}.
+ * @param details Represents a pointer to an instance of {@link OH_UdsDetails}. The pointer cannot be null.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @since 22
+ * @see OH_UdsPixelMap OH_UdsDetails Udmf_ErrCode
+ */
+int OH_UdsPixelMap_SetDetails(OH_UdsPixelMap* pThis, const OH_UdsDetails* details);
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdsArrayBuffer}.
@@ -854,6 +1017,99 @@ int OH_UdsContentForm_SetAppName(OH_UdsContentForm* pThis, const char* appName);
  * @since 14
  */
 int OH_UdsContentForm_SetLinkUri(OH_UdsContentForm* pThis, const char* linkUri);
+
+/**
+ * @brief Creation a pointer to the instance of the {@link OH_UdsDetails}.
+ *
+ * @return If the operation is successful, a pointer to the instance of the {@link OH_UdsDetails}
+ * structure is returned. If the operation is failed, nullptr is returned.
+ * @since 22
+ * @see OH_UdsDetails
+ */
+OH_UdsDetails* OH_UdsDetails_Create();
+
+/**
+ * @brief Destroy a pointer that points to the {@link OH_UdsDetails} instance.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsDetails}.
+ * @since 22
+ * @see OH_UdsDetails
+ */
+void OH_UdsDetails_Destroy(OH_UdsDetails* pThis);
+
+/**
+ * @brief Determine whether the {@link OH_UdsDetails} contain the specified key.
+ *
+ * @param pThis Represents a pointer to an instance of the {@link OH_UdsDetails}.
+ * @param key Represents key in the details.
+ * @return Returns the status code of the execution.
+ *         {@code false} Represents The details do not contain the key.
+ *         {@code true} Represents The details contain the key.
+ * @see OH_UdsDetails
+ * @since 22
+ */
+bool OH_UdsDetails_HasKey(const OH_UdsDetails* pThis, const char* key);
+
+/**
+ * @brief Remove the value corresponding to this key from the {@link OH_UdsDetails}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsDetails}.
+ * @param key Represents key in the details.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @since 22
+ * @see OH_UdsDetails Udmf_ErrCode
+ */
+int OH_UdsDetails_Remove(OH_UdsDetails* pThis, const char* key);
+
+/**
+ * @brief Clear all data in the {@link OH_UdsDetails}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsDetails}.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @since 22
+ * @see OH_UdsDetails Udmf_ErrCode
+ */
+int OH_UdsDetails_Clear(OH_UdsDetails* pThis);
+
+/**
+ * @brief Set key-value data to the {@link OH_UdsDetails}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsDetails}.
+ * @param key Represents the key data to be written.
+ * @param value Represents the value data to be written.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @since 22
+ * @see OH_UdsDetails Udmf_ErrCode
+ */
+int OH_UdsDetails_SetValue(OH_UdsDetails* pThis, const char* key, const char* value);
+
+/**
+ * @brief Get the value from the {@link OH_UdsDetails} using the key.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsDetails}.
+ * @param key Represents key in the details.
+ * @return Returns a string pointer when input args normally, otherwise return nullptr.
+ * @since 22
+ * @see OH_UdsDetails
+ */
+const char* OH_UdsDetails_GetValue(const OH_UdsDetails* pThis, const char* key);
+
+/**
+ * @brief Get the all keys from the {@link OH_UdsDetails}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsDetails}.
+ * @param count Represents the keys count.
+ * @return Returns string list of keys. Memory will be released after calling the OH_UdsDetails_Destroy function.
+ * @since 22
+ * @see OH_UdsDetails
+ */
+char** OH_UdsDetails_GetAllKeys(OH_UdsDetails* pThis, unsigned int* count);
 
 #ifdef __cplusplus
 };
