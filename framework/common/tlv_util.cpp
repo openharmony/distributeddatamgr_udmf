@@ -749,7 +749,7 @@ template <> bool Reading(Privilege &output, TLVObject &data, const TLVHead &head
 template <> size_t CountBufferSize(const UriInfo &input, TLVObject &data)
 {
     return data.CountHead() + data.CountBasic(input.position) + data.Count(input.oriUri) +
-        data.Count(input.dfsUri) + data.Count(input.authUri);
+        data.Count(input.dfsUri) + data.Count(input.authUri) + data.CountBasic(input.permission);
 }
 
 template <> bool Writing(const UriInfo &input, TLVObject &data, TAG tag)
@@ -769,6 +769,9 @@ template <> bool Writing(const UriInfo &input, TLVObject &data, TAG tag)
     if (!data.WriteBasic(TAG::TAG_URI_POS, input.position)) {
         return false;
     }
+    if (!data.WriteBasic(TAG::TAG_URI_PERMISSION, input.permission)) {
+        return false;
+    }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
 }
 
@@ -779,6 +782,7 @@ template <> bool Reading(UriInfo &output, TLVObject &data, const TLVHead &head)
         return false;
     }
     auto endCursor = data.GetCursor() + head.len;
+    output.permission = 0;
     while (data.GetCursor() < endCursor) {
         TLVHead headItem{};
         if (!data.ReadHead(headItem)) {
@@ -797,6 +801,9 @@ template <> bool Reading(UriInfo &output, TLVObject &data, const TLVHead &head)
                 break;
             case static_cast<uint16_t>(TAG::TAG_URI_POS):
                 result = data.ReadBasic(output.position, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_URI_PERMISSION):
+                result = data.ReadBasic(output.permission, headItem);
                 break;
             default:
                 result = data.Skip(headItem);

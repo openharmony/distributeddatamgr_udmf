@@ -635,7 +635,9 @@ enum ShareOptions : int32_t {
 };
 
 enum PermissionPolicy : int32_t {
-    ONLY_READ = 0,
+    UNKNOW = 0,
+    NO_PERMISSION,
+    ONLY_READ,
     READ_WRITE,
     PERMISSION_POLICY_BUTT,
 };

@@ -513,7 +513,7 @@ static constexpr UtdType UTD_TYPES[] = {
 
 static constexpr std::initializer_list<std::string_view> NOT_NEED_COUNT_VALUE_LIST = {
     UNIFORM_DATA_TYPE, ARRAY_BUFFER_LENGTH, THUMB_DATA_LENGTH, APP_ICON_LENGTH, APPLICATION_DEFINED_RECORD_MARK,
-    FILE_TYPE
+    FILE_TYPE, PERMISSION_POLICY
 };
 
 static const std::initializer_list<std::string> FILE_SUB_TYPES = {
