@@ -104,6 +104,21 @@ void IsUtdFuzz(FuzzedDataProvider &provider)
     UtdClient::GetInstance().IsUtd(typeId, result);
 }
 
+void InstallCustomUtdsFuzz(FuzzedDataProvider &provider)
+{
+    std::string bundleName = provider.ConsumeRandomLengthString();
+    std::string jsonStr = provider.ConsumeRandomLengthString();
+    int32_t user = provider.ConsumeIntegral<uint32_t>();
+    UtdClient::GetInstance().InstallCustomUtds(bundleName, jsonStr, user);
+}
+
+void UninstallCustomUtdsFuzz(FuzzedDataProvider &provider)
+{
+    std::string bundleName = provider.ConsumeRandomLengthString();
+    int32_t user = provider.ConsumeIntegral<uint32_t>();
+    UtdClient::GetInstance().UninstallCustomUtds(bundleName, user);
+}
+
 }
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
@@ -121,5 +136,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::GetUniformDataTypesByMIMETypeDefaultBelongsFuzz(provider);
     OHOS::GetUniformDataTypesByMIMETypeFuzz(provider);
     OHOS::IsUtdFuzz(provider);
+    OHOS::InstallCustomUtdsFuzz(provider);
+    OHOS::UninstallCustomUtdsFuzz(provider);
     return 0;
 }
