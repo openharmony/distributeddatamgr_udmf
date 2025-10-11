@@ -26,7 +26,7 @@ ohos_fuzztest("UdmfFuzzTest") {
   ]
 
   fuzz_config_file =
-      "${udmf_framework_path}/ndkimpl/test/udmf_fuzzer"
+      "${udmf_framework_path}/ndkimpl/test/fuzztest/udmf_fuzzer"
 
   cflags = [
     "-g",
