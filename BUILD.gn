@@ -34,7 +34,7 @@ group("unittest") {
   testonly = true
 
   deps = [
-    "framework/common/unittest:unittest",
+    "framework/common/test/unittest:unittest",
     "framework/innerkitsimpl/test/unittest:unittest",
     "framework/jskitsimpl/test:stage_unittest",
     "framework/jskitsimpl/unittest:unittest",
@@ -48,5 +48,6 @@ group("fuzztest") {
   deps = [
     "framework/innerkitsimpl/test/fuzztest:fuzztest",
     "framework/ndkimpl/test/udmf_fuzzer:fuzztest",
+    "framework/common/test/fuzztest:fuzztest",
   ]
 }
