@@ -3984,4 +3984,59 @@ HWTEST_F(UDMFTest, DestroyUnifiedRecordArray001, TestSize.Level1)
     OH_UdmfData_Destroy(unifiedData);
     EXPECT_EQ(unifiedData->recordsCount, 0);
 }
+
+/**
+ * @tc.name: OH_UDMF_GetDataElementAt001
+ * @tc.desc: test OH_UDMF_GetDataElementAt
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UDMF_GetDataElementAt001, TestSize.Level1)
+{
+    OH_UdsPlainText* plain_text = OH_UdsPlainText_Create();
+    ASSERT_NE(plain_text, nullptr);
+    OH_UdsHyperlink* hyperlink = OH_UdsHyperlink_Create();
+    ASSERT_NE(hyperlink, nullptr);
+    OH_UdmfRecord* record = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddPlainText(record, plain_text);
+    OH_UdmfRecord* hyRecord = OH_UdmfRecord_Create();
+    OH_UdmfRecord_AddHyperlink(hyRecord, hyperlink);
+    OH_UdmfData* data = OH_UdmfData_Create();
+    OH_UdmfData_AddRecord(data, record);
+    OH_UdmfData* data1 = OH_UdmfData_Create();
+    OH_UdmfData_AddRecord(data1, hyRecord);
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    options->intention = UDMF_INTENTION_DATA_HUB;
+    char key[UDMF_KEY_BUFFER_LEN];
+    int setRes = OH_Udmf_SetUnifiedDataByOptions(options, data, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    setRes = OH_Udmf_SetUnifiedDataByOptions(options, data1, key, UDMF_KEY_BUFFER_LEN);
+    EXPECT_EQ(setRes, UDMF_E_OK);
+    unsigned int dataSize = 0;
+    OH_UdmfData* dataArray = nullptr;
+    int getRes = OH_Udmf_GetUnifiedDataByOptions(options, &dataArray, &dataSize);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    EXPECT_NE(dataArray, nullptr);
+    EXPECT_EQ(dataSize, 2);
+    EXPECT_EQ(OH_UDMF_GetDataElementAt(nullptr, 0), nullptr);
+    auto readData = OH_UDMF_GetDataElementAt(&dataArray, 0);
+    EXPECT_NE(readData, nullptr);
+    EXPECT_TRUE(OH_UdmfData_HasType(readData, UDMF_META_PLAIN_TEXT));
+    readData = OH_UDMF_GetDataElementAt(&dataArray, 1);
+    EXPECT_NE(readData, nullptr);
+    EXPECT_TRUE(OH_UdmfData_HasType(readData, UDMF_META_HYPERLINK));
+    unsigned int dataSize1 = 0;
+    OH_UdmfData* dataArray1 = nullptr;
+    int deleteRes = OH_Udmf_DeleteUnifiedData(options, &dataArray1, &dataSize1);
+    EXPECT_EQ(deleteRes, UDMF_E_OK);
+    EXPECT_NE(dataArray1, nullptr);
+    OH_Udmf_DestroyDataArray(&dataArray, dataSize);
+    OH_Udmf_DestroyDataArray(&dataArray1, dataSize1);
+    OH_UdmfOptions_Destroy(options);
+    OH_UdsPlainText_Destroy(plain_text);
+    OH_UdsHyperlink_Destroy(hyperlink);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfRecord_Destroy(hyRecord);
+    OH_UdmfData_Destroy(data);
+    OH_UdmfData_Destroy(data1);
+}
 }
