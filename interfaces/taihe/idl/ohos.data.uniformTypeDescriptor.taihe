@@ -16,7 +16,7 @@
 @!namespace("@ohos.data.uniformTypeDescriptor", "uniformTypeDescriptor")
 
 @!sts_inject("""
-static { loadLibrary("udmf_taihe_native.z") }
+static { loadLibraryWithPermissionCheck("udmf_taihe_native.z", "@ohos.data.uniformTypeDescriptor") }
 """)
 
 enum UniformDataType: String {
