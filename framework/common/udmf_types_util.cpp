@@ -110,7 +110,7 @@ template<>
 bool Marshalling(const Summary &input, MessageParcel &parcel)
 {
     return ITypesUtil::Marshal(parcel, input.summary, input.totalSize, input.specificSummary,
-        input.summaryFormat, input.version);
+        input.summaryFormat, input.version, input.tag);
 }
 
 template<>
@@ -122,7 +122,7 @@ bool Unmarshalling(Summary &output, MessageParcel &parcel)
         return false;
     }
     return ITypesUtil::Unmarshal(parcel, output.summary, output.totalSize, output.specificSummary,
-        output.summaryFormat, output.version);
+        output.summaryFormat, output.version, output.tag);
 }
 
 template<>

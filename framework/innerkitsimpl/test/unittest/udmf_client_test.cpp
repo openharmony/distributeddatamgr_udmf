@@ -4045,4 +4045,50 @@ HWTEST_F(UdmfClientTest, GetSummary006, TestSize.Level1)
     EXPECT_TRUE(std::find(pngFormat.begin(), pngFormat.end(), Uds_Type::UDS_FILE_URI) != pngFormat.end());
     LOG_INFO(UDMF_TEST, "GetSummary006 end.");
 }
+
+/**
+* @tc.name: GetSummary007
+* @tc.desc: Get summary data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetSummary007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary007 begin.");
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
+    data.AddRecord(text);
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetDetails(details);
+    plainText->SetContent("content");
+    plainText->SetAbstract("abstract");
+    data.AddRecord(plainText);
+    std::shared_ptr<UnifiedDataProperties> properties = std::make_shared<UnifiedDataProperties>();
+    std::string tag = "this is a tag of test GetSummary007";
+    properties->tag = tag;
+    properties->shareOptions = CROSS_APP;
+    data.SetProperties(std::move(properties));
+    auto status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption query = { .key = key, .intention = Intention::UD_INTENTION_DATA_HUB };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(query, summary);
+    auto size = text->GetSize();
+    size += plainText->GetSize();
+
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(summary.totalSize, size);
+    ASSERT_EQ(summary.summary["general.text"], text->GetSize());
+    ASSERT_EQ(summary.summary["general.plain-text"], plainText->GetSize());
+    ASSERT_EQ(summary.tag, tag);
+
+    LOG_INFO(UDMF_TEST, "GetSummary007 end.");
+}
 } // OHOS::Test

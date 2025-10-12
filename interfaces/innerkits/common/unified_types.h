@@ -40,6 +40,7 @@ struct Summary {
     // otherwise(not set or 0), it means it does not contain.
     int32_t version {1};
     int64_t totalSize {0};
+    std::string tag;
 };
 
 struct Privilege {

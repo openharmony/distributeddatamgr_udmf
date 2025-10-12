@@ -108,6 +108,10 @@ void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
         CalRecordSummary(*record->GetEntries(), summary);
     }
     summary.version = WITH_SUMMARY_FORMAT_VER;
+    auto properties = data.GetProperties();
+    if (properties != nullptr) {
+        summary.tag = properties->tag;
+    }
 }
 
 void UnifiedDataHelper::GetSummaryFromLoadInfo(const DataLoadInfo &dataLoadInfo, Summary &summary)

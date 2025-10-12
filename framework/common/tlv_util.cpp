@@ -957,7 +957,7 @@ template <> size_t CountBufferSize(const Summary &input, TLVObject &data)
 {
     return data.CountHead() + CountBufferSize(input.summary, data) + data.CountBasic(input.totalSize) +
         CountBufferSize(input.specificSummary, data) + CountBufferSize(input.summaryFormat, data) +
-        data.CountBasic(input.version);
+        data.CountBasic(input.version) + data.Count(input.tag);
 }
 
 template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
@@ -978,6 +978,9 @@ template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
         return false;
     }
     if (!data.WriteBasic(TAG::TAG_SUMMARY_VERSION, input.version)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.tag, data, TAG::TAG_SUMMARY_TAG)) {
         return false;
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
@@ -1018,6 +1021,11 @@ template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
                 break;
             case static_cast<uint16_t>(TAG::TAG_SUMMARY_VERSION):
                 if (!data.ReadBasic(output.version, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_SUMMARY_TAG):
+                if (!TLVUtil::Reading(output.tag, data, headItem)) {
                     return false;
                 }
                 break;
