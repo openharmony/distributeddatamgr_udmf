@@ -795,43 +795,6 @@ void IsAppropriateTypeFuzz(FuzzedDataProvider &provider)
     UdmfClient::GetInstance().IsAppropriateType(summary, allowTypes);
 }
 
-void SetDataProcessDragInAppFuzz(FuzzedDataProvider &provider)
-{
-    std::string svalue = provider.ConsumeRandomLengthString();
-    CustomOption option1 = {.intention = Intention::UD_INTENTION_DRAG};
-    UnifiedData data1;
-    std::string key;
-    auto video1 = std::make_shared<Video>();
-    video1->SetUri(svalue + "uri");
-    video1->SetRemoteUri(svalue + "remoteUri");
-    data1.AddRecord(video1);
-    auto intentionDrag = UD_INTENTION_MAP.at(option1.intention);
-    UdmfClient::GetInstance().SetAppShareOption(intentionDrag, ShareOptions::IN_APP);
-    UdmfClient::GetInstance().SetData(option1, data1, key);
-
-    SetNativeToken();
-
-    QueryOption option2 = {.key = key};
-    Privilege privilege;
-    privilege.readPermission = "readPermission";
-    privilege.writePermission = "writePermission";
-    UdmfClient::GetInstance().AddPrivilege(option2, privilege);
-
-    SetHapToken();
-
-    UnifiedData data2;
-    UdmfClient::GetInstance().GetData(option2, data2);
-}
-
-void IsAppropriateTypeFuzz(FuzzedDataProvider &provider)
-{
-    std::string allowType = provider.ConsumeRandomLengthString();
-    std::vector<std::string> allowTypes{allowType};
-    Summary summary;
-    summary.version = provider.ConsumeIntegral<uint32_t>();
-    UdmfClient::GetInstance().IsAppropriateType(summary, allowTypes);
-}
-
 }
 
 /* Fuzzer entry point */
@@ -867,8 +830,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::SetDelayInfoFuzz(provider);
     OHOS::PushDelayDataFuzz(provider);
     OHOS::GetBundleNameByUdKeyFuzz(provider);
-    OHOS::SetDataProcessDragInAppFuzz(provider);
-    OHOS::IsAppropriateTypeFuzz(provider);
     OHOS::SetDataProcessDragInAppFuzz(provider);
     OHOS::IsAppropriateTypeFuzz(provider);
     OHOS::TearDown();
