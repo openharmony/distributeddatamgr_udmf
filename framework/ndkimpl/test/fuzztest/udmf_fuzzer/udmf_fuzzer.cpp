@@ -314,6 +314,94 @@ void SetAndGetUnifiedDataFuzz(FuzzedDataProvider &provider)
     OH_UdmfData_Destroy(udmfUnifiedData);
 }
 
+void SetAndGetVisibilityFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    Udmf_Visibility testVisibility = static_cast<Udmf_Visibility>(
+        provider.ConsumeIntegralInRange<int32_t>(Udmf_Visibility::UDMF_ALL, Udmf_Visibility::UDMF_OWN_PROCESS));
+    OH_UdmfOptions_SetVisibility(options, testVisibility);
+    OH_UdmfOptions_GetVisibility(options);
+    OH_UdmfOptions_Destroy(options);
+}
+
+void SetAndGetPlainTextFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfData *unifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsPlainText *plainText = OH_UdsPlainText_Create();
+    std::string content = provider.ConsumeRandomLengthString();
+    OH_UdsPlainText_SetContent(plainText, content.c_str());
+    OH_UdmfRecord_AddPlainText(record, plainText);
+    OH_UdmfData_AddRecord(unifiedData, record);
+    OH_UdmfData_GetPrimaryPlainText(unifiedData, plainText);
+    OH_UdmfRecord_GetPlainText(record, plainText);
+    OH_UdmfData_GetRecord(unifiedData, 0);
+    OH_UdmfData_IsLocal(unifiedData);
+    OH_UdsPlainText_Destroy(plainText);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(unifiedData);
+}
+
+void SetAndGetHtmlFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfData *unifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsHtml *html = OH_UdsHtml_Create();
+    std::string content = provider.ConsumeRandomLengthString();
+    OH_UdsHtml_SetContent(html, content.c_str());
+    OH_UdmfRecord_AddHtml(record, html);
+    OH_UdmfData_AddRecord(unifiedData, record);
+    OH_UdmfData_GetPrimaryHtml(unifiedData, html);
+    OH_UdmfRecord_GetHtml(record, html);
+    OH_UdmfData_GetRecordCount(unifiedData);
+    OH_UdsHtml_Destroy(html);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(unifiedData);
+}
+
+void SetAndGetOptionsKeyFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    std::string testKey = provider.ConsumeRandomLengthString();
+    OH_UdmfOptions_SetKey(options, testKey.c_str());
+    OH_UdmfOptions_GetKey(options);
+    OH_UdmfOptions_Destroy(options);
+}
+
+void SetAndGetOptionsIntentionFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    Udmf_Intention testIntention = static_cast<Udmf_Intention>(
+        provider.ConsumeIntegralInRange<int32_t>(UDMF_INTENTION_DRAG, UDMF_INTENTION_MENU));
+    OH_UdmfOptions_SetIntention(options, testIntention);
+    OH_UdmfOptions_GetIntention(options);
+    OH_UdmfOptions_Reset(options);
+    OH_UdmfOptions_Destroy(options);
+}
+
+void SetAndGetUnifiedDataFuzz(FuzzedDataProvider &provider)
+{
+    std::string skey = provider.ConsumeRandomLengthString();
+    OH_UdmfData *udmfUnifiedData = OH_UdmfData_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsFileUri *fileUri = OH_UdsFileUri_Create();
+    OH_UdsFileUri_SetFileUri(fileUri, skey.c_str());
+    OH_UdsFileUri_SetFileType(fileUri, UDMF_META_IMAGE);
+    OH_UdmfRecord_AddFileUri(record, fileUri);
+    OH_UdmfData_AddRecord(udmfUnifiedData, record);
+
+    Udmf_Intention intention = static_cast<Udmf_Intention>(
+        provider.ConsumeIntegralInRange<int32_t>(UDMF_INTENTION_DRAG, UDMF_INTENTION_MENU));
+    std::string key = provider.ConsumeBytesAsString(UDMF_KEY_BUFFER_LEN);
+    char testkey[UDMF_KEY_BUFFER_LEN] = {0};
+    std::copy(key.begin(), key.begin() + std::min(key.size(), (size_t)(UDMF_KEY_BUFFER_LEN - 1)),
+        testkey);
+    OH_Udmf_SetUnifiedData(intention, udmfUnifiedData, testkey, UDMF_KEY_BUFFER_LEN);
+    OH_Udmf_GetUnifiedData(key.c_str(), intention, udmfUnifiedData);
+    OH_UdsFileUri_Destroy(fileUri);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdmfData_Destroy(udmfUnifiedData);
+}
 }
 
 /* Fuzzer entry point */
@@ -327,6 +415,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::UpdataUnifiedDataFuzz(provider);
     OHOS::DeleteUnifiedDataFuzz(provider);
     OHOS::SetAndGetVisibilityFuzz(provider);
+    OHOS::SetAndGetPlainTextFuzz(provider);
+    OHOS::SetAndGetHtmlFuzz(provider);
+    OHOS::SetAndGetOptionsKeyFuzz(provider);
+    OHOS::SetAndGetOptionsIntentionFuzz(provider);
+    OHOS::SetAndGetUnifiedDataFuzz(provider);
     OHOS::SetAndGetPlainTextFuzz(provider);
     OHOS::SetAndGetHtmlFuzz(provider);
     OHOS::SetAndGetOptionsKeyFuzz(provider);
