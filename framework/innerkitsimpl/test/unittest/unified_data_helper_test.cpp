@@ -230,4 +230,26 @@ HWTEST_F(UnifiedDataHelperTest, FileClose002, TestSize.Level1)
     EXPECT_FALSE(status);
     LOG_INFO(UDMF_TEST, "FileClose002 end.");
 }
+
+/**
+* @tc.name: GetSummary001
+* @tc.desc: Abnormal testcase of GetSummary
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, GetSummary001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary001 begin.");
+    UnifiedDataHelper unifiedDataHelper;
+    UnifiedData data;
+    Summary summary;
+    unifiedDataHelper.GetSummary(data, summary);
+    EXPECT_TRUE(summary.tag.empty());
+    std::shared_ptr<UnifiedDataProperties> properties = std::make_shared<UnifiedDataProperties>();
+    std::string tag = "this is a tag of test GetSummary001";
+    properties->tag = tag;
+    data.SetProperties(std::move(properties));
+    unifiedDataHelper.GetSummary(data, summary);
+    EXPECT_EQ(summary.tag, tag);
+    LOG_INFO(UDMF_TEST, "GetSummary001 end.");
+}
 } // OHOS::Test
