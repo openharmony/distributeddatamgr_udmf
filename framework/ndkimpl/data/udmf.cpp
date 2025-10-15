@@ -1348,3 +1348,13 @@ void OH_UdmfDataLoadInfo_SetRecordCount(OH_UdmfDataLoadInfo* dataLoadInfo, unsig
     }
     dataLoadInfo->recordsCount = recordCount;
 }
+
+// This function does not prevent array out-of-bounds access, and users must ensure it themselves.
+OH_UdmfData* OH_UDMF_GetDataElementAt(OH_UdmfData** dataArray, unsigned int index)
+{
+    if (dataArray == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return nullptr;
+    }
+    return &((*dataArray)[index]);
+}

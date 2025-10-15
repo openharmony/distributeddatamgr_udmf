@@ -916,13 +916,13 @@ char** OH_UdsDetails_GetAllKeys(OH_UdsDetails* pThis, unsigned int* count)
         LOG_ERROR(UDMF_CAPI, "invalid para.");
         return nullptr;
     }
+    std::lock_guard<std::mutex> lock(pThis->mutex);
     if ((!pThis->isUpdate) && (pThis->keysArray != nullptr)) {
         LOG_DEBUG(UDMF_CAPI, "return cache value.");
         *count = pThis->keysCount;
         return pThis->keysArray;
     }
     std::vector<std::string> keys;
-    std::lock_guard<std::mutex> lock(pThis->mutex);
     for (const auto &item : pThis->details_) {
         if (item.first.empty()) {
             continue;
