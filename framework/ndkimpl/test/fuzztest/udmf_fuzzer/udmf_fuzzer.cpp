@@ -314,6 +314,218 @@ void SetAndGetUnifiedDataFuzz(FuzzedDataProvider &provider)
     OH_UdmfData_Destroy(udmfUnifiedData);
 }
 
+void SetAndGetGeneralEntryFuzz(FuzzedDataProvider &provider)
+{
+    size_t dataLen = provider.ConsumeIntegralInRange<size_t>(0, 1024);
+    std::vector<unsigned char> random_data = provider.ConsumeBytes<unsigned char>(dataLen);
+    
+    const unsigned char* entry = nullptr;
+    if (!random_data.empty()) {
+        entry = random_data.data();
+    }
+    
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    std::string typeId = provider.ConsumeRandomLengthString();
+    OH_UdmfRecord_AddGeneralEntry(record, typeId.c_str(), entry, dataLen);
+  
+    unsigned int getCount = 0;
+    unsigned char *getEntry;
+    OH_UdmfRecord_GetGeneralEntry(record, typeId.c_str(), &getEntry, &getCount);
+    OH_UdmfRecord_Destroy(record);
+}
+
+void SetAndGetHyperlinkFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsHyperlink *hyperlink = OH_UdsHyperlink_Create();
+    std::string url = provider.ConsumeRandomLengthString();
+    OH_UdsHyperlink_SetUrl(hyperlink, url.c_str());
+    OH_UdmfRecord_AddHyperlink(record, hyperlink);
+    OH_UdmfRecord_GetHyperlink(record, hyperlink);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdsHyperlink_Destroy(hyperlink);
+}
+
+void SetAndGetAppItemFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsAppItem *appItem = OH_UdsAppItem_Create();
+    std::string name = provider.ConsumeRandomLengthString();
+    OH_UdsAppItem_SetName(appItem, name.c_str());
+    OH_UdmfRecord_AddAppItem(record, appItem);
+    OH_UdmfRecord_GetAppItem(record, appItem);
+
+    OH_UdmfRecord_Destroy(record);
+    OH_UdsAppItem_Destroy(appItem);
+}
+
+void SetAndGetPixelMapFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsPixelMap *pixMap = OH_UdsPixelMap_Create();
+    auto details = OH_UdsDetails_Create();
+    std::string pixelMapKey = provider.ConsumeRandomLengthString();
+    std::string pixelMapValue = provider.ConsumeRandomLengthString();
+    OH_UdsDetails_SetValue(details, pixelMapKey.c_str(), pixelMapValue.c_str());
+
+    OH_UdsPixelMap_SetDetails(pixMap, details);
+    OH_UdmfRecord_AddPixelMap(record, pixMap);
+    OH_UdmfRecord_GetPixelMap(record, pixMap);
+    OH_UdsDetails_Destroy(details);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdsPixelMap_Destroy(pixMap);
+}
+
+void SetAndGetArrayBufferFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsArrayBuffer *buffer = OH_UdsArrayBuffer_Create();
+    std::string type = provider.ConsumeRandomLengthString();
+    OH_UdmfRecord_AddArrayBuffer(record, type.c_str(), buffer);
+    OH_UdmfRecord_GetArrayBuffer(record, type.c_str(), buffer);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdsArrayBuffer_Destroy(buffer);
+}
+
+void SetAndGetContentFormFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    OH_UdsContentForm *contentForm = OH_UdsContentForm_Create();
+    std::string description = provider.ConsumeRandomLengthString();
+    OH_UdsContentForm_SetDescription(contentForm, description.c_str());
+    OH_UdmfRecord_AddContentForm(record, contentForm);
+    OH_UdmfRecord_GetContentForm(record, contentForm);
+    OH_UdmfRecord_Destroy(record);
+    OH_UdsContentForm_Destroy(contentForm);
+}
+
+void CreateAndGetPropertyFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    std::string tag = provider.ConsumeRandomLengthString();
+    OH_UdmfProperty_SetTag(properties, tag.c_str());
+    OH_UdmfProperty_GetTag(properties);
+    OH_UdmfProperty_GetTimestamp(properties);
+    OH_UdmfProperty_Destroy(properties);
+    OH_UdmfData_Destroy(data);
+}
+
+void SetAndGetShareOptionFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    Udmf_ShareOption shareOption = static_cast<Udmf_ShareOption>(
+        provider.ConsumeIntegralInRange<int32_t>(Udmf_ShareOption::SHARE_OPTIONS_INVALID, SHARE_OPTIONS_CROSS_APP));
+    OH_UdmfProperty_SetShareOption(properties, shareOption);
+    OH_UdmfProperty_GetShareOption(properties);
+    OH_UdmfData_Destroy(data);
+    OH_UdmfProperty_Destroy(properties);
+}
+
+void SetAndGetExtrasIntParamFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    std::string key = provider.ConsumeRandomLengthString();
+    int defaultValue = provider.ConsumeIntegral<int>();
+    OH_UdmfProperty_SetExtrasIntParam(properties, key.c_str(), defaultValue);
+    OH_UdmfProperty_GetExtrasIntParam(properties, key.c_str(), defaultValue);
+    OH_UdmfData_Destroy(data);
+    OH_UdmfProperty_Destroy(properties);
+}
+
+void SetAndGetExtrasStringParamFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    std::string key = provider.ConsumeRandomLengthString();
+    std::string param = provider.ConsumeRandomLengthString();
+    OH_UdmfProperty_SetExtrasStringParam(properties, key.c_str(), param.c_str());
+    OH_UdmfProperty_GetExtrasStringParam(properties, key.c_str());
+    OH_UdmfData_Destroy(data);
+    OH_UdmfProperty_Destroy(properties);
+}
+
+void* GetDataCallbackFunc(void* context, const char* type)
+{
+    auto plainText = OH_UdsPlainText_Create();
+    OH_UdsPlainText_SetAbstract(plainText, "doing something");
+    OH_UdsPlainText_SetContent(plainText, "doing something");
+    return plainText;
+}
+
+void CreateAndSetRecordProviderFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfRecordProvider* recordProvider = OH_UdmfRecordProvider_Create();
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    int num = provider.ConsumeIntegral<int>();
+    void* context = &num;
+    auto finalizeCallback = [](void* context) {};
+    OH_UdmfRecordProvider_SetData(recordProvider, context, GetDataCallbackFunc, finalizeCallback);
+    const char* types[] = { "general.plain-text", "general.hyperlink", "general.html" };
+    size_t count = sizeof(types) / sizeof(types[0]);
+
+    OH_UdmfRecord_SetProvider(record, types, count, recordProvider);
+    OH_UdmfRecordProvider_Destroy(recordProvider);
+    OH_UdmfRecord_Destroy(record);
+}
+
+void CreateAndSetDataParamsFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfGetDataParams *params = OH_UdmfGetDataParams_Create();
+    std::string destUri = provider.ConsumeRandomLengthString();
+
+    Udmf_FileConflictOptions options = static_cast<Udmf_FileConflictOptions>(
+        provider.ConsumeIntegralInRange<int32_t>(Udmf_FileConflictOptions::UDMF_OVERWRITE,
+        Udmf_FileConflictOptions::UDMF_SKIP));
+    OH_UdmfGetDataParams_SetFileConflictOptions(params, options);
+    Udmf_ProgressIndicator progressIndicator = static_cast<Udmf_ProgressIndicator>(
+        provider.ConsumeIntegralInRange<int32_t>(Udmf_ProgressIndicator::UDMF_NONE,
+        Udmf_ProgressIndicator::UDMF_DEFAULT));
+    OH_UdmfGetDataParams_SetProgressIndicator(params, progressIndicator);
+    OH_UdmfDataLoadInfo *acceptableInfo = OH_UdmfDataLoadInfo_Create();
+    OH_UdmfGetDataParams_SetAcceptableInfo(params, acceptableInfo);
+    OH_UdmfGetDataParams_SetDestUri(params, destUri.c_str());
+    OH_UdmfGetDataParams_Destroy(params);
+}
+
+void CreateAndSetDataLoadParamsFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfDataLoadParams *params = OH_UdmfDataLoadParams_Create();
+    OH_Udmf_DataLoadHandler loadHandler = [] (OH_UdmfDataLoadInfo* acceptableInfo) {
+        OH_UdmfDataLoadInfo_GetRecordCount(acceptableInfo);
+        OH_UdmfData *unifiedData = OH_UdmfData_Create();
+        return unifiedData;
+    };
+    OH_UdmfDataLoadParams_SetLoadHandler(params, loadHandler);
+    OH_UdmfDataLoadInfo *dataLoadInfo = OH_UdmfDataLoadInfo_Create();
+    dataLoadInfo->typesCount = provider.ConsumeIntegral<unsigned int>();
+    dataLoadInfo->recordsCount = provider.ConsumeIntegral<unsigned int>();
+    OH_UdmfDataLoadParams_SetDataLoadInfo(params, dataLoadInfo);
+    OH_UdmfDataLoadInfo_Destroy(dataLoadInfo);
+    OH_UdmfDataLoadParams_Destroy(params);
+}
+
+void CreateAndSetDataLoadInfoTypeFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfDataLoadInfo *dataLoadInfo = OH_UdmfDataLoadInfo_Create();
+    std::string type = provider.ConsumeRandomLengthString();
+    OH_UdmfDataLoadInfo_SetType(dataLoadInfo, type.c_str());
+    unsigned int count;
+    OH_UdmfDataLoadInfo_GetTypes(dataLoadInfo, &count);
+    OH_UdmfDataLoadInfo_Destroy(dataLoadInfo);
+}
+
+void CreateAndSetDataLoadInfoRecordFuzz(FuzzedDataProvider &provider)
+{
+    OH_UdmfDataLoadInfo *dataLoadInfo = OH_UdmfDataLoadInfo_Create();
+    unsigned int recordCount = provider.ConsumeIntegral<unsigned int>();
+    OH_UdmfDataLoadInfo_SetRecordCount(dataLoadInfo, recordCount);
+    OH_UdmfDataLoadInfo_GetRecordCount(dataLoadInfo);
+    OH_UdmfDataLoadInfo_Destroy(dataLoadInfo);
+}
+
 }
 
 /* Fuzzer entry point */
@@ -332,6 +544,21 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::SetAndGetOptionsKeyFuzz(provider);
     OHOS::SetAndGetOptionsIntentionFuzz(provider);
     OHOS::SetAndGetUnifiedDataFuzz(provider);
+    OHOS::SetAndGetGeneralEntryFuzz(provider);
+    OHOS::SetAndGetHyperlinkFuzz(provider);
+    OHOS::SetAndGetAppItemFuzz(provider);
+    OHOS::SetAndGetPixelMapFuzz(provider);
+    OHOS::SetAndGetArrayBufferFuzz(provider);
+    OHOS::SetAndGetContentFormFuzz(provider);
+    OHOS::CreateAndGetPropertyFuzz(provider);
+    OHOS::SetAndGetShareOptionFuzz(provider);
+    OHOS::SetAndGetExtrasIntParamFuzz(provider);
+    OHOS::SetAndGetExtrasStringParamFuzz(provider);
+    OHOS::CreateAndSetRecordProviderFuzz(provider);
+    OHOS::CreateAndSetDataParamsFuzz(provider);
+    OHOS::CreateAndSetDataLoadParamsFuzz(provider);
+    OHOS::CreateAndSetDataLoadInfoTypeFuzz(provider);
+    OHOS::CreateAndSetDataLoadInfoRecordFuzz(provider);
     OHOS::TearDown();
     return 0;
 }
