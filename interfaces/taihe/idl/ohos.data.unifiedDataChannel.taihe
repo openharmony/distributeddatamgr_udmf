@@ -1063,10 +1063,10 @@ export function insertData(options: Options, data: UnifiedData): Promise<string>
         taskpool.execute((): string => {
             return insertDataSync(options, data.inner);
         })
-        .then((ret: NullishType): void => {
+        .then((ret: Any): void => {
             resolve(ret as string);
         })
-        .catch((ret: NullishType): void => {
+        .catch((ret: Any): void => {
             reject(ret as Error);
         });
     });
@@ -1076,10 +1076,10 @@ export function insertData(options: Options, data: UnifiedData, callback: AsyncC
     taskpool.execute((): string => {
         return insertDataSync(options, data.inner);
     })
-    .then((ret: NullishType): void => {
+    .then((ret: Any): void => {
         callback(new BusinessError(), ret as string);
     })
-    .catch((ret: NullishType): void => {
+    .catch((ret: Any): void => {
         let data: string;
         callback(ret as BusinessError, data);
     });
@@ -1095,10 +1095,10 @@ export function queryData(options: Options): Promise<Array<UnifiedData>> {
             }
             return arr;
         })
-        .then((ret: NullishType): void => {
+        .then((ret: Any): void => {
             resolve(ret as Array<UnifiedData>);
         })
-        .catch((ret: NullishType): void => {
+        .catch((ret: Any): void => {
             reject(ret as Error);
         });
     });
@@ -1113,10 +1113,10 @@ export function queryData(options: Options, callback: AsyncCallback<Array<Unifie
         }
         return arr;
     })
-    .then((ret: NullishType): void => {
+    .then((ret: Any): void => {
         callback(new BusinessError(), ret as Array<UnifiedData>);
     })
-    .catch((ret: NullishType): void => {
+    .catch((ret: Any): void => {
         let data: Array<UnifiedData>;
         callback(ret as BusinessError, data);
     });
