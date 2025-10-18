@@ -2743,6 +2743,434 @@ HWTEST_F(UdmfClientTest, SetData035, TestSize.Level1)
 }
 
 /**
+* @tc.name: SetData037
+* @tc.desc: The same application schema is file, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData037, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData037 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "file:///data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken1();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("file:///data/storage/el2/base/haps/101.png", std::get<std::string>(readFileUri->value_[FILE_URI_PARAM]));
+
+    LOG_INFO(UDMF_TEST, "SetData037 end.");
+}
+
+/**
+* @tc.name: SetData038
+* @tc.desc: different application schema is file, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData038, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData038 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "file:///data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege(option2);
+    SetHapToken2();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_INVALID_PARAMETERS, status);
+
+    LOG_INFO(UDMF_TEST, "SetData038 end.");
+}
+
+/**
+* @tc.name: SetData039
+* @tc.desc: different application schema is file, no addPrivilege, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData039, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData039 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "file:///data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken2();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_NO_PERMISSION);
+
+    LOG_INFO(UDMF_TEST, "SetData039 end.");
+}
+
+/**
+* @tc.name: SetData040
+* @tc.desc: no schema for the same application, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData040, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData040 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "/data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken1();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("/data/storage/el2/base/haps/101.png", std::get<std::string>(readFileUri->value_[FILE_URI_PARAM]));
+
+    LOG_INFO(UDMF_TEST, "SetData040 end.");
+}
+
+/**
+* @tc.name: SetData041
+* @tc.desc: no schema for different applications, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData041, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData041 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "/data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege(option2);
+    SetHapToken2();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_INVALID_PARAMETERS, status);
+
+    LOG_INFO(UDMF_TEST, "SetData041 end.");
+}
+
+/**
+* @tc.name: SetData042
+* @tc.desc: no schema for different applications, no addPrivilege, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData042, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData042 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "/data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken2();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_NO_PERMISSION);
+
+    LOG_INFO(UDMF_TEST, "SetData042 end.");
+}
+
+/**
+* @tc.name: SetData043
+* @tc.desc: The same application schema is file, authority is not empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData043, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData043 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "file://ohos.test.demo1/data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken1();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("file://ohos.test.demo1/data/storage/el2/base/haps/101.png",
+        std::get<std::string>(readFileUri->value_[FILE_URI_PARAM]));
+
+    LOG_INFO(UDMF_TEST, "SetData043 end.");
+}
+
+/**
+* @tc.name: SetData044
+* @tc.desc: different application schema is file, file not exist, authority is not empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData044, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData044 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "file://ohos.test.demo1/data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege(option2);
+    SetHapToken2();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_NO_PERMISSION, status);
+
+    LOG_INFO(UDMF_TEST, "SetData044 end.");
+}
+
+/**
+* @tc.name: SetData045
+* @tc.desc: different application schema is file, no addPrivilege, authority is not empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData045, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData045 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "file://ohos.test.demo1/data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken2();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_NO_PERMISSION);
+
+    LOG_INFO(UDMF_TEST, "SetData045 end.");
+}
+
+/**
+* @tc.name: SetData046
+* @tc.desc: The same application schema is https, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData046, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData046 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "https://data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken1();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("https://data/storage/el2/base/haps/101.png",
+        std::get<std::string>(readFileUri->value_[FILE_URI_PARAM]));
+
+    LOG_INFO(UDMF_TEST, "SetData046 end.");
+}
+
+/**
+* @tc.name: SetData047
+* @tc.desc: different application schema is https, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData047, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData047 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "https://data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    AddPrivilege(option2);
+    SetHapToken2();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("https://data/storage/el2/base/haps/101.png",
+        std::get<std::string>(readFileUri->value_[FILE_URI_PARAM]));
+
+    LOG_INFO(UDMF_TEST, "SetData047 end.");
+}
+
+/**
+* @tc.name: SetData048
+* @tc.desc: different application schema is https, no addPrivilege, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData048, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData048 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "https://data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken2();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_NO_PERMISSION);
+
+    LOG_INFO(UDMF_TEST, "SetData048 end.");
+}
+
+/**
 * @tc.name: GetSummary003
 * @tc.desc: Get summary data
 * @tc.type: FUNC
