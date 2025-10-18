@@ -703,6 +703,36 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, DataLoadInfo &o
     return napi_ok;
 }
 
+napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::vector<TypeDescriptorCfg> &out)
+{
+    bool isArray = false;
+    napi_is_array(env, in, &isArray);
+    LOG_ERROR_RETURN(isArray, "not an array", napi_invalid_arg);
+
+    uint32_t length = 0;
+    napi_status status = napi_get_array_length(env, in, &length);
+    LOG_ERROR_RETURN(status == napi_ok, "get_array failed!", napi_invalid_arg);
+    for (uint32_t i = 0; i < length; ++i) {
+        napi_value item = nullptr;
+        status = napi_get_element(env, in, i, &item);
+        LOG_ERROR_RETURN((item != nullptr) && (status == napi_ok), "no element", napi_invalid_arg);
+        std::shared_ptr<TypeDescriptor> value = nullptr;
+        status = GetValue(env, item, value);
+        LOG_ERROR_RETURN(status == napi_ok && value != nullptr, "not a TypeDescriptor", napi_invalid_arg);
+
+        TypeDescriptorCfg typeCfg;
+        typeCfg.typeId = value->GetTypeId();
+        typeCfg.belongingToTypes = value->GetBelongingToTypes();
+        typeCfg.mimeTypes = value->GetMimeTypes();
+        typeCfg.description = value->GetDescription();
+        typeCfg.filenameExtensions = value->GetFilenameExtensions();
+        typeCfg.iconFile = value->GetIconFile();
+        typeCfg.referenceURL = value->GetReferenceURL();
+        out.push_back(std::move(typeCfg));
+    }
+    return status;
+}
+
 bool NapiDataUtils::IsTypeForNapiValue(napi_env env, napi_value param, napi_valuetype expectType)
 {
     napi_valuetype valueType = napi_undefined;

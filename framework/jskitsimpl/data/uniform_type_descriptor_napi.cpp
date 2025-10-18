@@ -31,6 +31,8 @@ napi_value UniformTypeDescriptorNapi::UniformTypeDescriptorInit(napi_env env, na
         DECLARE_NAPI_FUNCTION("getUniformDataTypeByMIMEType", GetUniformDataTypeByMIMEType),
         DECLARE_NAPI_FUNCTION("getUniformDataTypesByFilenameExtension", GetMultiUniformDataTypesByFilenameExtension),
         DECLARE_NAPI_FUNCTION("getUniformDataTypesByMIMEType", GetMultiUniformDataTypesByMIMEType),
+        DECLARE_NAPI_FUNCTION("registerTypeDescriptors", RegisterTypeDescriptors),
+        DECLARE_NAPI_FUNCTION("unregisterTypeDescriptors", UnregisterTypeDescriptors),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
@@ -233,6 +235,55 @@ napi_value UniformTypeDescriptorNapi::GetMultiUniformDataTypesByMIMEType(napi_en
         napi_get_null(env, &ctxt->output);
     }
     return ctxt->output;
+}
+
+napi_value UniformTypeDescriptorNapi::RegisterTypeDescriptors(napi_env env, napi_callback_info info)
+{
+    auto ctxt = std::make_shared<ContextBase>();
+    auto descriptors = std::make_shared<std::vector<TypeDescriptorCfg>>();
+    auto input = [env, ctxt, descriptors](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], *descriptors);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "Parameter error: parameter descriptors type must be array of TypeDescriptor");
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_NULL(!ctxt->isThrowError, "RegisterTypeDescriptors Exit");
+    auto execute = [env, ctxt, descriptors]() {
+        auto status = UtdClient::GetInstance().RegisterTypeDescriptors(*descriptors);
+        ASSERT_WITH_ERRCODE(ctxt, status != E_NO_SYSTEM_PERMISSION, status, "Permission denied!");
+        ASSERT_WITH_ERRCODE(ctxt, status != E_NO_PERMISSION, status, "Permission denied!");
+        ASSERT_WITH_ERRCODE(ctxt, status != E_FORMAT_ERROR, status, "Error typeDescriptors format!");
+        ASSERT_WITH_ERRCODE(ctxt, status != E_CONTENT_ERROR, status, "Error typeDescriptors content!");
+        ASSERT_WITH_ERRCODE(ctxt, status == E_OK, status, "RegisterTypeDescriptors failed!");
+    };
+    auto output = [env, ctxt](napi_value &result) {};
+    return NapiQueue::AsyncWork(env, ctxt, std::string(__FUNCTION__), execute, output);
+}
+
+napi_value UniformTypeDescriptorNapi::UnregisterTypeDescriptors(napi_env env, napi_callback_info info)
+{
+    auto ctxt = std::make_shared<ContextBase>();
+    auto typeIds = std::make_shared<std::vector<std::string>>();
+    auto input = [env, ctxt, typeIds](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], *typeIds);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
+            "Parameter error: parameter typeIds type must be array of string");
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_NULL(!ctxt->isThrowError, "UnregisterTypeDescriptors Exit");
+    auto execute = [env, ctxt, typeIds]() {
+        auto status = UtdClient::GetInstance().UnregisterTypeDescriptors(*typeIds);
+        ASSERT_WITH_ERRCODE(ctxt, status != E_NO_SYSTEM_PERMISSION, status, "Permission denied!");
+        ASSERT_WITH_ERRCODE(ctxt, status != E_NO_PERMISSION, status, "Permission denied!");
+        ASSERT_WITH_ERRCODE(ctxt, status != E_INVALID_TYPE_ID, status, "Error TypeId!");
+        ASSERT_WITH_ERRCODE(ctxt, status == E_OK, status, "UnregisterTypeDescriptors failed!");
+    };
+    auto output = [env, ctxt](napi_value &result) {};
+    return NapiQueue::AsyncWork(env, ctxt, std::string(__FUNCTION__), execute, output);
 }
 } // namespace UDMF
 } // namespace OHOS

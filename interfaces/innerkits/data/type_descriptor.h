@@ -31,6 +31,7 @@ public:
                    const std::vector<std::string> &filenameExtensions, const std::vector<std::string> &mimeTypes,
                    const std::string &description, const std::string &referenceURL, const std::string &iconFile);
     API_EXPORT TypeDescriptor(const TypeDescriptorCfg& typeDescriptorCfg);
+    API_EXPORT TypeDescriptor();
     API_EXPORT ~TypeDescriptor();
     Status API_EXPORT BelongsTo(const std::string &typeId, bool &checkResult);
     Status API_EXPORT IsLowerLevelType(const std::string &typeId, bool &checkResult);

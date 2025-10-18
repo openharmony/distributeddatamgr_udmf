@@ -27,13 +27,13 @@ napi_value TypeDescriptorNapi::Constructor(napi_env env)
         DECLARE_NAPI_FUNCTION("isLowerLevelType", IsLowerLevelType),
         DECLARE_NAPI_FUNCTION("isHigherLevelType", IsHigherLevelType),
         DECLARE_NAPI_FUNCTION("equals", Equals),
-        DECLARE_NAPI_GETTER_SETTER("typeId", GetTypeId, nullptr),
-        DECLARE_NAPI_GETTER_SETTER("belongingToTypes", GetBelongingToTypes, nullptr),
-        DECLARE_NAPI_GETTER_SETTER("description", GetDescription, nullptr),
-        DECLARE_NAPI_GETTER_SETTER("referenceURL", GetReferenceURL, nullptr),
-        DECLARE_NAPI_GETTER_SETTER("iconFile", GetIconFile, nullptr),
-        DECLARE_NAPI_GETTER_SETTER("filenameExtensions", GetFilenameExtensions, nullptr),
-        DECLARE_NAPI_GETTER_SETTER("mimeTypes", GetMimeTypes, nullptr)
+        DECLARE_NAPI_GETTER_SETTER("typeId", GetTypeId, SetTypeId),
+        DECLARE_NAPI_GETTER_SETTER("belongingToTypes", GetBelongingToTypes, SetBelongingToTypes),
+        DECLARE_NAPI_GETTER_SETTER("description", GetDescription, SetDescription),
+        DECLARE_NAPI_GETTER_SETTER("referenceURL", GetReferenceURL, SetReferenceURL),
+        DECLARE_NAPI_GETTER_SETTER("iconFile", GetIconFile, SetIconFile),
+        DECLARE_NAPI_GETTER_SETTER("filenameExtensions", GetFilenameExtensions, SetFilenameExtensions),
+        DECLARE_NAPI_GETTER_SETTER("mimeTypes", GetMimeTypes, SetMimeTypes)
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "TypeDescriptor", properties, count, TypeDescriptorNapi::New);
@@ -48,7 +48,7 @@ napi_value TypeDescriptorNapi::New(napi_env env, napi_callback_info info)
 
     auto *descriptorNapi = new (std::nothrow) TypeDescriptorNapi();
     ASSERT_ERR(ctxt->env, descriptorNapi != nullptr, Status::E_ERROR, "no memory for descriptorNapi!");
-    descriptorNapi->value_ = nullptr;
+    descriptorNapi->value_ = std::make_shared<TypeDescriptor>();
     ASSERT_CALL(ctxt->env, napi_wrap(env, ctxt->self, descriptorNapi, Destructor, nullptr, nullptr), descriptorNapi);
     return ctxt->self;
 }
@@ -252,6 +252,202 @@ napi_value TypeDescriptorNapi::GetMimeTypes(napi_env env, napi_callback_info inf
     std::vector<std::string> mimeTypes = descriptorNapi->value_->GetMimeTypes();
     ctxt->status = NapiDataUtils::SetValue(env, mimeTypes, ctxt->output);
     return ctxt->output;
+}
+
+napi_value TypeDescriptorNapi::SetTypeId(napi_env env, napi_callback_info info)
+{
+    auto ctxt = std::make_shared<ContextBase>();
+    std::string typeId;
+    auto input = [env, ctxt, &typeId](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], typeId);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter typeId type must be string");
+    };
+    ctxt->GetCbInfo(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
+    auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
+    ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
+               Status::E_ERROR, "invalid object!");
+    TypeDescriptorCfg cfg;
+    cfg.typeId = std::move(typeId);
+    cfg.belongingToTypes = descriptorNapi->value_->GetBelongingToTypes();
+    cfg.filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
+    cfg.mimeTypes = descriptorNapi->value_->GetMimeTypes();
+    cfg.description = descriptorNapi->value_->GetDescription();
+    cfg.referenceURL = descriptorNapi->value_->GetReferenceURL();
+    cfg.iconFile = descriptorNapi->value_->GetIconFile();
+    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    return nullptr;
+}
+
+napi_value TypeDescriptorNapi::SetBelongingToTypes(napi_env env, napi_callback_info info)
+{
+    auto ctxt = std::make_shared<ContextBase>();
+    std::vector<std::string> belongingTypes;
+    auto input = [env, ctxt, &belongingTypes](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], belongingTypes);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter belongingTypes type must be array");
+    };
+    ctxt->GetCbInfo(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
+    auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
+    ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
+               Status::E_ERROR, "invalid object!");
+    TypeDescriptorCfg cfg;
+    cfg.typeId = descriptorNapi->value_->GetTypeId();
+    cfg.belongingToTypes = std::move(belongingTypes);
+    cfg.filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
+    cfg.mimeTypes = descriptorNapi->value_->GetMimeTypes();
+    cfg.description = descriptorNapi->value_->GetDescription();
+    cfg.referenceURL = descriptorNapi->value_->GetReferenceURL();
+    cfg.iconFile = descriptorNapi->value_->GetIconFile();
+    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    return nullptr;
+}
+
+napi_value TypeDescriptorNapi::SetDescription(napi_env env, napi_callback_info info)
+{
+    auto ctxt = std::make_shared<ContextBase>();
+    std::string description;
+    auto input = [env, ctxt, &description](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], description);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter description type must be string");
+    };
+    ctxt->GetCbInfo(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
+    auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
+    ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
+               Status::E_ERROR, "invalid object!");
+    TypeDescriptorCfg cfg;
+    cfg.typeId = descriptorNapi->value_->GetTypeId();
+    cfg.belongingToTypes = descriptorNapi->value_->GetBelongingToTypes();
+    cfg.filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
+    cfg.mimeTypes = descriptorNapi->value_->GetMimeTypes();
+    cfg.description = std::move(description);
+    cfg.referenceURL = descriptorNapi->value_->GetReferenceURL();
+    cfg.iconFile = descriptorNapi->value_->GetIconFile();
+    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    return nullptr;
+}
+
+napi_value TypeDescriptorNapi::SetReferenceURL(napi_env env, napi_callback_info info)
+{
+    auto ctxt = std::make_shared<ContextBase>();
+    std::string referenceURL;
+    auto input = [env, ctxt, &referenceURL](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], referenceURL);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter referenceURL type must be string");
+    };
+    ctxt->GetCbInfo(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
+    auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
+    ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
+               Status::E_ERROR, "invalid object!");
+    TypeDescriptorCfg cfg;
+    cfg.typeId = descriptorNapi->value_->GetTypeId();
+    cfg.belongingToTypes = descriptorNapi->value_->GetBelongingToTypes();
+    cfg.filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
+    cfg.mimeTypes = descriptorNapi->value_->GetMimeTypes();
+    cfg.description = descriptorNapi->value_->GetDescription();
+    cfg.referenceURL = std::move(referenceURL);
+    cfg.iconFile = descriptorNapi->value_->GetIconFile();
+    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    return nullptr;
+}
+
+napi_value TypeDescriptorNapi::SetIconFile(napi_env env, napi_callback_info info)
+{
+    auto ctxt = std::make_shared<ContextBase>();
+    std::string iconFile;
+    auto input = [env, ctxt, &iconFile](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], iconFile);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter iconFile type must be string");
+    };
+    ctxt->GetCbInfo(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
+    auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
+    ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
+               Status::E_ERROR, "invalid object!");
+    TypeDescriptorCfg cfg;
+    cfg.typeId = descriptorNapi->value_->GetTypeId();
+    cfg.belongingToTypes = descriptorNapi->value_->GetBelongingToTypes();
+    cfg.filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
+    cfg.mimeTypes = descriptorNapi->value_->GetMimeTypes();
+    cfg.description = descriptorNapi->value_->GetDescription();
+    cfg.referenceURL = descriptorNapi->value_->GetReferenceURL();
+    cfg.iconFile = std::move(iconFile);
+    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    return nullptr;
+}
+
+napi_value TypeDescriptorNapi::SetFilenameExtensions(napi_env env, napi_callback_info info)
+{
+    auto ctxt = std::make_shared<ContextBase>();
+    std::vector<std::string> filenameExtensions;
+    auto input = [env, ctxt, &filenameExtensions](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], filenameExtensions);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter filenameExtensions type must be string array");
+    };
+    ctxt->GetCbInfo(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
+    auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
+    ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
+               Status::E_ERROR, "invalid object!");
+    TypeDescriptorCfg cfg;
+    cfg.typeId = descriptorNapi->value_->GetTypeId();
+    cfg.belongingToTypes = descriptorNapi->value_->GetBelongingToTypes();
+    cfg.filenameExtensions = std::move(filenameExtensions);
+    cfg.mimeTypes = descriptorNapi->value_->GetMimeTypes();
+    cfg.description = descriptorNapi->value_->GetDescription();
+    cfg.referenceURL = descriptorNapi->value_->GetReferenceURL();
+    cfg.iconFile = descriptorNapi->value_->GetIconFile();
+    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    return nullptr;
+}
+
+napi_value TypeDescriptorNapi::SetMimeTypes(napi_env env, napi_callback_info info)
+{
+    auto ctxt = std::make_shared<ContextBase>();
+    std::vector<std::string> mimeTypes;
+    auto input = [env, ctxt, &mimeTypes](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        ctxt->status = NapiDataUtils::GetValue(env, argv[0], mimeTypes);
+        ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+            Status::E_INVALID_PARAMETERS, "Parameter error: parameter mimeTypes type must be string array");
+    };
+    ctxt->GetCbInfo(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
+    auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
+    ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
+               Status::E_ERROR, "invalid object!");
+    TypeDescriptorCfg cfg;
+    cfg.typeId = descriptorNapi->value_->GetTypeId();
+    cfg.belongingToTypes = descriptorNapi->value_->GetBelongingToTypes();
+    cfg.filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
+    cfg.mimeTypes = std::move(mimeTypes);
+    cfg.description = descriptorNapi->value_->GetDescription();
+    cfg.referenceURL = descriptorNapi->value_->GetReferenceURL();
+    cfg.iconFile = descriptorNapi->value_->GetIconFile();
+    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    return nullptr;
 }
 } // namespace UDMF
 } // namespace OHOS

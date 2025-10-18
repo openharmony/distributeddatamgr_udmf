@@ -39,6 +39,10 @@ TypeDescriptor::TypeDescriptor(const TypeDescriptorCfg& typeDescriptorCfg)
     isFlexibleType_ = (typeId_.find(FLEXIBLE_TYPE_FLAG) != typeId_.npos);
 }
 
+TypeDescriptor::TypeDescriptor()
+{
+}
+
 TypeDescriptor::~TypeDescriptor()
 {
 }
