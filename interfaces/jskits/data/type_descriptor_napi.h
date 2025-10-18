@@ -48,6 +48,13 @@ private:
     static napi_value GetReferenceURL(napi_env env, napi_callback_info info);
     static napi_value GetFilenameExtensions(napi_env env, napi_callback_info info);
     static napi_value GetMimeTypes(napi_env env, napi_callback_info info);
+    static napi_value SetTypeId(napi_env env, napi_callback_info info);
+    static napi_value SetBelongingToTypes(napi_env env, napi_callback_info info);
+    static napi_value SetDescription(napi_env env, napi_callback_info info);
+    static napi_value SetIconFile(napi_env env, napi_callback_info info);
+    static napi_value SetReferenceURL(napi_env env, napi_callback_info info);
+    static napi_value SetFilenameExtensions(napi_env env, napi_callback_info info);
+    static napi_value SetMimeTypes(napi_env env, napi_callback_info info);
 };
 } // namespace UDMF
 } // namespace OHOS

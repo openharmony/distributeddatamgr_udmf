@@ -46,6 +46,8 @@ public:
     Status API_EXPORT IsUtd(std::string typeId, bool &result);
     void API_EXPORT InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user);
     void API_EXPORT UninstallCustomUtds(const std::string &bundleName, int32_t user);
+    Status API_EXPORT RegisterTypeDescriptors(const std::vector<TypeDescriptorCfg> &descriptors);
+    Status API_EXPORT UnregisterTypeDescriptors(const std::vector<std::string> &typeIds);
 
 private:
     UtdClient();

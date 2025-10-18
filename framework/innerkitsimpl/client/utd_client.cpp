@@ -500,5 +500,15 @@ bool UtdClient::IsBelongingType(const std::string &belongsTo, const std::string 
            belongsTo == typeId ||
            UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId);
 }
+
+Status UtdClient::RegisterTypeDescriptors(const std::vector<TypeDescriptorCfg> &descriptors)
+{
+    return E_OK;
+}
+
+Status UtdClient::UnregisterTypeDescriptors(const std::vector<std::string> &typeIds)
+{
+    return E_OK;
+}
 } // namespace UDMF
 } // namespace OHOS

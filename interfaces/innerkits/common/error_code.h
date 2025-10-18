@@ -59,6 +59,9 @@ enum Status : int32_t {
     E_COPY_CANCELED,
     E_DB_CORRUPTED,
     E_JSON_CONVERT_FAILED,
+    E_FORMAT_ERROR,
+    E_CONTENT_ERROR,
+    E_INVALID_TYPE_ID,
     E_BUTT,
 };
 

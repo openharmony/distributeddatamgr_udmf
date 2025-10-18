@@ -31,6 +31,8 @@ public:
     static napi_value GetUniformDataTypeByMIMEType(napi_env env, napi_callback_info info);
     static napi_value GetMultiUniformDataTypesByFilenameExtension(napi_env env, napi_callback_info info);
     static napi_value GetMultiUniformDataTypesByMIMEType(napi_env env, napi_callback_info info);
+    static napi_value RegisterTypeDescriptors(napi_env env, napi_callback_info info);
+    static napi_value UnregisterTypeDescriptors(napi_env env, napi_callback_info info);
 
 private:
     static napi_value CreateUniformDataType(napi_env env);
