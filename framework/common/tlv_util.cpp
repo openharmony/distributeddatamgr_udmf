@@ -1039,7 +1039,7 @@ template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
 template <> size_t API_EXPORT CountBufferSize(const DataLoadInfo &input, TLVObject &data)
 {
     return data.CountHead() + data.Count(input.sequenceKey) + CountBufferSize(input.types, data) +
-        data.CountBasic(input.recordCount);
+        data.CountBasic(input.recordCount) + data.Count(input.deviceId);
 }
 
 template <> bool API_EXPORT Writing(const DataLoadInfo &input, TLVObject &data, TAG tag)
@@ -1054,6 +1054,9 @@ template <> bool API_EXPORT Writing(const DataLoadInfo &input, TLVObject &data, 
         return false;
     }
     if (!data.WriteBasic(TAG::TAG_RECORD_COUNT, input.recordCount)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.deviceId, data, TAG::TAG_DATA_LOAD_DEVICE_ID)) {
         return false;
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
@@ -1084,6 +1087,11 @@ template <> bool API_EXPORT Reading(DataLoadInfo &output, TLVObject &data, const
                 break;
             case static_cast<uint16_t>(TAG::TAG_RECORD_COUNT):
                 if (!data.ReadBasic(output.recordCount, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_DATA_LOAD_DEVICE_ID):
+                if (!TLVUtil::Reading(output.deviceId, data, headItem)) {
                     return false;
                 }
                 break;

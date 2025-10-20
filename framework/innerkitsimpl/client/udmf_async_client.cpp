@@ -218,6 +218,9 @@ Status UdmfAsyncClient::RegisterAsyncHelper(const GetDataParams &params)
     asyncHelper->destUri = params.destUri;
     asyncHelper->acceptableInfo = params.acceptableInfo;
     asyncHelperMap_.insert_or_assign(params.query.key, std::move(asyncHelper));
+    if (UdmfClient::GetInstance().SaveAcceptableInfo(params.query.key, params.acceptableInfo) != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Save acceptable info failed");
+    }
     return E_OK;
 }
 
