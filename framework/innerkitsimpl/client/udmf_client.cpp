@@ -452,11 +452,11 @@ bool UdmfClient::CheckFileUtdType(const Summary &summary, const std::vector<std:
     return false;
 }
 
-Status UdmfClient::SaveAcceptableInfo(const std::string &key, DataLoadInfo &info)
+Status UdmfClient::SaveAcceptableInfo(const std::string &key, DataLoadInfo info)
 {
-    UnifiedKey udkey(key);
-    if (!udkey.IsValid() || udKey.intention != UD_INTENTION_MAP.at(UD_INTENTION_DRAG)) {
-        LOG_ERROR(UDMF_CLIENT, "Key is invalid, udkey:%{public}s", key.c_str());
+    UnifiedKey udKey(key);
+    if (!udKey.IsValid() || udKey.intention != UD_INTENTION_MAP.at(UD_INTENTION_DRAG)) {
+        LOG_ERROR(UDMF_CLIENT, "Key is invalid, udKey:%{public}s", key.c_str());
         return E_INVALID_PARAMETERS;
     }
     auto service = UdmfServiceClient::GetInstance();
@@ -473,9 +473,9 @@ Status UdmfClient::SaveAcceptableInfo(const std::string &key, DataLoadInfo &info
 
 Status UdmfClient::PushAcceptableInfo(const QueryOption &query, const std::vector<std::string> &devices)
 {
-    UnifiedKey udkey(query.key);
-    if (!udkey.IsValid() || udKey.intention != UD_INTENTION_MAP.at(UD_INTENTION_DRAG)) {
-        LOG_ERROR(UDMF_CLIENT, "Key is invalid, udkey:%{public}s", key.c_str());
+    UnifiedKey udKey(query.key);
+    if (!udKey.IsValid() || udKey.intention != UD_INTENTION_MAP.at(UD_INTENTION_DRAG)) {
+        LOG_ERROR(UDMF_CLIENT, "Key is invalid, udKey:%{public}s", query.key.c_str());
         return E_INVALID_PARAMETERS;
     }
     auto service = UdmfServiceClient::GetInstance();

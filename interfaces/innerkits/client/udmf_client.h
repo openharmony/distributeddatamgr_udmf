@@ -53,7 +53,7 @@ public:
         sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData);
     std::string API_EXPORT GetBundleNameByUdKey(const std::string &key);
     bool API_EXPORT IsAppropriateType(const Summary &summary, const std::vector<std::string> &allowTypes);
-    Status SaveAcceptableInfo(const std::string &key, DataLoadInfo &info);
+    Status SaveAcceptableInfo(const std::string &key, DataLoadInfo info);
     Status API_EXPORT PushAcceptableInfo(const QueryOption &query, const std::vector<std::string> &devices);
 
 private:
