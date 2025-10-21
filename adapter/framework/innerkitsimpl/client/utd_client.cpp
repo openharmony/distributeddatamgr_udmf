@@ -354,5 +354,15 @@ Status UtdClient::GetUniformDataTypesByMIMEType(const std::string &mimeType, std
     }
     return Status::E_OK;
 }
+
+Status UtdClient::RegisterTypeDescriptors(const std::vector<TypeDescriptorCfg> &descriptors)
+{
+    return E_OK;
+}
+
+Status UtdClient::UnregisterTypeDescriptors(const std::vector<std::string> &typeIds)
+{
+    return E_OK;
+}
 } // namespace UDMF
 } // namespace OHOS

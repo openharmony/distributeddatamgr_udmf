@@ -45,6 +45,8 @@ public:
     Status API_EXPORT GetUniformDataTypesByMIMEType(const std::string &mimeType, std::vector<std::string> &typeIds,
                                         const std::string &belongsTo = DEFAULT_TYPE_ID);
     Status API_EXPORT IsUtd(std::string typeId, bool &result);
+    Status API_EXPORT RegisterTypeDescriptors(const std::vector<TypeDescriptorCfg> &descriptors);
+    Status API_EXPORT UnregisterTypeDescriptors(const std::vector<std::string> &typeIds);
 
 private:
     UtdClient();
