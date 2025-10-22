@@ -287,4 +287,44 @@ HWTEST_F(UdmfClientInnerTest, GetEntryTest003, TestSize.Level1)
     EXPECT_TRUE(std::holds_alternative<std::monostate>(
         std::get<std::shared_ptr<Object>>(fifthValue)->value_[VALUE_TYPE]));
 }
+
+/**
+* @tc.name: SaveAcceptableInfo001
+* @tc.desc: Test SaveAcceptableInfo function.
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientInnerTest, SaveAcceptableInfo001, TestSize.Level1)
+{
+    std::string key = "invalid_key";
+    DataLoadInfo info;
+    auto status = UdmfClient::GetInstance().SaveAcceptableInfo(key, info);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+
+    key = "udmf://ohos.test.demo1/invalid_intention/123456";
+    status = UdmfClient::GetInstance().SaveAcceptableInfo(key, info);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+
+    key = "udmf://ohos.test.demo1/drag/123456";
+    status = UdmfClient::GetInstance().SaveAcceptableInfo(key, info);
+    EXPECT_EQ(status, E_OK);
+}
+
+/**
+* @tc.name: PushAcceptableInfo001
+* @tc.desc: Test PushAcceptableInfo function.
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientInnerTest, PushAcceptableInfo001, TestSize.Level1)
+{
+    QueryOption query = { .key = "invalid_key" };
+    std::vector<std::string> devices = { "device1", "device2" };
+    auto status = UdmfClient::GetInstance().PushAcceptableInfo(query, devices);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+    query.key = "udmf://ohos.test.demo1/invalid_intention/123456";
+    status = UdmfClient::GetInstance().PushAcceptableInfo(query, devices);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+    query.key = "udmf://ohos.test.demo1/drag/123456";
+    status = UdmfClient::GetInstance().PushAcceptableInfo(query, devices);
+    EXPECT_EQ(status, E_OK);
+}
 } // OHOS::Test

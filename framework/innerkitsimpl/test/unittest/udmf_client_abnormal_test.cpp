@@ -270,4 +270,42 @@ HWTEST_F(UdmfClientAbnormalTest, RemoveAppShareOption001, TestSize.Level1)
     EXPECT_EQ(ret, Status::E_IPC);
     LOG_INFO(UDMF_TEST, "RemoveAppShareOption001 end.");
 }
+
+/**
+* @tc.name: SaveAcceptableInfo001
+* @tc.desc: Abnrmal testcase of SaveAcceptableInfo, the return value of GetInstance() is nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientAbnormalTest, SaveAcceptableInfo001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SaveAcceptableInfo001 begin.");
+    EXPECT_CALL(*mock_, GetInstance()).WillOnce(Return(nullptr));
+
+    UdmfClient client;
+    std::string key = "udmf://ohos.test.demo1/drag/123456";
+    DataLoadInfo info;
+
+    Status ret = client.SaveAcceptableInfo(key, info);
+    EXPECT_EQ(ret, Status::E_IPC);
+    LOG_INFO(UDMF_TEST, "SaveAcceptableInfo001 end.");
+}
+
+/**
+* @tc.name: PushAcceptableInfo001
+* @tc.desc: Abnrmal testcase of PushAcceptableInfo, the return value of GetInstance() is nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientAbnormalTest, PushAcceptableInfo001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "PushAcceptableInfo001 begin.");
+    EXPECT_CALL(*mock_, GetInstance()).WillOnce(Return(nullptr));
+
+    UdmfClient client;
+    QueryOption query = { .key = "udmf://ohos.test.demo1/drag/123456" };
+    std::vector<std::string> devices = { "device1", "device2" };
+
+    Status ret = client.PushAcceptableInfo(query, devices);
+    EXPECT_EQ(ret, Status::E_IPC);
+    LOG_INFO(UDMF_TEST, "PushAcceptableInfo001 end.");
+}
 } // OHOS::Test
