@@ -132,6 +132,7 @@ struct DataLoadInfo {
     std::set<std::string> types {};
     uint32_t recordCount {0};
     std::string deviceId = "";
+    std::string udKey = "";
 };
 
 using LoadHandler = std::function<void(const std::string &udKey, const DataLoadInfo &dataLoadInfo)>;

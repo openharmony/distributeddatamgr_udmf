@@ -106,6 +106,7 @@ enum class TAG : uint16_t {
     TAG_URI_PERMISSION,
     TAG_SUMMARY_TAG,
     TAG_DATA_LOAD_DEVICE_ID,
+    TAG_DATA_LOAD_UD_KEY,
 };
 }
 #endif //UDMF_TLV_TAG_H

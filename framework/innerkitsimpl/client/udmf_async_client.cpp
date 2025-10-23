@@ -471,4 +471,28 @@ uint64_t UdmfAsyncClient::GetCurrentTimeMillis()
     return (static_cast<uint64_t>(tv.tv_sec) * SEC_TO_MILLISEC +
         static_cast<uint64_t>(tv.tv_usec) / MICROSEC_TO_MILLISEC);
 }
+
+Status UdmfAsyncClient::PushAcceptableInfo(const QueryOption &query, const std::vector<std::string> &devices)
+{
+    UnifiedKey udKey(query.key);
+    if (!udKey.IsValid() || udKey.intention != UD_INTENTION_MAP.at(UD_INTENTION_DRAG)) {
+        LOG_ERROR(UDMF_CLIENT, "Key is invalid, udKey:%{public}s", query.key.c_str());
+        return E_INVALID_PARAMETERS;
+    }
+    auto service = UdmfServiceClient::GetInstance();
+    if (service == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        return E_IPC;
+    }
+    if (asyncHelperMap_.find(query.key) == asyncHelperMap_.end()) {
+        LOG_ERROR(UDMF_CLIENT, "Can not find data load info, key=%{public}s", query.key.c_str());
+        return E_ERROR;
+    }
+    auto &dataLoadInfo = asyncHelperMap_.at(query.key)->acceptableInfo;
+    auto status = service->PushAcceptableInfo(query, devices, dataLoadInfo);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d", status);
+    }
+    return static_cast<Status>(status);
+}
 } // namespace OHOS::UDMF

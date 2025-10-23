@@ -314,20 +314,11 @@ int32_t UdmfServiceProxy::GetDataIfAvailable(const std::string &key, const DataL
     return status;
 }
 
-int32_t UdmfServiceProxy::SaveAcceptableInfo(const std::string &key, DataLoadInfo &info)
+int32_t UdmfServiceProxy::PushAcceptableInfo(
+    const QueryOption &query, const std::vector<std::string> &devices, const DataLoadInfo info)
 {
     MessageParcel reply;
-    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SAVE_ACCEPTABLE_INFO, reply, key, info);
-    if (status != E_OK) {
-        LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s!", status, key.c_str());
-    }
-    return status;
-}
-
-int32_t UdmfServiceProxy::PushAcceptableInfo(const QueryOption &query, const std::vector<std::string> &devices)
-{
-    MessageParcel reply;
-    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::PUSH_ACCEPTABLE_INFO, reply, query, devices);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::PUSH_ACCEPTABLE_INFO, reply, query, devices, info);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x, key:%{public}s!", status, query.key.c_str());
     }
