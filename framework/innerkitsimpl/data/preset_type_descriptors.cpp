@@ -43,16 +43,20 @@ PresetTypeDescriptors &PresetTypeDescriptors::GetInstance()
 
 std::vector<TypeDescriptorCfg> &PresetTypeDescriptors::GetPresetTypes()
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     return typeDescriptors_;
 }
 
 void PresetTypeDescriptors::InitDescriptors()
 {
-    if (!typeDescriptors_.empty()) {
+    {
+        std::lock_guard<std::recursive_mutex> lock(mutex_);
+        if (!typeDescriptors_.empty()) {
             LOG_INFO(UDMF_CLIENT, "Preset type descriptors already init, utd size is %{public}zu",
                 typeDescriptors_.size());
             return;
         }
+    }
     std::ifstream fin(std::string(UTD_CONF_PATH) + std::string(UNIFORM_DATA_TYPES_JSON_PATH));
     if (!fin.good()) {
         LOG_ERROR(UDMF_CLIENT, "Failed to open uniform data types json file");

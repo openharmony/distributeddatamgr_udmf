@@ -39,21 +39,21 @@ private:
     Status InvokeHapTask(const std::string &businessUdKey);
 
     Status RegisterAsyncHelper(const GetDataParams &params);
-    Status CheckSync(std::unique_ptr<AsyncHelper> &asyncHelper, const QueryOption &query);
-    Status GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper, const QueryOption &query);
-    Status GetDataFromCache(std::unique_ptr<AsyncHelper> &asyncHelper, const QueryOption &query);
+    Status CheckSync(std::shared_ptr<AsyncHelper> asyncHelper, const QueryOption &query);
+    Status GetDataFromDB(std::shared_ptr<AsyncHelper> asyncHelper, const QueryOption &query);
+    Status GetDataFromCache(std::shared_ptr<AsyncHelper> asyncHelper, const QueryOption &query);
     Status SetProgressData(const std::string &businessUdKey);
     Status SetCancelData(const std::string &businessUdKey);
     Status UpdateProgressData(const std::string &progressUdKey, const ProgressInfo &progressInfo);
-    Status CopyFile(std::unique_ptr<AsyncHelper> &asyncHelper);
-    void CallProgress(std::unique_ptr<AsyncHelper> &asyncHelper, ProgressInfo &progressInfo,
+    Status CopyFile(std::shared_ptr<AsyncHelper> asyncHelper);
+    void CallProgress(std::shared_ptr<AsyncHelper> asyncHelper, ProgressInfo &progressInfo,
         std::shared_ptr<UnifiedData> data);
     Status Clear(const std::string &businessUdKey);
-    Status ProcessUnifiedData(std::unique_ptr<AsyncHelper> &asyncHelper);
+    Status ProcessUnifiedData(std::shared_ptr<AsyncHelper> asyncHelper);
     bool IsParamValid(const GetDataParams &params);
     uint64_t GetCurrentTimeMillis();
 
-    std::map<std::string, std::unique_ptr<AsyncHelper>> asyncHelperMap_ {};
+    std::map<std::string, std::shared_ptr<AsyncHelper>> asyncHelperMap_ {};
     std::mutex mutex_;
 };
 } // namespace

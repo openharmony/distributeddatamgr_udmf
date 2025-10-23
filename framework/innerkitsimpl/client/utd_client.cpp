@@ -481,9 +481,12 @@ bool UtdClient::TryReloadCustomUtd()
         }
     }
     UtdFileInfo info = CustomUtdStore::GetInstance().GetCustomUtdInfo(isHap, userId);
-    if (info.size == utdFileInfo_.size && info.lastTime == utdFileInfo_.lastTime) {
-        LOG_DEBUG(UDMF_CLIENT, "utd file not change");
-        return false;
+    {
+        std::lock_guard<std::mutex> lock(customUtdMutex_);
+        if (info.size == utdFileInfo_.size && info.lastTime == utdFileInfo_.lastTime) {
+            LOG_DEBUG(UDMF_CLIENT, "utd file not change");
+            return false;
+        }
     }
     LOG_INFO(UDMF_CLIENT, "utd file has change, try reload custom utd info");
     if (Init()) {
