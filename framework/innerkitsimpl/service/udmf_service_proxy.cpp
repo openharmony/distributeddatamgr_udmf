@@ -315,7 +315,7 @@ int32_t UdmfServiceProxy::GetDataIfAvailable(const std::string &key, const DataL
 }
 
 int32_t UdmfServiceProxy::PushAcceptableInfo(
-    const QueryOption &query, const std::vector<std::string> &devices, const DataLoadInfo info)
+    const QueryOption &query, const std::vector<std::string> &devices, DataLoadInfo &info)
 {
     MessageParcel reply;
     int32_t status = IPC_SEND(UdmfServiceInterfaceCode::PUSH_ACCEPTABLE_INFO, reply, query, devices, info);

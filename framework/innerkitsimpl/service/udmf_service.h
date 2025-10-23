@@ -58,7 +58,7 @@ public:
     virtual int32_t GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
         sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData) = 0;
     virtual int32_t PushAcceptableInfo(
-        const QueryOption &query, const std::vector<std::string> &devices, const DataLoadInfo info) = 0;
+        const QueryOption &query, const std::vector<std::string> &devices, DataLoadInfo &info) = 0;
 };
 } // namespace UDMF
 } // namespace OHOS

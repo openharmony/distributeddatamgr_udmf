@@ -327,13 +327,8 @@ int32_t UdmfServiceClient::GetDataIfAvailable(const std::string &key, const Data
     return udmfProxy_->GetDataIfAvailable(key, dataLoadInfo, iUdmfNotifier, unifiedData);
 }
 
-int32_t UdmfServiceClient::SaveAcceptableInfo(const std::string &key, DataLoadInfo &info)
-{
-    return udmfProxy_->SaveAcceptableInfo(key, info);
-}
-
 int32_t UdmfServiceClient::PushAcceptableInfo(
-    const QueryOption &query, const std::vector<std::string> &devices, const DataLoadInfo info)
+    const QueryOption &query, const std::vector<std::string> &devices, DataLoadInfo &info)
 {
     UnifiedKey udkey(query.key);
     if (!udkey.IsValid()) {
