@@ -832,4 +832,28 @@ HWTEST_F(UdmfAsyncClientTest, UpdateOnSameProgressAfterInterval, TestSize.Level1
     LOG_INFO(UDMF_TEST, "UpdateOnSameProgressAfterInterval end.");
 }
 
+/**
+* @tc.name: PushAcceptableInfo001
+* @tc.desc: Test PushAcceptableInfo function.
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfAsyncClientTest, PushAcceptableInfo001, TestSize.Level1)
+{
+    auto client = UdmfAsyncClient::GetInstance();
+    client.asyncHelperMap_.clear();
+    QueryOption query = { .key = "invalid_key" };
+    std::vector<std::string> devices = { "device1", "device2" };
+    auto status = client.PushAcceptableInfo(query, devices);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+    query.key = "udmf://ohos.test.demo1/invalid_intention/123456";
+    status = client.PushAcceptableInfo(query, devices);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+    query.key = "udmf://ohos.test.demo1/drag/123456";
+    status = client.PushAcceptableInfo(query, devices);
+    EXPECT_EQ(status, E_ERROR);
+
+    client.asyncHelperMap_.insert_or_assign(query.key, std::make_unique<AsyncHelper>());
+    status = client.PushAcceptableInfo(query, devices);
+    EXPECT_EQ(status, E_OK);
+}
 } // OHOS::Test
