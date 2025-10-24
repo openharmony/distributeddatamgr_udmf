@@ -3171,6 +3171,40 @@ HWTEST_F(UdmfClientTest, SetData048, TestSize.Level1)
 }
 
 /**
+* @tc.name: SetData049
+* @tc.desc: Normal test of SetData, record is nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData049, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData049 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "https://data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(nullptr);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken1();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+
+    LOG_INFO(UDMF_TEST, "SetData049 end.");
+}
+
+/**
 * @tc.name: GetSummary003
 * @tc.desc: Get summary data
 * @tc.type: FUNC
