@@ -3200,6 +3200,12 @@ HWTEST_F(UdmfClientTest, SetData049, TestSize.Level1)
     SetHapToken1();
     status = UdmfClient::GetInstance().GetData(option2, readData);
     ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("https://data/storage/el2/base/haps/101.png",
+        std::get<std::string>(readFileUri->value_[FILE_URI_PARAM]));
 
     LOG_INFO(UDMF_TEST, "SetData049 end.");
 }
