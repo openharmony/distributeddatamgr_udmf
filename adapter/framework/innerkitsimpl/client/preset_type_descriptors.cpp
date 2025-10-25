@@ -36,6 +36,7 @@ PresetTypeDescriptors &PresetTypeDescriptors::GetInstance()
 
 std::vector<TypeDescriptorCfg> &PresetTypeDescriptors::GetPresetTypes()
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     return typeDescriptors_;
 }
 

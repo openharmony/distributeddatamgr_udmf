@@ -55,12 +55,14 @@ UnifiedRecord::UnifiedRecord(UDType type, ValueType value)
 
 UDType UnifiedRecord::GetType() const
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     return this->dataType_;
 }
 
 std::vector<std::string> UnifiedRecord::GetTypes() const
 {
     std::vector<std::string> types;
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     for (auto it = entries_->begin(); it != entries_->end(); it++) {
         if (!it->first.empty()) {
             types.push_back(it->first);
@@ -83,6 +85,7 @@ void UnifiedRecord::SetType(const UDType &type)
 
 int64_t UnifiedRecord::GetSize()
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto value = std::get<std::shared_ptr<Object>>(value_);
         if (value->value_.size() == 1) {
@@ -94,16 +97,19 @@ int64_t UnifiedRecord::GetSize()
 
 std::string UnifiedRecord::GetUid() const
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     return this->uid_;
 }
 
 void UnifiedRecord::SetUid(const std::string &id)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     this->uid_ = id;
 }
 
 ValueType UnifiedRecord::GetValue()
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     return value_;
 }
 
@@ -115,11 +121,13 @@ void UnifiedRecord::SetValue(const ValueType &value)
 
 ValueType UnifiedRecord::GetOriginValue() const
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     return value_;
 }
 
 bool UnifiedRecord::HasType(const std::string &utdId) const
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (entries_->find(utdId) != entries_->end()) {
         return true;
     }
@@ -191,6 +199,7 @@ ValueType UnifiedRecord::GetEntry(const std::string &utdId)
 
 std::shared_ptr<std::map<std::string, ValueType>> UnifiedRecord::GetEntries()
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     auto res = std::make_shared<std::map<std::string, ValueType>>(*entries_);
     if (!utdId2_.empty()) {
         if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
@@ -208,6 +217,7 @@ std::shared_ptr<std::map<std::string, ValueType>> UnifiedRecord::GetEntries()
 
 std::shared_ptr<std::map<std::string, ValueType>> UnifiedRecord::GetInnerEntries() const
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     return entries_;
 }
 
@@ -219,6 +229,7 @@ void UnifiedRecord::SetInnerEntries(std::shared_ptr<std::map<std::string, ValueT
 
 int64_t UnifiedRecord::GetInnerEntriesSize() const
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (entries_ == nullptr) {
         return 0;
     }
@@ -232,6 +243,7 @@ int64_t UnifiedRecord::GetInnerEntriesSize() const
 std::set<std::string> UnifiedRecord::GetUtdIds() const
 {
     std::set<std::string> utdIds;
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (!utdId_.empty()) {
         utdIds.emplace(utdId_);
     }
@@ -244,6 +256,7 @@ std::set<std::string> UnifiedRecord::GetUtdIds() const
 std::set<std::string> UnifiedRecord::GetUtdIdsWithAddFileType(bool isSpecific) const
 {
     std::set<std::string> utdIds;
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (!utdId2_.empty()) {
         utdIds.emplace(utdId2_);
         if (utdId2_ == GENERAL_FILE_URI && std::holds_alternative<std::shared_ptr<Object>>(value_)) {
@@ -270,6 +283,7 @@ void UnifiedRecord::SetUtdId(const std::string& utdId)
 
 std::string UnifiedRecord::GetUtdId() const
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     return utdId_;
 }
 
@@ -281,26 +295,31 @@ void UnifiedRecord::SetUtdId2(const std::string& utdId)
 
 std::string UnifiedRecord::GetUtdId2() const
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     return utdId2_;
 }
 
 void UnifiedRecord::SetDataId(uint32_t dataId)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     dataId_ = dataId;
 }
 
 uint32_t UnifiedRecord::GetDataId() const
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     return dataId_;
 }
 
 void UnifiedRecord::SetRecordId(uint32_t recordId)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     recordId_ = recordId;
 }
 
 uint32_t UnifiedRecord::GetRecordId() const
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     return recordId_;
 }
 
@@ -315,21 +334,25 @@ void UnifiedRecord::SetEntryGetter(
         }
         AddEntry(utdId, ValueType());
     }
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     entryGetter_ = entryGetter;
 }
 
 std::shared_ptr<EntryGetter> UnifiedRecord::GetEntryGetter()
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     return entryGetter_;
 }
 
 void UnifiedRecord::SetChannelName(const std::string &channelName)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     channelName_ = channelName;
 }
 
 void UnifiedRecord::InitObject()
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (!std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto value = value_;
         value_ = std::make_shared<Object>();
@@ -343,6 +366,7 @@ bool UnifiedRecord::HasFileType(std::string &fileUri) const
     fileUri.clear();
     if (std::holds_alternative<std::shared_ptr<Object>>(GetOriginValue())) {
         auto obj = std::get<std::shared_ptr<Object>>(GetOriginValue());
+        std::lock_guard<std::recursive_mutex> lock(mutex_);
         if (obj->value_.find(ORI_URI) != obj->value_.end()) {
             obj->GetValue(ORI_URI, fileUri);
         }
@@ -372,10 +396,12 @@ bool UnifiedRecord::HasFileType(std::string &fileUri) const
 void UnifiedRecord::SetFileUri(const std::string &fileUri)
 {
     if (std::find(std::begin(FILE_TYPES), std::end(FILE_TYPES), GetType()) != std::end(FILE_TYPES)) {
+        std::lock_guard<std::recursive_mutex> lock(mutex_);
         auto file = static_cast<File*>(this);
         file->SetUri(fileUri);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(GetOriginValue())) {
         auto obj = std::get<std::shared_ptr<Object>>(GetOriginValue());
+        std::lock_guard<std::recursive_mutex> lock(mutex_);
         obj->value_[ORI_URI] = fileUri;
     } else {
         LOG_ERROR(UDMF_FRAMEWORK, "Record has no uri.");
@@ -384,21 +410,25 @@ void UnifiedRecord::SetFileUri(const std::string &fileUri)
 
 std::vector<UriInfo> UnifiedRecord::GetUris() const
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     return uris_;
 }
 
 void UnifiedRecord::SetUris(std::vector<UriInfo> uris)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     uris_ = std::move(uris);
 }
 
 void UnifiedRecord::ClearUris()
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     uris_.clear();
 }
 
 void UnifiedRecord::ComputeUris(const std::function<bool(UriInfo &)> &action)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     for (auto &uri : uris_) {
         if (!action(uri)) {
             break;
