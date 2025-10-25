@@ -6575,6 +6575,61 @@
             "mimeTypes": [],
             "description": "Account identify encryption file format defined by OpenHarmony",
             "referenceURL": "https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype"
+        },
+        {
+            "typeId": "com.apple.iwork",
+            "belongingToTypes": [
+                "general.archive"
+            ],
+            "filenameExtensions": [],
+            "mimeTypes": [],
+            "description": "Apple iWork",
+            "referenceURL": "https://www.apple.com.cn/iwork"
+        },
+        {
+            "typeId": "com.apple.iwork.keynote.key",
+            "belongingToTypes": [
+                "general.composite-object",
+                "com.apple.iwork"
+            ],
+            "filenameExtensions": [
+                ".key"
+            ],
+            "mimeTypes": [
+                "application/vnd.apple.keynote"
+            ],
+            "description": "Apple iWork Keynote Presentation File",
+            "referenceURL": "https://www.apple.com.cn/keynote"
+        },
+        {
+            "typeId": "com.apple.iwork.numbers.numbers",
+            "belongingToTypes": [
+                "general.composite-object",
+                "com.apple.iwork"
+            ],
+            "filenameExtensions": [
+                ".numbers"
+            ],
+            "mimeTypes": [
+                "application/vnd.apple.numbers"
+            ],
+            "description": "Apple iWork Numbers Spread Sheet File",
+            "referenceURL": "https://www.apple.com.cn/numbers"
+        },
+        {
+            "typeId": "com.apple.iwork.pages.pages",
+            "belongingToTypes": [
+                "general.composite-object",
+                "com.apple.iwork"
+            ],
+            "filenameExtensions": [
+                ".pages"
+            ],
+            "mimeTypes": [
+                "application/vnd.apple.pages"
+            ],
+            "description": "Apple iWork Pages Document File",
+            "referenceURL": "https://www.apple.com.cn/pages"
         }
     ]
 }
