@@ -20,6 +20,7 @@
 #include <string>
 
 #include "logger.h"
+#include "udmf_async_client.h"
 #include "udmf_capi_common.h"
 #include "udmf_client.h"
 #include "udmf_service_client_mock.h"
@@ -281,12 +282,11 @@ HWTEST_F(UdmfClientAbnormalTest, PushAcceptableInfo001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "PushAcceptableInfo001 begin.");
     EXPECT_CALL(*mock_, GetInstance()).WillOnce(Return(nullptr));
 
-    UdmfClient client;
+    UdmfAsyncClient client;
     QueryOption query = { .key = "udmf://ohos.test.demo1/drag/123456" };
     std::vector<std::string> devices = { "device1", "device2" };
-    DataLoadInfo info;
 
-    Status ret = client.PushAcceptableInfo(query, devices, info);
+    Status ret = client.PushAcceptableInfo(query, devices);
     EXPECT_EQ(ret, Status::E_IPC);
     LOG_INFO(UDMF_TEST, "PushAcceptableInfo001 end.");
 }
