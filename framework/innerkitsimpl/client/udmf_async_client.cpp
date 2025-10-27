@@ -558,11 +558,21 @@ Status UdmfAsyncClient::PushAcceptableInfo(const QueryOption &query, const std::
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         return E_IPC;
     }
-    if (asyncHelperMap_.find(query.key) == asyncHelperMap_.end()) {
-        LOG_ERROR(UDMF_CLIENT, "Can not find data load info, key=%{public}s", query.key.c_str());
-        return E_ERROR;
+    DataLoadInfo info;
+    {
+        std::lock_guard<std::mutex> lockMap(mutex_);
+        auto item = asyncHelperMap_.find(query.key);
+        if (item == asyncHelperMap_.end()) {
+            LOG_ERROR(UDMF_CLIENT, "Can not find data load info, key=%{public}s", query.key.c_str());
+            return E_ERROR;
+        }
+        if (item->second == nullptr) {
+            LOG_ERROR(UDMF_CLIENT, "asyncHelper is nullptr");
+            return E_ERROR;
+        }
+        dataLoadInfo = item->second->acceptableInfo;
     }
-    auto &dataLoadInfo = asyncHelperMap_.at(query.key)->acceptableInfo;
+    
     auto status = service->PushAcceptableInfo(query, devices, dataLoadInfo);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d", status);
