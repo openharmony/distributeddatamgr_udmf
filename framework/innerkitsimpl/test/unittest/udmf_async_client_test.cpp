@@ -780,9 +780,14 @@ HWTEST_F(UdmfAsyncClientTest, CancelOnSingleTask003, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "CancelOnSingleTask003 end.");
 }
 
-HWTEST_F(UdmfAsyncClientTest, UpdateOnSameProgressAfterInterval, TestSize.Level1)
+/* *
+ * @tc.name: UpdateOnSameProgressAfterInterval001
+ * @tc.desc: Test ProgressTask
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfAsyncClientTest, UpdateOnSameProgressAfterInterval001, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "UpdateOnSameProgressAfterInterval begin.");
+    LOG_INFO(UDMF_TEST, "UpdateOnSameProgressAfterInterval001 begin.");
     std::string businessUdKey = "udmf://a/b/c";
     GetDataParams params;
     params.progressIndicator = ProgressIndicator::DEFAULT;
@@ -829,7 +834,47 @@ HWTEST_F(UdmfAsyncClientTest, UpdateOnSameProgressAfterInterval, TestSize.Level1
     auto ret = UdmfAsyncClient::GetInstance().ProgressTask(businessUdKey);
     EXPECT_EQ(ret, E_OK);
     pushThread.join();
-    LOG_INFO(UDMF_TEST, "UpdateOnSameProgressAfterInterval end.");
+    LOG_INFO(UDMF_TEST, "UpdateOnSameProgressAfterInterval001 end.");
+}
+
+/* *
+ * @tc.name: Clear001
+ * @tc.desc: Test Cancel、ProgressTask、InvokeHapTask、Clear、SetProgressData、GetDataTask
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfAsyncClientTest, Clear001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Clear001 begin.");
+    std::string key = "businessUdKey";
+    UdmfAsyncClient::GetInstance().asyncHelperMap_.insert_or_assign(key, nullptr);
+    auto status = UdmfAsyncClient::GetInstance().Cancel("unKnow");
+    EXPECT_EQ(status, E_ERROR);
+    status = UdmfAsyncClient::GetInstance().Cancel(key);
+    EXPECT_EQ(status, E_ERROR);
+    status = UdmfAsyncClient::GetInstance().ProgressTask("unKnow");
+    EXPECT_EQ(status, E_ERROR);
+    status = UdmfAsyncClient::GetInstance().ProgressTask(key);
+    EXPECT_EQ(status, E_ERROR);
+    status = UdmfAsyncClient::GetInstance().InvokeHapTask("unKnow");
+    EXPECT_EQ(status, E_ERROR);
+    status = UdmfAsyncClient::GetInstance().InvokeHapTask(key);
+    EXPECT_EQ(status, E_ERROR);
+    status = UdmfAsyncClient::GetInstance().Clear("unKnow");
+    EXPECT_EQ(status, E_ERROR);
+    status = UdmfAsyncClient::GetInstance().Clear(key);
+    EXPECT_EQ(status, E_ERROR);
+    status = UdmfAsyncClient::GetInstance().SetProgressData("unKnow");
+    EXPECT_EQ(status, E_ERROR);
+    status = UdmfAsyncClient::GetInstance().SetProgressData(key);
+    EXPECT_EQ(status, E_ERROR);
+    QueryOption query;
+    query.key = "unKnow";
+    status = UdmfAsyncClient::GetInstance().GetDataTask(query);
+    EXPECT_EQ(status, E_ERROR);
+    query.key = key;
+    status = UdmfAsyncClient::GetInstance().GetDataTask(query);
+    EXPECT_EQ(status, E_ERROR);
+    LOG_INFO(UDMF_TEST, "Clear001 end.");
 }
 
 /**

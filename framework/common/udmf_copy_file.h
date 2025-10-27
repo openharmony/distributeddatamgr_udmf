@@ -28,17 +28,17 @@ namespace UDMF {
 class UdmfCopyFile {
 public:
     static UdmfCopyFile &GetInstance();
-    Status Copy(std::unique_ptr<AsyncHelper> &asyncHelper);
+    Status Copy(std::shared_ptr<AsyncHelper> asyncHelper);
 
 private:
     struct CopyContext {
-        std::unique_ptr<AsyncHelper> &asyncHelper;
+        std::shared_ptr<AsyncHelper> asyncHelper;
         uint64_t finishSize = 0;
         uint64_t totalSize = 0;
         Status status = E_OK;
         std::shared_ptr<UnifiedData> processedData;
 
-        explicit CopyContext(std::unique_ptr<AsyncHelper> &helper)
+        explicit CopyContext(std::shared_ptr<AsyncHelper> helper)
             : asyncHelper(helper),
             totalSize(UdmfCopyFile::GetInstance().GetTotalSize(helper->data->GetFileUris())),
             processedData(std::make_shared<UnifiedData>()) {}

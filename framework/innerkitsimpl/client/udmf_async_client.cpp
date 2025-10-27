@@ -77,11 +77,20 @@ Status UdmfAsyncClient::StartAsyncDataRetrieval(const GetDataParams &params)
     if (status != E_OK) {
         return status;
     }
-    if (asyncHelperMap_.find(params.query.key) == asyncHelperMap_.end()) {
-        LOG_ERROR(UDMF_CLIENT, "RegisterAsyncHelper failed, key=%{public}s", params.query.key.c_str());
+    std::shared_ptr<AsyncHelper> asyncHelper;
+    {
+        std::lock_guard<std::mutex> lockMap(mutex_);
+        auto item = asyncHelperMap_.find(params.query.key);
+        if (item == asyncHelperMap_.end()) {
+            LOG_ERROR(UDMF_CLIENT, "RegisterAsyncHelper failed, key=%{public}s", params.query.key.c_str());
+            return E_ERROR;
+        }
+        asyncHelper = item->second;
+    }
+    if (asyncHelper == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "asyncHelper is nullptr");
         return E_ERROR;
     }
-    auto &asyncHelper = asyncHelperMap_.at(params.query.key);
     if (params.progressIndicator == ProgressIndicator::DEFAULT) {
         asyncHelper->progressQueue.SetClearable(false);
         asyncHelper->invokeHapTask = udmfExecutor.Schedule(std::chrono::milliseconds(START_ABILITY_INTERVAL),
@@ -96,11 +105,16 @@ Status UdmfAsyncClient::StartAsyncDataRetrieval(const GetDataParams &params)
 Status UdmfAsyncClient::Cancel(std::string businessUdKey)
 {
     std::lock_guard<std::mutex> lockMap(mutex_);
-    if (asyncHelperMap_.find(businessUdKey) == asyncHelperMap_.end()) {
+    auto item = asyncHelperMap_.find(businessUdKey);
+    if (item == asyncHelperMap_.end()) {
         LOG_ERROR(UDMF_CLIENT, "No task can Cancel, key=%{public}s", businessUdKey.c_str());
         return E_ERROR;
     }
-    auto &asyncHelper = asyncHelperMap_.at(businessUdKey);
+    auto asyncHelper = item->second;
+    if (asyncHelper == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "asyncHelper is nullptr");
+        return E_ERROR;
+    }
     asyncHelper->progressQueue.Cancel();
     return E_OK;
 }
@@ -123,7 +137,20 @@ Status UdmfAsyncClient::CancelOnSingleTask()
 
 Status UdmfAsyncClient::ProgressTask(const std::string &businessUdKey)
 {
-    auto &asyncHelper = asyncHelperMap_.at(businessUdKey);
+    std::shared_ptr<AsyncHelper> asyncHelper;
+    {
+        std::lock_guard<std::mutex> lockMap(mutex_);
+        auto item = asyncHelperMap_.find(businessUdKey);
+        if (item == asyncHelperMap_.end()) {
+            LOG_ERROR(UDMF_CLIENT, "No task in progress, key=%{public}s", businessUdKey.c_str());
+            return E_ERROR;
+        }
+        asyncHelper = item->second;
+    }
+    if (asyncHelper == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "asyncHelper is nullptr");
+        return E_ERROR;
+    }
     if (asyncHelper->progressIndicator == ProgressIndicator::DEFAULT) {
         auto status = SetProgressData(businessUdKey);
         if (status != E_OK) {
@@ -158,7 +185,20 @@ Status UdmfAsyncClient::ProgressTask(const std::string &businessUdKey)
 
 Status UdmfAsyncClient::GetDataTask(const QueryOption &query)
 {
-    auto &asyncHelper = asyncHelperMap_.at(query.key);
+    std::shared_ptr<AsyncHelper> asyncHelper;
+    {
+        std::lock_guard<std::mutex> lockMap(mutex_);
+        auto item = asyncHelperMap_.find(query.key);
+        if (item == asyncHelperMap_.end()) {
+            LOG_ERROR(UDMF_CLIENT, "get data task fail, key=%{public}s", query.key.c_str());
+            return E_ERROR;
+        }
+        asyncHelper = item->second;
+    }
+    if (asyncHelper == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "asyncHelper is nullptr");
+        return E_ERROR;
+    }
     if (GetDataFromCache(asyncHelper, query) == E_OK) {
         ProcessUnifiedData(asyncHelper);
         return E_OK;
@@ -169,7 +209,20 @@ Status UdmfAsyncClient::GetDataTask(const QueryOption &query)
 Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
 {
     LOG_INFO(UDMF_CLIENT, "InvokeHap start!");
-    auto &asyncHelper = asyncHelperMap_.at(businessUdKey);
+    std::shared_ptr<AsyncHelper> asyncHelper;
+    {
+        std::lock_guard<std::mutex> lockMap(mutex_);
+        auto item = asyncHelperMap_.find(businessUdKey);
+        if (item == asyncHelperMap_.end()) {
+            LOG_ERROR(UDMF_CLIENT, "invoke hap task fail, key=%{public}s", businessUdKey.c_str());
+            return E_ERROR;
+        }
+        asyncHelper = item->second;
+    }
+    if (asyncHelper == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "asyncHelper is nullptr");
+        return E_ERROR;
+    }
     if (asyncHelper->progressQueue.IsCancel() || asyncHelper->progressQueue.IsClear()) {
         LOG_INFO(UDMF_CLIENT, "Finished, not invoke hap.");
         Clear(businessUdKey);
@@ -205,12 +258,12 @@ Status UdmfAsyncClient::InvokeHapTask(const std::string &businessUdKey)
 
 Status UdmfAsyncClient::RegisterAsyncHelper(const GetDataParams &params)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lockMap(mutex_);
     if (asyncHelperMap_.find(params.query.key) != asyncHelperMap_.end()) {
         LOG_ERROR(UDMF_CLIENT, "The same task is running, key = %{public}s", params.query.key.c_str());
         return E_IDEMPOTENT_ERROR;
     }
-    auto asyncHelper = std::make_unique<AsyncHelper>();
+    auto asyncHelper = std::make_shared<AsyncHelper>();
     asyncHelper->businessUdKey = params.query.key;
     asyncHelper->progressListener = params.progressListener;
     asyncHelper->progressIndicator = params.progressIndicator;
@@ -221,7 +274,7 @@ Status UdmfAsyncClient::RegisterAsyncHelper(const GetDataParams &params)
     return E_OK;
 }
 
-Status UdmfAsyncClient::CheckSync(std::unique_ptr<AsyncHelper> &asyncHelper, const QueryOption &query)
+Status UdmfAsyncClient::CheckSync(std::shared_ptr<AsyncHelper> asyncHelper, const QueryOption &query)
 {
 #ifndef IOS_PLATFORM
     AsyncProcessInfo processInfo = {
@@ -263,17 +316,26 @@ Status UdmfAsyncClient::CheckSync(std::unique_ptr<AsyncHelper> &asyncHelper, con
     return E_OK;
 }
 
-Status UdmfAsyncClient::GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper, const QueryOption &query)
+Status UdmfAsyncClient::GetDataFromDB(std::shared_ptr<AsyncHelper> asyncHelper, const QueryOption &query)
 {
     auto &data = *(asyncHelper->data);
     auto delayDataCallback = [this](const std::string &key, const UnifiedData &unifiedData) {
-        if (asyncHelperMap_.find(key) == asyncHelperMap_.end()) {
-            LOG_ERROR(UDMF_CLIENT, "No task exist, key=%{public}s", key.c_str());
+        std::shared_ptr<AsyncHelper> asyncHelperPtr;
+        {
+            std::lock_guard<std::mutex> lockMap(mutex_);
+            auto item = asyncHelperMap_.find(key);
+            if (item == asyncHelperMap_.end()) {
+                LOG_ERROR(UDMF_CLIENT, "No task exist, key=%{public}s", key.c_str());
+                return;
+            }
+            asyncHelperPtr = item->second;
+        }
+        if (asyncHelperPtr == nullptr) {
+            LOG_ERROR(UDMF_CLIENT, "asyncHelperPtr is nullptr");
             return;
         }
-        auto &asyncHelper = asyncHelperMap_.at(key);
-        *(asyncHelper->data) = unifiedData;
-        UdmfAsyncClient::GetInstance().ProcessUnifiedData(asyncHelper);
+        *(asyncHelperPtr->data) = unifiedData;
+        UdmfAsyncClient::GetInstance().ProcessUnifiedData(asyncHelperPtr);
     };
     sptr<IRemoteObject> iUdmfNotifier = new (std::nothrow) DelayDataCallbackClient(delayDataCallback);
     if (iUdmfNotifier == nullptr) {
@@ -300,7 +362,7 @@ Status UdmfAsyncClient::GetDataFromDB(std::unique_ptr<AsyncHelper> &asyncHelper,
     return ProcessUnifiedData(asyncHelper);
 }
 
-Status UdmfAsyncClient::GetDataFromCache(std::unique_ptr<AsyncHelper> &asyncHelper, const QueryOption &query)
+Status UdmfAsyncClient::GetDataFromCache(std::shared_ptr<AsyncHelper> asyncHelper, const QueryOption &query)
 {
     return UdmfClient::GetInstance().GetDataFromCache(query, *(asyncHelper->data));
 }
@@ -327,7 +389,17 @@ Status UdmfAsyncClient::SetProgressData(const std::string &businessUdKey)
         LOG_ERROR(UDMF_CLIENT, "Set progress data error, status = %{public}d", status);
         return static_cast<Status>(status);
     }
-    auto &asyncHelper = asyncHelperMap_.at(businessUdKey);
+    std::lock_guard<std::mutex> lockMap(mutex_);
+    auto item = asyncHelperMap_.find(businessUdKey);
+    if (item == asyncHelperMap_.end()) {
+        LOG_ERROR(UDMF_CLIENT, "No task exist, businessUdKey=%{public}s", businessUdKey.c_str());
+        return E_ERROR;
+    }
+    auto asyncHelper = item->second;
+    if (asyncHelper == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "asyncHelper is nullptr");
+        return E_ERROR;
+    }
     asyncHelper->processKey = progressKey;
     return E_OK;
 }
@@ -361,7 +433,7 @@ Status UdmfAsyncClient::UpdateProgressData(const std::string &progressUdKey, con
     return E_OK;
 }
 
-Status UdmfAsyncClient::CopyFile(std::unique_ptr<AsyncHelper> &asyncHelper)
+Status UdmfAsyncClient::CopyFile(std::shared_ptr<AsyncHelper> asyncHelper)
 {
     auto status = E_OK;
     if (asyncHelper->destUri.empty()) {
@@ -377,7 +449,7 @@ Status UdmfAsyncClient::CopyFile(std::unique_ptr<AsyncHelper> &asyncHelper)
     return E_OK;
 }
 
-void UdmfAsyncClient::CallProgress(std::unique_ptr<AsyncHelper> &asyncHelper, ProgressInfo &progressInfo,
+void UdmfAsyncClient::CallProgress(std::shared_ptr<AsyncHelper> asyncHelper, ProgressInfo &progressInfo,
     std::shared_ptr<UnifiedData> data)
 {
     if (progressInfo.errorCode == E_OK) {
@@ -403,11 +475,16 @@ Status UdmfAsyncClient::Clear(const std::string &businessUdKey)
 {
 #ifndef IOS_PLATFORM
     std::lock_guard<std::mutex> lockMap(mutex_);
-    if (asyncHelperMap_.find(businessUdKey) == asyncHelperMap_.end()) {
+    auto item = asyncHelperMap_.find(businessUdKey);
+    if (item == asyncHelperMap_.end()) {
         LOG_ERROR(UDMF_CLIENT, "No task can Clear, key=%{public}s", businessUdKey.c_str());
         return E_ERROR;
     }
-    auto &asyncHelper = asyncHelperMap_.at(businessUdKey);
+    auto asyncHelper = item->second;
+    if (asyncHelper == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "asyncHelper is nullptr");
+        return E_ERROR;
+    }
     if (!asyncHelper->progressQueue.Clear()) {
         return E_OK;
     }
@@ -423,7 +500,7 @@ Status UdmfAsyncClient::Clear(const std::string &businessUdKey)
     return E_OK;
 }
 
-Status UdmfAsyncClient::ProcessUnifiedData(std::unique_ptr<AsyncHelper> &asyncHelper)
+Status UdmfAsyncClient::ProcessUnifiedData(std::shared_ptr<AsyncHelper> asyncHelper)
 {
     if (!asyncHelper->data->HasFileType() && !asyncHelper->data->HasUriInfo()) {
         ProgressInfo progressInfo = {

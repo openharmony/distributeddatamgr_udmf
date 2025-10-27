@@ -40,7 +40,7 @@ UdmfCopyFile &UdmfCopyFile::GetInstance()
     return udmfCopyFile;
 }
 
-Status UdmfCopyFile::Copy(std::unique_ptr<AsyncHelper> &asyncHelper)
+Status UdmfCopyFile::Copy(std::shared_ptr<AsyncHelper> asyncHelper)
 {
     CopyContext context(asyncHelper);
 

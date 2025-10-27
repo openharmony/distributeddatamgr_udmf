@@ -69,7 +69,7 @@ HWTEST_F(CopyFileTest, GetInstance, TestSize.Level1)
 */
 HWTEST_F(CopyFileTest, Copy001, TestSize.Level1)
 {
-    auto asyncHelper = std::make_unique<AsyncHelper>();
+    auto asyncHelper = std::make_shared<AsyncHelper>();
     asyncHelper->progressQueue.Cancel();
     ASSERT_TRUE(asyncHelper->progressQueue.IsCancel());
 
@@ -87,7 +87,7 @@ HWTEST_F(CopyFileTest, Copy002, TestSize.Level1)
     std::string srcUri = "test_src.txt";
     std::string destUri = "test_dest.txt";
     auto record = std::make_shared<UnifiedRecord>();
-    auto asyncHelper = std::make_unique<AsyncHelper>();
+    auto asyncHelper = std::make_shared<AsyncHelper>();
     UdmfCopyFile::CopyContext context(asyncHelper);
 
     bool result = UdmfCopyFile::GetInstance().CopyFile(srcUri, destUri, record, context);
@@ -140,7 +140,7 @@ HWTEST_F(CopyFileTest, GetFileName002, TestSize.Level1)
 HWTEST_F(CopyFileTest, HandleRecord001, TestSize.Level1)
 {
     auto record = std::make_shared<UnifiedRecord>();
-    auto helper = std::make_unique<AsyncHelper>();
+    auto helper = std::make_shared<AsyncHelper>();
     UdmfCopyFile::CopyContext context(helper);
     bool result = UdmfCopyFile::GetInstance().HandleRecord(record, context);
     ASSERT_TRUE(result);
@@ -155,7 +155,7 @@ HWTEST_F(CopyFileTest, HandleRecord001, TestSize.Level1)
 HWTEST_F(CopyFileTest, HandleRecord002, TestSize.Level1)
 {
     auto record = nullptr;
-    auto helper = std::make_unique<AsyncHelper>();
+    auto helper = std::make_shared<AsyncHelper>();
     UdmfCopyFile::CopyContext context(helper);
     bool result = UdmfCopyFile::GetInstance().HandleRecord(record, context);
     ASSERT_FALSE(result);

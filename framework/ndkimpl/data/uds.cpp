@@ -143,7 +143,6 @@ static int GetUdsDetails(UdsObject* pThis, OH_UdsDetails* details, NdkStructId n
         return UDMF_E_INVALID_PARAM;
     }
     auto udDetails = ObjectUtils::ConvertToUDDetails(detailObj);
-    std::lock_guard<std::mutex> lock(pThis->mutex);
     ConvertToMap(udDetails, details->details_);
     details->isUpdate = true;
     return UDMF_E_OK;
