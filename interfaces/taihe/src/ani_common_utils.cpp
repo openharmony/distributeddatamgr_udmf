@@ -73,7 +73,7 @@ ani_object CreateLong(ani_env *env, int64_t value)
         return nullptr;
     }
     ani_method longCtor;
-    if ((status = env->Class_FindMethod(longCls, "<ctor>", "l:", &longCtor)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(longCls, "<ctor>", "J:V", &longCtor)) != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "Class_FindMethod status : %{public}d", status);
         return nullptr;
     }
