@@ -570,10 +570,10 @@ Status UdmfAsyncClient::PushAcceptableInfo(const QueryOption &query, const std::
             LOG_ERROR(UDMF_CLIENT, "asyncHelper is nullptr");
             return E_ERROR;
         }
-        dataLoadInfo = item->second->acceptableInfo;
+        info = item->second->acceptableInfo;
     }
     
-    auto status = service->PushAcceptableInfo(query, devices, dataLoadInfo);
+    auto status = service->PushAcceptableInfo(query, devices, info);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d", status);
     }
