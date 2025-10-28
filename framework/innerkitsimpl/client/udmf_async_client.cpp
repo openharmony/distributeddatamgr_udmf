@@ -203,6 +203,12 @@ Status UdmfAsyncClient::GetDataTask(const QueryOption &query)
         ProcessUnifiedData(asyncHelper);
         return E_OK;
     }
+    if (!asyncHelper->hasSavedAcceptableInfo) {
+        asyncHelper->hasSavedAcceptableInfo = true;
+        if (SaveAcceptableInfo(query.key, asyncHelper->acceptableInfo) != E_OK) {
+            LOG_ERROR(UDMF_CLIENT, "Save acceptable info failed, key=%{public}s", query.key.c_str());
+        }
+    }
     return CheckSync(asyncHelper, query);
 }
 
