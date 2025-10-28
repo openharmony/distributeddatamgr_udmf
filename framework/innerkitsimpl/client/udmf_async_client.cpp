@@ -546,6 +546,25 @@ uint64_t UdmfAsyncClient::GetCurrentTimeMillis()
         static_cast<uint64_t>(tv.tv_usec) / MICROSEC_TO_MILLISEC);
 }
 
+Status UdmfAsyncClient::SaveAcceptableInfo(const std::string &key, DataLoadInfo &info)
+{
+    UnifiedKey udKey(key);
+    if (!udKey.IsValid() || udKey.intention != UD_INTENTION_MAP.at(UD_INTENTION_DRAG)) {
+        LOG_ERROR(UDMF_CLIENT, "Key is invalid, udKey:%{public}s", key.c_str());
+        return E_INVALID_PARAMETERS;
+    }
+    auto service = UdmfServiceClient::GetInstance();
+    if (service == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        return E_IPC;
+    }
+    auto status = service->SaveAcceptableInfo(key, info);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d", status);
+    }
+    return static_cast<Status>(status);
+}
+
 Status UdmfAsyncClient::PushAcceptableInfo(const QueryOption &query, const std::vector<std::string> &devices)
 {
     UnifiedKey udKey(query.key);
