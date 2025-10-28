@@ -327,15 +327,19 @@ int32_t UdmfServiceClient::GetDataIfAvailable(const std::string &key, const Data
     return udmfProxy_->GetDataIfAvailable(key, dataLoadInfo, iUdmfNotifier, unifiedData);
 }
 
-int32_t UdmfServiceClient::PushAcceptableInfo(
-    const QueryOption &query, const std::vector<std::string> &devices, DataLoadInfo &info)
+int32_t UdmfServiceClient::SaveAcceptableInfo(const std::string &key, DataLoadInfo &info)
+{
+    return udmfProxy_->SaveAcceptableInfo(key, info);
+}
+
+int32_t UdmfServiceClient::PushAcceptableInfo(const QueryOption &query, const std::vector<std::string> &devices)
 {
     UnifiedKey udkey(query.key);
     if (!udkey.IsValid()) {
         LOG_ERROR(UDMF_SERVICE, "Invalid key");
         return E_INVALID_PARAMETERS;
     }
-    return udmfProxy_->PushAcceptableInfo(query, devices, info);
+    return udmfProxy_->PushAcceptableInfo(query, devices);
 }
 } // namespace UDMF
 } // namespace OHOS
