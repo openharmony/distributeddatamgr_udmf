@@ -29,7 +29,7 @@ enum DataStatus : int32_t {
     WORKING = 0,
     HISTORY,
     DELETED,
-    DELAY,
+    WAITING,
     FADE
 };
 

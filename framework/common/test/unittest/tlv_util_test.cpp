@@ -967,7 +967,7 @@ HWTEST_F(TlvUtilTest, Reading_005, TestSize.Level1)
 HWTEST_F(TlvUtilTest, Reading_006, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Reading_006 begin.");
-    int32_t invalidStatus = 3;
+    int32_t invalidStatus = 4;
     TLVHead head;
     head.tag = static_cast<uint16_t>(TAG::TAG_DATA_STATUS);
     head.len = sizeof(invalidStatus);
