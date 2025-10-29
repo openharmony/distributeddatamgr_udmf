@@ -44,6 +44,8 @@ public:
     static void TearDownTestCase();
     void SetUp() override;
     void TearDown() override;
+    void SetNativeToken(const std::string &processName);
+    void AddPrivilege(QueryOption &option);
 
     static void AllocHapToken();
 };
@@ -107,6 +109,23 @@ void UdmfAsyncClientTest::AllocHapToken()
     };
     auto tokenID = AccessTokenKit::AllocHapToken(info, policy);
     SetSelfTokenID(tokenID.tokenIDEx);
+}
+
+void UdmfClientTest::SetNativeToken(const std::string &processName)
+{
+    auto tokenId = AccessTokenKit::GetNativeTokenId(processName);
+    SetSelfTokenID(tokenId);
+}
+
+void UdmfClientTest::AddPrivilege(QueryOption &option)
+{
+    Privilege privilege;
+    privilege.tokenId = AccessTokenKit::GetHapTokenID(USER_ID, "ohos.test.asyncdemo", INST_INDEX);
+    privilege.readPermission = "readPermission";
+    privilege.writePermission = "writePermission";
+    SetNativeToken("msdp");
+    auto status = UdmfClient::GetInstance().AddPrivilege(option, privilege);
+    ASSERT_EQ(status, E_OK);
 }
 
 /* *
@@ -884,7 +903,6 @@ HWTEST_F(UdmfAsyncClientTest, Clear001, TestSize.Level1)
 */
 HWTEST_F(UdmfAsyncClientTest, PushAcceptableInfo001, TestSize.Level1)
 {
-    UdmfAsyncClient::GetInstance().asyncHelperMap_.clear();
     QueryOption query = { .key = "invalid_key" };
     std::vector<std::string> devices = { "device1", "device2" };
     auto status = UdmfAsyncClient::GetInstance().PushAcceptableInfo(query, devices);
@@ -893,11 +911,36 @@ HWTEST_F(UdmfAsyncClientTest, PushAcceptableInfo001, TestSize.Level1)
     status = UdmfAsyncClient::GetInstance().PushAcceptableInfo(query, devices);
     EXPECT_EQ(status, E_INVALID_PARAMETERS);
     query.key = "udmf://ohos.test.demo1/drag/123456";
-    status = UdmfAsyncClient::GetInstance().PushAcceptableInfo(query, devices);
-    EXPECT_EQ(status, E_ERROR);
 
-    UdmfAsyncClient::GetInstance().asyncHelperMap_.insert_or_assign(query.key, std::make_unique<AsyncHelper>());
     status = UdmfAsyncClient::GetInstance().PushAcceptableInfo(query, devices);
+    EXPECT_EQ(status, E_NO_PERMISSION);
+
+    SetNativeToken("msdp");
+    status = UdmfAsyncClient::GetInstance().PushAcceptableInfo(query, devices);
+    EXPECT_EQ(status, E_OK);
+}
+
+/**
+* @tc.name: SaveAcceptableInfo001
+* @tc.desc: Test SaveAcceptableInfo function.
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfAsyncClientTest, SaveAcceptableInfo001, TestSize.Level1)
+{
+    std::string key = "invalid_key";
+    DataLoadInfo info;
+    auto status = UdmfAsyncClient::GetInstance().SaveAcceptableInfo(key, info);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+    key = "udmf://ohos.test.demo1/invalid_intention/123456";
+    status = UdmfAsyncClient::GetInstance().SaveAcceptableInfo(key, info);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+    key = "udmf://ohos.test.demo1/drag/123456";
+    status = UdmfAsyncClient::GetInstance().SaveAcceptableInfo(key, info);
+    EXPECT_EQ(status, E_NO_PERMISSION);
+    QueryOption query;
+    query.key = key;
+    AddPrivilege(query);
+    status = UdmfAsyncClient::GetInstance().SaveAcceptableInfo(key, info);
     EXPECT_EQ(status, E_OK);
 }
 } // OHOS::Test

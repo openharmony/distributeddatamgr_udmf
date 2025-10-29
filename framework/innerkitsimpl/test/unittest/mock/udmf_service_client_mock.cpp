@@ -182,13 +182,21 @@ int32_t UdmfServiceClient::GetDataIfAvailable(const std::string &key, const Data
     }
 }
 
-int32_t UdmfServiceClient::PushAcceptableInfo(
-    const QueryOption &query, const std::vector<std::string> &devices, DataLoadInfo &info)
+int32_t UdmfServiceClient::PushAcceptableInfo(const QueryOption &query, const std::vector<std::string> &devices)
 {
     if (MUdmfServiceClient::udmfServiceClient == nullptr) {
         return -1;
     } else {
-        return MUdmfServiceClient::udmfServiceClient->PushAcceptableInfo(query, devices, info);
+        return MUdmfServiceClient::udmfServiceClient->PushAcceptableInfo(query, devices);
+    }
+}
+
+int32_t UdmfServiceClient::SaveAcceptableInfo(const std::string &key, DataLoadInfo &info)
+{
+    if (MUdmfServiceClient::udmfServiceClient == nullptr) {
+        return -1;
+    } else {
+        return MUdmfServiceClient::udmfServiceClient->SaveAcceptableInfo(key, info);
     }
 }
 } // namespace OHOS::UDMF
