@@ -512,7 +512,10 @@ static constexpr UtdType UTD_TYPES[] = {
     { IWORK, "IWORK", "com.apple.iwork" },
     { IWORK_KEYNOTE, "IWORK_KEYNOTE", "com.apple.iwork.keynote.key" },
     { IWORK_NUMBERS, "IWORK_NUMBERS", "com.apple.iwork.numbers.numbers" },
-    { IWORK_PAGES, "IWORK_PAGES", "com.apple.iwork.pages.pages" }
+    { IWORK_PAGES, "IWORK_PAGES", "com.apple.iwork.pages.pages" },
+    { KML, "KML", "general.kml" },
+    { KMZ, "KMZ", "general.kmz" },
+    { GPX, "GPX", "general.gpx" }
 };
 
 static constexpr std::initializer_list<std::string_view> NOT_NEED_COUNT_VALUE_LIST = {
