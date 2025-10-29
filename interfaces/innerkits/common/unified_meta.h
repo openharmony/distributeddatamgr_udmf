@@ -542,6 +542,9 @@ enum UDType : int32_t {
     IWORK_KEYNOTE,
     IWORK_NUMBERS,
     IWORK_PAGES,
+    KML,
+    KMZ,
+    GPX,
     UD_BUTT
 };
 
