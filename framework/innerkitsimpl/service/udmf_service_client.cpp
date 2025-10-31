@@ -334,11 +334,6 @@ int32_t UdmfServiceClient::SaveAcceptableInfo(const std::string &key, DataLoadIn
 
 int32_t UdmfServiceClient::PushAcceptableInfo(const QueryOption &query, const std::vector<std::string> &devices)
 {
-    UnifiedKey udkey(query.key);
-    if (!udkey.IsValid()) {
-        LOG_ERROR(UDMF_SERVICE, "Invalid key");
-        return E_INVALID_PARAMETERS;
-    }
     return udmfProxy_->PushAcceptableInfo(query, devices);
 }
 } // namespace UDMF
