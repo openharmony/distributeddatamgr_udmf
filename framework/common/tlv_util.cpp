@@ -1056,10 +1056,10 @@ template <> bool API_EXPORT Writing(const DataLoadInfo &input, TLVObject &data, 
     if (!data.WriteBasic(TAG::TAG_RECORD_COUNT, input.recordCount)) {
         return false;
     }
-    if (!TLVUtil::Writing(input.deviceId, data, TAG::TAG_DATA_LOAD_DEVICE_ID)) {
+    if (!TLVUtil::Writing(input.deviceId, data, TAG::TAG_DEVICE_ID)) {
         return false;
     }
-    if (!TLVUtil::Writing(input.udKey, data, TAG::TAG_DATA_LOAD_UD_KEY)) {
+    if (!TLVUtil::Writing(input.udKey, data, TAG::TAG_KEY)) {
         return false;
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
@@ -1093,12 +1093,12 @@ template <> bool API_EXPORT Reading(DataLoadInfo &output, TLVObject &data, const
                     return false;
                 }
                 break;
-            case static_cast<uint16_t>(TAG::TAG_DATA_LOAD_DEVICE_ID):
+            case static_cast<uint16_t>(TAG::TAG_DEVICE_ID):
                 if (!TLVUtil::Reading(output.deviceId, data, headItem)) {
                     return false;
                 }
                 break;
-            case static_cast<uint16_t>(TAG::TAG_DATA_LOAD_UD_KEY):
+            case static_cast<uint16_t>(TAG::TAG_KEY):
                 if (!TLVUtil::Reading(output.udKey, data, headItem)) {
                     return false;
                 }

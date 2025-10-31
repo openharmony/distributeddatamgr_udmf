@@ -303,7 +303,7 @@ HWTEST_F(UdmfClientAbnormalTest, SaveAcceptableInfo001, TestSize.Level1)
 
     UdmfAsyncClient client;
     std::string key = "udmf://drag/ohos.test.demo1/123456";
-    DataLoadInfo info;    
+    DataLoadInfo info;
     Status ret = client.SaveAcceptableInfo(key, info);
     EXPECT_EQ(ret, Status::E_IPC);
     LOG_INFO(UDMF_TEST, "SaveAcceptableInfo001 end.");
