@@ -283,7 +283,7 @@ HWTEST_F(UdmfClientAbnormalTest, PushAcceptableInfo001, TestSize.Level1)
     EXPECT_CALL(*mock_, GetInstance()).WillOnce(Return(nullptr));
 
     UdmfAsyncClient client;
-    QueryOption query = { .key = "udmf://ohos.test.demo1/drag/123456" };
+    QueryOption query = { .key = "udmf://drag/ohos.test.demo1/123456" };
     std::vector<std::string> devices = { "device1", "device2" };
 
     Status ret = client.PushAcceptableInfo(query, devices);
