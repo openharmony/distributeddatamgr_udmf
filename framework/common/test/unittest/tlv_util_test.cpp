@@ -967,7 +967,7 @@ HWTEST_F(TlvUtilTest, Reading_005, TestSize.Level1)
 HWTEST_F(TlvUtilTest, Reading_006, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Reading_006 begin.");
-    int32_t invalidStatus = 3;
+    int32_t invalidStatus = 4;
     TLVHead head;
     head.tag = static_cast<uint16_t>(TAG::TAG_DATA_STATUS);
     head.len = sizeof(invalidStatus);
@@ -1160,6 +1160,7 @@ HWTEST_F(TlvUtilTest, WritingDataLoadInfo001, TestSize.Level1) {
     normalData.sequenceKey = "seq_2023";
     normalData.types = {"typeA", "typeB", "typeC"};
     normalData.recordCount = 1000;
+    normalData.deviceId = "device_001";
 
     std::vector<uint8_t> dataBytes;
     auto tlvObject = TLVObject(dataBytes);
@@ -1173,6 +1174,8 @@ HWTEST_F(TlvUtilTest, WritingDataLoadInfo001, TestSize.Level1) {
     EXPECT_EQ(normalData.sequenceKey, normalDataResult.sequenceKey);
     EXPECT_EQ(normalData.recordCount, normalDataResult.recordCount);
     ASSERT_EQ(normalData.types.size(), normalDataResult.types.size());
+    EXPECT_EQ(normalData.deviceId, normalDataResult.deviceId);
+
     for (auto &item : normalData.types) {
         EXPECT_TRUE(normalDataResult.types.find(item) != normalDataResult.types.end());
     }
