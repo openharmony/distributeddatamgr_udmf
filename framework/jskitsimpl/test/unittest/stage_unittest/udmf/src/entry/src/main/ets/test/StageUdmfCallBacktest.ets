@@ -208,7 +208,10 @@ export default function stageUdmfCallbackJsTest() {
           expect(null).assertFail();
           done();
         });
-      } catch (err: BusinessError) {
+      } catch (err) {
+        if (!(err instanceof BusinessError)) {
+          throw err;
+        }
         console.error(TAG , err.code + err.message);
         expect(err.code).assertEqual("401");
         done();
