@@ -56,6 +56,7 @@ void UtdConcurrentUpdateTest::TearDownTestCase()
 
 void UtdConcurrentUpdateTest::SetUp()
 {
+    UtdClient::GetInstance();
     SetNativeToken("foundation");
 }
 

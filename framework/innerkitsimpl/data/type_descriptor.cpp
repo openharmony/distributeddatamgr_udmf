@@ -164,5 +164,40 @@ std::vector<std::string> TypeDescriptor::GetMimeTypes()
 {
     return mimeTypes_;
 }
+
+void TypeDescriptor::SetTypeId(const std::string &typeId)
+{
+    typeId_ = typeId;
+}
+
+void TypeDescriptor::SetBelongingToTypes(const std::vector<std::string> &belongingToTypes)
+{
+    belongingToTypes_ = belongingToTypes;
+}
+
+void TypeDescriptor::SetFilenameExtensions(const std::vector<std::string> &filenameExtensions)
+{
+    filenameExtensions_ = filenameExtensions;
+}
+
+void TypeDescriptor::SetMimeTypes(const std::vector<std::string> &mimeTypes)
+{
+    mimeTypes_ = mimeTypes;
+}
+
+void TypeDescriptor::SetDescription(const std::string &description)
+{
+    description_ = description;
+}
+
+void TypeDescriptor::SetReferenceURL(const std::string &referenceURL)
+{
+    referenceURL_ = referenceURL;
+}
+
+void TypeDescriptor::SetIconFile(const std::string &iconFile)
+{
+    iconFile_ = iconFile;
+}
 } // namespace UDMF
 } // namespace OHOS

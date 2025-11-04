@@ -21,23 +21,25 @@ namespace OHOS {
 namespace UDMF {
 class UtdCfgsChecker {
 public:
-    static UtdCfgsChecker &GetInstance();
-    bool CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
+    static UtdCfgsChecker & API_EXPORT GetInstance();
+    Status CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
         const std::vector<TypeDescriptorCfg> &customCfgs, const std::string &bundleName);
     bool CheckBelongingToTypes(const std::vector<TypeDescriptorCfg> &typeCfgs,
         const std::vector<TypeDescriptorCfg> &presetCfgs);
+    bool API_EXPORT CheckTypeCfgsFormat(const CustomUtdCfgs &typeCfgs);
+    bool API_EXPORT CheckTypeIdsFormat(const std::vector<std::string> &typeIds);
 
 private:
     UtdCfgsChecker();
     ~UtdCfgsChecker();
     UtdCfgsChecker(const UtdCfgsChecker &obj) = delete;
     UtdCfgsChecker &operator=(const UtdCfgsChecker &obj) = delete;
-    bool CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string &bundleName);
-    bool CheckTypesOptions(CustomUtdCfgs &typeCfgs, const std::string &bundleName);
+    Status CheckTypeIdsContent(CustomUtdCfgs &typeCfgs, const std::string &bundleName);
     bool CheckTypesRelation(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
         const std::vector<TypeDescriptorCfg> &customCfgs);
     bool CanConstructDAG(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
         const std::vector<TypeDescriptorCfg> &customCfgs);
+    bool CheckTypeCfgsSize(const std::vector<TypeDescriptorCfg> &typeCfgs);
 };
 }
 }

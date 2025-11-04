@@ -46,6 +46,14 @@ public:
     std::vector<std::string> API_EXPORT GetFilenameExtensions();
     std::vector<std::string> API_EXPORT GetMimeTypes();
 
+    void API_EXPORT SetTypeId(const std::string &typeId);
+    void API_EXPORT SetBelongingToTypes(const std::vector<std::string> &belongingToTypes);
+    void API_EXPORT SetFilenameExtensions(const std::vector<std::string> &filenameExtensions);
+    void API_EXPORT SetMimeTypes(const std::vector<std::string> &mimeTypes);
+    void API_EXPORT SetDescription(const std::string &description);
+    void API_EXPORT SetReferenceURL(const std::string &referenceURL);
+    void API_EXPORT SetIconFile(const std::string &iconFile);
+
 private:
     bool CmpFlexibleTypeLevel(const std::string higherLevelTypeId, bool isFlexibleType);
 

@@ -270,15 +270,7 @@ napi_value TypeDescriptorNapi::SetTypeId(napi_env env, napi_callback_info info)
     auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
                Status::E_ERROR, "invalid object!");
-    TypeDescriptorCfg cfg;
-    cfg.typeId = std::move(typeId);
-    cfg.belongingToTypes = descriptorNapi->value_->GetBelongingToTypes();
-    cfg.filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
-    cfg.mimeTypes = descriptorNapi->value_->GetMimeTypes();
-    cfg.description = descriptorNapi->value_->GetDescription();
-    cfg.referenceURL = descriptorNapi->value_->GetReferenceURL();
-    cfg.iconFile = descriptorNapi->value_->GetIconFile();
-    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    descriptorNapi->value_->SetTypeId(typeId);
     return nullptr;
 }
 
@@ -298,15 +290,7 @@ napi_value TypeDescriptorNapi::SetBelongingToTypes(napi_env env, napi_callback_i
     auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
                Status::E_ERROR, "invalid object!");
-    TypeDescriptorCfg cfg;
-    cfg.typeId = descriptorNapi->value_->GetTypeId();
-    cfg.belongingToTypes = std::move(belongingTypes);
-    cfg.filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
-    cfg.mimeTypes = descriptorNapi->value_->GetMimeTypes();
-    cfg.description = descriptorNapi->value_->GetDescription();
-    cfg.referenceURL = descriptorNapi->value_->GetReferenceURL();
-    cfg.iconFile = descriptorNapi->value_->GetIconFile();
-    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    descriptorNapi->value_->SetBelongingToTypes(belongingTypes);
     return nullptr;
 }
 
@@ -326,15 +310,7 @@ napi_value TypeDescriptorNapi::SetDescription(napi_env env, napi_callback_info i
     auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
                Status::E_ERROR, "invalid object!");
-    TypeDescriptorCfg cfg;
-    cfg.typeId = descriptorNapi->value_->GetTypeId();
-    cfg.belongingToTypes = descriptorNapi->value_->GetBelongingToTypes();
-    cfg.filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
-    cfg.mimeTypes = descriptorNapi->value_->GetMimeTypes();
-    cfg.description = std::move(description);
-    cfg.referenceURL = descriptorNapi->value_->GetReferenceURL();
-    cfg.iconFile = descriptorNapi->value_->GetIconFile();
-    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    descriptorNapi->value_->SetDescription(description);
     return nullptr;
 }
 
@@ -354,15 +330,7 @@ napi_value TypeDescriptorNapi::SetReferenceURL(napi_env env, napi_callback_info 
     auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
                Status::E_ERROR, "invalid object!");
-    TypeDescriptorCfg cfg;
-    cfg.typeId = descriptorNapi->value_->GetTypeId();
-    cfg.belongingToTypes = descriptorNapi->value_->GetBelongingToTypes();
-    cfg.filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
-    cfg.mimeTypes = descriptorNapi->value_->GetMimeTypes();
-    cfg.description = descriptorNapi->value_->GetDescription();
-    cfg.referenceURL = std::move(referenceURL);
-    cfg.iconFile = descriptorNapi->value_->GetIconFile();
-    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    descriptorNapi->value_->SetReferenceURL(referenceURL);
     return nullptr;
 }
 
@@ -382,15 +350,7 @@ napi_value TypeDescriptorNapi::SetIconFile(napi_env env, napi_callback_info info
     auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
                Status::E_ERROR, "invalid object!");
-    TypeDescriptorCfg cfg;
-    cfg.typeId = descriptorNapi->value_->GetTypeId();
-    cfg.belongingToTypes = descriptorNapi->value_->GetBelongingToTypes();
-    cfg.filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
-    cfg.mimeTypes = descriptorNapi->value_->GetMimeTypes();
-    cfg.description = descriptorNapi->value_->GetDescription();
-    cfg.referenceURL = descriptorNapi->value_->GetReferenceURL();
-    cfg.iconFile = std::move(iconFile);
-    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    descriptorNapi->value_->SetIconFile(iconFile);
     return nullptr;
 }
 
@@ -410,15 +370,7 @@ napi_value TypeDescriptorNapi::SetFilenameExtensions(napi_env env, napi_callback
     auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
                Status::E_ERROR, "invalid object!");
-    TypeDescriptorCfg cfg;
-    cfg.typeId = descriptorNapi->value_->GetTypeId();
-    cfg.belongingToTypes = descriptorNapi->value_->GetBelongingToTypes();
-    cfg.filenameExtensions = std::move(filenameExtensions);
-    cfg.mimeTypes = descriptorNapi->value_->GetMimeTypes();
-    cfg.description = descriptorNapi->value_->GetDescription();
-    cfg.referenceURL = descriptorNapi->value_->GetReferenceURL();
-    cfg.iconFile = descriptorNapi->value_->GetIconFile();
-    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    descriptorNapi->value_->SetFilenameExtensions(filenameExtensions);
     return nullptr;
 }
 
@@ -438,15 +390,7 @@ napi_value TypeDescriptorNapi::SetMimeTypes(napi_env env, napi_callback_info inf
     auto descriptorNapi = static_cast<TypeDescriptorNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (descriptorNapi != nullptr && descriptorNapi->value_ != nullptr),
                Status::E_ERROR, "invalid object!");
-    TypeDescriptorCfg cfg;
-    cfg.typeId = descriptorNapi->value_->GetTypeId();
-    cfg.belongingToTypes = descriptorNapi->value_->GetBelongingToTypes();
-    cfg.filenameExtensions = descriptorNapi->value_->GetFilenameExtensions();
-    cfg.mimeTypes = std::move(mimeTypes);
-    cfg.description = descriptorNapi->value_->GetDescription();
-    cfg.referenceURL = descriptorNapi->value_->GetReferenceURL();
-    cfg.iconFile = descriptorNapi->value_->GetIconFile();
-    *descriptorNapi->value_ = TypeDescriptor(cfg);
+    descriptorNapi->value_->SetMimeTypes(mimeTypes);
     return nullptr;
 }
 } // namespace UDMF
