@@ -34,7 +34,7 @@ constexpr const int MAX_UTD_LENGTH = 256;
 constexpr const int64_t RELOAD_INTERVAL = 10;
 constexpr const int MAX_RETRY = 5;
 constexpr const int RETRY_INTERVAL_SEC = 3;
-constexpr const char *DDMS_PROCESS_NAME = "distributeddata";
+constexpr const char *DISTRIBUTED_DATA_MGR_PROCESS_NAME = "distributeddata";
 using namespace std::chrono;
 
 UtdClient::UtdClient()
@@ -55,7 +55,8 @@ UtdClient &UtdClient::GetInstance()
     return instance;
 }
 
-void UtdClient::InitializeOnce() {
+void UtdClient::InitializeOnce()
+{
     bool res = InitializeUtdTypes();
     bool tryRegisterNotifier = false;
     if (ShouldRegisterNotifier()) {
@@ -66,12 +67,13 @@ void UtdClient::InitializeOnce() {
     }
 }
 
-bool UtdClient::ShouldRegisterNotifier() {
+bool UtdClient::ShouldRegisterNotifier()
+{
     if (IsHapTokenType()) return true;
 
     Security::AccessToken::NativeTokenInfo tokenInfo;
     if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(IPCSkeleton::GetSelfTokenID(), tokenInfo) == 0) {
-        return tokenInfo.processName != DDMS_PROCESS_NAME;
+        return tokenInfo.processName != DISTRIBUTED_DATA_MGR_PROCESS_NAME;
     } else {
         LOG_ERROR(UDMF_CLIENT, "GetNativeTokenInfo failed.");
         return false;

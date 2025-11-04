@@ -95,7 +95,7 @@ std::string CustomUtdStore::GetDynamicUtdPath(bool isHap, int32_t userId)
         append(DYNAMIC_UTD_CFG_FILE);
 }
 
-int32_t CustomUtdStore::ReadTypeCfgs(const std::string &filePath, 
+int32_t CustomUtdStore::ReadTypeCfgs(const std::string &filePath,
     std::vector<TypeDescriptorCfg> &utdTypes)
 {
     std::ifstream fin(filePath);
@@ -253,7 +253,7 @@ Status CustomUtdStore::InstallDynamicUtds(const std::vector<TypeDescriptorCfg> &
 
     CustomUtdCfgs typeCfgs = { dynamicUtds, {} };
     auto status = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(
-        typeCfgs, presetTypes, installedTypes, bundleName); 
+        typeCfgs, presetTypes, installedTypes, bundleName);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "check type descriptors failed, bundleName:%{public}s, status = %{public}d",
             bundleName.c_str(), status);

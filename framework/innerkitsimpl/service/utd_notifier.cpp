@@ -22,10 +22,9 @@
 
 namespace OHOS::UDMF {
 constexpr UtdNotifierStub::Handler
-    UtdNotifierStub::HANDLERS[static_cast<uint32_t>(UtdNotifierInterfaceCode::CODE_BUTT)];
+    UtdNotifierStub::handlers_[static_cast<uint32_t>(UtdNotifierInterfaceCode::CODE_BUTT)];
 
-int UtdNotifierStub::OnRemoteRequest(
-        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int UtdNotifierStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     LOG_INFO(UDMF_SERVICE, "code:%{public}u callingPid:%{public}u", code, IPCSkeleton::GetCallingPid());
     std::u16string local = GetDescriptor();
@@ -39,7 +38,7 @@ int UtdNotifierStub::OnRemoteRequest(
         code >= static_cast<uint32_t>(UtdNotifierInterfaceCode::CODE_BUTT)) {
         return E_IPC;
     }
-    return (this->*HANDLERS[code])(data, reply);
+    return (this->*handlers_[code])(data, reply);
 }
 
 int32_t UtdNotifierStub::OnRegisterDynamicUtd(MessageParcel &data, MessageParcel &reply)

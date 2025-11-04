@@ -42,7 +42,7 @@ public:
     int32_t OnDynamicUtdChange(MessageParcel &data, MessageParcel &reply);
 
     using Handler = int32_t (UtdNotifierStub::*)(MessageParcel &data, MessageParcel &reply);
-    static constexpr Handler HANDLERS[static_cast<uint32_t>(UtdNotifierInterfaceCode::CODE_BUTT)] = {
+    static constexpr Handler handlers_[static_cast<uint32_t>(UtdNotifierInterfaceCode::CODE_BUTT)] = {
         &UtdNotifierStub::OnDynamicUtdChange,
         &UtdNotifierStub::OnRegisterDynamicUtd,
         &UtdNotifierStub::OnUnregisterDynamicUtd,

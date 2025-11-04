@@ -408,13 +408,13 @@ HWTEST_F(UtdDynamicUpdateTest, permissiontest001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "permissiontest001 end.");
 };
 
-/** 
-* @tc.name: TypeDescriptor001 
-* @tc.desc: Normal test 
-* @tc.type: FUNC 
-*/ 
+/**
+* @tc.name: TypeDescriptor001
+* @tc.desc: Normal test case
+* @tc.type: FUNC
+*/
 HWTEST_F(UtdDynamicUpdateTest, TypeDescriptor001, TestSize.Level1)
-{ 
+{
     LOG_INFO(UDMF_TEST, "TypeDescriptor001 begin.");
     TypeDescriptor typeDescriptor;
     std::string typeId = std::string(HAP_BUNDLE_NAME) + ".ppp";
@@ -451,7 +451,7 @@ HWTEST_F(UtdDynamicUpdateTest, TypeDescriptor001, TestSize.Level1)
  @tc.name: InstallDynamicUtds001
  @tc.desc: Abnormal test, error process
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InstallDynamicUtds001 begin.");
@@ -473,7 +473,7 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds001, TestSize.Level1)
  @tc.name: InstallDynamicUtds002
  @tc.desc: Normal test
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InstallDynamicUtds002 begin.");
@@ -495,7 +495,7 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds002, TestSize.Level1)
  @tc.name: InstallDynamicUtds003
  @tc.desc: Abnormal test, customTypeCfgs is empty
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InstallDynamicUtds003 begin.");
@@ -515,7 +515,7 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds003, TestSize.Level1)
  @tc.name: InstallDynamicUtds004
  @tc.desc: Abnormal test, error typeId
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds004, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InstallDynamicUtds004 begin.");
@@ -535,7 +535,7 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds004, TestSize.Level1)
  @tc.name: InstallDynamicUtds005
  @tc.desc: Abnormal test, error belongingToTypes
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds005, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InstallDynamicUtds005 begin.");
@@ -556,7 +556,7 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds005, TestSize.Level1)
  @tc.name: InstallDynamicUtds006
  @tc.desc: Abnormal test, error typeId bundleName
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds006, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InstallDynamicUtds006 begin.");
@@ -577,7 +577,7 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds006, TestSize.Level1)
  @tc.name: InstallDynamicUtds007
  @tc.desc: Abnormal test, duplicate typeId
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds007, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InstallDynamicUtds007 begin.");
@@ -598,7 +598,7 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds007, TestSize.Level1)
  @tc.name: InstallDynamicUtds008
  @tc.desc: Abnormal test, error typeId regex
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds008, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InstallDynamicUtds008 begin.");
@@ -616,7 +616,7 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds008, TestSize.Level1)
  @tc.name: InstallDynamicUtds009
  @tc.desc: Abnormal test, error typeId size
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds009, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InstallDynamicUtds009 begin.");
@@ -637,7 +637,7 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds009, TestSize.Level1)
  @tc.name: InstallDynamicUtds010
  @tc.desc: Abnormal test, error fileExtention size
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds010, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InstallDynamicUtds010 begin.");
@@ -656,7 +656,7 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds010, TestSize.Level1)
  @tc.name: InstallDynamicUtds011
  @tc.desc: Abnormal test, error mimetype size
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds011, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InstallDynamicUtds011 begin.");
@@ -675,7 +675,7 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds011, TestSize.Level1)
  @tc.name: InstallDynamicUtds012
  @tc.desc: Abnormal test, error description size
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds012, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InstallDynamicUtds012 begin.");
@@ -706,7 +706,7 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds012, TestSize.Level1)
  @tc.name: UninstallDynamicUtds001
  @tc.desc: Abnormal test, typeId not exist
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, UninstallDynamicUtds001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "UninstallDynamicUtds001 begin.");
@@ -722,7 +722,7 @@ HWTEST_F(UtdDynamicUpdateTest, UninstallDynamicUtds001, TestSize.Level1)
  @tc.name: UninstallDynamicUtds002
  @tc.desc: Abnormal test, typeId bundle not match
  @tc.type: FUNC
-*/ 
+*/
 HWTEST_F(UtdDynamicUpdateTest, UninstallDynamicUtds002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "UninstallDynamicUtds002 begin.");

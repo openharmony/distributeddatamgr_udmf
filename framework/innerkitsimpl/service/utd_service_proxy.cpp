@@ -51,7 +51,7 @@ UtdServiceProxy::UtdServiceProxy(sptr<IRemoteObject> object) : IRemoteProxy<IUtd
 }
 
 int32_t UtdServiceProxy::SendRequest(UtdServiceInterfaceCode code, MessageParcel &data,
-                                      MessageParcel &reply, MessageOption &option)
+    MessageParcel &reply, MessageOption &option)
 {
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
