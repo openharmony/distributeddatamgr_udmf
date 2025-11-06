@@ -108,6 +108,10 @@ std::vector<std::string> UnifiedData::GetTypesLabels() const
 {
     std::vector<std::string> types;
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
+        if (record == nullptr) {
+            LOG_ERROR(UDMF_FRAMEWORK, "Invalid record, skip!");
+            continue;
+        }
         types.push_back(UtdUtils::GetUtdIdFromUtdEnum(record->GetType()));
     }
     return types;
