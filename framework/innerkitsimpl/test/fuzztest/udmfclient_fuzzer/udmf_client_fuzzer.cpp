@@ -134,8 +134,8 @@ void SetDataTextFuzz(FuzzedDataProvider &provider)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.readPermission = "readPermission";
-    privilege.writePermission = "writePermission";
+    privilege.readPermission = provider.ConsumeRandomLengthString();
+    privilege.writePermission = provider.ConsumeRandomLengthString();
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
 
     SetHapToken();
@@ -154,8 +154,8 @@ void SetDataPlainTextFuzz(FuzzedDataProvider &provider)
     auto plainText1 = std::make_shared<PlainText>();
     details1.insert({skey, svalue});
     plainText1->SetDetails(details1);
-    plainText1->SetContent(svalue + "content");
-    plainText1->SetAbstract(svalue + "abstract");
+    plainText1->SetContent(svalue + provider.ConsumeRandomLengthString());
+    plainText1->SetAbstract(svalue + provider.ConsumeRandomLengthString());
     plainText1->GetContent();
     plainText1->GetAbstract();
     data1.AddRecord(plainText1);
@@ -166,8 +166,8 @@ void SetDataPlainTextFuzz(FuzzedDataProvider &provider)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.readPermission = "readPermission";
-    privilege.writePermission = "writePermission";
+    privilege.readPermission = provider.ConsumeRandomLengthString();
+    privilege.writePermission = provider.ConsumeRandomLengthString();
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
 
     SetHapToken();
@@ -187,8 +187,8 @@ void SetDataHtmlFuzz(FuzzedDataProvider &provider)
     UDDetails details1;
     details1.insert({skey, svalue});
     html1->SetDetails(details1);
-    html1->SetHtmlContent(svalue + "htmlcontent");
-    html1->SetPlainContent(svalue + "plainContent");
+    html1->SetHtmlContent(svalue + provider.ConsumeRandomLengthString());
+    html1->SetPlainContent(svalue + provider.ConsumeRandomLengthString());
     html1->GetHtmlContent();
     html1->GetPlainContent();
     data1.AddRecord(html1);
@@ -198,8 +198,8 @@ void SetDataHtmlFuzz(FuzzedDataProvider &provider)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.readPermission = "readPermission";
-    privilege.writePermission = "writePermission";
+    privilege.readPermission = provider.ConsumeRandomLengthString();
+    privilege.writePermission = provider.ConsumeRandomLengthString();
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
 
     SetHapToken();
@@ -219,8 +219,8 @@ void SetDataLinkFuzz(FuzzedDataProvider &provider)
     UDDetails details1;
     details1.insert({skey, svalue});
     link1->SetDetails(details1);
-    link1->SetUrl(svalue + "url");
-    link1->SetDescription(svalue + "description");
+    link1->SetUrl(svalue + provider.ConsumeRandomLengthString());
+    link1->SetDescription(svalue + provider.ConsumeRandomLengthString());
     link1->GetUrl();
     link1->GetDescription();
     data1.AddRecord(link1);
@@ -230,8 +230,8 @@ void SetDataLinkFuzz(FuzzedDataProvider &provider)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.readPermission = "readPermission";
-    privilege.writePermission = "writePermission";
+    privilege.readPermission = provider.ConsumeRandomLengthString();
+    privilege.writePermission = provider.ConsumeRandomLengthString();
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
 
     SetHapToken();
@@ -247,8 +247,8 @@ void SetDataFileFuzz(FuzzedDataProvider &provider)
     UnifiedData data1;
     std::string key;
     auto file1 = std::make_shared<File>();
-    file1->SetUri(svalue + "uri");
-    file1->SetRemoteUri(svalue + "remoteUri");
+    file1->SetUri(svalue + provider.ConsumeRandomLengthString());
+    file1->SetRemoteUri(svalue + provider.ConsumeRandomLengthString());
     file1->GetUri();
     file1->GetRemoteUri();
     file1->GetSize();
@@ -259,8 +259,8 @@ void SetDataFileFuzz(FuzzedDataProvider &provider)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.readPermission = "readPermission";
-    privilege.writePermission = "writePermission";
+    privilege.readPermission = provider.ConsumeRandomLengthString();
+    privilege.writePermission = provider.ConsumeRandomLengthString();
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
 
     SetHapToken();
@@ -276,8 +276,8 @@ void SetDataImageFuzz(FuzzedDataProvider &provider)
     UnifiedData data1;
     std::string key;
     auto image1 = std::make_shared<Image>();
-    image1->SetUri(svalue + "uri");
-    image1->SetRemoteUri(svalue + "remoteUri");
+    image1->SetUri(svalue + provider.ConsumeRandomLengthString());
+    image1->SetRemoteUri(svalue + provider.ConsumeRandomLengthString());
     data1.AddRecord(image1);
     UdmfClient::GetInstance().SetData(option1, data1, key);
 
@@ -285,8 +285,8 @@ void SetDataImageFuzz(FuzzedDataProvider &provider)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.readPermission = "readPermission";
-    privilege.writePermission = "writePermission";
+    privilege.readPermission = provider.ConsumeRandomLengthString();
+    privilege.writePermission = provider.ConsumeRandomLengthString();
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
 
     SetHapToken();
@@ -302,8 +302,8 @@ void SetDataVideoFuzz(FuzzedDataProvider &provider)
     UnifiedData data1;
     std::string key;
     auto video1 = std::make_shared<Video>();
-    video1->SetUri(svalue + "uri");
-    video1->SetRemoteUri(svalue + "remoteUri");
+    video1->SetUri(svalue + provider.ConsumeRandomLengthString());
+    video1->SetRemoteUri(svalue + provider.ConsumeRandomLengthString());
     data1.AddRecord(video1);
     UdmfClient::GetInstance().SetData(option1, data1, key);
 
@@ -311,8 +311,8 @@ void SetDataVideoFuzz(FuzzedDataProvider &provider)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.readPermission = "readPermission";
-    privilege.writePermission = "writePermission";
+    privilege.readPermission = provider.ConsumeRandomLengthString();
+    privilege.writePermission = provider.ConsumeRandomLengthString();
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
 
     SetHapToken();
@@ -339,8 +339,8 @@ void SetDataSystemDefinedRecordFuzz(FuzzedDataProvider &provider)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.readPermission = "readPermission";
-    privilege.writePermission = "writePermission";
+    privilege.readPermission = provider.ConsumeRandomLengthString();
+    privilege.writePermission = provider.ConsumeRandomLengthString();
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
 
     SetHapToken();
@@ -362,10 +362,10 @@ void SetDataSystemDefinedFormFuzz(FuzzedDataProvider &provider)
     systemDefinedForm1->SetDetails(details1);
     auto formId = 123;
     systemDefinedForm1->SetFormId(formId);
-    systemDefinedForm1->SetFormName(svalue + "formName");
-    systemDefinedForm1->SetModule(svalue + "module");
-    systemDefinedForm1->SetAbilityName(svalue + "abilityName");
-    systemDefinedForm1->SetBundleName(svalue + "bundleName");
+    systemDefinedForm1->SetFormName(svalue + provider.ConsumeRandomLengthString());
+    systemDefinedForm1->SetModule(svalue + provider.ConsumeRandomLengthString());
+    systemDefinedForm1->SetAbilityName(svalue + provider.ConsumeRandomLengthString());
+    systemDefinedForm1->SetBundleName(svalue + provider.ConsumeRandomLengthString());
     systemDefinedForm1->GetFormId();
     systemDefinedForm1->GetFormName();
     systemDefinedForm1->GetBundleName();
@@ -378,8 +378,8 @@ void SetDataSystemDefinedFormFuzz(FuzzedDataProvider &provider)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.readPermission = "readPermission";
-    privilege.writePermission = "writePermission";
+    privilege.readPermission = provider.ConsumeRandomLengthString();
+    privilege.writePermission = provider.ConsumeRandomLengthString();
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
 
     SetHapToken();
@@ -399,12 +399,12 @@ void SetDataSystemDefinedAppItemFuzz(FuzzedDataProvider &provider)
     UDDetails details1;
     details1.insert({skey, svalue});
     systemDefinedAppItem1->SetDetails(details1);
-    systemDefinedAppItem1->SetAppId(svalue + "appId");
-    systemDefinedAppItem1->SetAppName(svalue + "appName");
-    systemDefinedAppItem1->SetAppIconId(svalue + "appIconId");
-    systemDefinedAppItem1->SetAppLabelId(svalue + "appLabelId");
-    systemDefinedAppItem1->SetBundleName(svalue + "bundleName");
-    systemDefinedAppItem1->SetAbilityName(svalue + "abilityName");
+    systemDefinedAppItem1->SetAppId(svalue + provider.ConsumeRandomLengthString());
+    systemDefinedAppItem1->SetAppName(svalue + provider.ConsumeRandomLengthString());
+    systemDefinedAppItem1->SetAppIconId(svalue + provider.ConsumeRandomLengthString());
+    systemDefinedAppItem1->SetAppLabelId(svalue + provider.ConsumeRandomLengthString());
+    systemDefinedAppItem1->SetBundleName(svalue + provider.ConsumeRandomLengthString());
+    systemDefinedAppItem1->SetAbilityName(svalue + provider.ConsumeRandomLengthString());
     systemDefinedAppItem1->GetAppId();
     systemDefinedAppItem1->GetAppName();
     systemDefinedAppItem1->GetBundleName();
@@ -418,8 +418,8 @@ void SetDataSystemDefinedAppItemFuzz(FuzzedDataProvider &provider)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.readPermission = "readPermission";
-    privilege.writePermission = "writePermission";
+    privilege.readPermission = provider.ConsumeRandomLengthString();
+    privilege.writePermission = provider.ConsumeRandomLengthString();
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
 
     SetHapToken();
@@ -448,8 +448,8 @@ void SetDataSystemDefinedPixelMapFuzz(FuzzedDataProvider &provider)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.readPermission = "readPermission";
-    privilege.writePermission = "writePermission";
+    privilege.readPermission = provider.ConsumeRandomLengthString();
+    privilege.writePermission = provider.ConsumeRandomLengthString();
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
 
     SetHapToken();
@@ -475,18 +475,18 @@ void GetSummaryFuzz(FuzzedDataProvider &provider)
 
     auto plainText = std::make_shared<PlainText>();
     plainText->SetDetails(details);
-    plainText->SetContent(svalue + "content");
-    plainText->SetAbstract(svalue + "abstract");
+    plainText->SetContent(svalue + provider.ConsumeRandomLengthString());
+    plainText->SetAbstract(svalue + provider.ConsumeRandomLengthString());
     UData.AddRecord(plainText);
 
     auto file = std::make_shared<File>();
-    file->SetUri(svalue + "uri");
-    file->SetRemoteUri(svalue + "remoteUri");
+    file->SetUri(svalue + provider.ConsumeRandomLengthString());
+    file->SetRemoteUri(svalue + provider.ConsumeRandomLengthString());
     UData.AddRecord(file);
 
     auto image = std::make_shared<Image>();
-    image->SetUri(svalue + "uri");
-    image->SetRemoteUri(svalue + "remoteUri");
+    image->SetUri(svalue + provider.ConsumeRandomLengthString());
+    image->SetRemoteUri(svalue + provider.ConsumeRandomLengthString());
     UData.AddRecord(image);
 
     auto systemDefinedRecord = std::make_shared<SystemDefinedRecord>();
@@ -497,10 +497,10 @@ void GetSummaryFuzz(FuzzedDataProvider &provider)
     systemDefinedForm->SetDetails(details);
     auto formId = 123;
     systemDefinedForm->SetFormId(formId);
-    systemDefinedForm->SetFormName(svalue + "formName");
-    systemDefinedForm->SetModule(svalue + "module");
-    systemDefinedForm->SetAbilityName(svalue + "abilityName");
-    systemDefinedForm->SetBundleName(svalue + "bundleName");
+    systemDefinedForm->SetFormName(svalue + provider.ConsumeRandomLengthString());
+    systemDefinedForm->SetModule(svalue + provider.ConsumeRandomLengthString());
+    systemDefinedForm->SetAbilityName(svalue + provider.ConsumeRandomLengthString());
+    systemDefinedForm->SetBundleName(svalue + provider.ConsumeRandomLengthString());
     UData.AddRecord(systemDefinedForm);
 
     UdmfClient::GetInstance().SetData(option1, UData, key);
@@ -765,8 +765,8 @@ void SetDataProcessDragInAppFuzz(FuzzedDataProvider &provider)
     UnifiedData data1;
     std::string key;
     auto video1 = std::make_shared<Video>();
-    video1->SetUri(svalue + "uri");
-    video1->SetRemoteUri(svalue + "remoteUri");
+    video1->SetUri(svalue + provider.ConsumeRandomLengthString());
+    video1->SetRemoteUri(svalue + provider.ConsumeRandomLengthString());
     data1.AddRecord(video1);
     auto intentionDrag = UD_INTENTION_MAP.at(option1.intention);
     UdmfClient::GetInstance().SetAppShareOption(intentionDrag, ShareOptions::IN_APP);
@@ -776,8 +776,8 @@ void SetDataProcessDragInAppFuzz(FuzzedDataProvider &provider)
 
     QueryOption option2 = {.key = key};
     Privilege privilege;
-    privilege.readPermission = "readPermission";
-    privilege.writePermission = "writePermission";
+    privilege.readPermission = provider.ConsumeRandomLengthString();
+    privilege.writePermission = provider.ConsumeRandomLengthString();
     UdmfClient::GetInstance().AddPrivilege(option2, privilege);
 
     SetHapToken();
