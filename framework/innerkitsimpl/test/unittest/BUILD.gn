@@ -992,6 +992,7 @@ group("unittest") {
     ":UnifiedRecordTest",
     ":UtdClientTest",
     ":UtdConcurrentUpdateTest",
+    ":UtdDynamicUpdateTest",
     ":VideoTest",
   ]
 }
