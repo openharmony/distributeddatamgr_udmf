@@ -28,7 +28,7 @@ namespace OHOS {
 namespace UDMF {
 class UdmfServiceClient final : public UdmfService {
 public:
-    explicit UdmfServiceClient(const sptr<UdmfServiceProxy> &proxy);
+    explicit UdmfServiceClient(const sptr<IUdmfService> &proxy);
     ~UdmfServiceClient() override = default;
     static std::shared_ptr<UdmfServiceClient> GetInstance();
 
@@ -67,7 +67,7 @@ private:
     static std::mutex mutex_;
     static sptr<DistributedKv::IKvStoreDataService> kvDataServiceProxy_;
     static sptr<DistributedKv::IKvStoreDataService> GetDistributedKvDataService();
-    sptr<UdmfServiceProxy> udmfProxy_;
+    sptr<IUdmfService> udmfProxy_;
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -30,7 +30,7 @@ std::shared_ptr<UdmfServiceClient> UdmfServiceClient::instance_;
 std::mutex UdmfServiceClient::mutex_;
 sptr<DistributedKv::IKvStoreDataService> UdmfServiceClient::kvDataServiceProxy_;
 
-UdmfServiceClient::UdmfServiceClient(const sptr<UdmfServiceProxy> &proxy) : udmfProxy_(proxy)
+UdmfServiceClient::UdmfServiceClient(const sptr<IUdmfService> &proxy) : udmfProxy_(proxy)
 {
     LOG_INFO(UDMF_SERVICE, "construct");
 }
@@ -49,7 +49,7 @@ std::shared_ptr<UdmfServiceClient> UdmfServiceClient::GetInstance()
     if (service == nullptr) {
         return nullptr;
     }
-    sptr<UdmfServiceProxy> proxy = iface_cast<UdmfServiceProxy>(service);
+    sptr<IUdmfService> proxy = iface_cast<IUdmfService>(service);
     if (proxy == nullptr) {
         return nullptr;
     }
@@ -70,7 +70,7 @@ sptr<DistributedKv::IKvStoreDataService> UdmfServiceClient::GetDistributedKvData
     }
 
     auto remote = samgr->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
-    kvDataServiceProxy_ = iface_cast<DistributedKv::DataMgrServiceProxy>(remote);
+    kvDataServiceProxy_ = iface_cast<DistributedKv::IKvStoreDataService>(remote);
     if (kvDataServiceProxy_ == nullptr) {
         LOG_ERROR(UDMF_SERVICE, "initialize proxy failed.");
         return nullptr;
