@@ -646,6 +646,7 @@ Status UtdClient::InstallDynamicUtds(const std::string &bundleName,
         LOG_ERROR(UDMF_CLIENT, "GetCurrentActiveUserId failed");
         return E_ERROR;
     }
+    std::lock_guard<std::mutex> lock(updateUtdMutex_);
     auto status = CustomUtdStore::GetInstance().InstallDynamicUtds(customTypeCfgs, bundleName, userId);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Failed, status=%{public}d", status);
@@ -671,6 +672,7 @@ Status UtdClient::UninstallDynamicUtds(const std::string &bundleName, const std:
         LOG_ERROR(UDMF_CLIENT, "GetCurrentActiveUserId failed");
         return E_ERROR;
     }
+    std::lock_guard<std::mutex> lock(updateUtdMutex_);
     auto status = CustomUtdStore::GetInstance().UninstallDynamicUtds(typeIds, bundleName, userId);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Failed, status=%{public}d", status);

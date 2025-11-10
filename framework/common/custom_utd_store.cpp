@@ -249,6 +249,7 @@ Status CustomUtdStore::InstallDynamicUtds(const std::vector<TypeDescriptorCfg> &
 
     auto installedDynamicUtds = GetDynamicUtd(false, userId);
     auto installedTypes = GetCustomUtd(false, userId);
+    installedTypes.reserve(installedTypes.size() + installedDynamicUtds.size());
     installedTypes.insert(installedTypes.end(), installedDynamicUtds.begin(), installedDynamicUtds.end());
 
     CustomUtdCfgs typeCfgs = { dynamicUtds, {} };

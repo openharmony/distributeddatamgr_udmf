@@ -15,6 +15,9 @@
 
 #ifndef UDMF_UTD_CFGS_CHERCKER_H
 #define UDMF_UTD_CFGS_CHERCKER_H
+
+#include <regex>
+
 #include "utd_common.h"
 #include "visibility.h"
 namespace OHOS {
@@ -40,6 +43,8 @@ private:
     bool CanConstructDAG(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
         const std::vector<TypeDescriptorCfg> &customCfgs);
     bool CheckTypeCfgsSize(const std::vector<TypeDescriptorCfg> &typeCfgs);
+
+    static const std::regex typeIdPattern_;
 };
 }
 }
