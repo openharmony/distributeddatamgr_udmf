@@ -52,7 +52,8 @@
         "//foundation/distributeddatamgr/udmf:udmf_packages",
         "//foundation/distributeddatamgr/udmf/interfaces/cj:cj_unified_data_channel_ffi",
         "//foundation/distributeddatamgr/udmf/interfaces/cj:cj_uniform_type_descriptor_ffi",
-        "//foundation/distributeddatamgr/udmf/interfaces/components:udmfcomponents"
+        "//foundation/distributeddatamgr/udmf/interfaces/components:udmfcomponents",
+        "//foundation/distributeddatamgr/udmf/conf:utd_conf"
       ],
       "inner_kits": [
         {
