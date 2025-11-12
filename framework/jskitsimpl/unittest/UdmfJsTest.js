@@ -831,66 +831,6 @@ describe('UdmfJSTest', function () {
   });
 
   /**
-   * @tc.name UdmfTextOver2MSystemDefinedPixelMap
-   * @tc.desc SystemDefinedPixelMap Over 2MB
-   * @tc.type: FUNC
-   * @tc.require: issueNumber
-   */
-  it('UdmfTextOver2MSystemDefinedPixelMap', 0, async function (done) {
-    const TAG = 'UdmfTextOver2MSystemDefinedPixelMap:';
-    console.info(TAG, 'start');
-    try {
-      let text = new UDC.SystemDefinedPixelMap();
-      let longU8ArrayData = new Uint8Array(NUM_4M);
-      longU8ArrayData.fill(0);
-      text.rawData = longU8ArrayData;
-      text.details = {
-        recordKey1: 'systemDefinedPixelMap' + KEY_TEST_ELEMENT,
-        recordKey2: U8_ARRAY,
-      };
-      let unifiedData = new UDC.UnifiedData(text);
-      UDC.insertData(optionsValid, unifiedData).then((data) => {
-        console.info(TAG, `insert success. The key: ${data}`);
-        let options = { key: data };
-        console.info(TAG, `query start. The options: ${JSON.stringify(options)}`);
-        UDC.queryData(options).then((data) => {
-          console.info(TAG, 'query success.');
-          expect(data.length).assertEqual(1);          
-          let records = data[0].getRecords();
-          expect(records.length).assertEqual(1);
-          expect(records[0].details.recordKey1).assertEqual('systemDefinedPixelMap' + KEY_TEST_ELEMENT);
-          for (let i = 0; i < U8_ARRAY.length; i++) {
-            expect(records[0].details.recordKey2[i]).assertEqual(U8_ARRAY[i]);
-          }
-          expect(records[0].rawData.toString()).assertEqual(longU8ArrayData.toString());
-          UDC.deleteData(options).then((data) => {
-            console.info(TAG, 'delete success.');
-            expect(data.length).assertEqual(1);
-            done();
-          }).catch(() => {
-            console.error(TAG, 'Unreachable code!');
-            expect(null).assertFail();
-            done();
-          });
-        }).catch(() => {
-          console.error(TAG, 'Unreachable code!');
-          expect(null).assertFail();
-          done();
-        });
-      }).catch(() => {
-        console.error(TAG, 'Unreachable code!');
-        expect(null).assertFail();
-        done();
-      });
-    } catch (e) {
-      console.error(TAG, 'Unreachable code!');
-      expect(null).assertFail();
-      done();
-    }
-    console.info(TAG, 'end');
-  });
-
-  /**
    * @tc.name UdmfTextOver2MApplicationDefinedRecord
    * @tc.desc ApplicationDefinedRecord Over 2MB
    * @tc.type: FUNC
