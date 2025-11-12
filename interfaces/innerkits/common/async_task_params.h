@@ -65,7 +65,6 @@ struct AsyncHelper {
     std::shared_ptr<UnifiedData> data = std::make_shared<UnifiedData>();
     ProgressQueue progressQueue;
     DataLoadInfo acceptableInfo;
-    bool hasSavedAcceptableInfo = false;
 };
 
 enum ListenerStatus: int32_t {
