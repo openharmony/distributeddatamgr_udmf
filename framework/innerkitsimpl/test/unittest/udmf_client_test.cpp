@@ -3316,7 +3316,7 @@ HWTEST_F(UdmfClientTest, GetTypesLabels001, TestSize.Level1)
     text->SetDetails(details);
     auto plainText = std::make_shared<PlainText>();
     plainText->SetDetails(details);
-    std::vector<std::shared_ptr<UnifiedRecord>> records = {text, plainText};
+    std::vector<std::shared_ptr<UnifiedRecord>> records = {text, plainText, nullptr};
     data.AddRecords(records);
 
     std::vector<std::string> types = {"general.text", "general.plain-text"};
@@ -3324,22 +3324,6 @@ HWTEST_F(UdmfClientTest, GetTypesLabels001, TestSize.Level1)
     ASSERT_EQ(data.HasType("general.text"), true);
     ASSERT_EQ(data.HasType("general.plain-text"), true);
     ASSERT_EQ(data.HasType("general.html"), false);
-}
-
-/**
-* @tc.name: GetTypesLabels002
-* @tc.desc: test GetTypesLabels
-* @tc.type: FUNC
-*/
-HWTEST_F(UdmfClientTest, GetTypesLabels002, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "GetTypesLabels002 begin.");
-    UnifiedData data;
-    std::vector<std::shared_ptr<UnifiedRecord>> records = {std::make_shared<UnifiedRecord>()};
-    records[0]->dataType_ = static_cast<UDType>(UD_BUTT + 1);
-    data.AddRecords(records);
-
-    ASSERT_TRUE(data.GetTypesLabels().empty());
 }
 
 /**

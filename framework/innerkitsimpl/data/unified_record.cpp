@@ -64,13 +64,9 @@ std::vector<std::string> UnifiedRecord::GetTypes() const
     std::vector<std::string> types;
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     for (auto it = entries_->begin(); it != entries_->end(); it++) {
-        if (!it->first.empty()) {
-            types.push_back(it->first);
-        }
+        types.push_back(it->first);
     }
-    if (!utdId2_.empty()) {
-        types.push_back(utdId2_);
-    }
+    types.push_back(utdId2_);
     return types;
 }
 
