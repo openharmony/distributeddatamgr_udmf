@@ -20,29 +20,40 @@
 #include <set>
 #include <map>
 #include <cstdint>
-#include "utd_common.h"
 #include "custom_utd_json_parser.h"
+#include "utd_common.h"
+#include "visibility.h"
+
 namespace OHOS {
 namespace UDMF {
 class CustomUtdStore {
 public:
     static CustomUtdStore &GetInstance();
     std::vector<TypeDescriptorCfg> GetCustomUtd(bool isHap, int32_t userId);
-    int32_t SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes, int32_t user);
+    std::vector<TypeDescriptorCfg> GetDynamicUtd(bool isHap, int32_t userId);
     bool InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user,
-        std::vector<TypeDescriptorCfg> &customTyepCfgs);
+        std::vector<TypeDescriptorCfg> &customTypeCfgs);
     bool UninstallCustomUtds(const std::string &bundleName, int32_t user,
-        std::vector<TypeDescriptorCfg> &customTyepCfgs);
+        std::vector<TypeDescriptorCfg> &customTypeCfgs);
     UtdFileInfo GetCustomUtdInfo(bool isHap, int32_t userId);
+    Status InstallDynamicUtds(const std::vector<TypeDescriptorCfg> &dynamicUtds,
+        const std::string &bundleName, int32_t user);
+    Status UninstallDynamicUtds(const std::vector<std::string> &dynamicUtds,
+        const std::string &bundleName, int32_t user);
+    Status UninstallDynamicUtds(const std::string &bundleName, int32_t userId);
 
 private:
     CustomUtdStore();
     ~CustomUtdStore();
+    int32_t ReadTypeCfgs(const std::string &filePath, std::vector<TypeDescriptorCfg> &utdTypes);
+    int32_t SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes,
+        const std::string &fileDir, const std::string &filePath);
     int32_t SaveCfgFile(const std::string &jsonData, const std::string &cfgFilePath);
     bool CreateDirectory(const std::string &path) const;
     static void ProcessUtdForSave(const CustomUtdCfgs &utdTypes, std::vector<TypeDescriptorCfg> &customTyepCfgs,
         const std::string &bundleName);
     std::string GetCustomUtdPath(bool isHap, int32_t userId);
+    std::string GetDynamicUtdPath(bool isHap, int32_t userId);
 
     CustomUtdJsonParser utdJsonParser_;
 };

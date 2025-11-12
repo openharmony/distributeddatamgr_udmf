@@ -21,6 +21,7 @@
 #include "logger.h"
 #include "udmf_capi_common.h"
 #include "html.h"
+#include "udmf_img_extractor.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
@@ -163,5 +164,34 @@ HWTEST_F(HtmlTest, SetPlainContent002, TestSize.Level1)
     html.SetPlainContent(plainContent);
     EXPECT_NE(html.plainContent_, plainContent);
     LOG_INFO(UDMF_TEST, "SetPlainContent002 end.");
+}
+
+/**
+* @tc.name: ExtractImgSrc001
+* @tc.desc: Normal testcase of ExtractImgSrc
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, ExtractImgSrc001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc001 begin.");
+    UdmfImgExtractor extractor;
+
+    std::string html = R"HTML(
+        <html>
+            <body>
+                <img src="file:///example.com/img1.png" />
+                <img src="file:///test.com/img2.jpg" />
+                <img src="file:///cdn.com/photo.png" />
+            </body>
+        </html>
+    )HTML";
+
+    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+
+    ASSERT_EQ(uris.size(), 3);
+    EXPECT_EQ(uris[0], "file:///example.com/img1.png");
+    EXPECT_EQ(uris[1], "file:///test.com/img2.jpg");
+    EXPECT_EQ(uris[2], "file:///cdn.com/photo.png");
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc001 end.");
 }
 } // OHOS::Test

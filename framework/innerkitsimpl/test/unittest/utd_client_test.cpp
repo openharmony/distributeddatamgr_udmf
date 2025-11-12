@@ -1684,8 +1684,7 @@ HWTEST_F(UtdClientTest, IsValidMimeType001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "IsValidMimeType001 begin.");
     const std::string mimeType = "mimeType?";
-    UtdClient utdClient;
-    bool ret = utdClient.IsValidMimeType(mimeType);
+    bool ret = UtdClient::GetInstance().IsValidMimeType(mimeType);
     EXPECT_EQ(ret, false);
     LOG_INFO(UDMF_TEST, "IsValidMimeType001 end.");
 }
@@ -1699,8 +1698,7 @@ HWTEST_F(UtdClientTest, IsValidMimeType002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "IsValidMimeType002 begin.");
     const std::string mimeType = "mimeType:";
-    UtdClient utdClient;
-    bool ret = utdClient.IsValidMimeType(mimeType);
+    bool ret = UtdClient::GetInstance().IsValidMimeType(mimeType);
     EXPECT_EQ(ret, false);
     LOG_INFO(UDMF_TEST, "IsValidMimeType002 end.");
 }
@@ -1714,8 +1712,7 @@ HWTEST_F(UtdClientTest, IsValidMimeType003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "IsValidMimeType003 begin.");
     const std::string mimeType = "mimeType=";
-    UtdClient utdClient;
-    bool ret = utdClient.IsValidMimeType(mimeType);
+    bool ret = UtdClient::GetInstance().IsValidMimeType(mimeType);
     EXPECT_EQ(ret, false);
     LOG_INFO(UDMF_TEST, "IsValidMimeType003 end.");
 }
@@ -1729,8 +1726,7 @@ HWTEST_F(UtdClientTest, IsValidMimeType004, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "IsValidMimeType004 begin.");
     const std::string mimeType = "mimeType\\";
-    UtdClient utdClient;
-    bool ret = utdClient.IsValidMimeType(mimeType);
+    bool ret = UtdClient::GetInstance().IsValidMimeType(mimeType);
     EXPECT_EQ(ret, false);
     LOG_INFO(UDMF_TEST, "IsValidMimeType004 end.");
 }
@@ -1745,8 +1741,7 @@ HWTEST_F(UtdClientTest, GetFlexibleTypeDescriptor001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "GetFlexibleTypeDescriptor001 begin.");
     const std::string typeId = "";
     std::shared_ptr<TypeDescriptor> descriptor = nullptr;
-    UtdClient utdClient;
-    Status ret = utdClient.GetFlexibleTypeDescriptor(typeId, descriptor);
+    Status ret = UtdClient::GetInstance().GetFlexibleTypeDescriptor(typeId, descriptor);
     EXPECT_EQ(ret, Status::E_ERROR);
     LOG_INFO(UDMF_TEST, "GetFlexibleTypeDescriptor001 end.");
 }
@@ -1763,8 +1758,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension005, TestSize.Leve
     const std::string fileExtension = "fileExtension";
     std::vector<std::string> typeIds = std::vector<std::string>();
     const std::string belongsTo = "";
-    UtdClient utdClient;
-    Status ret = utdClient.GetUniformDataTypesByFilenameExtension(fileExtension, typeIds, belongsTo);
+    Status ret = UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(fileExtension, typeIds, belongsTo);
     EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtension005 end.");
 }
@@ -1795,9 +1789,8 @@ HWTEST_F(UtdClientTest, GetTypeIdFromCfg001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetTypeIdFromCfg001 begin.");
     const std::string mimeType = "mimeType";
-    UtdClient utdClient;
-    utdClient.descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
-    std::string ret = utdClient.GetTypeIdFromCfg(mimeType);
+    UtdClient::GetInstance().descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
+    std::string ret = UtdClient::GetInstance().GetTypeIdFromCfg(mimeType);
     EXPECT_EQ(ret, "");
     LOG_INFO(UDMF_TEST, "GetTypeIdFromCfg001 end.");
 }
@@ -1813,8 +1806,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMEType004, TestSize.Level1)
     const std::string mimeType = "mimeType";
     std::vector<std::string> typeIds = std::vector<std::string>();
     const std::string belongsTo = "";
-    UtdClient utdClient;
-    Status ret = utdClient.GetUniformDataTypesByMIMEType(mimeType, typeIds, belongsTo);
+    Status ret = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, typeIds, belongsTo);
     EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMEType004 end.");
 }
@@ -1829,8 +1821,7 @@ HWTEST_F(UtdClientTest, IsUtd005, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "IsUtd005 begin.");
     std::string typeId = "";
     bool result = true;
-    UtdClient utdClient;
-    Status ret = utdClient.IsUtd(typeId, result);
+    Status ret = UtdClient::GetInstance().IsUtd(typeId, result);
     EXPECT_EQ(result, false);
     EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "IsUtd005 end.");
@@ -1844,8 +1835,7 @@ HWTEST_F(UtdClientTest, IsUtd005, TestSize.Level1)
 HWTEST_F(UtdClientTest, TryReloadCustomUtdTest001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "TryReloadCustomUtdTest001 begin.");
-    UtdClient utdClient;
-    bool ret = utdClient.TryReloadCustomUtd();
+    bool ret = UtdClient::GetInstance().TryReloadCustomUtd();
     EXPECT_FALSE(ret);
     LOG_INFO(UDMF_TEST, "TryReloadCustomUtdTest001 end.");
 }
@@ -1858,9 +1848,8 @@ HWTEST_F(UtdClientTest, TryReloadCustomUtdTest001, TestSize.Level1)
 HWTEST_F(UtdClientTest, TryReloadCustomUtdTest002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "TryReloadCustomUtdTest002 begin.");
-    UtdClient utdClient;
     std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
-    bool ret = utdClient.TryReloadCustomUtd();
+    bool ret = UtdClient::GetInstance().TryReloadCustomUtd();
     EXPECT_FALSE(ret);
     LOG_INFO(UDMF_TEST, "TryReloadCustomUtdTest002 end.");
 }
@@ -1873,13 +1862,12 @@ HWTEST_F(UtdClientTest, TryReloadCustomUtdTest002, TestSize.Level1)
 HWTEST_F(UtdClientTest, TryReloadCustomUtdTest003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "TryReloadCustomUtdTest003 begin.");
-    UtdClient utdClient;
     std::string filePath = CustomUtdStore::GetInstance().GetCustomUtdPath(false, USERID);
     auto now = std::chrono::system_clock::now();
     auto ftime = std::filesystem::file_time_type::clock::now() + (now - std::chrono::system_clock::now());
     std::filesystem::last_write_time(filePath, ftime);
     std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
-    bool ret = utdClient.TryReloadCustomUtd();
+    bool ret = UtdClient::GetInstance().TryReloadCustomUtd();
     EXPECT_TRUE(ret);
     LOG_INFO(UDMF_TEST, "TryReloadCustomUtdTest003 end.");
 }
@@ -1892,24 +1880,22 @@ HWTEST_F(UtdClientTest, TryReloadCustomUtdTest003, TestSize.Level1)
 HWTEST_F(UtdClientTest, TryReloadCustomUtdTest004, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "TryReloadCustomUtdTest004 begin.");
-    UtdClient utdClient;
     std::string filePath = CustomUtdStore::GetInstance().GetCustomUtdPath(false, USERID);
     std::filesystem::resize_file(filePath, USERID * USERID);
-    bool ret = utdClient.TryReloadCustomUtd();
+    bool ret = UtdClient::GetInstance().TryReloadCustomUtd();
     EXPECT_FALSE(ret);
     LOG_INFO(UDMF_TEST, "TryReloadCustomUtdTest004 end.");
 }
 
 bool UtdClientTest::TryReloadCustomUtdTest()
 {
-    UtdClient utdClient;
     std::string filePath = CustomUtdStore::GetInstance().GetCustomUtdPath(false, USERID);
     auto now = std::chrono::system_clock::now();
     auto ftime = std::filesystem::file_time_type::clock::now() + (now - std::chrono::system_clock::now());
     std::filesystem::last_write_time(filePath, ftime);
     std::filesystem::resize_file(filePath, USERID * USERID);
     std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
-    return utdClient.TryReloadCustomUtd();
+    return UtdClient::GetInstance().TryReloadCustomUtd();
 }
 
 /**
@@ -1949,12 +1935,11 @@ HWTEST_F(UtdClientTest, TryReloadCustomUtdTest005, TestSize.Level0)
 HWTEST_F(UtdClientTest, GetTypeDescriptorTest001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetTypeDescriptorTest001 begin.");
-    UtdClient utdClient;
     std::string typeId("NotExist");
     std::shared_ptr<TypeDescriptor> descriptor = nullptr;
     std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
 
-    auto ret = utdClient.GetTypeDescriptor(typeId, descriptor);
+    auto ret = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
     EXPECT_EQ(ret, 0);
     LOG_INFO(UDMF_TEST, "GetTypeDescriptorTest001 end.");
 }
@@ -1967,7 +1952,6 @@ HWTEST_F(UtdClientTest, GetTypeDescriptorTest001, TestSize.Level1)
 HWTEST_F(UtdClientTest, GetTypeDescriptorTest002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetTypeDescriptorTest002 begin.");
-    UtdClient utdClient;
     std::string typeId("NotExist");
     std::shared_ptr<TypeDescriptor> descriptor = nullptr;
 
@@ -1977,7 +1961,7 @@ HWTEST_F(UtdClientTest, GetTypeDescriptorTest002, TestSize.Level1)
     auto ftime = std::filesystem::file_time_type::clock::now() + (now - std::chrono::system_clock::now());
     std::filesystem::last_write_time(filePath, ftime);
 
-    auto ret = utdClient.GetTypeDescriptor(typeId, descriptor);
+    auto ret = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
     EXPECT_EQ(ret, 0);
     LOG_INFO(UDMF_TEST, "GetTypeDescriptorTest002 end.");
 }
@@ -1990,7 +1974,6 @@ HWTEST_F(UtdClientTest, GetTypeDescriptorTest002, TestSize.Level1)
 HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionTest001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionTest001 begin.");
-    UtdClient utdClient;
     std::string extension = "NotExist";
     std::string blongsToType = "general.object";
     std::string currType;
@@ -2001,7 +1984,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionTest001, TestSize.L
     auto ftime = std::filesystem::file_time_type::clock::now() + (now - std::chrono::system_clock::now());
     std::filesystem::last_write_time(filePath, ftime);
 
-    auto ret = utdClient.GetUniformDataTypeByFilenameExtension(extension, currType, blongsToType);
+    auto ret = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(extension, currType, blongsToType);
     EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionTest001 end.");
 }
@@ -2014,7 +1997,6 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionTest001, TestSize.L
 HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionTest002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionTest002 begin.");
-    UtdClient utdClient;
     std::string extension = ".mp3";
     std::string blongsToType = "NotExist";
     std::string currType;
@@ -2025,7 +2007,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionTest002, TestSize.L
     auto ftime = std::filesystem::file_time_type::clock::now() + (now - std::chrono::system_clock::now());
     std::filesystem::last_write_time(filePath, ftime);
 
-    auto ret = utdClient.GetUniformDataTypeByFilenameExtension(extension, currType, blongsToType);
+    auto ret = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(extension, currType, blongsToType);
     EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByFilenameExtensionTest002 end.");
 }
@@ -2038,7 +2020,6 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtensionTest002, TestSize.L
 HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtensionTest007, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtensionTest007 begin.");
-    UtdClient utdClient;
     std::string fileExtension = "fileExtension";
     std::vector<std::string> typeIds = std::vector<std::string>();
     std::string belongsTo = "";
@@ -2049,7 +2030,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtensionTest007, TestSize.
     auto ftime = std::filesystem::file_time_type::clock::now() + (now - std::chrono::system_clock::now());
     std::filesystem::last_write_time(filePath, ftime);
 
-    auto ret = utdClient.GetUniformDataTypesByFilenameExtension(fileExtension, typeIds, belongsTo);
+    auto ret = UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(fileExtension, typeIds, belongsTo);
     EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByFilenameExtensionTest007 end.");
 }
@@ -2062,7 +2043,6 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtensionTest007, TestSize.
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeTest008, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeTest008 begin.");
-    UtdClient utdClient;
     std::string mimeType = "";
     std::string blongsToType = "test02";
     std::string currType;
@@ -2073,7 +2053,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeTest008, TestSize.Level1)
     auto ftime = std::filesystem::file_time_type::clock::now() + (now - std::chrono::system_clock::now());
     std::filesystem::last_write_time(filePath, ftime);
 
-    auto ret = utdClient.GetUniformDataTypeByMIMEType(mimeType, currType, blongsToType);
+    auto ret = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(mimeType, currType, blongsToType);
     EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeTest008 end.");
 }
@@ -2087,10 +2067,9 @@ HWTEST_F(UtdClientTest, GetTypeIdFromCfgTest002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetTypeIdFromCfgTest002 begin.");
     std::string mimeType = "mimeType*";
-    UtdClient utdClient;
-    utdClient.descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
+    UtdClient::GetInstance().descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
 
-    std::string ret = utdClient.GetTypeIdFromCfg(mimeType);
+    std::string ret = UtdClient::GetInstance().GetTypeIdFromCfg(mimeType);
     EXPECT_EQ(ret, "");
     LOG_INFO(UDMF_TEST, "GetTypeIdFromCfgTest002 end.");
 }
@@ -2111,9 +2090,8 @@ HWTEST_F(UtdClientTest, GetTypeIdFromCfgTest003, TestSize.Level1)
     std::filesystem::last_write_time(filePath, ftime);
 
     std::string mimeType = "mimeType*";
-    UtdClient utdClient;
-    utdClient.descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
-    std::string ret = utdClient.GetTypeIdFromCfg(mimeType);
+    UtdClient::GetInstance().descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
+    std::string ret = UtdClient::GetInstance().GetTypeIdFromCfg(mimeType);
     EXPECT_EQ(ret, "");
     LOG_INFO(UDMF_TEST, "GetTypeIdFromCfgTest003 end.");
 }
@@ -2126,12 +2104,11 @@ HWTEST_F(UtdClientTest, GetTypeIdFromCfgTest003, TestSize.Level1)
 HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMETypeTest005, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMETypeTest005 begin.");
-    UtdClient utdClient;
     std::string mimeType = "video/x-ms-asf";
     std::vector<std::string> currTypes;
     std::string blongsToType = "general.media";
 
-    auto ret = utdClient.GetUniformDataTypesByMIMEType(mimeType, currTypes, blongsToType);
+    auto ret = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes, blongsToType);
     EXPECT_EQ(ret, Status::E_OK);
     std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
     std::string filePath = CustomUtdStore::GetInstance().GetCustomUtdPath(false, USERID);
@@ -2139,7 +2116,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMETypeTest005, TestSize.Level1)
     auto ftime = std::filesystem::file_time_type::clock::now() + (now - std::chrono::system_clock::now());
     std::filesystem::last_write_time(filePath, ftime);
 
-    ret = utdClient.GetUniformDataTypesByMIMEType(mimeType, currTypes, blongsToType);
+    ret = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes, blongsToType);
     EXPECT_EQ(ret, Status::E_OK);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMETypeTest005 end.");
 }
@@ -2155,7 +2132,6 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMETypeTest006, TestSize.Level1)
     std::string mimeType = "mimeType";
     std::vector<std::string> typeIds = std::vector<std::string>();
     std::string belongsTo = "";
-    UtdClient utdClient;
 
     std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
     std::string filePath = CustomUtdStore::GetInstance().GetCustomUtdPath(false, USERID);
@@ -2163,7 +2139,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMETypeTest006, TestSize.Level1)
     auto ftime = std::filesystem::file_time_type::clock::now() + (now - std::chrono::system_clock::now());
     std::filesystem::last_write_time(filePath, ftime);
 
-    auto ret = utdClient.GetUniformDataTypesByMIMEType(mimeType, typeIds, belongsTo);
+    auto ret = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, typeIds, belongsTo);
     EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMETypeTest006 end.");
 }
@@ -2176,14 +2152,13 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMETypeTest006, TestSize.Level1)
 HWTEST_F(UtdClientTest, InitTest001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "InitTest001 begin.");
-    UtdClient utdClient;
-    utdClient.descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
+    UtdClient::GetInstance().descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
     TypeDescriptorCfg cfg;
     cfg.typeId = "com.example.utdTest.document";
     cfg.filenameExtensions = { ".my-doc", ".my-document" };
-    utdClient.descriptorCfgs_.push_back(cfg);
+    UtdClient::GetInstance().descriptorCfgs_.push_back(cfg);
 
-    auto ret = utdClient.Init();
+    auto ret = UtdClient::GetInstance().InitializeUtdTypes();
     EXPECT_TRUE(ret);
     LOG_INFO(UDMF_TEST, "InitTest001 end.");
 }
@@ -2196,11 +2171,10 @@ HWTEST_F(UtdClientTest, InitTest001, TestSize.Level1)
 HWTEST_F(UtdClientTest, GetTypeIdsFromCfgtest001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetTypeIdsFromCfgtest001 begin.");
-    UtdClient utdClient;
     std::string mimeType = "application/my-doc";
-    utdClient.descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
+    UtdClient::GetInstance().descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
 
-    auto ret = utdClient.GetTypeIdsFromCfg(mimeType);
+    auto ret = UtdClient::GetInstance().GetTypeIdsFromCfg(mimeType);
     EXPECT_TRUE(ret.empty());
     LOG_INFO(UDMF_TEST, "GetTypeIdsFromCfgtest001 end.");
 }
@@ -2213,15 +2187,14 @@ HWTEST_F(UtdClientTest, GetTypeIdsFromCfgtest001, TestSize.Level1)
 HWTEST_F(UtdClientTest, GetTypeIdsFromCfgtest002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetTypeIdsFromCfgtest002 begin.");
-    UtdClient utdClient;
     std::string mimeType = "application/my-doc";
-    utdClient.descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
+    UtdClient::GetInstance().descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
     TypeDescriptorCfg cfg;
     cfg.typeId = "com.example.utdTest.document";
     cfg.mimeTypes = { "application/my-doc", "application/my-document" };
-    utdClient.descriptorCfgs_.push_back(cfg);
+    UtdClient::GetInstance().descriptorCfgs_.push_back(cfg);
 
-    auto ret = utdClient.GetTypeIdsFromCfg(mimeType);
+    auto ret = UtdClient::GetInstance().GetTypeIdsFromCfg(mimeType);
     EXPECT_FALSE(ret.empty());
 
     std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
@@ -2230,7 +2203,7 @@ HWTEST_F(UtdClientTest, GetTypeIdsFromCfgtest002, TestSize.Level1)
     auto ftime = std::filesystem::file_time_type::clock::now() + (now - std::chrono::system_clock::now());
     std::filesystem::last_write_time(filePath, ftime);
 
-    ret = utdClient.GetTypeIdsFromCfg(mimeType);
+    ret = UtdClient::GetInstance().GetTypeIdsFromCfg(mimeType);
     EXPECT_FALSE(ret.empty());
     LOG_INFO(UDMF_TEST, "GetTypeIdsFromCfgtest002 end.");
 }
@@ -2244,15 +2217,14 @@ HWTEST_F(UtdClientTest, GetTypeIdFromCfg002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetTypeIdFromCfg002 begin.");
     std::string mimeType = "";
-    UtdClient utdClient;
-    utdClient.descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
-    auto ret = utdClient.GetTypeIdFromCfg(mimeType);
+    UtdClient::GetInstance().descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
+    auto ret = UtdClient::GetInstance().GetTypeIdFromCfg(mimeType);
     EXPECT_EQ(ret, "");
     mimeType = "mimeType";
-    ret = utdClient.GetTypeIdFromCfg(mimeType);
+    ret = UtdClient::GetInstance().GetTypeIdFromCfg(mimeType);
     EXPECT_EQ(ret, "");
     mimeType = "mimeType*";
-    ret = utdClient.GetTypeIdFromCfg(mimeType);
+    ret = UtdClient::GetInstance().GetTypeIdFromCfg(mimeType);
     EXPECT_EQ(ret, "");
     LOG_INFO(UDMF_TEST, "GetTypeIdFromCfg002 end.");
 }
@@ -2266,9 +2238,8 @@ HWTEST_F(UtdClientTest, GetTypeIdFromCfg003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetTypeIdFromCfg003 begin.");
     const std::string mimeType = "mimeType";
-    UtdClient utdClient;
-    utdClient.descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
-    std::string ret = utdClient.GetTypeIdFromCfg(mimeType);
+    UtdClient::GetInstance().descriptorCfgs_ = std::vector<TypeDescriptorCfg>();
+    std::string ret = UtdClient::GetInstance().GetTypeIdFromCfg(mimeType);
     EXPECT_EQ(ret, "");
     std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
     std::string filePath = CustomUtdStore::GetInstance().GetCustomUtdPath(false, USERID);
@@ -2276,7 +2247,7 @@ HWTEST_F(UtdClientTest, GetTypeIdFromCfg003, TestSize.Level1)
     auto ftime = std::filesystem::file_time_type::clock::now() + (now - std::chrono::system_clock::now());
     std::filesystem::last_write_time(filePath, ftime);
 
-    ret = utdClient.GetTypeIdFromCfg(mimeType);
+    ret = UtdClient::GetInstance().GetTypeIdFromCfg(mimeType);
     EXPECT_EQ(ret, "");
     LOG_INFO(UDMF_TEST, "GetTypeIdFromCfg003 end.");
 }
@@ -2323,8 +2294,7 @@ HWTEST_F(UtdClientTest, IsHapTokenType001, TestSize.Level1)
     };
     auto tokenID = AccessTokenKit::AllocHapToken(info, policy);
     SetSelfTokenID(tokenID.tokenIDEx);
-    UtdClient utdClient;
-    bool ret = utdClient.IsHapTokenType();
+    bool ret = UtdClient::GetInstance().IsHapTokenType();
     EXPECT_TRUE(ret);
     LOG_INFO(UDMF_TEST, "IsHapTokenType001 end.");
 }

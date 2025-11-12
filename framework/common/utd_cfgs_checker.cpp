@@ -15,7 +15,6 @@
 #define LOG_TAG "UtdCfgsChecker"
 #include "utd_cfgs_checker.h"
 
-#include <regex>
 #include "utd_graph.h"
 #include "logger.h"
 
@@ -24,6 +23,14 @@ namespace UDMF {
 constexpr const char *TYPE_ID_REGEX = "[a-zA-Z0-9/.-]+$";
 constexpr const char FILE_EXTENSION_PREFIX = '.';
 constexpr const int32_t MAX_UTD_SIZE = 50;
+constexpr const int32_t MAX_TYPEID_SIZE = 127;
+constexpr const int32_t MAX_EXTENSION_SIZE = 127;
+constexpr const int32_t MAX_MIMETYPE_SIZE = 127;
+constexpr const int32_t MAX_DESCRIPTION_SIZE = 255;
+constexpr const int32_t MAX_REFERENCE_SIZE = 255;
+constexpr const int32_t MAX_ICON_FILE_SIZE = 255;
+
+const std::regex UtdCfgsChecker::typeIdPattern_(TYPE_ID_REGEX);
 
 UtdCfgsChecker::UtdCfgsChecker()
 {
@@ -39,71 +46,120 @@ UtdCfgsChecker &UtdCfgsChecker::GetInstance()
     return *instance;
 }
 
-bool UtdCfgsChecker::CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
+Status UtdCfgsChecker::CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
     const std::vector<TypeDescriptorCfg> &customCfgs, const std::string &bundleName)
 {
-    if (!CheckTypesFormat(typeCfgs, bundleName)) {
-        LOG_ERROR(UDMF_CLIENT, "CheckTypesFormat not pass, bundleName: %{public}s.", bundleName.c_str());
-        return false;
+    if (!CheckTypeCfgsFormat(typeCfgs)) {
+        LOG_ERROR(UDMF_CLIENT, "CheckTypeCfgsFormat not pass, bundleName: %{public}s.", bundleName.c_str());
+        return E_FORMAT_ERROR;
+    }
+    auto status = CheckTypeIdsContent(typeCfgs, bundleName);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "CheckTypeIdsContent not pass, bundleName: %{public}s, status = %{public}d.",
+            bundleName.c_str(), status);
+        return status;
     }
     if (!CheckTypesRelation(typeCfgs, presetCfgs, customCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "CheckTypesRelation not pass, bundleName: %{public}s.", bundleName.c_str());
-        return false;
+        return E_CONTENT_ERROR;
     }
-    return true;
+    return E_OK;
 }
 
-bool UtdCfgsChecker::CheckTypesFormat(CustomUtdCfgs &typeCfgs, const std::string &bundleName)
+Status UtdCfgsChecker::CheckTypeIdsContent(CustomUtdCfgs &typeCfgs, const std::string &bundleName)
 {
 #ifndef CROSS_PLATFORM
     try {
 #endif
         for (auto declarationType: typeCfgs.first) {
-            if (!std::regex_match(declarationType.typeId, std::regex(bundleName + TYPE_ID_REGEX))) {
+            if (declarationType.typeId.find(bundleName) != 0) {
+                LOG_ERROR(UDMF_CLIENT, "Declaration typeId does not start with bundleName");
+                return E_CONTENT_ERROR;
+            }
+            if (!std::regex_match(declarationType.typeId, typeIdPattern_)) {
                 LOG_ERROR(UDMF_CLIENT, "Declaration typeId check failed, bundleName: %{public}s", bundleName.c_str());
-                return false;
+                return E_FORMAT_ERROR;
             }
         }
         for (auto referenceTypes: typeCfgs.second) {
-            if (!std::regex_match(referenceTypes.typeId, std::regex(TYPE_ID_REGEX))) {
+            if (!std::regex_match(referenceTypes.typeId, typeIdPattern_)) {
                 LOG_ERROR(UDMF_CLIENT, "Reference typeId check failed, bundleName: %{public}s", bundleName.c_str());
-                return false;
+                return E_FORMAT_ERROR;
             }
         }
 #ifndef CROSS_PLATFORM
     } catch (const std::regex_error& e) {
         LOG_ERROR(UDMF_CLIENT, "catch regex_error, bundleName: %{public}s.", bundleName.c_str());
-        return false;
+        return E_FORMAT_ERROR;
     }
 #endif
-    return CheckTypesOptions(typeCfgs, bundleName);
+    return E_OK;
 }
 
-bool UtdCfgsChecker::CheckTypesOptions(CustomUtdCfgs &typeCfgs, const std::string &bundleName)
+bool UtdCfgsChecker::CheckTypeCfgsFormat(const CustomUtdCfgs &typeCfgs)
 {
-    std::vector<TypeDescriptorCfg> inputTypeCfgs;
-    if (!typeCfgs.first.empty()) {
-        inputTypeCfgs.insert(inputTypeCfgs.end(), typeCfgs.first.begin(), typeCfgs.first.end());
+    auto allTypes = typeCfgs.first;
+    allTypes.insert(allTypes.end(), typeCfgs.second.begin(), typeCfgs.second.end());
+    return CheckTypeCfgsSize(allTypes);
+}
+
+bool UtdCfgsChecker::CheckTypeCfgsSize(const std::vector<TypeDescriptorCfg> &typeCfgs)
+{
+    if (typeCfgs.empty() || typeCfgs.size() > MAX_UTD_SIZE) {
+        LOG_ERROR(UDMF_CLIENT, "typeCfgs is empty or size exceeds max size");
+        return false;
     }
-    if (!typeCfgs.second.empty()) {
-        inputTypeCfgs.insert(inputTypeCfgs.end(), typeCfgs.second.begin(), typeCfgs.second.end());
-    }
-    for (TypeDescriptorCfg &typeCfg : inputTypeCfgs) {
-        for (std::string filenames : typeCfg.filenameExtensions) {
-            if (filenames.size() <= 1 || filenames[0] != FILE_EXTENSION_PREFIX) {
-                LOG_ERROR(UDMF_CLIENT, "Extension not valid, bundleName: %{public}s.", bundleName.c_str());
-                return false;
-            }
-        }
-        if (typeCfg.belongingToTypes.empty()) {
-            LOG_ERROR(UDMF_CLIENT, "BelongingToTypes can not be empty, bundleName: %{public}s.", bundleName.c_str());
+    for (auto &typeCfg : typeCfgs) {
+        if (typeCfg.typeId.empty() || typeCfg.typeId.size() > MAX_TYPEID_SIZE) {
+            LOG_ERROR(UDMF_CLIENT, "typeId format error");
             return false;
         }
-        for (std::string mimeType : typeCfg.mimeTypes) {
-            if (mimeType.empty()) {
-                LOG_ERROR(UDMF_CLIENT, "mimeType can not be an empty string");
+        if (typeCfg.belongingToTypes.empty() || typeCfg.belongingToTypes.size() > MAX_UTD_SIZE) {
+            LOG_ERROR(UDMF_CLIENT, "BelongingToTypes format error");
+            return false;
+        }
+        for (auto &typeId : typeCfg.belongingToTypes) {
+            if (typeId.empty() || typeId.size() > MAX_TYPEID_SIZE) {
+                LOG_ERROR(UDMF_CLIENT, "BelongingToTypes format error");
                 return false;
             }
+        }
+        if (typeCfg.filenameExtensions.size() > MAX_UTD_SIZE || typeCfg.mimeTypes.size() > MAX_UTD_SIZE) {
+            LOG_ERROR(UDMF_CLIENT, "length format error");
+            return false;
+        }
+        for (auto &filenames : typeCfg.filenameExtensions) {
+            if (filenames.size() <= 1 || filenames[0] != FILE_EXTENSION_PREFIX ||
+                filenames.size() > MAX_EXTENSION_SIZE) {
+                LOG_ERROR(UDMF_CLIENT, "Extension not valid");
+                return false;
+            }
+        }
+        for (auto &mimeType : typeCfg.mimeTypes) {
+            if (mimeType.empty() || mimeType.size() > MAX_MIMETYPE_SIZE) {
+                LOG_ERROR(UDMF_CLIENT, "mimeType format error");
+                return false;
+            }
+        }
+        if (typeCfg.description.size() > MAX_DESCRIPTION_SIZE || typeCfg.referenceURL.size() > MAX_REFERENCE_SIZE ||
+            typeCfg.iconFile.size() > MAX_ICON_FILE_SIZE) {
+            LOG_ERROR(UDMF_CLIENT, "typeCfg string length error");
+            return false;
+        }
+    }
+    return true;
+}
+
+bool UtdCfgsChecker::CheckTypeIdsFormat(const std::vector<std::string> &typeIds)
+{
+    if (typeIds.empty() || typeIds.size() > MAX_UTD_SIZE) {
+        LOG_ERROR(UDMF_CLIENT, "typeIds is empty or size exceeds max size");
+        return false;
+    }
+    for (auto &typeId : typeIds) {
+        if (typeId.empty() || typeId.size() > MAX_TYPEID_SIZE) {
+            LOG_ERROR(UDMF_CLIENT, "typeId format error");
+            return false;
         }
     }
     return true;
@@ -129,6 +185,9 @@ bool UtdCfgsChecker::CheckTypesRelation(CustomUtdCfgs &typeCfgs, const std::vect
     }
     for (auto &presetCfg: presetCfgs) {
         typeIds.push_back(presetCfg.typeId);
+    }
+    for (auto &customCfg: customCfgs) {
+        typeIds.push_back(customCfg.typeId);
     }
     if (std::set<std::string>(typeIds.begin(), typeIds.end()).size() != typeIds.size()) {
         LOG_ERROR(UDMF_CLIENT, "Find duplicated typeIds.");
@@ -166,8 +225,7 @@ bool UtdCfgsChecker::CheckBelongingToTypes(const std::vector<TypeDescriptorCfg> 
                 return false;
             }
             if (find(typeIds.begin(), typeIds.end(), belongingToType) == typeIds.end()) {
-                LOG_ERROR(UDMF_CLIENT, "BelongingToType can not find in typeids, belongingToType: %{public}s.",
-                    belongingToType.c_str());
+                LOG_ERROR(UDMF_CLIENT, "BelongingToType can not find in typeIds");
                 return false;
             }
         }

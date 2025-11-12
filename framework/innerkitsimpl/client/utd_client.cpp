@@ -24,23 +24,21 @@
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
 #include "os_account_manager.h"
+#include "utd_cfgs_checker.h"
+#include "utd_notifier.h"
+#include "utd_service_client.h"
+
 namespace OHOS {
 namespace UDMF {
 constexpr const int MAX_UTD_LENGTH = 256;
 constexpr const int64_t RELOAD_INTERVAL = 10;
+constexpr const int MAX_RETRY = 5;
+constexpr const int RETRY_INTERVAL_SEC = 3;
+constexpr const char *DISTRIBUTED_DATA_MGR_PROCESS_NAME = "distributeddata";
 using namespace std::chrono;
 
 UtdClient::UtdClient()
 {
-    if (!Init()) {
-        LOG_WARN(UDMF_CLIENT, "construct UtdClient failed, try again.");
-        auto updateTask = []() {
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-            UtdClient::GetInstance().Init();
-        };
-        std::thread(updateTask).detach();
-    }
-    LOG_INFO(UDMF_CLIENT, "construct UtdClient sucess.");
 }
 
 UtdClient::~UtdClient()
@@ -49,11 +47,65 @@ UtdClient::~UtdClient()
 
 UtdClient &UtdClient::GetInstance()
 {
-    static auto instance = new UtdClient();
-    return *instance;
+    static UtdClient instance;
+    static std::once_flag initFlag;
+    std::call_once(initFlag, []() {
+        instance.InitializeOnce();
+    });
+    return instance;
 }
 
-bool UtdClient::Init()
+void UtdClient::InitializeOnce()
+{
+    bool res = InitializeUtdTypes();
+    bool tryRegisterNotifier = false;
+    if (ShouldRegisterNotifier()) {
+        tryRegisterNotifier = (RegServiceNotifier() != E_OK);
+    }
+    if (!res || tryRegisterNotifier) {
+        WaitRetry(tryRegisterNotifier, !res);
+    }
+}
+
+bool UtdClient::ShouldRegisterNotifier()
+{
+    if (IsHapTokenType()) return true;
+
+    Security::AccessToken::NativeTokenInfo tokenInfo;
+    if (Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(IPCSkeleton::GetSelfTokenID(), tokenInfo) == 0) {
+        return tokenInfo.processName != DISTRIBUTED_DATA_MGR_PROCESS_NAME;
+    } else {
+        LOG_ERROR(UDMF_CLIENT, "GetNativeTokenInfo failed.");
+        return false;
+    }
+}
+
+void UtdClient::WaitRetry(bool tryRegisterNotifier, bool tryInit)
+{
+    std::thread([tryRegisterNotifier, tryInit]() {
+        bool shouldRegisterNotifier = tryRegisterNotifier;
+        bool shouldInit = tryInit;
+        int retryCount = 0;
+        while (retryCount < MAX_RETRY) {
+            std::this_thread::sleep_for(std::chrono::seconds(RETRY_INTERVAL_SEC));
+            if (shouldRegisterNotifier && UtdClient::GetInstance().RegServiceNotifier() == E_OK) {
+                shouldRegisterNotifier = false;
+            }
+            if (shouldInit && UtdClient::GetInstance().InitializeUtdTypes()) {
+                shouldInit = false;
+            }
+            if (!shouldRegisterNotifier && !shouldInit) {
+                return;
+            }
+            LOG_WARN(UDMF_CLIENT, "Failed attempt %{public}d,shouldRegisterNotifier=%{public}d,shouldInit=%{public}d.",
+                retryCount + 1, shouldRegisterNotifier, shouldInit);
+            ++retryCount;
+        }
+        LOG_ERROR(UDMF_CLIENT, "Failed after %{public}d attempts.", MAX_RETRY);
+    }).detach();
+}
+
+bool UtdClient::InitializeUtdTypes()
 {
     bool result = true;
     int32_t userId = DEFAULT_USER_ID;
@@ -70,14 +122,17 @@ bool UtdClient::Init()
         lastLoadTime_ = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
     }
 
+    auto dynamicUtd = CustomUtdStore::GetInstance().GetDynamicUtd(isHap, userId);
+
     std::unique_lock<std::shared_mutex> lock(utdMutex_);
     descriptorCfgs_ = PresetTypeDescriptors::GetInstance().GetPresetTypes();
 
-    LOG_INFO(UDMF_CLIENT, "get customUtd size:%{public}zu, file size:%{public}" PRIu64,
-        customUtd.size(), utdFileInfo_.size);
-    if (!customUtd.empty()) {
-        descriptorCfgs_.insert(descriptorCfgs_.end(), customUtd.begin(), customUtd.end());
-    }
+    LOG_INFO(UDMF_CLIENT, "get customUtd size:%{public}zu, dynamicUtd size:%{public}zu, file size:%{public}" PRIu64,
+        customUtd.size(), dynamicUtd.size(), utdFileInfo_.size);
+    descriptorCfgs_.insert(descriptorCfgs_.end(),
+        std::make_move_iterator(customUtd.begin()), std::make_move_iterator(customUtd.end()));
+    descriptorCfgs_.insert(descriptorCfgs_.end(),
+        std::make_move_iterator(dynamicUtd.begin()), std::make_move_iterator(dynamicUtd.end()));
     UtdGraph::GetInstance().InitUtdGraph(descriptorCfgs_);
     return result;
 }
@@ -413,20 +468,25 @@ void UtdClient::InstallCustomUtds(const std::string &bundleName, const std::stri
     }
     LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
     std::lock_guard<std::mutex> lock(updateUtdMutex_);
-    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, user);
-    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user, customTyepCfgs)) {
+    std::vector<TypeDescriptorCfg> customTypeCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, user);
+    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user, customTypeCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
             bundleName.c_str(), user);
         return;
     }
-    UpdateGraph(customTyepCfgs);
+    auto dynamicUtd = CustomUtdStore::GetInstance().GetDynamicUtd(false, user);
+    auto allInstallUtd = dynamicUtd;
+    allInstallUtd.insert(allInstallUtd.end(), customTypeCfgs.begin(), customTypeCfgs.end());
+    UpdateGraph(allInstallUtd);
     if (!jsonStr.empty()) {
-        if (!CustomUtdStore::GetInstance().InstallCustomUtds(bundleName, jsonStr, user, customTyepCfgs)) {
+        if (!CustomUtdStore::GetInstance().InstallCustomUtds(bundleName, jsonStr, user, customTypeCfgs)) {
             LOG_ERROR(UDMF_CLIENT, "no custom utd installed. bundleName:%{public}s, user:%{public}d",
                 bundleName.c_str(), user);
             return;
         }
-        UpdateGraph(customTyepCfgs);
+        customTypeCfgs.insert(customTypeCfgs.end(),
+            std::make_move_iterator(dynamicUtd.begin()), std::make_move_iterator(dynamicUtd.end()));
+        UpdateGraph(customTypeCfgs);
     }
 }
 
@@ -437,13 +497,22 @@ void UtdClient::UninstallCustomUtds(const std::string &bundleName, int32_t user)
     }
     LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
     std::lock_guard<std::mutex> lock(updateUtdMutex_);
-    std::vector<TypeDescriptorCfg> customTyepCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, user);
-    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user, customTyepCfgs)) {
+    std::vector<TypeDescriptorCfg> customTypeCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, user);
+    if (!CustomUtdStore::GetInstance().UninstallCustomUtds(bundleName, user, customTypeCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
             bundleName.c_str(), user);
         return;
     }
-    UpdateGraph(customTyepCfgs);
+    auto status = CustomUtdStore::GetInstance().UninstallDynamicUtds(bundleName, user);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "dynamic utd installed failed. bundleName:%{public}s, status:%{public}d",
+            bundleName.c_str(), status);
+        return;
+    }
+    auto dynamicUtd = CustomUtdStore::GetInstance().GetDynamicUtd(false, user);
+    customTypeCfgs.insert(customTypeCfgs.end(),
+        std::make_move_iterator(dynamicUtd.begin()), std::make_move_iterator(dynamicUtd.end()));
+    UpdateGraph(customTypeCfgs);
 }
 
 void UtdClient::UpdateGraph(const std::vector<TypeDescriptorCfg> &customTyepCfgs)
@@ -489,7 +558,7 @@ bool UtdClient::TryReloadCustomUtd()
         }
     }
     LOG_INFO(UDMF_CLIENT, "utd file has change, try reload custom utd info");
-    if (Init()) {
+    if (InitializeUtdTypes()) {
         std::lock_guard<std::mutex> lock(customUtdMutex_);
         utdFileInfo_ = info;
         return true;
@@ -504,13 +573,116 @@ bool UtdClient::IsBelongingType(const std::string &belongsTo, const std::string 
            UtdGraph::GetInstance().IsLowerLevelType(belongsTo, typeId);
 }
 
+Status UtdClient::RegServiceNotifier()
+{
+    auto service = UtdServiceClient::GetInstance();
+    if (service == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        return E_IPC;
+    }
+    sptr<IRemoteObject> iUtdNotifier = new (std::nothrow) UtdNotifierClient();
+    if (iUtdNotifier == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "IUtdNotifier unavailable");
+        return E_ERROR;
+    }
+    auto ret = service->RegServiceNotifier(iUtdNotifier);
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d.", ret);
+        return E_ERROR;
+    }
+    return E_OK;
+}
+
 Status UtdClient::RegisterTypeDescriptors(const std::vector<TypeDescriptorCfg> &descriptors)
 {
+    if (!UtdCfgsChecker::GetInstance().CheckTypeCfgsFormat({descriptors, {}})) {
+        LOG_ERROR(UDMF_CLIENT, "CheckTypeCfgsFormat not pass");
+        return E_FORMAT_ERROR;
+    }
+    auto service = UtdServiceClient::GetInstance();
+    if (service == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        return E_IPC;
+    }
+    auto ret = service->RegisterTypeDescriptors(descriptors);
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d.", ret);
+        return static_cast<Status>(ret);
+    }
+    InitializeUtdTypes();
     return E_OK;
 }
 
 Status UtdClient::UnregisterTypeDescriptors(const std::vector<std::string> &typeIds)
 {
+    if (!UtdCfgsChecker::GetInstance().CheckTypeIdsFormat(typeIds)) {
+        LOG_ERROR(UDMF_CLIENT, "CheckTypeIdsFormat not pass");
+        return E_INVALID_TYPE_ID;
+    }
+    auto service = UtdServiceClient::GetInstance();
+    if (service == nullptr) {
+        LOG_ERROR(UDMF_CLIENT, "Service unavailable");
+        return E_IPC;
+    }
+    auto ret = service->UnregisterTypeDescriptors(typeIds);
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d.", ret);
+        return static_cast<Status>(ret);
+    }
+    InitializeUtdTypes();
+    return E_OK;
+}
+
+Status UtdClient::InstallDynamicUtds(const std::string &bundleName,
+    const std::vector<TypeDescriptorCfg> &customTypeCfgs)
+{
+    LOG_INFO(UDMF_CLIENT, "Start, bundleName:%{public}s, size:%{public}zu", bundleName.c_str(), customTypeCfgs.size());
+    if (IsHapTokenType()) {
+        LOG_ERROR(UDMF_CLIENT, "HapTokenType not support");
+        return E_ERROR;
+    }
+    int32_t userId = DEFAULT_USER_ID;
+    if (GetCurrentActiveUserId(userId) != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "GetCurrentActiveUserId failed");
+        return E_ERROR;
+    }
+    std::lock_guard<std::mutex> lock(updateUtdMutex_);
+    auto status = CustomUtdStore::GetInstance().InstallDynamicUtds(customTypeCfgs, bundleName, userId);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Failed, status=%{public}d", status);
+        return status;
+    }
+    auto typeCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, userId);
+    auto dynamicUtd = CustomUtdStore::GetInstance().GetDynamicUtd(false, userId);
+    typeCfgs.insert(typeCfgs.end(),
+        std::make_move_iterator(dynamicUtd.begin()), std::make_move_iterator(dynamicUtd.end()));
+    UpdateGraph(typeCfgs);
+    return E_OK;
+}
+
+Status UtdClient::UninstallDynamicUtds(const std::string &bundleName, const std::vector<std::string> &typeIds)
+{
+    LOG_INFO(UDMF_CLIENT, "Start, bundleName:%{public}s, size:%{public}zu", bundleName.c_str(), typeIds.size());
+    if (IsHapTokenType()) {
+        LOG_ERROR(UDMF_CLIENT, "HapTokenType not support");
+        return E_ERROR;
+    }
+    int32_t userId = DEFAULT_USER_ID;
+    if (GetCurrentActiveUserId(userId) != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "GetCurrentActiveUserId failed");
+        return E_ERROR;
+    }
+    std::lock_guard<std::mutex> lock(updateUtdMutex_);
+    auto status = CustomUtdStore::GetInstance().UninstallDynamicUtds(typeIds, bundleName, userId);
+    if (status != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Failed, status=%{public}d", status);
+        return status;
+    }
+    auto typeCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, userId);
+    auto dynamicUtd = CustomUtdStore::GetInstance().GetDynamicUtd(false, userId);
+    typeCfgs.insert(typeCfgs.end(),
+        std::make_move_iterator(dynamicUtd.begin()), std::make_move_iterator(dynamicUtd.end()));
+    UpdateGraph(typeCfgs);
     return E_OK;
 }
 } // namespace UDMF

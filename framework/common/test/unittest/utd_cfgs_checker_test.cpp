@@ -69,8 +69,8 @@ HWTEST_F(UtdCfgsCheckerTest, CheckTypeDescriptors_001, TestSize.Level1)
     std::vector<TypeDescriptorCfg> customCfgs = {};
     std::string bundleName("com.demo.test");
 
-    bool result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
-    EXPECT_TRUE(result);
+    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
+    EXPECT_EQ(result, E_OK);
     LOG_INFO(UDMF_TEST, "CheckTypeDescriptors_001 end.");
 }
 
@@ -100,13 +100,13 @@ HWTEST_F(UtdCfgsCheckerTest, CheckTypeDescriptors_002, TestSize.Level1)
     std::vector<TypeDescriptorCfg> customCfgs = {};
     std::string bundleName("com.demo.test");
 
-    bool result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs1, presetCfgs, customCfgs,
+    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs1, presetCfgs, customCfgs,
         bundleName);
-    EXPECT_FALSE(result);
+    EXPECT_EQ(result, E_FORMAT_ERROR);
 
     CustomUtdCfgs customUtdCfgs2 = {second, first};
     result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs2, presetCfgs, customCfgs, bundleName);
-    EXPECT_FALSE(result);
+    EXPECT_EQ(result, E_FORMAT_ERROR);
     LOG_INFO(UDMF_TEST, "CheckTypeDescriptors_002 end.");
 }
 
@@ -126,8 +126,8 @@ HWTEST_F(UtdCfgsCheckerTest, CheckTypeDescriptors_003, TestSize.Level1)
     std::vector<TypeDescriptorCfg> customCfgs = {};
     std::string bundleName("com.demo.test");
 
-    bool result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
-    EXPECT_FALSE(result);
+    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
+    EXPECT_EQ(result, E_FORMAT_ERROR);
     LOG_INFO(UDMF_TEST, "CheckTypeDescriptors_003 end.");
 }
 
@@ -160,27 +160,27 @@ HWTEST_F(UtdCfgsCheckerTest, CheckTypeDescriptors_004, TestSize.Level1)
     std::vector<TypeDescriptorCfg> customCfgs = {};
     std::string bundleName("com.demo.test");
 
-    bool result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
-    EXPECT_FALSE(result);
+    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
+    EXPECT_EQ(result, E_FORMAT_ERROR);
 
     tdc1.filenameExtensions = {".abc"};
     first = {tdc1};
     customUtdCfgs = {first, second};
     result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
-    EXPECT_FALSE(result);
+    EXPECT_EQ(result, E_FORMAT_ERROR);
 
     tdc1.belongingToTypes = {"com.demo.test.parent"};
     tdc1.mimeTypes = {""};
     first = {tdc1};
     customUtdCfgs = {first, second};
     result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
-    EXPECT_FALSE(result);
+    EXPECT_EQ(result, E_FORMAT_ERROR);
 
     tdc1.mimeTypes = {"parent/abc"};
     first = {tdc1};
     customUtdCfgs = {first, second};
     result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
-    EXPECT_TRUE(result);
+    EXPECT_EQ(result, E_OK);
     LOG_INFO(UDMF_TEST, "CheckTypeDescriptors_004 end.");
 }
 
@@ -270,11 +270,11 @@ HWTEST_F(UtdCfgsCheckerTest, CheckTypeDescriptors_005, TestSize.Level1)
     presetCfg2.mimeTypes = {"parent3/abc"};
     std::vector<TypeDescriptorCfg> presetCfgs = {presetCfg1, presetCfg2};
 
-    std::vector<TypeDescriptorCfg> customCfgs = {tdc1, tdc3};
+    std::vector<TypeDescriptorCfg> customCfgs = {};
 
     std::string bundleName("com.demo.test");
-    bool result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
-    EXPECT_TRUE(result);
+    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
+    EXPECT_EQ(result, E_OK);
     LOG_INFO(UDMF_TEST, "CheckTypeDescriptors_005 end.");
 }
 
