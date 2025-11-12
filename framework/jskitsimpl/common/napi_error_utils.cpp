@@ -26,6 +26,9 @@ static constexpr NapiErrorCode JS_ERROR_CODE_MSGS[] = {
       "Settings already exist. To reconfigure, remove the existing sharing options." },
     { Status::E_NO_SYSTEM_PERMISSION, 202,
       "Permission denied, application which is not a system application uses system API." },
+    { Status::E_FORMAT_ERROR, 20400002, "The format of one or more typeDescriptor are invalid." },
+    { Status::E_CONTENT_ERROR, 20400003, "The content of one or more typeDescriptor violate rules." },
+    { Status::E_INVALID_TYPE_ID, 20400004, "One or more typeIds are invalid or do not exist." },
 };
 
 const std::optional<NapiErrorCode> GetErrorCode(int32_t errorCode)

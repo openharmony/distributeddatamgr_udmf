@@ -30,9 +30,9 @@
 namespace OHOS {
 namespace UDMF {
 class TypeDescriptor;
-class UtdChangeSubscriber;
 class UtdClient {
 public:
+    friend class UtdNotifierClient;
     static UtdClient API_EXPORT &GetInstance();
     Status API_EXPORT GetTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
     Status API_EXPORT GetUniformDataTypeByFilenameExtension(const std::string &fileExtension, std::string &typeId,
@@ -54,7 +54,8 @@ private:
     ~UtdClient();
     UtdClient(const UtdClient &obj) = delete;
     UtdClient &operator=(const UtdClient &obj) = delete;
-    bool Init();
+    void InitializeOnce();
+    bool InitializeUtdTypes();
     bool IsHapTokenType();
     Status GetCurrentActiveUserId(int32_t& userId);
     bool IsValidFileExtension(const std::string &fileExtension);
@@ -62,10 +63,15 @@ private:
     Status GetFlexibleTypeDescriptor(const std::string &typeId, std::shared_ptr<TypeDescriptor> &descriptor);
     std::string GetTypeIdFromCfg(const std::string &mimeType, const std::string &belongsTo = DEFAULT_TYPE_ID);
     std::vector<std::string> GetTypeIdsFromCfg(const std::string &mimeType);
-    void UpdateGraph(const std::vector<TypeDescriptorCfg> &customTyepCfgs);
+    void UpdateGraph(const std::vector<TypeDescriptorCfg> &customTypeCfgs);
     bool TryReloadCustomUtd();
     bool IsBelongingType(const std::string &belongsTo, const std::string &typeId) const;
-
+    bool ShouldRegisterNotifier();
+    void WaitRetry(bool tryRegisterNotifier, bool tryInit);
+    Status RegServiceNotifier();
+    Status InstallDynamicUtds(const std::string &bundleName, const std::vector<TypeDescriptorCfg> &customTypeCfgs);
+    Status UninstallDynamicUtds(const std::string &bundleName, const std::vector<std::string> &typeIds);
+    
     std::vector<TypeDescriptorCfg> descriptorCfgs_ {};
     std::shared_mutex utdMutex_;
 

@@ -16,6 +16,8 @@
 #ifndef DISTRIBUTEDDATA_UDMF_IPC_INTERFACE_CODE_H
 #define DISTRIBUTEDDATA_UDMF_IPC_INTERFACE_CODE_H
 
+#include <cstdint>
+
 /* SAID:1301 FeatureSystem:udmf_service */
 namespace OHOS::UDMF {
 enum class UdmfServiceInterfaceCode : uint32_t {
@@ -46,6 +48,22 @@ enum class UdmfNotifierInterfaceCode : uint32_t {
     CODE_HEAD = 0,
     HANDLE_DELAY_OBSERVER = CODE_HEAD,
     HANDLE_DELAY_DATA,
+    CODE_BUTT
+};
+
+enum class UtdServiceInterfaceCode : uint32_t {
+    CODE_HEAD = 0,
+    SET_UTD_NOTIFIER = CODE_HEAD,
+    REGISTER_UTD_TYPES,
+    UNREGISTER_UTD_TYPES,
+    CODE_BUTT
+};
+
+enum class UtdNotifierInterfaceCode : uint32_t {
+    CODE_HEAD = 0,
+    DYNAMIC_UTD_CHANGE = CODE_HEAD,
+    REGISTER_DYNAMIC_UTD,
+    UNREGISTER_DYNAMIC_UTD,
     CODE_BUTT
 };
 } // namespace OHOS::UDMF

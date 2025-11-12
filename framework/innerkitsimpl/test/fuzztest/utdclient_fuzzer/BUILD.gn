@@ -36,7 +36,10 @@ ohos_fuzztest("UtdClientFuzzTest") {
 
   deps = [ "${udmf_interfaces_path}/innerkits:utd_client" ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_single",
+  ]
 }
 
 ###############################################################################

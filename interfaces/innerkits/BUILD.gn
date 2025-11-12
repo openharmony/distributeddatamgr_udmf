@@ -147,10 +147,14 @@ ohos_shared_library("utd_client") {
     "${udmf_framework_path}/common/graph.cpp",
     "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
     "${udmf_framework_path}/common/utd_graph.cpp",
+    "${udmf_framework_path}/common/utd_tlv_util.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/utd_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/flexible_type.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/type_descriptor.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/utd_notifier.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/utd_service_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/utd_service_proxy.cpp",
   ]
 
   public_configs = [ ":utd_client_config" ]
@@ -161,7 +165,9 @@ ohos_shared_library("utd_client") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "kv_store:distributeddata_mgr",
     "os_account:os_account_innerkits",
+    "samgr:samgr_proxy",
   ]
 
   public_external_deps = [ "cJSON:cjson" ]

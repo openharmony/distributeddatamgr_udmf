@@ -262,10 +262,14 @@ ohos_unittest("UtdClientTest") {
     "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
     "${udmf_framework_path}/common/utd_graph.cpp",
+    "${udmf_framework_path}/common/utd_tlv_util.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/utd_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/flexible_type.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/type_descriptor.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/utd_notifier.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/utd_service_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/utd_service_proxy.cpp",
     "custom_utd_json_parser_test.cpp",
     "custom_utd_store_test.cpp",
     "graph_test.cpp",
@@ -299,11 +303,53 @@ ohos_unittest("UtdConcurrentUpdateTest") {
     "${udmf_framework_path}/common/udmf_utils.cpp",
     "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
     "${udmf_framework_path}/common/utd_graph.cpp",
+    "${udmf_framework_path}/common/utd_tlv_util.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/utd_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/flexible_type.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/type_descriptor.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/utd_notifier.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/utd_service_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/utd_service_proxy.cpp",
     "utd_concurrent_update_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  use_exceptions = true
+
+  external_deps = common_external_deps
+  external_deps += [
+    "cJSON:cjson",
+    "os_account:os_account_innerkits",
+  ]
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+}
+
+ohos_unittest("UtdDynamicUpdateTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${udmf_framework_path}/common/base32_utils.cpp",
+    "${udmf_framework_path}/common/custom_utd_json_parser.cpp",
+    "${udmf_framework_path}/common/custom_utd_store.cpp",
+    "${udmf_framework_path}/common/graph.cpp",
+    "${udmf_framework_path}/common/udmf_utils.cpp",
+    "${udmf_framework_path}/common/utd_cfgs_checker.cpp",
+    "${udmf_framework_path}/common/utd_graph.cpp",
+    "${udmf_framework_path}/common/utd_tlv_util.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/utd_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/flexible_type.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/preset_type_descriptors.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/type_descriptor.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/utd_notifier.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/utd_service_client.cpp",
+    "${udmf_framework_path}/innerkitsimpl/service/utd_service_proxy.cpp",
+    "utd_dynamic_update_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]
@@ -946,6 +992,7 @@ group("unittest") {
     ":UnifiedRecordTest",
     ":UtdClientTest",
     ":UtdConcurrentUpdateTest",
+    ":UtdDynamicUpdateTest",
     ":VideoTest",
   ]
 }
