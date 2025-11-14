@@ -13,14 +13,29 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "UDMF_DEFINED_FORM"
+
+#include <dlfcn.h>
+
 #include "defined_form_taihe.h"
+#include "interop_js/arkts_esvalue.h"
+#include "interop_js/arkts_interop_js_api.h"
+#include "logger.h"
+#include "system_defined_form_napi.h"
 #include "taihe_common_utils.h"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace UDMF {
+using CreateInstance = napi_value (*)(napi_env, std::shared_ptr<SystemDefinedForm>);
 SystemDefinedFormTaihe::SystemDefinedFormTaihe()
 {
     this->value_ = std::make_shared<SystemDefinedForm>();
+}
+
+SystemDefinedFormTaihe::SystemDefinedFormTaihe(std::shared_ptr<SystemDefinedForm> value)
+{
+    this->value_ = value;
 }
 
 ::taihe::string SystemDefinedFormTaihe::GetType()
@@ -104,12 +119,70 @@ int64_t SystemDefinedFormTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
-} // namespace UDMF
-} // namespace OHOS
 
 ::taiheChannel::SystemDefinedFormInner CreateSystemDefinedForm()
 {
-    return taihe::make_holder<OHOS::UDMF::SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>();
+    return taihe::make_holder<SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>();
 }
 
-TH_EXPORT_CPP_API_CreateSystemDefinedForm(CreateSystemDefinedForm);
+::taiheChannel::SystemDefinedFormInner SystemDefinedFormTransferStaticImpl(uintptr_t input)
+{
+    ani_object esValue = reinterpret_cast<ani_object>(input);
+    void *nativePtr = nullptr;
+    if (!arkts_esvalue_unwrap(taihe::get_env(), esValue, &nativePtr) || nativePtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
+        return taihe::make_holder<SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>();
+    }
+    auto formNapi = reinterpret_cast<SystemDefinedFormNapi *>(nativePtr);
+    if (formNapi == nullptr || formNapi->value_ == nullptr) {
+        LOG_ERROR(UDMF_ANI, "cast SystemDefinedFormNapi failed");
+        return taihe::make_holder<SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>();
+    }
+    return taihe::make_holder<SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>(formNapi->value_);
+}
+
+uintptr_t SystemDefinedFormTransferDynamicImpl(::taiheChannel::weak::SystemDefinedFormInner input)
+{
+    auto formPtr = input->GetInner();
+    auto formInnerPtr = reinterpret_cast<SystemDefinedFormTaihe *>(formPtr);
+    if (formInnerPtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "cast native pointer failed");
+        return 0;
+    }
+    std::shared_ptr<SystemDefinedForm> systemDefinedForm = formInnerPtr->value_;
+    formInnerPtr = nullptr;
+    napi_env jsenv;
+    if (!arkts_napi_scope_open(taihe::get_env(), &jsenv)) {
+        LOG_ERROR(UDMF_ANI, "arkts_napi_scope_open failed");
+        return 0;
+    }
+    auto handle = dlopen(NEW_INSTANCE_LIB.c_str(), RTLD_NOW);
+    if (handle == nullptr) {
+        LOG_ERROR(UDMF_ANI, "dlopen failed");
+        arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
+        return 0;
+    }
+    CreateInstance newInstance = reinterpret_cast<CreateInstance>(dlsym(handle, "GetEtsSysForm"));
+    if (newInstance == nullptr) {
+        LOG_ERROR(UDMF_ANI, "dlsym get func failed, %{public}s", dlerror());
+        arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
+        dlclose(handle);
+        return 0;
+    }
+    napi_value instance = newInstance(jsenv, systemDefinedForm);
+    dlclose(handle);
+    if (instance == nullptr) {
+        LOG_ERROR(UDMF_ANI, "instance is nullptr");
+        arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
+        return 0;
+    }
+    uintptr_t result = 0;
+    arkts_napi_scope_close_n(jsenv, 1, &instance, reinterpret_cast<ani_ref*>(&result));
+    return result;
+}
+} // namespace UDMF
+} // namespace OHOS
+
+TH_EXPORT_CPP_API_CreateSystemDefinedForm(OHOS::UDMF::CreateSystemDefinedForm);
+TH_EXPORT_CPP_API_SystemDefinedFormTransferStaticImpl(OHOS::UDMF::SystemDefinedFormTransferStaticImpl);
+TH_EXPORT_CPP_API_SystemDefinedFormTransferDynamicImpl(OHOS::UDMF::SystemDefinedFormTransferDynamicImpl);

@@ -56,6 +56,10 @@ private:
     static napi_value GetAbilityName(napi_env env, napi_callback_info info);
     static napi_value SetAbilityName(napi_env env, napi_callback_info info);
 };
+
+extern "C" {
+    napi_value GetEtsSysAppItem(napi_env env, std::shared_ptr<SystemDefinedAppItem> appItem);
+}
 } // namespace UDMF
 } // namespace OHOS
 

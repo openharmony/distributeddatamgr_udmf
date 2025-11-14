@@ -27,6 +27,7 @@ namespace UDMF {
 class SystemDefinedAppItemTaihe {
 public:
     SystemDefinedAppItemTaihe();
+    SystemDefinedAppItemTaihe(std::shared_ptr<SystemDefinedAppItem> value);
 
     ::taihe::string GetType();
     taiheChannel::ValueType GetValue();
