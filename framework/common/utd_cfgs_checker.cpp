@@ -23,6 +23,7 @@ namespace UDMF {
 constexpr const char *TYPE_ID_REGEX = "[a-zA-Z0-9/.-]+$";
 constexpr const char FILE_EXTENSION_PREFIX = '.';
 constexpr const int32_t MAX_UTD_SIZE = 50;
+constexpr const int32_t MAX_UTD_LENGTH = 200;
 constexpr const int32_t MAX_TYPEID_SIZE = 127;
 constexpr const int32_t MAX_EXTENSION_SIZE = 127;
 constexpr const int32_t MAX_MIMETYPE_SIZE = 127;
@@ -58,6 +59,13 @@ Status UtdCfgsChecker::CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::
         LOG_ERROR(UDMF_CLIENT, "CheckTypeIdsContent not pass, bundleName: %{public}s, status = %{public}d.",
             bundleName.c_str(), status);
         return status;
+    }
+    auto installedSize =
+        std::count_if(customCfgs.begin(), customCfgs.end(), [&bundleName](TypeDescriptorCfg typeDescriptorCfg) {
+        return typeDescriptorCfg.ownerBundle == bundleName;
+    });
+    if (installedSize + typeCfgs.first.size() > MAX_UTD_LENGTH) {
+        return E_FORMAT_ERROR;
     }
     if (!CheckTypesRelation(typeCfgs, presetCfgs, customCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "CheckTypesRelation not pass, bundleName: %{public}s.", bundleName.c_str());
