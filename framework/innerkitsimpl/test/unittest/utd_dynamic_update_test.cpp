@@ -197,13 +197,13 @@ HWTEST_F(UtdDynamicUpdateTest, RegisterTypeDescriptors001, TestSize.Level1)
     auto status = UtdClient::GetInstance().RegisterTypeDescriptors(descriptors);
     ASSERT_EQ(status, E_OK);
 
-    auto status = UtdClient::GetInstance().RegisterTypeDescriptors(descriptors1);
+    status = UtdClient::GetInstance().RegisterTypeDescriptors(descriptors1);
     ASSERT_EQ(status, E_OK);
 
-    auto status = UtdClient::GetInstance().RegisterTypeDescriptors(descriptors2);
+    status = UtdClient::GetInstance().RegisterTypeDescriptors(descriptors2);
     ASSERT_EQ(status, E_OK);
 
-    auto status = UtdClient::GetInstance().RegisterTypeDescriptors(descriptors3);
+    status = UtdClient::GetInstance().RegisterTypeDescriptors(descriptors3);
     ASSERT_EQ(status, E_OK);
 
     for (size_t j = 0; j < 50; ++j) {
@@ -241,8 +241,8 @@ HWTEST_F(UtdDynamicUpdateTest, RegisterTypeDescriptors001, TestSize.Level1)
         EXPECT_EQ(descriptor->filenameExtensions_, descriptors1[j].filenameExtensions);
         EXPECT_EQ(descriptor->mimeTypes_, descriptors1[j].mimeTypes);
         AllocSysHapToken();
-        std::vector<std::string> typeIds = {std::string(SYS_HAP_BUNDLE_NAME) + ".ppp" + std::to_string(j) + std::to_string(j) };
-        status = UtdClient::GetInstance().UnregisterTypeDescriptors(typeIds);
+        std::vector<std::string> typeIds1 = {std::string(SYS_HAP_BUNDLE_NAME) + ".ppp" + std::to_string(j) + std::to_string(j) };
+        status = UtdClient::GetInstance().UnregisterTypeDescriptors(typeIds1);
         ASSERT_EQ(status, E_OK);
 
         AllocFoundationToken();
@@ -263,9 +263,9 @@ HWTEST_F(UtdDynamicUpdateTest, RegisterTypeDescriptors001, TestSize.Level1)
         EXPECT_EQ(descriptor->filenameExtensions_, descriptors2[j].filenameExtensions);
         EXPECT_EQ(descriptor->mimeTypes_, descriptors2[j].mimeTypes);
         AllocSysHapToken();
-        std::vector<std::string> typeIds = {std::string(SYS_HAP_BUNDLE_NAME) + ".ppp" + std::to_string(j) +
+        std::vector<std::string> typeIds2 = {std::string(SYS_HAP_BUNDLE_NAME) + ".ppp" + std::to_string(j) +
             std::to_string(j) + std::to_string(j) };
-        status = UtdClient::GetInstance().UnregisterTypeDescriptors(typeIds);
+        status = UtdClient::GetInstance().UnregisterTypeDescriptors(typeIds2);
         ASSERT_EQ(status, E_OK);
 
         AllocFoundationToken();
@@ -279,9 +279,9 @@ HWTEST_F(UtdDynamicUpdateTest, RegisterTypeDescriptors001, TestSize.Level1)
         EXPECT_EQ(descriptor->filenameExtensions_, descriptors3[j].filenameExtensions);
         EXPECT_EQ(descriptor->mimeTypes_, descriptors3[j].mimeTypes);
         AllocSysHapToken();
-        std::vector<std::string> typeIds = {std::string(SYS_HAP_BUNDLE_NAME) + ".ppp" + std::to_string(j) +
+        std::vector<std::string> typeIds3 = {std::string(SYS_HAP_BUNDLE_NAME) + ".ppp" + std::to_string(j) +
             std::to_string(j) + std::to_string(j) + std::to_string(j)  };
-        status = UtdClient::GetInstance().UnregisterTypeDescriptors(typeIds);
+        status = UtdClient::GetInstance().UnregisterTypeDescriptors(typeIds3);
         ASSERT_EQ(status, E_OK);
 
         AllocFoundationToken();
