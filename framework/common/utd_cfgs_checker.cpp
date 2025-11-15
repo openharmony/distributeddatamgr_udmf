@@ -23,15 +23,13 @@ namespace UDMF {
 constexpr const char *TYPE_ID_REGEX = "[a-zA-Z0-9/.-]+$";
 constexpr const char FILE_EXTENSION_PREFIX = '.';
 constexpr const int32_t MAX_UTD_SIZE = 50;
-constexpr const int32_t MAX_UTD_LENGTH = 200;
+constexpr const size_t MAX_UTD_LENGTH = 200;
 constexpr const int32_t MAX_TYPEID_SIZE = 127;
 constexpr const int32_t MAX_EXTENSION_SIZE = 127;
 constexpr const int32_t MAX_MIMETYPE_SIZE = 127;
 constexpr const int32_t MAX_DESCRIPTION_SIZE = 255;
 constexpr const int32_t MAX_REFERENCE_SIZE = 255;
 constexpr const int32_t MAX_ICON_FILE_SIZE = 255;
-
-const std::regex UtdCfgsChecker::typeIdPattern_(TYPE_ID_REGEX);
 
 UtdCfgsChecker::UtdCfgsChecker()
 {
@@ -84,13 +82,13 @@ Status UtdCfgsChecker::CheckTypeIdsContent(CustomUtdCfgs &typeCfgs, const std::s
                 LOG_ERROR(UDMF_CLIENT, "Declaration typeId does not start with bundleName");
                 return E_CONTENT_ERROR;
             }
-            if (!std::regex_match(declarationType.typeId, typeIdPattern_)) {
+            if (!std::regex_match(declarationType.typeId, std::regex(bundleName + TYPE_ID_REGEX))) {
                 LOG_ERROR(UDMF_CLIENT, "Declaration typeId check failed, bundleName: %{public}s", bundleName.c_str());
                 return E_FORMAT_ERROR;
             }
         }
         for (auto referenceTypes: typeCfgs.second) {
-            if (!std::regex_match(referenceTypes.typeId, typeIdPattern_)) {
+            if (!std::regex_match(referenceTypes.typeId, std::regex(TYPE_ID_REGEX))) {
                 LOG_ERROR(UDMF_CLIENT, "Reference typeId check failed, bundleName: %{public}s", bundleName.c_str());
                 return E_FORMAT_ERROR;
             }
