@@ -58,11 +58,8 @@ std::vector<std::string> UdmfImgExtractor::ExtractImgSrc(const std::string &html
 
 void UdmfImgExtractor::FilterFileUris(std::vector<std::string> &uris)
 {
-    uris.erase(
-        std::remove_if(uris.begin(), uris.end(),  
-            [](const std::string &str) {
-                return str.find("file:///") != 0;
-            }),
+    uris.erase(std::remove_if(uris.begin(), uris.end(),
+        [](const std::string &str) { return str.find("file:///") != 0; }),
         uris.end()
     );
 }

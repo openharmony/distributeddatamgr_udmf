@@ -140,19 +140,17 @@ std::vector<UriInfo> UnifiedHtmlRecordProcess::GetValueStr(const ValueType &valu
 {
     auto object = std::get<std::shared_ptr<Object>>(value);
     auto iter = object->value_.find(HTML_CONTENT);
-    if (iter != object->value_.end()) {
-        if (std::holds_alternative<std::string>(iter->second)) {
-            auto content = std::get<std::string>(iter->second);
-            auto uriInfos = SplitHtmlStr(content);
-            if (uriInfos.empty()) {
-                return {};
-            }
-            auto validImgSrcList = UdmfImgExtractor::GetInstance().ExtractImgSrc(content);
-            RemoveInvalidImgSrc(validImgSrcList, uriInfos);
-            return uriInfos;
-        }
+    if (iter == object->value_.end() || !std::holds_alternative<std::string>(iter->second)) {
+        return {};
     }
-    return {};
+    auto content = std::get<std::string>(iter->second);
+    auto uriInfos = SplitHtmlStr(content);
+    if (uriInfos.empty()) {
+        return {};
+    }
+    auto validImgSrcList = UdmfImgExtractor::GetInstance().ExtractImgSrc(content);
+    RemoveInvalidImgSrc(validImgSrcList, uriInfos);
+    return uriInfos;
 }
 
 std::vector<UriInfo> UnifiedHtmlRecordProcess::SplitHtmlStr(const std::string &htmlContent)
