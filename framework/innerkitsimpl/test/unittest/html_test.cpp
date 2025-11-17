@@ -194,4 +194,129 @@ HWTEST_F(HtmlTest, ExtractImgSrc001, TestSize.Level1)
     EXPECT_EQ(uris[2], "file:///cdn.com/photo.png");
     LOG_INFO(UDMF_TEST, "ExtractImgSrc001 end.");
 }
+
+/**
+* @tc.name: ExtractImgSrc002
+* @tc.desc: Abnormal testcase of ExtractImgSrc, no valid img src
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, ExtractImgSrc002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc002 begin.");
+    UdmfImgExtractor extractor;
+
+    std::string html = R"HTML(
+        <html>
+            <body>
+                <img src="https://example.com/img1.png" />
+                <img src="http://test.com/img2.jpg" />
+                <img src="file://cdn.com/photo.png" />
+            </body>
+        </html>
+    )HTML";
+
+    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    EXPECT_TRUE(uris.empty());
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc002 end.");
+}
+
+/**
+* @tc.name: ExtractImgSrc003
+* @tc.desc: Abnormal testcase of ExtractImgSrc, no img tag
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, ExtractImgSrc003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc003 begin.");
+    UdmfImgExtractor extractor;
+
+    std::string html = R"HTML(
+        <html>
+            <body>
+                <p>No images here</p>
+            </body>
+        </html>
+    )HTML";
+    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    EXPECT_TRUE(uris.empty());
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc003 end.");
+}
+
+/**
+* @tc.name: ExtractImgSrc004
+* @tc.desc: Abnormal testcase of ExtractImgSrc, no src attribute
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, ExtractImgSrc004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc004 begin.");
+    UdmfImgExtractor extractor;
+
+    std::string html = R"HTML(
+        <html>
+            <body>
+                <img alt="no src" />
+            </body>
+        </html>
+    )HTML";
+
+    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    EXPECT_TRUE(uris.empty());
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc004 end.");
+}
+
+/**
+* @tc.name: ExtractImgSrc005
+* @tc.desc: Abnormal testcase of ExtractImgSrc, mixed valid and invalid img src
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, ExtractImgSrc005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc005 begin.");
+    UdmfImgExtractor extractor;
+
+    std::string html = R"HTML(
+        <html>
+            <body>
+                <img src="https://valid.com/1.png" />
+                <img src="file:///invalid/local.png" />
+                <img src="http://another.com/2.jpg" />
+                <img src="file://another/local.png" />
+            </body>
+        </html>
+    )HTML";
+
+    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    EXPECT_EQ(uris.size(), 1);
+    EXPECT_EQ(uris[0], "file:///invalid/local.png");
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc005 end.");
+}
+
+/**
+* @tc.name: ExtractImgSrc006
+* @tc.desc: Normal testcase of ExtractImgSrc, in span tag
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, ExtractImgSrc006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc006 begin.");
+    UdmfImgExtractor extractor;
+
+    std::string html = R"HTML(
+        <html>
+            <body>
+                <span>
+                    <img src="file:///inside-span.com/img.png" />
+                </span>
+                <img src="file:///outside-span.com/img.png" />
+            </body>
+        </html>
+    )HTML";
+
+    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    EXPECT_EQ(uris.size(), 2);
+    EXPECT_EQ(uris[0], "file:///inside-span.com/img.png");
+    EXPECT_EQ(uris[1], "file:///outside-span.com/img.png");
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc006 end.");
+}
 } // OHOS::Test
