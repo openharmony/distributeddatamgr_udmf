@@ -28,8 +28,6 @@ public:
     Status API_EXPORT Cancel(std::string businessUdKey);
     Status CancelOnSingleTask();
     void PushTaskToExecutor(UdmfTask task);
-    Status SaveAcceptableInfo(const std::string &key, DataLoadInfo &info);
-    Status API_EXPORT PushAcceptableInfo(const QueryOption &query, const std::vector<std::string> &devices);
 private:
     UdmfAsyncClient();
     ~UdmfAsyncClient() = default;

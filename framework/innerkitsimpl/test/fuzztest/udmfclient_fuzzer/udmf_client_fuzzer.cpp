@@ -794,18 +794,6 @@ void IsAppropriateTypeFuzz(FuzzedDataProvider &provider)
     summary.version = provider.ConsumeIntegral<uint32_t>();
     UdmfClient::GetInstance().IsAppropriateType(summary, allowTypes);
 }
-
-void PushAcceptableInfoFuzz(FuzzedDataProvider &provider)
-{
-    QueryOption queryOption;
-    queryOption.key = provider.ConsumeRandomLengthString();
-    std::vector<std::string> devices;
-    size_t size = provider.ConsumeIntegralInRange<size_t>(0, 10);
-    for (size_t i = 0; i < size; ++i) {
-        devices.push_back(provider.ConsumeRandomLengthString());
-    }
-    UdmfAsyncClient::GetInstance().PushAcceptableInfo(queryOption, devices);
-}
 }
 
 /* Fuzzer entry point */
@@ -843,7 +831,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::GetBundleNameByUdKeyFuzz(provider);
     OHOS::SetDataProcessDragInAppFuzz(provider);
     OHOS::IsAppropriateTypeFuzz(provider);
-    OHOS::PushAcceptableInfoFuzz(provider);
     OHOS::TearDown();
     return 0;
 }
