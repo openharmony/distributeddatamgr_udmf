@@ -16,10 +16,12 @@
 #include "unified_html_record_process.h"
 
 #include <regex>
+#include <unordered_set>
 
 #include "file_uri.h"
 #include "html.h"
 #include "logger.h"
+#include "udmf_img_extractor.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -138,13 +140,17 @@ std::vector<UriInfo> UnifiedHtmlRecordProcess::GetValueStr(const ValueType &valu
 {
     auto object = std::get<std::shared_ptr<Object>>(value);
     auto iter = object->value_.find(HTML_CONTENT);
-    if (iter != object->value_.end()) {
-        if (std::holds_alternative<std::string>(iter->second)) {
-            auto content = std::get<std::string>(iter->second);
-            return SplitHtmlStr(content);
-        }
+    if (iter == object->value_.end() || !std::holds_alternative<std::string>(iter->second)) {
+        return {};
     }
-    return {};
+    auto content = std::get<std::string>(iter->second);
+    auto uriInfos = SplitHtmlStr(content);
+    if (uriInfos.empty()) {
+        return {};
+    }
+    auto validImgSrcList = UdmfImgExtractor::GetInstance().ExtractImgSrc(content);
+    RemoveInvalidImgSrc(validImgSrcList, uriInfos);
+    return uriInfos;
 }
 
 std::vector<UriInfo> UnifiedHtmlRecordProcess::SplitHtmlStr(const std::string &htmlContent)
@@ -210,5 +216,15 @@ bool UnifiedHtmlRecordProcess::IsLocalURI(const std::string &uri) noexcept
     return uri.substr(0, strlen(IMG_LOCAL_URI)) == std::string(IMG_LOCAL_URI);
 }
 
+void UnifiedHtmlRecordProcess::RemoveInvalidImgSrc(const std::vector<std::string> &validImgSrcList,
+    std::vector<UriInfo> &imgSrcMap) noexcept
+{
+    std::unordered_set<std::string> validImgSrcSet(validImgSrcList.begin(), validImgSrcList.end());
+    auto new_end = std::remove_if(imgSrcMap.begin(), imgSrcMap.end(),
+        [&validImgSrcSet](const UriInfo& uriInfo) {
+            return validImgSrcSet.find(uriInfo.oriUri) == validImgSrcSet.end();
+        });
+    imgSrcMap.erase(new_end, imgSrcMap.end());
+}
 } // namespace UDMF
 } // namespace OHOS

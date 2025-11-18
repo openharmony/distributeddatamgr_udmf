@@ -4543,4 +4543,54 @@ HWTEST_F(UdmfClientTest, GetSummary007, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "GetSummary007 end.");
 }
+
+/**
+* @tc.name: HtmlData001
+* @tc.desc: test html record process
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, HtmlData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "HtmlData001 begin.");
+
+    UnifiedData data;
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetContent("plainContent");
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[HTML_CONTENT] = R"HTML(
+        <html>
+            <body>
+                <img src="https://invalid.png" />
+                <!-- img src="file:///invalid/local.png" -->
+                <img src="file:///valid/local.png" />
+            </body>
+        </html>
+    )HTML";
+    plainText->AddEntry("general.html", obj);
+    data.AddRecord(plainText);
+    
+    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(data);
+    ASSERT_EQ(plainText->GetUris().size(), 1);
+    EXPECT_EQ(plainText->GetUris()[0].oriUri, "file:///valid/local.png");
+
+    auto uriInfo = plainText->GetUris()[0];
+    uriInfo.authUri = "file://ohos.test.demo1/data/storage/el2/base/haps/local.png";
+    plainText->SetUris({uriInfo});
+
+    UnifiedHtmlRecordProcess::RebuildHtmlRecord(data);
+    ASSERT_EQ(data.GetRecords().size(), 1);
+    auto record = data.GetRecordAt(0);
+    
+    auto htmlEntry = record->GetEntry("general.html");
+    ASSERT_TRUE(std::holds_alternative<std::shared_ptr<Object>>(htmlEntry));
+    auto htmlObject = std::get<std::shared_ptr<Object>>(htmlEntry);
+    ASSERT_TRUE(htmlObject->value_.find(HTML_CONTENT) != htmlObject->value_.end());
+    ASSERT_TRUE(std::holds_alternative<std::string>(htmlObject->value_[HTML_CONTENT]));
+    auto rebuiltHtml = std::get<std::string>(htmlObject->value_[HTML_CONTENT]);
+    ASSERT_TRUE(rebuiltHtml.find("https://invalid.png") != std::string::npos);
+    ASSERT_TRUE(rebuiltHtml.find("file:///invalid/local.png") != std::string::npos);
+    ASSERT_TRUE(rebuiltHtml.find("file:///valid/local.png") == std::string::npos);
+
+    LOG_INFO(UDMF_TEST, "HtmlData001 end.");
+}
 } // OHOS::Test

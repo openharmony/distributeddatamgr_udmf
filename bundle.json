@@ -44,6 +44,7 @@
         "os_account",
         "selinux_adapter",
         "libuv",
+        "libxml2",
 	      "runtime_core"
       ]
     },

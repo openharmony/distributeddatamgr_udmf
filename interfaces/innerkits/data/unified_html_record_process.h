@@ -35,6 +35,8 @@ private:
     static std::string RebuildHtmlContent(const std::string &str, const std::vector<UriInfo> &uris);
     static std::vector<UriInfo> GetValueStr(const ValueType &value);
     static void ProcessEntry(const std::shared_ptr<UnifiedRecord> &record);
+    static void RemoveInvalidImgSrc(const std::vector<std::string> &validImgSrcList,
+        std::vector<UriInfo> &imgSrcMap) noexcept;
 };
 } // namespace UDMF
 } // namespace OHOS
