@@ -220,14 +220,11 @@ void UnifiedHtmlRecordProcess::RemoveInvalidImgSrc(const std::vector<std::string
     std::vector<UriInfo> &imgSrcMap) noexcept
 {
     std::unordered_set<std::string> validImgSrcSet(validImgSrcList.begin(), validImgSrcList.end());
-    auto it = imgSrcMap.begin();
-    while (it != imgSrcMap.end()) {
-        if (validImgSrcSet.find(it->oriUri) == validImgSrcSet.end()) {
-        it = imgSrcMap.erase(it);
-        } else {
-            ++it;
-        }
-    }
+    auto new_end = std::remove_if(imgSrcMap.begin(), imgSrcMap.end(),
+        [&validImgSrcSet](const UriInfo& uriInfo) {
+            return validImgSrcSet.find(uriInfo.oriUri) == validImgSrcSet.end();
+        });
+    imgSrcMap.erase(new_end, imgSrcMap.end());
 }
 } // namespace UDMF
 } // namespace OHOS

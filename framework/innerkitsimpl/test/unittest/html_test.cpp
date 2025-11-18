@@ -319,4 +319,76 @@ HWTEST_F(HtmlTest, ExtractImgSrc006, TestSize.Level1)
     EXPECT_EQ(uris[1], "file:///outside-span.com/img.png");
     LOG_INFO(UDMF_TEST, "ExtractImgSrc006 end.");
 }
+
+/**
+* @tc.name: ExtractImgSrc007
+* @tc.desc: Normal testcase of ExtractImgSrc, in input tag
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, ExtractImgSrc007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc007 begin.");
+    UdmfImgExtractor extractor;
+
+    std::string html = R"HTML(
+        <html>
+            <body>
+                <input value="<img src="file:///outside-span.com/img.png" /> />
+            </body>
+        </html>
+    )HTML";
+
+    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    EXPECT_EQ(uris.size(), 0);
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc007 end.");
+}
+
+/**
+* @tc.name: ExtractImgSrc008
+* @tc.desc: Normal testcase of ExtractImgSrc, in textarea tag
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, ExtractImgSrc008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc008 begin.");
+    UdmfImgExtractor extractor;
+
+    std::string html = R"HTML(
+        <html>
+            <body>
+                <textarea>
+                    <img src="file:///inside-span.com/img.png" />
+                </textarea>
+            </body>
+        </html>
+    )HTML";
+
+    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    EXPECT_EQ(uris.size(), 0);
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc008 end.");
+}
+
+/**
+* @tc.name: ExtractImgSrc009
+* @tc.desc: Normal testcase of ExtractImgSrc, in comment tag
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, ExtractImgSrc009, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc009 begin.");
+    UdmfImgExtractor extractor;
+
+    std::string html = R"HTML(
+        <html>
+            <body>
+                <!-- img src="file:///invalid/local.png" -->
+                <!-- <img src="file:///inside-span.com/img.png" /> -->
+            </body>
+        </html>
+    )HTML";
+
+    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    EXPECT_EQ(uris.size(), 0);
+    LOG_INFO(UDMF_TEST, "ExtractImgSrc009 end.");
+}
 } // OHOS::Test

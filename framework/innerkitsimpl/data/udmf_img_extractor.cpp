@@ -46,7 +46,7 @@ std::vector<std::string> UdmfImgExtractor::ExtractImgSrc(const std::string &html
     int options = HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING;
     xmlDocPtr doc = htmlReadDoc(reinterpret_cast<const xmlChar *>(htmlContent.c_str()), nullptr, nullptr, options);
     if (doc == nullptr) {
-        LOG_ERROR(UDMF_CLIENT, "parse html failed");
+        LOG_WARN(UDMF_CLIENT, "parse html failed");
         return {};
     }
 
@@ -73,14 +73,14 @@ std::vector<std::string> UdmfImgExtractor::ExecuteXPath(xmlDocPtr doc, const cha
 {
     xmlXPathContextPtr context = xmlXPathNewContext(doc);
     if (context == nullptr) {
-        LOG_ERROR(UDMF_CLIENT, "xpath new context failed");
+        LOG_WARN(UDMF_CLIENT, "xpath new context failed");
         return {};
     }
 
     std::unique_ptr<xmlXPathContext, decltype(&xmlXPathFreeContext)> contextGuard(context, xmlXPathFreeContext);
     xmlXPathObjectPtr result = xmlXPathEvalExpression(reinterpret_cast<const xmlChar *>(xpathExpr), context);
     if (result == nullptr) {
-        LOG_ERROR(UDMF_CLIENT, "xpath eval expr failed");
+        LOG_WARN(UDMF_CLIENT, "xpath eval expr failed");
         return {};
     }
 
@@ -117,8 +117,7 @@ std::string UdmfImgExtractor::SafeXmlToString(const xmlChar *xmlStr)
         return "";
     }
 
-    std::string result(reinterpret_cast<const char *>(xmlStr));
-    return result;
+    return std::string(reinterpret_cast<const char *>(xmlStr));
 }
 } // namespace UDMF
 } // namespace OHOS
