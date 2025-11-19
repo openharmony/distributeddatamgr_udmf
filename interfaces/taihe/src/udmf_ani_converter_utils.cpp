@@ -175,7 +175,7 @@ ani_object AniConverter::WrapSummary(ani_env *env, std::shared_ptr<Summary> summ
         return nullptr;
     }
     ani_long param_value;
-    if (ANI_OK != env->Object_CallMethodByName_Long(longObj, "unboxed", ":l", &param_value)) {
+    if (ANI_OK != env->Object_CallMethodByName_Long(longObj, "toLong", ":l", &param_value)) {
         LOG_ERROR(UDMF_ANI, "Unbox Long failed");
         return nullptr;
     }
