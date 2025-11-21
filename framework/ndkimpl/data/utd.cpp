@@ -76,6 +76,7 @@ static const char** CreateStrArrByVector(const std::vector<std::string>& paramVe
             *count = 0;
             return nullptr;
         }
+        charPtr[i] = buffer;
     }
     *count = size;
     return charPtr;
