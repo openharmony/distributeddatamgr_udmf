@@ -387,6 +387,37 @@ HWTEST_F(UnifiedDataTest, IsCompleteTest001, TestSize.Level1)
 }
 
 /**
+* @tc.name: IsCompleteTest002
+* @tc.desc: Normal test of IsComplete
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataTest, IsCompleteTest002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsCompleteTest002 begin.");
+    UnifiedData unifiedData;
+    EXPECT_FALSE(unifiedData.IsComplete());
+
+    Runtime runtime;
+    runtime.recordTotalNum = 1;
+    runtime.dataStatus = DataStatus::WAITING;
+    unifiedData.SetRuntime(runtime);
+    EXPECT_FALSE(unifiedData.IsComplete());
+
+    std::shared_ptr<Object> fileObj = std::make_shared<Object>();
+    fileObj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    fileObj->value_[FILE_URI_PARAM] = "file://1111/a.jpeg";
+    fileObj->value_[FILE_TYPE] = "general.jpeg";
+    std::shared_ptr<UnifiedRecord> fileRecord = std::make_shared<UnifiedRecord>(FILE_URI, fileObj);
+    unifiedData.AddRecord(fileRecord);
+    EXPECT_FALSE(unifiedData.IsComplete());
+
+    runtime.dataStatus = DataStatus::WORKING;
+    unifiedData.SetRuntime(runtime);
+    EXPECT_TRUE(unifiedData.IsComplete());
+    LOG_INFO(UDMF_TEST, "IsCompleteTest002 end.");
+}
+
+/**
 * @tc.name: GetFileUrisTest001
 * @tc.desc: Normal test of HasHigherFileType return true.
 * @tc.type: FUNC
