@@ -207,7 +207,7 @@ bool UnifiedData::IsComplete()
             runtime->recordTotalNum, this->GetRecords().size());
         return false;
     }
-    if (runtime->dataStatus != DataStatus::WAITING) {
+    if (runtime->dataStatus == DataStatus::WAITING) {
         LOG_INFO(UDMF_FRAMEWORK, "Data is wating!");
         return false;
     }
