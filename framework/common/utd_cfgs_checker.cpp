@@ -62,7 +62,7 @@ Status UtdCfgsChecker::CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::
         std::count_if(customCfgs.begin(), customCfgs.end(), [&bundleName](TypeDescriptorCfg typeDescriptorCfg) {
         return typeDescriptorCfg.ownerBundle == bundleName;
     });
-    if (installedSize + typeCfgs.first.size() > MAX_UTD_LENGTH) {
+    if (static_cast<size_t>(installedSize) + typeCfgs.first.size() > MAX_UTD_LENGTH) {
         return E_FORMAT_ERROR;
     }
     if (!CheckTypesRelation(typeCfgs, presetCfgs, customCfgs)) {
