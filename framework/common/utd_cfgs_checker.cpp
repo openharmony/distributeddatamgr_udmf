@@ -24,6 +24,7 @@ namespace UDMF {
 constexpr const char *TYPE_ID_REGEX = "[a-zA-Z0-9/.-]+$";
 constexpr const char FILE_EXTENSION_PREFIX = '.';
 constexpr const int32_t MAX_UTD_SIZE = 50;
+constexpr const size_t MAX_UTD_LENGTH = 200;
 constexpr const int32_t MAX_TYPEID_SIZE = 127;
 constexpr const int32_t MAX_EXTENSION_SIZE = 127;
 constexpr const int32_t MAX_MIMETYPE_SIZE = 127;
@@ -52,6 +53,10 @@ Status UtdCfgsChecker::CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, UtdTypeCate
 {
     if (!CheckTypeCfgsFormat(typeCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "CheckTypeCfgsFormat not pass, bundleName: %{public}s.", param.bundleName.c_str());
+        return E_FORMAT_ERROR;
+    }
+    if (typeCategory == UtdTypeCategory::DYNAMIC && !CheckDynamicTypesSize(typeCfgs, param)) {
+        LOG_ERROR(UDMF_CLIENT, "CheckDynamicTypesSize not pass, bundleName: %{public}s.", param.bundleName.c_str());
         return E_FORMAT_ERROR;
     }
     auto status = CheckTypeIdsContent(typeCfgs, param.bundleName);
@@ -147,6 +152,19 @@ bool UtdCfgsChecker::CheckTypeCfgsSize(const std::vector<TypeDescriptorCfg> &typ
             LOG_ERROR(UDMF_CLIENT, "typeCfg string length error");
             return false;
         }
+    }
+    return true;
+}
+
+bool UtdCfgsChecker::CheckDynamicTypesSize(CustomUtdCfgs &typeCfgs, const UpdateUtdParam &param)
+{
+    auto dynamicTypesSize = std::count_if(param.installedDynamicUtdCfgs.begin(), param.installedDynamicUtdCfgs.end(),
+        [](const TypeDescriptorCfg &typeCfg) {
+            return typeCfg.ownerBundle == param.bundleName;
+        });
+    if (static_cast<size_t>(dynamicTypesSize) + typeCfgs.first.size() > MAX_UTD_LENGTH) {
+        LOG_ERROR(UDMF_CLIENT, "dynamic types size exceeds max length");
+        return false;
     }
     return true;
 }

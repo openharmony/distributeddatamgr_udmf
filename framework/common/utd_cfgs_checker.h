@@ -43,6 +43,7 @@ private:
     bool CanConstructDAG(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
         const std::vector<TypeDescriptorCfg> &customCfgs);
     bool CheckTypeCfgsSize(const std::vector<TypeDescriptorCfg> &typeCfgs);
+    bool CheckDynamicTypesSize(CustomUtdCfgs &typeCfgs, const UpdateUtdParam &param);
 
     static const std::regex typeIdPattern_;
 };
