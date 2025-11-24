@@ -53,6 +53,10 @@ private:
     static napi_value GetModule(napi_env env, napi_callback_info info);
     static napi_value SetModule(napi_env env, napi_callback_info info);
 };
+
+extern "C" {
+    napi_value GetEtsSysForm(napi_env env, std::shared_ptr<SystemDefinedForm> form);
+}
 } // namespace UDMF
 } // namespace OHOS
 

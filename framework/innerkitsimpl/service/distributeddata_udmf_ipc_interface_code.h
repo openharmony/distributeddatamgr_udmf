@@ -39,8 +39,6 @@ enum class UdmfServiceInterfaceCode : uint32_t {
     SET_DELAY_INFO,
     SET_DELAY_DATA,
     GET_DELAY_DATA,
-    SAVE_ACCEPTABLE_INFO,
-    PUSH_ACCEPTABLE_INFO,
     CODE_BUTT
 };
 

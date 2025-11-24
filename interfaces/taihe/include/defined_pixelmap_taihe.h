@@ -26,6 +26,7 @@ namespace UDMF {
 class SystemDefinedPixelMapTaihe {
 public:
     SystemDefinedPixelMapTaihe();
+    SystemDefinedPixelMapTaihe(std::shared_ptr<SystemDefinedPixelMap> value);
 
     ::taihe::string GetType();
     ::taiheChannel::ValueType GetValue();

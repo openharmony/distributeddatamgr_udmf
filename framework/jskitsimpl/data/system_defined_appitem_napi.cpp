@@ -284,5 +284,14 @@ napi_value SystemDefinedAppItemNapi::SetAbilityName(napi_env env, napi_callback_
     sdAppItem->value_->SetAbilityName(abilityName);
     return nullptr;
 }
+
+extern "C" {
+    napi_value GetEtsSysAppItem(napi_env env, std::shared_ptr<SystemDefinedAppItem> appItem)
+    {
+        napi_value instance = nullptr;
+        SystemDefinedAppItemNapi::NewInstance(env, appItem, instance);
+        return instance;
+    }
+}
 } // namespace UDMF
 } // namespace OHOS
