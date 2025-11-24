@@ -41,6 +41,10 @@ private:
     static napi_value GetRawData(napi_env env, napi_callback_info info);
     static napi_value SetRawData(napi_env env, napi_callback_info info);
 };
+
+extern "C" {
+    napi_value GetEtsSysPixelMap(napi_env env, std::shared_ptr<SystemDefinedPixelMap> pixelMap);
+}
 } // namespace UDMF
 } // namespace OHOS
 

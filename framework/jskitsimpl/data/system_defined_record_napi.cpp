@@ -113,5 +113,14 @@ napi_value SystemDefinedRecordNapi::SetDetails(napi_env env, napi_callback_info 
     sdRecord->value_->SetDetails(details);
     return nullptr;
 }
+
+extern "C" {
+    napi_value GetEtsSysRecord(napi_env env, std::shared_ptr<SystemDefinedRecord> record)
+    {
+        napi_value instance = nullptr;
+        SystemDefinedRecordNapi::NewInstance(env, record, instance);
+        return instance;
+    }
+}
 } // namespace UDMF
 } // namespace OHOS

@@ -36,6 +36,7 @@ using namespace OHOS;
 
 namespace OHOS::Test {
 constexpr const int32_t USERID = 100;
+constexpr const char *SYS_HAP_BUNDLE_NAME = "com.example.mythread";
 
 class UtdConcurrentUpdateTest : public testing::Test {
 public:
@@ -44,6 +45,7 @@ public:
     void SetUp() override;
     void TearDown() override;
     void SetNativeToken(const std::string &processName);
+    static void AllocSysHapToken();
 };
 
 void UtdConcurrentUpdateTest::SetUpTestCase()
@@ -62,6 +64,8 @@ void UtdConcurrentUpdateTest::SetUp()
 
 void UtdConcurrentUpdateTest::TearDown()
 {
+    auto tokenId = AccessTokenKit::GetHapTokenID(USERID, SYS_HAP_BUNDLE_NAME, 0);
+    AccessTokenKit::DeleteToken(tokenId);
 }
 
 static constexpr const char *K_TEST_JSON_STR = R"({
@@ -101,6 +105,45 @@ std::string ReplaceThread(const std::string& jsonStr, const std::string& newThre
         pos += newThreadId.length();
     }
     return result;
+}
+
+void UtdConcurrentUpdateTest::AllocSysHapToken()
+{
+    HapInfoParams info = {
+        .userID = USERID,
+        .bundleName = SYS_HAP_BUNDLE_NAME,
+        .instIndex = 0,
+        .appIDDesc = SYS_HAP_BUNDLE_NAME,
+        .isSystemApp = true,
+    };
+
+    HapPolicyParams policy = {
+        .apl = APL_SYSTEM_BASIC,
+        .domain = "test.domain",
+        .permList = {
+            {
+                .permissionName = "ohos.permission.MANAGE_DYNAMIC_UTD_TYPE",
+                .bundleName = SYS_HAP_BUNDLE_NAME,
+                .grantMode = 1,
+                .availableLevel = APL_SYSTEM_BASIC,
+                .label = "label",
+                .labelId = 1,
+                .description = "test1",
+                .descriptionId = 1
+            }
+        },
+        .permStateList = {
+            {
+                .permissionName = "ohos.permission.MANAGE_DYNAMIC_UTD_TYPE",
+                .isGeneral = true,
+                .resDeviceID = { "local" },
+                .grantStatus = { PermissionState::PERMISSION_GRANTED },
+                .grantFlags = { 1 }
+            }
+        }
+    };
+    auto tokenID = AccessTokenKit::AllocHapToken(info, policy);
+    SetSelfTokenID(tokenID.tokenIDEx);
 }
 
 /**
@@ -159,5 +202,65 @@ HWTEST_F(UtdConcurrentUpdateTest, MultiThreadUpdate001, TestSize.Level1)
     }
     auto customTypeCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, USERID);
     EXPECT_EQ(customTypeCfgs.size(), prevSize);
+};
+
+/**
+* @tc.name: MultiThreadUpdate002
+* @tc.desc: MultiThread Update dynamic utd
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdConcurrentUpdateTest, MultiThreadUpdate002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_CLIENT, "MultiThreadUpdate002 start");
+    AllocSysHapToken();
+    const int numThreads = 8;
+
+    for (int i = 1; i <= numThreads; ++i) {
+        UtdClient::GetInstance().UnregisterTypeDescriptors({SYS_HAP_BUNDLE_NAME + std::to_string(i)});
+    }
+    
+    std::vector<TypeDescriptorCfg> prevDynamicTypeCfgs = CustomUtdStore::GetInstance().GetDynamicUtd(false, USERID);
+    size_t prevSize = prevDynamicTypeCfgs.size();
+    
+    const int trials = 50;
+    for (int i = 0; i < trials; ++i) {
+        bool op = (i % 2 == 0);
+        auto worker = [op](int threadId) {
+            const std::string typeId = SYS_HAP_BUNDLE_NAME + std::to_string(threadId);
+            if (op) {
+                std::vector<TypeDescriptorCfg> customTypeCfgs(1);
+                customTypeCfgs[0].typeId = typeId;
+                customTypeCfgs[0].belongingToTypes = {"general.image"};
+                UtdClient::GetInstance().RegisterTypeDescriptors(customTypeCfgs);
+                LOG_INFO(UDMF_CLIENT, "Thread %{public}d Register done", threadId);
+            } else {
+                UtdClient::GetInstance().UnregisterTypeDescriptors({typeId});
+                LOG_INFO(UDMF_CLIENT, "Thread %{public}d Unregister done", threadId);
+            }
+        };
+        std::vector<std::thread> threads;
+        for (int j = 1; j <= numThreads; ++j) {
+            threads.emplace_back(worker, j);
+        }
+        for (auto &t : threads) { t.join(); }
+
+        auto dynamicTypeCfgs = CustomUtdStore::GetInstance().GetDynamicUtd(false, USERID);
+        if (op) {
+            EXPECT_EQ(dynamicTypeCfgs.size(), numThreads + prevSize);
+        } else {
+            EXPECT_EQ(dynamicTypeCfgs.size(), prevSize);
+        }
+        for (const auto &cfg : dynamicTypeCfgs) {
+            if (std::find(prevDynamicTypeCfgs.begin(), prevDynamicTypeCfgs.end(), cfg) == prevDynamicTypeCfgs.end()) {
+                EXPECT_TRUE(cfg.typeId.find(SYS_HAP_BUNDLE_NAME) != std::string::npos);
+                EXPECT_TRUE(cfg.belongingToTypes.size() > 0);
+            }
+        }
+    }
+    for (int i = 1; i <= numThreads; ++i) {
+        UtdClient::GetInstance().UnregisterTypeDescriptors({SYS_HAP_BUNDLE_NAME + std::to_string(i)});
+    }
+    auto dynamicTypeCfgs = CustomUtdStore::GetInstance().GetDynamicUtd(false, USERID);
+    EXPECT_EQ(dynamicTypeCfgs.size(), prevSize);
 };
 } // namespace OHOS::Test

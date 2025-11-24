@@ -31,12 +31,12 @@ public:
     static CustomUtdStore &GetInstance();
     std::vector<TypeDescriptorCfg> GetCustomUtd(bool isHap, int32_t userId);
     std::vector<TypeDescriptorCfg> GetDynamicUtd(bool isHap, int32_t userId);
-    bool InstallCustomUtds(const std::string &jsonStr, UpdateUtdParam &param);
-    bool UninstallCustomUtds(UpdateUtdParam &param);
+    bool InstallCustomUtds(const std::string &jsonStr, UtdUpdateContext &context);
+    bool UninstallCustomUtds(UtdUpdateContext &context);
     UtdFileInfo GetCustomUtdInfo(bool isHap, int32_t userId);
-    Status InstallDynamicUtds(const std::vector<TypeDescriptorCfg> &dynamicUtds, UpdateUtdParam &param);
-    Status UninstallDynamicUtds(const std::vector<std::string> &dynamicTypeIds, UpdateUtdParam &param);
-    Status UninstallDynamicUtds(UpdateUtdParam &param);
+    Status InstallDynamicUtds(const std::vector<TypeDescriptorCfg> &dynamicUtds, UtdUpdateContext &context);
+    Status UninstallDynamicUtds(const std::vector<std::string> &dynamicTypeIds, UtdUpdateContext &context);
+    Status UninstallDynamicUtds(UtdUpdateContext &context);
 
 private:
     CustomUtdStore();

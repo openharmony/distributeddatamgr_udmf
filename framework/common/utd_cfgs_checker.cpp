@@ -49,24 +49,24 @@ UtdCfgsChecker &UtdCfgsChecker::GetInstance()
 }
 
 Status UtdCfgsChecker::CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, UtdTypeCategory typeCategory,
-    const UpdateUtdParam &param)
+    const UtdUpdateContext &context)
 {
     if (!CheckTypeCfgsFormat(typeCfgs)) {
-        LOG_ERROR(UDMF_CLIENT, "CheckTypeCfgsFormat not pass, bundleName: %{public}s.", param.bundleName.c_str());
+        LOG_ERROR(UDMF_CLIENT, "CheckTypeCfgsFormat not pass, bundleName: %{public}s.", context.bundleName.c_str());
         return E_FORMAT_ERROR;
     }
-    if (typeCategory == UtdTypeCategory::DYNAMIC && !CheckDynamicTypesSize(typeCfgs, param)) {
-        LOG_ERROR(UDMF_CLIENT, "CheckDynamicTypesSize not pass, bundleName: %{public}s.", param.bundleName.c_str());
+    if (typeCategory == UtdTypeCategory::DYNAMIC_TYPE && !CheckDynamicTypesSize(typeCfgs, context)) {
+        LOG_ERROR(UDMF_CLIENT, "CheckDynamicTypesSize not pass, bundleName: %{public}s.", context.bundleName.c_str());
         return E_FORMAT_ERROR;
     }
-    auto status = CheckTypeIdsContent(typeCfgs, param.bundleName);
+    auto status = CheckTypeIdsContent(typeCfgs, context.bundleName);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "CheckTypeIdsContent not pass, bundleName: %{public}s, status = %{public}d.",
-            param.bundleName.c_str(), status);
+            context.bundleName.c_str(), status);
         return status;
     }
-    if (!CheckTypesRelation(typeCfgs, typeCategory, param)) {
-        LOG_ERROR(UDMF_CLIENT, "CheckTypesRelation not pass, bundleName: %{public}s.", param.bundleName.c_str());
+    if (!CheckTypesRelation(typeCfgs, typeCategory, context)) {
+        LOG_ERROR(UDMF_CLIENT, "CheckTypesRelation not pass, bundleName: %{public}s.", context.bundleName.c_str());
         return E_CONTENT_ERROR;
     }
     return E_OK;
@@ -156,11 +156,11 @@ bool UtdCfgsChecker::CheckTypeCfgsSize(const std::vector<TypeDescriptorCfg> &typ
     return true;
 }
 
-bool UtdCfgsChecker::CheckDynamicTypesSize(CustomUtdCfgs &typeCfgs, const UpdateUtdParam &param)
+bool UtdCfgsChecker::CheckDynamicTypesSize(CustomUtdCfgs &typeCfgs, const UtdUpdateContext &context)
 {
-    auto dynamicTypesSize = std::count_if(param.installedDynamicUtdCfgs.begin(), param.installedDynamicUtdCfgs.end(),
-        [](const TypeDescriptorCfg &typeCfg) {
-            return typeCfg.ownerBundle == param.bundleName;
+    auto dynamicTypesSize = std::count_if(context.installedDynamicUtdCfgs.begin(),
+        context.installedDynamicUtdCfgs.end(), [&context](const TypeDescriptorCfg &typeCfg) {
+            return typeCfg.ownerBundle == context.bundleName;
         });
     if (static_cast<size_t>(dynamicTypesSize) + typeCfgs.first.size() > MAX_UTD_LENGTH) {
         LOG_ERROR(UDMF_CLIENT, "dynamic types size exceeds max length");
@@ -185,38 +185,38 @@ bool UtdCfgsChecker::CheckTypeIdsFormat(const std::vector<std::string> &typeIds)
 }
 
 bool UtdCfgsChecker::CheckTypesRelation(CustomUtdCfgs &typeCfgs,
-    UtdTypeCategory typeCategory, const UpdateUtdParam &param)
+    UtdTypeCategory typeCategory, const UtdUpdateContext &context)
 {
-    if (!CheckTypeIdUniqueness(typeCfgs, typeCategory, param)) {
+    if (!CheckTypeIdUniqueness(typeCfgs, typeCategory, context)) {
         LOG_ERROR(UDMF_CLIENT, "TypeId uniqueness check failed.");
         return false;
     }
 
     std::vector<TypeDescriptorCfg> inputTypeCfgs = typeCfgs.first;
     inputTypeCfgs.insert(inputTypeCfgs.end(), typeCfgs.second.begin(), typeCfgs.second.end());
-    if (!CheckBelongingToTypes(inputTypeCfgs, param.presetCfgs)) {
+    if (!CheckBelongingToTypes(inputTypeCfgs, context.presetCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "BelongingToType check failed.");
         return false;
     }
 
-    auto installedTypes = param.installedCustomUtdCfgs;
+    auto installedTypes = context.installedCustomUtdCfgs;
     installedTypes.insert(installedTypes.end(),
-        param.installedDynamicUtdCfgs.begin(), param.installedDynamicUtdCfgs.end());
-    if (!CanConstructDAG(typeCfgs, param.presetCfgs, installedTypes)) {
+        context.installedDynamicUtdCfgs.begin(), context.installedDynamicUtdCfgs.end());
+    if (!CanConstructDAG(typeCfgs, context.presetCfgs, installedTypes)) {
         LOG_ERROR(UDMF_CLIENT, "Can not construct DAG.");
         return false;
-    }  
+    }
     return true;
 }
 
 bool UtdCfgsChecker::CheckTypeIdUniqueness(const CustomUtdCfgs &typeCfgs,
-    UtdTypeCategory typeCategory, const UpdateUtdParam &param)
+    UtdTypeCategory typeCategory, const UtdUpdateContext &context)
 {
     std::unordered_set<std::string> seenIds;
-    for (auto &typeCfg: param.presetCfgs) {
+    for (auto &typeCfg: context.presetCfgs) {
         seenIds.insert(typeCfg.typeId);
     }
-    for (auto &typeCfg: param.installedDynamicUtdCfgs) {
+    for (auto &typeCfg: context.installedDynamicUtdCfgs) {
         seenIds.insert(typeCfg.typeId);
     }
     for (auto &typeCfg: typeCfgs.second) {
@@ -225,7 +225,7 @@ bool UtdCfgsChecker::CheckTypeIdUniqueness(const CustomUtdCfgs &typeCfgs,
             return false;
         }
     }
-    for (auto &typeCfg: param.installedCustomUtdCfgs) {
+    for (auto &typeCfg: context.installedCustomUtdCfgs) {
         if (typeCategory == UtdTypeCategory::DYNAMIC_TYPE || !typeCfg.ownerBundle.empty()) {
             seenIds.insert(typeCfg.typeId);
         }

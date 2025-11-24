@@ -54,32 +54,32 @@ static const char** CreateStrArrByVector(const std::vector<std::string>& paramVe
         *count = 0;
         return nullptr;
     }
-    auto charPtr = new (std::nothrow) char* [size];
+    const char** charPtr = new (std::nothrow) const char* [size]();
     if (charPtr == nullptr) {
         *count = 0;
         return nullptr;
     }
     for (unsigned int i = 0; i < size; i++) {
-        charPtr[i] = new (std::nothrow) char[paramVector[i].size() + 1];
-        if (charPtr[i] == nullptr) {
+        char* buffer = new (std::nothrow) char[paramVector[i].size() + 1]();
+        if (buffer == nullptr) {
             LOG_ERROR(UDMF_CAPI, "Allocate memory fail!");
-            const char** arrayPtr = const_cast<const char**>(charPtr);
             unsigned int allocatedSize = i;
-            DestroyArrayPtr(arrayPtr, allocatedSize);
+            DestroyArrayPtr(charPtr, allocatedSize);
             *count = 0;
             return nullptr;
         }
-        if (strcpy_s(charPtr[i], paramVector[i].size() + 1, paramVector[i].c_str()) != UDMF_E_OK) {
+        if (strcpy_s(buffer, paramVector[i].size() + 1, paramVector[i].c_str()) != UDMF_E_OK) {
             LOG_ERROR(UDMF_CAPI, "String copy fail!");
-            const char** arrayPtr = const_cast<const char**>(charPtr);
             unsigned int allocatedSize = i + 1;
-            DestroyArrayPtr(arrayPtr, allocatedSize);
+            delete[] buffer;
+            DestroyArrayPtr(charPtr, allocatedSize);
             *count = 0;
             return nullptr;
         }
+        charPtr[i] = buffer;
     }
     *count = size;
-    return const_cast<const char**>(charPtr);
+    return charPtr;
 }
 
 static std::shared_ptr<TypeDescriptor> GetTypeDescriptorByUtdClient(const char* typeId)
@@ -116,9 +116,13 @@ static const char** GetTypesByCondition(const char* condition, unsigned int* cou
         return nullptr;
     }
     *count = 1;
-    auto typeIds = new char* [*count];
-    typeIds[0] = typeId;
-    return const_cast<const char**>(typeIds);
+    const char** typeIds = new (std::nothrow) const char* [*count]();
+    if (typeIds != nullptr) {
+        typeIds[0] = typeId;
+    } else {
+        LOG_ERROR(UDMF_CAPI, "Allocate memory fail!");
+    }
+    return typeIds;
 }
 
 OH_Utd* OH_Utd_Create(const char* typeId)

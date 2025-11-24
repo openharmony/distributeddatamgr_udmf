@@ -46,7 +46,7 @@ struct UtdFileInfo {
     int64_t lastTime = 0;
 };
 
-struct UpdateUtdParam {
+struct UtdUpdateContext {
     std::string bundleName;
     int32_t userId;
     const std::vector<TypeDescriptorCfg> &presetCfgs;

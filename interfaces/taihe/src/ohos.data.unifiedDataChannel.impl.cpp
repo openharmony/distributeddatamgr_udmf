@@ -31,12 +31,6 @@ namespace OHOS {
 namespace UDMF {
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 
-::taiheChannel::Summary CreateSummary()
-{
-    ::taihe::map<::taihe::string, int64_t> summary;
-    return {summary, 0};
-}
-
 ::taihe::string InsertDataSync(::taiheChannel::Options const& options,
     ::taiheChannel::weak::UnifiedDataInner data)
 {
@@ -91,6 +85,5 @@ namespace taiheChannel = ohos::data::unifiedDataChannel;
 } // namespace UDMF
 } // namespace OHOS
 
-TH_EXPORT_CPP_API_CreateSummary(OHOS::UDMF::CreateSummary);
 TH_EXPORT_CPP_API_InsertDataSync(OHOS::UDMF::InsertDataSync);
 TH_EXPORT_CPP_API_QueryDataSync(OHOS::UDMF::QueryDataSync);

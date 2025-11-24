@@ -26,6 +26,7 @@ namespace UDMF {
 class ApplicationDefinedRecordTaihe {
 public:
     ApplicationDefinedRecordTaihe();
+    ApplicationDefinedRecordTaihe(std::shared_ptr<ApplicationDefinedRecord> value);
 
     ::taihe::string GetType();
     ::ohos::data::unifiedDataChannel::ValueType GetValue();

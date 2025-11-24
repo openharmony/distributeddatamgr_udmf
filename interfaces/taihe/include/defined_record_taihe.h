@@ -26,6 +26,7 @@ namespace UDMF {
 class SystemDefinedRecordTaihe {
 public:
     SystemDefinedRecordTaihe();
+    SystemDefinedRecordTaihe(std::shared_ptr<SystemDefinedRecord> value);
 
     ::taihe::string GetType();
     ::taiheChannel::ValueType GetValue();
