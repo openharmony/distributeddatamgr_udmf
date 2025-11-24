@@ -13,14 +13,29 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "UDMF_DEFINED_APPITEM"
+
+#include <dlfcn.h>
+
 #include "defined_appitem_taihe.h"
+#include "interop_js/arkts_esvalue.h"
+#include "interop_js/arkts_interop_js_api.h"
+#include "logger.h"
+#include "system_defined_appitem_napi.h"
 #include "taihe_common_utils.h"
+#include "taihe/runtime.hpp"
 
 namespace OHOS {
 namespace UDMF {
+using CreateInstance = napi_value (*)(napi_env, std::shared_ptr<SystemDefinedAppItem>);
 SystemDefinedAppItemTaihe::SystemDefinedAppItemTaihe()
 {
     this->value_ = std::make_shared<SystemDefinedAppItem>();
+}
+
+SystemDefinedAppItemTaihe::SystemDefinedAppItemTaihe(std::shared_ptr<SystemDefinedAppItem> value)
+{
+    this->value_ = value;
 }
 
 ::taihe::string SystemDefinedAppItemTaihe::GetType()
@@ -116,13 +131,71 @@ int64_t SystemDefinedAppItemTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
-} // namespace UDMF
-} // namespace OHOS
 
 ::taiheChannel::SystemDefinedAppItemInner CreateSystemDefinedAppItem()
 {
-    return taihe::make_holder<OHOS::UDMF::SystemDefinedAppItemTaihe,
-        ::taiheChannel::SystemDefinedAppItemInner>();
+    return taihe::make_holder<SystemDefinedAppItemTaihe, ::taiheChannel::SystemDefinedAppItemInner>();
 }
 
-TH_EXPORT_CPP_API_CreateSystemDefinedAppItem(CreateSystemDefinedAppItem);
+::taiheChannel::SystemDefinedAppItemInner SystemDefinedAppItemTransferStaticImpl(uintptr_t input)
+{
+    ani_object esValue = reinterpret_cast<ani_object>(input);
+    void *nativePtr = nullptr;
+    if (!arkts_esvalue_unwrap(taihe::get_env(), esValue, &nativePtr) || nativePtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "unwrap esvalue failed");
+        return taihe::make_holder<SystemDefinedAppItemTaihe, ::taiheChannel::SystemDefinedAppItemInner>();
+    }
+    auto appItemNapi = reinterpret_cast<SystemDefinedAppItemNapi *>(nativePtr);
+    if (appItemNapi == nullptr || appItemNapi->value_ == nullptr) {
+        LOG_ERROR(UDMF_ANI, "cast SystemDefinedAppItemNapi failed");
+        return taihe::make_holder<SystemDefinedAppItemTaihe, ::taiheChannel::SystemDefinedAppItemInner>();
+    }
+    return taihe::make_holder<SystemDefinedAppItemTaihe,
+        ::taiheChannel::SystemDefinedAppItemInner>(appItemNapi->value_);
+}
+
+uintptr_t SystemDefinedAppItemTransferDynamicImpl(::taiheChannel::weak::SystemDefinedAppItemInner input)
+{
+    auto appItemPtr = input->GetInner();
+    auto appItemInnerPtr = reinterpret_cast<SystemDefinedAppItemTaihe *>(appItemPtr);
+    if (appItemInnerPtr == nullptr) {
+        LOG_ERROR(UDMF_ANI, "cast native pointer failed");
+        return 0;
+    }
+    std::shared_ptr<SystemDefinedAppItem> systemDefinedAppItem = appItemInnerPtr->value_;
+    appItemInnerPtr = nullptr;
+    napi_env jsenv;
+    if (!arkts_napi_scope_open(taihe::get_env(), &jsenv)) {
+        LOG_ERROR(UDMF_ANI, "arkts_napi_scope_open failed");
+        return 0;
+    }
+    auto handle = dlopen(NEW_INSTANCE_LIB.c_str(), RTLD_NOW);
+    if (handle == nullptr) {
+        LOG_ERROR(UDMF_ANI, "dlopen failed");
+        arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
+        return 0;
+    }
+    CreateInstance newInstance = reinterpret_cast<CreateInstance>(dlsym(handle, "GetEtsSysAppItem"));
+    if (newInstance == nullptr) {
+        LOG_ERROR(UDMF_ANI, "dlsym get func failed, %{public}s", dlerror());
+        arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
+        dlclose(handle);
+        return 0;
+    }
+    napi_value instance = newInstance(jsenv, systemDefinedAppItem);
+    dlclose(handle);
+    if (instance == nullptr) {
+        LOG_ERROR(UDMF_ANI, "instance is nullptr");
+        arkts_napi_scope_close_n(jsenv, 0, nullptr, nullptr);
+        return 0;
+    }
+    uintptr_t result = 0;
+    arkts_napi_scope_close_n(jsenv, 1, &instance, reinterpret_cast<ani_ref*>(&result));
+    return result;
+}
+} // namespace UDMF
+} // namespace OHOS
+
+TH_EXPORT_CPP_API_CreateSystemDefinedAppItem(OHOS::UDMF::CreateSystemDefinedAppItem);
+TH_EXPORT_CPP_API_SystemDefinedAppItemTransferStaticImpl(OHOS::UDMF::SystemDefinedAppItemTransferStaticImpl);
+TH_EXPORT_CPP_API_SystemDefinedAppItemTransferDynamicImpl(OHOS::UDMF::SystemDefinedAppItemTransferDynamicImpl);

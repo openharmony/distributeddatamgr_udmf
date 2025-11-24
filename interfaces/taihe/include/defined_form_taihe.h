@@ -26,6 +26,7 @@ namespace UDMF {
 class SystemDefinedFormTaihe {
 public:
     SystemDefinedFormTaihe();
+    SystemDefinedFormTaihe(std::shared_ptr<SystemDefinedForm> value);
 
     ::taihe::string GetType();
     taiheChannel::ValueType GetValue();

@@ -40,6 +40,10 @@ private:
     static SystemDefinedRecordNapi *GetSystemDefinedRecord(
         napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt);
 };
+
+extern "C" {
+    napi_value GetEtsSysRecord(napi_env env, std::shared_ptr<SystemDefinedRecord> record);
+}
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_SYSTEM_DEFINED_RECORD_NAPI_H

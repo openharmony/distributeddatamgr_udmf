@@ -79,6 +79,7 @@ taihe_shared_library("udmf_taihe_native") {
     "src/ohos.data.unifiedDataChannel.impl.cpp",
     "src/ohos.data.uniformTypeDescriptor.impl.cpp",
     "src/plain_text_taihe.cpp",
+    "src/summary_taihe.cpp",
     "src/taihe_common_utils.cpp",
     "src/text_taihe.cpp",
     "src/udmf_ani_converter_utils.cpp",
@@ -96,8 +97,10 @@ taihe_shared_library("udmf_taihe_native") {
     "ability_base:want",
     "ability_runtime:abilitykit_native",
     "ability_runtime:ani_common",
+    "ability_runtime:napi_common",
     "hilog:libhilog",
     "image_framework:image_taihe",
+    "runtime_core:ani_helpers",
   ]
   public_configs = [ ":taihe_config" ]
 }

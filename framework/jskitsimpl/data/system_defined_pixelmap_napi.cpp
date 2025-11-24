@@ -114,5 +114,14 @@ napi_value SystemDefinedPixelMapNapi::SetRawData(napi_env env, napi_callback_inf
     sdPixelMap->value_->SetRawData(pixelMap);
     return nullptr;
 }
+
+extern "C" {
+    napi_value GetEtsSysPixelMap(napi_env env, std::shared_ptr<SystemDefinedPixelMap> pixelMap)
+    {
+        napi_value instance = nullptr;
+        SystemDefinedPixelMapNapi::NewInstance(env, pixelMap, instance);
+        return instance;
+    }
+}
 } // namespace UDMF
 } // namespace OHOS

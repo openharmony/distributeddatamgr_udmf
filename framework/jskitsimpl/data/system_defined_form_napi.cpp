@@ -250,5 +250,14 @@ napi_value SystemDefinedFormNapi::SetModule(napi_env env, napi_callback_info inf
     sdForm->value_->SetModule(module);
     return nullptr;
 }
+
+extern "C" {
+    napi_value GetEtsSysForm(napi_env env, std::shared_ptr<SystemDefinedForm> form)
+    {
+        napi_value instance = nullptr;
+        SystemDefinedFormNapi::NewInstance(env, form, instance);
+        return instance;
+    }
+}
 } // namespace UDMF
 } // namespace OHOS

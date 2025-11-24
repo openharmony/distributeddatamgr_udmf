@@ -106,5 +106,14 @@ napi_value SummaryNapi::GetOverview(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set record failed!");
     return ctxt->output;
 }
+
+extern "C" {
+    napi_value GetEtsSummary(napi_env env, std::shared_ptr<Summary> summary)
+    {
+        napi_value instance = nullptr;
+        SummaryNapi::NewInstance(env, summary, instance);
+        return instance;
+    }
+}
 } // namespace UDMF
 } // namespace OHOS
