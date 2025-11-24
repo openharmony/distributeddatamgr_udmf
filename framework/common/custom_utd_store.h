@@ -31,23 +31,19 @@ public:
     static CustomUtdStore &GetInstance();
     std::vector<TypeDescriptorCfg> GetCustomUtd(bool isHap, int32_t userId);
     std::vector<TypeDescriptorCfg> GetDynamicUtd(bool isHap, int32_t userId);
-    bool InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user,
-        std::vector<TypeDescriptorCfg> &customTypeCfgs);
-    bool UninstallCustomUtds(const std::string &bundleName, int32_t user,
-        std::vector<TypeDescriptorCfg> &customTypeCfgs);
+    bool InstallCustomUtds(const std::string &jsonStr, UpdateUtdParam &param);
+    bool UninstallCustomUtds(UpdateUtdParam &param);
     UtdFileInfo GetCustomUtdInfo(bool isHap, int32_t userId);
-    Status InstallDynamicUtds(const std::vector<TypeDescriptorCfg> &dynamicUtds,
-        const std::string &bundleName, int32_t user);
-    Status UninstallDynamicUtds(const std::vector<std::string> &dynamicUtds,
-        const std::string &bundleName, int32_t user);
-    Status UninstallDynamicUtds(const std::string &bundleName, int32_t userId);
+    Status InstallDynamicUtds(const std::vector<TypeDescriptorCfg> &dynamicUtds, UpdateUtdParam &param);
+    Status UninstallDynamicUtds(const std::vector<std::string> &dynamicTypeIds, UpdateUtdParam &param);
+    Status UninstallDynamicUtds(UpdateUtdParam &param);
 
 private:
     CustomUtdStore();
     ~CustomUtdStore();
     int32_t ReadTypeCfgs(const std::string &filePath, std::vector<TypeDescriptorCfg> &utdTypes);
     int32_t SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes,
-        const std::string &fileDir, const std::string &filePath);
+        UtdTypeCategory category, int32_t userId);
     int32_t SaveCfgFile(const std::string &jsonData, const std::string &cfgFilePath);
     bool CreateDirectory(const std::string &path) const;
     static void ProcessUtdForSave(const CustomUtdCfgs &utdTypes, std::vector<TypeDescriptorCfg> &customTyepCfgs,

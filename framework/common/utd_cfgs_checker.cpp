@@ -15,6 +15,7 @@
 #define LOG_TAG "UtdCfgsChecker"
 #include "utd_cfgs_checker.h"
 
+#include <unordered_set>
 #include "utd_graph.h"
 #include "logger.h"
 
@@ -23,13 +24,14 @@ namespace UDMF {
 constexpr const char *TYPE_ID_REGEX = "[a-zA-Z0-9/.-]+$";
 constexpr const char FILE_EXTENSION_PREFIX = '.';
 constexpr const int32_t MAX_UTD_SIZE = 50;
-constexpr const size_t MAX_UTD_LENGTH = 200;
 constexpr const int32_t MAX_TYPEID_SIZE = 127;
 constexpr const int32_t MAX_EXTENSION_SIZE = 127;
 constexpr const int32_t MAX_MIMETYPE_SIZE = 127;
 constexpr const int32_t MAX_DESCRIPTION_SIZE = 255;
 constexpr const int32_t MAX_REFERENCE_SIZE = 255;
 constexpr const int32_t MAX_ICON_FILE_SIZE = 255;
+
+const std::regex UtdCfgsChecker::typeIdPattern_(TYPE_ID_REGEX);
 
 UtdCfgsChecker::UtdCfgsChecker()
 {
@@ -45,28 +47,21 @@ UtdCfgsChecker &UtdCfgsChecker::GetInstance()
     return *instance;
 }
 
-Status UtdCfgsChecker::CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
-    const std::vector<TypeDescriptorCfg> &customCfgs, const std::string &bundleName)
+Status UtdCfgsChecker::CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, UtdTypeCategory typeCategory,
+    const UpdateUtdParam &param)
 {
     if (!CheckTypeCfgsFormat(typeCfgs)) {
-        LOG_ERROR(UDMF_CLIENT, "CheckTypeCfgsFormat not pass, bundleName: %{public}s.", bundleName.c_str());
+        LOG_ERROR(UDMF_CLIENT, "CheckTypeCfgsFormat not pass, bundleName: %{public}s.", param.bundleName.c_str());
         return E_FORMAT_ERROR;
     }
-    auto status = CheckTypeIdsContent(typeCfgs, bundleName);
+    auto status = CheckTypeIdsContent(typeCfgs, param.bundleName);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "CheckTypeIdsContent not pass, bundleName: %{public}s, status = %{public}d.",
-            bundleName.c_str(), status);
+            param.bundleName.c_str(), status);
         return status;
     }
-    auto installedSize =
-        std::count_if(customCfgs.begin(), customCfgs.end(), [&bundleName](TypeDescriptorCfg typeDescriptorCfg) {
-        return typeDescriptorCfg.ownerBundle == bundleName;
-    });
-    if (installedSize + typeCfgs.first.size() > MAX_UTD_LENGTH) {
-        return E_FORMAT_ERROR;
-    }
-    if (!CheckTypesRelation(typeCfgs, presetCfgs, customCfgs)) {
-        LOG_ERROR(UDMF_CLIENT, "CheckTypesRelation not pass, bundleName: %{public}s.", bundleName.c_str());
+    if (!CheckTypesRelation(typeCfgs, typeCategory, param)) {
+        LOG_ERROR(UDMF_CLIENT, "CheckTypesRelation not pass, bundleName: %{public}s.", param.bundleName.c_str());
         return E_CONTENT_ERROR;
     }
     return E_OK;
@@ -82,13 +77,13 @@ Status UtdCfgsChecker::CheckTypeIdsContent(CustomUtdCfgs &typeCfgs, const std::s
                 LOG_ERROR(UDMF_CLIENT, "Declaration typeId does not start with bundleName");
                 return E_CONTENT_ERROR;
             }
-            if (!std::regex_match(declarationType.typeId, std::regex(bundleName + TYPE_ID_REGEX))) {
+            if (!std::regex_match(declarationType.typeId, typeIdPattern_)) {
                 LOG_ERROR(UDMF_CLIENT, "Declaration typeId check failed, bundleName: %{public}s", bundleName.c_str());
                 return E_FORMAT_ERROR;
             }
         }
         for (auto referenceTypes: typeCfgs.second) {
-            if (!std::regex_match(referenceTypes.typeId, std::regex(TYPE_ID_REGEX))) {
+            if (!std::regex_match(referenceTypes.typeId, typeIdPattern_)) {
                 LOG_ERROR(UDMF_CLIENT, "Reference typeId check failed, bundleName: %{public}s", bundleName.c_str());
                 return E_FORMAT_ERROR;
             }
@@ -171,41 +166,57 @@ bool UtdCfgsChecker::CheckTypeIdsFormat(const std::vector<std::string> &typeIds)
     return true;
 }
 
-bool UtdCfgsChecker::CheckTypesRelation(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
-    const std::vector<TypeDescriptorCfg> &customCfgs)
+bool UtdCfgsChecker::CheckTypesRelation(CustomUtdCfgs &typeCfgs,
+    UtdTypeCategory typeCategory, const UpdateUtdParam &param)
 {
-    std::vector<TypeDescriptorCfg> inputTypeCfgs;
-    if (!typeCfgs.first.empty()) {
-        inputTypeCfgs.insert(inputTypeCfgs.end(), typeCfgs.first.begin(), typeCfgs.first.end());
-    }
-    if (!typeCfgs.second.empty()) {
-        inputTypeCfgs.insert(inputTypeCfgs.end(), typeCfgs.second.begin(), typeCfgs.second.end());
-    }
-    std::vector<std::string> typeIds;
-    for (auto &inputTypeCfg: inputTypeCfgs) {
-        typeIds.push_back(inputTypeCfg.typeId);
-    }
-    if (typeIds.size() > MAX_UTD_SIZE) {
-        LOG_ERROR(UDMF_CLIENT, "Create more UTDs than limit.");
+    if (!CheckTypeIdUniqueness(typeCfgs, typeCategory, param)) {
+        LOG_ERROR(UDMF_CLIENT, "TypeId uniqueness check failed.");
         return false;
     }
-    for (auto &presetCfg: presetCfgs) {
-        typeIds.push_back(presetCfg.typeId);
-    }
-    for (auto &customCfg: customCfgs) {
-        typeIds.push_back(customCfg.typeId);
-    }
-    if (std::set<std::string>(typeIds.begin(), typeIds.end()).size() != typeIds.size()) {
-        LOG_ERROR(UDMF_CLIENT, "Find duplicated typeIds.");
-        return false;
-    }
-    if (!CheckBelongingToTypes(inputTypeCfgs, presetCfgs)) {
+
+    std::vector<TypeDescriptorCfg> inputTypeCfgs = typeCfgs.first;
+    inputTypeCfgs.insert(inputTypeCfgs.end(), typeCfgs.second.begin(), typeCfgs.second.end());
+    if (!CheckBelongingToTypes(inputTypeCfgs, param.presetCfgs)) {
         LOG_ERROR(UDMF_CLIENT, "BelongingToType check failed.");
         return false;
     }
-    if (!CanConstructDAG(typeCfgs, presetCfgs, customCfgs)) {
+
+    auto installedTypes = param.installedCustomUtdCfgs;
+    installedTypes.insert(installedTypes.end(),
+        param.installedDynamicUtdCfgs.begin(), param.installedDynamicUtdCfgs.end());
+    if (!CanConstructDAG(typeCfgs, param.presetCfgs, installedTypes)) {
         LOG_ERROR(UDMF_CLIENT, "Can not construct DAG.");
         return false;
+    }  
+    return true;
+}
+
+bool UtdCfgsChecker::CheckTypeIdUniqueness(const CustomUtdCfgs &typeCfgs,
+    UtdTypeCategory typeCategory, const UpdateUtdParam &param)
+{
+    std::unordered_set<std::string> seenIds;
+    for (auto &typeCfg: param.presetCfgs) {
+        seenIds.insert(typeCfg.typeId);
+    }
+    for (auto &typeCfg: param.installedDynamicUtdCfgs) {
+        seenIds.insert(typeCfg.typeId);
+    }
+    for (auto &typeCfg: typeCfgs.second) {
+        if (!seenIds.insert(typeCfg.typeId).second) {
+            LOG_ERROR(UDMF_CLIENT, "Find duplicated installing typeIds.");
+            return false;
+        }
+    }
+    for (auto &typeCfg: param.installedCustomUtdCfgs) {
+        if (typeCategory == UtdTypeCategory::DYNAMIC_TYPE || !typeCfg.ownerBundle.empty()) {
+            seenIds.insert(typeCfg.typeId);
+        }
+    }
+    for (auto &typeCfg: typeCfgs.first) {
+        if (!seenIds.insert(typeCfg.typeId).second) {
+            LOG_ERROR(UDMF_CLIENT, "Find duplicated installing typeIds.");
+            return false;
+        }
     }
     return true;
 }

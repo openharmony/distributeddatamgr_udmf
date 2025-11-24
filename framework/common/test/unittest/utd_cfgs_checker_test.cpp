@@ -64,12 +64,16 @@ HWTEST_F(UtdCfgsCheckerTest, CheckTypeDescriptors_001, TestSize.Level1)
     preTdc1.typeId = "com.demo.test.parent";
     TypeDescriptorCfg preTdc2;
     preTdc2.typeId = "com.demo.test.parent2";
-    std::vector<TypeDescriptorCfg> presetCfgs = {preTdc1, preTdc2};
 
-    std::vector<TypeDescriptorCfg> customCfgs = {};
-    std::string bundleName("com.demo.test");
+    UpdateUtdParam param = {
+        .bundleName = "com.demo.test",
+        .userId = 100,
+        .presetCfgs = {preTdc1, preTdc2},
+        .installedCustomUtdCfgs = {},
+        .installedDynamicUtdCfgs = {},
+    };
 
-    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
+    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, UtdTypeCategory::STATIC_TYPE, param);
     EXPECT_EQ(result, E_OK);
     LOG_INFO(UDMF_TEST, "CheckTypeDescriptors_001 end.");
 }
@@ -95,17 +99,20 @@ HWTEST_F(UtdCfgsCheckerTest, CheckTypeDescriptors_002, TestSize.Level1)
     preTdc1.typeId = "com.demo.test.parent";
     TypeDescriptorCfg preTdc2;
     preTdc2.typeId = "com.demo.test.parent2";
-    std::vector<TypeDescriptorCfg> presetCfgs = {preTdc1, preTdc2};
 
-    std::vector<TypeDescriptorCfg> customCfgs = {};
-    std::string bundleName("com.demo.test");
+    UpdateUtdParam param = {
+        .bundleName = "com.demo.test",
+        .userId = 100,
+        .presetCfgs = {preTdc1, preTdc2},
+        .installedCustomUtdCfgs = {},
+        .installedDynamicUtdCfgs = {},
+    };
 
-    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs1, presetCfgs, customCfgs,
-        bundleName);
+    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs1, UtdTypeCategory::STATIC_TYPE, param);
     EXPECT_EQ(result, E_FORMAT_ERROR);
 
     CustomUtdCfgs customUtdCfgs2 = {second, first};
-    result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs2, presetCfgs, customCfgs, bundleName);
+    result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs2, UtdTypeCategory::STATIC_TYPE, param);
     EXPECT_EQ(result, E_FORMAT_ERROR);
     LOG_INFO(UDMF_TEST, "CheckTypeDescriptors_002 end.");
 }
@@ -122,11 +129,16 @@ HWTEST_F(UtdCfgsCheckerTest, CheckTypeDescriptors_003, TestSize.Level1)
     std::vector<TypeDescriptorCfg> first = {};
     std::vector<TypeDescriptorCfg> second = {};
     CustomUtdCfgs customUtdCfgs = {first, second};
-    std::vector<TypeDescriptorCfg> presetCfgs = {};
-    std::vector<TypeDescriptorCfg> customCfgs = {};
-    std::string bundleName("com.demo.test");
 
-    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
+    UpdateUtdParam param = {
+        .bundleName = "com.demo.test",
+        .userId = 100,
+        .presetCfgs = {},
+        .installedCustomUtdCfgs = {},
+        .installedDynamicUtdCfgs = {},
+    };
+
+    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, UtdTypeCategory::STATIC_TYPE, param);
     EXPECT_EQ(result, E_FORMAT_ERROR);
     LOG_INFO(UDMF_TEST, "CheckTypeDescriptors_003 end.");
 }
@@ -157,29 +169,35 @@ HWTEST_F(UtdCfgsCheckerTest, CheckTypeDescriptors_004, TestSize.Level1)
     preTdc2.typeId = "com.demo.test.parent2";
     std::vector<TypeDescriptorCfg> presetCfgs = {preTdc1, preTdc2};
 
-    std::vector<TypeDescriptorCfg> customCfgs = {};
-    std::string bundleName("com.demo.test");
+    UpdateUtdParam param = {
+        .bundleName = "com.demo.test",
+        .userId = 100,
+        .presetCfgs = {preTdc1, preTdc2},
+        .installedCustomUtdCfgs = {},
+        .installedDynamicUtdCfgs = {},
+    };
 
-    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
+    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(
+        customUtdCfgs, UtdTypeCategory::STATIC_TYPE, param);
     EXPECT_EQ(result, E_FORMAT_ERROR);
 
     tdc1.filenameExtensions = {".abc"};
     first = {tdc1};
     customUtdCfgs = {first, second};
-    result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
+    result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, UtdTypeCategory::STATIC_TYPE, param);
     EXPECT_EQ(result, E_FORMAT_ERROR);
 
     tdc1.belongingToTypes = {"com.demo.test.parent"};
     tdc1.mimeTypes = {""};
     first = {tdc1};
     customUtdCfgs = {first, second};
-    result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
+    result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, UtdTypeCategory::STATIC_TYPE, param);
     EXPECT_EQ(result, E_FORMAT_ERROR);
 
     tdc1.mimeTypes = {"parent/abc"};
     first = {tdc1};
     customUtdCfgs = {first, second};
-    result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
+    result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, UtdTypeCategory::STATIC_TYPE, param);
     EXPECT_EQ(result, E_OK);
     LOG_INFO(UDMF_TEST, "CheckTypeDescriptors_004 end.");
 }
@@ -268,12 +286,15 @@ HWTEST_F(UtdCfgsCheckerTest, CheckTypeDescriptors_005, TestSize.Level1)
     presetCfg2.filenameExtensions = {".abca3"};
     presetCfg2.belongingToTypes = {"com.demo.test.parent6"};
     presetCfg2.mimeTypes = {"parent3/abc"};
-    std::vector<TypeDescriptorCfg> presetCfgs = {presetCfg1, presetCfg2};
-
-    std::vector<TypeDescriptorCfg> customCfgs = {};
-
-    std::string bundleName("com.demo.test");
-    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(customUtdCfgs, presetCfgs, customCfgs, bundleName);
+    UpdateUtdParam param = {
+        .bundleName = "com.demo.test",
+        .userId = 100,
+        .presetCfgs = {presetCfg1, presetCfg2},
+        .installedCustomUtdCfgs = {},
+        .installedDynamicUtdCfgs = {},
+    };
+    auto result = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(
+        customUtdCfgs, UtdTypeCategory::STATIC_TYPE, param);
     EXPECT_EQ(result, E_OK);
     LOG_INFO(UDMF_TEST, "CheckTypeDescriptors_005 end.");
 }
