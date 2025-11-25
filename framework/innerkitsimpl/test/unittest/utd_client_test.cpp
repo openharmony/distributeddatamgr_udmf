@@ -179,6 +179,106 @@ HWTEST_F(UtdClientTest, GetTypeDescriptor006, TestSize.Level1)
 }
 
 /**
+* @tc.name: GetTypeDescriptor007
+* @tc.desc: Normal testcase of GetTypeDescriptor
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetTypeDescriptor007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor007 begin.");
+
+    std::shared_ptr<TypeDescriptor> descriptor;
+    std::string typeId = "com.apple.iwork";
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), typeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.archive");
+    EXPECT_EQ(descriptor->GetDescription(), "Apple iWork");
+    EXPECT_EQ(descriptor->GetIconFile(), "");
+    EXPECT_EQ(descriptor->GetFilenameExtensions().empty(), true);
+    EXPECT_EQ(descriptor->GetMimeTypes().empty(), true);
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor007 end.");
+}
+
+/**
+* @tc.name: GetTypeDescriptor008
+* @tc.desc: Normal testcase of GetTypeDescriptor
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetTypeDescriptor008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor008 begin.");
+
+    std::shared_ptr<TypeDescriptor> descriptor;
+    std::string typeId = "com.apple.iwork.keynote.key";
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), typeId);
+    auto belongingToTypes = descriptor->GetBelongingToTypes();
+    EXPECT_EQ(belongingToTypes[0], "general.composite-object");
+    EXPECT_EQ(belongingToTypes[1], "com.apple.iwork");
+    EXPECT_EQ(descriptor->GetDescription(), "Apple iWork Keynote Presentation File");
+    EXPECT_EQ(descriptor->GetIconFile(), "");
+    auto filenameExtensions = descriptor->GetFilenameExtensions();
+    EXPECT_EQ(filenameExtensions[0], ".key");
+    auto mimeTypes = descriptor->GetMimeTypes();
+    EXPECT_EQ(mimeTypes[0], "application/vnd.apple.keynote");
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor008 end.");
+}
+
+/**
+* @tc.name: GetTypeDescriptor009
+* @tc.desc: Normal testcase of GetTypeDescriptor
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetTypeDescriptor009, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor009 begin.");
+
+    std::shared_ptr<TypeDescriptor> descriptor;
+    std::string typeId = "com.apple.iwork.numbers.numbers";
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), typeId);
+    auto belongingToTypes = descriptor->GetBelongingToTypes();
+    EXPECT_EQ(belongingToTypes[0], "general.composite-object");
+    EXPECT_EQ(belongingToTypes[1], "com.apple.iwork");
+    EXPECT_EQ(descriptor->GetDescription(), "Apple iWork Numbers Spread Sheet File");
+    EXPECT_EQ(descriptor->GetIconFile(), "");
+    auto filenameExtensions = descriptor->GetFilenameExtensions();
+    EXPECT_EQ(filenameExtensions[0], ".numbers");
+    auto mimeTypes = descriptor->GetMimeTypes();
+    EXPECT_EQ(mimeTypes[0], "application/vnd.apple.numbers");
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor009 end.");
+}
+
+/**
+* @tc.name: GetTypeDescriptor0010
+* @tc.desc: Normal testcase of GetTypeDescriptor
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetTypeDescriptor0010, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor0010 begin.");
+
+    std::shared_ptr<TypeDescriptor> descriptor;
+    std::string typeId = "com.apple.iwork.pages.pages";
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), typeId);
+    auto belongingToTypes = descriptor->GetBelongingToTypes();
+    EXPECT_EQ(belongingToTypes[0], "general.composite-object");
+    EXPECT_EQ(belongingToTypes[1], "com.apple.iwork");
+    EXPECT_EQ(descriptor->GetDescription(), "Apple iWork Pages Document File");
+    EXPECT_EQ(descriptor->GetIconFile(), "");
+    auto filenameExtensions = descriptor->GetFilenameExtensions();
+    EXPECT_EQ(filenameExtensions[0], ".pages");
+    auto mimeTypes = descriptor->GetMimeTypes();
+    EXPECT_EQ(mimeTypes[0], "application/vnd.apple.pages");
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor0010 end.");
+}
+
+/**
 * @tc.name: GetUniformDataTypeByFilenameExtension001
 * @tc.desc: Normal testcase of GetUniformDataTypeByFilenameExtension
 * @tc.type: FUNC
