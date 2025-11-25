@@ -87,13 +87,7 @@ ani_object CreateLong(ani_env *env, int64_t value)
 
 bool SetFieldRef(ani_env *env, ani_class cls, ani_object object, const std::string &fieldName, ani_ref value)
 {
-    ani_field field = nullptr;
-    ani_status status = env->Class_FindField(cls, fieldName.c_str(), &field);
-    if (status != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "FindField %{public}s failed, status: %{public}d", fieldName.c_str(), status);
-        return false;
-    }
-    status = env->Object_SetField_Ref(object, field, value);
+    ani_status status = env->Object_SetPropertyByName_Ref(object, fieldName.c_str(), value);
     if (status != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "SetField_Ref %{public}s failed, status: %{public}d", fieldName.c_str(), status);
         return false;
