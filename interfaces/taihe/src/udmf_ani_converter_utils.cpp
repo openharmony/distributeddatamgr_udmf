@@ -179,7 +179,7 @@ ani_object AniConverter::WrapSummary(ani_env *env, std::shared_ptr<Summary> summ
         LOG_ERROR(UDMF_ANI, "Unbox Long failed");
         return nullptr;
     }
-    if (ANI_OK != env->Object_SetFieldByName_Long(obj, "totalSize", param_value)) {
+    if (ANI_OK != env->Object_SetPropertyByName_Long(obj, "totalSize", param_value)) {
         LOG_ERROR(UDMF_ANI, "Set Field failed");
         return nullptr;
     }
