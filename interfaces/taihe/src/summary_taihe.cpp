@@ -74,7 +74,7 @@ void SummaryTaihe::SetSummary(::taihe::map_view<::taihe::string, int64_t> summar
         if (item.first.empty()) {
             continue;
         }
-        this->value_->summary.emplace(std::string(item.first), item.second);
+        this->value_->summary.emplace(item.first, item.second);
     }
 }
 
