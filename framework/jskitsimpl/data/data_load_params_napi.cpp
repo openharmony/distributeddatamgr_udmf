@@ -75,6 +75,7 @@ bool DataLoadParamsNapi::Convert2NativeValue(napi_env env, napi_value in, DataLo
                 LOG_ERROR(UDMF_KITS_NAPI, "call func failed,status=%{public}d,udKey=%{public}s", status, udKey.c_str());
             }
             napi_release_threadsafe_function(tsfn, napi_tsfn_release);
+            delete infoArgs;
             return false;
         });
         if (!tsfnExist) { LOG_ERROR(UDMF_KITS_NAPI, "Tsfn not exist, udKey=%{public}s", udKey.c_str()); }
@@ -119,7 +120,8 @@ void DataLoadParamsNapi::CallDataLoadHandler(napi_env env, napi_value callback, 
     napi_call_function(env, result, thenFunc, 2, thenArgs, NULL);
 }
 
-napi_value DataLoadParamsNapi::PromiseThenHandler(napi_env env, napi_callback_info info) {
+napi_value DataLoadParamsNapi::PromiseThenHandler(napi_env env, napi_callback_info info)
+{
     size_t argc = 1;
     napi_value args[1];
     DataLoadArgs* infoArgs;
@@ -132,7 +134,8 @@ napi_value DataLoadParamsNapi::PromiseThenHandler(napi_env env, napi_callback_in
     return promiseRet;
 }
 
-napi_value DataLoadParamsNapi::PromiseCatchHandler(napi_env env, napi_callback_info info) {
+napi_value DataLoadParamsNapi::PromiseCatchHandler(napi_env env, napi_callback_info info)
+{
     size_t argc = 1;
     napi_value args[1];
     DataLoadArgs* infoArgs;
