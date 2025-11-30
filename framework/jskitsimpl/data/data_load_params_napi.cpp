@@ -55,31 +55,7 @@ bool DataLoadParamsNapi::Convert2NativeValue(napi_env env, napi_value in, DataLo
         }
         return true;
     });
-    dataLoadParams.loadHandler = [](const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
-        LOG_INFO(UDMF_KITS_NAPI, "Load handler Start.");
-        auto seqKey = UTILS::GetSequenceKey(udKey);
-        if (seqKey.empty()) {
-            LOG_ERROR(UDMF_KITS_NAPI, "Error udKey:%{public}s", udKey.c_str());
-            return;
-        }
-        bool tsfnExist = tsfns_.ComputeIfPresent(seqKey, [&](const std::string &key, napi_threadsafe_function &tsfn) {
-            DataLoadArgs *infoArgs = new (std::nothrow) DataLoadArgs;
-            if (infoArgs == nullptr) {
-                LOG_ERROR(UDMF_KITS_NAPI, "No space for dataLoadArgs, udKey=%{public}s", udKey.c_str());
-                return false;
-            }
-            infoArgs->udKey = udKey;
-            infoArgs->dataLoadInfo = dataLoadInfo;
-            auto status = napi_call_threadsafe_function(tsfn, infoArgs, napi_tsfn_blocking);
-            if (status != napi_ok) {
-                LOG_ERROR(UDMF_KITS_NAPI, "call func failed,status=%{public}d,udKey=%{public}s", status, udKey.c_str());
-            }
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release);
-            delete infoArgs;
-            return false;
-        });
-        if (!tsfnExist) { LOG_ERROR(UDMF_KITS_NAPI, "Tsfn not exist, udKey=%{public}s", udKey.c_str()); }
-    };
+    AssignDataLoadParams(dataLoadParams);
     return true;
 }
 
@@ -116,8 +92,13 @@ void DataLoadParamsNapi::CallDataLoadHandler(napi_env env, napi_value callback, 
     napi_create_function(env, "asyncThen", NAPI_AUTO_LENGTH, PromiseThenHandler, infoArgs, &thenHandler);
     napi_value catchHandler;
     napi_create_function(env, "asyncCatch", NAPI_AUTO_LENGTH, PromiseCatchHandler, infoArgs, &catchHandler);
+    size_t argsSize = 2;
     napi_value thenArgs[2] = { thenHandler, catchHandler };
-    napi_call_function(env, result, thenFunc, 2, thenArgs, NULL);
+    status = napi_call_function(env, result, thenFunc, argsSize, thenArgs, NULL);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "Call then failed, status=%{public}d", status);
+        delete infoArgs;
+    }
 }
 
 napi_value DataLoadParamsNapi::PromiseThenHandler(napi_env env, napi_callback_info info)
@@ -163,6 +144,35 @@ int32_t DataLoadParamsNapi::HandleUnifiedData(napi_env env, std::string udKey, n
         LOG_ERROR(UDMF_KITS_NAPI, "SetData failed, status=%{public}d", ret);
     }
     return ret;
+}
+
+void DataLoadParamsNapi::AssignDataLoadParams(DataLoadParams &dataLoadParams)
+{
+    dataLoadParams.loadHandler = [](const std::string &udKey, const DataLoadInfo &dataLoadInfo) {
+        LOG_INFO(UDMF_KITS_NAPI, "Load handler Start.");
+        auto seqKey = UTILS::GetSequenceKey(udKey);
+        if (seqKey.empty()) {
+            LOG_ERROR(UDMF_KITS_NAPI, "Error udKey:%{public}s", udKey.c_str());
+            return;
+        }
+        bool tsfnExist = tsfns_.ComputeIfPresent(seqKey, [&](const std::string &key, napi_threadsafe_function &tsfn) {
+            DataLoadArgs *infoArgs = new (std::nothrow) DataLoadArgs;
+            if (infoArgs == nullptr) {
+                LOG_ERROR(UDMF_KITS_NAPI, "No space for dataLoadArgs, udKey=%{public}s", udKey.c_str());
+                return false;
+            }
+            infoArgs->udKey = udKey;
+            infoArgs->dataLoadInfo = dataLoadInfo;
+            auto status = napi_call_threadsafe_function(tsfn, infoArgs, napi_tsfn_blocking);
+            if (status != napi_ok) {
+                LOG_ERROR(UDMF_KITS_NAPI, "call func failed,status=%{public}d,udKey=%{public}s", status, udKey.c_str());
+            }
+            napi_release_threadsafe_function(tsfn, napi_tsfn_release);
+            delete infoArgs;
+            return false;
+        });
+        if (!tsfnExist) { LOG_ERROR(UDMF_KITS_NAPI, "Tsfn not exist, udKey=%{public}s", udKey.c_str()); }
+    };
 }
 } // namespace UDMF
 } // namespace OHOS

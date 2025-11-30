@@ -41,6 +41,7 @@ private:
     static napi_value PromiseCatchHandler(napi_env env, napi_callback_info info);
     static int32_t HandleUnifiedData(napi_env env, std::string udKey, napi_value data);
     static ConcurrentMap<std::string, napi_threadsafe_function> tsfns_;
+    static void AssignDataLoadParams(DataLoadParams &dataLoadParams);
 };
 
 } // namespace UDMF
