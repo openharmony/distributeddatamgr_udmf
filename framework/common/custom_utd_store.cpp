@@ -81,7 +81,14 @@ std::string CustomUtdStore::GetCustomUtdPath(bool isHap, int32_t userId)
     std::string userIdStr = std::to_string(userId);
     std::string path = std::string(CUSTOM_UTD_SA_DIR).append(userIdStr).append(CUSTOM_UTD_SA_SUB_DIR);
     std::string oldPath = std::string(CUSTOM_UTD_SA_DIR).append(userIdStr).append(OLD_CUSTOM_UTD_SA_SUB_DIR);
-    path = (access(path.c_str(), F_OK) != 0 && access(oldPath.c_str(), F_OK) == 0) ? oldPath : path;
+    if (access(path.c_str(), F_OK) != 0) {
+        LOG_WARN(UDMF_CLIENT, "path not exist, errno:%{public}d", errno);
+        if (access(oldPath.c_str(), F_OK) == 0) {
+            path = oldPath;
+        } else {
+            LOG_WARN(UDMF_CLIENT, "oldPath not exist, errno:%{public}d", errno);
+        }
+    }
     path.append(UTD_CFG_FILE);
     return path;
 }
@@ -141,15 +148,18 @@ int32_t CustomUtdStore::SaveCfgFile(const std::string &jsonData, const std::stri
     std::ofstream ofs;
     ofs.open(cfgFilePath, 0x02);
     if (!ofs.is_open()) {
-        LOG_ERROR(UDMF_CLIENT, "open cfg failed");
+        LOG_ERROR(UDMF_CLIENT, "open cfg failed, errno:%{public}d", errno);
         return E_FS_ERROR;
     }
     ofs << jsonData << std::endl;
     if (!ofs.good()) {
-        LOG_ERROR(UDMF_CLIENT, "write cfg failed");
+        LOG_ERROR(UDMF_CLIENT, "write cfg failed, errno:%{public}d", errno);
         return E_FS_ERROR;
     }
     ofs.close();
+    if (ofs.fail()) {
+        LOG_WARN(UDMF_CLIENT, "close cfg failed, errno:%{public}d", errno);
+    }
     LOG_DEBUG(UDMF_CLIENT, "set cfg end.");
     return E_OK;
 }
@@ -171,8 +181,9 @@ bool CustomUtdStore::CreateDirectory(const std::string &path) const
         }
 
         if (access(subPath.c_str(), F_OK) != 0) {
+            LOG_WARN(UDMF_CLIENT, "subPath not exist, errno:%{public}d", errno);
             if (mkdir(subPath.c_str(), (S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) != 0) {
-                LOG_WARN(UDMF_CLIENT, "CreateDirectory, fail.");
+                LOG_WARN(UDMF_CLIENT, "CreateDirectory, fail, errno:%{public}d", errno);
                 return false;
             }
         }
@@ -184,7 +195,7 @@ bool CustomUtdStore::CreateDirectory(const std::string &path) const
 #endif
         return true;
     }
-    LOG_ERROR(UDMF_CLIENT, "CreateDirectory fail.");
+    LOG_ERROR(UDMF_CLIENT, "CreateDirectory fail, errno:%{public}d", errno);
     return false;
 }
 
@@ -353,7 +364,7 @@ UtdFileInfo CustomUtdStore::GetCustomUtdInfo(bool isHap, int32_t userId)
     std::string path = GetCustomUtdPath(isHap, userId);
     struct stat fileStat;
     if (stat(path.c_str(), &fileStat) != 0) {
-        LOG_WARN(UDMF_CLIENT, "custom utd file not exist");
+        LOG_WARN(UDMF_CLIENT, "custom utd file not exist, errno:%{public}d", errno);
         return info;
     }
 
