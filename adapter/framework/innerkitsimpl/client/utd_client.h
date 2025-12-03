@@ -63,6 +63,7 @@ private:
     std::string GetTypeIdFromCfg(const std::string &mimeType);
     std::vector<std::string> GetTypeIdsFromCfg(const std::string &mimeType);
     void SubscribeUtdChange();
+    UtdUpdateContext PrepareContext(const std::string &bundleName, int32_t userId);
 
     std::vector<TypeDescriptorCfg> descriptorCfgs_;
     std::shared_ptr<UtdChangeSubscriber> subscriber_;

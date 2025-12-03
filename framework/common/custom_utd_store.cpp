@@ -256,8 +256,7 @@ Status CustomUtdStore::InstallDynamicUtds(const std::vector<TypeDescriptorCfg> &
         context.installedDynamicUtdCfgs.begin(), context.installedDynamicUtdCfgs.end());
 
     CustomUtdCfgs typeCfgs = { dynamicUtds, {} };
-    auto status = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(
-        typeCfgs, UtdTypeCategory::DYNAMIC_TYPE, context);
+    auto status = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(typeCfgs, UtdTypeCategory::DYNAMIC_TYPE, context);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "check type descriptors failed, bundleName:%{public}s, status = %{public}d",
             context.bundleName.c_str(), status);

@@ -226,9 +226,11 @@ bool UtdCfgsChecker::CheckTypeIdUniqueness(const CustomUtdCfgs &typeCfgs,
         }
     }
     for (auto &typeCfg: context.installedCustomUtdCfgs) {
-        if (typeCategory == UtdTypeCategory::DYNAMIC_TYPE || !typeCfg.ownerBundle.empty()) {
-            seenIds.insert(typeCfg.typeId);
+        // not check reference type while installing static type
+        if (typeCategory == UtdTypeCategory::STATIC_TYPE && typeCfg.ownerBundle.empty()) {
+            continue;
         }
+        seenIds.insert(typeCfg.typeId);
     }
     for (auto &typeCfg: typeCfgs.first) {
         if (!seenIds.insert(typeCfg.typeId).second) {

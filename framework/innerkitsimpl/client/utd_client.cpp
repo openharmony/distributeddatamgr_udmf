@@ -469,13 +469,7 @@ void UtdClient::InstallCustomUtds(const std::string &bundleName, const std::stri
     LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
     std::lock_guard<std::mutex> lock(updateUtdMutex_);
 
-    UtdUpdateContext context = {
-        .bundleName = bundleName,
-        .userId = user,
-        .presetCfgs = PresetTypeDescriptors::GetInstance().GetPresetTypes(),
-        .installedCustomUtdCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, user),
-        .installedDynamicUtdCfgs = CustomUtdStore::GetInstance().GetDynamicUtd(false, user),
-    };
+    UtdUpdateContext context = PrepareContext(bundleName, user);
     if (!CustomUtdStore::GetInstance().UninstallCustomUtds(context)) {
         LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
             bundleName.c_str(), user);
@@ -496,8 +490,8 @@ void UtdClient::InstallCustomUtds(const std::string &bundleName, const std::stri
         return;
     }
     allInstallUtd = context.installedDynamicUtdCfgs;
-    allInstallUtd.insert(allInstallUtd.end(),
-        context.installedCustomUtdCfgs.begin(), context.installedCustomUtdCfgs.end());
+    allInstallUtd.insert(allInstallUtd.end(), std::make_move_iterator(context.installedCustomUtdCfgs.begin()),
+        std::make_move_iterator(context.installedCustomUtdCfgs.end()));
     UpdateGraph(allInstallUtd);
 }
 
@@ -509,13 +503,7 @@ void UtdClient::UninstallCustomUtds(const std::string &bundleName, int32_t user)
     LOG_INFO(UDMF_CLIENT, "start, bundleName:%{public}s, user:%{public}d", bundleName.c_str(), user);
     std::lock_guard<std::mutex> lock(updateUtdMutex_);
 
-    UtdUpdateContext context = {
-        .bundleName = bundleName,
-        .userId = user,
-        .presetCfgs = PresetTypeDescriptors::GetInstance().GetPresetTypes(),
-        .installedCustomUtdCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, user),
-        .installedDynamicUtdCfgs = CustomUtdStore::GetInstance().GetDynamicUtd(false, user),
-    };
+    UtdUpdateContext context = PrepareContext(bundleName, user);
     if (!CustomUtdStore::GetInstance().UninstallCustomUtds(context)) {
         LOG_ERROR(UDMF_CLIENT, "custom utd installed failed. bundleName:%{public}s, user:%{public}d",
             bundleName.c_str(), user);
@@ -528,8 +516,8 @@ void UtdClient::UninstallCustomUtds(const std::string &bundleName, int32_t user)
         return;
     }
     auto allInstallUtd = context.installedDynamicUtdCfgs;
-    allInstallUtd.insert(allInstallUtd.end(),
-        context.installedCustomUtdCfgs.begin(), context.installedCustomUtdCfgs.end());
+    allInstallUtd.insert(allInstallUtd.end(), std::make_move_iterator(context.installedCustomUtdCfgs.begin()),
+        std::make_move_iterator(context.installedCustomUtdCfgs.end()));
     UpdateGraph(allInstallUtd);
 }
 
@@ -665,13 +653,7 @@ Status UtdClient::InstallDynamicUtds(const std::string &bundleName,
         return E_ERROR;
     }
     std::lock_guard<std::mutex> lock(updateUtdMutex_);
-    UtdUpdateContext context = {
-        .bundleName = bundleName,
-        .userId = userId,
-        .presetCfgs = PresetTypeDescriptors::GetInstance().GetPresetTypes(),
-        .installedCustomUtdCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, userId),
-        .installedDynamicUtdCfgs = CustomUtdStore::GetInstance().GetDynamicUtd(false, userId),
-    };
+    UtdUpdateContext context = PrepareContext(bundleName, userId);
     auto status = CustomUtdStore::GetInstance().InstallDynamicUtds(customTypeCfgs, context);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Failed, status=%{public}d", status);
@@ -697,13 +679,7 @@ Status UtdClient::UninstallDynamicUtds(const std::string &bundleName, const std:
         return E_ERROR;
     }
     std::lock_guard<std::mutex> lock(updateUtdMutex_);
-    UtdUpdateContext context = {
-        .bundleName = bundleName,
-        .userId = userId,
-        .presetCfgs = PresetTypeDescriptors::GetInstance().GetPresetTypes(),
-        .installedCustomUtdCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, userId),
-        .installedDynamicUtdCfgs = CustomUtdStore::GetInstance().GetDynamicUtd(false, userId),
-    };
+    UtdUpdateContext context = PrepareContext(bundleName, userId);
     auto status = CustomUtdStore::GetInstance().UninstallDynamicUtds(typeIds, context);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Failed, status=%{public}d", status);
@@ -714,6 +690,17 @@ Status UtdClient::UninstallDynamicUtds(const std::string &bundleName, const std:
         std::make_move_iterator(context.installedDynamicUtdCfgs.end()));
     UpdateGraph(allInstalledUtd);
     return E_OK;
+}
+
+UtdUpdateContext UtdClient::PrepareContext(const std::string &bundleName, int32_t userId)
+{
+    return {
+        .bundleName = bundleName,
+        .userId = userId,
+        .presetCfgs = PresetTypeDescriptors::GetInstance().GetPresetTypes(),
+        .installedCustomUtdCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, userId),
+        .installedDynamicUtdCfgs = CustomUtdStore::GetInstance().GetDynamicUtd(false, userId),
+    };
 }
 } // namespace UDMF
 } // namespace OHOS

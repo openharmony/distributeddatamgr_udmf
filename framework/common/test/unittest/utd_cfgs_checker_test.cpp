@@ -303,4 +303,192 @@ HWTEST_F(UtdCfgsCheckerTest, CheckTypeDescriptors_005, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "CheckTypeDescriptors_005 end.");
 }
 
+/**
+ * @tc.name: CheckTypeIdUniqueness_001
+ * @tc.desc: Normal testcase of CheckTypeIdUniqueness
+ * @tc.type: FUNC
+ */
+HWTEST_F(UtdCfgsCheckerTest, CheckTypeIdUniqueness_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CheckTypeIdUniqueness_001 begin.");
+    TypeDescriptorCfg type1;
+    type1.typeId = "general.type1";
+    std::vector<TypeDescriptorCfg> presetCfgs = {type1};
+
+    TypeDescriptorCfg type2;
+    type2.typeId = "com.demo.test.type2";
+    type2.ownerBundle = "com.demo.test";
+
+    TypeDescriptorCfg type3;
+    type3.typeId = "com.demo.test.type3";
+    type3.ownerBundle = "com.demo.test";
+    
+    UtdUpdateContext ctx = {
+        .presetCfgs = {type1}
+    };
+    ctx.installedDynamicUtdCfgs = { type2 };
+    ctx.installedCustomUtdCfgs = { type3 };
+
+    TypeDescriptorCfg type4;
+    type4.typeId = "com.demo.test.type4";
+    type4.ownerBundle = "com.demo.test";
+
+    CustomUtdCfgs installing = {{type4}, {}};
+    EXPECT_TRUE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::DYNAMIC_TYPE, ctx));
+    EXPECT_TRUE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::STATIC_TYPE, ctx));
+
+    installing = {{}, {type4}};
+    EXPECT_TRUE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::DYNAMIC_TYPE, ctx));
+    EXPECT_TRUE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::STATIC_TYPE, ctx));
+}
+
+/**
+ * @tc.name: CheckTypeIdUniqueness_002
+ * @tc.desc: Normal testcase of CheckTypeIdUniqueness
+ * @tc.type: FUNC
+ */
+HWTEST_F(UtdCfgsCheckerTest, CheckTypeIdUniqueness_002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CheckTypeIdUniqueness_002 begin.");
+    TypeDescriptorCfg type1;
+    type1.typeId = "general.type1";
+    std::vector<TypeDescriptorCfg> presetCfgs = {type1};
+
+    TypeDescriptorCfg type2;
+    type2.typeId = "com.demo.test.type2";
+    type2.ownerBundle = "com.demo.test";
+
+    TypeDescriptorCfg type3;
+    type3.typeId = "com.demo.test.type3";
+    type3.ownerBundle = "com.demo.test";
+    
+    UtdUpdateContext ctx = {
+        .presetCfgs = {type1}
+    };
+    ctx.installedDynamicUtdCfgs = { type2 };
+    ctx.installedCustomUtdCfgs = { type3 };
+
+    TypeDescriptorCfg type4;
+    type4.typeId = "com.demo.test.type3";
+    type4.ownerBundle = "";
+
+    CustomUtdCfgs installing = {{}, {type4}};
+    EXPECT_TRUE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::STATIC_TYPE, ctx));
+}
+
+/**
+ * @tc.name: CheckTypeIdUniqueness_003
+ * @tc.desc: Normal testcase of CheckTypeIdUniqueness
+ * @tc.type: FUNC
+ */
+HWTEST_F(UtdCfgsCheckerTest, CheckTypeIdUniqueness_003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CheckTypeIdUniqueness_003 begin.");
+    TypeDescriptorCfg type1;
+    type1.typeId = "general.type1";
+    std::vector<TypeDescriptorCfg> presetCfgs = {type1};
+
+    TypeDescriptorCfg type2;
+    type2.typeId = "com.demo.test.type2";
+    type2.ownerBundle = "com.demo.test";
+
+    TypeDescriptorCfg type3;
+    type3.typeId = "com.demo.test.type3";
+    type3.ownerBundle = "";
+    
+    UtdUpdateContext ctx = {
+        .presetCfgs = {type1}
+    };
+    ctx.installedDynamicUtdCfgs = { type2 };
+    ctx.installedCustomUtdCfgs = { type3 };
+
+    TypeDescriptorCfg type4;
+    type4.typeId = "com.demo.test.type3";
+    type4.ownerBundle = "com.demo.test";
+    CustomUtdCfgs installing = {{}, {type4}};
+    EXPECT_TRUE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::STATIC_TYPE, ctx));
+
+    type4.ownerBundle = "";
+    installing = {{}, {type4}};
+    EXPECT_TRUE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::STATIC_TYPE, ctx));
+}
+
+/**
+ * @tc.name: CheckTypeIdUniqueness_004
+ * @tc.desc: Abnormal testcase of CheckTypeIdUniqueness
+ * @tc.type: FUNC
+ */
+HWTEST_F(UtdCfgsCheckerTest, CheckTypeIdUniqueness_004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CheckTypeIdUniqueness_004 begin.");
+    TypeDescriptorCfg type1;
+    type1.typeId = "general.type1";
+    std::vector<TypeDescriptorCfg> presetCfgs = {type1};
+
+    TypeDescriptorCfg type2;
+    type2.typeId = "com.demo.test.type2";
+    type2.ownerBundle = "com.demo.test";
+
+    TypeDescriptorCfg type3;
+    type3.typeId = "com.demo.test.type3";
+    type3.ownerBundle = "com.demo.test";
+    
+    UtdUpdateContext ctx = {
+        .presetCfgs = {type1}
+    };
+    ctx.installedDynamicUtdCfgs = { type2 };
+    ctx.installedCustomUtdCfgs = { type3 };
+
+    TypeDescriptorCfg type4;
+    type4.typeId = "general.type1";
+    CustomUtdCfgs installing = {{}, {type4}};
+    EXPECT_FALSE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::STATIC_TYPE, ctx));
+
+    type4.typeId = "com.demo.test.type2";
+    installing = {{}, {type4}};
+    EXPECT_FALSE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::STATIC_TYPE, ctx));
+}
+
+/**
+ * @tc.name: CheckTypeIdUniqueness_005
+ * @tc.desc: Abnormal testcase of CheckTypeIdUniqueness
+ * @tc.type: FUNC
+ */
+HWTEST_F(UtdCfgsCheckerTest, CheckTypeIdUniqueness_005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CheckTypeIdUniqueness_005 begin.");
+    TypeDescriptorCfg type1;
+    type1.typeId = "general.type1";
+    std::vector<TypeDescriptorCfg> presetCfgs = {type1};
+
+    TypeDescriptorCfg type2;
+    type2.typeId = "com.demo.test.type2";
+    type2.ownerBundle = "com.demo.test";
+
+    TypeDescriptorCfg type3;
+    type3.typeId = "com.demo.test.type3";
+    type3.ownerBundle = "com.demo.test";
+    
+    UtdUpdateContext ctx = {
+        .presetCfgs = {type1}
+    };
+    ctx.installedDynamicUtdCfgs = { type2 };
+    ctx.installedCustomUtdCfgs = { type3 };
+
+    TypeDescriptorCfg type4;
+    type4.typeId = "general.type1";
+    CustomUtdCfgs installing = {{type4}, {}};
+    EXPECT_FALSE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::STATIC_TYPE, ctx));
+    EXPECT_FALSE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::DYNAMIC_TYPE, ctx));
+
+    type4.typeId = "com.demo.test.type2";
+    installing = {{type4}, {}};
+    EXPECT_FALSE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::STATIC_TYPE, ctx));
+    EXPECT_FALSE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::DYNAMIC_TYPE, ctx));
+
+    type4.typeId = "com.demo.test.type3";
+    installing = {{type4}, {}};
+    EXPECT_FALSE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::STATIC_TYPE, ctx));
+    EXPECT_FALSE(UtdCfgsChecker::GetInstance().CheckTypeIdUniqueness(installing, UtdTypeCategory::DYNAMIC_TYPE, ctx));
+}
 }
