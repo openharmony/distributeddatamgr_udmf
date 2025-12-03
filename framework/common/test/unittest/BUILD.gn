@@ -72,6 +72,11 @@ ohos_unittest("UtdCfgsCheckerTest") {
   deps = common_deps
   use_exceptions = true
   external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
 }
 
 ohos_unittest("UdmfTypesUtilTest") {

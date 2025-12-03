@@ -57,6 +57,7 @@ struct UtdUpdateContext {
 enum class UtdTypeCategory {
     STATIC_TYPE,
     DYNAMIC_TYPE,
+    BUTT_TYPE
 };
 
 // UTD data category

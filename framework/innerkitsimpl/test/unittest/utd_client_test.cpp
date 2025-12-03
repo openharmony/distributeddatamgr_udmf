@@ -65,7 +65,7 @@ void UtdClientTest::TearDown()
 
 /**
 * @tc.name: GetTypeDescriptor001
-* @tc.desc: Normal testcase of GetTypeDescriptor
+* @tc.desc: Normal testcase of GetTypeDescriptor for com.amazon.azw3
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetTypeDescriptor001, TestSize.Level1)
@@ -121,7 +121,7 @@ HWTEST_F(UtdClientTest, GetTypeDescriptor003, TestSize.Level1)
 
 /**
 * @tc.name: GetTypeDescriptor004
-* @tc.desc: Normal testcase of GetTypeDescriptor
+* @tc.desc: Normal testcase of GetTypeDescriptor for org.gnu.gnu-zip-archive
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetTypeDescriptor004, TestSize.Level1)
@@ -158,7 +158,7 @@ HWTEST_F(UtdClientTest, GetTypeDescriptor005, TestSize.Level1)
 
 /**
 * @tc.name: GetTypeDescriptor006
-* @tc.desc: Normal testcase of GetTypeDescriptor
+* @tc.desc: Normal testcase of GetTypeDescriptor for general.fax
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetTypeDescriptor006, TestSize.Level1)
@@ -176,6 +176,106 @@ HWTEST_F(UtdClientTest, GetTypeDescriptor006, TestSize.Level1)
     EXPECT_EQ(descriptor->GetFilenameExtensions().empty(), true);
     EXPECT_EQ(descriptor->GetMimeTypes().empty(), true);
     LOG_INFO(UDMF_TEST, "GetTypeDescriptor006 end.");
+}
+
+/**
+* @tc.name: GetTypeDescriptor007
+* @tc.desc: Normal testcase of GetTypeDescriptor for com.apple.iwork
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetTypeDescriptor007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor007 begin.");
+
+    std::shared_ptr<TypeDescriptor> descriptor;
+    std::string typeId = "com.apple.iwork";
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), typeId);
+    EXPECT_EQ(*(descriptor->GetBelongingToTypes().begin()), "general.archive");
+    EXPECT_EQ(descriptor->GetDescription(), "Apple iWork");
+    EXPECT_EQ(descriptor->GetIconFile(), "");
+    EXPECT_EQ(descriptor->GetFilenameExtensions().empty(), true);
+    EXPECT_EQ(descriptor->GetMimeTypes().empty(), true);
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor007 end.");
+}
+
+/**
+* @tc.name: GetTypeDescriptor008
+* @tc.desc: Normal testcase of GetTypeDescriptor for com.apple.iwork.keynote.key
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetTypeDescriptor008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor008 begin.");
+
+    std::shared_ptr<TypeDescriptor> descriptor;
+    std::string typeId = "com.apple.iwork.keynote.key";
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), typeId);
+    auto belongingToTypes = descriptor->GetBelongingToTypes();
+    EXPECT_EQ(belongingToTypes[0], "general.composite-object");
+    EXPECT_EQ(belongingToTypes[1], "com.apple.iwork");
+    EXPECT_EQ(descriptor->GetDescription(), "Apple iWork Keynote Presentation File");
+    EXPECT_EQ(descriptor->GetIconFile(), "");
+    auto filenameExtensions = descriptor->GetFilenameExtensions();
+    EXPECT_EQ(filenameExtensions[0], ".key");
+    auto mimeTypes = descriptor->GetMimeTypes();
+    EXPECT_EQ(mimeTypes[0], "application/vnd.apple.keynote");
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor008 end.");
+}
+
+/**
+* @tc.name: GetTypeDescriptor009
+* @tc.desc: Normal testcase of GetTypeDescriptor for com.apple.iwork.numbers.numbers
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetTypeDescriptor009, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor009 begin.");
+
+    std::shared_ptr<TypeDescriptor> descriptor;
+    std::string typeId = "com.apple.iwork.numbers.numbers";
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), typeId);
+    auto belongingToTypes = descriptor->GetBelongingToTypes();
+    EXPECT_EQ(belongingToTypes[0], "general.composite-object");
+    EXPECT_EQ(belongingToTypes[1], "com.apple.iwork");
+    EXPECT_EQ(descriptor->GetDescription(), "Apple iWork Numbers Spread Sheet File");
+    EXPECT_EQ(descriptor->GetIconFile(), "");
+    auto filenameExtensions = descriptor->GetFilenameExtensions();
+    EXPECT_EQ(filenameExtensions[0], ".numbers");
+    auto mimeTypes = descriptor->GetMimeTypes();
+    EXPECT_EQ(mimeTypes[0], "application/vnd.apple.numbers");
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor009 end.");
+}
+
+/**
+* @tc.name: GetTypeDescriptor0010
+* @tc.desc: Normal testcase of GetTypeDescriptor for com.apple.iwork.pages.pages
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetTypeDescriptor0010, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor0010 begin.");
+
+    std::shared_ptr<TypeDescriptor> descriptor;
+    std::string typeId = "com.apple.iwork.pages.pages";
+    auto status = UtdClient::GetInstance().GetTypeDescriptor(typeId, descriptor);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(descriptor->GetTypeId(), typeId);
+    auto belongingToTypes = descriptor->GetBelongingToTypes();
+    EXPECT_EQ(belongingToTypes[0], "general.composite-object");
+    EXPECT_EQ(belongingToTypes[1], "com.apple.iwork");
+    EXPECT_EQ(descriptor->GetDescription(), "Apple iWork Pages Document File");
+    EXPECT_EQ(descriptor->GetIconFile(), "");
+    auto filenameExtensions = descriptor->GetFilenameExtensions();
+    EXPECT_EQ(filenameExtensions[0], ".pages");
+    auto mimeTypes = descriptor->GetMimeTypes();
+    EXPECT_EQ(mimeTypes[0], "application/vnd.apple.pages");
+    LOG_INFO(UDMF_TEST, "GetTypeDescriptor0010 end.");
 }
 
 /**
@@ -234,7 +334,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension003, TestSize.Level
 
 /**
 * @tc.name: GetUniformDataTypeByFilenameExtension004
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension,
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension,filenameExtension is invalid
 * para empty string, return E_INVALID_PARAMETERS
 * @tc.type: FUNC
 */
@@ -252,7 +352,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension004, TestSize.Level
 
 /**
 * @tc.name: GetUniformDataTypeByFilenameExtension005
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension, return invalid parameter
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension, blongsToType is invalid
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension005, TestSize.Level1)
@@ -287,7 +387,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension006, TestSize.Level
 
 /**
 * @tc.name: GetUniformDataTypeByFilenameExtension007
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension, return invalid parameter
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByFilenameExtension, blongsToType is invalid
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByFilenameExtension007, TestSize.Level1)
@@ -365,7 +465,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType002, TestSize.Level1)
 
 /**
 * @tc.name: GetUniformDataTypeByMIMEType003
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType, return invalid parameter
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType, blongsToType is invalid
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType003, TestSize.Level1)
@@ -381,7 +481,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType003, TestSize.Level1)
 
 /**
 * @tc.name: GetUniformDataTypeByMIMEType004
-* @tc.desc: BelongsTo is invalid, return invalid parameter
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType,, blongsToType is invalid
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType004, TestSize.Level1)
@@ -397,7 +497,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType004, TestSize.Level1)
 
 /**
 * @tc.name: GetUniformDataTypeByMIMEType005
-* @tc.desc: BelongsTo is invalid, return invalid parameter
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType,, blongsToType is invalid
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType005, TestSize.Level1)
@@ -413,7 +513,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMEType005, TestSize.Level1)
 
 /**
 * @tc.name: GetUniformDataTypeByMIMEType006
-* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType,
+* @tc.desc: Abnormal testcase of GetUniformDataTypeByMIMEType,, mimeType is invalid
 * para empty string, return E_INVALID_PARAMETERS
 * @tc.type: FUNC
 */
@@ -595,7 +695,7 @@ HWTEST_F(UtdClientTest, IsLowerLevelType001, TestSize.Level1)
 
 /**
 * @tc.name: IsLowerLevelType002
-* @tc.desc: TypeId is "', return invalid parameter
+* @tc.desc: Abnormal testcase of IsLowerLevelType, TypeId is invalid
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, IsLowerLevelType002, TestSize.Level1)
@@ -675,7 +775,7 @@ HWTEST_F(UtdClientTest, IsHigherLevelType001, TestSize.Level1)
 
 /**
 * @tc.name: IsHigherLevelType002
-* @tc.desc: Abnormal testcase of IsHigherLevelType, the two values are equal
+* @tc.desc: Abnormal testcase of IsHigherLevelType, descriptor is not com.amazon.azw3 higher level type
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, IsHigherLevelType002, TestSize.Level1)
@@ -695,7 +795,7 @@ HWTEST_F(UtdClientTest, IsHigherLevelType002, TestSize.Level1)
 
 /**
 * @tc.name: IsHigherLevelType003
-* @tc.desc: Abnormal testcase of IsHigherLevelType
+* @tc.desc: Abnormal testcase of IsHigherLevelType, descriptor is not general.image higher level type
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, IsHigherLevelType003, TestSize.Level1)
@@ -915,7 +1015,7 @@ HWTEST_F(UtdClientTest, FlexibleType002, TestSize.Level1)
     std::shared_ptr<TypeDescriptor> descriptor1;
     status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId1, descriptor1);
     EXPECT_EQ(status, E_OK);
-    
+
     std::string filenameExtension2 = ".myvideo";
     std::string blongsToType2 = "general.video";
     std::string flexTypeId2;
@@ -1055,7 +1155,7 @@ HWTEST_F(UtdClientTest, FlexibleType013, TestSize.Level1)
     std::shared_ptr<TypeDescriptor> descriptor1;
     status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId1, descriptor1);
     EXPECT_EQ(status, E_OK);
-    
+
     std::string filenameExtension2 = ".myvideo";
     std::string blongsToType2 = "general.video";
     std::string flexTypeId2;
@@ -1185,7 +1285,7 @@ HWTEST_F(UtdClientTest, FlexibleType023, TestSize.Level1)
     std::shared_ptr<TypeDescriptor> descriptor1;
     status = UtdClient::GetInstance().GetTypeDescriptor(flexTypeId1, descriptor1);
     EXPECT_EQ(status, E_OK);
-    
+
     std::string filenameExtension2 = ".myvideo";
     std::string blongsToType2 = "general.video";
     std::string flexTypeId2;
@@ -1235,7 +1335,7 @@ HWTEST_F(UtdClientTest, FlexibleType024, TestSize.Level1)
 
 /**
 * @tc.name: IsUtd001
-* @tc.desc: IsUtd
+* @tc.desc: Normal test of IsUtd
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, IsUtd001, TestSize.Level1)
@@ -1286,7 +1386,7 @@ HWTEST_F(UtdClientTest, IsUtd001, TestSize.Level1)
 
 /**
 * @tc.name: IsUtd002
-* @tc.desc: IsUtd
+* @tc.desc: Abnormal test of IsUtd, parameter is invalid
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, IsUtd002, TestSize.Level1)
@@ -1331,7 +1431,7 @@ HWTEST_F(UtdClientTest, IsUtd002, TestSize.Level1)
 
 /**
 * @tc.name: IsUtd003
-* @tc.desc: IsUtd
+* @tc.desc: Abnormal test of IsUtd, parameter is invalid
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, IsUtd003, TestSize.Level1)
@@ -1361,7 +1461,7 @@ HWTEST_F(UtdClientTest, IsUtd003, TestSize.Level1)
 
 /**
 * @tc.name: IsUtd004
-* @tc.desc: IsUtd
+* @tc.desc: Abnormal test of IsUtd, parameter is invalid
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, IsUtd004, TestSize.Level1)
@@ -1397,7 +1497,7 @@ HWTEST_F(UtdClientTest, IsUtd004, TestSize.Level1)
 
 /**
 * @tc.name: GetUniformDataTypeByMIMETypeByPrefix001
-* @tc.desc: normal testcase of GetUniformDataTypeByMIMEType by prefix.
+* @tc.desc: Normal testcase of GetUniformDataTypeByMIMEType by prefix.
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix001, TestSize.Level1)
@@ -1426,7 +1526,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix001, TestSize.Level1
 
 /**
 * @tc.name: GetUniformDataTypeByMIMETypeByPrefix002
-* @tc.desc: normal testcase of GetUniformDataTypeByMIMEType by prefix.
+* @tc.desc: Normal testcase of GetUniformDataTypeByMIMEType by prefix.
 * @tc.type: FUNC
 */
 HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix002, TestSize.Level1)
@@ -1515,7 +1615,7 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByFilenameExtension003, TestSize.Leve
     ASSERT_EQ(status, E_OK);
     ASSERT_EQ(currTypes.size(), 1);
     ASSERT_EQ(currTypes[0], "general.type-script");
-    
+
     blongsToType = "general.video";
     status =
         UtdClient::GetInstance().GetUniformDataTypesByFilenameExtension(filenameExtension, currTypes, blongsToType);

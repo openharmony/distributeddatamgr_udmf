@@ -82,7 +82,7 @@ Status UtdCfgsChecker::CheckTypeIdsContent(CustomUtdCfgs &typeCfgs, const std::s
                 LOG_ERROR(UDMF_CLIENT, "Declaration typeId does not start with bundleName");
                 return E_CONTENT_ERROR;
             }
-            if (!std::regex_match(declarationType.typeId, typeIdPattern_)) {
+            if (!std::regex_match(declarationType.typeId, std::regex(bundleName + TYPE_ID_REGEX))) {
                 LOG_ERROR(UDMF_CLIENT, "Declaration typeId check failed, bundleName: %{public}s", bundleName.c_str());
                 return E_FORMAT_ERROR;
             }
@@ -163,7 +163,8 @@ bool UtdCfgsChecker::CheckDynamicTypesSize(CustomUtdCfgs &typeCfgs, const UtdUpd
             return typeCfg.ownerBundle == context.bundleName;
         });
     if (static_cast<size_t>(dynamicTypesSize) + typeCfgs.first.size() > MAX_UTD_LENGTH) {
-        LOG_ERROR(UDMF_CLIENT, "dynamic types size exceeds max length");
+        LOG_ERROR(UDMF_CLIENT, "dynamic types size exceeds max length, dynamicTypesSize: %{public}d,\
+            installSize: %{public}zu", dynamicTypesSize, typeCfgs.first.size());
         return false;
     }
     return true;
