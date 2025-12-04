@@ -25,8 +25,7 @@ namespace UDMF {
 class UtdCfgsChecker {
 public:
     static UtdCfgsChecker & API_EXPORT GetInstance();
-    Status CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
-        const std::vector<TypeDescriptorCfg> &customCfgs, const std::string &bundleName);
+    Status CheckTypeDescriptors(CustomUtdCfgs &typeCfgs, UtdTypeCategory typeCategory, const UtdUpdateContext &context);
     bool CheckBelongingToTypes(const std::vector<TypeDescriptorCfg> &typeCfgs,
         const std::vector<TypeDescriptorCfg> &presetCfgs);
     bool API_EXPORT CheckTypeCfgsFormat(const CustomUtdCfgs &typeCfgs);
@@ -38,11 +37,13 @@ private:
     UtdCfgsChecker(const UtdCfgsChecker &obj) = delete;
     UtdCfgsChecker &operator=(const UtdCfgsChecker &obj) = delete;
     Status CheckTypeIdsContent(CustomUtdCfgs &typeCfgs, const std::string &bundleName);
-    bool CheckTypesRelation(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
-        const std::vector<TypeDescriptorCfg> &customCfgs);
+    bool CheckTypesRelation(CustomUtdCfgs &typeCfgs, UtdTypeCategory typeCategory, const UtdUpdateContext &context);
+    bool CheckTypeIdUniqueness(const CustomUtdCfgs &typeCfgs,
+        UtdTypeCategory typeCategory, const UtdUpdateContext &context);
     bool CanConstructDAG(CustomUtdCfgs &typeCfgs, const std::vector<TypeDescriptorCfg> &presetCfgs,
         const std::vector<TypeDescriptorCfg> &customCfgs);
     bool CheckTypeCfgsSize(const std::vector<TypeDescriptorCfg> &typeCfgs);
+    bool CheckDynamicTypesSize(CustomUtdCfgs &typeCfgs, const UtdUpdateContext &context);
 
     static const std::regex typeIdPattern_;
 };

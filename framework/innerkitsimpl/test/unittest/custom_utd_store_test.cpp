@@ -30,9 +30,6 @@ namespace OHOS::Test {
 constexpr const int32_t USERID = 1000000;
 constexpr const char* TEST_CFG_FILE = "/data/1000000/utd-adt.json";
 constexpr const char* TEST_CFG_DIR = "/data/1000000/";
-constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/utdtypes/utd/";
-constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/";
-constexpr const char* UTD_CFG_FILE = "utd-adt.json";
 
 constexpr const char* TEST_DATA2 = "{\
     \"CustomUTDs\": [{\
@@ -98,8 +95,7 @@ HWTEST_F(CustomUtdStoreTest, SaveTypeCfgs001, TestSize.Level1)
     std::vector<TypeDescriptorCfg> typesCfg;
     CustomUtdJsonParser parser;
     parser.ParseStoredCustomUtdJson(TEST_DATA2, typesCfg);
-    std::string fileDir = std::string(CUSTOM_UTD_SA_DIR).append(std::to_string(USERID)).append(CUSTOM_UTD_SA_SUB_DIR);
-    auto status = CustomUtdStore::GetInstance().SaveTypeCfgs(typesCfg, fileDir, fileDir + UTD_CFG_FILE);
+    auto status = CustomUtdStore::GetInstance().SaveTypeCfgs(typesCfg, UtdTypeCategory::STATIC_TYPE, USERID);
     EXPECT_EQ(status, E_OK);
 
     typesCfg.clear();

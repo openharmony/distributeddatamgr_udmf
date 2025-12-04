@@ -46,6 +46,20 @@ struct UtdFileInfo {
     int64_t lastTime = 0;
 };
 
+struct UtdUpdateContext {
+    std::string bundleName;
+    int32_t userId;
+    const std::vector<TypeDescriptorCfg> &presetCfgs;
+    std::vector<TypeDescriptorCfg> installedCustomUtdCfgs;
+    std::vector<TypeDescriptorCfg> installedDynamicUtdCfgs;
+};
+
+enum class UtdTypeCategory {
+    STATIC_TYPE,
+    DYNAMIC_TYPE,
+    BUTT_TYPE
+};
+
 // UTD data category
 constexpr const char* UTD_CUSTOM_DECLARATION = "UniformDataTypeDeclarations";
 constexpr const char* UTD_CUSTOM_REFERENCE = "ReferenceUniformDataTypeDeclarations";

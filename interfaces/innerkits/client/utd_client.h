@@ -71,6 +71,7 @@ private:
     Status RegServiceNotifier();
     Status InstallDynamicUtds(const std::string &bundleName, const std::vector<TypeDescriptorCfg> &customTypeCfgs);
     Status UninstallDynamicUtds(const std::string &bundleName, const std::vector<std::string> &typeIds);
+    UtdUpdateContext PrepareContext(const std::string &bundleName, int32_t userId);
     
     std::vector<TypeDescriptorCfg> descriptorCfgs_ {};
     std::shared_mutex utdMutex_;

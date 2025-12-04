@@ -34,6 +34,7 @@ constexpr const char* DYNAMIC_UTD_HAP_DIR = "/data/utd/utd-dynamic.json";
 constexpr const char* CUSTOM_UTD_SA_DIR = "/data/service/el1/";
 constexpr const char* OLD_CUSTOM_UTD_SA_SUB_DIR = "/distributeddata/utd/";
 constexpr const char* CUSTOM_UTD_SA_SUB_DIR = "/utdtypes/utd/";
+constexpr const char* TEMP_FILE_SUFFIX = ".tmp";
 
 CustomUtdStore::CustomUtdStore()
 {
@@ -102,8 +103,7 @@ std::string CustomUtdStore::GetDynamicUtdPath(bool isHap, int32_t userId)
         append(DYNAMIC_UTD_CFG_FILE);
 }
 
-int32_t CustomUtdStore::ReadTypeCfgs(const std::string &filePath,
-    std::vector<TypeDescriptorCfg> &utdTypes)
+int32_t CustomUtdStore::ReadTypeCfgs(const std::string &filePath, std::vector<TypeDescriptorCfg> &utdTypes)
 {
     std::ifstream fin(filePath);
     if (!fin.is_open()) {
@@ -127,8 +127,8 @@ int32_t CustomUtdStore::ReadTypeCfgs(const std::string &filePath,
     return E_OK;
 }
 
-int32_t CustomUtdStore::SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes,
-    const std::string &fileDir, const std::string &filePath)
+int32_t CustomUtdStore::SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &customUtdTypes, UtdTypeCategory category,
+    int32_t userId)
 {
     LOG_DEBUG(UDMF_CLIENT, "customUtdTypes total:%{public}zu.", customUtdTypes.size());
     std::string jsonData;
@@ -136,17 +136,23 @@ int32_t CustomUtdStore::SaveTypeCfgs(const std::vector<TypeDescriptorCfg> &custo
         LOG_ERROR(UDMF_CLIENT, "ConvertUtdCfgsToJson failed");
         return E_JSON_CONVERT_FAILED;
     }
+    std::string fileDir =
+        std::string(CUSTOM_UTD_SA_DIR).append(std::to_string(userId)).append(CUSTOM_UTD_SA_SUB_DIR);
     if (!CreateDirectory(fileDir)) {
         LOG_ERROR(UDMF_CLIENT, "CreateDirectory failed");
         return E_FS_ERROR;
     }
+    std::string filePath = category == UtdTypeCategory::STATIC_TYPE ?
+        fileDir + UTD_CFG_FILE : fileDir + DYNAMIC_UTD_CFG_FILE;
     return SaveCfgFile(jsonData, filePath);
 }
 
 int32_t CustomUtdStore::SaveCfgFile(const std::string &jsonData, const std::string &cfgFilePath)
 {
+    std::string tempFilePath = cfgFilePath + TEMP_FILE_SUFFIX;
     std::ofstream ofs;
-    ofs.open(cfgFilePath, 0x02);
+    ofs.open(tempFilePath, std::ios::out | std::ios::trunc);
+    
     if (!ofs.is_open()) {
         LOG_ERROR(UDMF_CLIENT, "open cfg failed, errno:%{public}d", errno);
         return E_FS_ERROR;
@@ -154,13 +160,27 @@ int32_t CustomUtdStore::SaveCfgFile(const std::string &jsonData, const std::stri
     ofs << jsonData << std::endl;
     if (!ofs.good()) {
         LOG_ERROR(UDMF_CLIENT, "write cfg failed, errno:%{public}d", errno);
+        ofs.close();
+        if (ofs.fail()) {
+            LOG_WARN(UDMF_CLIENT, "close cfg failed, errno:%{public}d", errno);
+        }
+        if (std::remove(tempFilePath.c_str()) != 0) {
+            LOG_WARN(UDMF_CLIENT, "remove temp cfg failed, errno:%{public}d", errno);
+        }
         return E_FS_ERROR;
     }
     ofs.close();
     if (ofs.fail()) {
         LOG_WARN(UDMF_CLIENT, "close cfg failed, errno:%{public}d", errno);
     }
-    LOG_DEBUG(UDMF_CLIENT, "set cfg end.");
+
+    if (std::rename(tempFilePath.c_str(), cfgFilePath.c_str()) != 0) {
+        LOG_ERROR(UDMF_CLIENT, "rename temp cfg failed, errno: %{public}d", errno);
+        if (std::remove(tempFilePath.c_str()) != 0) {
+            LOG_WARN(UDMF_CLIENT, "remove temp cfg failed, errno:%{public}d", errno);
+        }
+        return E_FS_ERROR;
+    }
     return E_OK;
 }
 
@@ -199,128 +219,110 @@ bool CustomUtdStore::CreateDirectory(const std::string &path) const
     return false;
 }
 
-bool CustomUtdStore::InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr,
-    int32_t user, std::vector<TypeDescriptorCfg> &customTyepCfgs)
+bool CustomUtdStore::InstallCustomUtds(const std::string &jsonStr, UtdUpdateContext &context)
 {
     CustomUtdCfgs typeCfgs;
     if (!utdJsonParser_.ParseUserCustomUtdJson(jsonStr, typeCfgs.first, typeCfgs.second)) {
-        LOG_ERROR(UDMF_CLIENT, "Parse json failed. bundleName:%{public}s", bundleName.c_str());
+        LOG_ERROR(UDMF_CLIENT, "Parse json failed. bundleName:%{public}s", context.bundleName.c_str());
         return false;
     }
-    std::vector<TypeDescriptorCfg> presetTypes = PresetTypeDescriptors::GetInstance().GetPresetTypes();
 
     auto status = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(
-        typeCfgs, presetTypes, customTyepCfgs, bundleName);
+        typeCfgs, UtdTypeCategory::STATIC_TYPE, context);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "check type descriptors failed, bundleName:%{public}s, status = %{public}d",
-            bundleName.c_str(), status);
+            context.bundleName.c_str(), status);
         return false;
     }
 
-    ProcessUtdForSave(typeCfgs, customTyepCfgs, bundleName);
-    std::string fileDir = std::string(CUSTOM_UTD_SA_DIR).append(std::to_string(user)).append(CUSTOM_UTD_SA_SUB_DIR);
-    if (SaveTypeCfgs(customTyepCfgs, fileDir, fileDir + UTD_CFG_FILE) != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "Save failed, bundleName: %{public}s", bundleName.c_str());
-        return false;
-    }
-    return true;
-}
-
-bool CustomUtdStore::UninstallCustomUtds(const std::string &bundleName, int32_t user,
-    std::vector<TypeDescriptorCfg> &customTyepCfgs)
-{
-    for (auto iter = customTyepCfgs.begin(); iter != customTyepCfgs.end();) {
-        auto it = find(iter->installerBundles.begin(), iter->installerBundles.end(), bundleName);
-        if (it != iter->installerBundles.end()) {
-            iter->installerBundles.erase(it);
-        }
-        if (iter->installerBundles.empty()) {
-            iter = customTyepCfgs.erase(iter);
-        } else {
-            iter++;
-        }
-    }
-    std::vector<TypeDescriptorCfg> presetTypes = PresetTypeDescriptors::GetInstance().GetPresetTypes();
-    if (!UtdCfgsChecker::GetInstance().CheckBelongingToTypes(customTyepCfgs, presetTypes)) {
-        LOG_ERROR(UDMF_CLIENT, "belongingToTypes check failed. bundleName:%{public}s", bundleName.c_str());
-        return false;
-    }
-    std::string fileDir = std::string(CUSTOM_UTD_SA_DIR).append(std::to_string(user)).append(CUSTOM_UTD_SA_SUB_DIR);
-    if (SaveTypeCfgs(customTyepCfgs, fileDir, fileDir + UTD_CFG_FILE) != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s", bundleName.c_str());
+    ProcessUtdForSave(typeCfgs, context.installedCustomUtdCfgs, context.bundleName);
+    if (SaveTypeCfgs(context.installedCustomUtdCfgs, UtdTypeCategory::STATIC_TYPE, context.userId) != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Save failed, bundleName: %{public}s", context.bundleName.c_str());
         return false;
     }
     return true;
 }
 
-Status CustomUtdStore::InstallDynamicUtds(const std::vector<TypeDescriptorCfg> &dynamicUtds,
-    const std::string &bundleName, int32_t userId)
+bool CustomUtdStore::UninstallCustomUtds(UtdUpdateContext &context)
 {
-    std::vector<TypeDescriptorCfg> presetTypes = PresetTypeDescriptors::GetInstance().GetPresetTypes();
+    auto shouldRemove = [&context](auto& cfg) {
+        if (cfg.ownerBundle == context.bundleName) {
+            cfg.ownerBundle.clear();
+        }
+        cfg.installerBundles.erase(context.bundleName);
+        return cfg.installerBundles.empty();
+    };
+    context.installedCustomUtdCfgs.erase(std::remove_if(
+        context.installedCustomUtdCfgs.begin(), context.installedCustomUtdCfgs.end(), shouldRemove),
+        context.installedCustomUtdCfgs.end());
+    
+    if (!UtdCfgsChecker::GetInstance().CheckBelongingToTypes(context.installedCustomUtdCfgs, context.presetCfgs)) {
+        LOG_ERROR(UDMF_CLIENT, "belongingToTypes check failed. bundleName:%{public}s", context.bundleName.c_str());
+        return false;
+    }
+    if (SaveTypeCfgs(context.installedCustomUtdCfgs, UtdTypeCategory::STATIC_TYPE, context.userId) != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s", context.bundleName.c_str());
+        return false;
+    }
+    return true;
+}
 
-    auto installedDynamicUtds = GetDynamicUtd(false, userId);
-    auto installedTypes = GetCustomUtd(false, userId);
-    installedTypes.reserve(installedTypes.size() + installedDynamicUtds.size());
-    installedTypes.insert(installedTypes.end(), installedDynamicUtds.begin(), installedDynamicUtds.end());
+Status CustomUtdStore::InstallDynamicUtds(const std::vector<TypeDescriptorCfg> &dynamicUtds, UtdUpdateContext &context)
+{
+    auto installedTypes = context.installedCustomUtdCfgs;
+    installedTypes.insert(installedTypes.end(),
+        context.installedDynamicUtdCfgs.begin(), context.installedDynamicUtdCfgs.end());
 
     CustomUtdCfgs typeCfgs = { dynamicUtds, {} };
-    auto status = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(
-        typeCfgs, presetTypes, installedTypes, bundleName);
+    auto status = UtdCfgsChecker::GetInstance().CheckTypeDescriptors(typeCfgs, UtdTypeCategory::DYNAMIC_TYPE, context);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "check type descriptors failed, bundleName:%{public}s, status = %{public}d",
-            bundleName.c_str(), status);
+            context.bundleName.c_str(), status);
         return status;
     }
 
     for (auto dynamicUtd : dynamicUtds) {
-        dynamicUtd.installerBundles.emplace(bundleName);
-        dynamicUtd.ownerBundle = bundleName;
-        installedDynamicUtds.push_back(std::move(dynamicUtd));
+        dynamicUtd.installerBundles.emplace(context.bundleName);
+        dynamicUtd.ownerBundle = context.bundleName;
+        context.installedDynamicUtdCfgs.push_back(std::move(dynamicUtd));
     }
-    std::string fileDir = std::string(CUSTOM_UTD_SA_DIR).append(std::to_string(userId)).append(CUSTOM_UTD_SA_SUB_DIR);
-    if (SaveTypeCfgs(installedDynamicUtds, fileDir, fileDir + DYNAMIC_UTD_CFG_FILE) != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "Save failed, bundleName: %{public}s", bundleName.c_str());
+    if (SaveTypeCfgs(context.installedDynamicUtdCfgs, UtdTypeCategory::DYNAMIC_TYPE, context.userId) != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Save failed, bundleName: %{public}s", context.bundleName.c_str());
         return E_FS_ERROR;
     }
     return E_OK;
 }
 
-Status CustomUtdStore::UninstallDynamicUtds(const std::vector<std::string> &typeIds,
-    const std::string &bundleName, int32_t userId)
+Status CustomUtdStore::UninstallDynamicUtds(const std::vector<std::string> &dynamicTypeIds, UtdUpdateContext &context)
 {
-    if (!UtdCfgsChecker::GetInstance().CheckTypeIdsFormat(typeIds)) {
+    if (!UtdCfgsChecker::GetInstance().CheckTypeIdsFormat(dynamicTypeIds)) {
         LOG_ERROR(UDMF_CLIENT, "CheckTypeIdsFormat not pass");
         return E_INVALID_TYPE_ID;
     }
-    auto installedDynamicUtd = GetDynamicUtd(false, userId);
-    for (const auto &typeId : typeIds) {
-        auto it = find_if(installedDynamicUtd.begin(), installedDynamicUtd.end(),
+    for (const auto &typeId : dynamicTypeIds) {
+        auto it = find_if(context.installedDynamicUtdCfgs.begin(), context.installedDynamicUtdCfgs.end(),
             [&typeId](const TypeDescriptorCfg &typeCfg) { return typeCfg.typeId == typeId; });
-        if (it == installedDynamicUtd.end()) {
+        if (it == context.installedDynamicUtdCfgs.end()) {
             LOG_ERROR(UDMF_CLIENT, "typeId not installed");
             return E_INVALID_TYPE_ID;
         }
-        if (it->ownerBundle != bundleName) {
-            LOG_ERROR(UDMF_CLIENT, "bundleName:%{public}s not install typeId", bundleName.c_str());
+        if (it->ownerBundle != context.bundleName) {
+            LOG_ERROR(UDMF_CLIENT, "bundleName:%{public}s not install typeId", context.bundleName.c_str());
             return E_INVALID_TYPE_ID;
         }
-        installedDynamicUtd.erase(it);
+        context.installedDynamicUtdCfgs.erase(it);
     }
 
-    std::vector<TypeDescriptorCfg> presetTypes = PresetTypeDescriptors::GetInstance().GetPresetTypes();
-
-    auto installedTypes = installedDynamicUtd;
-    auto installedCustomUtd = GetCustomUtd(false, userId);
+    auto installedTypes = context.installedDynamicUtdCfgs;
     installedTypes.insert(installedTypes.end(),
-        std::make_move_iterator(installedCustomUtd.begin()), std::make_move_iterator(installedCustomUtd.end()));
-
-    if (!UtdCfgsChecker::GetInstance().CheckBelongingToTypes(installedTypes, presetTypes)) {
-        LOG_ERROR(UDMF_CLIENT, "belongingToTypes check failed. bundleName:%{public}s", bundleName.c_str());
+        context.installedCustomUtdCfgs.begin(), context.installedCustomUtdCfgs.end());
+    
+    if (!UtdCfgsChecker::GetInstance().CheckBelongingToTypes(installedTypes, context.presetCfgs)) {
+        LOG_ERROR(UDMF_CLIENT, "belongingToTypes check failed. bundleName:%{public}s", context.bundleName.c_str());
         return E_INVALID_TYPE_ID;
     }
-    std::string fileDir = std::string(CUSTOM_UTD_SA_DIR).append(std::to_string(userId)).append(CUSTOM_UTD_SA_SUB_DIR);
-    if (SaveTypeCfgs(installedDynamicUtd, fileDir, fileDir + DYNAMIC_UTD_CFG_FILE) != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s", bundleName.c_str());
+    if (SaveTypeCfgs(context.installedDynamicUtdCfgs, UtdTypeCategory::DYNAMIC_TYPE, context.userId) != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Save type cfgs failed, bundleName: %{public}s", context.bundleName.c_str());
         return E_FS_ERROR;
     }
     return E_OK;
@@ -373,21 +375,20 @@ UtdFileInfo CustomUtdStore::GetCustomUtdInfo(bool isHap, int32_t userId)
     return info;
 }
 
-Status CustomUtdStore::UninstallDynamicUtds(const std::string &bundleName, int32_t userId)
+Status CustomUtdStore::UninstallDynamicUtds(UtdUpdateContext &context)
 {
-    auto installedDynamicUtd = GetDynamicUtd(false, userId);
     bool modifiyDynamicUtd = false;
-    for (auto it = installedDynamicUtd.begin(); it != installedDynamicUtd.end();) {
-        if (it->ownerBundle == bundleName) {
-            it = installedDynamicUtd.erase(it);
+    for (auto it = context.installedDynamicUtdCfgs.begin(); it != context.installedDynamicUtdCfgs.end();) {
+        if (it->ownerBundle == context.bundleName) {
+            it = context.installedDynamicUtdCfgs.erase(it);
             modifiyDynamicUtd = true;
         } else {
             it++;
         }
     }
-    std::string fileDir = std::string(CUSTOM_UTD_SA_DIR).append(std::to_string(userId)).append(CUSTOM_UTD_SA_SUB_DIR);
-    if (modifiyDynamicUtd && SaveTypeCfgs(installedDynamicUtd, fileDir, fileDir + DYNAMIC_UTD_CFG_FILE) != E_OK) {
-        LOG_ERROR(UDMF_CLIENT, "Save failed, bundleName: %{public}s", bundleName.c_str());
+    if (modifiyDynamicUtd &&
+        SaveTypeCfgs(context.installedDynamicUtdCfgs, UtdTypeCategory::DYNAMIC_TYPE, context.userId) != E_OK) {
+        LOG_ERROR(UDMF_CLIENT, "Save failed, bundleName: %{public}s", context.bundleName.c_str());
         return E_FS_ERROR;
     }
     return E_OK;
