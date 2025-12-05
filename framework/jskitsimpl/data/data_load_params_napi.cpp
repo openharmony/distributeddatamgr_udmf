@@ -31,7 +31,7 @@ bool DataLoadParamsNapi::Convert2NativeValue(napi_env env, napi_value in, DataLo
     NAPI_CALL_BASE(env, napi_get_named_property(env, in, "dataLoadInfo", &jsDataLoadInfo), false);
     NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsDataLoadInfo, dataLoadParams.dataLoadInfo), false);
     napi_value loadHandler = nullptr;
-    NAPI_CALL_BASE(env, napi_get_named_property(env, in, "loadHandlerAsync", &loadHandler), false);
+    NAPI_CALL_BASE(env, napi_get_named_property(env, in, "delayedDataLoadHandler", &loadHandler), false);
     napi_valuetype handlerType = napi_undefined;
     NAPI_CALL_BASE(env, napi_typeof(env, loadHandler, &handlerType), false);
     if (handlerType == napi_null || handlerType == napi_undefined) {
@@ -61,19 +61,17 @@ bool DataLoadParamsNapi::Convert2NativeValue(napi_env env, napi_value in, DataLo
 
 void DataLoadParamsNapi::CallDataLoadHandler(napi_env env, napi_value callback, void *context, void *data)
 {
-    DataLoadArgs* infoArgs = static_cast<DataLoadArgs*>(data);
+    std::unique_ptr<DataLoadArgs> infoArgs(static_cast<DataLoadArgs*>(data));
     napi_value param;
     auto status = NapiDataUtils::SetValue(env, infoArgs->dataLoadInfo, param);
     if (status != napi_ok) {
         LOG_ERROR(UDMF_KITS_NAPI, "SetValue dataLoadInfo failed, status=%{public}d", status);
-        delete infoArgs;
         return;
     }
     napi_value result = nullptr;
     status = napi_call_function(env, nullptr, callback, 1, &param, &result);
     if (status != napi_ok || result == nullptr) {
         LOG_ERROR(UDMF_KITS_NAPI, "napi_call_function failed, status=%{public}d", status);
-        delete infoArgs;
         return;
     }
     bool isPromise = false;
@@ -81,34 +79,62 @@ void DataLoadParamsNapi::CallDataLoadHandler(napi_env env, napi_value callback, 
     if (!isPromise) {
         LOG_INFO(UDMF_KITS_NAPI, "Not promise");
         HandleUnifiedData(env, infoArgs->udKey, result);
-        delete infoArgs;
         return;
     }
+    HandlePromise(env, result, std::move(infoArgs));
+}
+
+napi_status DataLoadParamsNapi::HandlePromise(napi_env env, napi_value promise, std::unique_ptr<DataLoadArgs> data)
+{
     napi_value thenName;
-    napi_create_string_utf8(env, "then", NAPI_AUTO_LENGTH, &thenName);
+    auto status = napi_create_string_utf8(env, "then", NAPI_AUTO_LENGTH, &thenName);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_create_string_utf8 failed, status=%{public}d", status);
+        return status;
+    }
     napi_value thenFunc;
-    napi_get_property(env, result, thenName, &thenFunc);
+    status = napi_get_property(env, promise, thenName, &thenFunc);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_get_property failed, status=%{public}d", status);
+        return status;
+    }
     napi_value thenHandler;
-    napi_create_function(env, "asyncThen", NAPI_AUTO_LENGTH, PromiseThenHandler, infoArgs, &thenHandler);
+    DataLoadArgs *args = data.release();
+    napi_create_function(env, "asyncThen", NAPI_AUTO_LENGTH, PromiseThenHandler, args, &thenHandler);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_create_function asyncThen failed, status=%{public}d", status);
+        delete args;
+        return status;
+    }
     napi_value catchHandler;
-    napi_create_function(env, "asyncCatch", NAPI_AUTO_LENGTH, PromiseCatchHandler, infoArgs, &catchHandler);
+    napi_create_function(env, "asyncCatch", NAPI_AUTO_LENGTH, PromiseCatchHandler, args, &catchHandler);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_create_function asyncCatch failed, status=%{public}d", status);
+        delete args;
+        return status;
+    }
     size_t argsSize = 2;
     napi_value thenArgs[2] = { thenHandler, catchHandler };
-    status = napi_call_function(env, result, thenFunc, argsSize, thenArgs, NULL);
+    status = napi_call_function(env, promise, thenFunc, argsSize, thenArgs, NULL);
     if (status != napi_ok) {
         LOG_ERROR(UDMF_KITS_NAPI, "Call then failed, status=%{public}d", status);
-        delete infoArgs;
+        delete args;
+        return status;
     }
+    return napi_ok;
 }
 
 napi_value DataLoadParamsNapi::PromiseThenHandler(napi_env env, napi_callback_info info)
 {
     size_t argc = 1;
     napi_value args[1];
-    DataLoadArgs* infoArgs;
-    napi_get_cb_info(env, info, &argc, args, NULL, (void **)&infoArgs);
+    std::unique_ptr<DataLoadArgs> infoArgs;
+    auto status = napi_get_cb_info(env, info, &argc, args, NULL, (void **)&infoArgs);
+    if (status != napi_ok || !infoArgs) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_get_cb_info failed, status=%{public}d", status);
+        return NULL;
+    }
     std::string udKey = infoArgs->udKey;
-    delete infoArgs;
     auto ret = HandleUnifiedData(env, udKey, args[0]);
     napi_value promiseRet;
     NapiDataUtils::SetValue(env, ret, promiseRet);
@@ -119,9 +145,11 @@ napi_value DataLoadParamsNapi::PromiseCatchHandler(napi_env env, napi_callback_i
 {
     size_t argc = 1;
     napi_value args[1];
-    DataLoadArgs* infoArgs;
-    napi_get_cb_info(env, info, &argc, args, NULL, (void **)&infoArgs);
-    delete infoArgs;
+    std::unique_ptr<DataLoadArgs> infoArgs;
+    auto status = napi_get_cb_info(env, info, &argc, args, NULL, (void **)&infoArgs);
+    if (status != napi_ok) {
+        LOG_ERROR(UDMF_KITS_NAPI, "napi_get_cb_info failed, status=%{public}d", status);
+    }
     return NULL;
 }
 
@@ -156,19 +184,20 @@ void DataLoadParamsNapi::AssignDataLoadParams(DataLoadParams &dataLoadParams)
             return;
         }
         bool tsfnExist = tsfns_.ComputeIfPresent(seqKey, [&](const std::string &key, napi_threadsafe_function &tsfn) {
-            DataLoadArgs *infoArgs = new (std::nothrow) DataLoadArgs;
+            auto infoArgs = std::make_unique<DataLoadArgs>();
             if (infoArgs == nullptr) {
                 LOG_ERROR(UDMF_KITS_NAPI, "No space for dataLoadArgs, udKey=%{public}s", udKey.c_str());
                 return false;
             }
             infoArgs->udKey = udKey;
             infoArgs->dataLoadInfo = dataLoadInfo;
-            auto status = napi_call_threadsafe_function(tsfn, infoArgs, napi_tsfn_blocking);
+            DataLoadArgs *data = infoArgs.release();
+            auto status = napi_call_threadsafe_function(tsfn, data, napi_tsfn_blocking);
             if (status != napi_ok) {
                 LOG_ERROR(UDMF_KITS_NAPI, "call func failed,status=%{public}d,udKey=%{public}s", status, udKey.c_str());
+                delete data;
             }
             napi_release_threadsafe_function(tsfn, napi_tsfn_release);
-            delete infoArgs;
             return false;
         });
         if (!tsfnExist) { LOG_ERROR(UDMF_KITS_NAPI, "Tsfn not exist, udKey=%{public}s", udKey.c_str()); }
