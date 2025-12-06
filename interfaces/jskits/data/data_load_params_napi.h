@@ -37,8 +37,12 @@ private:
     };
     static napi_value CreateDataLoadInfo(napi_env env, const DataLoadInfo &dataLoadInfo);
     static void CallDataLoadHandler(napi_env env, napi_value callback, void *context, void *data);
-    
+    static napi_status HandlePromise(napi_env env, napi_value promise, std::unique_ptr<DataLoadArgs> data);
+    static napi_value PromiseThenHandler(napi_env env, napi_callback_info info);
+    static napi_value PromiseCatchHandler(napi_env env, napi_callback_info info);
+    static int32_t HandleUnifiedData(napi_env env, std::string udKey, napi_value data);
     static ConcurrentMap<std::string, napi_threadsafe_function> tsfns_;
+    static void AssignDataLoadParams(DataLoadParams &dataLoadParams);
 };
 
 } // namespace UDMF
