@@ -272,4 +272,78 @@ HWTEST_F(UdmfTypesUtilMockTest, Unmarshalling011, TestSize.Level1)
     ret = ITypesUtil::Unmarshalling(dataLoadInfo, parcel);
     EXPECT_FALSE(ret);
 }
+
+/**
+* @tc.name: Unmarshalling012
+* @tc.desc: Unmarshalling UnifiedData
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilMockTest, Unmarshalling012, TestSize.Level1)
+{
+    UnifiedData output;
+    MessageParcel parcel;
+    auto rawData = new (std::nothrow) uint8_t[10];
+    EXPECT_CALL(*messageParcelMock_, GetDataSize()).WillOnce(Return(10));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillOnce(Return(10));
+    EXPECT_CALL(*messageParcelMock_, ReadRawData(_)).WillOnce(Return(rawData));
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_FALSE(ret);
+    delete[] rawData;
+}
+
+/**
+* @tc.name: Unmarshalling013
+* @tc.desc: Unmarshalling std::vector<UnifiedData>
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilMockTest, Unmarshalling013, TestSize.Level1)
+{
+    UnifiedData unifiedData;
+    std::vector<UnifiedData> output = {unifiedData};
+    MessageParcel parcel;
+    auto rawData = new (std::nothrow) uint8_t[10];
+    EXPECT_CALL(*messageParcelMock_, GetDataSize()).WillOnce(Return(10));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillOnce(Return(10));
+    EXPECT_CALL(*messageParcelMock_, ReadRawData(_)).WillOnce(Return(rawData));
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_FALSE(ret);
+    delete[] rawData;
+}
+
+/**
+* @tc.name: Marshalling001
+* @tc.desc: Marshalling DataLoadInfo
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilMockTest, Marshalling001, TestSize.Level1)
+{
+    DataLoadInfo input;
+    input.sequenceKey = "seq_2023";
+    input.types = {"typeA", "typeB", "typeC"};
+    input.recordCount = 1000;
+    MessageParcel parcel;
+
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, WriteRawData(_, _)).WillOnce(Return(false));
+    bool ret = ITypesUtil::Marshalling(input, parcel);
+    EXPECT_FALSE(ret);
+}
+
+/**
+* @tc.name: Unmarshalling014
+* @tc.desc: Unmarshalling DataLoadInfo
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilMockTest, Unmarshalling014, TestSize.Level1)
+{
+    DataLoadInfo output;
+    MessageParcel parcel;
+    auto rawData = new (std::nothrow) uint8_t[10];
+    EXPECT_CALL(*messageParcelMock_, GetDataSize()).WillOnce(Return(10));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillOnce(Return(10));
+    EXPECT_CALL(*messageParcelMock_, ReadRawData(_)).WillOnce(Return(rawData));
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_FALSE(ret);
+    delete[] rawData;
+}
 }
