@@ -282,13 +282,15 @@ HWTEST_F(UdmfTypesUtilMockTest, Unmarshalling012, TestSize.Level1)
 {
     UnifiedData output;
     MessageParcel parcel;
-    auto rawData = new (std::nothrow) uint8_t[10];
+    std::vector<uint8_t> rawData(10);
     EXPECT_CALL(*messageParcelMock_, GetDataSize()).WillOnce(Return(10));
     EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillOnce(Return(10));
-    EXPECT_CALL(*messageParcelMock_, ReadRawData(_)).WillOnce(Return(rawData));
+    EXPECT_CALL(*messageParcelMock_, ReadRawData(_))
+    .WillOnce([&](size_t size) -> uint8_t* {
+        return rawData.data();
+    });
     bool ret = ITypesUtil::Unmarshalling(output, parcel);
     EXPECT_FALSE(ret);
-    delete[] rawData;
 }
 
 /**
@@ -301,13 +303,15 @@ HWTEST_F(UdmfTypesUtilMockTest, Unmarshalling013, TestSize.Level1)
     UnifiedData unifiedData;
     std::vector<UnifiedData> output = {unifiedData};
     MessageParcel parcel;
-    auto rawData = new (std::nothrow) uint8_t[10];
+    std::vector<uint8_t> rawData(10);
     EXPECT_CALL(*messageParcelMock_, GetDataSize()).WillOnce(Return(10));
     EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillOnce(Return(10));
-    EXPECT_CALL(*messageParcelMock_, ReadRawData(_)).WillOnce(Return(rawData));
+    EXPECT_CALL(*messageParcelMock_, ReadRawData(_))
+    .WillOnce([&](size_t size) -> uint8_t* {
+        return rawData.data();
+    });
     bool ret = ITypesUtil::Unmarshalling(output, parcel);
     EXPECT_FALSE(ret);
-    delete[] rawData;
 }
 
 /**
@@ -338,12 +342,14 @@ HWTEST_F(UdmfTypesUtilMockTest, Unmarshalling014, TestSize.Level1)
 {
     DataLoadInfo output;
     MessageParcel parcel;
-    auto rawData = new (std::nothrow) uint8_t[10];
+    std::vector<uint8_t> rawData(10);
     EXPECT_CALL(*messageParcelMock_, GetDataSize()).WillOnce(Return(10));
     EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillOnce(Return(10));
-    EXPECT_CALL(*messageParcelMock_, ReadRawData(_)).WillOnce(Return(rawData));
+    EXPECT_CALL(*messageParcelMock_, ReadRawData(_))
+    .WillOnce([&](size_t size) -> uint8_t* {
+        return rawData.data();
+    });
     bool ret = ITypesUtil::Unmarshalling(output, parcel);
     EXPECT_FALSE(ret);
-    delete[] rawData;
 }
 }
