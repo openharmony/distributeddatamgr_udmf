@@ -274,7 +274,7 @@ void ImageEmbeddingImpl::releaseModel()
         return ::taihe::array<double>(nullptr, 0);
     }
     std::vector<double> res(result.size());
-    std::transform(result.begin(), result.end(), res.begin(), [](int val) { return static_cast<double>(val); });
+    std::transform(result.begin(), result.end(), res.begin(), [](float val) { return static_cast<double>(val); });
     return ::taihe::array<double>(res);
 }
 
