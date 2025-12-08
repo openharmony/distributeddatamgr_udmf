@@ -121,49 +121,60 @@ HWTEST_F(UdmfTypesUtilTest, Marshalling001, TestSize.Level1)
 
 /**
 * @tc.name: Unmarshalling003
-* @tc.desc: Normal testcase of Unmarshalling
+* @tc.desc: Normal testcase of Marshalling and Unmarshalling Privilege
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfTypesUtilTest, Unmarshalling003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Unmarshalling003 begin.");
+    Privilege input;
+    input.tokenId = 5;
+    input.readPermission = "readPermission";
+    input.writePermission = "writePermission";
     Privilege output;
-    output.tokenId = 5;
-    output.readPermission = "readPermission";
-    output.writePermission = "writePermission";
     MessageParcel parcel;
-    bool ret = ITypesUtil::Unmarshalling(output, parcel);
-    EXPECT_EQ(ret, ITypesUtil::Unmarshal(parcel, output.tokenId, output.readPermission, output.writePermission));
+    bool ret = ITypesUtil::Marshalling(input, parcel);
+    EXPECT_TRUE(ret);
+    ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_TRUE(ret);
     LOG_INFO(UDMF_TEST, "Unmarshalling003 end.");
 }
 
 /**
 * @tc.name: Unmarshalling004
-* @tc.desc: Normal testcase of Unmarshalling
+* @tc.desc: Normal testcase of Marshalling and Unmarshalling CustomOption
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfTypesUtilTest, Unmarshalling004, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Unmarshalling004 begin.");
-    CustomOption output;
+    CustomOption input = {.intention = Intention::UD_INTENTION_BUTT};
     MessageParcel parcel;
-    bool ret = ITypesUtil::Unmarshalling(output, parcel);
-    EXPECT_EQ(ret, ITypesUtil::Unmarshal(parcel, output.intention));
+    CustomOption output;
+    bool ret = ITypesUtil::Marshalling(input, parcel);
+    EXPECT_TRUE(ret);
+    ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_TRUE(ret);
     LOG_INFO(UDMF_TEST, "Unmarshalling004 end.");
 }
 
 /**
 * @tc.name: Unmarshalling005
-* @tc.desc: Normal testcase of Unmarshalling
+* @tc.desc: Normal testcase of Marshalling and Unmarshalling QueryOption
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfTypesUtilTest, Unmarshalling005, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "Unmarshalling005 begin.");
-    QueryOption output;
+    QueryOption input = {
+        .intention = Intention::UD_INTENTION_DATA_HUB
+    };
     MessageParcel parcel;
-    bool ret = ITypesUtil::Unmarshalling(output, parcel);
-    EXPECT_EQ(ret, ITypesUtil::Unmarshal(parcel, output.key, output.intention));
+    QueryOption output;
+    bool ret = ITypesUtil::Marshalling(input, parcel);
+    EXPECT_TRUE(ret);
+    ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_TRUE(ret);
     LOG_INFO(UDMF_TEST, "Unmarshalling005 end.");
 }
 
@@ -344,5 +355,90 @@ HWTEST_F(UdmfTypesUtilTest, Unmarshalling011, TestSize.Level1)
     EXPECT_TRUE(ret);
     EXPECT_EQ(input, output);
     LOG_INFO(UDMF_TEST, "Unmarshalling011 end.");
+}
+
+/**
+* @tc.name: Unmarshalling012
+* @tc.desc: Normal testcase of Marshalling and Unmarshalling UDType
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Unmarshalling012, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Unmarshalling012 begin.");
+    UDType input = static_cast<UDType>(UD_BUTT + 1);
+    MessageParcel parcel;
+    QueryOption output;
+    bool ret = ITypesUtil::Marshalling(input, parcel);
+    EXPECT_TRUE(ret);
+    ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "Unmarshalling012 end.");
+}
+
+/**
+* @tc.name: Unmarshalling013
+* @tc.desc: Normal testcase of Marshalling and Unmarshalling Intention
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Unmarshalling013, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Unmarshalling013 begin.");
+    Intention input = static_cast<Intention>(UD_INTENTION_BUTT + 1);
+    MessageParcel parcel;
+    QueryOption output;
+    bool ret = ITypesUtil::Marshalling(input, parcel);
+    EXPECT_TRUE(ret);
+    ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "Unmarshalling013 end.");
+}
+
+/**
+* @tc.name: Unmarshalling014
+* @tc.desc: Abnormal testcase of Unmarshalling Visibility
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Unmarshalling014, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Unmarshalling014 begin.");
+
+    Visibility output;
+    MessageParcel parcel;
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "Unmarshalling014 end.");
+}
+
+/**
+* @tc.name: Unmarshalling015
+* @tc.desc: Normal testcase of Marshalling and Unmarshalling Visibility
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Unmarshalling015, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Unmarshalling015 begin.");
+    Visibility input = static_cast<Visibility>(VISIBILITY_BUTT + 1);
+
+    MessageParcel parcel;
+    ITypesUtil::Marshalling(input, parcel);
+    Visibility output;
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "Unmarshalling015 end.");
+}
+
+/**
+* @tc.name: Unmarshalling016
+* @tc.desc: Abormal testcase of Unmarshalling Summary
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfTypesUtilTest, Unmarshalling016, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Unmarshalling016 begin.");
+    Summary output;
+    MessageParcel parcel;
+    bool ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_EQ(ret, false);
+    LOG_INFO(UDMF_TEST, "Unmarshalling016 end.");
 }
 } // OHOS::Test

@@ -1125,6 +1125,38 @@ HWTEST_F(TlvUtilTest, CountBufferSize_008, TestSize.Level1)
 }
 
 /* *
+ * @tc.name: CountBufferSize_009
+ * @tc.desc: test UriInfo for countBufferSize
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, CountBufferSize_009, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CountBufferSize_009 begin.");
+    UriInfo input;
+    input.authUri = "file://ohos.test.demo1/data/storage/el2/base/haps/local.png";
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    const size_t expectedSize = 6 * sizeof(TLVHead) + sizeof(uint32_t) + input.authUri.size() + sizeof(int32_t);
+    EXPECT_EQ(expectedSize, TLVUtil::CountBufferSize(input, tlvObject));
+    LOG_INFO(UDMF_TEST, "CountBufferSize_009 end.");
+}
+
+/* *
+ * @tc.name: CountBufferSize_010
+ * @tc.desc: test std::shared_ptr<OHOS::Media::PixelMap> for countBufferSize
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, CountBufferSize_010, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CountBufferSize_010 begin.");
+    std::shared_ptr<OHOS::Media::PixelMap> input;
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_EQ(0, TLVUtil::CountBufferSize(input, tlvObject));
+    LOG_INFO(UDMF_TEST, "CountBufferSize_010 end.");
+}
+
+/* *
  * @tc.name: WritingSet001
  * @tc.desc: Normal test of Writing Set
  * @tc.type: FUNC
@@ -1293,5 +1325,386 @@ HWTEST_F(TlvUtilTest, Reading_009, TestSize.Level1)
     result = TLVUtil::Reading(loadInfo, data, head);
     EXPECT_FALSE(result);
     LOG_INFO(UDMF_TEST, "Reading_009 end.");
+}
+
+/* *
+ * @tc.name: Reading_014
+ * @tc.desc: Abnormal test of Reading UDType
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Reading_014, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Reading_014 begin.");
+    UDType uType;
+    TLVObject data;
+    TLVHead head;
+    auto ret = TLVUtil::Reading(uType, data, head);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "Reading_014 end.");
+}
+
+/* *
+ * @tc.name: Reading_015
+ * @tc.desc: test ShareOptions for Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Reading_015, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Reading_015 begin.");
+    ShareOptions output;
+    TLVHead head;
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_FALSE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "Reading_015 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_010
+ * @tc.desc: test UnifiedKey for Writing and Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_010, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_010 begin.");
+    UnifiedKey input;
+    input.key = "123456";
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_APP_ID));
+
+    UnifiedKey output;
+    TLVHead head;
+    EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "WritingAndReading_010 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_011
+ * @tc.desc: test UnifiedData for Writing and Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_011, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_011 begin.");
+    UnifiedData input;
+    std::shared_ptr<UnifiedRecord> plainText = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "this is a content");
+    std::shared_ptr<UnifiedRecord> html = std::make_shared<Html>(UDType::HTML, "this is a HTML content");
+    std::vector<std::shared_ptr<UnifiedRecord>> records = {plainText, html };
+    input.SetRecords(records);
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_APP_ID));
+
+    UnifiedData output;
+    TLVHead head;
+    EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "WritingAndReading_011 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_012
+ * @tc.desc: test UnifiedDataProperties for Writing and Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_012, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_012 begin.");
+    UnifiedDataProperties input;
+    input.tag = "test";
+    input.timestamp = 0;
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_APP_ID));
+
+    UnifiedDataProperties output;
+    TLVHead head;
+    EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "WritingAndReading_012 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_013
+ * @tc.desc: test ShareOptions for Writing and Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_013, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_013 begin.");
+    UnifiedDataProperties input;
+    input.shareOptions= static_cast<ShareOptions>(SHARE_OPTIONS_BUTT + 1);
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_PROPERTIES_SHARE_OPTIONS));
+
+    ShareOptions output;
+    TLVHead head;
+    EXPECT_FALSE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "WritingAndReading_013 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_014
+ * @tc.desc: test UnifiedRecord for Writing and Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_014, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_014 begin.");
+    std::shared_ptr<UnifiedRecord> plainText = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "this is a content");
+    std::shared_ptr<UnifiedRecord> html = std::make_shared<Html>(UDType::HTML, "this is a HTML content");
+    std::vector<std::shared_ptr<UnifiedRecord>> input = {plainText, html };
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_APP_ID));
+
+    std::vector<std::shared_ptr<UnifiedRecord>> output;
+    TLVHead head;
+    EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "WritingAndReading_014 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_015
+ * @tc.desc: test Runtime for Writing and Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_015, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_015 begin.");
+    UnifiedKey key;
+    key.key = "123456";
+    Privilege privilege;
+    privilege.readPermission = "read";
+    privilege.tokenId = 333;
+    Privilege privilege2;
+    privilege2.writePermission = "read";
+    privilege2.tokenId = 444;
+    Runtime input;
+    input.dataStatus = DELETED;
+    input.key = key;
+    input.privileges.push_back(privilege);
+    input.privileges.push_back(privilege2);
+    input.createTime = 1;
+    input.dataVersion = 3;
+    input.createPackage = "package";
+    input.isPrivate = true;
+    input.appId = "appId";
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_APP_ID));
+
+    Runtime output;
+    TLVHead head;
+    EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "WritingAndReading_015 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_016
+ * @tc.desc: test Runtime for Writing and Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_016, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_016 begin.");
+    Privilege input;
+    input.readPermission = "read";
+    input.tokenId = 333;
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_APP_ID));
+
+    Privilege output;
+    TLVHead head;
+    EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "WritingAndReading_016 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_017
+ * @tc.desc: test UriInfo for Writing and Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_017, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_017 begin.");
+    UriInfo input;
+    input.authUri = "file://ohos.test.demo1/data/storage/el2/base/haps/local.png";
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_URI_ORI));
+
+    UriInfo output;
+    TLVHead head;
+    EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "WritingAndReading_017 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_018
+ * @tc.desc: test UriInfo for Writing and Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_018, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_018 begin.");
+    UriInfo input;
+    input.authUri = "file://ohos.test.demo1/data/storage/el2/base/haps/local.png";
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_URI_PERMISSION));
+
+    UriInfo output;
+    TLVHead head;
+    EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "WritingAndReading_018 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_019
+ * @tc.desc: test UriInfo for Writing and Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_019, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_019 begin.");
+    UriInfo input;
+    input.authUri = "file://ohos.test.demo1/data/storage/el2/base/haps/local.png";
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_APP_ID));
+
+    UriInfo output;
+    TLVHead head;
+    EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "WritingAndReading_019 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_020
+ * @tc.desc: test UriInfo for Writing and Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_020, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_020 begin.");
+    std::map<std::string, ValueType> value;
+    value["fileType"] = "File Type";
+    value["fileUri"] = "File Uri";
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    std::shared_ptr<UnifiedRecord> fileUri = std::make_shared<UnifiedRecord>(UDType::FILE_URI, obj);
+    std::shared_ptr<UnifiedRecord> plainText = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "this is a content");
+    std::shared_ptr<UnifiedRecord> html = std::make_shared<Html>(UDType::HTML, "this is a HTML content");
+    std::vector<std::shared_ptr<UnifiedRecord>> records = { fileUri, plainText, html };
+    UnifiedData data1;
+    data1.SetRecords(records);
+    Summary input;
+    UnifiedDataHelper::GetSummary(data1, input);
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_APP_ID));
+
+    Summary output;
+    TLVHead head;
+    EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "WritingAndReading_020 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_021
+ * @tc.desc: test UriInfo for Writing and Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_021, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_021 begin.");
+    DataLoadInfo input;
+    input.sequenceKey = "seq_2023";
+    input.types = {"typeA", "typeB", "typeC"};
+    input.recordCount = 1000;
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_APP_ID));
+
+    DataLoadInfo output;
+    TLVHead head;
+    EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "WritingAndReading_021 end.");
+}
+
+/* *
+ * @tc.name: Writing001
+ * @tc.desc: test std::shared_ptr<OHOS::Media::PixelMap> for Writing
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Writing001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Writing001 begin.");
+    std::shared_ptr<OHOS::Media::PixelMap> input;
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_FALSE(TLVUtil::Writing(input, tlvObject, TAG::TAG_SUMMARY_SPECIFIC_SUMMARY));
+    LOG_INFO(UDMF_TEST, "Writing001 end.");
+}
+
+/* *
+ * @tc.name: Writing002
+ * @tc.desc: test std::shared_ptr<OHOS::Media::PixelMap> for Writing
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Writing002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Writing002 begin.");
+    std::shared_ptr<OHOS::Media::PixelMap> input;
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_FALSE(TLVUtil::Writing(input, tlvObject, TAG::TAG_SUMMARY_SUMMARY_FORMAT));
+    LOG_INFO(UDMF_TEST, "Writing002 end.");
+}
+
+/* *
+ * @tc.name: Writing003
+ * @tc.desc: test std::shared_ptr<OHOS::Media::PixelMap> for Writing
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Writing003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Writing003 begin.");
+    std::shared_ptr<OHOS::Media::PixelMap> input;
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_FALSE(TLVUtil::Writing(input, tlvObject, TAG::TAG_SUMMARY_VERSION));
+    LOG_INFO(UDMF_TEST, "Writing003 end.");
+}
+
+/* *
+ * @tc.name: Writing004
+ * @tc.desc: test std::shared_ptr<OHOS::Media::PixelMap> for Writing
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Writing004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Writing004 begin.");
+    std::shared_ptr<OHOS::Media::PixelMap> input;
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_FALSE(TLVUtil::Writing(input, tlvObject, TAG::TAG_SUMMARY_TAG));
+    LOG_INFO(UDMF_TEST, "Writing004 end.");
 }
 }
