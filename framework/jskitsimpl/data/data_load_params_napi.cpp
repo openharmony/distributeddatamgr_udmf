@@ -38,6 +38,7 @@ bool DataLoadParamsNapi::Convert2NativeValue(napi_env env, napi_value in, DataLo
         LOG_INFO(UDMF_KITS_NAPI, "Aync data load handler is empty!");
         NAPI_CALL_BASE(env, napi_get_named_property(env, in, "loadHandler", &loadHandler), false);
     }
+    NAPI_CALL_BASE(env, napi_typeof(env, loadHandler, &handlerType), false);
     if (handlerType == napi_null || handlerType == napi_undefined) {
         LOG_INFO(UDMF_KITS_NAPI, "Data load handler is empty!");
         return false;
