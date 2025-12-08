@@ -44,21 +44,21 @@ OHOS::DataIntelligence::IAipCoreManager *imageAipCoreManager_ = nullptr;
 bool LoadAlgoLibrary(const std::string &fileName, OHOS::DataIntelligence::AipCoreManagerHandle &managerHandle)
 {
     if (managerHandle.handle != nullptr) {
-        LOG_ERROR(UDMF_ANI, "%{public}s handle has exists", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "handle has exists");
         return false;
     }
     if (fileName.empty()) {
-        LOG_ERROR(UDMF_ANI, "%{public}s algoPath is empty", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "algoPath is empty");
         return false;
     }
     char libRealPath[PATH_MAX] = {};
     if (realpath(fileName.c_str(), libRealPath) == nullptr) {
-        LOG_ERROR("%{public}s get absolute algoPath error, %{public}d", LOG_TAG, errno);
+        LOG_ERROR("get absolute algoPath error, %{public}d", errno);
         return false;
     }
     managerHandle.handle = dlopen(libRealPath, RTLD_LAZY);
     if (managerHandle.handle == nullptr) {
-        LOG_ERROR(UDMF_ANI, "%{public}s cannot load lib error: %{public}s", LOG_TAG, dlerror());
+        LOG_ERROR(UDMF_ANI, "cannot load lib error: %{public}s", dlerror());
         return false;
     }
     managerHandle.create = reinterpret_cast<OHOS::DataIntelligence::IAipCoreManager *(*)()>(
@@ -68,7 +68,7 @@ bool LoadAlgoLibrary(const std::string &fileName, OHOS::DataIntelligence::AipCor
     if (managerHandle.create == nullptr || managerHandle.destroy == nullptr) {
         dlclose(managerHandle.handle);
         managerHandle.Clear();
-        LOG_ERROR(UDMF_ANI, "%{public}s Failed to create and destroy algo", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "Failed to create and destroy algo");
         return false;
     }
     managerHandle.pAipManager = managerHandle.create();
@@ -81,7 +81,7 @@ bool LoadAlgoLibrary(const std::string &fileName, OHOS::DataIntelligence::AipCor
 bool UnLoadAlgoLibrary(OHOS::DataIntelligence::AipCoreManagerHandle &managerHandle)
 {
     if (managerHandle.handle == nullptr) {
-        LOG_ERROR(UDMF_ANI, "%{public}s handle is nullptr", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "handle is nullptr");
         return false;
     }
 
@@ -98,7 +98,7 @@ bool UnLoadAlgoLibrary(OHOS::DataIntelligence::AipCoreManagerHandle &managerHand
 TextEmbeddingImpl::TextEmbeddingImpl()
 {
     if (!LoadAlgoLibrary(AIP_MANAGER_PATH, textAipCoreMgrHandle_)) {
-        LOG_ERROR(UDMF_ANI, "%{public}s LoadAlgoLibrary failed", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "LoadAlgoLibrary failed");
     }
     if (textAipCoreMgrHandle_.pAipManager) {
         textAipCoreManager_ = textAipCoreMgrHandle_.pAipManager;
@@ -116,13 +116,13 @@ TextEmbeddingImpl::~TextEmbeddingImpl()
 void TextEmbeddingImpl::loadModel()
 {
     if (!textAipCoreManager_) {
-        LOG_ERROR(UDMF_ANI, "%{public}s textAipCoreManager_ is nullptr", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "textAipCoreManager_ is nullptr");
         taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
         return;
     }
     auto ret = textAipCoreManager_->LoadTextModel();
     if (ret != ERR_OK) {
-        LOG_ERROR(UDMF_ANI, "%{public}s LoadTextModel failed! ret:%{public}d", LOG_TAG, ret);
+        LOG_ERROR(UDMF_ANI, "LoadTextModel failed! ret:%{public}d", ret);
         if (ret == DEVICE_EXCEPTION_ERROR) {
             taihe::set_business_error(DEVICE_EXCEPTION_ERROR, "The device does not support this API.");
         } else {
@@ -134,13 +134,13 @@ void TextEmbeddingImpl::loadModel()
 void TextEmbeddingImpl::releaseModel()
 {
     if (!textAipCoreManager_) {
-        LOG_ERROR(UDMF_ANI, "%{public}s textAipCoreManager_ is nullptr", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "textAipCoreManager_ is nullptr");
         taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
         return;
     }
     auto ret = textAipCoreManager_->ReleaseTextModel();
     if (ret != ERR_OK) {
-        LOG_ERROR(UDMF_ANI, "%{public}s ReleaseTextModel failed! ret:%{public}d", LOG_TAG, ret);
+        LOG_ERROR(UDMF_ANI, "ReleaseTextModel failed! ret:%{public}d", ret);
         if (ret == DEVICE_EXCEPTION_ERROR) {
             taihe::set_business_error(DEVICE_EXCEPTION_ERROR, "The device does not support this API.");
         } else {
@@ -152,14 +152,14 @@ void TextEmbeddingImpl::releaseModel()
 ::taihe::array<double> TextEmbeddingImpl::getEmbedding(::taihe::string_view text)
 {
     if (!textAipCoreManager_) {
-        LOG_ERROR(UDMF_ANI, "%{public}s textAipCoreManager_ is nullptr", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "textAipCoreManager_ is nullptr");
         taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
         return ::taihe::array<double>(nullptr, 0);
     }
     std::vector<float> result;
     int32_t ret = textAipCoreManager_->GetTextEmbedding(std::string(text), result);
     if (ret != ERR_OK) {
-        LOG_ERROR(UDMF_ANI, "%{public}s GetTextEmbedding string failed! ret:%{public}d", LOG_TAG, ret);
+        LOG_ERROR(UDMF_ANI, "GetTextEmbedding string failed! ret:%{public}d", ret);
         if (ret == DEVICE_EXCEPTION_ERROR) {
             taihe::set_business_error(DEVICE_EXCEPTION_ERROR, "The device does not support this API.");
         } else {
@@ -176,7 +176,7 @@ void TextEmbeddingImpl::releaseModel()
     ::taihe::array_view<::taihe::string> batchTexts)
 {
     if (!textAipCoreManager_) {
-        LOG_ERROR(UDMF_ANI, "%{public}s textAipCoreManager_ is nullptr", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "textAipCoreManager_ is nullptr");
         taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
         return ::taihe::array<::taihe::array<double>>(nullptr, 0);
     }
@@ -186,7 +186,7 @@ void TextEmbeddingImpl::releaseModel()
         [](::taihe::string val) { return std::string(val); });
     int32_t ret = textAipCoreManager_->GetTextEmbedding(texts, result);
     if (ret != ERR_OK) {
-        LOG_ERROR(UDMF_ANI, "%{public}s GetTextEmbedding Array failed! ret:%{public}d", LOG_TAG, ret);
+        LOG_ERROR(UDMF_ANI, "GetTextEmbedding Array failed! ret:%{public}d", ret);
         if (ret == DEVICE_EXCEPTION_ERROR) {
             taihe::set_business_error(DEVICE_EXCEPTION_ERROR, "The device does not support this API.");
         } else {
@@ -207,7 +207,7 @@ void TextEmbeddingImpl::releaseModel()
 ImageEmbeddingImpl::ImageEmbeddingImpl()
 {
     if (!LoadAlgoLibrary(AIP_MANAGER_PATH, imgAipCoreMgrHandle_)) {
-        LOG_ERROR(UDMF_ANI, "%{public}s LoadAlgoLibrary failed", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "LoadAlgoLibrary failed");
     }
     if (imgAipCoreMgrHandle_.pAipManager) {
         imageAipCoreManager_ = imgAipCoreMgrHandle_.pAipManager;
@@ -225,13 +225,13 @@ ImageEmbeddingImpl::~ImageEmbeddingImpl()
 void ImageEmbeddingImpl::loadModel()
 {
     if (!imageAipCoreManager_) {
-        LOG_ERROR(UDMF_ANI, "%{public}s imageAipCoreManager_ is nullptr", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "imageAipCoreManager_ is nullptr");
         taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
         return;
     }
     auto ret = imageAipCoreManager_->LoadImageModel();
     if (ret != ERR_OK) {
-        LOG_ERROR(UDMF_ANI, "%{public}s LoadImageModel failed! ret:%{public}d", LOG_TAG, ret);
+        LOG_ERROR(UDMF_ANI, "LoadImageModel failed! ret:%{public}d", ret);
         if (ret == DEVICE_EXCEPTION_ERROR) {
             taihe::set_business_error(DEVICE_EXCEPTION_ERROR, "The device does not support this API.");
         } else {
@@ -243,13 +243,13 @@ void ImageEmbeddingImpl::loadModel()
 void ImageEmbeddingImpl::releaseModel()
 {
     if (!imageAipCoreManager_) {
-        LOG_ERROR(UDMF_ANI, "%{public}s imageAipCoreManager_ is nullptr", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "imageAipCoreManager_ is nullptr");
         taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
         return;
     }
     auto ret = imageAipCoreManager_->ReleaseImageModel();
     if (ret != ERR_OK) {
-        LOG_ERROR(UDMF_ANI, "%{public}s ReleaseImageModel failed! ret:%{public}d", LOG_TAG, ret);
+        LOG_ERROR(UDMF_ANI, "ReleaseImageModel failed! ret:%{public}d", ret);
         if (ret == DEVICE_EXCEPTION_ERROR) {
             taihe::set_business_error(DEVICE_EXCEPTION_ERROR, "The device does not support this API.");
         } else {
@@ -261,14 +261,14 @@ void ImageEmbeddingImpl::releaseModel()
 ::taihe::array<double> ImageEmbeddingImpl::getEmbedding(::taihe::string_view image)
 {
     if (!imageAipCoreManager_) {
-        LOG_ERROR(UDMF_ANI, "%{public}s imageAipCoreManager_ is nullptr", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "imageAipCoreManager_ is nullptr");
         taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
         return ::taihe::array<double>(nullptr, 0);
     }
     std::vector<float> result;
     int32_t ret = imageAipCoreManager_->GetImageEmbedding(std::string(image), result);
     if (ret != ERR_OK) {
-        LOG_ERROR(UDMF_ANI, "%{public}s GetImageEmbedding failed! ret:%{public}d", LOG_TAG, ret);
+        LOG_ERROR(UDMF_ANI, "GetImageEmbedding failed! ret:%{public}d", ret);
         if (ret == DEVICE_EXCEPTION_ERROR) {
             taihe::set_business_error(DEVICE_EXCEPTION_ERROR, "The device does not support this API.");
         } else {
@@ -287,7 +287,7 @@ void ImageEmbeddingImpl::releaseModel()
     ::ohos::data::intelligence::TextEmbedding textEmbed =
         taihe::make_holder<TextEmbeddingImpl, ::ohos::data::intelligence::TextEmbedding>();
     if (!textAipCoreManager_) {
-        LOG_ERROR(UDMF_ANI, "%{public}s textAipCoreManager_ is nullptr", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "textAipCoreManager_ is nullptr");
         taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
         return ::taihe::make_holder<TextEmbeddingImpl, ::ohos::data::intelligence::TextEmbedding>();
     }
@@ -302,7 +302,7 @@ void ImageEmbeddingImpl::releaseModel()
     }
     int32_t ret = textAipCoreManager_ ->InitTextModel(cfgData);
     if (ret != ERR_OK) {
-        LOG_ERROR(UDMF_ANI, "%{public}s GetTextEmbeddingModel failed! ret:%{public}d", LOG_TAG, ret);
+        LOG_ERROR(UDMF_ANI, "GetTextEmbeddingModel failed! ret:%{public}d", ret);
         if (ret == DEVICE_EXCEPTION_ERROR) {
             taihe::set_business_error(DEVICE_EXCEPTION_ERROR, "The device does not support this API.");
         } else {
@@ -320,7 +320,7 @@ void ImageEmbeddingImpl::releaseModel()
     ::ohos::data::intelligence::ImageEmbedding imageEmbed =
         taihe::make_holder<ImageEmbeddingImpl, ::ohos::data::intelligence::ImageEmbedding>();
     if (!imageAipCoreManager_) {
-        LOG_ERROR(UDMF_ANI, "%{public}s imageAipCoreManager_ is nullptr", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "imageAipCoreManager_ is nullptr");
         taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
         return taihe::make_holder<ImageEmbeddingImpl, ::ohos::data::intelligence::ImageEmbedding>();
     }
@@ -334,7 +334,7 @@ void ImageEmbeddingImpl::releaseModel()
     }
     int32_t ret = imageAipCoreManager_ ->InitImageModel(cfgData);
     if (ret != ERR_OK) {
-        LOG_ERROR(UDMF_ANI, "%{public}s getImageEmbeddingModel failed! ret:%{public}d", LOG_TAG, ret);
+        LOG_ERROR(UDMF_ANI, "getImageEmbeddingModel failed! ret:%{public}d", ret);
         if (ret == DEVICE_EXCEPTION_ERROR) {
             taihe::set_business_error(DEVICE_EXCEPTION_ERROR, "The device does not support this API.");
         } else {
@@ -351,24 +351,24 @@ void ImageEmbeddingImpl::releaseModel()
     ::ohos::data::intelligence::TextEmbedding textEmbed =
         taihe::make_holder<TextEmbeddingImpl, ::ohos::data::intelligence::TextEmbedding>();
     if (!textAipCoreManager_) {
-        LOG_ERROR(UDMF_ANI, "%{public}s textAipCoreManager_ is nullptr", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "textAipCoreManager_ is nullptr");
         taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
         return ::taihe::array<::taihe::string>(nullptr, 0);
     }
     if (!textAipCoreManager_->CheckDeviceType()) {
-        LOG_ERROR(UDMF_ANI, "%{public}s CheckDeviceType failed", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "CheckDeviceType failed");
         taihe::set_business_error(DEVICE_EXCEPTION_ERROR, "The device does not support this API.");
         return ::taihe::array<::taihe::string>(nullptr, 0);
     }
     if (config.size <= NUM_0 || config.overlapRatio < NUM_0 || config.overlapRatio >= NUM_1) {
-        LOG_ERROR(UDMF_ANI, "%{public}s The parameter value range is incorrect", LOG_TAG);
+        LOG_ERROR(UDMF_ANI, "The parameter value range is incorrect");
         taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
         return ::taihe::array<::taihe::string>(nullptr, 0);
     }
     std::vector<std::string> result;
     int32_t ret = textAipCoreManager_->SplitText(std::string(text), config.size, config.overlapRatio, result);
     if (ret != ERR_OK) {
-        LOG_ERROR(UDMF_ANI, "%{public}s SplitText failed! ret:%{public}d", LOG_TAG, ret);
+        LOG_ERROR(UDMF_ANI, "SplitText failed! ret:%{public}d", ret);
         if (ret == DEVICE_EXCEPTION_ERROR) {
             taihe::set_business_error(DEVICE_EXCEPTION_ERROR, "The device does not support this API.");
         } else {
