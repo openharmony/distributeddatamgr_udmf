@@ -1,0 +1,66 @@
+/*
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef UDMF_TYPE_DESCRIPTOR_TAIHE_H
+#define UDMF_TYPE_DESCRIPTOR_TAIHE_H
+
+#include "type_descriptor.h"
+#include "taihe_common_utils.h"
+#include "taihe/runtime.hpp"
+#include "ohos.data.uniformTypeDescriptor.impl.hpp"
+#include "ohos.data.uniformTypeDescriptor.proj.hpp"
+
+namespace OHOS {
+namespace UDMF {
+class TypeDescriptorImpl {
+private:
+    std::shared_ptr<TypeDescriptor> nativeDescriptor_;
+
+public:
+    TypeDescriptorImpl()
+    {
+        TypeDescriptorCfg config;
+        nativeDescriptor_ = std::make_shared<TypeDescriptor>(config);
+    }
+
+    explicit TypeDescriptorImpl(std::shared_ptr<TypeDescriptor> descriptor) : nativeDescriptor_(descriptor)
+    {
+        if (nativeDescriptor_ == nullptr) {
+            TypeDescriptorCfg config;
+            nativeDescriptor_ = std::make_shared<TypeDescriptor>(config);
+        }
+    }
+    ::taihe::string GetTypeId() const;
+    void SetTypeId(::taihe::string_view value);
+    ::taihe::array<::taihe::string> GetBelongingToTypes() const;
+    void SetBelongingToTypes(const ::taihe::array<::taihe::string>& value);
+    ::taihe::string GetDescription() const;
+    void SetDescription(::taihe::string_view value);
+    ::taihe::string GetReferenceURL() const;
+    void SetReferenceURL(::taihe::string_view value);
+    ::taihe::string GetIconFile() const;
+    void SetIconFile(::taihe::string_view value);
+    ::taihe::array<::taihe::string> GetFilenameExtensions() const;
+    void SetFilenameExtensions(const ::taihe::array<::taihe::string>& value);
+    ::taihe::array<::taihe::string> GetMimeTypes() const;
+    void SetMimeTypes(const ::taihe::array<::taihe::string>& value);
+    bool BelongsTo(::taihe::string_view type) const;
+    bool IsLowerLevelType(::taihe::string_view type) const;
+    bool IsHigherLevelType(::taihe::string_view type) const;
+    bool Equals(::ohos::data::uniformTypeDescriptor::weak::TypeDescriptor other) const;
+};
+} // namespace UDMF
+} // namespace OHOS
+#endif // UDMF_TYPE_DESCRIPTOR_H
