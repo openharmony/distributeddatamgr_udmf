@@ -34,7 +34,7 @@ static constexpr uint8_t NUM_1 = 1;
 #ifdef __aarch64__
 constexpr const char *AIP_MANAGER_PATH = "/system/lib64/platformsdk/libaip_core.z.so";
 #else
-constexpr const char *AIP_MANAGER_PATH = "libaip_core.z.so";
+constexpr const char *AIP_MANAGER_PATH = "/system/lib/platformsdk/libaip_core.z.so";
 #endif
 OHOS::DataIntelligence::AipCoreManagerHandle textAipCoreMgrHandle_{};
 OHOS::DataIntelligence::AipCoreManagerHandle imgAipCoreMgrHandle_{};
@@ -72,6 +72,9 @@ bool LoadAlgoLibrary(const std::string &fileName, OHOS::DataIntelligence::AipCor
         return false;
     }
     managerHandle.pAipManager = managerHandle.create();
+    if (managerHandle.pAipManager == nullptr) {
+        return false;
+    }
     return true;
 }
 
@@ -291,9 +294,12 @@ void ImageEmbeddingImpl::releaseModel()
     OHOS::DataIntelligence::ModelConfigData cfgData {
         .versionValue = config.version,
         .isNPUAvailableValue = config.isNpuAvailable,
-        .cachePathValue = config.isNpuAvailable ? std::string(config.cachePath.value()) : ""
+        .cachePathValue = ""
+        
     };
-
+    if (config.isNpuAvailable && config.cachePath.has_value()) {
+        cfgData.cachePathValue =  std::string(config.cachePath.value());
+    }
     int32_t ret = textAipCoreManager_ ->InitTextModel(cfgData);
     if (ret != ERR_OK) {
         LOG_ERROR(UDMF_ANI, "%{public}s GetTextEmbeddingModel failed! ret:%{public}d", LOG_TAG, ret);
@@ -321,8 +327,11 @@ void ImageEmbeddingImpl::releaseModel()
     OHOS::DataIntelligence::ModelConfigData cfgData {
         .versionValue = config.version,
         .isNPUAvailableValue = config.isNpuAvailable,
-        .cachePathValue = config.isNpuAvailable ? std::string(config.cachePath.value()) : ""
+        .cachePathValue = ""
     };
+    if (config.isNpuAvailable && config.cachePath.has_value()) {
+        cfgData.cachePathValue =  std::string(config.cachePath.value());
+    }
     int32_t ret = imageAipCoreManager_ ->InitImageModel(cfgData);
     if (ret != ERR_OK) {
         LOG_ERROR(UDMF_ANI, "%{public}s getImageEmbeddingModel failed! ret:%{public}d", LOG_TAG, ret);
