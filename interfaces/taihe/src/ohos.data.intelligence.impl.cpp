@@ -53,7 +53,7 @@ bool LoadAlgoLibrary(const std::string &fileName, OHOS::DataIntelligence::AipCor
     }
     char libRealPath[PATH_MAX] = {};
     if (realpath(fileName.c_str(), libRealPath) == nullptr) {
-        LOG_ERROR("get absolute algoPath error, %{public}d", errno);
+        LOG_ERROR("get absolute algoPath error.");
         return false;
     }
     managerHandle.handle = dlopen(libRealPath, RTLD_LAZY);
