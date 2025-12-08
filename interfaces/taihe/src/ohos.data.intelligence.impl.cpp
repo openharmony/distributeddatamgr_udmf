@@ -20,9 +20,6 @@
 #include "data_intelligence_impl.h"
 #include "logger.h"
 
-#undef LOG_TAG
-#define LOG_TAG "intelligence"
-
 namespace intelligence {
 using namespace OHOS::UDMF;
 const int32_t ERR_OK = 0;
@@ -53,7 +50,7 @@ bool LoadAlgoLibrary(const std::string &fileName, OHOS::DataIntelligence::AipCor
     }
     char libRealPath[PATH_MAX] = {};
     if (realpath(fileName.c_str(), libRealPath) == nullptr) {
-        LOG_ERROR("get absolute algoPath error.");
+        LOG_ERROR(UDMF_ANI, "get absolute algoPath error, %{public}d", errno);
         return false;
     }
     managerHandle.handle = dlopen(libRealPath, RTLD_LAZY);
