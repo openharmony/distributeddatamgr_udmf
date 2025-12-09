@@ -31,6 +31,7 @@
 
 using namespace taihe;
 using namespace ohos::data::uniformTypeDescriptor;
+constexpr size_t MAX_BELONGS_LEN = 1024;
 
 namespace OHOS {
 namespace UDMF {
@@ -39,10 +40,17 @@ namespace UDMF {
                                                               ::taihe::optional_view<::taihe::string> belongsTo)
 {
     std::string isMime(mimeType);
-    std::string isBelongs = belongsTo.has_value()
-                                ? std::string(belongsTo.value().data(), belongsTo.value().size())
-                                : std::string(DEFAULT_TYPE_ID);
-
+    std::string isBelongs;
+    if (belongsTo.has_value()) {
+        auto val = belongsTo.value();
+        if (val.size() > MAX_BELONGS_LEN) {
+            set_business_error(PARAMETERSERROR, "Input string too long");
+            return taihe::array<::taihe::string>(0, taihe::string(""));
+        }
+        isBelongs = std::string(val.data(), val.size());
+    } else {
+        isBelongs = std::string(DEFAULT_TYPE_ID);
+    }
     std::vector<std::string> typeIds;
     Status status = UtdClient::GetInstance()
         .GetUniformDataTypesByMIMEType(isMime, typeIds, isBelongs);
@@ -70,9 +78,17 @@ namespace UDMF {
     ::taihe::optional_view<::taihe::string> belongsTo)
 {
     std::string fileName(filenameExtension);
-    std::string isBelongs = belongsTo.has_value()
-                                ? std::string(belongsTo.value().data(), belongsTo.value().size())
-                                : std::string(DEFAULT_TYPE_ID);
+    std::string isBelongs;
+    if (belongsTo.has_value()) {
+        auto val = belongsTo.value();
+        if (val.size() > MAX_BELONGS_LEN) {
+            set_business_error(PARAMETERSERROR, "Input string too long");
+            return taihe::array<::taihe::string>(0, taihe::string(""));
+        }
+        isBelongs = std::string(val.data(), val.size());
+    } else {
+        isBelongs = std::string(DEFAULT_TYPE_ID);
+    }
     std::vector<std::string> typeIds;
     Status status = UtdClient::GetInstance()
         .GetUniformDataTypesByFilenameExtension(fileName, typeIds, isBelongs);

@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <mutex>
 #include "hilog_wrapper.h"
 #include "logger.h"
 #include "napi_error_utils.h"
@@ -37,6 +38,7 @@ namespace UDMF {
 
     ::taihe::string TypeDescriptorImpl::GetTypeId() const
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetTypeId");
             return ::taihe::string("");
@@ -46,6 +48,7 @@ namespace UDMF {
 
     void TypeDescriptorImpl::SetTypeId(::taihe::string_view value)
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         std::string typeId = std::string(value);
         if (nativeDescriptor_) {
             nativeDescriptor_->SetTypeId(typeId);
@@ -54,6 +57,7 @@ namespace UDMF {
 
     ::taihe::array<::taihe::string> TypeDescriptorImpl::GetBelongingToTypes() const
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetBelongingToTypes");
             return ::taihe::array<::taihe::string>(0, ::taihe::string(""));
@@ -68,6 +72,7 @@ namespace UDMF {
 
     void TypeDescriptorImpl::SetBelongingToTypes(const ::taihe::array<::taihe::string>& value)
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         std::vector<std::string> belongingToTypes;
         belongingToTypes.clear();
         for (size_t i = 0; i < value.size(); ++i) {
@@ -80,6 +85,7 @@ namespace UDMF {
 
     ::taihe::string TypeDescriptorImpl::GetDescription() const
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetDescription");
             return ::taihe::string("");
@@ -89,6 +95,7 @@ namespace UDMF {
 
     void TypeDescriptorImpl::SetDescription(::taihe::string_view value)
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         std::string description = std::string(value);
         if (nativeDescriptor_) {
             nativeDescriptor_->SetDescription(description);
@@ -97,6 +104,7 @@ namespace UDMF {
 
     ::taihe::string TypeDescriptorImpl::GetReferenceURL() const
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetReferenceURL");
             return ::taihe::string("");
@@ -106,6 +114,7 @@ namespace UDMF {
 
     void TypeDescriptorImpl::SetReferenceURL(::taihe::string_view value)
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         std::string referenceURL = std::string(value);
         if (nativeDescriptor_) {
             nativeDescriptor_->SetReferenceURL(referenceURL);
@@ -114,6 +123,7 @@ namespace UDMF {
 
     ::taihe::string TypeDescriptorImpl::GetIconFile() const
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetIconFile");
             return ::taihe::string("");
@@ -123,6 +133,7 @@ namespace UDMF {
 
     void TypeDescriptorImpl::SetIconFile(::taihe::string_view value)
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         std::string iconFile = std::string(value);
         if (nativeDescriptor_) {
             nativeDescriptor_->SetIconFile(iconFile);
@@ -131,6 +142,7 @@ namespace UDMF {
 
     ::taihe::array<::taihe::string> TypeDescriptorImpl::GetFilenameExtensions() const
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetFilenameExtensions");
             return ::taihe::array<::taihe::string>(0, ::taihe::string(""));
@@ -145,6 +157,7 @@ namespace UDMF {
 
     void TypeDescriptorImpl::SetFilenameExtensions(const ::taihe::array<::taihe::string>& value)
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         std::vector<std::string> filenameExtensions;
         filenameExtensions.clear();
         for (size_t i = 0; i < value.size(); ++i) {
@@ -157,6 +170,7 @@ namespace UDMF {
 
     ::taihe::array<::taihe::string> TypeDescriptorImpl::GetMimeTypes() const
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetMimeTypes");
             return ::taihe::array<::taihe::string>(0, ::taihe::string(""));
@@ -171,6 +185,7 @@ namespace UDMF {
 
     void TypeDescriptorImpl::SetMimeTypes(const ::taihe::array<::taihe::string>& value)
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         std::vector<std::string> mimeTypes;
         mimeTypes.clear();
         for (size_t i = 0; i < value.size(); ++i) {
@@ -183,9 +198,15 @@ namespace UDMF {
 
     bool TypeDescriptorImpl::BelongsTo(::taihe::string_view type) const
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         if (type.empty()) {
             LOG_ERROR(UDMF_ANI, "Type string is empty");
             taihe::set_business_error(E_INVALID_PARAMETERS, "type is empty");
+            return false;
+        }
+        if (!nativeDescriptor_) {
+            LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in BelongsTo");
+            taihe::set_business_error(E_INVALID_PARAMETERS, "nativeDescriptor_ is null");
             return false;
         }
         bool checkRet = false;
@@ -207,9 +228,15 @@ namespace UDMF {
 
     bool TypeDescriptorImpl::IsLowerLevelType(::taihe::string_view type) const
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         if (type.empty()) {
             LOG_ERROR(UDMF_ANI, "Type string is empty");
             taihe::set_business_error(E_INVALID_PARAMETERS, "type is empty");
+            return false;
+        }
+        if (!nativeDescriptor_) {
+            LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in IsLowerLevelType");
+            taihe::set_business_error(E_INVALID_PARAMETERS, "nativeDescriptor_ is null");
             return false;
         }
         bool checkRet = false;
@@ -231,9 +258,15 @@ namespace UDMF {
 
     bool TypeDescriptorImpl::IsHigherLevelType(::taihe::string_view type) const
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         if (type.empty()) {
             LOG_ERROR(UDMF_ANI, "Type string is empty");
             taihe::set_business_error(E_INVALID_PARAMETERS, "type is empty");
+            return false;
+        }
+        if (!nativeDescriptor_) {
+            LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in IsHigherLevelType");
+            taihe::set_business_error(E_INVALID_PARAMETERS, "nativeDescriptor_ is null");
             return false;
         }
         bool checkRet = false;
@@ -255,6 +288,7 @@ namespace UDMF {
 
     bool TypeDescriptorImpl::Equals(::ohos::data::uniformTypeDescriptor::weak::TypeDescriptor other) const
     {
+        std::lock_guard<std::mutex> lock(mtx_);
         if (other.operator->() == nullptr || !nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "[ERROR] TypeDescriptorImpl::Equals received nullptr for other parameter\n");
             return false;
