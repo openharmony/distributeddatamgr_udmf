@@ -34,14 +34,14 @@ bool DataLoadParamsNapi::Convert2NativeValue(napi_env env, napi_value in, DataLo
     NAPI_CALL_BASE(env, napi_get_named_property(env, in, "delayedDataLoadHandler", &loadHandler), false);
     napi_valuetype handlerType = napi_undefined;
     NAPI_CALL_BASE(env, napi_typeof(env, loadHandler, &handlerType), false);
-    if (handlerType == napi_null || handlerType == napi_undefined) {
+    if (handlerType == napi_null || handlerType == napi_undefined || handlerType != napi_function) {
         LOG_INFO(UDMF_KITS_NAPI, "Aync data load handler is empty!");
         NAPI_CALL_BASE(env, napi_get_named_property(env, in, "loadHandler", &loadHandler), false);
-    }
-    NAPI_CALL_BASE(env, napi_typeof(env, loadHandler, &handlerType), false);
-    if (handlerType == napi_null || handlerType == napi_undefined) {
-        LOG_INFO(UDMF_KITS_NAPI, "Data load handler is empty!");
-        return false;
+        NAPI_CALL_BASE(env, napi_typeof(env, loadHandler, &handlerType), false);
+        if (handlerType == napi_null || handlerType == napi_undefined || handlerType != napi_function) {
+            LOG_ERROR(UDMF_KITS_NAPI, "Data load handler is empty!");
+            return false;
+        }
     }
     dataLoadParams.dataLoadInfo.sequenceKey = UTILS::GenerateId();
     tsfns_.Compute(dataLoadParams.dataLoadInfo.sequenceKey, [&](const std::string &k, napi_threadsafe_function &tsfn) {
