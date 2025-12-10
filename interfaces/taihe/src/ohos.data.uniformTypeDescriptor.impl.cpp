@@ -41,17 +41,17 @@ namespace UDMF {
 {
     std::string isMime(mimeType);
     std::string isBelongs;
+    std::vector<std::string> typeIds;
     if (belongsTo.has_value()) {
         auto val = belongsTo.value();
         if (val.size() > MAX_BELONGS_LEN) {
             set_business_error(PARAMETERSERROR, "Input string too long");
-            return taihe::array<::taihe::string>(0, taihe::string(""));
+            return {};
         }
         isBelongs = std::string(val.data(), val.size());
     } else {
         isBelongs = std::string(DEFAULT_TYPE_ID);
     }
-    std::vector<std::string> typeIds;
     Status status = UtdClient::GetInstance()
         .GetUniformDataTypesByMIMEType(isMime, typeIds, isBelongs);
     if (status != E_OK) {
@@ -61,16 +61,12 @@ namespace UDMF {
             napiError = errorMsg.value();
         } else {
             napiError.jsCode = PARAMETERSERROR;
-            napiError.message = "Parameter error.";
+            napiError.message = "invalid arguments!";
         }
         set_business_error(napiError.jsCode, napiError.message);
-        return taihe::array<::taihe::string>(0, taihe::string(""));
+        return {};
     }
-    taihe::array<::taihe::string> result(typeIds.size(), taihe::string(""));
-    for (size_t i = 0; i < typeIds.size(); ++i) {
-        result[i] = taihe::string(typeIds[i].c_str());
-    }
-    return result;
+    return ConvertStringVectorToTaiheArray(typeIds);
 }
 
 ::taihe::array<::taihe::string> GetUniformDataTypesByFilenameExtension(
@@ -79,17 +75,17 @@ namespace UDMF {
 {
     std::string fileName(filenameExtension);
     std::string isBelongs;
+    std::vector<std::string> typeIds;
     if (belongsTo.has_value()) {
         auto val = belongsTo.value();
         if (val.size() > MAX_BELONGS_LEN) {
             set_business_error(PARAMETERSERROR, "Input string too long");
-            return taihe::array<::taihe::string>(0, taihe::string(""));
+            return {};
         }
         isBelongs = std::string(val.data(), val.size());
     } else {
         isBelongs = std::string(DEFAULT_TYPE_ID);
     }
-    std::vector<std::string> typeIds;
     Status status = UtdClient::GetInstance()
         .GetUniformDataTypesByFilenameExtension(fileName, typeIds, isBelongs);
     if (status != E_OK) {
@@ -99,16 +95,12 @@ namespace UDMF {
             napiError = errorMsg.value();
         } else {
             napiError.jsCode = PARAMETERSERROR;
-            napiError.message = "Parameter error.";
+            napiError.message = "invalid arguments!";
         }
         set_business_error(napiError.jsCode, napiError.message);
-        return taihe::array<::taihe::string>(0, taihe::string(""));
+        return {};
     }
-    taihe::array<::taihe::string> result(typeIds.size(), taihe::string(""));
-    for (size_t i = 0; i < typeIds.size(); ++i) {
-        result[i] = taihe::string(typeIds[i].c_str());
-    }
-    return result;
+    return ConvertStringVectorToTaiheArray(typeIds);
 }
 
 ::taihe::string GetUniformDataTypeByMIMEType(::taihe::string_view mimeType,
@@ -130,7 +122,7 @@ namespace UDMF {
             napiError = errorMsg.value();
         } else {
             napiError.jsCode = PARAMETERSERROR;
-            napiError.message = "Parameter error.";
+            napiError.message = "invalid arguments!";
         }
         set_business_error(napiError.jsCode, napiError.message);
         return "";
@@ -157,7 +149,7 @@ namespace UDMF {
             napiError = errorMsg.value();
         } else {
             napiError.jsCode = PARAMETERSERROR;
-            napiError.message = "Parameter error.";
+            napiError.message = "invalid arguments!";
         }
         set_business_error(napiError.jsCode, napiError.message);
         return "";
@@ -177,7 +169,7 @@ namespace UDMF {
             napiError = errorMsg.value();
         } else {
             napiError.jsCode = PARAMETERSERROR;
-            napiError.message = "Parameter error.";
+            napiError.message = "invalid arguments!";
         }
         set_business_error(napiError.jsCode, napiError.message);
         return ::ohos::data::uniformTypeDescriptor::TypeDescriptorUnion::make_empty();

@@ -18,7 +18,6 @@
 #include <string>
 #include <vector>
 #include <set>
-#include <mutex>
 #include "hilog_wrapper.h"
 #include "logger.h"
 #include "napi_error_utils.h"
@@ -32,23 +31,22 @@
 
 using namespace taihe;
 using namespace ohos::data::uniformTypeDescriptor;
+constexpr size_t MAX_BELONGS_LEN = 1024;
 
 namespace OHOS {
 namespace UDMF {
 
     ::taihe::string TypeDescriptorImpl::GetTypeId() const
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetTypeId");
             return ::taihe::string("");
         }
-        return ::taihe::string(nativeDescriptor_->GetTypeId().c_str());
+        return ::taihe::string(nativeDescriptor_->GetTypeId());
     }
 
     void TypeDescriptorImpl::SetTypeId(::taihe::string_view value)
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         std::string typeId = std::string(value);
         if (nativeDescriptor_) {
             nativeDescriptor_->SetTypeId(typeId);
@@ -57,26 +55,26 @@ namespace UDMF {
 
     ::taihe::array<::taihe::string> TypeDescriptorImpl::GetBelongingToTypes() const
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetBelongingToTypes");
-            return ::taihe::array<::taihe::string>(0, ::taihe::string(""));
+            return {};
         }
-        std::vector<std::string> belongingToTypes = nativeDescriptor_->GetBelongingToTypes();
-        ::taihe::array<::taihe::string> result(belongingToTypes.size(), ::taihe::string(""));
-        for (size_t i = 0; i < belongingToTypes.size(); ++i) {
-            result[i] = ::taihe::string(belongingToTypes[i].c_str());
-        }
-        return result;
+        const std::vector<std::string>& belongingToTypes = nativeDescriptor_->GetBelongingToTypes();
+        return ConvertStringVectorToTaiheArray(belongingToTypes);
     }
 
     void TypeDescriptorImpl::SetBelongingToTypes(const ::taihe::array<::taihe::string>& value)
     {
-        std::lock_guard<std::mutex> lock(mtx_);
+        if (value.size() > MAX_BELONGS_LEN) {
+            LOG_ERROR(UDMF_ANI, "SetBelongingToTypes: array size %zu exceeds maximum limit %zu",
+                value.size(), MAX_BELONGS_LEN);
+            taihe::set_business_error(E_INVALID_PARAMETERS, "array size exceeds maximum limit");
+            return;
+        }
         std::vector<std::string> belongingToTypes;
         belongingToTypes.clear();
         for (size_t i = 0; i < value.size(); ++i) {
-            belongingToTypes.push_back(std::string(value[i]));
+            belongingToTypes.emplace_back(std::string(value[i]));
         }
         if (nativeDescriptor_) {
             nativeDescriptor_->SetBelongingToTypes(belongingToTypes);
@@ -85,17 +83,15 @@ namespace UDMF {
 
     ::taihe::string TypeDescriptorImpl::GetDescription() const
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetDescription");
             return ::taihe::string("");
         }
-        return ::taihe::string(nativeDescriptor_->GetDescription().c_str());
+        return ::taihe::string(nativeDescriptor_->GetDescription());
     }
 
     void TypeDescriptorImpl::SetDescription(::taihe::string_view value)
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         std::string description = std::string(value);
         if (nativeDescriptor_) {
             nativeDescriptor_->SetDescription(description);
@@ -104,17 +100,15 @@ namespace UDMF {
 
     ::taihe::string TypeDescriptorImpl::GetReferenceURL() const
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetReferenceURL");
             return ::taihe::string("");
         }
-        return ::taihe::string(nativeDescriptor_->GetReferenceURL().c_str());
+        return ::taihe::string(nativeDescriptor_->GetReferenceURL());
     }
 
     void TypeDescriptorImpl::SetReferenceURL(::taihe::string_view value)
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         std::string referenceURL = std::string(value);
         if (nativeDescriptor_) {
             nativeDescriptor_->SetReferenceURL(referenceURL);
@@ -123,17 +117,15 @@ namespace UDMF {
 
     ::taihe::string TypeDescriptorImpl::GetIconFile() const
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetIconFile");
             return ::taihe::string("");
         }
-        return ::taihe::string(nativeDescriptor_->GetIconFile().c_str());
+        return ::taihe::string(nativeDescriptor_->GetIconFile());
     }
 
     void TypeDescriptorImpl::SetIconFile(::taihe::string_view value)
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         std::string iconFile = std::string(value);
         if (nativeDescriptor_) {
             nativeDescriptor_->SetIconFile(iconFile);
@@ -142,26 +134,26 @@ namespace UDMF {
 
     ::taihe::array<::taihe::string> TypeDescriptorImpl::GetFilenameExtensions() const
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetFilenameExtensions");
-            return ::taihe::array<::taihe::string>(0, ::taihe::string(""));
+            return {};
         }
-        std::vector<std::string> filenameExtensions = nativeDescriptor_->GetFilenameExtensions();
-        ::taihe::array<::taihe::string> result(filenameExtensions.size(), ::taihe::string(""));
-        for (size_t i = 0; i < filenameExtensions.size(); ++i) {
-            result[i] = ::taihe::string(filenameExtensions[i].c_str());
-        }
-        return result;
+        const std::vector<std::string>& filenameExtensions = nativeDescriptor_->GetFilenameExtensions();
+        return ConvertStringVectorToTaiheArray(filenameExtensions);
     }
 
     void TypeDescriptorImpl::SetFilenameExtensions(const ::taihe::array<::taihe::string>& value)
     {
-        std::lock_guard<std::mutex> lock(mtx_);
+        if (value.size() > MAX_BELONGS_LEN) {
+            LOG_ERROR(UDMF_ANI, "SetFilenameExtensions: array size %zu exceeds maximum limit %zu",
+                value.size(), MAX_BELONGS_LEN);
+            taihe::set_business_error(E_INVALID_PARAMETERS, "array size exceeds maximum limit");
+            return;
+        }
         std::vector<std::string> filenameExtensions;
         filenameExtensions.clear();
         for (size_t i = 0; i < value.size(); ++i) {
-            filenameExtensions.push_back(std::string(value[i]));
+            filenameExtensions.emplace_back(std::string(value[i]));
         }
         if (nativeDescriptor_) {
             nativeDescriptor_->SetFilenameExtensions(filenameExtensions);
@@ -170,26 +162,26 @@ namespace UDMF {
 
     ::taihe::array<::taihe::string> TypeDescriptorImpl::GetMimeTypes() const
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in GetMimeTypes");
-            return ::taihe::array<::taihe::string>(0, ::taihe::string(""));
+            return {};
         }
-        std::vector<std::string> mimeTypes = nativeDescriptor_->GetMimeTypes();
-        ::taihe::array<::taihe::string> result(mimeTypes.size(), ::taihe::string(""));
-        for (size_t i = 0; i < mimeTypes.size(); ++i) {
-            result[i] = ::taihe::string(mimeTypes[i].c_str());
-        }
-        return result;
+        const std::vector<std::string>& mimeTypes = nativeDescriptor_->GetMimeTypes();
+        return ConvertStringVectorToTaiheArray(mimeTypes);
     }
 
     void TypeDescriptorImpl::SetMimeTypes(const ::taihe::array<::taihe::string>& value)
     {
-        std::lock_guard<std::mutex> lock(mtx_);
+        if (value.size() > MAX_BELONGS_LEN) {
+            LOG_ERROR(UDMF_ANI, "SetMimeTypes: array size %zu exceeds maximum limit %zu",
+                value.size(), MAX_BELONGS_LEN);
+            taihe::set_business_error(E_INVALID_PARAMETERS, "array size exceeds maximum limit");
+            return;
+        }
         std::vector<std::string> mimeTypes;
         mimeTypes.clear();
         for (size_t i = 0; i < value.size(); ++i) {
-            mimeTypes.push_back(std::string(value[i]));
+            mimeTypes.emplace_back(std::string(value[i]));
         }
         if (nativeDescriptor_) {
             nativeDescriptor_->SetMimeTypes(mimeTypes);
@@ -198,7 +190,6 @@ namespace UDMF {
 
     bool TypeDescriptorImpl::BelongsTo(::taihe::string_view type) const
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         if (type.empty()) {
             LOG_ERROR(UDMF_ANI, "Type string is empty");
             taihe::set_business_error(E_INVALID_PARAMETERS, "type is empty");
@@ -218,7 +209,7 @@ namespace UDMF {
                 napiError = errorMsg.value();
             } else {
                 napiError.jsCode = PARAMETERSERROR;
-                napiError.message = "Parameter error.";
+                napiError.message = "invalid arguments!";
             }
             set_business_error(napiError.jsCode, napiError.message);
             return false;
@@ -228,7 +219,6 @@ namespace UDMF {
 
     bool TypeDescriptorImpl::IsLowerLevelType(::taihe::string_view type) const
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         if (type.empty()) {
             LOG_ERROR(UDMF_ANI, "Type string is empty");
             taihe::set_business_error(E_INVALID_PARAMETERS, "type is empty");
@@ -248,7 +238,7 @@ namespace UDMF {
                 napiError = errorMsg.value();
             } else {
                 napiError.jsCode = PARAMETERSERROR;
-                napiError.message = "Parameter error.";
+                napiError.message = "invalid arguments!";
             }
             set_business_error(napiError.jsCode, napiError.message);
             return false;
@@ -258,7 +248,6 @@ namespace UDMF {
 
     bool TypeDescriptorImpl::IsHigherLevelType(::taihe::string_view type) const
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         if (type.empty()) {
             LOG_ERROR(UDMF_ANI, "Type string is empty");
             taihe::set_business_error(E_INVALID_PARAMETERS, "type is empty");
@@ -278,7 +267,7 @@ namespace UDMF {
                 napiError = errorMsg.value();
             } else {
                 napiError.jsCode = PARAMETERSERROR;
-                napiError.message = "Parameter error.";
+                napiError.message = "invalid arguments!";
             }
             set_business_error(napiError.jsCode, napiError.message);
             return false;
@@ -288,7 +277,6 @@ namespace UDMF {
 
     bool TypeDescriptorImpl::Equals(::ohos::data::uniformTypeDescriptor::weak::TypeDescriptor other) const
     {
-        std::lock_guard<std::mutex> lock(mtx_);
         if (other.operator->() == nullptr || !nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "[ERROR] TypeDescriptorImpl::Equals received nullptr for other parameter\n");
             return false;

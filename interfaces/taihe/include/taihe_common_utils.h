@@ -24,6 +24,7 @@
 namespace OHOS {
 namespace UDMF {
 static constexpr int PARAMETERSERROR = 401;
+static const std::string NEW_INSTANCE_LIB = "libudmf_data_napi.z.so";
 Intention ConvertIntention(::ohos::data::unifiedDataChannel::Intention value);
 ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,
     ::ohos::data::unifiedDataChannel::ValueType const& value);
@@ -34,6 +35,7 @@ UDDetails ConvertUDDetails(const ::taihe::map_view<::taihe::string, ::taihe::str
     const UDDetails &details);
 UDDetails ConvertUDDetailsToUnion(
     const ::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> &details);
+::taihe::array<::taihe::string> ConvertStringVectorToTaiheArray(const std::vector<std::string>& stringVector);
 
 } // namespace UDMF
 } // namespace OHOS

@@ -21,28 +21,20 @@
 #include "taihe/runtime.hpp"
 #include "ohos.data.uniformTypeDescriptor.impl.hpp"
 #include "ohos.data.uniformTypeDescriptor.proj.hpp"
-#include <mutex>
 
 namespace OHOS {
 namespace UDMF {
 class TypeDescriptorImpl {
 private:
     std::shared_ptr<TypeDescriptor> nativeDescriptor_;
-    mutable std::mutex mtx_;
 public:
     TypeDescriptorImpl()
     {
-        TypeDescriptorCfg config;
-        nativeDescriptor_ = std::make_shared<TypeDescriptor>(config);
+        nativeDescriptor_ = std::make_shared<TypeDescriptor>();
     }
 
-    explicit TypeDescriptorImpl(std::shared_ptr<TypeDescriptor> descriptor) : nativeDescriptor_(descriptor)
-    {
-        if (nativeDescriptor_ == nullptr) {
-            TypeDescriptorCfg config;
-            nativeDescriptor_ = std::make_shared<TypeDescriptor>(config);
-        }
-    }
+    explicit TypeDescriptorImpl(std::shared_ptr<TypeDescriptor> descriptor) : nativeDescriptor_(descriptor){}
+
     ::taihe::string GetTypeId() const;
     ::taihe::array<::taihe::string> GetBelongingToTypes() const;
     ::taihe::string GetDescription() const;
