@@ -33,7 +33,7 @@ public:
         nativeDescriptor_ = std::make_shared<TypeDescriptor>();
     }
 
-    explicit TypeDescriptorImpl(std::shared_ptr<TypeDescriptor> descriptor) : nativeDescriptor_(descriptor){}
+    explicit TypeDescriptorImpl(std::shared_ptr<TypeDescriptor> descriptor) : nativeDescriptor_(descriptor) {}
 
     ::taihe::string GetTypeId() const;
     ::taihe::array<::taihe::string> GetBelongingToTypes() const;
