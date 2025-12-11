@@ -418,7 +418,11 @@ template <typename... _Types> bool Reading(std::variant<_Types...> &output, TLVO
                 return false;
             }
         } else {
-            return ReadVariant<decltype(output), _Types...>(data, 0, index, output, headItem);
+            using VariantType = std::remove_reference_t<decltype(output)>;
+            if (index < std::variant_size_v<VariantType>) {
+                return ReadVariant<decltype(output), _Types...>(data, 0, index, output, headItem);
+            }
+            return false;
         }
     }
     return true;
