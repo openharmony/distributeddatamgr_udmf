@@ -226,5 +226,16 @@ UDDetails ConvertUDDetailsToUnion(
     }
     return taiheDetails;
 }
+
+::taihe::array<::taihe::string> ConvertStringVectorToTaiheArray(const std::vector<std::string>& stringVector)
+{
+    std::vector<::taihe::string> keys;
+    keys.reserve(stringVector.size());
+    for (const auto& s : stringVector) {
+        keys.emplace_back(s.c_str());
+    }
+    return ::taihe::array<::taihe::string>(::taihe::copy_data, keys.begin(), keys.size());
+}
+
 } // namespace UDMF
 } // namespace OHOS

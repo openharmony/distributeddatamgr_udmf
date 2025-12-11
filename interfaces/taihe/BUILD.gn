@@ -88,6 +88,7 @@ taihe_shared_library("udmf_taihe_native") {
     "src/summary_taihe.cpp",
     "src/taihe_common_utils.cpp",
     "src/text_taihe.cpp",
+    "src/type_descriptor_taihe.cpp",
     "src/udmf_ani_converter_utils.cpp",
     "src/unified_data_taihe.cpp",
     "src/unified_record_taihe.cpp",

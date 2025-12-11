@@ -35,6 +35,7 @@ UDDetails ConvertUDDetails(const ::taihe::map_view<::taihe::string, ::taihe::str
     const UDDetails &details);
 UDDetails ConvertUDDetailsToUnion(
     const ::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> &details);
+::taihe::array<::taihe::string> ConvertStringVectorToTaiheArray(const std::vector<std::string>& stringVector);
 
 } // namespace UDMF
 } // namespace OHOS
