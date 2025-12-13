@@ -42,6 +42,7 @@
 #include "text.h"
 #include "unified_data_helper.h"
 #include "unified_html_record_process.h"
+#include "progress_callback.h"
 #include "video.h"
 
 using namespace testing::ext;
@@ -4568,7 +4569,7 @@ HWTEST_F(UdmfClientTest, HtmlData001, TestSize.Level1)
     )HTML";
     plainText->AddEntry("general.html", obj);
     data.AddRecord(plainText);
-    
+
     UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(data);
     ASSERT_EQ(plainText->GetUris().size(), 1);
     EXPECT_EQ(plainText->GetUris()[0].oriUri, "file:///valid/local.png");
@@ -4580,7 +4581,7 @@ HWTEST_F(UdmfClientTest, HtmlData001, TestSize.Level1)
     UnifiedHtmlRecordProcess::RebuildHtmlRecord(data);
     ASSERT_EQ(data.GetRecords().size(), 1);
     auto record = data.GetRecordAt(0);
-    
+
     auto htmlEntry = record->GetEntry("general.html");
     ASSERT_TRUE(std::holds_alternative<std::shared_ptr<Object>>(htmlEntry));
     auto htmlObject = std::get<std::shared_ptr<Object>>(htmlEntry);
@@ -4592,5 +4593,135 @@ HWTEST_F(UdmfClientTest, HtmlData001, TestSize.Level1)
     ASSERT_TRUE(rebuiltHtml.find("file:///valid/local.png") == std::string::npos);
 
     LOG_INFO(UDMF_TEST, "HtmlData001 end.");
+}
+
+/**
+* @tc.name: GetSummary008
+* @tc.desc: Normal test of GetSummary, key is in dataCache_
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetSummary008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary008 begin.");
+    UnifiedData data;
+
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
+    data.AddRecord(text);
+
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetDetails(details);
+    plainText->SetContent("content");
+    plainText->SetAbstract("abstract");
+    data.AddRecord(plainText);
+    std::string intentionDrag = "darg";
+    std::string key = "udmf_key";
+    UdmfClient::GetInstance().ProcessDragIfInApp(data, intentionDrag, key);
+
+    QueryOption query = { .key = key, .intention = Intention::UD_INTENTION_DATA_HUB };
+    Summary summary;
+    auto status = UdmfClient::GetInstance().GetSummary(query, summary);
+    ASSERT_EQ(status, E_OK);
+
+    LOG_INFO(UDMF_TEST, "GetSummary008 end.");
+}
+
+/**
+* @tc.name: IsRemoteData002
+* @tc.desc: Abnormal test of IsRemoteData, parameter is invalid
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, IsRemoteData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsRemoteData002 begin.");
+
+    QueryOption option2;
+    bool result = true;
+    auto status = UdmfClient::GetInstance().IsRemoteData(option2, result);
+
+    ASSERT_NE(status, E_OK);
+
+    LOG_INFO(UDMF_TEST, "IsRemoteData002 end.");
+}
+
+/**
+* @tc.name: PushDelayData001
+* @tc.desc: Abnormal test of PushDelayData, parameter is invalid
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, PushDelayData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "PushDelayData001 begin.");
+
+    std::string key = "udmf_key";
+    UnifiedData unifiedData;
+    auto status = UdmfClient::GetInstance().PushDelayData(key, unifiedData);
+
+    ASSERT_NE(status, E_OK);
+
+    LOG_INFO(UDMF_TEST, "PushDelayData001 end.");
+}
+
+/**
+* @tc.name: GetDataIfAvailable001
+* @tc.desc: Abnormal test of GetDataIfAvailable, key is invalid
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetDataIfAvailable001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetDataIfAvailable001 begin.");
+
+    std::string key = "";
+    DataLoadInfo dataLoadInfo;
+    sptr<IRemoteObject> iUdmfNotifier = new (std::nothrow) ProgressSignalCallback();
+    std::shared_ptr<UnifiedData> unifiedData = nullptr;
+    auto status = UdmfClient::GetInstance().GetDataIfAvailable(key, dataLoadInfo, iUdmfNotifier, unifiedData);
+
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    LOG_INFO(UDMF_TEST, "GetDataIfAvailable001 end.");
+}
+
+/**
+* @tc.name: GetDataIfAvailable002
+* @tc.desc: Abnormal test of GetDataIfAvailable, iUdmfNotifier is invalid
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetDataIfAvailable002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetDataIfAvailable002 begin.");
+
+    std::string key = "udmf_key";
+    DataLoadInfo dataLoadInfo;
+    sptr<IRemoteObject> iUdmfNotifier = nullptr;
+    std::shared_ptr<UnifiedData> unifiedData = nullptr;
+    auto status = UdmfClient::GetInstance().GetDataIfAvailable(key, dataLoadInfo, iUdmfNotifier, unifiedData);
+
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    LOG_INFO(UDMF_TEST, "GetDataIfAvailable002 end.");
+}
+
+/**
+* @tc.name: GetDataIfAvailable003
+* @tc.desc: Abnormal test of GetDataIfAvailable, key and iUdmfNotifier are invalid
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetDataIfAvailable003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetDataIfAvailable003 begin.");
+
+    std::string key = "";
+    DataLoadInfo dataLoadInfo;
+    sptr<IRemoteObject> iUdmfNotifier = nullptr;
+    std::shared_ptr<UnifiedData> unifiedData = nullptr;
+    auto status = UdmfClient::GetInstance().GetDataIfAvailable(key, dataLoadInfo, iUdmfNotifier, unifiedData);
+
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    LOG_INFO(UDMF_TEST, "GetDataIfAvailable003 end.");
 }
 } // OHOS::Test
