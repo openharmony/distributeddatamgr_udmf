@@ -169,19 +169,9 @@ ani_object AniConverter::WrapSummary(ani_env *env, std::shared_ptr<Summary> summ
         LOG_ERROR(UDMF_ANI, "Create object fail");
         return obj;
     }
-    ani_object longObj = CreateLong(env, summary->totalSize);
-    if (longObj == nullptr) {
-        LOG_ERROR(UDMF_ANI, "CreateLong faild");
-        return nullptr;
-    }
-    ani_long param_value;
-    if (ANI_OK != env->Object_CallMethodByName_Long(longObj, "unboxed", ":l", &param_value)) {
-        LOG_ERROR(UDMF_ANI, "Unbox Long failed");
-        return nullptr;
-    }
-    if (ANI_OK != env->Object_SetFieldByName_Long(obj, "totalSize", param_value)) {
+    if (ANI_OK != env->Object_SetPropertyByName_Long(obj, "totalSize", summary->totalSize)) {
         LOG_ERROR(UDMF_ANI, "Set Field failed");
-        return nullptr;
+        return obj;
     }
     InnerWrapMapParams(env, cls, obj, summary->summary);
     return obj;

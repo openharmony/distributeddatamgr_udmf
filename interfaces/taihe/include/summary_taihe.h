@@ -29,7 +29,9 @@ public:
     SummaryTaihe(std::shared_ptr<Summary> value);
 
     int64_t GetTotalSize();
+    void SetTotalSize(int64_t totalSize);
     ::taihe::map<::taihe::string, int64_t> GetSummary();
+    void SetSummary(::taihe::map_view<::taihe::string, int64_t> summary);
     int64_t GetInner();
 
     std::shared_ptr<Summary> value_;

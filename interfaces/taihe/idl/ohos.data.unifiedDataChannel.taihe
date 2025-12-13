@@ -25,15 +25,34 @@
 static { loadLibraryWithPermissionCheck("udmf_taihe_native.z", "@ohos.data.unifiedDataChannel") }
 """)
 
+from ohos.data.uniformDataStruct use PlainText, Hyperlink, HTML, OpenHarmonyAppItem, ContentForm, Form, FileUri, PixelMap;
+
+union RecordData {
+  @undefined undefinedType;
+  @null nullType;
+  recordMap: @record Map<String, RecordData>;
+  recordArray: Array<RecordData>;
+  object: Opaque;
+}
+
 union ValueType {
+  @undefined undefinedType;
+  @null nullType;
   intType: i32;
   longType: i64;
   doubleType: f64;
   string: String;
   boolean: bool;
   ArrayBuffer: @arraybuffer Array<u8>;
-  @null nullType;
-  @undefined undefinedType;
+  recordData: RecordData;
+  plainText: PlainText;
+  hyperlink: Hyperlink;
+  html: HTML;
+  openHarmonyAppItem: OpenHarmonyAppItem;
+  contentForm: ContentForm;
+  form: Form;
+  fileUri: FileUri;
+  pixelMap: PixelMap;
   object: @sts_type("(image.PixelMap | Want | object)") Opaque;
 }
 
@@ -103,8 +122,12 @@ struct Options {
 interface Summary {
   @get("totalSize")
   GetTotalSize(): i64;
+  @set("totalSize")
+  SetTotalSize(totalSize: i64): void;
   @get("summary")
   GetSummary(): @record Map<String, i64>;
+  @set("summary")
+  SetSummary(summary: @record Map<String, i64>): void;
   GetInner(): i64;
 }
 

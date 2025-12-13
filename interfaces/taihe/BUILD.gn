@@ -20,6 +20,7 @@ copy_taihe_idl("copy_udmf_taihe") {
   sources = [
     "idl/ohos.data.intelligence.taihe",
     "idl/ohos.data.unifiedDataChannel.taihe",
+    "idl/ohos.data.uniformDataStruct.taihe",
     "idl/ohos.data.uniformTypeDescriptor.taihe",
   ]
   external_deps = []
@@ -43,6 +44,8 @@ ohos_taihe("run_udmf_taihe") {
     "$taihe_generated_file_path/src/ohos.data.unifiedDataChannel.abi.c",
     "$taihe_generated_file_path/src/ohos.data.uniformTypeDescriptor.ani.cpp",
     "$taihe_generated_file_path/src/ohos.data.uniformTypeDescriptor.abi.c",
+    "$taihe_generated_file_path/src/ohos.data.uniformDataStruct.ani.cpp",
+    "$taihe_generated_file_path/src/ohos.data.uniformDataStruct.abi.c",
   ]
 }
 
@@ -120,6 +123,7 @@ generate_static_abc("udmf_abc") {
     "$taihe_generated_file_path/@ohos.data.intelligence.ets",
     "$taihe_generated_file_path/@ohos.data.unifiedDataChannel.ets",
     "$taihe_generated_file_path/@ohos.data.uniformTypeDescriptor.ets",
+    "$taihe_generated_file_path/@ohos.data.uniformDataStruct.ets",
   ]
   is_boot_abc = "True"
   device_dst_file = "/system/framework/udmf_abc.abc"
