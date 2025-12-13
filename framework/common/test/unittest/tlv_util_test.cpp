@@ -57,6 +57,42 @@ void TlvUtilTest::TearDownTestCase(void) {}
 void TlvUtilTest::SetUp(void) {}
 void TlvUtilTest::TearDown(void) {}
 
+bool RecursiveWriting(int depth, int maxDepth, Object &obj, TLVObject &tlvObject, TAG tag)
+{
+    TLVUtil::RecursiveGuard guard;
+    if (!guard.IsValid()) {
+        LOG_ERROR(UDMF_TEST, "Recursive depth exceeded at depth: %{public}d", depth);
+        return false;
+    }
+    bool result = TLVUtil::Writing(obj, tlvObject, tag);
+    if (!result) {
+        LOG_ERROR(UDMF_TEST, "Writing failed at depth: %{public}d", depth);
+        return false;
+    }
+    if (depth <= maxDepth) {
+        return RecursiveWriting(depth + 1, maxDepth, obj, tlvObject, tag);
+    }
+    return true;
+}
+
+bool RecursiveReading(int depth, int maxDepth, Object &output, TLVObject &tlvObject, TLVHead &head)
+{
+    TLVUtil::RecursiveGuard guard;
+    if (!guard.IsValid()) {
+        LOG_ERROR(UDMF_TEST, "Recursive depth exceeded at depth: %{public}d", depth);
+        return false;
+    }
+    if (depth <= maxDepth) {
+        return RecursiveReading(depth + 1, maxDepth, output, tlvObject, head);
+    }
+    bool result = TLVUtil::Reading(output, tlvObject, head);
+    if (!result) {
+        LOG_ERROR(UDMF_TEST, "Reading failed at depth: %{public}d", depth);
+        return false;
+    }
+    return true;
+}
+
 /* *
  * @tc.name: CountBufferSize_001
  * @tc.desc: test fundamental for countBufferSize
@@ -1706,5 +1742,26 @@ HWTEST_F(TlvUtilTest, Writing004, TestSize.Level1)
     auto tlvObject = TLVObject(dataBytes);
     EXPECT_FALSE(TLVUtil::Writing(input, tlvObject, TAG::TAG_SUMMARY_TAG));
     LOG_INFO(UDMF_TEST, "Writing004 end.");
+}
+
+/* *
+ * @tc.name: RecursiveWritingAndReading001
+ * @tc.desc: test obj for RecursiveWritingAndReading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, RecursiveWritingAndReading001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "RecursiveWritingAndReading001 begin.");
+    Object obj;
+    obj.value_ = {{"test", 123}};
+    std::vector<uint8_t> dataBytes;
+    TLVObject tlvObject(dataBytes);
+    bool result = RecursiveWriting(1, TLVUtil::RecursiveGuard::MAX_DEPTH, obj, tlvObject, TAG::TAG_OBJECT_VALUE);
+    EXPECT_FALSE(result);
+    Object output;
+    TLVHead head;
+    result = RecursiveReading(1, TLVUtil::RecursiveGuard::MAX_DEPTH, output, tlvObject, head);
+    EXPECT_FALSE(result);
+    LOG_INFO(UDMF_TEST, "RecursiveWritingAndReading001 end.");
 }
 }
