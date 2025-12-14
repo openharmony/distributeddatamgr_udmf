@@ -15,6 +15,7 @@
 
 #define LOG_TAG "GET_DDATA_PARAMS_TAIHE"
 
+#include "ani_common_utils.h"
 #include "get_data_params_taihe.h"
 #include "logger.h"
 #include "udmf_ani_converter_utils.h"
@@ -45,6 +46,9 @@ bool GetDataParamsTaihe::Convert2NativeValue(ani_env *env, ani_object in,
     }
     if (!SetFileConflictOptions(env, in, getDataParams)) {
         LOG_ERROR(UDMF_ANI, "SetFileConflictOptions failed.");
+    }
+    if (!SetAcceptableInfo(env, in, getDataParams)) {
+        LOG_ERROR(UDMF_ANI, "SetAcceptableInfo failed.");
     }
     return true;
 }
@@ -111,6 +115,27 @@ bool GetDataParamsTaihe::SetFileConflictOptions(ani_env *env, ani_object in, Get
     getDataParams.fileConflictOptions = static_cast<FileConflictOptions>(fileConflictOptionsValue);
     return true;
 }
+
+bool GetDataParamsTaihe::SetAcceptableInfo(ani_env *env, ani_object in, GetDataParams &getDataParams)
+{
+    ani_ref acceptableInfo;
+    auto status = env->Object_GetPropertyByName_Ref(in, "acceptableInfo", &acceptableInfo);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
+        return false;
+    }
+    ani_object dataLoadInfo = static_cast<ani_object>(acceptableInfo);
+
+    ani_long recordCount;
+    status = env->Object_GetPropertyByName_Long(dataLoadInfo, "recordCount", &recordCount);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Long failed.");
+        return false;
+    }
+    getDataParams.acceptableInfo.recordCount = static_cast<long>(recordCount);
+    return true;
+}
+
 
 bool GetDataParamsTaihe::SetProgressListener(ani_env *env, GetDataParams &getDataParams,
     ani_fn_object callback, const std::string &key)

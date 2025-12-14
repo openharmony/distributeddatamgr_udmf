@@ -31,16 +31,20 @@ public:
 
     ::taihe::string GetType();
     taiheChannel::ValueType GetValue();
+    ::taihe::array<::taihe::string> GetTypes();
+    void AddEntry(::taihe::string_view type, ::taiheChannel::ValueType value);
+    ::taiheChannel::ValueType GetEntry(::taihe::string_view type);
+    ::taihe::map<::taihe::string, ::taiheChannel::ValueType> GetEntries();
     ::taihe::optional<::taihe::map<::taihe::string, taiheChannel::DetailsValue>> GetDetails();
     void SetDetails(const ::taihe::map_view<::taihe::string, taiheChannel::DetailsValue> &details);
     ::taihe::string GetAppId();
     void SetAppId(const ::taihe::string_view &appId);
     ::taihe::string GetAppName();
     void SetAppName(const ::taihe::string_view &appName);
-    ::taihe::string GetAppIconId();
-    void SetAppIconId(const ::taihe::string_view &appIconId);
-    ::taihe::string GetAppLabelId();
-    void SetAppLabelId(const ::taihe::string_view &appLabelId);
+    int64_t GetAppIconId();
+    void SetAppIconId(int64_t appIconId);
+    int64_t GetAppLabelId();
+    void SetAppLabelId(int64_t appLabelId);
     ::taihe::string GetBundleName();
     void SetBundleName(const ::taihe::string_view &bundleName);
     ::taihe::string GetAbilityName();

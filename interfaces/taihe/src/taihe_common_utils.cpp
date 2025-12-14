@@ -12,15 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #define LOG_TAG "UDMF_TAIHE_COMMON_UTILS"
 
 #include "ani_common_utils.h"
 #include "ani_common_want.h"
-#include "logger.h"
 #include "pixel_map_taihe_ani.h"
-#include "taihe/runtime.hpp"
 #include "taihe_common_utils.h"
+#include "unified_meta.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace taiheStruct = ohos::data::uniformDataStruct;
@@ -43,8 +41,16 @@ OHOS::UDMF::Intention ConvertIntention(::taiheChannel::Intention value)
     switch (value.get_key()) {
         case ::taiheChannel::Intention::key_t::DATA_HUB:
             return OHOS::UDMF::Intention::UD_INTENTION_DATA_HUB;
-        default:
+        case ::taiheChannel::Intention::key_t::DRAG:
             return OHOS::UDMF::Intention::UD_INTENTION_DRAG;
+        case ::taiheChannel::Intention::key_t::SYSTEM_SHARE:
+            return OHOS::UDMF::Intention::UD_INTENTION_SYSTEM_SHARE;
+        case ::taiheChannel::Intention::key_t::PICKER:
+            return OHOS::UDMF::Intention::UD_INTENTION_PICKER;
+        case ::taiheChannel::Intention::key_t::MENU:
+            return OHOS::UDMF::Intention::UD_INTENTION_MENU;
+        default:
+            return OHOS::UDMF::Intention::UD_INTENTION_BUTT;
     }
 }
 
@@ -383,6 +389,40 @@ UDDetails ConvertUDDetailsToUnion(
         }
     }
     return taiheDetails;
+}
+
+OHOS::UDMF::ShareOptions ConvertShareOptions(::taiheChannel::ShareOptions value)
+{
+    switch (value.get_key()) {
+        case ::taiheChannel::ShareOptions::key_t::IN_APP:
+            return OHOS::UDMF::ShareOptions::IN_APP;
+        case ::taiheChannel::ShareOptions::key_t::CROSS_APP:
+            return OHOS::UDMF::ShareOptions::CROSS_APP;
+        default:
+            return OHOS::UDMF::ShareOptions::SHARE_OPTIONS_BUTT;
+    }
+}
+
+::taiheChannel::ShareOptions ConvertShareOptions(OHOS::UDMF::ShareOptions value)
+{
+    switch (value) {
+        case OHOS::UDMF::ShareOptions::IN_APP:
+            return ::taiheChannel::ShareOptions::key_t::IN_APP;
+        default:
+            return ::taiheChannel::ShareOptions::key_t::CROSS_APP;
+    }
+}
+
+OHOS::UDMF::Visibility ConvertVisibility(::taiheChannel::Visibility value)
+{
+    switch (value.get_key()) {
+        case ::taiheChannel::Visibility::key_t::ALL:
+            return OHOS::UDMF::Visibility::VISIBILITY_ALL;
+        case ::taiheChannel::Visibility::key_t::OWN_PROCESS:
+            return OHOS::UDMF::Visibility::VISIBILITY_OWN_PROCESS;
+        default:
+            return OHOS::UDMF::Visibility::VISIBILITY_BUTT;
+    }
 }
 
 ::taihe::map<::taihe::string, ::taiheStruct::DetailsValue> ConvertUDSUDDetailsToUnion(

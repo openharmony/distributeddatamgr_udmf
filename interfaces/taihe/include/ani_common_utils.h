@@ -44,6 +44,7 @@ ani_status SetDouble(ani_env *env, double value, ani_object &doubleObj);
 ani_status SetBoolean(ani_env *env, bool value, ani_object &boolObj);
 ani_status SetArrayBuffer(ani_env *env, std::vector<uint8_t> value, ani_arraybuffer &arrayBufferObj);
 ani_status SetMap(ani_env *env, std::map<std::string, int64_t> value, ani_object &arrayBufferObj);
+ani_status SetTimestamp(ani_env *env, double timestamp, ani_object &aniDate);
 bool SetFieldRef(ani_env *env, ani_class cls, ani_object object, const std::string &fieldName, ani_ref value);
 bool InnerWrapMapParams(ani_env *env, ani_class wantCls, ani_object wantObject,
     const std::map<std::string, int64_t> &mapParams);

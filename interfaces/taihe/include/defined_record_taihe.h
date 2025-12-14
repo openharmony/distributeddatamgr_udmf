@@ -30,6 +30,10 @@ public:
 
     ::taihe::string GetType();
     ::taiheChannel::ValueType GetValue();
+    ::taihe::array<::taihe::string> GetTypes();
+    void AddEntry(::taihe::string_view type, ::taiheChannel::ValueType value);
+    ::taiheChannel::ValueType GetEntry(::taihe::string_view type);
+    ::taihe::map<::taihe::string, ::taiheChannel::ValueType> GetEntries();
     ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> GetDetails();
     void SetDetails(const ::taihe::map_view<::taihe::string, ::taiheChannel::DetailsValue> &details);
     int64_t GetInner();

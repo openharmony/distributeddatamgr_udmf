@@ -36,6 +36,7 @@ constexpr const char* CLASSNAME_OBJECT = "std.core.Object";
 constexpr const int MAX_KEY_COUNT = 10 * 1024;
 constexpr const int MAX_DATA_BYTES = 100 * 1024 * 1024;
 
+
 ani_ref WrapMapParams(ani_env *env, const std::map<std::string, int64_t> &mapParams)
 {
     ani_status status = ANI_ERROR;
@@ -70,6 +71,35 @@ ani_ref WrapMapParams(ani_env *env, const std::map<std::string, int64_t> &mapPar
         return nullptr;
     }
     return mapParamsRef;
+}
+
+ani_status SetTimestamp(ani_env *env, double timestamp, ani_object &aniDate)
+{
+    ani_class cls {};
+    auto status = env->FindClass("escompat.Date", &cls);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "FindClass failed, status:%{public}d", status);
+        return status;
+    }
+    ani_method ctorMethod {};
+    status = env->Class_FindMethod(cls, "<ctor>",
+        "X{C{std.core.Double}C{std.core.String}C{escompat.Date}}:", &ctorMethod);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Class_FindMethod failed, status:%{public}d", status);
+        return status;
+    }
+    ani_object aniDoubleObject {};
+    status = SetDouble(env, timestamp, aniDoubleObject);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "SetDouble failed, status:%{public}d", status);
+        return status;
+    }
+    status = env->Object_New(cls, ctorMethod, &aniDate, aniDoubleObject);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Object_New failed, status:%{public}d", status);
+        return status;
+    }
+    return ANI_OK;
 }
 
 ani_status SetInt(ani_env *env, int32_t value, ani_object &intObj)
