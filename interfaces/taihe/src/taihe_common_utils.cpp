@@ -26,15 +26,16 @@ namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace taiheStruct = ohos::data::uniformDataStruct;
 namespace OHOS {
 namespace UDMF {
-static const std::map<std::string, std::function<::taiheChannel::ValueType(std::shared_ptr<Object>)>> CONVERTORS = {
-    {"general.plain-text", [](std::shared_ptr<Object> udsObj) { return ConvertPlainText(udsObj); }},
-    {"general.hyperlink", [](std::shared_ptr<Object> udsObj) { return ConvertHyperlink(udsObj); }},
-    {"general.html", [](std::shared_ptr<Object> udsObj) { return ConvertHTML(udsObj); }},
-    {"openharmony.app-item", [](std::shared_ptr<Object> udsObj) { return ConvertOpenHarmonyAppItem(udsObj); }},
-    {"general.content-form", [](std::shared_ptr<Object> udsObj) { return ConvertContentForm(udsObj); }},
-    {"openharmony.form", [](std::shared_ptr<Object> udsObj) { return ConvertForm(udsObj); }},
-    {"general.file-uri", [](std::shared_ptr<Object> udsObj) { return ConvertFileUri(udsObj); }},
-    {"openharmony.pixel-map", [](std::shared_ptr<Object> udsObj) { return ConvertPixelMap(udsObj); }},
+using ConvertorFunc = ::taiheChannel::ValueType (*)(std::shared_ptr<Object>);
+static const std::map<std::string, ConvertorFunc> CONVERTORS = {
+    {"general.plain-text", ConvertPlainText},
+    {"general.hyperlink", ConvertHyperlink},
+    {"general.html", ConvertHTML},
+    {"openharmony.app-item", ConvertOpenHarmonyAppItem},
+    {"general.content-form", ConvertContentForm},
+    {"openharmony.form", ConvertForm},
+    {"general.file-uri", ConvertFileUri},
+    {"openharmony.pixel-map", ConvertPixelMap},
 };
 
 OHOS::UDMF::Intention ConvertIntention(::taiheChannel::Intention value)
@@ -103,7 +104,6 @@ ValueType ConvertRecordData(ani_env *env, ::taiheChannel::RecordData const& valu
         LOG_ERROR(UDMF_ANI, "Exceeding the maximum recursion depth");
         return nullptr;
     }
-    depth++;
     ValueType valueType = nullptr;
     switch (value.get_tag()) {
         case taiheChannel::RecordData::tag_t::nullType:
@@ -117,7 +117,7 @@ ValueType ConvertRecordData(ani_env *env, ::taiheChannel::RecordData const& valu
             auto obj = std::make_shared<Object>();
             for (auto &item : recordMap) {
                 std::string attrName(item.first);
-                obj->value_[attrName] = ConvertRecordData(env, item.second, depth);
+                obj->value_[attrName] = ConvertRecordData(env, item.second, depth + 1);
             }
             valueType = std::move(obj);
             break;
@@ -127,7 +127,7 @@ ValueType ConvertRecordData(ani_env *env, ::taiheChannel::RecordData const& valu
         }
         case taiheChannel::RecordData::tag_t::object: {
             auto in = reinterpret_cast<ani_object>(value.get_object_ref());
-            ConverObject(env, in, valueType, depth);
+            ConverObject(env, in, valueType, depth + 1);
             break;
         }
     }
@@ -197,7 +197,6 @@ ValueType ConvertRecordData(ani_env *env, ::taiheChannel::RecordData const& valu
         LOG_ERROR(UDMF_ANI, "Exceeding the maximum recursion depth");
         return ::taiheChannel::RecordData::make_recordMap(recordMap);
     }
-    depth++;
     for (auto &[key, value] : object->value_) {
         if (std::holds_alternative<double>(value)) {
             auto d = std::get<double>(value);
@@ -275,7 +274,7 @@ ValueType ConvertRecordData(ani_env *env, ::taiheChannel::RecordData const& valu
             recordMap.emplace(key, ::taiheChannel::RecordData::make_object(pixelMapPtr));
             continue;
         } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
-            recordMap.emplace(key, ConvertRecordData(std::get<std::shared_ptr<Object>>(value), depth));
+            recordMap.emplace(key, ConvertRecordData(std::get<std::shared_ptr<Object>>(value), depth + 1));
             continue;
         } else if (std::holds_alternative<nullptr_t>(value)) {
             recordMap.emplace(key, ::taiheChannel::RecordData::make_nullType());

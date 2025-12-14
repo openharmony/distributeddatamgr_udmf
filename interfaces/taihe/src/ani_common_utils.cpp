@@ -198,15 +198,18 @@ ani_status SetMap(ani_env *env, std::map<std::string, int64_t> value, ani_object
 
 ani_status SetArrayBuffer(ani_env *env, std::vector<uint8_t> value, ani_arraybuffer &arrayBufferObj)
 {
-    auto valueLen = value.size();
-    if (valueLen > MAX_DATA_BYTES) {
-        LOG_ERROR(UDMF_ANI, "SetArrayBuffer failed, data size exceed max limit %{public}d bytes",
-            MAX_DATA_BYTES);
+    if (value.empty()) {
+        LOG_ERROR(UDMF_ANI, "ArrayBuffer value is empty.");
         return ANI_ERROR;
     }
-    void *buffer = {};
+    auto valueLen = value.size();
+    if (valueLen > MAX_DATA_BYTES) {
+        LOG_ERROR(UDMF_ANI, "The number of data bytes exceeds the maximum value.");
+        return ANI_ERROR;
+    }
+    void *buffer = nullptr;
     auto status = env->CreateArrayBuffer(valueLen, &buffer, &arrayBufferObj);
-    if (status != ANI_OK) {
+    if (status != ANI_OK || buffer == nullptr) {
         LOG_ERROR(UDMF_ANI, "CreateArrayBuffer failed, status:%{public}d", status);
         return status;
     }
@@ -244,7 +247,7 @@ ObjectType GetObjectType(ani_env *env, ani_object obj)
         return ObjectType::OBJ_BUTT;
     }
     if (isUndefined) {
-        return ObjectType::OBJ_UNDEFIEND;
+        return ObjectType::OBJ_UNDEFINED;
     }
     std::map<ObjectType, std::string> typeClassMap = {
         {ObjectType::OBJ_NULL, CLASSNAME_NULL},
@@ -404,7 +407,6 @@ ani_status GetMap(ani_env *env, ani_object in, std::shared_ptr<Object> &out, int
         LOG_ERROR(UDMF_ANI, "Exceeding the maximum recursion depth");
         return ANI_ERROR;
     }
-    depth++;
     ani_ref keys;
     ani_status status = env->Object_CallMethodByName_Ref(in, "keys", ":C{escompat.IterableIterator}", &keys);
     if (status != ANI_OK) {
@@ -447,7 +449,7 @@ ani_status GetMap(ani_env *env, ani_object in, std::shared_ptr<Object> &out, int
             continue;
         }
         ValueType value;
-        status = ConverObject(env, static_cast<ani_object>(value_obj), value, depth);
+        status = ConverObject(env, static_cast<ani_object>(value_obj), value, depth + 1);
         if (status != ANI_OK) {
             LOG_WARN(UDMF_ANI, "Failed to get sring for key, status %{public}d", status);
             continue;
@@ -463,7 +465,6 @@ ani_status GetObject(ani_env *env, ani_object in, ValueType &out, int depth)
         LOG_ERROR(UDMF_ANI, "Exceeding the maximum recursion depth");
         return ANI_ERROR;
     }
-    depth++;
     auto keys = GetObjectKeys(env, in);
     if (std::find(keys.begin(), keys.end(), "uniformDataType") != keys.end()) {
         ani_ref aniType {};
@@ -497,7 +498,7 @@ ani_status GetObject(ani_env *env, ani_object in, ValueType &out, int depth)
             continue;
         }
         ValueType value = nullptr;
-        status = ConverObject(env, static_cast<ani_object>(aniValue), value, depth);
+        status = ConverObject(env, static_cast<ani_object>(aniValue), value, depth + 1);
         if (status != ANI_OK) {
             LOG_WARN(UDMF_ANI, "ConverObject fail");
             continue;
@@ -514,7 +515,6 @@ ani_status ConverObject(ani_env *env, ani_object aniObj, ValueType &valueType, i
         LOG_ERROR(UDMF_ANI, "Exceeding the maximum recursion depth");
         return ANI_ERROR;
     }
-    depth++;
     auto type = GetObjectType(env, aniObj);
     if (type == ObjectType::OBJ_BUTT) {
         LOG_ERROR(UDMF_ANI, "Invalid object type");
@@ -522,7 +522,7 @@ ani_status ConverObject(ani_env *env, ani_object aniObj, ValueType &valueType, i
     } else if (type == ObjectType::OBJ_NULL) {
         valueType = std::monostate();
         return ANI_OK;
-    } else if (type == ObjectType::OBJ_UNDEFIEND) {
+    } else if (type == ObjectType::OBJ_UNDEFINED) {
         valueType = nullptr;
         return ANI_OK;
     } else if (type == ObjectType::OBJ_INT) {
@@ -574,14 +574,14 @@ ani_status ConverObject(ani_env *env, ani_object aniObj, ValueType &valueType, i
         std::vector<uint8_t> value;
         auto status = GetArrayBuffer(env, aniObj, value);
         if (status != ANI_OK) {
-            LOG_ERROR(UDMF_ANI, "GetBool fail, status:%{public}d", status);
+            LOG_ERROR(UDMF_ANI, "GetArrayBuffer fail, status:%{public}d", status);
             return status;
         }
         valueType = std::move(value);
         return ANI_OK;
     } else if (type == ObjectType::OBJ_MAP) {
         std::shared_ptr<Object> value;
-        auto status = GetMap(env, aniObj, value, depth);
+        auto status = GetMap(env, aniObj, value, depth + 1);
         if (status != ANI_OK) {
             LOG_ERROR(UDMF_ANI, "GetMap fail, status:%{public}d", status);
             return status;
@@ -589,7 +589,7 @@ ani_status ConverObject(ani_env *env, ani_object aniObj, ValueType &valueType, i
         valueType = value;
         return ANI_OK;
     } else if (type == ObjectType::OBJ_OBJECT) {
-        auto status = GetObject(env, aniObj, valueType, depth);
+        auto status = GetObject(env, aniObj, valueType, depth + 1);
         if (status != ANI_OK) {
             LOG_ERROR(UDMF_ANI, "GetObject fail, status:%{public}d", status);
             return status;
