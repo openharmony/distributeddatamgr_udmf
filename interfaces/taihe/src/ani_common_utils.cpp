@@ -33,6 +33,8 @@ constexpr const char* CLASSNAME_BOOLEAN = "std.core.Boolean";
 constexpr const char* CLASSNAME_ARRAY_BUFFER = "escompat.ArrayBuffer";
 constexpr const char* CLASSNAME_RECORD = "escompat.Record";
 constexpr const char* CLASSNAME_OBJECT = "std.core.Object";
+constexpr const int MAX_KEY_COUNT = 10 * 1024;
+constexpr const int MAX_DATA_BYTES = 100 * 1024 * 1024;
 
 ani_ref WrapMapParams(ani_env *env, const std::map<std::string, int64_t> &mapParams)
 {
@@ -196,8 +198,14 @@ ani_status SetMap(ani_env *env, std::map<std::string, int64_t> value, ani_object
 
 ani_status SetArrayBuffer(ani_env *env, std::vector<uint8_t> value, ani_arraybuffer &arrayBufferObj)
 {
+    auto valueLen = value.size();
+    if (valueLen > MAX_DATA_BYTES) {
+        LOG_ERROR(UDMF_ANI, "SetArrayBuffer failed, data size exceed max limit %{public}d bytes",
+            MAX_DATA_BYTES);
+        return ANI_ERROR;
+    }
     void *buffer = {};
-    auto status = env->CreateArrayBuffer(value.size(), &buffer, &arrayBufferObj);
+    auto status = env->CreateArrayBuffer(valueLen, &buffer, &arrayBufferObj);
     if (status != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "CreateArrayBuffer failed, status:%{public}d", status);
         return status;
@@ -348,6 +356,10 @@ ani_status GetString(ani_env *env, ani_object in, std::string &out)
         LOG_ERROR(UDMF_ANI, "String_GetUTF8Size fail, status:%{public}d", status);
         return status;
     }
+    if (sz > MAX_DATA_BYTES) {
+        LOG_ERROR(UDMF_ANI, "GetString failed, string size exceed max limit %{public}d bytes", MAX_DATA_BYTES);
+        return ANI_ERROR;
+    }
     std::string result(sz + 1, 0);
     status = env->String_GetUTF8(aniStr, result.data(), result.size(), &sz);
     if (status != ANI_OK) {
@@ -400,7 +412,7 @@ ani_status GetMap(ani_env *env, ani_object in, std::shared_ptr<Object> &out, int
         return status;
     }
     out = std::make_shared<Object>();
-    while (true) {
+    for (int loopCount = 0; loopCount < MAX_KEY_COUNT; ++loopCount) {
         ani_ref next;
         ani_boolean done;
         status = env->Object_CallMethodByName_Ref(static_cast<ani_object>(keys), "next", nullptr, &next);

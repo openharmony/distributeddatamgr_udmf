@@ -546,7 +546,8 @@ UDDetails ConvertUDDetailsToUnion(
         auto thDetails = ConvertUDSUDDetailsToUnion(details);
         thOpDetails.emplace(std::move(thDetails));
     }
-    ::ohos::data::uniformDataStruct::OpenHarmonyAppItem openHarmonyAppItem = ::ohos::data::uniformDataStruct::OpenHarmonyAppItem {
+    ::ohos::data::uniformDataStruct::OpenHarmonyAppItem openHarmonyAppItem =
+            ::ohos::data::uniformDataStruct::OpenHarmonyAppItem {
         std::move(thType),
         std::move(thAppId),
         std::move(thAppName),
@@ -684,7 +685,7 @@ UDDetails ConvertUDDetailsToUnion(
         OHOS::Media::PixelMapTaiheAni::CreateEtsPixelMap(taihe::get_env(), pixelMapObj);
     ::taihe::string thType = ::taihe::string(uniformDataType);
     if (aniPixel == nullptr) {
-        ::taiheChannel::ValueType::make_nullType();
+        return ::taiheChannel::ValueType::make_nullType();
     }
 
     std::shared_ptr<Object> detailsPtr;

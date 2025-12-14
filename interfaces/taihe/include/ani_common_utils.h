@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace UDMF {
-static constexpr int MAX_RECURSIVE = 10;
+static constexpr int MAX_RECURSIVE = 100;
 enum ObjectType : int32_t {
     OBJ_UNDEFIEND = 0,
     OBJ_NULL,
