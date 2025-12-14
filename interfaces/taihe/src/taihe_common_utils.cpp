@@ -15,6 +15,7 @@
 
 #define LOG_TAG "UDMF_TAIHE_COMMON_UTILS"
 
+#include "ani_common_utils.h"
 #include "ani_common_want.h"
 #include "logger.h"
 #include "pixel_map_taihe_ani.h"
@@ -22,8 +23,21 @@
 #include "taihe_common_utils.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace taiheStruct = ohos::data::uniformDataStruct;
 namespace OHOS {
 namespace UDMF {
+using ConvertorFunc = ::taiheChannel::ValueType (*)(std::shared_ptr<Object>);
+static const std::map<std::string, ConvertorFunc> CONVERTORS = {
+    {"general.plain-text", ConvertPlainText},
+    {"general.hyperlink", ConvertHyperlink},
+    {"general.html", ConvertHTML},
+    {"openharmony.app-item", ConvertOpenHarmonyAppItem},
+    {"general.content-form", ConvertContentForm},
+    {"openharmony.form", ConvertForm},
+    {"general.file-uri", ConvertFileUri},
+    {"openharmony.pixel-map", ConvertPixelMap},
+};
+
 OHOS::UDMF::Intention ConvertIntention(::taiheChannel::Intention value)
 {
     switch (value.get_key()) {
@@ -61,21 +75,59 @@ ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,
             break;
         }
         case taiheChannel::ValueType::tag_t::nullType:
-            valueType = std::monostate();
-            break;
-        case taiheChannel::ValueType::tag_t::undefinedType:
             valueType = nullptr;
             break;
-        case taiheChannel::ValueType::tag_t::object: {
-            ani_object obj = reinterpret_cast<ani_object>(value.get_object_ref());
-            if (type ==  "openharmony.want") {
-                OHOS::AAFwk::Want want;
-                OHOS::AppExecFwk::UnwrapWant(env, obj, want);
-                valueType = std::make_shared<OHOS::AAFwk::Want>(want);
-            } else if (type ==  "openharmony.pixel-map") {
-                valueType = OHOS::Media::PixelMapTaiheAni::GetNativePixelMap(env, obj);
-            } else {
+        case taiheChannel::ValueType::tag_t::undefinedType:
+            valueType = std::monostate();
+            break;
+        case taiheChannel::ValueType::tag_t::object:
+        case taiheChannel::ValueType::tag_t::plainText:
+        case taiheChannel::ValueType::tag_t::hyperlink:
+        case taiheChannel::ValueType::tag_t::html:
+        case taiheChannel::ValueType::tag_t::openHarmonyAppItem:
+        case taiheChannel::ValueType::tag_t::contentForm:
+        case taiheChannel::ValueType::tag_t::form:
+        case taiheChannel::ValueType::tag_t::fileUri:
+        case taiheChannel::ValueType::tag_t::pixelMap:
+        case taiheChannel::ValueType::tag_t::recordData: {
+            auto obj = value.get_recordData_ref();
+            valueType = ConvertRecordData(env, obj, 0);
+            break;
+        }
+    }
+    return valueType;
+}
+
+ValueType ConvertRecordData(ani_env *env, ::taiheChannel::RecordData const& value, int depth)
+{
+    if (depth > MAX_RECURSIVE) {
+        LOG_ERROR(UDMF_ANI, "Exceeding the maximum recursion depth");
+        return nullptr;
+    }
+    ValueType valueType = nullptr;
+    switch (value.get_tag()) {
+        case taiheChannel::RecordData::tag_t::nullType:
+            valueType = nullptr;
+            break;
+        case taiheChannel::RecordData::tag_t::undefinedType:
+            valueType = std::monostate();
+            break;
+        case taiheChannel::RecordData::tag_t::recordMap: {
+            auto recordMap = value.get_recordMap_ref();
+            auto obj = std::make_shared<Object>();
+            for (auto &item : recordMap) {
+                std::string attrName(item.first);
+                obj->value_[attrName] = ConvertRecordData(env, item.second, depth + 1);
             }
+            valueType = std::move(obj);
+            break;
+        }
+        case taiheChannel::RecordData::tag_t::recordArray: {
+            break;
+        }
+        case taiheChannel::RecordData::tag_t::object: {
+            auto in = reinterpret_cast<ani_object>(value.get_object_ref());
+            ConverObject(env, in, valueType, depth + 1);
             break;
         }
     }
@@ -119,6 +171,15 @@ ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,
         return ::taiheChannel::ValueType::make_object(pixelMapPtr);
     }
     if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        auto obj = std::get<std::shared_ptr<Object>>(value);
+        std::string type;
+        if (obj->GetValue(UNIFORM_DATA_TYPE, type)) {
+            auto convertor = CONVERTORS.find(type);
+            if (convertor != CONVERTORS.end()) {
+                return convertor->second(obj);
+            }
+        }
+        return ::taiheChannel::ValueType::make_recordData(ConvertRecordData(obj, 0));
     }
     if (std::holds_alternative<nullptr_t>(value)) {
         return ::taiheChannel::ValueType::make_undefinedType();
@@ -127,6 +188,103 @@ ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,
         return ::taiheChannel::ValueType::make_nullType();
     }
     return ::taiheChannel::ValueType::make_nullType();
+}
+
+::taiheChannel::RecordData ConvertRecordData(std::shared_ptr<Object> object, int depth)
+{
+    taihe::map<taihe::string, ::taiheChannel::RecordData> recordMap;
+    if (depth > MAX_RECURSIVE) {
+        LOG_ERROR(UDMF_ANI, "Exceeding the maximum recursion depth");
+        return ::taiheChannel::RecordData::make_recordMap(recordMap);
+    }
+    for (auto &[key, value] : object->value_) {
+        if (std::holds_alternative<double>(value)) {
+            auto d = std::get<double>(value);
+            ani_object doubleObj {};
+            auto status = SetDouble(::taihe::get_env(), d, doubleObj);
+            if (status != ANI_OK) {
+                continue;
+            }
+            uintptr_t doulePtr = reinterpret_cast<uintptr_t>(doubleObj);
+            recordMap.emplace(key, ::taiheChannel::RecordData::make_object(doulePtr));
+            continue;
+        } else if (std::holds_alternative<int32_t>(value)) {
+            auto i32 = std::get<int32_t>(value);
+            ani_object intObj {};
+            auto status = SetInt(::taihe::get_env(), i32, intObj);
+            if (status != ANI_OK) {
+                continue;
+            }
+            uintptr_t intPtr = reinterpret_cast<uintptr_t>(intObj);
+            recordMap.emplace(key, ::taiheChannel::RecordData::make_object(intPtr));
+            continue;
+        } else if (std::holds_alternative<int64_t>(value)) {
+            auto i64 = std::get<int64_t>(value);
+            ani_object longObj {};
+            auto status = SetLong(::taihe::get_env(), i64, longObj);
+            if (status != ANI_OK) {
+                continue;
+            }
+            uintptr_t longPtr = reinterpret_cast<uintptr_t>(longObj);
+            recordMap.emplace(key, ::taiheChannel::RecordData::make_object(longPtr));
+            continue;
+        } else if (std::holds_alternative<bool>(value)) {
+            auto b = std::get<bool>(value);
+            ani_object boolObj {};
+            auto status = SetBoolean(::taihe::get_env(), b, boolObj);
+            if (status != ANI_OK) {
+                continue;
+            }
+            uintptr_t boolPtr = reinterpret_cast<uintptr_t>(boolObj);
+            recordMap.emplace(key, ::taiheChannel::RecordData::make_object(boolPtr));
+            continue;
+        } else if (std::holds_alternative<std::string>(value)) {
+            auto s = std::get<std::string>(value);
+            ani_string strObj;
+            auto env = ::taihe::get_env();
+            if (env->String_NewUTF8(s.c_str(), s.size(), &strObj) != ANI_OK) {
+                LOG_INFO(UDMF_ANI, "String_NewUTF8 failed");
+            }
+            uintptr_t strPtr = reinterpret_cast<uintptr_t>(strObj);
+            recordMap.emplace(key, ::taiheChannel::RecordData::make_object(strPtr));
+            continue;
+        } else if (std::holds_alternative<std::vector<uint8_t>>(value)) {
+            std::vector<uint8_t> dataArray = std::get<std::vector<uint8_t>>(value);
+            ani_arraybuffer arrayBufferObj {};
+            auto status = SetArrayBuffer(taihe::get_env(), dataArray, arrayBufferObj);
+            if (status != ANI_OK) {
+                continue;
+            }
+            uintptr_t bufferPtr = reinterpret_cast<uintptr_t>(arrayBufferObj);
+            recordMap.emplace(key, ::taiheChannel::RecordData::make_object(bufferPtr));
+            continue;
+        } else if (std::holds_alternative<std::shared_ptr<OHOS::AAFwk::Want>>(value)) {
+            auto want = std::get<std::shared_ptr<OHOS::AAFwk::Want>>(value);
+            ani_object wantObj = OHOS::AppExecFwk::WrapWant(taihe::get_env(), *want);
+            uintptr_t wantPtr = reinterpret_cast<uintptr_t>(wantObj);
+            recordMap.emplace(key, ::taiheChannel::RecordData::make_object(wantPtr));
+            continue;
+        } else if (std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(value)) {
+            auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value);
+            ani_object pixelMapObj = OHOS::Media::PixelMapTaiheAni::CreateEtsPixelMap(taihe::get_env(), pixelMap);
+            uintptr_t pixelMapPtr = reinterpret_cast<uintptr_t>(pixelMapObj);
+            if (pixelMapPtr != 0) {
+                LOG_INFO(UDMF_ANI, "<PixelMap> is not null");
+            }
+            recordMap.emplace(key, ::taiheChannel::RecordData::make_object(pixelMapPtr));
+            continue;
+        } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+            recordMap.emplace(key, ConvertRecordData(std::get<std::shared_ptr<Object>>(value), depth + 1));
+            continue;
+        } else if (std::holds_alternative<nullptr_t>(value)) {
+            recordMap.emplace(key, ::taiheChannel::RecordData::make_nullType());
+            continue;
+        } else if (std::holds_alternative<std::monostate>(value)) {
+            recordMap.emplace(key, ::taiheChannel::RecordData::make_undefinedType());
+            continue;
+        }
+    }
+    return ::taiheChannel::RecordData::make_recordMap(recordMap);
 }
 
 UDDetails ConvertUDDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details)
@@ -225,6 +383,323 @@ UDDetails ConvertUDDetailsToUnion(
         }
     }
     return taiheDetails;
+}
+
+::taihe::map<::taihe::string, ::taiheStruct::DetailsValue> ConvertUDSUDDetailsToUnion(
+    const UDDetails &details)
+{
+    ::taihe::map<::taihe::string, ::taiheStruct::DetailsValue> taiheDetails;
+    for (auto &item : details) {
+        if (item.first.empty()) {
+            continue;
+        }
+        if (std::holds_alternative<double>(item.second)) {
+            taiheDetails.emplace(::taihe::string(item.first),
+                ::taiheStruct::DetailsValue::make_doubleType(std::get<double>(item.second)));
+            continue;
+        }
+        if (std::holds_alternative<int64_t>(item.second)) {
+            taiheDetails.emplace(::taihe::string(item.first),
+                ::taiheStruct::DetailsValue::make_longType(std::get<int64_t>(item.second)));
+            continue;
+        }
+        if (std::holds_alternative<int32_t>(item.second)) {
+            taiheDetails.emplace(::taihe::string(item.first),
+                ::taiheStruct::DetailsValue::make_intType(std::get<int32_t>(item.second)));
+            continue;
+        }
+        if (std::holds_alternative<std::string>(item.second)) {
+            taiheDetails.emplace(::taihe::string(item.first),
+                ::taiheStruct::DetailsValue::make_string(std::get<std::string>(item.second)));
+            continue;
+        }
+        if (std::holds_alternative<std::vector<uint8_t>>(item.second)) {
+            std::vector<uint8_t> dataArray = std::get<std::vector<uint8_t>>(item.second);
+            taiheDetails.emplace(::taihe::string(item.first),
+                ::taiheStruct::DetailsValue::make_Uint8Array(taihe::array<uint8_t>(dataArray)));
+            continue;
+        }
+    }
+    return taiheDetails;
+}
+
+::taiheChannel::ValueType ConvertPlainText(std::shared_ptr<Object> udsObj)
+{
+    std::string uniformDataType;
+    udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
+    std::string textContent;
+    udsObj->GetValue("textContent", textContent);
+    std::string textAbstract;
+    ::taihe::optional<::taihe::string> thOpAbstract;
+    if (udsObj->GetValue("abstract", textAbstract) || udsObj->GetValue("textAbstract", textAbstract)) {
+        ::taihe::string thTextAbstract = ::taihe::string(std::move(textAbstract));
+        thOpAbstract.emplace(std::move(thTextAbstract));
+    }
+    std::shared_ptr<Object> detailsPtr;
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> thOpDetails;
+    if (udsObj->GetValue("details", detailsPtr)) {
+        UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
+        auto thDetails = ConvertUDDetailsToString(details);
+        thOpDetails.emplace(std::move(thDetails));
+    }
+    ::taihe::string thType = ::taihe::string(uniformDataType);
+    ::taihe::string thTextContent = ::taihe::string(textContent);
+    ::ohos::data::uniformDataStruct::PlainText plainText = ::ohos::data::uniformDataStruct::PlainText {
+        std::move(thType),
+        std::move(thTextContent),
+        std::move(thOpAbstract),
+        std::move(thOpDetails)
+    };
+    return ::taiheChannel::ValueType::make_plainText(plainText);
+}
+
+::taiheChannel::ValueType ConvertHyperlink(std::shared_ptr<Object> udsObj)
+{
+    std::string uniformDataType;
+    udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
+    std::string url;
+    udsObj->GetValue("url", url);
+    ::taihe::string thType = ::taihe::string(uniformDataType);
+    ::taihe::string thUrl = ::taihe::string(url);
+
+    ::taihe::optional<::taihe::string> thDescriptionOpt;
+    std::string description;
+    if (udsObj->GetValue("description", description)) {
+        ::taihe::string thDescription = ::taihe::string(std::move(description));
+        thDescriptionOpt.emplace(std::move(thDescription));
+    }
+    std::shared_ptr<Object> detailsPtr;
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> thOpDetails;
+    if (udsObj->GetValue("details", detailsPtr)) {
+        UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
+        auto thDetails = ConvertUDDetailsToString(details);
+        thOpDetails.emplace(std::move(thDetails));
+    }
+    ::ohos::data::uniformDataStruct::Hyperlink hyperlink = ::ohos::data::uniformDataStruct::Hyperlink {
+        std::move(thType),
+        std::move(thUrl),
+        std::move(thDescriptionOpt),
+        std::move(thOpDetails)
+    };
+    return ::taiheChannel::ValueType::make_hyperlink(hyperlink);
+}
+
+::taiheChannel::ValueType ConvertHTML(std::shared_ptr<Object> udsObj)
+{
+    std::string uniformDataType;
+    udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
+    std::string htmlContent;
+    udsObj->GetValue("htmlContent", htmlContent);
+    ::taihe::string thType = ::taihe::string(uniformDataType);
+    ::taihe::string thHtmlContent = ::taihe::string(htmlContent);
+
+    ::taihe::optional<::taihe::string> thPlainContentOpt;
+    std::string plainContent;
+    if (udsObj->GetValue("plainContent", plainContent)) {
+        ::taihe::string thPlainContent = ::taihe::string(std::move(plainContent));
+        thPlainContentOpt.emplace(std::move(thPlainContent));
+    }
+    std::shared_ptr<Object> detailsPtr;
+    ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> thOpDetails;
+    if (udsObj->GetValue("details", detailsPtr)) {
+        UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
+        auto thDetails = ConvertUDDetailsToString(details);
+        thOpDetails.emplace(std::move(thDetails));
+    }
+    ::ohos::data::uniformDataStruct::HTML html = ::ohos::data::uniformDataStruct::HTML {
+        std::move(thType),
+        std::move(thHtmlContent),
+        std::move(thPlainContentOpt),
+        std::move(thOpDetails)
+    };
+    return ::taiheChannel::ValueType::make_html(html);
+}
+
+::taiheChannel::ValueType ConvertOpenHarmonyAppItem(std::shared_ptr<Object> udsObj)
+{
+    std::string uniformDataType;
+    udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
+    std::string appId;
+    udsObj->GetValue("appId", appId);
+    std::string appName;
+    udsObj->GetValue("appName", appName);
+    std::string appIconId;
+    udsObj->GetValue("appIconId", appIconId);
+    std::string appLabelId;
+    udsObj->GetValue("appLabelId", appLabelId);
+    std::string bundleName;
+    udsObj->GetValue("bundleName", bundleName);
+    std::string abilityName;
+    udsObj->GetValue("abilityName", abilityName);
+    ::taihe::string thType = ::taihe::string(uniformDataType);
+    ::taihe::string thAppId = ::taihe::string(appId);
+    ::taihe::string thAppName = ::taihe::string(appName);
+    ::taihe::string thAppIconId = ::taihe::string(appIconId);
+    ::taihe::string thAppLabelId = ::taihe::string(appLabelId);
+    ::taihe::string thBundleName = ::taihe::string(bundleName);
+    ::taihe::string thAbilityName = ::taihe::string(abilityName);
+    std::shared_ptr<Object> detailsPtr;
+    ::taihe::optional<::taihe::map<::taihe::string, ::taiheStruct::DetailsValue>> thOpDetails;
+    if (udsObj->GetValue("details", detailsPtr)) {
+        UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
+        auto thDetails = ConvertUDSUDDetailsToUnion(details);
+        thOpDetails.emplace(std::move(thDetails));
+    }
+    ::ohos::data::uniformDataStruct::OpenHarmonyAppItem openHarmonyAppItem =
+            ::ohos::data::uniformDataStruct::OpenHarmonyAppItem {
+        std::move(thType),
+        std::move(thAppId),
+        std::move(thAppName),
+        std::move(thAppIconId),
+        std::move(thAppLabelId),
+        std::move(thBundleName),
+        std::move(thAbilityName),
+        std::move(thOpDetails)
+    };
+    return ::taiheChannel::ValueType::make_openHarmonyAppItem(openHarmonyAppItem);
+}
+
+::taiheChannel::ValueType ConvertContentForm(std::shared_ptr<Object> udsObj)
+{
+    std::string uniformDataType;
+    udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
+    std::string title;
+    udsObj->GetValue("title", title);
+    ::taihe::string thType = ::taihe::string(uniformDataType);
+    ::taihe::string thTitle = ::taihe::string(title);
+    std::vector<uint8_t> thumbData;
+    ::taihe::optional<::taihe::array<uint8_t>> thThumbDataOpt;
+    if (udsObj->GetValue("thumbData", thumbData)) {
+        ::taihe::array<uint8_t> thThumbData = ::taihe::array<uint8_t>(thumbData);
+        thThumbDataOpt.emplace(thThumbData);
+    }
+    ::taihe::optional<::taihe::string> thDescriptionOpt;
+    std::string description;
+    if (udsObj->GetValue("description", description)) {
+        ::taihe::string thDescription = ::taihe::string(std::move(description));
+        thDescriptionOpt.emplace(std::move(thDescription));
+    }
+    std::vector<uint8_t> appIcon;
+    ::taihe::optional<::taihe::array<uint8_t>> thAppIconOpt;
+    if (udsObj->GetValue("appIcon", appIcon)) {
+        ::taihe::array<uint8_t> thAppIcon = ::taihe::array<uint8_t>(appIcon);
+        thAppIconOpt.emplace(thAppIcon);
+    }
+    ::taihe::optional<::taihe::string> thAppNameOpt;
+    std::string appName;
+    if (udsObj->GetValue("appName", appName)) {
+        ::taihe::string thAppName = ::taihe::string(std::move(appName));
+        thAppNameOpt.emplace(std::move(thAppName));
+    }
+    ::taihe::optional<::taihe::string> thLinkUriOpt;
+    std::string linkUri;
+    if (udsObj->GetValue("linkUri", linkUri)) {
+        ::taihe::string thLinkUri = ::taihe::string(std::move(linkUri));
+        thLinkUriOpt.emplace(std::move(thLinkUri));
+    }
+    ::ohos::data::uniformDataStruct::ContentForm contentForm = ::ohos::data::uniformDataStruct::ContentForm {
+        std::move(thType),
+        std::move(thThumbDataOpt),
+        std::move(thDescriptionOpt),
+        std::move(thTitle),
+        std::move(thAppIconOpt),
+        std::move(thAppNameOpt),
+        std::move(thLinkUriOpt)
+    };
+    return ::taiheChannel::ValueType::make_contentForm(std::move(contentForm));
+}
+
+::taiheChannel::ValueType ConvertForm(std::shared_ptr<Object> udsObj)
+{
+    std::string uniformDataType;
+    udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
+    int32_t formId;
+    udsObj->GetValue("formId", formId);
+    std::string formName;
+    udsObj->GetValue("formName", formName);
+    std::string bundleName;
+    udsObj->GetValue("bundleName", bundleName);
+    std::string abilityName;
+    udsObj->GetValue("abilityName", abilityName);
+    std::string module;
+    udsObj->GetValue("module", module);
+    ::taihe::string thType = ::taihe::string(uniformDataType);
+    ::taihe::string thFormName = ::taihe::string(formName);
+    ::taihe::string thBundleName = ::taihe::string(bundleName);
+    ::taihe::string thAbilityName = ::taihe::string(abilityName);
+    ::taihe::string thModule = ::taihe::string(module);
+    std::shared_ptr<Object> detailsPtr;
+    ::taihe::optional<::taihe::map<::taihe::string, ::taiheStruct::DetailsValue>> thOpDetails;
+    if (udsObj->GetValue("details", detailsPtr)) {
+        UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
+        auto thDetails = ConvertUDSUDDetailsToUnion(details);
+        thOpDetails.emplace(std::move(thDetails));
+    }
+    ::ohos::data::uniformDataStruct::Form form = ::ohos::data::uniformDataStruct::Form {
+        std::move(thType),
+        formId,
+        std::move(thFormName),
+        std::move(thBundleName),
+        std::move(thAbilityName),
+        std::move(thModule),
+        std::move(thOpDetails)
+    };
+    return ::taiheChannel::ValueType::make_form(form);
+}
+
+::taiheChannel::ValueType ConvertFileUri(std::shared_ptr<Object> udsObj)
+{
+    std::string uniformDataType;
+    udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
+    std::string oriUri;
+    udsObj->GetValue("oriUri", oriUri);
+    std::string fileType;
+    udsObj->GetValue("fileType", fileType);
+    ::taihe::string thType = ::taihe::string(uniformDataType);
+    ::taihe::string thOriUri = ::taihe::string(oriUri);
+    ::taihe::string thFileType = ::taihe::string(fileType);
+    std::shared_ptr<Object> detailsPtr;
+    ::taihe::optional<::taihe::map<::taihe::string, ::taiheStruct::DetailsValue>> thOpDetails;
+    if (udsObj->GetValue("details", detailsPtr)) {
+        UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
+        auto thDetails = ConvertUDSUDDetailsToUnion(details);
+        thOpDetails.emplace(std::move(thDetails));
+    }
+    ::ohos::data::uniformDataStruct::FileUri fileUri = ::ohos::data::uniformDataStruct::FileUri {
+        std::move(thType),
+        std::move(thOriUri),
+        std::move(thFileType),
+        std::move(thOpDetails)
+    };
+    return ::taiheChannel::ValueType::make_fileUri(fileUri);
+}
+
+::taiheChannel::ValueType ConvertPixelMap(std::shared_ptr<Object> udsObj)
+{
+    std::string uniformDataType;
+    udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMapObj;
+    udsObj->GetValue("pixelMap", pixelMapObj);
+    ani_object aniPixel =
+        OHOS::Media::PixelMapTaiheAni::CreateEtsPixelMap(taihe::get_env(), pixelMapObj);
+    ::taihe::string thType = ::taihe::string(uniformDataType);
+    if (aniPixel == nullptr) {
+        return ::taiheChannel::ValueType::make_nullType();
+    }
+
+    std::shared_ptr<Object> detailsPtr;
+    ::taihe::optional<::taihe::map<::taihe::string, ::taiheStruct::DetailsValue>> thOpDetails;
+    if (udsObj->GetValue("details", detailsPtr)) {
+        UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
+        auto thDetails = ConvertUDSUDDetailsToUnion(details);
+        thOpDetails.emplace(std::move(thDetails));
+    }
+    ::ohos::data::uniformDataStruct::PixelMap pixelMap = ::ohos::data::uniformDataStruct::PixelMap {
+        std::move(thType),
+        std::move(thOpDetails),
+        reinterpret_cast<uintptr_t>(aniPixel)
+    };
+    return ::taiheChannel::ValueType::make_pixelMap(std::move(pixelMap));
 }
 
 ::taihe::array<::taihe::string> ConvertStringVectorToTaiheArray(const std::vector<std::string>& stringVector)
