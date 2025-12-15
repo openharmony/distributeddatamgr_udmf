@@ -41,9 +41,9 @@ public:
     void SetAppId(const ::taihe::string_view &appId);
     ::taihe::string GetAppName();
     void SetAppName(const ::taihe::string_view &appName);
-    ::taihe::string GetAppIconId();	
-    void SetAppIconId(const ::taihe::string_view &appIconId);	
-    ::taihe::string GetAppLabelId();	
+    ::taihe::string GetAppIconId();
+    void SetAppIconId(const ::taihe::string_view &appIconId);
+    ::taihe::string GetAppLabelId();
     void SetAppLabelId(const ::taihe::string_view &appLabelId);
     ::taihe::string GetBundleName();
     void SetBundleName(const ::taihe::string_view &bundleName);
