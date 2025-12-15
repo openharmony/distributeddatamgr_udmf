@@ -16,6 +16,7 @@
 
 #include "application_defined_record_taihe.h"
 #include "audio_taihe.h"
+#include "error_code.h"
 #include "defined_appitem_taihe.h"
 #include "defined_form_taihe.h"
 #include "defined_pixelmap_taihe.h"
@@ -38,13 +39,15 @@ namespace OHOS {
 namespace UDMF {
 UnifiedDataTaihe::UnifiedDataTaihe()
 {
-    this->value_ = std::make_shared<UnifiedData>();
+    this->propertiesValue_ = std::make_shared<UnifiedDataPropertiesTaihe>();
+    this->value_ = std::make_shared<UnifiedData>(this->propertiesValue_->value_);
 }
 
 void UnifiedDataTaihe::AddRecord(::taiheChannel::AllRecords const& unifiedRecord)
 {
     if (this->value_ == nullptr) {
         LOG_ERROR(UDMF_ANI, "Inner value is empty.");
+        taihe::set_business_error(PARAMETERSERROR, "Parameter error.");
         return;
     }
     switch (unifiedRecord.get_tag()) {
@@ -162,7 +165,8 @@ void UnifiedDataTaihe::AddRecord(::taiheChannel::AllRecords const& unifiedRecord
             return ::taiheChannel::AllRecords::make_file(fileTaihe);
         }
         case FOLDER: {
-            auto folderTaihe = taihe::make_holder<FolderTaihe, ::taiheChannel::FolderInner>();
+            auto folderTaihe =
+                taihe::make_holder<FolderTaihe, ::taiheChannel::FolderInner>();
             auto folderTaihePtr = reinterpret_cast<FolderTaihe*>(folderTaihe->GetInner());
             folderTaihePtr->value_ = std::static_pointer_cast<Folder>(in);
             return ::taiheChannel::AllRecords::make_folder(folderTaihe);
@@ -192,7 +196,8 @@ void UnifiedDataTaihe::AddRecord(::taiheChannel::AllRecords const& unifiedRecord
             return ::taiheChannel::AllRecords::make_text(textTaihe);
         }
         case PLAIN_TEXT: {
-            auto plainTextTaihe = taihe::make_holder<PlainTextTaihe, ::taiheChannel::PlainTextInner>();
+            auto plainTextTaihe =
+                taihe::make_holder<PlainTextTaihe, ::taiheChannel::PlainTextInner>();
             auto plainTextTaihePtr = reinterpret_cast<PlainTextTaihe*>(plainTextTaihe->GetInner());
             plainTextTaihePtr->value_ = std::static_pointer_cast<PlainText>(in);
             return ::taiheChannel::AllRecords::make_plainText(plainTextTaihe);
@@ -204,57 +209,107 @@ void UnifiedDataTaihe::AddRecord(::taiheChannel::AllRecords const& unifiedRecord
             return ::taiheChannel::AllRecords::make_html(htmlTaihe);
         }
         case HYPERLINK: {
-            auto hyperlinkTaihe = taihe::make_holder<HyperlinkTaihe, ::taiheChannel::HyperlinkInner>();
+            auto hyperlinkTaihe =
+                taihe::make_holder<HyperlinkTaihe, ::taiheChannel::HyperlinkInner>();
             auto hyperlinkTaihePtr = reinterpret_cast<HyperlinkTaihe*>(hyperlinkTaihe->GetInner());
             hyperlinkTaihePtr->value_ = std::static_pointer_cast<Link>(in);
             return ::taiheChannel::AllRecords::make_hyperlink(hyperlinkTaihe);
         }
         case SYSTEM_DEFINED_RECORD: {
-            auto systemDefinedRecordTaihe =
-                taihe::make_holder<SystemDefinedRecordTaihe, ::taiheChannel::SystemDefinedRecordInner>();
+            auto systemDefinedRecordTaihe = taihe::make_holder<SystemDefinedRecordTaihe,
+                ::taiheChannel::SystemDefinedRecordInner>();
             auto systemDefinedRecordTaihePtr =
                 reinterpret_cast<SystemDefinedRecordTaihe*>(systemDefinedRecordTaihe->GetInner());
             systemDefinedRecordTaihePtr->value_ = std::static_pointer_cast<SystemDefinedRecord>(in);
             return ::taiheChannel::AllRecords::make_systemDefinedRecord(systemDefinedRecordTaihe);
         }
         case SYSTEM_DEFINED_APP_ITEM: {
-            auto systemDefinedAppItemTaihe =
-                taihe::make_holder<SystemDefinedAppItemTaihe, ::taiheChannel::SystemDefinedAppItemInner>();
+            auto systemDefinedAppItemTaihe = taihe::make_holder<SystemDefinedAppItemTaihe,
+                ::taiheChannel::SystemDefinedAppItemInner>();
             auto systemDefinedAppItemTaihePtr =
                 reinterpret_cast<SystemDefinedAppItemTaihe*>(systemDefinedAppItemTaihe->GetInner());
             systemDefinedAppItemTaihePtr->value_ = std::static_pointer_cast<SystemDefinedAppItem>(in);
-            return ::taiheChannel::AllRecords::make_systemDefinedAppItem(systemDefinedAppItemTaihe);
+            return ::taiheChannel::AllRecords::make_systemDefinedAppItem(
+                systemDefinedAppItemTaihe);
         }
         case SYSTEM_DEFINED_FORM: {
             auto systemDefinedFormTaihe =
-                taihe::make_holder<SystemDefinedFormTaihe, ::taiheChannel::SystemDefinedFormInner>();
+                taihe::make_holder<SystemDefinedFormTaihe,
+                ::taiheChannel::SystemDefinedFormInner>();
             auto systemDefinedFormTaihePtr =
                 reinterpret_cast<SystemDefinedFormTaihe*>(systemDefinedFormTaihe->GetInner());
             systemDefinedFormTaihePtr->value_ = std::static_pointer_cast<SystemDefinedForm>(in);
             return ::taiheChannel::AllRecords::make_systemDefinedForm(systemDefinedFormTaihe);
         }
         case SYSTEM_DEFINED_PIXEL_MAP: {
-            auto systemDefinedPixelMapTaihe =
-                taihe::make_holder<SystemDefinedPixelMapTaihe, ::taiheChannel::SystemDefinedPixelMapInner>();
+            auto systemDefinedPixelMapTaihe = taihe::make_holder<SystemDefinedPixelMapTaihe,
+                ::taiheChannel::SystemDefinedPixelMapInner>();
             auto systemDefinedPixelMapTaihePtr =
                 reinterpret_cast<SystemDefinedPixelMapTaihe*>(systemDefinedPixelMapTaihe->GetInner());
-            systemDefinedPixelMapTaihePtr->value_ = std::static_pointer_cast<SystemDefinedPixelMap>(in);
-            return ::taiheChannel::AllRecords::make_systemDefinedPixelMap(systemDefinedPixelMapTaihe);
+            systemDefinedPixelMapTaihePtr->value_ =
+                std::static_pointer_cast<SystemDefinedPixelMap>(in);
+            return ::taiheChannel::AllRecords::make_systemDefinedPixelMap(
+                systemDefinedPixelMapTaihe);
         }
         case APPLICATION_DEFINED_RECORD: {
-            auto applicationDefinedRecordTaihe =
-                taihe::make_holder<ApplicationDefinedRecordTaihe, ::taiheChannel::ApplicationDefinedRecordInner>();
+            auto applicationDefinedRecordTaihe = taihe::make_holder<ApplicationDefinedRecordTaihe,
+                ::taiheChannel::ApplicationDefinedRecordInner>();
             auto applicationDefinedRecordTaihePtr =
                 reinterpret_cast<ApplicationDefinedRecordTaihe*>(applicationDefinedRecordTaihe->GetInner());
-            applicationDefinedRecordTaihePtr->value_ = std::static_pointer_cast<ApplicationDefinedRecord>(in);
-            return ::taiheChannel::AllRecords::make_applicationDefinedRecord(applicationDefinedRecordTaihe);
+            applicationDefinedRecordTaihePtr->value_ =
+                std::static_pointer_cast<ApplicationDefinedRecord>(in);
+            return ::taiheChannel::AllRecords::make_applicationDefinedRecord(
+                applicationDefinedRecordTaihe);
         }
         default:
-            auto recordImpl = taihe::make_holder<UnifiedRecordTaihe, ::taiheChannel::UnifiedRecordInner>();
+            auto recordImpl = taihe::make_holder<UnifiedRecordTaihe,
+                ::taiheChannel::UnifiedRecordInner>();
             auto recordImplPtr = reinterpret_cast<UnifiedRecordTaihe*>(recordImpl->GetInner());
             recordImplPtr->value_ = std::static_pointer_cast<UnifiedRecord>(in);
             return ::taiheChannel::AllRecords::make_unifiedRecord(recordImpl);
     }
+}
+
+bool UnifiedDataTaihe::HasType(::taihe::string_view type)
+{
+    if (!this->value_) {
+        LOG_ERROR(UDMF_ANI, "Inner value is null.");
+        taihe::set_business_error(PARAMETERSERROR, "invalid object!");
+        return false;
+    }
+    return this->value_->HasHigherFileType(std::string(type));
+}
+
+::taihe::array<::taihe::string> UnifiedDataTaihe::GetTypes()
+{
+    std::vector<std::string> res;
+    if (this->value_ == nullptr) {
+        LOG_ERROR(UDMF_ANI, "Inner value is empty.");
+        return ::taihe::array<::taihe::string>(taihe::copy_data_t{}, res.data(), res.size());
+    }
+    res = this->value_->GetTypesLabels();
+    return ::taihe::array<::taihe::string>(taihe::copy_data_t{}, res.data(), res.size());
+}
+
+::taiheChannel::UnifiedDataProperties UnifiedDataTaihe::GetProperties()
+{
+    if (!this->propertiesValue_) {
+        this->propertiesValue_ = std::make_shared<UnifiedDataPropertiesTaihe>();
+    }
+    return taihe::make_holder<UnifiedDataPropertiesTaihe, ::taiheChannel::UnifiedDataProperties>(
+        this->propertiesValue_->value_, this->propertiesValue_->delayData_);
+}
+
+void UnifiedDataTaihe::SetProperties(::taiheChannel::UnifiedDataProperties properties)
+{
+    if (!this->value_ || !this->propertiesValue_) {
+        LOG_ERROR(UDMF_ANI, "Inner value or propertiesValue is null.");
+        return;
+    }
+    auto propertiesPtr = properties->GetInner();
+    auto propertiesInnerPtr = reinterpret_cast<UnifiedDataPropertiesTaihe *>(propertiesPtr);
+    this->propertiesValue_.reset(propertiesInnerPtr);
+    this->value_->SetProperties(propertiesInnerPtr->value_);
 }
 
 int64_t UnifiedDataTaihe::GetInner()

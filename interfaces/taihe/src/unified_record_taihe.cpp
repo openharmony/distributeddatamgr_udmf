@@ -40,7 +40,7 @@ UnifiedRecordTaihe::UnifiedRecordTaihe()
     this->value_ = std::make_shared<UnifiedRecord>();
 }
 
-UnifiedRecordTaihe::UnifiedRecordTaihe(const ::taihe::string_view &type,
+std::shared_ptr<UnifiedRecord> UnifiedRecordTaihe::GenerateNativeRecord(const ::taihe::string_view &type,
     ::taiheChannel::ValueType const& value)
 {
     ValueType valueType = ConvertValueType(::taihe::get_env(), type, value);
@@ -76,7 +76,7 @@ UnifiedRecordTaihe::UnifiedRecordTaihe(const ::taihe::string_view &type,
     auto constructor = constructors.find(utdType);
     if (constructor == constructors.end()) {
         this->value_ = std::make_shared<UnifiedRecord>(utdType, valueType);
-        return;
+        return this->value_;
     }
     auto uRecord = constructor->second(utdType, valueType);
     if (utdType == APPLICATION_DEFINED_RECORD) {
@@ -84,7 +84,13 @@ UnifiedRecordTaihe::UnifiedRecordTaihe(const ::taihe::string_view &type,
             std::static_pointer_cast<ApplicationDefinedRecord>(uRecord);
         applicationDefinedRecord->SetApplicationDefinedType(std::string(type));
     }
-    this->value_ = uRecord;
+    return uRecord;
+}
+
+UnifiedRecordTaihe::UnifiedRecordTaihe(const ::taihe::string_view &type,
+    ::taiheChannel::ValueType const& value)
+{
+    this->value_ = GenerateNativeRecord(type, value);
 }
 
 ::taihe::string UnifiedRecordTaihe::GetType()
@@ -101,6 +107,75 @@ int64_t UnifiedRecordTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);
 }
+
+::taihe::array<::taihe::string> UnifiedRecordTaihe::GetTypes()
+{
+    std::vector<std::string> res;
+    if (!this->value_) {
+        LOG_ERROR(UDMF_ANI, "Inner value is null.");
+        taihe::set_business_error(PARAMETERSERROR, "invalid object!");
+        return ::taihe::array<::taihe::string>(taihe::copy_data_t{}, res.data(), res.size());
+    }
+    res = this->value_->GetTypes();
+    return ::taihe::array<::taihe::string>(taihe::copy_data_t{}, res.data(), res.size());
+}
+
+void UnifiedRecordTaihe::AddEntry(::taihe::string_view type, ::taiheChannel::ValueType value)
+{
+    if (type.empty()) {
+        LOG_ERROR(UDMF_ANI, "Inner value is empty.");
+        taihe::set_business_error(PARAMETERSERROR, "Parameter error: parameter type must be string");
+        return;
+    }
+
+    if (!this->value_) {
+        LOG_ERROR(UDMF_ANI, "Inner value is null.");
+        taihe::set_business_error(PARAMETERSERROR, "invalid object!");
+        return;
+    }
+    ValueType valueType = ConvertValueType(::taihe::get_env(), type, value);
+
+    if (this->value_->GetType() == UD_BUTT) {
+        this->value_ = GenerateNativeRecord(type, value);
+        if (!this->value_) {
+            taihe::set_business_error(PARAMETERSERROR, "Parameter error: unsupported type");
+            return;
+        }
+    } else {
+        this->value_->AddEntry(std::string(type), std::move(valueType));
+    }
+    return;
+}
+
+::taiheChannel::ValueType UnifiedRecordTaihe::GetEntry(::taihe::string_view type)
+{
+    if (!this->value_) {
+        LOG_ERROR(UDMF_ANI, "Inner value is null.");
+        taihe::set_business_error(PARAMETERSERROR, "invalid object!");
+        return ::taiheChannel::ValueType::make_nullType();
+    }
+    return ConvertValueType(this->value_->GetEntry(std::string(type)));
+}
+
+::taihe::map<::taihe::string, ::taiheChannel::ValueType> UnifiedRecordTaihe::GetEntries()
+{
+    ::taihe::map<::taihe::string, ::taiheChannel::ValueType> res;
+    if (!this->value_) {
+        LOG_ERROR(UDMF_ANI, "Inner value is null.");
+        taihe::set_business_error(PARAMETERSERROR, "invalid object!");
+        return res;
+    }
+    auto entries = this->value_->GetEntries();
+    if (!entries) {
+        LOG_ERROR(UDMF_ANI, "entries value is null.");
+        return res;
+    }
+    for (auto &entry : *entries) {
+        res.emplace(::taihe::string(entry.first), ConvertValueType(entry.second));
+    }
+    return res;
+}
+
 } // namespace UDMF
 } // namespace OHOS
 
@@ -112,7 +187,8 @@ int64_t UnifiedRecordTaihe::GetInner()
 ::taiheChannel::UnifiedRecordInner CreateUnifiedRecordWithParams(::taihe::string_view type,
     ::taiheChannel::ValueType const& value)
 {
-    return taihe::make_holder<OHOS::UDMF::UnifiedRecordTaihe, ::taiheChannel::UnifiedRecordInner>(type, value);
+    return taihe::make_holder<OHOS::UDMF::UnifiedRecordTaihe,
+        ::taiheChannel::UnifiedRecordInner>(type, value);
 }
 
 TH_EXPORT_CPP_API_CreateUnifiedRecord(CreateUnifiedRecord);

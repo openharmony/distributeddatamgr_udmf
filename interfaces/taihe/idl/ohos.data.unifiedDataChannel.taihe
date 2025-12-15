@@ -89,7 +89,20 @@ union UnifiedDataOrNull {
 
 enum Intention: String {
   DATA_HUB = "DataHub",
-  DRAG = "Drag"
+  DRAG = "Drag",
+  SYSTEM_SHARE = "SystemShare",
+  PICKER = "Picker",
+  MENU = "Menu"
+}
+
+enum ShareOptions: i32 {
+  IN_APP = 0,
+  CROSS_APP = 1
+}
+
+enum Visibility: i32 {
+  ALL = 0,
+  OWN_PROCESS = 1
 }
 
 enum ProgressIndicator: i32 {
@@ -116,7 +129,38 @@ enum FileConflictOptions: i32 {
 struct Options {
   intention: Optional<Intention>;
   key: Optional<String>;
+  visibility: Optional<Visibility>;
 }
+
+@!sts_inject("""
+export type GetDelayData = (type: string) => UnifiedData;
+""")
+
+@class
+interface UnifiedDataProperties {
+  @get("tag")
+  GetTag(): String;
+  @set("tag")
+  SetTag(tag: String): void;
+  @get("extras")
+  GetExtras(): @record Map<String, Opaque>;
+  @set("extras")
+  SetExtras(extras: @record Map<String, Opaque>): void;
+  @get("timestamp")
+  GetTimestamp():@sts_type("Date") Opaque;
+  @get("shareOptions")
+  GetShareOptions(): ShareOptions;
+  @set("shareOptions")
+  SetShareOptions(shareOptions: ShareOptions): void;
+  @get("getDelayData")
+  GetDelayData(): @sts_type("GetDelayData") Opaque;
+  @set("getDelayData")
+  SetDelayData(setDelayData: @sts_type("GetDelayData") Opaque): void;
+  GetInner(): i64;
+}
+
+@ctor("UnifiedDataProperties")
+function CreateUnifiedDataProperties(): UnifiedDataProperties;
 
 @class
 interface Summary {
@@ -139,17 +183,28 @@ struct ProgressInfo {
   status: ListenerStatus;
 }
 
+struct DataLoadInfo {
+  recordCount: Optional<i64>;
+}
+
 struct GetDataParams {
   progressIndicator: ProgressIndicator;
   dataProgressListener: (progressInfo: ProgressInfo, data: UnifiedDataOrNull) => void;
   destUri: Optional<String>;
   fileConflictOptions: Optional<FileConflictOptions>;
+  acceptableInfo: Optional<DataLoadInfo>;
 }
 
 @class
 interface UnifiedDataInner {
   AddRecord(unifiedRecord: AllRecords): void;
   GetRecords(): Array<AllRecords>;
+  HasType(type: String): bool;
+  GetTypes(): Array<String>;
+  @get("properties")
+  GetProperties(): UnifiedDataProperties;
+  @set("properties")
+  SetProperties(properties: UnifiedDataProperties): void;
   GetInner(): i64;
 }
 
@@ -161,6 +216,10 @@ function CreateUnifiedDataWithParams(unifiedRecord: AllRecords): UnifiedDataInne
 interface UnifiedRecordInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   GetInner(): i64;
 }
 
@@ -172,6 +231,10 @@ function CreateUnifiedRecordWithParams(type: String, value: ValueType): UnifiedR
 interface FileInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("uri")
   GetUri(): String;
   @set("uri")
@@ -189,6 +252,10 @@ function CreateUnifiedFile(): FileInner;
 interface FolderInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("uri")
   GetUri(): String;
   @set("uri")
@@ -210,6 +277,10 @@ function CreateUnifiedFolder(): FolderInner;
 interface AudioInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("uri")
   GetUri(): String;
   @set("uri")
@@ -231,6 +302,10 @@ function CreateUnifiedAudio(): AudioInner;
 interface VideoInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("uri")
   GetUri(): String;
   @set("uri")
@@ -252,6 +327,10 @@ function CreateUnifiedVideo(): VideoInner;
 interface ImageInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("uri")
   GetUri(): String;
   @set("uri")
@@ -273,6 +352,10 @@ function CreateUnifiedImage(): ImageInner;
 interface TextInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("details")
   GetDetails(): Optional<@record Map<String, String>>;
   @set("details")
@@ -286,6 +369,10 @@ function CreateText(): TextInner;
 interface HTMLInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("details")
   GetDetails(): Optional<@record Map<String, String>>;
   @set("details")
@@ -307,6 +394,10 @@ function CreateHtml(): HTMLInner;
 interface HyperlinkInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("details")
   GetDetails(): Optional<@record Map<String, String>>;
   @set("details")
@@ -328,6 +419,10 @@ function CreateHyperlink(): HyperlinkInner;
 interface PlainTextInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("details")
   GetDetails(): Optional<@record Map<String, String>>;
   @set("details")
@@ -350,6 +445,10 @@ function CreatePlainText(): PlainTextInner;
 interface SystemDefinedRecordInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("details")
   GetDetails(): Optional<@record Map<String, DetailsValue>>;
   @set("details")
@@ -363,6 +462,10 @@ function CreateSystemDefinedRecord(): SystemDefinedRecordInner;
 interface SystemDefinedFormInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("details")
   GetDetails(): Optional<@record Map<String, DetailsValue>>;
   @set("details")
@@ -396,6 +499,10 @@ function CreateSystemDefinedForm(): SystemDefinedFormInner;
 interface SystemDefinedAppItemInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("details")
   GetDetails(): Optional<@record Map<String, DetailsValue>>;
   @set("details")
@@ -433,6 +540,10 @@ function CreateSystemDefinedAppItem(): SystemDefinedAppItemInner;
 interface SystemDefinedPixelMapInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("details")
   GetDetails(): Optional<@record Map<String, DetailsValue>>;
   @set("details")
@@ -450,6 +561,10 @@ function CreateSystemDefinedPixelMap(): SystemDefinedPixelMapInner;
 interface ApplicationDefinedRecordInner {
   GetType(): String;
   GetValue(): ValueType;
+  GetTypes(): Array<String>;
+  AddEntry(type: String, value: ValueType): void;
+  GetEntry(type: String): ValueType;
+  GetEntries(): @record Map<String, ValueType>;
   @get("applicationDefinedType")
   GetApplicationDefinedType(): String;
   @set("applicationDefinedType")
@@ -465,7 +580,12 @@ function createApplicationDefinedRecord(): ApplicationDefinedRecordInner;
 
 function InsertDataSync(options: Options, data: UnifiedDataInner): String;
 function QueryDataSync(options: Options): Array<UnifiedDataInner>;
+function UpdateDataSync(options: Options, data: UnifiedDataInner): void;
+function DeleteDataSync(options: Options): Array<UnifiedDataInner>;
 
+function RemoveAppShareOptions(intention: Intention): void;
+function SetAppShareOptions(intention: Intention, shareOptions: ShareOptions): void;
+function ConvertRecordsToEntriesSync(data: UnifiedDataInner): void;
 @!sts_inject("""
 
 export class UnifiedData {
@@ -583,6 +703,18 @@ export class UnifiedData {
     }
     return arr;
   }
+  hasType(type: string): boolean {
+    return this.inner.hasType(type);
+  }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  get properties(): UnifiedDataProperties {
+    return this.inner.properties;
+  }
+  set properties(properties: UnifiedDataProperties) {
+    this.inner.properties = properties;
+  }
 }
 
 export class UnifiedRecord {
@@ -602,6 +734,18 @@ export class UnifiedRecord {
   }
   getValue(): ValueType {
     return this.inner.getValue();
+  }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
   }
 }
 
@@ -630,6 +774,18 @@ export class File extends UnifiedRecord {
   }
   set uri(uri: string) {
     this.inner.uri = uri;
+  }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
   }
 }
 
@@ -665,6 +821,18 @@ export class Folder extends File {
   set folderUri(folderUri: string) {
     this.inner.folderUri = folderUri;
   }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
+  }
 }
 
 export class Audio extends File {
@@ -698,6 +866,18 @@ export class Audio extends File {
   }
   set audioUri(audioUri: string) {
     this.inner.audioUri = audioUri;
+  }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
   }
 }
 
@@ -733,6 +913,18 @@ export class Video extends File {
   set videoUri(videoUri: string) {
     this.inner.videoUri = videoUri;
   }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
+  }
 }
 
 export class Image extends File {
@@ -767,6 +959,18 @@ export class Image extends File {
   set imageUri(imageUri: string) {
     this.inner.imageUri = imageUri;
   }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
+  }
 }
 
 export class Text extends UnifiedRecord {
@@ -788,6 +992,18 @@ export class Text extends UnifiedRecord {
   }
   set details(info: Record<string, string>) {
     this.inner.details = info;
+  }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
   }
 }
 
@@ -823,6 +1039,18 @@ export class PlainText extends Text {
   getValue(): ValueType {
     return this.inner.getValue();
   }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
+  }
 }
 
 export class HTML extends Text {
@@ -856,6 +1084,18 @@ export class HTML extends Text {
   }
   getValue(): ValueType {
     return this.inner.getValue();
+  }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
   }
 }
 
@@ -891,6 +1131,18 @@ export class Hyperlink extends Text {
   getValue(): ValueType {
     return this.inner.getValue();
   }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
+  }
 }
 
 export class SystemDefinedRecord extends UnifiedRecord {
@@ -912,6 +1164,18 @@ export class SystemDefinedRecord extends UnifiedRecord {
   }
   set details(details: Record<String, DetailsValue>) {
     this.inner.details = details;
+  }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
   }
 }
 
@@ -964,6 +1228,18 @@ export class SystemDefinedForm extends SystemDefinedRecord {
   }
   set module(module: String) {
     this.inner.module = module;
+  }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
   }
 }
 
@@ -1023,6 +1299,18 @@ export class SystemDefinedAppItem extends SystemDefinedRecord {
   set abilityName(abilityName: String) {
     this.inner.abilityName = abilityName;
   }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
+  }
 }
 
 export class SystemDefinedPixelMap extends SystemDefinedRecord {
@@ -1051,6 +1339,18 @@ export class SystemDefinedPixelMap extends SystemDefinedRecord {
   set rawData(rawData: Uint8Array) {
     this.inner.rawData = rawData;
   }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
+  }
 }
 
 export class ApplicationDefinedRecord extends UnifiedRecord {
@@ -1078,6 +1378,18 @@ export class ApplicationDefinedRecord extends UnifiedRecord {
   }
   set rawData(rawData: Uint8Array) {
     this.inner.rawData = rawData;
+  }
+  getTypes(): Array<string> {
+    return this.inner.getTypes();
+  }
+  addEntry(type: string, value: ValueType) {
+    this.inner.addEntry(type, value);
+  }
+  getEntry(type: String): ValueType {
+    return this.inner.getEntry(type);
+  }
+  getEntries(): Record<String, ValueType> {
+    return this.inner.getEntries();
   }
 }
 
@@ -1143,6 +1455,74 @@ export function queryData(options: Options, callback: AsyncCallback<Array<Unifie
         let data: Array<UnifiedData>;
         callback(ret as BusinessError, data);
     });
+}
+
+export function updateData(options: Options, data: UnifiedData): Promise<void> {
+    return new Promise<void>((resolve, reject): void => {
+        taskpool.execute((): void => {
+            return updateDataSync(options, data.inner);
+        })
+        .then((ret: NullishType): void => {
+            resolve(ret as undefined);
+        })
+        .catch((ret: NullishType): void => {
+            reject(ret as Error);
+        });
+    });
+}
+
+export function updateData(options: Options, data: UnifiedData, callback: AsyncCallback<void>): void {
+    taskpool.execute((): void => {
+        return updateDataSync(options, data.inner);
+    })
+    .then((ret: NullishType): void => {
+        callback(null, ret as undefined);
+    })
+    .catch((ret: NullishType): void => {
+        let data: undefined;
+        callback(ret as BusinessError, data);
+    });
+}
+
+export function deleteData(options: Options): Promise<Array<UnifiedData>> {
+    return new Promise<Array<UnifiedData>>((resolve, reject): void => {
+        taskpool.execute((): Array<UnifiedData> => {
+            let dataArray = deleteDataSync(options);
+            let arr: Array<UnifiedData> = new Array<UnifiedData>();
+            for (let i = 0; i < dataArray.length; i++ ) {
+              arr.push(new UnifiedData(dataArray[i]))
+            }
+            return arr;
+        })
+        .then((ret: NullishType): void => {
+            resolve(ret as Array<UnifiedData>);
+        })
+        .catch((ret: NullishType): void => {
+            reject(ret as Error);
+        });
+    });
+}
+
+export function deleteData(options: Options, callback: AsyncCallback<Array<UnifiedData>>): void {
+    taskpool.execute((): Array<UnifiedData> => {
+        let dataArray = deleteDataSync(options);
+        let arr: Array<UnifiedData> = new Array<UnifiedData>();
+        for (let i = 0; i < dataArray.length; i++ ) {
+          arr.push(new UnifiedData(dataArray[i]))
+        }
+        return arr;
+    })
+    .then((ret: NullishType): void => {
+        callback(new BusinessError(), ret as Array<UnifiedData>);
+    })
+    .catch((ret: NullishType): void => {
+        let data: Array<UnifiedData>;
+        callback(ret as BusinessError, data);
+    });
+}
+
+export function convertRecordsToEntries(data: UnifiedData): void {
+    return convertRecordsToEntriesSync(data.inner);
 }
 
 class ProgressInfoInner implements ProgressInfo {

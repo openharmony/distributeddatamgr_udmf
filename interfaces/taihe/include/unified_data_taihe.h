@@ -19,6 +19,7 @@
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "unified_data.h"
+#include "unified_data_properties_taihe.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
@@ -30,9 +31,15 @@ public:
     void AddRecord(::taiheChannel::AllRecords const& unifiedRecord);
     ::taihe::array<::taiheChannel::AllRecords> GetRecords();
     ::taiheChannel::AllRecords GetRecord(std::shared_ptr<UnifiedRecord> in);
+    bool HasType(::taihe::string_view type);
+    ::taihe::array<::taihe::string> GetTypes();
+    void SetProperties(::taiheChannel::UnifiedDataProperties properties);
+    ::taiheChannel::UnifiedDataProperties GetProperties();
+
     int64_t GetInner();
 
     std::shared_ptr<UnifiedData> value_;
+    std::shared_ptr<UnifiedDataPropertiesTaihe> propertiesValue_;
 };
 } // namespace UDMF
 } // namespace OHOS

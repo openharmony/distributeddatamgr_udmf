@@ -30,6 +30,10 @@ public:
 
     ::taihe::string GetType();
     ::ohos::data::unifiedDataChannel::ValueType GetValue();
+    ::taihe::array<::taihe::string> GetTypes();
+    void AddEntry(::taihe::string_view type, ::taiheChannel::ValueType value);
+    ::taiheChannel::ValueType GetEntry(::taihe::string_view type);
+    ::taihe::map<::taihe::string, ::taiheChannel::ValueType> GetEntries();
     ::taihe::string GetApplicationDefinedType();
     void SetApplicationDefinedType(const ::taihe::string_view &applicationDefinedType);
     ::taihe::optional<::taihe::array<uint8_t>> GetRawData();

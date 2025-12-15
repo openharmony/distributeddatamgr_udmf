@@ -28,8 +28,14 @@ public:
     UnifiedRecordTaihe();
     UnifiedRecordTaihe(const ::taihe::string_view &type, ::taiheChannel::ValueType const& value);
 
+    std::shared_ptr<UnifiedRecord> GenerateNativeRecord(const ::taihe::string_view &type,
+        ::taiheChannel::ValueType const& value);
     ::taihe::string GetType();
     ::taiheChannel::ValueType GetValue();
+    ::taihe::array<::taihe::string> GetTypes();
+    void AddEntry(::taihe::string_view type, ::taiheChannel::ValueType value);
+    ::taiheChannel::ValueType GetEntry(::taihe::string_view type);
+    ::taihe::map<::taihe::string, ::taiheChannel::ValueType> GetEntries();
     int64_t GetInner();
 
     std::shared_ptr<UnifiedRecord> value_;

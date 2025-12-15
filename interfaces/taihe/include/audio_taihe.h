@@ -29,6 +29,10 @@ public:
 
     ::taihe::string GetType();
     taiheChannel::ValueType GetValue();
+    ::taihe::array<::taihe::string> GetTypes();
+    void AddEntry(::taihe::string_view type, ::taiheChannel::ValueType value);
+    ::taiheChannel::ValueType GetEntry(::taihe::string_view type);
+    ::taihe::map<::taihe::string, ::taiheChannel::ValueType> GetEntries();
     ::taihe::string GetUri();
     void SetUri(const ::taihe::string_view &uri);
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();

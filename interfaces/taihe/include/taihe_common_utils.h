@@ -20,11 +20,18 @@
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "unified_meta.h"
+#include "taihe/runtime.hpp"
+#include "logger.h"
+#include "unified_record_taihe.h"
+
+namespace taiheChannel = ohos::data::unifiedDataChannel;
 
 namespace OHOS {
 namespace UDMF {
 static constexpr int PARAMETERSERROR = 401;
 static const std::string NEW_INSTANCE_LIB = "libudmf_data_napi.z.so";
+static constexpr int NOPERMISSION = 201;
+static constexpr int ESETTINGSEXISTED = 20400001;
 Intention ConvertIntention(::ohos::data::unifiedDataChannel::Intention value);
 ::taihe::array<::taihe::string> ConvertStringVectorToTaiheArray(const std::vector<std::string>& stringVector);
 ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,
@@ -38,6 +45,10 @@ UDDetails ConvertUDDetails(const ::taihe::map_view<::taihe::string, ::taihe::str
     const UDDetails &details);
 UDDetails ConvertUDDetailsToUnion(
     const ::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> &details);
+ShareOptions ConvertShareOptions(::ohos::data::unifiedDataChannel::ShareOptions value);
+Visibility ConvertVisibility(::ohos::data::unifiedDataChannel::Visibility value);
+::taihe::array<::taihe::string> ConvertStringVectorToTaiheArray(const std::vector<std::string>& stringVector);
+::ohos::data::unifiedDataChannel::ShareOptions ConvertShareOptions(OHOS::UDMF::ShareOptions value);
 ValueType ConvertRecordData(ani_env *env, ::ohos::data::unifiedDataChannel::RecordData const& value, int depth);
 ::ohos::data::unifiedDataChannel::RecordData ConvertRecordData(std::shared_ptr<Object> object, int depth);
 ::ohos::data::unifiedDataChannel::ValueType ConvertPlainText(std::shared_ptr<Object> udsObj);
@@ -48,6 +59,7 @@ ValueType ConvertRecordData(ani_env *env, ::ohos::data::unifiedDataChannel::Reco
 ::ohos::data::unifiedDataChannel::ValueType ConvertForm(std::shared_ptr<Object> udsObj);
 ::ohos::data::unifiedDataChannel::ValueType ConvertFileUri(std::shared_ptr<Object> udsObj);
 ::ohos::data::unifiedDataChannel::ValueType ConvertPixelMap(std::shared_ptr<Object> udsObj);
+
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_TAIHE_COMMON_UTILS_H

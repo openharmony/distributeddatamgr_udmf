@@ -15,6 +15,7 @@
 
 #define LOG_TAG "UDMF_DEFINED_APPITEM"
 
+#include <cstdint>
 #include <dlfcn.h>
 
 #include "defined_appitem_taihe.h"
@@ -24,6 +25,7 @@
 #include "system_defined_appitem_napi.h"
 #include "taihe_common_utils.h"
 #include "taihe/runtime.hpp"
+#include "unified_record_taihe.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -46,6 +48,78 @@ SystemDefinedAppItemTaihe::SystemDefinedAppItemTaihe(std::shared_ptr<SystemDefin
 ::taiheChannel::ValueType SystemDefinedAppItemTaihe::GetValue()
 {
     return ConvertValueType(this->value_->GetValue());
+}
+
+::taihe::array<::taihe::string> SystemDefinedAppItemTaihe::GetTypes()
+{
+    std::vector<std::string> res;
+    if (!this->value_) {
+        LOG_ERROR(UDMF_ANI, "Inner value is null.");
+        taihe::set_business_error(PARAMETERSERROR, "invalid object!");
+        return ::taihe::array<::taihe::string>(taihe::copy_data_t{}, res.data(), res.size());
+    }
+    res = this->value_->GetTypes();
+    return ::taihe::array<::taihe::string>(taihe::copy_data_t{}, res.data(), res.size());
+}
+
+void SystemDefinedAppItemTaihe::AddEntry(::taihe::string_view type, ::taiheChannel::ValueType value)
+{
+    if (type.empty()) {
+        LOG_ERROR(UDMF_ANI, "Inner value is empty.");
+        taihe::set_business_error(PARAMETERSERROR, "Parameter error: parameter type must be string");
+        return;
+    }
+
+    if (!this->value_) {
+        LOG_ERROR(UDMF_ANI, "Inner value is null.");
+        taihe::set_business_error(PARAMETERSERROR, "invalid object!");
+        return;
+    }
+    ValueType valueType = ConvertValueType(::taihe::get_env(), type, value);
+
+    if (this->value_->GetType() == UD_BUTT) {
+        UDType utdType = SYSTEM_DEFINED_APP_ITEM;
+        if (UtdUtils::IsValidUtdId(std::string(type))) {
+            utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(std::string(type)));
+        }
+        this->value_ = std::make_shared<SystemDefinedAppItem>(utdType, valueType);
+        if (!this->value_) {
+            taihe::set_business_error(PARAMETERSERROR, "Parameter error: unsupported type");
+            return;
+        }
+    } else {
+        this->value_->AddEntry(std::string(type), std::move(valueType));
+    }
+    return;
+}
+
+::taiheChannel::ValueType SystemDefinedAppItemTaihe::GetEntry(::taihe::string_view type)
+{
+    if (!this->value_) {
+        LOG_ERROR(UDMF_ANI, "Inner value is null.");
+        taihe::set_business_error(PARAMETERSERROR, "invalid object!");
+        return ::taiheChannel::ValueType::make_nullType();
+    }
+    return ConvertValueType(this->value_->GetEntry(std::string(type)));
+}
+
+::taihe::map<::taihe::string, ::taiheChannel::ValueType> SystemDefinedAppItemTaihe::GetEntries()
+{
+    ::taihe::map<::taihe::string, ::taiheChannel::ValueType> res;
+    if (!this->value_) {
+        LOG_ERROR(UDMF_ANI, "Inner value is null.");
+        taihe::set_business_error(PARAMETERSERROR, "invalid object!");
+        return res;
+    }
+    auto entries = this->value_->GetEntries();
+    if (!entries) {
+        LOG_ERROR(UDMF_ANI, "entries value is null.");
+        return res;
+    }
+    for (auto &entry : *entries) {
+        res.emplace(::taihe::string(entry.first), ConvertValueType(entry.second));
+    }
+    return res;
 }
 
 ::taihe::optional<::taihe::map<::taihe::string, ::taiheChannel::DetailsValue>> SystemDefinedAppItemTaihe::GetDetails()
