@@ -320,7 +320,7 @@ std::vector<std::string> GetObjectKeys(ani_env *env, ani_object obj)
         LOG_ERROR(UDMF_ANI, "Class_CallStaticMethodByName_Ref fail %{public}d", status);
         return keys;
     }
-    ani_array_ref aniKeys = static_cast<ani_array_ref>(result);
+    ani_array aniKeys = static_cast<ani_array>(result);
     ani_size size;
     if (ANI_OK != env->Array_GetLength(aniKeys, &size)) {
         LOG_ERROR(UDMF_ANI, "Array_GetLength fail");
@@ -328,9 +328,9 @@ std::vector<std::string> GetObjectKeys(ani_env *env, ani_object obj)
     }
     for (ani_size i = 0; i < size ; i++) {
         ani_ref string_ref;
-        auto status = env->Array_Get_Ref(aniKeys, i, &string_ref);
+        auto status = env->Array_Get(aniKeys, i, &string_ref);
         if (status != ANI_OK) {
-            LOG_WARN(UDMF_ANI, "Array_Get_Ref fail");
+            LOG_WARN(UDMF_ANI, "Array_Get fail");
             continue;
         }
         std::string key;
