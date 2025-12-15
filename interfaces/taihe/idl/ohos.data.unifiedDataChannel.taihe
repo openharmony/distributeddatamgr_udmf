@@ -516,13 +516,13 @@ interface SystemDefinedAppItemInner {
   @set("appName")
   SetAppName(appName: String): void;
   @get("appIconId")
-  GetAppIconId(): i64;
+  GetAppIconId(): String;
   @set("appIconId")
-  SetAppIconId(appIconId: i64): void;
+  SetAppIconId(appIconId: String): void;
   @get("appLabelId")
-  GetAppLabelId(): i64;
+  GetAppLabelId(): String;
   @set("appLabelId")
-  SetAppLabelId(appLabelId: i64): void;
+  SetAppLabelId(appLabelId: String): void;
   @get("bundleName")
   GetBundleName(): String;
   @set("bundleName")

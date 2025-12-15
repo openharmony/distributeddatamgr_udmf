@@ -157,33 +157,25 @@ void SystemDefinedAppItemTaihe::SetAppName(const ::taihe::string_view &appName)
     this->value_->SetAppName(appNameStr);
 }
 
-int64_t SystemDefinedAppItemTaihe::GetAppIconId()
+::taihe::string SystemDefinedAppItemTaihe::GetAppIconId()
 {
-    std::string appIconIdStr = this->value_->GetAppIconId();
-    if (appIconIdStr.empty()) {
-        return 0;
-    }
-    return std::stoll(appIconIdStr);
+    return ::taihe::string(this->value_->GetAppIconId());
 }
 
-void SystemDefinedAppItemTaihe::SetAppIconId(int64_t appIconId)
+void SystemDefinedAppItemTaihe::SetAppIconId(const ::taihe::string_view &appIconId)
 {
-    std::string appIconIdStr = std::to_string(appIconId);
+    std::string appIconIdStr(appIconId);
     this->value_->SetAppIconId(appIconIdStr);
 }
 
-int64_t SystemDefinedAppItemTaihe::GetAppLabelId()
+::taihe::string SystemDefinedAppItemTaihe::GetAppLabelId()
 {
-    std::string appLabelIdStr = this->value_->GetAppLabelId();
-    if (appLabelIdStr.empty()) {
-        return 0;
-    }
-    return std::stoll(appLabelIdStr);
+    return ::taihe::string(this->value_->GetAppLabelId());
 }
 
-void SystemDefinedAppItemTaihe::SetAppLabelId(int64_t appLabelId)
+void SystemDefinedAppItemTaihe::SetAppLabelId(const ::taihe::string_view &appLabelId)
 {
-    std::string appLabelIdStr = std::to_string(appLabelId);
+    std::string appLabelIdStr(appLabelId);
     this->value_->SetAppLabelId(appLabelIdStr);
 }
 

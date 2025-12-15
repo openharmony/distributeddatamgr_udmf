@@ -132,10 +132,9 @@ bool GetDataParamsTaihe::SetAcceptableInfo(ani_env *env, ani_object in, GetDataP
         LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Long failed.");
         return false;
     }
-    getDataParams.acceptableInfo.recordCount = static_cast<long>(recordCount);
+    getDataParams.acceptableInfo.recordCount = recordCount;
     return true;
 }
-
 
 bool GetDataParamsTaihe::SetProgressListener(ani_env *env, GetDataParams &getDataParams,
     ani_fn_object callback, const std::string &key)
