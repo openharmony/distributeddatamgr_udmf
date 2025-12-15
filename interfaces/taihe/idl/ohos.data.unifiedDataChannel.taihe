@@ -1275,16 +1275,16 @@ export class SystemDefinedAppItem extends SystemDefinedRecord {
   set appName(appName: String) {
     this.inner.appName = appName;
   }
-  get appIconId(): long {
+  get appIconId(): String {
     return this.inner.appIconId;
   }
-  set appIconId(appIconId: long) {
+  set appIconId(appIconId: String) {
     this.inner.appIconId = appIconId;
   }
-  get appLabelId(): long {
+  get appLabelId(): String {
     return this.inner.appLabelId;
   }
-  set appLabelId(appLabelId: long) {
+  set appLabelId(appLabelId: String) {
     this.inner.appLabelId = appLabelId;
   }
   get bundleName(): String {
