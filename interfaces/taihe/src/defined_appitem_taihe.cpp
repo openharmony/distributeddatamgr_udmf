@@ -78,7 +78,7 @@ void SystemDefinedAppItemTaihe::AddEntry(::taihe::string_view type, ::taiheChann
     ValueType valueType = ConvertValueType(::taihe::get_env(), type, value);
 
     if (this->value_->GetType() == UD_BUTT) {
-        UDType utdType = APPLICATION_DEFINED_RECORD;
+        UDType utdType = SYSTEM_DEFINED_APP_ITEM;
         if (UtdUtils::IsValidUtdId(std::string(type))) {
             utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(std::string(type)));
         }
