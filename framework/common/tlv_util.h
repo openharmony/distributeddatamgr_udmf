@@ -29,6 +29,28 @@ namespace OHOS {
 namespace TLVUtil {
 using namespace OHOS::UDMF;
 
+class RecursiveGuard {
+public:
+    RecursiveGuard()
+    {
+        depth_++;
+    }
+
+    ~RecursiveGuard()
+    {
+        depth_--;
+    }
+
+    bool IsValid()
+    {
+        return depth_ <= MAX_DEPTH;
+    }
+
+private:
+    static constexpr uint32_t MAX_DEPTH = 20;
+    static thread_local inline uint32_t depth_ = 0;
+};
+
 template <typename T> bool API_EXPORT ReadTlv(T &output, TLVObject &data, TAG tag);
 
 template <typename T> size_t API_EXPORT CountBufferSize(const T &input, TLVObject &data);

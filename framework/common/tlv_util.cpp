@@ -146,6 +146,10 @@ template <> size_t CountBufferSize(const Object &input, TLVObject &data)
 
 template <> bool Writing(const Object &input, TLVObject &data, TAG tag)
 {
+    RecursiveGuard guard;
+    if (!guard.IsValid()) {
+        return false;
+    }
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -156,6 +160,10 @@ template <> bool Writing(const Object &input, TLVObject &data, TAG tag)
 }
 template <> bool Reading(Object &output, TLVObject &data, const TLVHead &head)
 {
+    RecursiveGuard guard;
+    if (!guard.IsValid()) {
+        return false;
+    }
     TLVHead headValue{};
     if (!data.ReadHead(headValue)) {
         return false;
