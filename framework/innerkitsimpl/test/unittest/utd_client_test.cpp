@@ -1366,6 +1366,12 @@ HWTEST_F(UtdClientTest, IsUtd001, TestSize.Level1)
     status = UtdClient::GetInstance().IsUtd("com.example.demo2.mytype3", result);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("system.haha", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("hello.text", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
     std::vector<TypeDescriptorCfg> allUTD = PresetTypeDescriptors::GetInstance().GetPresetTypes();
     for (auto item : allUTD) {
         status = UtdClient::GetInstance().IsUtd(item.typeId, result);
@@ -1559,12 +1565,6 @@ HWTEST_F(UtdClientTest, IsUtd010, TestSize.Level1)
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(result, true);
     status = UtdClient::GetInstance().IsUtd("app-v1.2-beta", result);
-    EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(result, false);
-    status = UtdClient::GetInstance().IsUtd("system.haha", result);
-    EXPECT_EQ(status, E_OK);
-    EXPECT_EQ(result, false);
-    status = UtdClient::GetInstance().IsUtd("hello.text", result);
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(result, false);
     LOG_INFO(UDMF_TEST, "IsUtd010 end.");
@@ -2810,7 +2810,7 @@ HWTEST_F(UtdClientTest, IsValidFileExtension006, TestSize.Level1)
 HWTEST_F(UtdClientTest, IsUtd006, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "IsUtd006 begin.");
-    std::string typeId(267, 'a');
+    std::string typeId(257, 'a');
     bool result = true;
     Status ret = UtdClient::GetInstance().IsUtd(typeId, result);
     EXPECT_EQ(result, false);

@@ -4617,7 +4617,7 @@ HWTEST_F(UdmfClientTest, GetSummary008, TestSize.Level1)
     plainText->SetContent("content");
     plainText->SetAbstract("abstract");
     data.AddRecord(plainText);
-    std::string intentionDrag = "darg";
+    std::string intentionDrag = "drag";
     std::string key = "udmf_key";
     UdmfClient::GetInstance().ProcessDragIfInApp(data, intentionDrag, key);
 
@@ -4625,6 +4625,10 @@ HWTEST_F(UdmfClientTest, GetSummary008, TestSize.Level1)
     Summary summary;
     auto status = UdmfClient::GetInstance().GetSummary(query, summary);
     ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(summary.totalSize, text->GetSize() + plainText->GetSize());
+    ASSERT_EQ(summary.summary["general.text"], text->GetSize());
+    ASSERT_EQ(summary.summary["general.plain-text"], plainText->GetSize());
+    ASSERT_EQ(summary.tag, "");
 
     LOG_INFO(UDMF_TEST, "GetSummary008 end.");
 }
@@ -4642,7 +4646,7 @@ HWTEST_F(UdmfClientTest, IsRemoteData002, TestSize.Level1)
     bool result = true;
     auto status = UdmfClient::GetInstance().IsRemoteData(option2, result);
 
-    ASSERT_NE(status, E_OK);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
 
     LOG_INFO(UDMF_TEST, "IsRemoteData002 end.");
 }
@@ -4660,7 +4664,7 @@ HWTEST_F(UdmfClientTest, PushDelayData001, TestSize.Level1)
     UnifiedData unifiedData;
     auto status = UdmfClient::GetInstance().PushDelayData(key, unifiedData);
 
-    ASSERT_NE(status, E_OK);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
 
     LOG_INFO(UDMF_TEST, "PushDelayData001 end.");
 }
@@ -4681,6 +4685,7 @@ HWTEST_F(UdmfClientTest, GetDataIfAvailable001, TestSize.Level1)
     auto status = UdmfClient::GetInstance().GetDataIfAvailable(key, dataLoadInfo, iUdmfNotifier, unifiedData);
 
     ASSERT_EQ(status, E_INVALID_PARAMETERS);
+    iUdmfNotifier = nullptr;
 
     LOG_INFO(UDMF_TEST, "GetDataIfAvailable001 end.");
 }
