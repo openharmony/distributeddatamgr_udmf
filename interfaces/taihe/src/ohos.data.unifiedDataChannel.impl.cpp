@@ -43,24 +43,30 @@ bool IsValidOptionInfoNonDrag(UnifiedKey &key, const std::string &intention)
 ::taihe::string InsertDataSync(::taiheChannel::Options const& options,
     ::taiheChannel::weak::UnifiedDataInner data)
 {
-    CustomOption customOption;
-    if (!options.intention.has_value() && !options.visibility.has_value()) {
+    if (!options.intention.has_value()) {
         LOG_ERROR(UDMF_ANI, "Intention is empty");
         taihe::set_business_error(PARAMETERSERROR, "Parameter error.");
         return "";
     }
-    customOption.intention = ConvertIntention(options.intention.value());
-    customOption.visibility = ConvertVisibility(options.visibility.value());
-    if (!UnifiedDataUtils::IsPersist(customOption.intention)) {
+    auto intention = ConvertIntention(options.intention.value());
+    if (!UnifiedDataUtils::IsPersist(intention)) {
         taihe::set_business_error(PARAMETERSERROR,
             "Parameter error: parameter options intention type must correspond to Intention");
         return "";
     }
-    if (!UnifiedDataUtils::IsPersist(customOption.visibility)) {
-        taihe::set_business_error(PARAMETERSERROR,
-            "Parameter error: parameter options visibility type must correspond to Visibility");
-        return "";
+    auto visibility = Visibility::VISIBILITY_ALL;
+    if (options.visibility.has_value()) {
+        visibility = ConvertVisibility(options.visibility.value());
+        if (!UnifiedDataUtils::IsPersist(visibility)) {
+            taihe::set_business_error(PARAMETERSERROR,
+                "Parameter error: parameter options visibility type must correspond to Visibility");
+            return "";
+        }
     }
+    CustomOption customOption;
+
+    customOption.intention = intention;
+    customOption.visibility = visibility;
     auto unifiedDataImpl = reinterpret_cast<OHOS::UDMF::UnifiedDataTaihe*>(data->GetInner());
     auto unifiedData = unifiedDataImpl->value_;
     std::string key;
