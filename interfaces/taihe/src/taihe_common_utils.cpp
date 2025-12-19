@@ -752,5 +752,23 @@ OHOS::UDMF::Visibility ConvertVisibility(::taiheChannel::Visibility value)
     return ::taihe::array<::taihe::string>(::taihe::copy_data, keys.begin(), keys.size());
 }
 
+OHOS::UDMF::UnifiedDataProperties ConvertUnifiedDataProperties(::taiheChannel::UnifiedDataProperties value)
+{
+    OHOS::UDMF::UnifiedDataProperties properties;
+    if (value.tag.has_value()) {
+        properties.tag = std::string(value.tag.value());
+    }
+    if (value.extras.has_value()) {
+        OHOS::AAFwk::WantParams want;
+        auto object = reinterpret_cast<ani_ref>(value.extras.value());
+        if (OHOS::AppExecFwk::UnwrapWantParams(taihe::get_env(), object, want)) {
+            properties.extras = want;
+        }
+    }
+    if (value.shareOptions.has_value()) {
+        properties.shareOptions = ConvertShareOptions(value.shareOptions.value());
+    }
+    return properties;
+}
 } // namespace UDMF
 } // namespace OHOS
