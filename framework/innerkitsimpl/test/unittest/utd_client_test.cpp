@@ -1496,6 +1496,81 @@ HWTEST_F(UtdClientTest, IsUtd004, TestSize.Level1)
 }
 
 /**
+* @tc.name: IsUtd009
+* @tc.desc: Normal test of IsUtd
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsUtd009, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsUtd009 begin.");
+    bool result = false;
+    auto status = UtdClient::GetInstance().IsUtd("app.lib.doc", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("app.lib.doc-v1", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("app.lib.doc_v1", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("123.example", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("123.example.", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("lib.app.#name", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    status = UtdClient::GetInstance().IsUtd("lib.app.123", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    LOG_INFO(UDMF_TEST, "IsUtd009 end.");
+}
+
+/**
+* @tc.name: IsUtd010
+* @tc.desc: Normal test of IsUtd
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsUtd010, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsUtd010 begin.");
+    bool result = false;
+    auto status = UtdClient::GetInstance().IsUtd("org.text", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("openharmony.text", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("macos.text", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("debian.text", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("redhat.text", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("io.text", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("de.text", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("net.text", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("net.app-v1.2", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, true);
+    status = UtdClient::GetInstance().IsUtd("app-v1.2-beta", result);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_EQ(result, false);
+    LOG_INFO(UDMF_TEST, "IsUtd010 end.");
+}
+
+/**
 * @tc.name: GetUniformDataTypeByMIMETypeByPrefix001
 * @tc.desc: Normal testcase of GetUniformDataTypeByMIMEType by prefix.
 * @tc.type: FUNC
@@ -2609,5 +2684,169 @@ HWTEST_F(UtdClientTest, GetUniformDataTypeByMIMETypeByPrefix003, TestSize.Level1
     EXPECT_EQ(status, E_OK);
     EXPECT_EQ(descriptor->GetTypeId(), "general.image");
     LOG_INFO(UDMF_TEST, "GetUniformDataTypeByMIMETypeByPrefix003 end.");
+}
+
+/**
+* @tc.name: WaitRetry001
+* @tc.desc: Normal testcase of WaitRetry
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, WaitRetry001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WaitRetry001 begin.");
+
+    bool tryRegisterNotifier = false;
+    bool tryInit = false;
+    UtdClient::GetInstance().WaitRetry(tryRegisterNotifier, tryInit);
+    EXPECT_FALSE(tryRegisterNotifier);
+    EXPECT_FALSE(tryInit);
+    LOG_INFO(UDMF_TEST, "WaitRetry001 end.");
+}
+
+/**
+* @tc.name: GetTypeIdsFromCfgTest002
+* @tc.desc: Normal testcase of GetTypeIdsFromCfg
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, GetTypeIdsFromCfgTest002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypeIdsFromCfgTest002 begin.");
+    std::string mimeType = "application/my-doc**";
+
+    auto ret = UtdClient::GetInstance().GetTypeIdsFromCfg(mimeType);
+    EXPECT_TRUE(ret.empty());
+    LOG_INFO(UDMF_TEST, "GetTypeIdsFromCfgTest002 end.");
+}
+
+/**
+* @tc.name: IsValidFileExtension001
+* @tc.desc: Abnormal test of IsValidFileExtension, fileExtension not contains .
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsValidFileExtension001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsValidFileExtension001 begin.");
+    std::string fileExtension = "doc";
+    bool ret = UtdClient::GetInstance().IsValidFileExtension(fileExtension);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "IsValidFileExtension001 end.");
+}
+
+/**
+* @tc.name: IsValidFileExtension002
+* @tc.desc: Abnormal test of IsValidFileExtension, fileExtension contains ?
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsValidFileExtension002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsValidFileExtension002 begin.");
+    std::string fileExtension = ".do?c";
+    bool ret = UtdClient::GetInstance().IsValidFileExtension(fileExtension);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "IsValidFileExtension002 end.");
+}
+
+/**
+* @tc.name: IsValidFileExtension003
+* @tc.desc: Abnormal test of IsValidFileExtension, fileExtension contains :
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsValidFileExtension003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsValidFileExtension003 begin.");
+    std::string fileExtension = ".doc:";
+    bool ret = UtdClient::GetInstance().IsValidFileExtension(fileExtension);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "IsValidFileExtension003 end.");
+}
+
+/**
+* @tc.name: IsValidFileExtension004
+* @tc.desc: Abnormal test of IsValidFileExtension, fileExtension contains =
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsValidFileExtension004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsValidFileExtension004 begin.");
+    std::string fileExtension = ".doc=";
+    bool ret = UtdClient::GetInstance().IsValidFileExtension(fileExtension);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "IsValidFileExtension004 end.");
+}
+
+/**
+* @tc.name: IsValidFileExtension005
+* @tc.desc: Abnormal test of IsValidFileExtension, fileExtension contains :\
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsValidFileExtension005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsValidFileExtension005 begin.");
+    std::string fileExtension = ".doc\\";
+    bool ret = UtdClient::GetInstance().IsValidFileExtension(fileExtension);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "IsValidFileExtension005 end.");
+}
+
+/**
+* @tc.name: IsValidFileExtension006
+* @tc.desc: Abnormal test of IsValidFileExtension, fileExtension contains ?:=\\
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsValidFileExtension006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsValidFileExtension006 begin.");
+    std::string fileExtension = ".doc?:=\\";
+    bool ret = UtdClient::GetInstance().IsValidFileExtension(fileExtension);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "IsValidFileExtension006 end.");
+}
+
+/**
+* @tc.name: IsUtd006
+* @tc.desc: Abnormal testcase of IsUtd, typeId's length more than 256
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsUtd006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsUtd006 begin.");
+    std::string typeId(257, 'a');
+    bool result = true;
+    Status ret = UtdClient::GetInstance().IsUtd(typeId, result);
+    EXPECT_EQ(result, false);
+    EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
+    LOG_INFO(UDMF_TEST, "IsUtd006 end.");
+}
+
+/**
+* @tc.name: IsUtd007
+* @tc.desc: Normal testcase of IsUtd, typeId is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsUtd007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsUtd007 begin.");
+    std::string typeId = "";
+    bool result = true;
+    Status ret = UtdClient::GetInstance().IsUtd(typeId, result);
+    EXPECT_EQ(result, false);
+    EXPECT_EQ(ret, Status::E_INVALID_PARAMETERS);
+    LOG_INFO(UDMF_TEST, "IsUtd007 end.");
+}
+
+/**
+* @tc.name: IsUtd008
+* @tc.desc: Normal testcase of IsUtd, typeId is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdClientTest, IsUtd008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsUtd008 begin.");
+    std::string typeId = "./a.doc";
+    bool result = true;
+    Status ret = UtdClient::GetInstance().IsUtd(typeId, result);
+    EXPECT_EQ(result, false);
+    EXPECT_EQ(ret, Status::E_OK);
+    LOG_INFO(UDMF_TEST, "IsUtd008 end.");
 }
 } // OHOS::Test
