@@ -143,9 +143,9 @@ interface UnifiedDataProperties {
   @set("tag")
   SetTag(tag: String): void;
   @get("extras")
-  GetExtras(): @record Map<String, Opaque>;
+  GetExtras(): @sts_type("record Map<String, RecordData>") Opaque;
   @set("extras")
-  SetExtras(extras: @record Map<String, Opaque>): void;
+  SetExtras(extras: @sts_type("record Map<String, RecordData>") Opaque): void;
   @get("timestamp")
   GetTimestamp():@sts_type("Date") Opaque;
   @get("shareOptions")
