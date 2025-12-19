@@ -16,6 +16,7 @@
 
 #include "application_defined_record_taihe.h"
 #include "audio_taihe.h"
+#include "ani_common_utils.h"
 #include "error_code.h"
 #include "defined_appitem_taihe.h"
 #include "defined_form_taihe.h"
@@ -37,10 +38,32 @@
 
 namespace OHOS {
 namespace UDMF {
+::taiheChannel::UnifiedDataProperties CreateUnifiedDataProperties()
+{
+    ::taihe::optional<::taihe::string> tagOpt;
+    ::taihe::optional<uintptr_t> extrasOpt;
+    ::taihe::optional<::ohos::data::unifiedDataChannel::ShareOptions> shareOptionsOpt;
+    ::taihe::optional<::taihe::callback<uintptr_t(::taihe::string_view type)>> getDelayDataOpt;
+    ::taihe::optional<uintptr_t> timestampOpt;
+
+    auto taiheProperties = ::taiheChannel::UnifiedDataProperties {
+        std::move(extrasOpt),
+        std::move(tagOpt),
+        std::move(timestampOpt),
+        std::move(shareOptionsOpt),
+        std::move(getDelayDataOpt),
+    }
+    return taiheProperties;
+}
+
 UnifiedDataTaihe::UnifiedDataTaihe()
 {
-    this->propertiesValue_ = std::make_shared<UnifiedDataPropertiesTaihe>();
-    this->value_ = std::make_shared<UnifiedData>(this->propertiesValue_->value_);
+    this->propertiesValue_ = CreateUnifiedDataProperties();
+    this->value_ = std::make_shared<UnifiedData>();
+    auto properties = this->value_->GetProperties();
+    ani_object aniTimeStamp {};
+    SetTimestamp(taihe::get_env(), static_cast<double>(properties->timestamp), aniTimeStamp);
+    this->propertiesValue_.timestamp = ::taihe::optional<uintptr_t>::make(reinterpret_cast<uintptr_t>(aniTimeStamp));
 }
 
 void UnifiedDataTaihe::AddRecord(::taiheChannel::AllRecords const& unifiedRecord)
@@ -293,11 +316,11 @@ bool UnifiedDataTaihe::HasType(::taihe::string_view type)
 
 ::taiheChannel::UnifiedDataProperties UnifiedDataTaihe::GetProperties()
 {
-    if (!this->propertiesValue_) {
-        this->propertiesValue_ = std::make_shared<UnifiedDataPropertiesTaihe>();
-    }
-    return taihe::make_holder<UnifiedDataPropertiesTaihe, ::taiheChannel::UnifiedDataProperties>(
-        this->propertiesValue_->value_, this->propertiesValue_->delayData_);
+    auto properties = this->value_->GetProperties();
+    ani_object aniTimeStamp {};
+    SetTimestamp(taihe::get_env(), static_cast<double>(properties->timestamp), aniTimeStamp);
+    this->propertiesValue_.timestamp = ::taihe::optional<uintptr_t>::make(reinterpret_cast<uintptr_t>(aniTimeStamp));
+    return this->propertiesValue_;
 }
 
 void UnifiedDataTaihe::SetProperties(::taiheChannel::UnifiedDataProperties properties)
@@ -306,10 +329,10 @@ void UnifiedDataTaihe::SetProperties(::taiheChannel::UnifiedDataProperties prope
         LOG_ERROR(UDMF_ANI, "Inner value or propertiesValue is null.");
         return;
     }
-    auto propertiesPtr = properties->GetInner();
-    auto propertiesInnerPtr = reinterpret_cast<UnifiedDataPropertiesTaihe *>(propertiesPtr);
-    this->propertiesValue_.reset(propertiesInnerPtr);
-    this->value_->SetProperties(propertiesInnerPtr->value_);
+    this->propertiesValue_ = properties;
+    auto property = ConvertUnifiedDataProperties(properties);
+    auto propertyPtr =  std::make_shared<UnifiedDataProperties>(property);
+    this->value_->SetProperties(propertyPtr);
 }
 
 int64_t UnifiedDataTaihe::GetInner()

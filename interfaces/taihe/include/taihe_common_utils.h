@@ -23,6 +23,7 @@
 #include "taihe/runtime.hpp"
 #include "logger.h"
 #include "unified_record_taihe.h"
+#include "unified_data_properties.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 
@@ -59,6 +60,7 @@ ValueType ConvertRecordData(ani_env *env, ::ohos::data::unifiedDataChannel::Reco
 ::ohos::data::unifiedDataChannel::ValueType ConvertForm(std::shared_ptr<Object> udsObj);
 ::ohos::data::unifiedDataChannel::ValueType ConvertFileUri(std::shared_ptr<Object> udsObj);
 ::ohos::data::unifiedDataChannel::ValueType ConvertPixelMap(std::shared_ptr<Object> udsObj);
+OHOS::UDMF::UnifiedDataProperties ConvertUnifiedDataProperties(const ::taiheChannel::UnifiedDataProperties value);
 
 } // namespace UDMF
 } // namespace OHOS
