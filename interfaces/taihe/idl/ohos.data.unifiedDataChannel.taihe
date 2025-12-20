@@ -135,7 +135,7 @@ struct Options {
 
 @class
 interface UnifiedDataProperties {
-  extras: Optional<@sts_type("record Map<String, RecordData>") Opaque>;
+  extras: Optional<@sts_type("record<String, RecordData>") Opaque>;
   tag: Optional<String>;
   timestamp: Optional<@sts_type("Date") Opaque>;
   shareOptions: Optional<ShareOptions>;
