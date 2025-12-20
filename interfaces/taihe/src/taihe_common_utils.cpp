@@ -778,7 +778,8 @@ OHOS::UDMF::UnifiedDataProperties ConvertUnifiedDataProperties(::taiheChannel::U
     auto extrasOpt = ::taihe::optional<uintptr_t>::make(reinterpret_cast<uintptr_t>
         (OHOS::AppExecFwk::WrapWantParams(taihe::get_env(), value.extras)));
 
-    auto shareOptionsOpt = ::taihe::optional<::taiheChannel::ShareOptions>::make(ConvertShareOptions(value.shareOptions));
+    auto shareOptionsOpt = ::taihe::optional<::taiheChannel::ShareOptions>::make
+        (ConvertShareOptions(value.shareOptions));
 
     ::taihe::optional<::taihe::callback<uintptr_t(::taihe::string_view type)>> getDelayDataOpt;
 
