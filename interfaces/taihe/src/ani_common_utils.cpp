@@ -30,8 +30,9 @@ constexpr const char* CLASSNAME_LONG = "std.core.Long";
 constexpr const char* CLASSNAME_DOUBLE = "std.core.Double";
 constexpr const char* CLASSNAME_STRING = "std.core.String";
 constexpr const char* CLASSNAME_BOOLEAN = "std.core.Boolean";
-constexpr const char* CLASSNAME_ARRAY_BUFFER = "std.core.ArrayBuffer";
-constexpr const char* CLASSNAME_RECORD = "std.core.Record";
+constexpr const char* CLASSNAME_ARRAY_BUFFER = "std.code.ArrayBuffer";
+constexpr const char* CLASSNAME_UINT8_ARRAY = "escompat.Uint8Array";
+constexpr const char* CLASSNAME_RECORD = "std.code.Record";
 constexpr const char* CLASSNAME_OBJECT = "std.core.Object";
 constexpr const int MAX_KEY_COUNT = 10 * 1024;
 constexpr const int MAX_DATA_BYTES = 100 * 1024 * 1024;
@@ -287,6 +288,7 @@ ObjectType GetObjectType(ani_env *env, ani_object obj)
         {ObjectType::OBJ_STRING, CLASSNAME_STRING},
         {ObjectType::OBJ_BOOL, CLASSNAME_BOOLEAN},
         {ObjectType::OBJ_ARRAY_BUFFER, CLASSNAME_ARRAY_BUFFER},
+        {ObjectType::OBJ_UINT8_ARRAY, CLASSNAME_UINT8_ARRAY},
         {ObjectType::OBJ_MAP, CLASSNAME_RECORD},
         {ObjectType::OBJ_OBJECT, CLASSNAME_OBJECT},
     };
@@ -423,6 +425,39 @@ ani_status GetArrayBuffer(ani_env *env, ani_object in, std::vector<uint8_t> &out
     auto status = env->ArrayBuffer_GetInfo(static_cast<ani_arraybuffer>(in), &data, &dataLen);
     if (status != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "GetArrayBuffer fail, status:%{public}d", status);
+        return status;
+    }
+    if (dataLen > 0) {
+        out = std::vector<uint8_t>(reinterpret_cast<uint8_t *>(data), reinterpret_cast<uint8_t *>(data) + dataLen);
+    }
+    return ANI_OK;
+}
+
+ani_status GetUint8Array(ani_env *env, ani_object in, std::vector<uint8_t> &out)
+{
+    ani_int len = {};
+    ani_int byteOffSet = {};
+    ani_arraybuffer buffer = {};
+    auto status = env->Object_GetPropertyByName_Int(in, "byteLength", &len);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Int fail, status:%{public}d", status);
+        return status;
+    }
+    status = env->Object_GetPropertyByName_Int(in, "byteOffset", &byteOffSet);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Int fail, status:%{public}d", status);
+        return status;
+    }
+    status = env->Object_GetPropertyByName_Ref(in, "buffer", reinterpret_cast<ani_ref*>(&buffer));
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref fail, status:%{public}d", status);
+        return status;
+    }
+    void* data = {};
+    ani_size dataLen = {};
+    status = env->ArrayBuffer_GetInfo(buffer, &data, &dataLen);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "ArrayBuffer_GetInfo fail, status:%{public}d", status);
         return status;
     }
     if (dataLen > 0) {
@@ -603,6 +638,15 @@ ani_status ConverObject(ani_env *env, ani_object aniObj, ValueType &valueType, i
     } else if (type == ObjectType::OBJ_ARRAY_BUFFER) {
         std::vector<uint8_t> value;
         auto status = GetArrayBuffer(env, aniObj, value);
+        if (status != ANI_OK) {
+            LOG_ERROR(UDMF_ANI, "GetArrayBuffer fail, status:%{public}d", status);
+            return status;
+        }
+        valueType = std::move(value);
+        return ANI_OK;
+    } else if (type == ObjectType::OBJ_UINT8_ARRAY) {
+        std::vector<uint8_t> value;
+        auto status = GetUint8Array(env, aniObj, value);
         if (status != ANI_OK) {
             LOG_ERROR(UDMF_ANI, "GetArrayBuffer fail, status:%{public}d", status);
             return status;
