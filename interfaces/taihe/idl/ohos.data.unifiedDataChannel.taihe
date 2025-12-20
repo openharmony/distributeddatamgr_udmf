@@ -132,31 +132,14 @@ struct Options {
   visibility: Optional<Visibility>;
 }
 
-@!sts_inject("""
-export type GetDelayData = (type: string) => UnifiedData;
-""")
 
 @class
-interface UnifiedDataProperties {
-  @get("tag")
-  GetTag(): String;
-  @set("tag")
-  SetTag(tag: String): void;
-  @get("extras")
-  GetExtras(): @record Map<String, Opaque>;
-  @set("extras")
-  SetExtras(extras: @record Map<String, Opaque>): void;
-  @get("timestamp")
-  GetTimestamp():@sts_type("Date") Opaque;
-  @get("shareOptions")
-  GetShareOptions(): ShareOptions;
-  @set("shareOptions")
-  SetShareOptions(shareOptions: ShareOptions): void;
-  @get("getDelayData")
-  GetDelayData(): @sts_type("GetDelayData") Opaque;
-  @set("getDelayData")
-  SetDelayData(setDelayData: @sts_type("GetDelayData") Opaque): void;
-  GetInner(): i64;
+struct UnifiedDataProperties {
+  tag: Optional<String>;
+  timestamp: Optional<@sts_type("Date") Opaque>;
+  shareOptions: Optional<ShareOptions>;
+  getDelayData: Optional<(type: String) => @sts_type("UnifiedData") Opaque>;
+  extras: Optional<@sts_type("Record<String, RecordData>") Opaque>;
 }
 
 @ctor("UnifiedDataProperties")

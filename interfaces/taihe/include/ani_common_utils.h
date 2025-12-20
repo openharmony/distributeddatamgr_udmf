@@ -33,6 +33,7 @@ enum ObjectType : int32_t {
     OBJ_STRING,
     OBJ_BOOL,
     OBJ_ARRAY_BUFFER,
+    OBJ_UINT8_ARRAY,
     OBJ_MAP,
     OBJ_OBJECT,
     OBJ_BUTT,
@@ -57,6 +58,7 @@ ani_status GetDouble(ani_env *env, ani_object in, double &out);
 ani_status GetString(ani_env *env, ani_object in, std::string &out);
 ani_status GetBool(ani_env *env, ani_object in, bool &out);
 ani_status GetArrayBuffer(ani_env *env, ani_object in, std::vector<uint8_t> &out);
+ani_status GetUint8Array(ani_env *env, ani_object in, std::vector<uint8_t> &out);
 ani_status GetMap(ani_env *env, ani_object in, std::shared_ptr<Object> &out, int depth);
 ani_status GetObject(ani_env *env, ani_object in, ValueType &out, int depth);
 ani_status ConverObject(ani_env *env, ani_object object, ValueType &valueType, int depth);

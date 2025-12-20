@@ -19,7 +19,6 @@
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
 #include "unified_data.h"
-#include "unified_data_properties_taihe.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
@@ -39,7 +38,7 @@ public:
     int64_t GetInner();
 
     std::shared_ptr<UnifiedData> value_;
-    std::shared_ptr<UnifiedDataPropertiesTaihe> propertiesValue_;
+    ::taiheChannel::UnifiedDataProperties propertiesValue_;
 };
 } // namespace UDMF
 } // namespace OHOS
