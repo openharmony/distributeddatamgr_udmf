@@ -107,6 +107,10 @@ bool IsValidOptionInfoNonDrag(UnifiedKey &key, const std::string &intention)
         auto dataImpl = taihe::make_holder<OHOS::UDMF::UnifiedDataTaihe, ::taiheChannel::UnifiedDataInner>();
         auto dataImplPtr = reinterpret_cast<OHOS::UDMF::UnifiedDataTaihe*>(dataImpl->GetInner());
         dataImplPtr->value_ = std::make_shared<UnifiedData>(data);
+        auto properties = data.GetProperties();
+        if (properties) {
+            dataImplPtr->propertiesValue_ = std::move(ConvertUnifiedDataProperties(*properties));
+        }
         dataImpls.push_back(dataImpl);
     }
     return ::taihe::array<::taiheChannel::UnifiedDataInner>(dataImpls);
