@@ -134,8 +134,8 @@ struct Options {
 
 
 @class
-interface UnifiedDataProperties {
-  extras: Optional<@sts_type("record<String, RecordData>") Opaque>;
+struct UnifiedDataProperties {
+  extras: Optional<@sts_type("Record<String, RecordData>") Opaque>;
   tag: Optional<String>;
   timestamp: Optional<@sts_type("Date") Opaque>;
   shareOptions: Optional<ShareOptions>;

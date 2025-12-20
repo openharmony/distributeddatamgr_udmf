@@ -52,7 +52,7 @@ namespace UDMF {
         std::move(timestampOpt),
         std::move(shareOptionsOpt),
         std::move(getDelayDataOpt),
-    }
+    };
     return taiheProperties;
 }
 
@@ -325,8 +325,8 @@ bool UnifiedDataTaihe::HasType(::taihe::string_view type)
 
 void UnifiedDataTaihe::SetProperties(::taiheChannel::UnifiedDataProperties properties)
 {
-    if (!this->value_ || !this->propertiesValue_) {
-        LOG_ERROR(UDMF_ANI, "Inner value or propertiesValue is null.");
+    if (!this->value_) {
+        LOG_ERROR(UDMF_ANI, "Inner value is null.");
         return;
     }
     this->propertiesValue_ = properties;
@@ -441,3 +441,4 @@ int64_t UnifiedDataTaihe::GetInner()
 
 TH_EXPORT_CPP_API_CreateUnifiedData(CreateUnifiedData);
 TH_EXPORT_CPP_API_CreateUnifiedDataWithParams(CreateUnifiedDataWithParams);
+TH_EXPORT_CPP_API_CreateUnifiedDataProperties(OHOS::UDMF::CreateUnifiedDataProperties);

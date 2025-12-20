@@ -38,7 +38,7 @@ public:
     int64_t GetInner();
 
     std::shared_ptr<UnifiedData> value_;
-    ::taiheChannel::UnifiedDataPropertiesTaihe propertiesValue_;
+    ::taiheChannel::UnifiedDataProperties propertiesValue_;
 };
 } // namespace UDMF
 } // namespace OHOS
