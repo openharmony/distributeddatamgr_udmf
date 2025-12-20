@@ -109,7 +109,8 @@ bool IsValidOptionInfoNonDrag(UnifiedKey &key, const std::string &intention)
         dataImplPtr->value_ = std::make_shared<UnifiedData>(data);
         auto properties = data.GetProperties();
         if (properties) {
-            dataImplPtr->propertiesValue_ = std::move(ConvertUnifiedDataProperties(*properties));
+            auto propertiesTaihe = OHOS::UDMF::ConvertUnifiedDataProperties(*properties);
+            dataImplPtr->propertiesValue_ = std::move(propertiesTaihe);
         }
         dataImpls.push_back(dataImpl);
     }
