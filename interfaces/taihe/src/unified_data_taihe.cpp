@@ -47,11 +47,11 @@ namespace UDMF {
     ::taihe::optional<uintptr_t> timestampOpt;
 
     auto taiheProperties = ::taiheChannel::UnifiedDataProperties {
-        std::move(extrasOpt),
         std::move(tagOpt),
         std::move(timestampOpt),
         std::move(shareOptionsOpt),
         std::move(getDelayDataOpt),
+        std::move(extrasOpt),
     };
     return taiheProperties;
 }
@@ -316,6 +316,10 @@ bool UnifiedDataTaihe::HasType(::taihe::string_view type)
 
 ::taiheChannel::UnifiedDataProperties UnifiedDataTaihe::GetProperties()
 {
+    if (!this->value_) {
+        LOG_ERROR(UDMF_ANI, "Inner value is null.");
+        return this->propertiesValue_;
+    }
     auto properties = this->value_->GetProperties();
     ani_object aniTimeStamp {};
     SetTimestamp(taihe::get_env(), static_cast<double>(properties->timestamp), aniTimeStamp);

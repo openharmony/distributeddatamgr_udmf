@@ -135,11 +135,11 @@ struct Options {
 
 @class
 struct UnifiedDataProperties {
-  extras: Optional<@sts_type("Record<String, RecordData>") Opaque>;
   tag: Optional<String>;
   timestamp: Optional<@sts_type("Date") Opaque>;
   shareOptions: Optional<ShareOptions>;
   getDelayData: Optional<(type: String) => @sts_type("UnifiedData") Opaque>;
+  extras: Optional<@sts_type("Record<String, RecordData>") Opaque>;
 }
 
 @ctor("UnifiedDataProperties")
