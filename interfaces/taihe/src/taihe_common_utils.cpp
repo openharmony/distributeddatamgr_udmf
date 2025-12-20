@@ -752,7 +752,7 @@ OHOS::UDMF::Visibility ConvertVisibility(::taiheChannel::Visibility value)
     return ::taihe::array<::taihe::string>(::taihe::copy_data, keys.begin(), keys.size());
 }
 
-OHOS::UDMF::UnifiedDataProperties ConvertUnifiedDataProperties(::taiheChannel::UnifiedDataProperties value)
+OHOS::UDMF::UnifiedDataProperties ConvertUnifiedDataProperties(::taiheChannel::UnifiedDataProperties &value)
 {
     OHOS::UDMF::UnifiedDataProperties properties;
     if (value.tag.has_value()) {
@@ -769,6 +769,31 @@ OHOS::UDMF::UnifiedDataProperties ConvertUnifiedDataProperties(::taiheChannel::U
         properties.shareOptions = ConvertShareOptions(value.shareOptions.value());
     }
     return properties;
+}
+
+::taiheChannel::UnifiedDataProperties ConvertUnifiedDataProperties(OHOS::UDMF::UnifiedDataProperties &value)
+{
+    auto tagOpt = ::taihe::optional<::taihe::string>::make(::taihe::string(value.tag));
+
+    auto extrasOpt = ::taihe::optional<uintptr_t>::make(reinterpret_cast<uintptr_t>
+        (OHOS::AppExecFwk::WrapWantParams(taihe::get_env(), value.extras)));
+
+    auto shareOptionsOpt = ::taihe::optional<::taiheChannel::ShareOptions>::make(ConvertShareOptions(value.shareOptions));
+
+    ::taihe::optional<::taihe::callback<uintptr_t(::taihe::string_view type)>> getDelayDataOpt;
+
+    ani_object aniTimeStamp {};
+    SetTimestamp(taihe::get_env(), static_cast<double>(value.timestamp), aniTimeStamp);
+    auto timestampOpt = ::taihe::optional<uintptr_t>::make(reinterpret_cast<uintptr_t>(aniTimeStamp));
+
+    auto taiheProperties = ::taiheChannel::UnifiedDataProperties {
+        std::move(tagOpt),
+        std::move(timestampOpt),
+        std::move(shareOptionsOpt),
+        std::move(getDelayDataOpt),
+        std::move(extrasOpt),
+    };
+    return taiheProperties;
 }
 } // namespace UDMF
 } // namespace OHOS
