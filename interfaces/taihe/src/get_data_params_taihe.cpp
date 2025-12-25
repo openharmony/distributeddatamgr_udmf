@@ -75,8 +75,8 @@ bool GetDataParamsTaihe::SetDestUri(ani_env *env, ani_object in, GetDataParams &
 {
     ani_ref destUri;
     auto status = env->Object_GetPropertyByName_Ref(in, "destUri", &destUri);
-    if (status != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
+    if (status != ANI_OK || !destUri) {
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed or destUri is null.");
         return false;
     }
     ani_size destUriLength;
@@ -102,8 +102,8 @@ bool GetDataParamsTaihe::SetFileConflictOptions(ani_env *env, ani_object in, Get
 {
     ani_ref fileConflictOptions;
     auto status = env->Object_GetPropertyByName_Ref(in, "fileConflictOptions", &fileConflictOptions);
-    if (status != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
+    if (status != ANI_OK || !fileConflictOptions) {
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed or fileConflictOptions is null.");
         return false;
     }
     ani_int fileConflictOptionsValue;
@@ -120,8 +120,8 @@ bool GetDataParamsTaihe::SetAcceptableInfo(ani_env *env, ani_object in, GetDataP
 {
     ani_ref acceptableInfo;
     auto status = env->Object_GetPropertyByName_Ref(in, "acceptableInfo", &acceptableInfo);
-    if (status != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
+    if (status != ANI_OK || !acceptableInfo) {
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed or acceptableInfo is null.");
         return false;
     }
     ani_object dataLoadInfo = static_cast<ani_object>(acceptableInfo);
@@ -132,7 +132,9 @@ bool GetDataParamsTaihe::SetAcceptableInfo(ani_env *env, ani_object in, GetDataP
         LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Long failed.");
         return false;
     }
-    getDataParams.acceptableInfo.recordCount = static_cast<uint32_t>(recordCount);
+    if (recordCount) {
+        getDataParams.acceptableInfo.recordCount = static_cast<uint32_t>(recordCount);
+    }
     return true;
 }
 
