@@ -75,8 +75,12 @@ bool GetDataParamsTaihe::SetDestUri(ani_env *env, ani_object in, GetDataParams &
 {
     ani_ref destUri;
     auto status = env->Object_GetPropertyByName_Ref(in, "destUri", &destUri);
-    if (status != ANI_OK || !destUri) {
+    if (status != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed or destUri is null.");
+        return false;
+    }
+    if (IsNullOrUndefined(env, static_cast<ani_object>(destUri))) {
+        LOG_ERROR(UDMF_ANI, "destUri is null or undefined.");
         return false;
     }
     ani_size destUriLength;
@@ -106,6 +110,10 @@ bool GetDataParamsTaihe::SetFileConflictOptions(ani_env *env, ani_object in, Get
         LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed or fileConflictOptions is null.");
         return false;
     }
+    if (IsNullOrUndefined(env, static_cast<ani_object>(fileConflictOptions))) {
+        LOG_ERROR(UDMF_ANI, "fileConflictOptions is null or undefined.");
+        return false;
+    }
     ani_int fileConflictOptionsValue;
     status = env->EnumItem_GetValue_Int(static_cast<ani_enum_item>(fileConflictOptions), &fileConflictOptionsValue);
     if (status != ANI_OK) {
@@ -125,15 +133,18 @@ bool GetDataParamsTaihe::SetAcceptableInfo(ani_env *env, ani_object in, GetDataP
         return false;
     }
     ani_object dataLoadInfo = static_cast<ani_object>(acceptableInfo);
-
+    if (IsNullOrUndefined(env, dataLoadInfo)) {
+        LOG_ERROR(UDMF_ANI, "dataLoadInfo is null or undefined.");
+        return false;
+    }
     ani_long recordCount;
     status = env->Object_GetPropertyByName_Long(dataLoadInfo, "recordCount", &recordCount);
     if (status != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Long failed.");
         return false;
     }
-    if (recordCount) {
-        getDataParams.acceptableInfo.recordCount = static_cast<uint32_t>(recordCount);
+    if (recordCount != 0) {
+        dataLoadParams.dataLoadInfo.recordCount = static_cast<uint32_t>(recordCount);
     }
     return true;
 }

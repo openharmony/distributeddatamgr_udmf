@@ -672,5 +672,22 @@ ani_status ConverObject(ani_env *env, ani_object aniObj, ValueType &valueType, i
     }
     return ANI_OK;
 }
+
+bool IsNullOrUndefined(ani_env *env, ani_object aniObj)
+{
+    if(!env) {
+        return true;
+    }
+    ani_boolean isNUllOrUndefined = ANI_FALSE;
+    ani_status status = env->Reference_IsUndefined(aniObj, &isNUllOrUndefined);
+    if (status != ANI_OK || isNUllOrUndefined) {
+        return true;
+    }
+    status = env->Reference_IsNull(aniObj, &isNUllOrUndefined);
+    if (status != ANI_OK || isNUllOrUndefined) {
+        return true;
+    }
+    return false;
+}
 } // namespace UDMF
 } // namespace OHOS
