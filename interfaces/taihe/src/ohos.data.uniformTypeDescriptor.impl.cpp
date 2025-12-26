@@ -111,7 +111,7 @@ namespace UDMF {
     auto status = E_OK;
     if (belongsTo.has_value()) {
         if (belongsTo.value().empty()) {
-            set_business_error(PARAMETERSERROR, "Parameter error: parameter belongsTo type must be string");   
+            set_business_error(PARAMETERSERROR, "Parameter error: parameter belongsTo type must be string");
         } else {
             std::string isBelongs(belongsTo.value());
             status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(isMime, typeId, isBelongs);
@@ -142,7 +142,7 @@ namespace UDMF {
     auto status = E_OK;
     if (belongsTo.has_value()) {
         if (belongsTo.value().empty()) {
-            set_business_error(PARAMETERSERROR, "Parameter error: parameter belongsTo type must be string");   
+            set_business_error(PARAMETERSERROR, "Parameter error: parameter belongsTo type must be string");
         } else {
             std::string belongs(belongsTo.value());
             status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(fileName, typeId, belongs);
