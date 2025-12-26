@@ -675,9 +675,6 @@ ani_status ConverObject(ani_env *env, ani_object aniObj, ValueType &valueType, i
 
 bool IsNullOrUndefined(ani_env *env, ani_object aniObj)
 {
-    if(!env) {
-        return true;
-    }
     ani_boolean isNUllOrUndefined = ANI_FALSE;
     ani_status status = env->Reference_IsUndefined(aniObj, &isNUllOrUndefined);
     if (status != ANI_OK || isNUllOrUndefined) {
