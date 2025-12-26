@@ -62,6 +62,7 @@ ani_status GetUint8Array(ani_env *env, ani_object in, std::vector<uint8_t> &out)
 ani_status GetMap(ani_env *env, ani_object in, std::shared_ptr<Object> &out, int depth);
 ani_status GetObject(ani_env *env, ani_object in, ValueType &out, int depth);
 ani_status ConverObject(ani_env *env, ani_object object, ValueType &valueType, int depth);
+bool IsNullOrUndefined(ani_env *env, ani_object aniObj);
 
 } // namespace UDMF
 } // namespace OHOS
