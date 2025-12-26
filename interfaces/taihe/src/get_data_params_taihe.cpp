@@ -144,7 +144,7 @@ bool GetDataParamsTaihe::SetAcceptableInfo(ani_env *env, ani_object in, GetDataP
         return false;
     }
     if (recordCount != 0) {
-        getDataParams.dataLoadInfo.recordCount = static_cast<uint32_t>(recordCount);
+        getDataParams.acceptableInfo.recordCount = static_cast<uint32_t>(recordCount);
     }
     return true;
 }
