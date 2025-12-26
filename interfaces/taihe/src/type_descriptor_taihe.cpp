@@ -68,7 +68,7 @@ namespace UDMF {
         if (value.size() > MAX_BELONGS_LEN) {
             LOG_ERROR(UDMF_ANI, "SetBelongingToTypes: array size %zu exceeds maximum limit %zu",
                 value.size(), MAX_BELONGS_LEN);
-            taihe::set_business_error(E_INVALID_PARAMETERS, "array size exceeds maximum limit");
+            taihe::set_business_error(PARAMETERSERROR, "array size exceeds maximum limit");
             return;
         }
         std::vector<std::string> belongingToTypes;
@@ -147,7 +147,7 @@ namespace UDMF {
         if (value.size() > MAX_BELONGS_LEN) {
             LOG_ERROR(UDMF_ANI, "SetFilenameExtensions: array size %zu exceeds maximum limit %zu",
                 value.size(), MAX_BELONGS_LEN);
-            taihe::set_business_error(E_INVALID_PARAMETERS, "array size exceeds maximum limit");
+            taihe::set_business_error(PARAMETERSERROR, "array size exceeds maximum limit");
             return;
         }
         std::vector<std::string> filenameExtensions;
@@ -175,7 +175,7 @@ namespace UDMF {
         if (value.size() > MAX_BELONGS_LEN) {
             LOG_ERROR(UDMF_ANI, "SetMimeTypes: array size %zu exceeds maximum limit %zu",
                 value.size(), MAX_BELONGS_LEN);
-            taihe::set_business_error(E_INVALID_PARAMETERS, "array size exceeds maximum limit");
+            taihe::set_business_error(PARAMETERSERROR, "array size exceeds maximum limit");
             return;
         }
         std::vector<std::string> mimeTypes;
@@ -192,12 +192,12 @@ namespace UDMF {
     {
         if (type.empty()) {
             LOG_ERROR(UDMF_ANI, "Type string is empty");
-            taihe::set_business_error(E_INVALID_PARAMETERS, "type is empty");
+            taihe::set_business_error(PARAMETERSERROR, "invalid arguments!");
             return false;
         }
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in BelongsTo");
-            taihe::set_business_error(E_INVALID_PARAMETERS, "nativeDescriptor_ is null");
+            taihe::set_business_error(PARAMETERSERROR, "nativeDescriptor_ is null");
             return false;
         }
         bool checkRet = false;
@@ -221,12 +221,12 @@ namespace UDMF {
     {
         if (type.empty()) {
             LOG_ERROR(UDMF_ANI, "Type string is empty");
-            taihe::set_business_error(E_INVALID_PARAMETERS, "type is empty");
+            taihe::set_business_error(PARAMETERSERROR, "invalid arguments!");
             return false;
         }
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in IsLowerLevelType");
-            taihe::set_business_error(E_INVALID_PARAMETERS, "nativeDescriptor_ is null");
+            taihe::set_business_error(PARAMETERSERROR, "nativeDescriptor_ is null");
             return false;
         }
         bool checkRet = false;
@@ -250,12 +250,12 @@ namespace UDMF {
     {
         if (type.empty()) {
             LOG_ERROR(UDMF_ANI, "Type string is empty");
-            taihe::set_business_error(E_INVALID_PARAMETERS, "type is empty");
+            taihe::set_business_error(PARAMETERSERROR, "invalid arguments!");
             return false;
         }
         if (!nativeDescriptor_) {
             LOG_ERROR(UDMF_ANI, "nativeDescriptor_ is null in IsHigherLevelType");
-            taihe::set_business_error(E_INVALID_PARAMETERS, "nativeDescriptor_ is null");
+            taihe::set_business_error(PARAMETERSERROR, "nativeDescriptor_ is null");
             return false;
         }
         bool checkRet = false;

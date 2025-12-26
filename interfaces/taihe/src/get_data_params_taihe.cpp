@@ -143,6 +143,10 @@ bool GetDataParamsTaihe::SetAcceptableInfo(ani_env *env, ani_object in, GetDataP
         LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Long failed.");
         return false;
     }
+    if (recordCount < 0 || recordCount > UINT32_MAX) {
+        LOG_ERROR(UDMF_ANI, "recordCount out of range");
+        return false;
+    }
     getDataParams.acceptableInfo.recordCount = static_cast<uint32_t>(recordCount);
     return true;
 }
