@@ -76,7 +76,7 @@ bool GetDataParamsTaihe::SetDestUri(ani_env *env, ani_object in, GetDataParams &
     ani_ref destUri;
     auto status = env->Object_GetPropertyByName_Ref(in, "destUri", &destUri);
     if (status != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed or destUri is null.");
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
         return false;
     }
     if (IsNullOrUndefined(env, static_cast<ani_object>(destUri))) {
@@ -106,8 +106,8 @@ bool GetDataParamsTaihe::SetFileConflictOptions(ani_env *env, ani_object in, Get
 {
     ani_ref fileConflictOptions;
     auto status = env->Object_GetPropertyByName_Ref(in, "fileConflictOptions", &fileConflictOptions);
-    if (status != ANI_OK || !fileConflictOptions) {
-        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed or fileConflictOptions is null.");
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
         return false;
     }
     if (IsNullOrUndefined(env, static_cast<ani_object>(fileConflictOptions))) {
@@ -128,8 +128,8 @@ bool GetDataParamsTaihe::SetAcceptableInfo(ani_env *env, ani_object in, GetDataP
 {
     ani_ref acceptableInfo;
     auto status = env->Object_GetPropertyByName_Ref(in, "acceptableInfo", &acceptableInfo);
-    if (status != ANI_OK || !acceptableInfo) {
-        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed or acceptableInfo is null.");
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed.");
         return false;
     }
     ani_object dataLoadInfo = static_cast<ani_object>(acceptableInfo);
@@ -144,7 +144,7 @@ bool GetDataParamsTaihe::SetAcceptableInfo(ani_env *env, ani_object in, GetDataP
         return false;
     }
     if (recordCount != 0) {
-        dataLoadParams.dataLoadInfo.recordCount = static_cast<uint32_t>(recordCount);
+        getDataParams.dataLoadInfo.recordCount = static_cast<uint32_t>(recordCount);
     }
     return true;
 }
