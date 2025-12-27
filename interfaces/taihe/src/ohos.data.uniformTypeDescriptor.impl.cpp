@@ -109,11 +109,15 @@ namespace UDMF {
     std::string isMime(mimeType);
     std::string typeId;
     auto status = E_OK;
-    if (!belongsTo.has_value() || belongsTo.value().empty()) {
-        status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(isMime, typeId);
+    if (belongsTo.has_value()) {
+        if (belongsTo.value().empty()) {
+            set_business_error(PARAMETERSERROR, "Parameter error: parameter belongsTo type must be string");
+        } else {
+            std::string isBelongs(belongsTo.value());
+            status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(isMime, typeId, isBelongs);
+        }
     } else {
-        std::string isBelongs(belongsTo.value());
-        status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(isMime, typeId, isBelongs);
+        status = UtdClient::GetInstance().GetUniformDataTypeByMIMEType(isMime, typeId);
     }
     if (status != E_OK) {
         auto errorMsg = GetErrorCode(status);
@@ -136,11 +140,15 @@ namespace UDMF {
     std::string fileName(filenameExtension);
     std::string typeId;
     auto status = E_OK;
-    if (!belongsTo.has_value() || belongsTo.value().empty()) {
-        status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(fileName, typeId);
+    if (belongsTo.has_value()) {
+        if (belongsTo.value().empty()) {
+            set_business_error(PARAMETERSERROR, "Parameter error: parameter belongsTo type must be string");
+        } else {
+            std::string belongs(belongsTo.value());
+            status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(fileName, typeId, belongs);
+        }
     } else {
-        std::string belongs(belongsTo.value());
-        status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(fileName, typeId, belongs);
+        status = UtdClient::GetInstance().GetUniformDataTypeByFilenameExtension(fileName, typeId);
     }
     if (status != E_OK) {
         auto errorMsg = GetErrorCode(status);
