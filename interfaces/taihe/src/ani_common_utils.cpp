@@ -549,9 +549,6 @@ ani_status GetObject(ani_env *env, ani_object in, ValueType &out, int depth)
             OHOS::AppExecFwk::UnwrapWant(env, in, want);
             out = std::make_shared<OHOS::AAFwk::Want>(want);
             return ANI_OK;
-        } else if (type == "openharmony.pixel-map") {
-            out = OHOS::Media::PixelMapTaiheAni::GetNativePixelMap(env, in);
-            return ANI_OK;
         }
     }
     auto objectPtr = std::make_shared<Object>();
@@ -560,6 +557,11 @@ ani_status GetObject(ani_env *env, ani_object in, ValueType &out, int depth)
         auto status = env->Object_GetPropertyByName_Ref(in, key.c_str(), &aniValue);
         if (status != ANI_OK) {
             LOG_WARN(UDMF_ANI, "Object_GetPropertyByName_Ref fail");
+            continue;
+        }
+        if (key == PIXEL_MAP) {
+            objectPtr->value_[key]
+                = OHOS::Media::PixelMapTaiheAni::GetNativePixelMap(env, static_cast<ani_object>(aniValue));
             continue;
         }
         ValueType value = nullptr;
