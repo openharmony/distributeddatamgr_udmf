@@ -25,76 +25,100 @@ namespace OHOS {
 namespace TLVUtil {
 template <> size_t CountBufferSize(const std::nullptr_t &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
     return data.CountHead();
 }
 
 template <> bool Writing(const std::nullptr_t &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     return data.WriteHead(static_cast<uint16_t>(tag), 0);
 }
 
 template <> bool Reading(std::nullptr_t &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     return data.Read(output, head);
 }
 
 template <> size_t CountBufferSize(const std::monostate &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
     return data.Count(input);
+}
+
+bool CheckAndAdd(size_t &currentSize, size_t partSize)
+{
+    if (partSize > std::numeric_limits<size_t>::max() - currentSize) {
+        LOG_ERROR(UDMF_FRAMEWORK, "Count error, size overflow.");
+        return false;
+    }
+    currentSize += partSize;
+    return true;
 }
 
 template <> bool Writing(const std::monostate &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     return data.Write(tag, input);
 }
 
 template <> bool Reading(std::monostate &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     return data.Read(output, head);
 }
 
 template <> size_t CountBufferSize(const std::string &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
     return data.Count(input);
 }
 
 template <> bool Writing(const std::string &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     return data.Write(tag, input);
 }
 
 template <> bool Reading(std::string &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     return data.Read(output, head);
 }
 
 template <> size_t CountBufferSize(const std::vector<uint8_t> &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
     return data.Count(input);
 }
 
 template <> bool Writing(const std::vector<uint8_t> &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     return data.Write(tag, input);
 }
 
 template <> bool Reading(std::vector<uint8_t> &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     return data.Read(output, head);
 }
 
 template <> size_t CountBufferSize(const UDType &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
     int32_t type = input;
     return data.CountBasic(type);
 }
 
 template <> bool Writing(const UDType &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     int32_t type = input;
     return data.WriteBasic(tag, type);
@@ -102,6 +126,7 @@ template <> bool Writing(const UDType &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(UDType &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     int32_t type;
     if (!Reading(type, data, head)) {
         return false;
@@ -115,12 +140,14 @@ template <> bool Reading(UDType &output, TLVObject &data, const TLVHead &head)
 
 template <> size_t CountBufferSize(const DataStatus &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
     int32_t status = input;
     return data.CountBasic(status);
 }
 
 template <> bool Writing(const DataStatus &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     int32_t status = input;
     return data.WriteBasic(tag, status);
@@ -128,6 +155,7 @@ template <> bool Writing(const DataStatus &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(DataStatus &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     int32_t status;
     if (!data.ReadBasic(status, head)) {
         return false;
@@ -141,15 +169,15 @@ template <> bool Reading(DataStatus &output, TLVObject &data, const TLVHead &hea
 
 template <> size_t CountBufferSize(const Object &input, TLVObject &data)
 {
-    return data.CountHead() + CountBufferSize(input.value_, data);
+    CHECK_RECURSIVE_GUARD();
+    size_t headSize = data.CountHead();
+    bool isWithinMax = CheckAndAdd(headSize, CountBufferSize(input.value_, data));
+    return isWithinMax ? headSize : 0;
 }
 
 template <> bool Writing(const Object &input, TLVObject &data, TAG tag)
 {
-    RecursiveGuard guard;
-    if (!guard.IsValid()) {
-        return false;
-    }
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -160,10 +188,7 @@ template <> bool Writing(const Object &input, TLVObject &data, TAG tag)
 }
 template <> bool Reading(Object &output, TLVObject &data, const TLVHead &head)
 {
-    RecursiveGuard guard;
-    if (!guard.IsValid()) {
-        return false;
-    }
+    CHECK_RECURSIVE_GUARD();
     TLVHead headValue{};
     if (!data.ReadHead(headValue)) {
         return false;
@@ -179,11 +204,16 @@ template <> bool Reading(Object &output, TLVObject &data, const TLVHead &head)
 
 template <> size_t CountBufferSize(const UnifiedKey &input, TLVObject &data)
 {
-    return data.CountHead() + data.Count(input.key) + data.Count(input.intention) + data.Count(input.bundleName) +
-        data.Count(input.groupId);
+    CHECK_RECURSIVE_GUARD();
+    size_t size = data.CountHead();
+    bool isWithinMax = CheckAndAdd(size, data.Count(input.key)) && CheckAndAdd(size, data.Count(input.intention))
+        && CheckAndAdd(size, data.Count(input.bundleName)) && CheckAndAdd(size, data.Count(input.groupId));
+    return isWithinMax ? size : 0;
 }
+
 template <> bool Writing(const UnifiedKey &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -204,6 +234,7 @@ template <> bool Writing(const UnifiedKey &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(UnifiedKey &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (head.len > data.GetTotal() - data.GetCursor()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
         return false;
@@ -244,12 +275,17 @@ template <> bool Reading(UnifiedKey &output, TLVObject &data, const TLVHead &hea
 
 template <> size_t CountBufferSize(const UnifiedData &input, TLVObject &data)
 {
-    return data.CountHead() + data.Count(input.GetSdkVersion()) + TLVUtil::CountBufferSize(input.GetRecords(), data) +
-        TLVUtil::CountBufferSize(input.GetProperties(), data);
+    CHECK_RECURSIVE_GUARD();
+    auto size = data.CountHead();
+    bool isWithinMax = CheckAndAdd(size, data.Count(input.GetSdkVersion()))
+        && CheckAndAdd(size, TLVUtil::CountBufferSize(input.GetRecords(), data))
+        && CheckAndAdd(size, TLVUtil::CountBufferSize(input.GetProperties(), data));
+    return isWithinMax ? size : 0;
 }
 
 template <> bool Writing(const UnifiedData &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -267,6 +303,7 @@ template <> bool Writing(const UnifiedData &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(UnifiedData &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (head.len > data.GetTotal() - data.GetCursor()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
         return false;
@@ -308,12 +345,17 @@ template <> bool Reading(UnifiedData &output, TLVObject &data, const TLVHead &he
 
 template <> size_t CountBufferSize(const UnifiedDataProperties &input, TLVObject &data)
 {
-    return data.CountHead() + data.Count(input.tag) + data.CountBasic(input.timestamp) +
-        data.CountBasic(static_cast<int32_t>(input.shareOptions))  + TLVUtil::CountBufferSize(input.extras, data);
+    CHECK_RECURSIVE_GUARD();
+    auto size = data.CountHead();
+    bool isWithinMax = CheckAndAdd(size, data.Count(input.tag)) && CheckAndAdd(size, data.CountBasic(input.timestamp))
+        && CheckAndAdd(size, data.CountBasic(static_cast<int32_t>(input.shareOptions)))
+        && CheckAndAdd(size, TLVUtil::CountBufferSize(input.extras, data));
+    return isWithinMax ? size : 0;
 }
 
 template <> bool Writing(const UnifiedDataProperties &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -334,6 +376,7 @@ template <> bool Writing(const UnifiedDataProperties &input, TLVObject &data, TA
 
 template <> bool Reading(UnifiedDataProperties &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (head.len > data.GetTotal() - data.GetCursor()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
         return false;
@@ -370,6 +413,7 @@ template <> bool Reading(UnifiedDataProperties &output, TLVObject &data, const T
 
 template <> bool Reading(ShareOptions &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     int32_t shareOptions;
     if (!Reading(shareOptions, data, head)) {
         return false;
@@ -383,6 +427,7 @@ template <> bool Reading(ShareOptions &output, TLVObject &data, const TLVHead &h
 
 template <> size_t CountBufferSize(const OHOS::AAFwk::WantParams &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
     Parcel parcel;
     if (!input.Marshalling(parcel)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Marshalling want error when Count");
@@ -395,6 +440,7 @@ template <> size_t CountBufferSize(const OHOS::AAFwk::WantParams &input, TLVObje
 
 template <> bool Writing(const OHOS::AAFwk::WantParams &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     Parcel parcel;
     if (!input.Marshalling(parcel)) {
@@ -416,6 +462,7 @@ template <> bool Writing(const OHOS::AAFwk::WantParams &input, TLVObject &data, 
 
 template <> bool Reading(OHOS::AAFwk::WantParams &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     std::vector<std::uint8_t> val;
     if (!data.Read(val, head)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Reading u8 vector error.");
@@ -452,14 +499,20 @@ template <> bool Reading(OHOS::AAFwk::WantParams &output, TLVObject &data, const
 
 template <> size_t CountBufferSize(const UnifiedRecord &input, TLVObject &data)
 {
-    return data.CountHead() + data.CountBasic(static_cast<int32_t>(input.GetType())) +
-        data.Count(input.GetUid()) + CountBufferSize(input.GetOriginValue(), data) + data.Count(input.GetUtdId()) +
-        data.Count(input.GetUtdId2()) + CountBufferSize(input.GetInnerEntries(), data) +
-        CountBufferSize(input.GetUris(), data);
+    CHECK_RECURSIVE_GUARD();
+    size_t size = data.CountHead();
+    bool isWithinMax = CheckAndAdd(size, data.CountBasic(static_cast<int32_t>(input.GetType())))
+        && CheckAndAdd(size, data.Count(input.GetUid()))
+        && CheckAndAdd(size, CountBufferSize(input.GetOriginValue(), data))
+        && CheckAndAdd(size, data.Count(input.GetUtdId())) && CheckAndAdd(size, data.Count(input.GetUtdId2()))
+        && CheckAndAdd(size, CountBufferSize(input.GetInnerEntries(), data))
+        && CheckAndAdd(size, CountBufferSize(input.GetUris(), data));
+    return isWithinMax ? size : 0;
 }
 
 template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -489,6 +542,7 @@ template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (head.len > data.GetTotal() - data.GetCursor()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
         return false;
@@ -558,18 +612,26 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
 
 template <> size_t CountBufferSize(const Runtime &input, TLVObject &data)
 {
-    return data.CountHead() + data.CountBasic(input.isPrivate) + data.CountBasic(input.dataVersion) +
-        data.CountBasic(input.recordTotalNum) + data.CountBasic(input.tokenId) +
-        data.CountBasic(static_cast<int64_t>(input.createTime)) +
-        data.CountBasic(static_cast<int64_t>(input.lastModifiedTime)) +
-        data.CountBasic(static_cast<int32_t>(input.dataStatus)) + data.Count(input.sourcePackage) +
-        data.Count(input.createPackage) + data.Count(input.deviceId) + TLVUtil::CountBufferSize(input.key, data) +
-        data.Count(input.sdkVersion) + TLVUtil::CountBufferSize(input.privileges, data) +
-        data.CountBasic(static_cast<int32_t>(input.visibility)) + data.Count(input.appId);
+    CHECK_RECURSIVE_GUARD();
+    size_t size = data.CountHead();
+    bool isWithinMax = CheckAndAdd(size, data.CountBasic(input.isPrivate))
+        && CheckAndAdd(size, data.CountBasic(input.dataVersion))
+        && CheckAndAdd(size, data.CountBasic(input.recordTotalNum)) && CheckAndAdd(size, data.CountBasic(input.tokenId))
+        && CheckAndAdd(size, data.CountBasic(static_cast<int64_t>(input.createTime)))
+        && CheckAndAdd(size, data.CountBasic(static_cast<int64_t>(input.lastModifiedTime)))
+        && CheckAndAdd(size, data.CountBasic(static_cast<int32_t>(input.dataStatus)))
+        && CheckAndAdd(size, data.Count(input.sourcePackage)) && CheckAndAdd(size, data.Count(input.createPackage))
+        && CheckAndAdd(size, data.Count(input.deviceId)) && CheckAndAdd(size, TLVUtil::CountBufferSize(input.key, data))
+        && CheckAndAdd(size, data.Count(input.sdkVersion))
+        && CheckAndAdd(size, TLVUtil::CountBufferSize(input.privileges, data))
+        && CheckAndAdd(size, data.CountBasic(static_cast<int32_t>(input.visibility)))
+        && CheckAndAdd(size, data.Count(input.appId));
+    return isWithinMax ? size : 0;
 }
 
 template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -623,6 +685,7 @@ template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(Runtime &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (head.len > data.GetTotal() - data.GetCursor()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
         return false;
@@ -698,12 +761,16 @@ template <> bool Reading(Runtime &output, TLVObject &data, const TLVHead &head)
 
 template <> size_t CountBufferSize(const Privilege &input, TLVObject &data)
 {
-    return data.CountHead() + data.CountBasic(input.tokenId) + data.Count(input.readPermission) +
-        data.Count(input.writePermission);
+    CHECK_RECURSIVE_GUARD();
+    auto size = data.CountHead();
+    bool isWithinMax = CheckAndAdd(size, data.CountBasic(input.tokenId))
+    && CheckAndAdd(size, data.Count(input.readPermission)) && CheckAndAdd(size, data.Count(input.writePermission));
+    return isWithinMax ? size : 0;
 }
 
 template <> bool Writing(const Privilege &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -721,6 +788,7 @@ template <> bool Writing(const Privilege &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(Privilege &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (head.len > data.GetTotal() - data.GetCursor()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
         return false;
@@ -756,12 +824,17 @@ template <> bool Reading(Privilege &output, TLVObject &data, const TLVHead &head
 
 template <> size_t CountBufferSize(const UriInfo &input, TLVObject &data)
 {
-    return data.CountHead() + data.CountBasic(input.position) + data.Count(input.oriUri) +
-        data.Count(input.dfsUri) + data.Count(input.authUri) + data.CountBasic(input.permission);
+    CHECK_RECURSIVE_GUARD();
+    size_t size = data.CountHead();
+    bool isWithinMax = CheckAndAdd(size, data.CountBasic(input.position))
+        && CheckAndAdd(size, data.Count(input.oriUri)) && CheckAndAdd(size, data.Count(input.dfsUri))
+        && CheckAndAdd(size, data.Count(input.authUri)) && CheckAndAdd(size, data.CountBasic(input.permission));
+    return isWithinMax ? size : 0;
 }
 
 template <> bool Writing(const UriInfo &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -785,6 +858,7 @@ template <> bool Writing(const UriInfo &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(UriInfo &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (head.len > data.GetTotal() - data.GetCursor()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
         return false;
@@ -825,6 +899,7 @@ template <> bool Reading(UriInfo &output, TLVObject &data, const TLVHead &head)
 
 template <> size_t CountBufferSize(const std::shared_ptr<OHOS::Media::PixelMap> &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
     std::vector<std::uint8_t> val;
     PixelMapLoader loader;
     if (!loader.EncodeTlv(input, val)) {
@@ -836,6 +911,7 @@ template <> size_t CountBufferSize(const std::shared_ptr<OHOS::Media::PixelMap> 
 
 template <> bool Writing(const std::shared_ptr<OHOS::Media::PixelMap> &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     std::vector<std::uint8_t> val;
     PixelMapLoader loader;
@@ -848,6 +924,7 @@ template <> bool Writing(const std::shared_ptr<OHOS::Media::PixelMap> &input, TL
 
 template <> bool Reading(std::shared_ptr<OHOS::Media::PixelMap> &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     std::vector<std::uint8_t> val;
     if (!data.Read(val, head)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Reading u8 vector error.");
@@ -864,6 +941,7 @@ template <> bool Reading(std::shared_ptr<OHOS::Media::PixelMap> &output, TLVObje
 
 template <> size_t CountBufferSize(const std::shared_ptr<std::map<std::string, ValueType>> &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
     if (input == nullptr) {
         return data.CountHead();
     }
@@ -872,6 +950,7 @@ template <> size_t CountBufferSize(const std::shared_ptr<std::map<std::string, V
 
 template <> bool Writing(const std::shared_ptr<std::map<std::string, ValueType>> &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     if (input == nullptr) {
         return false;
     }
@@ -882,6 +961,7 @@ template <> bool Writing(const std::shared_ptr<std::map<std::string, ValueType>>
 template <> bool Reading(std::shared_ptr<std::map<std::string, ValueType>> &output,
     TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (output == nullptr) {
         output = std::make_shared<std::map<std::string, ValueType>>();
     }
@@ -890,6 +970,8 @@ template <> bool Reading(std::shared_ptr<std::map<std::string, ValueType>> &outp
 
 template <> size_t CountBufferSize(const std::shared_ptr<OHOS::AAFwk::Want> &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
+
     if (input == nullptr) {
         return 0;
     }
@@ -905,6 +987,7 @@ template <> size_t CountBufferSize(const std::shared_ptr<OHOS::AAFwk::Want> &inp
 
 template <> bool Writing(const std::shared_ptr<OHOS::AAFwk::Want> &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     if (input == nullptr) {
         return 0;
     }
@@ -929,6 +1012,7 @@ template <> bool Writing(const std::shared_ptr<OHOS::AAFwk::Want> &input, TLVObj
 
 template <> bool Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     std::vector<std::uint8_t> val;
     if (!data.Read(val, head)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Reading u8 vector error.");
@@ -963,13 +1047,19 @@ template <> bool Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &
 
 template <> size_t CountBufferSize(const Summary &input, TLVObject &data)
 {
-    return data.CountHead() + CountBufferSize(input.summary, data) + data.CountBasic(input.totalSize) +
-        CountBufferSize(input.specificSummary, data) + CountBufferSize(input.summaryFormat, data) +
-        data.CountBasic(input.version) + data.Count(input.tag);
+    CHECK_RECURSIVE_GUARD();
+    size_t size = data.CountHead();
+    bool isWithinMax = CheckAndAdd(size, CountBufferSize(input.summary, data))
+        && CheckAndAdd(size, CountBufferSize(input.totalSize, data))
+        && CheckAndAdd(size, CountBufferSize(input.specificSummary, data))
+        && CheckAndAdd(size, CountBufferSize(input.summaryFormat, data))
+        && CheckAndAdd(size, data.CountBasic(input.version)) && CheckAndAdd(size, data.Count(input.tag));
+    return isWithinMax ? size : 0;
 }
 
 template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -996,6 +1086,7 @@ template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
 
 template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (head.len > data.GetTotal() - data.GetCursor()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
         return false;
@@ -1046,12 +1137,18 @@ template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
 
 template <> size_t API_EXPORT CountBufferSize(const DataLoadInfo &input, TLVObject &data)
 {
-    return data.CountHead() + data.Count(input.sequenceKey) + CountBufferSize(input.types, data) +
-        data.CountBasic(input.recordCount) + data.Count(input.deviceId) + data.Count(input.udKey);
+    CHECK_RECURSIVE_GUARD();
+    auto size = data.CountHead();
+    bool isWithinMax = CheckAndAdd(size, data.Count(input.sequenceKey))
+        && CheckAndAdd(size, CountBufferSize(input.types, data))
+        && CheckAndAdd(size, data.CountBasic(input.recordCount))
+        && CheckAndAdd(size, CountBufferSize(input.deviceId, data)) && CheckAndAdd(size, data.Count(input.udKey));
+    return isWithinMax ? size : 0;
 }
 
 template <> bool API_EXPORT Writing(const DataLoadInfo &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -1075,6 +1172,7 @@ template <> bool API_EXPORT Writing(const DataLoadInfo &input, TLVObject &data, 
 
 template <> bool API_EXPORT Reading(DataLoadInfo &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (head.len > data.GetTotal() - data.GetCursor()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid length, would read out of bounds.");
         return false;

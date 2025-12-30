@@ -3212,6 +3212,66 @@ HWTEST_F(UdmfClientTest, SetData049, TestSize.Level1)
 }
 
 /**
+* @tc.name: SetData050
+* @tc.desc: Set Html entry include valid value and get uris data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData050, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData050 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    std::vector<std::string> htmlContents;
+
+    for (int i = 0; i < 100; i++) {
+        std::shared_ptr<Object> obj = std::make_shared<Object>();
+        obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+        obj->value_[FILE_URI_PARAM] = "http://demo.com/image" + std::to_string(i);
+        obj->value_[FILE_TYPE] = "image/png";
+
+        auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+
+        std::string currentHtml = "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/" +
+            std::to_string(100 + i) + ".png'>";
+        htmlContents.push_back(currentHtml);
+
+        auto htmlRecord = Html(currentHtml, "abstract");
+        htmlRecord.InitObject();
+
+        record->AddEntry(htmlRecord.GetUtdId(), htmlRecord.GetOriginValue());
+        data.AddRecord(record);
+    }
+
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+    for (int i = 0; i < 100; i++) {
+        std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(i);
+        ASSERT_NE(readRecord, nullptr);
+        auto entryValue = readRecord->GetEntry(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML));
+        auto object = std::get<std::shared_ptr<Object>>(entryValue);
+        ASSERT_NE(object, nullptr);
+        auto iter = object->value_.find(HTML_CONTENT);
+        ASSERT_TRUE(iter != object->value_.end());
+        EXPECT_TRUE(std::holds_alternative<std::string>(iter->second));
+        auto content = std::get<std::string>(iter->second);
+        EXPECT_EQ(content, htmlContents[i]);
+        auto uris = readRecord->GetUris();
+        EXPECT_EQ(uris.size(), 0);
+    }
+
+    LOG_INFO(UDMF_TEST, "SetData050 end.");
+}
+
+/**
 * @tc.name: GetSummary003
 * @tc.desc: Get summary data
 * @tc.type: FUNC
