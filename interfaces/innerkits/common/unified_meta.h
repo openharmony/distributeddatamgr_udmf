@@ -35,7 +35,6 @@ namespace UDMF {
 constexpr const char* UNIFORM_DATA_TYPE = "uniformDataType";
 constexpr const char* CONTENT = "textContent";
 constexpr const char* ABSTRACT = "abstract";
-constexpr const char* TEXT_ABSTRACT = "textAbstract";
 constexpr const char* URL = "url";
 constexpr const char* LINK_URI = "linkUri";
 constexpr const char* DESCRIPTION = "description";

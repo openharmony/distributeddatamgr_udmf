@@ -518,7 +518,7 @@ UDDetails ConvertUDSUDDetailsToUnion(
     udsObj->GetValue(CONTENT, textContent);
     std::string textAbstract;
     ::taihe::optional<::taihe::string> thOpAbstract;
-    if (udsObj->GetValue(ABSTRACT, textAbstract) || udsObj->GetValue(TEXT_ABSTRACT, textAbstract)) {
+    if (udsObj->GetValue(ABSTRACT, textAbstract)) {
         ::taihe::string thTextAbstract = ::taihe::string(std::move(textAbstract));
         thOpAbstract.emplace(std::move(thTextAbstract));
     }
@@ -546,7 +546,7 @@ std::shared_ptr<Object> ConvertPlainText(::taiheStruct::PlainText &text)
     obj->value_[UNIFORM_DATA_TYPE] = std::string(text.uniformDataType);
     obj->value_[CONTENT] = std::string(text.textContent);
     if (text.textAbstract.has_value()) {
-        obj->value_[TEXT_ABSTRACT] = std::string(text.textAbstract.value());
+        obj->value_[ABSTRACT] = std::string(text.textAbstract.value());
     }
     if (text.details.has_value()) {
         auto udDetails = ConvertUDDetails(text.details.value());
