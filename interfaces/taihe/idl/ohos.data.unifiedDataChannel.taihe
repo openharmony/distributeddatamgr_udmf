@@ -44,7 +44,6 @@ union ValueType {
   string: String;
   boolean: bool;
   ArrayBuffer: @arraybuffer Array<u8>;
-  recordData: RecordData;
   plainText: PlainText;
   hyperlink: Hyperlink;
   html: HTML;
@@ -53,6 +52,7 @@ union ValueType {
   form: Form;
   fileUri: FileUri;
   pixelMap: PixelMap;
+  recordData: RecordData;
   object: @sts_type("(image.PixelMap | Want | object)") Opaque;
 }
 
