@@ -332,7 +332,6 @@ UDDetails ConvertUDDetails(const ::taihe::map_view<::taihe::string, ::taihe::str
             taiheDetails.emplace(::taihe::string(item.first), std::get<std::string>(item.second));
         }
     }
-    LOG_INFO(UDMF_ANI, "taiheDetails size is %{public}zu", taiheDetails.size());
     return taiheDetails;
 }
 
@@ -516,16 +515,16 @@ UDDetails ConvertUDSUDDetailsToUnion(
     std::string uniformDataType;
     udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
     std::string textContent;
-    udsObj->GetValue("textContent", textContent);
+    udsObj->GetValue(CONTENT, textContent);
     std::string textAbstract;
     ::taihe::optional<::taihe::string> thOpAbstract;
-    if (udsObj->GetValue("abstract", textAbstract) || udsObj->GetValue("textAbstract", textAbstract)) {
+    if (udsObj->GetValue(ABSTRACT, textAbstract) || udsObj->GetValue(TEXT_ABSTRACT, textAbstract)) {
         ::taihe::string thTextAbstract = ::taihe::string(std::move(textAbstract));
         thOpAbstract.emplace(std::move(thTextAbstract));
     }
     std::shared_ptr<Object> detailsPtr;
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> thOpDetails;
-    if (udsObj->GetValue("details", detailsPtr)) {
+    if (udsObj->GetValue(DETAILS, detailsPtr)) {
         UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
         auto thDetails = ConvertUDDetailsToString(details);
         thOpDetails.emplace(std::move(thDetails));
@@ -544,14 +543,14 @@ UDDetails ConvertUDSUDDetailsToUnion(
 std::shared_ptr<Object> ConvertPlainText(::taiheStruct::PlainText &text)
 {
     std::shared_ptr<Object> obj = std::make_shared<Object>();
-    obj->value_["uniformDataType"] = std::string(text.uniformDataType);
-    obj->value_["textContent"] = std::string(text.textContent);
+    obj->value_[UNIFORM_DATA_TYPE] = std::string(text.uniformDataType);
+    obj->value_[CONTENT] = std::string(text.textContent);
     if (text.textAbstract.has_value()) {
-        obj->value_["textAbstract"] = std::string(text.textAbstract.value());
+        obj->value_[TEXT_ABSTRACT] = std::string(text.textAbstract.value());
     }
     if (text.details.has_value()) {
         auto udDetails = ConvertUDDetails(text.details.value());
-        obj->value_["details"] = ObjectUtils::ConvertToObject(udDetails);
+        obj->value_[DETAILS] = ObjectUtils::ConvertToObject(udDetails);
     }
     return obj;
 }
@@ -561,19 +560,19 @@ std::shared_ptr<Object> ConvertPlainText(::taiheStruct::PlainText &text)
     std::string uniformDataType;
     udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
     std::string url;
-    udsObj->GetValue("url", url);
+    udsObj->GetValue(URL, url);
     ::taihe::string thType = ::taihe::string(uniformDataType);
     ::taihe::string thUrl = ::taihe::string(url);
 
     ::taihe::optional<::taihe::string> thDescriptionOpt;
     std::string description;
-    if (udsObj->GetValue("description", description)) {
+    if (udsObj->GetValue(DESCRIPTION, description)) {
         ::taihe::string thDescription = ::taihe::string(std::move(description));
         thDescriptionOpt.emplace(std::move(thDescription));
     }
     std::shared_ptr<Object> detailsPtr;
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> thOpDetails;
-    if (udsObj->GetValue("details", detailsPtr)) {
+    if (udsObj->GetValue(DETAILS, detailsPtr)) {
         UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
         auto thDetails = ConvertUDDetailsToString(details);
         thOpDetails.emplace(std::move(thDetails));
@@ -590,14 +589,14 @@ std::shared_ptr<Object> ConvertPlainText(::taiheStruct::PlainText &text)
 std::shared_ptr<Object> ConvertHyperlink(::taiheStruct::Hyperlink &link)
 {
     std::shared_ptr<Object> obj = std::make_shared<Object>();
-    obj->value_["uniformDataType"] = std::string(link.uniformDataType);
-    obj->value_["url"] = std::string(link.url);
+    obj->value_[UNIFORM_DATA_TYPE] = std::string(link.uniformDataType);
+    obj->value_[URL] = std::string(link.url);
     if (link.description.has_value()) {
-        obj->value_["description"] = std::string(link.description.value());
+        obj->value_[DESCRIPTION] = std::string(link.description.value());
     }
     if (link.details.has_value()) {
         auto udDetails = ConvertUDDetails(link.details.value());
-        obj->value_["details"] = ObjectUtils::ConvertToObject(udDetails);
+        obj->value_[DETAILS] = ObjectUtils::ConvertToObject(udDetails);
     }
     return obj;
 }
@@ -607,19 +606,19 @@ std::shared_ptr<Object> ConvertHyperlink(::taiheStruct::Hyperlink &link)
     std::string uniformDataType;
     udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
     std::string htmlContent;
-    udsObj->GetValue("htmlContent", htmlContent);
+    udsObj->GetValue(HTML_CONTENT, htmlContent);
     ::taihe::string thType = ::taihe::string(uniformDataType);
     ::taihe::string thHtmlContent = ::taihe::string(htmlContent);
 
     ::taihe::optional<::taihe::string> thPlainContentOpt;
     std::string plainContent;
-    if (udsObj->GetValue("plainContent", plainContent)) {
+    if (udsObj->GetValue(PLAIN_CONTENT, plainContent)) {
         ::taihe::string thPlainContent = ::taihe::string(std::move(plainContent));
         thPlainContentOpt.emplace(std::move(thPlainContent));
     }
     std::shared_ptr<Object> detailsPtr;
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> thOpDetails;
-    if (udsObj->GetValue("details", detailsPtr)) {
+    if (udsObj->GetValue(DETAILS, detailsPtr)) {
         UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
         auto thDetails = ConvertUDDetailsToString(details);
         thOpDetails.emplace(std::move(thDetails));
@@ -636,14 +635,14 @@ std::shared_ptr<Object> ConvertHyperlink(::taiheStruct::Hyperlink &link)
 std::shared_ptr<Object> ConvertHTML(::taiheStruct::HTML &html)
 {
     std::shared_ptr<Object> obj = std::make_shared<Object>();
-    obj->value_["uniformDataType"] = std::string(html.uniformDataType);
-    obj->value_["htmlContent"] = std::string(html.htmlContent);
+    obj->value_[UNIFORM_DATA_TYPE] = std::string(html.uniformDataType);
+    obj->value_[HTML_CONTENT] = std::string(html.htmlContent);
     if (html.plainContent.has_value()) {
-        obj->value_["plainContent"] = std::string(html.plainContent.value());
+        obj->value_[PLAIN_CONTENT] = std::string(html.plainContent.value());
     }
     if (html.details.has_value()) {
         auto udDetails = ConvertUDDetails(html.details.value());
-        obj->value_["details"] = ObjectUtils::ConvertToObject(udDetails);
+        obj->value_[DETAILS] = ObjectUtils::ConvertToObject(udDetails);
     }
     return obj;
 }
@@ -653,17 +652,17 @@ std::shared_ptr<Object> ConvertHTML(::taiheStruct::HTML &html)
     std::string uniformDataType;
     udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
     std::string appId;
-    udsObj->GetValue("appId", appId);
+    udsObj->GetValue(APP_ID, appId);
     std::string appName;
-    udsObj->GetValue("appName", appName);
+    udsObj->GetValue(APP_NAME, appName);
     std::string appIconId;
-    udsObj->GetValue("appIconId", appIconId);
+    udsObj->GetValue(APP_ICON_ID, appIconId);
     std::string appLabelId;
-    udsObj->GetValue("appLabelId", appLabelId);
+    udsObj->GetValue(APP_LABEL_ID, appLabelId);
     std::string bundleName;
-    udsObj->GetValue("bundleName", bundleName);
+    udsObj->GetValue(BUNDLE_NAME, bundleName);
     std::string abilityName;
-    udsObj->GetValue("abilityName", abilityName);
+    udsObj->GetValue(ABILITY_NAME, abilityName);
     ::taihe::string thType = ::taihe::string(uniformDataType);
     ::taihe::string thAppId = ::taihe::string(appId);
     ::taihe::string thAppName = ::taihe::string(appName);
@@ -673,7 +672,7 @@ std::shared_ptr<Object> ConvertHTML(::taiheStruct::HTML &html)
     ::taihe::string thAbilityName = ::taihe::string(abilityName);
     std::shared_ptr<Object> detailsPtr;
     ::taihe::optional<::taihe::map<::taihe::string, ::taiheStruct::DetailsValue>> thOpDetails;
-    if (udsObj->GetValue("details", detailsPtr)) {
+    if (udsObj->GetValue(DETAILS, detailsPtr)) {
         UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
         auto thDetails = ConvertUDSUDDetailsToUnion(details);
         thOpDetails.emplace(std::move(thDetails));
@@ -695,16 +694,16 @@ std::shared_ptr<Object> ConvertHTML(::taiheStruct::HTML &html)
 std::shared_ptr<Object> ConvertAppItem(::taiheStruct::OpenHarmonyAppItem &item)
 {
     std::shared_ptr<Object> obj = std::make_shared<Object>();
-    obj->value_["uniformDataType"] = std::string(item.uniformDataType);
-    obj->value_["appId"] = std::string(item.appId);
-    obj->value_["appName"] = std::string(item.appName);
-    obj->value_["appIconId"] = std::string(item.appIconId);
-    obj->value_["appLabelId"] = std::string(item.appLabelId);
-    obj->value_["bundleName"] = std::string(item.bundleName);
-    obj->value_["abilityName"] = std::string(item.abilityName);
+    obj->value_[UNIFORM_DATA_TYPE] = std::string(item.uniformDataType);
+    obj->value_[APP_ID] = std::string(item.appId);
+    obj->value_[APP_NAME] = std::string(item.appName);
+    obj->value_[APP_ICON_ID] = std::string(item.appIconId);
+    obj->value_[APP_LABEL_ID] = std::string(item.appLabelId);
+    obj->value_[BUNDLE_NAME] = std::string(item.bundleName);
+    obj->value_[ABILITY_NAME] = std::string(item.abilityName);
     if (item.details.has_value()) {
         auto udDetails = ConvertUDSUDDetailsToUnion(item.details.value());
-        obj->value_["details"] = ObjectUtils::ConvertToObject(udDetails);
+        obj->value_[DETAILS] = ObjectUtils::ConvertToObject(udDetails);
     }
     return obj;
 }
@@ -714,36 +713,36 @@ std::shared_ptr<Object> ConvertAppItem(::taiheStruct::OpenHarmonyAppItem &item)
     std::string uniformDataType;
     udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
     std::string title;
-    udsObj->GetValue("title", title);
+    udsObj->GetValue(TITLE, title);
     ::taihe::string thType = ::taihe::string(uniformDataType);
     ::taihe::string thTitle = ::taihe::string(title);
     std::vector<uint8_t> thumbData;
     ::taihe::optional<::taihe::array<uint8_t>> thThumbDataOpt;
-    if (udsObj->GetValue("thumbData", thumbData)) {
+    if (udsObj->GetValue(THUMB_DATA, thumbData)) {
         ::taihe::array<uint8_t> thThumbData = ::taihe::array<uint8_t>(thumbData);
         thThumbDataOpt.emplace(thThumbData);
     }
     ::taihe::optional<::taihe::string> thDescriptionOpt;
     std::string description;
-    if (udsObj->GetValue("description", description)) {
+    if (udsObj->GetValue(DESCRIPTION, description)) {
         ::taihe::string thDescription = ::taihe::string(std::move(description));
         thDescriptionOpt.emplace(std::move(thDescription));
     }
     std::vector<uint8_t> appIcon;
     ::taihe::optional<::taihe::array<uint8_t>> thAppIconOpt;
-    if (udsObj->GetValue("appIcon", appIcon)) {
+    if (udsObj->GetValue(APP_ICON, appIcon)) {
         ::taihe::array<uint8_t> thAppIcon = ::taihe::array<uint8_t>(appIcon);
         thAppIconOpt.emplace(thAppIcon);
     }
     ::taihe::optional<::taihe::string> thAppNameOpt;
     std::string appName;
-    if (udsObj->GetValue("appName", appName)) {
+    if (udsObj->GetValue(APP_NAME, appName)) {
         ::taihe::string thAppName = ::taihe::string(std::move(appName));
         thAppNameOpt.emplace(std::move(thAppName));
     }
     ::taihe::optional<::taihe::string> thLinkUriOpt;
     std::string linkUri;
-    if (udsObj->GetValue("linkUri", linkUri)) {
+    if (udsObj->GetValue(LINK_URI, linkUri)) {
         ::taihe::string thLinkUri = ::taihe::string(std::move(linkUri));
         thLinkUriOpt.emplace(std::move(thLinkUri));
     }
@@ -762,26 +761,26 @@ std::shared_ptr<Object> ConvertAppItem(::taiheStruct::OpenHarmonyAppItem &item)
 std::shared_ptr<Object> ConvertContentForm(::taiheStruct::ContentForm &form)
 {
     std::shared_ptr<Object> obj = std::make_shared<Object>();
-    obj->value_["uniformDataType"] = std::string(form.uniformDataType);
+    obj->value_[UNIFORM_DATA_TYPE] = std::string(form.uniformDataType);
     if (form.thumbData.has_value()) {
         ::taihe::array<uint8_t> thThumbData = form.thumbData.value();
         std::vector<uint8_t> valueVec(thThumbData.begin(), thThumbData.end());
-        obj->value_["thumbData"] = std::move(valueVec);
+        obj->value_[THUMB_DATA] = std::move(valueVec);
     }
     if (form.description.has_value()) {
-        obj->value_["description"] = std::string(form.description.value());
+        obj->value_[DESCRIPTION] = std::string(form.description.value());
     }
-    obj->value_["title"] = std::string(form.title);
+    obj->value_[TITLE] = std::string(form.title);
     if (form.appIcon.has_value()) {
         ::taihe::array<uint8_t> thAppIcon = form.appIcon.value();
         std::vector<uint8_t> valueVec(thAppIcon.begin(), thAppIcon.end());
-        obj->value_["appIcon"] = std::move(valueVec);
+        obj->value_[APP_ICON] = std::move(valueVec);
     }
     if (form.appName.has_value()) {
-        obj->value_["appName"] = std::string(form.appName.value());
+        obj->value_[APP_NAME] = std::string(form.appName.value());
     }
     if (form.linkUri.has_value()) {
-        obj->value_["linkUri"] = std::string(form.linkUri.value());
+        obj->value_[LINK_URI] = std::string(form.linkUri.value());
     }
     return obj;
 }
@@ -791,15 +790,15 @@ std::shared_ptr<Object> ConvertContentForm(::taiheStruct::ContentForm &form)
     std::string uniformDataType;
     udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
     int32_t formId;
-    udsObj->GetValue("formId", formId);
+    udsObj->GetValue(FORMID, formId);
     std::string formName;
-    udsObj->GetValue("formName", formName);
+    udsObj->GetValue(FORMNAME, formName);
     std::string bundleName;
-    udsObj->GetValue("bundleName", bundleName);
+    udsObj->GetValue(BUNDLE_NAME, bundleName);
     std::string abilityName;
-    udsObj->GetValue("abilityName", abilityName);
+    udsObj->GetValue(ABILITY_NAME, abilityName);
     std::string module;
-    udsObj->GetValue("module", module);
+    udsObj->GetValue(MODULE, module);
     ::taihe::string thType = ::taihe::string(uniformDataType);
     ::taihe::string thFormName = ::taihe::string(formName);
     ::taihe::string thBundleName = ::taihe::string(bundleName);
@@ -807,7 +806,7 @@ std::shared_ptr<Object> ConvertContentForm(::taiheStruct::ContentForm &form)
     ::taihe::string thModule = ::taihe::string(module);
     std::shared_ptr<Object> detailsPtr;
     ::taihe::optional<::taihe::map<::taihe::string, ::taiheStruct::DetailsValue>> thOpDetails;
-    if (udsObj->GetValue("details", detailsPtr)) {
+    if (udsObj->GetValue(DETAILS, detailsPtr)) {
         UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
         auto thDetails = ConvertUDSUDDetailsToUnion(details);
         thOpDetails.emplace(std::move(thDetails));
@@ -827,15 +826,15 @@ std::shared_ptr<Object> ConvertContentForm(::taiheStruct::ContentForm &form)
 std::shared_ptr<Object> ConvertForm(::taiheStruct::Form &form)
 {
     std::shared_ptr<Object> obj = std::make_shared<Object>();
-    obj->value_["uniformDataType"] = std::string(form.uniformDataType);
-    obj->value_["formId"] = form.formId;
-    obj->value_["formName"] = std::string(form.formName);
-    obj->value_["bundleName"] = std::string(form.bundleName);
-    obj->value_["abilityName"] = std::string(form.abilityName);
-    obj->value_["module"] = std::string(form.module);
+    obj->value_[UNIFORM_DATA_TYPE] = std::string(form.uniformDataType);
+    obj->value_[FORMID] = form.formId;
+    obj->value_[FORMNAME] = std::string(form.formName);
+    obj->value_[BUNDLE_NAME] = std::string(form.bundleName);
+    obj->value_[ABILITY_NAME] = std::string(form.abilityName);
+    obj->value_[MODULE] = std::string(form.module);
     if (form.details.has_value()) {
         auto udDetails = ConvertUDSUDDetailsToUnion(form.details.value());
-        obj->value_["details"] = ObjectUtils::ConvertToObject(udDetails);
+        obj->value_[DETAILS] = ObjectUtils::ConvertToObject(udDetails);
     }
     return obj;
 }
@@ -845,15 +844,15 @@ std::shared_ptr<Object> ConvertForm(::taiheStruct::Form &form)
     std::string uniformDataType;
     udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
     std::string oriUri;
-    udsObj->GetValue("oriUri", oriUri);
+    udsObj->GetValue(ORI_URI, oriUri);
     std::string fileType;
-    udsObj->GetValue("fileType", fileType);
+    udsObj->GetValue(FILE_TYPE, fileType);
     ::taihe::string thType = ::taihe::string(uniformDataType);
     ::taihe::string thOriUri = ::taihe::string(oriUri);
     ::taihe::string thFileType = ::taihe::string(fileType);
     std::shared_ptr<Object> detailsPtr;
     ::taihe::optional<::taihe::map<::taihe::string, ::taiheStruct::DetailsValue>> thOpDetails;
-    if (udsObj->GetValue("details", detailsPtr)) {
+    if (udsObj->GetValue(DETAILS, detailsPtr)) {
         UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
         auto thDetails = ConvertUDSUDDetailsToUnion(details);
         thOpDetails.emplace(std::move(thDetails));
@@ -870,12 +869,12 @@ std::shared_ptr<Object> ConvertForm(::taiheStruct::Form &form)
 std::shared_ptr<Object> ConvertFileUri(::taiheStruct::FileUri &file)
 {
     std::shared_ptr<Object> obj = std::make_shared<Object>();
-    obj->value_["uniformDataType"] = std::string(file.uniformDataType);
-    obj->value_["oriUri"] = std::string(file.oriUri);
-    obj->value_["fileType"] = std::string(file.fileType);
+    obj->value_[UNIFORM_DATA_TYPE] = std::string(file.uniformDataType);
+    obj->value_[ORI_URI] = std::string(file.oriUri);
+    obj->value_[FILE_TYPE] = std::string(file.fileType);
     if (file.details.has_value()) {
         auto udDetails = ConvertUDSUDDetailsToUnion(file.details.value());
-        obj->value_["details"] = ObjectUtils::ConvertToObject(udDetails);
+        obj->value_[DETAILS] = ObjectUtils::ConvertToObject(udDetails);
     }
     return obj;
 }
@@ -885,7 +884,7 @@ std::shared_ptr<Object> ConvertFileUri(::taiheStruct::FileUri &file)
     std::string uniformDataType;
     udsObj->GetValue(UNIFORM_DATA_TYPE, uniformDataType);
     std::shared_ptr<OHOS::Media::PixelMap> pixelMapObj;
-    udsObj->GetValue("pixelMap", pixelMapObj);
+    udsObj->GetValue(PIXEL_MAP, pixelMapObj);
     ani_object aniPixel =
         OHOS::Media::PixelMapTaiheAni::CreateEtsPixelMap(taihe::get_env(), pixelMapObj);
     ::taihe::string thType = ::taihe::string(uniformDataType);
@@ -895,7 +894,7 @@ std::shared_ptr<Object> ConvertFileUri(::taiheStruct::FileUri &file)
 
     std::shared_ptr<Object> detailsPtr;
     ::taihe::optional<::taihe::map<::taihe::string, ::taiheStruct::DetailsValue>> thOpDetails;
-    if (udsObj->GetValue("details", detailsPtr)) {
+    if (udsObj->GetValue(DETAILS, detailsPtr)) {
         UDDetails details = ObjectUtils::ConvertToUDDetails(detailsPtr);
         auto thDetails = ConvertUDSUDDetailsToUnion(details);
         thOpDetails.emplace(std::move(thDetails));
@@ -911,13 +910,13 @@ std::shared_ptr<Object> ConvertFileUri(::taiheStruct::FileUri &file)
 std::shared_ptr<Object> ConvertPixelMap(::taiheStruct::PixelMap &pixel)
 {
     std::shared_ptr<Object> obj = std::make_shared<Object>();
-    obj->value_["uniformDataType"] = std::string(pixel.uniformDataType);
+    obj->value_[UNIFORM_DATA_TYPE] = std::string(pixel.uniformDataType);
     if (pixel.details.has_value()) {
         auto udDetails = ConvertUDSUDDetailsToUnion(pixel.details.value());
-        obj->value_["details"] = ObjectUtils::ConvertToObject(udDetails);
+        obj->value_[DETAILS] = ObjectUtils::ConvertToObject(udDetails);
     }
     auto pixelMapVal = reinterpret_cast<ani_object>(pixel.pixelMap);
-    obj->value_["pixelMap"] = OHOS::Media::PixelMapTaiheAni::GetNativePixelMap(taihe::get_env(), pixelMapVal);
+    obj->value_[PIXEL_MAP] = OHOS::Media::PixelMapTaiheAni::GetNativePixelMap(taihe::get_env(), pixelMapVal);
     return obj;
 }
 
