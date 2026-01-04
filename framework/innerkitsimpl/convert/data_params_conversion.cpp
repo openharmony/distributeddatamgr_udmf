@@ -20,10 +20,13 @@
 #include "udmf_utils.h"
 
 namespace OHOS::UDMF {
+static constexpr size_t MAX_TYPE_COUNT = 1000;
+
 Status DataParamsConversion::GetInnerDataParams(OH_UdmfGetDataParams &ndkDataParams, QueryOption &query,
     GetDataParams &dataParams)
 {
-    if (ndkDataParams.dataProgressListener == nullptr || query.key.size() == 0) {
+    if (ndkDataParams.dataProgressListener == nullptr || query.key.size() == 0 ||
+        ndkDataParams.acceptableInfo.typesCount > MAX_TYPE_COUNT) {
         return Status::E_INVALID_PARAMETERS;
     }
     dataParams.query = query;

@@ -24,6 +24,7 @@ namespace OHOS {
 namespace UDMF {
 static constexpr int32_t PROGRESS_INIT = 0;
 static constexpr int32_t PROGRESS_ALL_FINISHED = 100;
+static constexpr size_t MAX_TYPE_COUNT = 1000;
 ConcurrentMap<std::string, napi_threadsafe_function> GetDataParamsNapi::tsfns;
 
 bool GetDataParamsNapi::Convert2NativeValue(napi_env env, napi_value in,
@@ -71,6 +72,10 @@ bool GetDataParamsNapi::Convert2NativeValue(napi_env env, napi_value in,
         napi_value jsDataLoadInfo = nullptr;
         NAPI_CALL_BASE(env, napi_get_named_property(env, in, "acceptableInfo", &jsDataLoadInfo), false);
         NAPI_CALL_BASE(env, NapiDataUtils::GetValue(env, jsDataLoadInfo, getDataParams.acceptableInfo), false);
+        if (getDataParams.acceptableInfo.types.size() > MAX_TYPE_COUNT) {
+            LOG_ERROR(UDMF_KITS_NAPI, "types count exceeds max limit");
+            return false;
+        }
     }
     return true;
 }
