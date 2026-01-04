@@ -26,6 +26,7 @@
 #include "unified_data_properties.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
+namespace taiheStruct = ohos::data::uniformDataStruct;
 
 namespace OHOS {
 namespace UDMF {
@@ -42,10 +43,12 @@ UDDetails ConvertUDDetails(const ::taihe::map_view<::taihe::string, ::taihe::str
 ::taihe::map<::taihe::string, ::taihe::string> ConvertUDDetailsToString(const UDDetails &details);
 ::taihe::map<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> ConvertUDDetailsToUnion(
     const UDDetails &details);
-::taihe::map<::taihe::string, ::ohos::data::uniformDataStruct::DetailsValue> ConvertUDSUDDetailsToUnion(
+::taihe::map<::taihe::string, ::taiheStruct::DetailsValue> ConvertUDSUDDetailsToUnion(
     const UDDetails &details);
 UDDetails ConvertUDDetailsToUnion(
     const ::taihe::map_view<::taihe::string, ::ohos::data::unifiedDataChannel::DetailsValue> &details);
+UDDetails ConvertUDSUDDetailsToUnion(
+    const ::taihe::map<::taihe::string, ::taiheStruct::DetailsValue> &details);
 ShareOptions ConvertShareOptions(::ohos::data::unifiedDataChannel::ShareOptions value);
 Visibility ConvertVisibility(::ohos::data::unifiedDataChannel::Visibility value);
 ::taihe::array<::taihe::string> ConvertStringVectorToTaiheArray(const std::vector<std::string>& stringVector);
@@ -53,13 +56,21 @@ Visibility ConvertVisibility(::ohos::data::unifiedDataChannel::Visibility value)
 ValueType ConvertRecordData(ani_env *env, ::ohos::data::unifiedDataChannel::RecordData const& value, int depth);
 ::ohos::data::unifiedDataChannel::RecordData ConvertRecordData(std::shared_ptr<Object> object, int depth);
 ::ohos::data::unifiedDataChannel::ValueType ConvertPlainText(std::shared_ptr<Object> udsObj);
+std::shared_ptr<Object> ConvertPlainText(::taiheStruct::PlainText &text);
 ::ohos::data::unifiedDataChannel::ValueType ConvertHyperlink(std::shared_ptr<Object> udsObj);
+std::shared_ptr<Object> ConvertHyperlink(::taiheStruct::Hyperlink &link);
 ::ohos::data::unifiedDataChannel::ValueType ConvertHTML(std::shared_ptr<Object> udsObj);
+std::shared_ptr<Object> ConvertHTML(::taiheStruct::HTML &html);
 ::ohos::data::unifiedDataChannel::ValueType ConvertOpenHarmonyAppItem(std::shared_ptr<Object> udsObj);
+std::shared_ptr<Object> ConvertAppItem(::taiheStruct::OpenHarmonyAppItem &item);
 ::ohos::data::unifiedDataChannel::ValueType ConvertContentForm(std::shared_ptr<Object> udsObj);
+std::shared_ptr<Object> ConvertContentForm(::taiheStruct::ContentForm &form);
 ::ohos::data::unifiedDataChannel::ValueType ConvertForm(std::shared_ptr<Object> udsObj);
+std::shared_ptr<Object> ConvertForm(::taiheStruct::Form &form);
 ::ohos::data::unifiedDataChannel::ValueType ConvertFileUri(std::shared_ptr<Object> udsObj);
+std::shared_ptr<Object> ConvertFileUri(::taiheStruct::FileUri &file);
 ::ohos::data::unifiedDataChannel::ValueType ConvertPixelMap(std::shared_ptr<Object> udsObj);
+std::shared_ptr<Object> ConvertPixelMap(::taiheStruct::PixelMap &pixel);
 OHOS::UDMF::UnifiedDataProperties ConvertUnifiedDataProperties(::taiheChannel::UnifiedDataProperties &value);
 ::taiheChannel::UnifiedDataProperties ConvertUnifiedDataProperties(OHOS::UDMF::UnifiedDataProperties &value);
 
