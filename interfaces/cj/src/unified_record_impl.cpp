@@ -41,6 +41,7 @@
 #include "system_defined_pixelmap.h"
 #include "utils.h"
 #include "video.h"
+#include "udmf_log.h"
 
 using namespace OHOS::FFI;
 using namespace OHOS::UDMF;
@@ -159,6 +160,10 @@ CUnifiedRecord::CUnifiedRecord()
 
 CUnifiedRecord::CUnifiedRecord(const char *type)
 {
+    if (!type) {
+        LOGE("CUnifiedRecord failed, type is null.");
+        return;
+    }
     UDType utdType = APPLICATION_DEFINED_RECORD;
     if (UtdUtils::IsValidUtdId(type)) {
         utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(type));
@@ -194,6 +199,10 @@ CUnifiedRecord::CUnifiedRecord(const char *type)
 
 CUnifiedRecord::CUnifiedRecord(const char *type, CJValueType cjvalue)
 {
+    if (!type) {
+        LOGE("CUnifiedRecord failed, type is null.");
+        return;
+    }
     UDType utdType = APPLICATION_DEFINED_RECORD;
     if (UtdUtils::IsValidUtdId(type)) {
         utdType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(type));
@@ -251,21 +260,37 @@ const std::shared_ptr<UDMF::UnifiedRecord> &CUnifiedRecord::GetUnifiedRecord() c
 
 char *CUnifiedRecord::GetFileUri()
 {
-    std::shared_ptr<UDMF::File> resFile = std::reinterpret_pointer_cast<UDMF::File>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::File> resFile = std::static_pointer_cast<UDMF::File>(this->unifiedRecord_);
+    if (!resFile) {
+        LOGE("GetFileUri failed, resFile is null.");
+        return nullptr;
+    }
     std::string res = resFile->GetUri();
     return Utils::MallocCString(res);
 }
 
 void CUnifiedRecord::SetFileUri(const char *uri)
 {
-    std::shared_ptr<UDMF::File> resFile = std::reinterpret_pointer_cast<UDMF::File>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::File> resFile = std::static_pointer_cast<UDMF::File>(this->unifiedRecord_);
+    if (!resFile) {
+        LOGE("SetFileUri failed, resFile is null.");
+        return;
+    }
+    if (!uri) {
+        LOGE("SetFileUri failed, uri is null.");
+        return;
+    }
     resFile->SetUri(uri);
 }
 
 CRecord CUnifiedRecord::GetFileDetails()
 {
     CRecord ret = { .keys = { .head = nullptr, .size = 0 }, .values = { .head = nullptr, .size = 0 } };
-    std::shared_ptr<UDMF::File> resFile = std::reinterpret_pointer_cast<UDMF::File>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::File> resFile = std::static_pointer_cast<UDMF::File>(this->unifiedRecord_);
+    if (!resFile) {
+        LOGE("GetFileDetails failed, resFile is null.");
+        return ret;
+    }
     OHOS::UDMF::UDDetails resDetails = resFile->GetDetails();
     std::map<std::string, std::string> params;
     for (auto it : resDetails) {
@@ -298,7 +323,11 @@ CRecord CUnifiedRecord::GetFileDetails()
 
 void CUnifiedRecord::SetFileDetails(const std::map<std::string, std::string> &details)
 {
-    std::shared_ptr<UDMF::File> resFile = std::reinterpret_pointer_cast<UDMF::File>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::File> resFile = std::static_pointer_cast<UDMF::File>(this->unifiedRecord_);
+    if (!resFile) {
+        LOGE("SetFileDetails failed, resFile is null.");
+        return;
+    }
     OHOS::UDMF::UDDetails udDetails;
     for (auto &param : details) {
         udDetails[param.first] = param.second;
@@ -308,34 +337,62 @@ void CUnifiedRecord::SetFileDetails(const std::map<std::string, std::string> &de
 
 char *CUnifiedRecord::GetImageUri()
 {
-    std::shared_ptr<UDMF::Image> resImage = std::reinterpret_pointer_cast<UDMF::Image>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::Image> resImage = std::static_pointer_cast<UDMF::Image>(this->unifiedRecord_);
+    if (!resImage) {
+        LOGE("GetImageUri failed, resImage is null.");
+        return nullptr;
+    }
     std::string res = resImage->GetUri();
     return Utils::MallocCString(res);
 }
 
 void CUnifiedRecord::SetImageUri(const char *uri)
 {
-    std::shared_ptr<UDMF::Image> resImage = std::reinterpret_pointer_cast<UDMF::Image>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::Image> resImage = std::static_pointer_cast<UDMF::Image>(this->unifiedRecord_);
+    if (!resImage) {
+        LOGE("SetImageUri failed, resImage is null.");
+        return;
+    }
+    if (!uri) {
+        LOGE("SetImageUri failed, uri is null.");
+        return;
+    }
     resImage->SetUri(uri);
 }
 
 char *CUnifiedRecord::GetVideoUri()
 {
-    std::shared_ptr<UDMF::Video> resVideo = std::reinterpret_pointer_cast<UDMF::Video>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::Video> resVideo = std::static_pointer_cast<UDMF::Video>(this->unifiedRecord_);
+    if (!resVideo) {
+        LOGE("GetVideoUri failed, resVideo is null.");
+        return nullptr;
+    }
     std::string res = resVideo->GetUri();
     return Utils::MallocCString(res);
 }
 
 void CUnifiedRecord::SetVideoUri(const char *uri)
 {
-    std::shared_ptr<UDMF::Video> resVideo = std::reinterpret_pointer_cast<UDMF::Video>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::Video> resVideo = std::static_pointer_cast<UDMF::Video>(this->unifiedRecord_);
+    if (!resVideo) {
+        LOGE("SetVideoUri failed, resVideo is null.");
+        return;
+    }
+    if (!uri) {
+        LOGE("SetVideoUri failed, uri is null.");
+        return;
+    }
     resVideo->SetUri(uri);
 }
 
 CRecord CUnifiedRecord::GetTextDetails()
 {
     CRecord ret = { .keys = { .head = nullptr, .size = 0 }, .values = { .head = nullptr, .size = 0 } };
-    std::shared_ptr<UDMF::Text> resText = std::reinterpret_pointer_cast<UDMF::Text>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::Text> resText = std::static_pointer_cast<UDMF::Text>(this->unifiedRecord_);
+    if (!resText) {
+        LOGE("GetTextDetails failed, resText is null.");
+        return ret;
+    }
     OHOS::UDMF::UDDetails resDetails = resText->GetDetails();
     std::map<std::string, std::string> params;
     for (auto it : resDetails) {
@@ -368,7 +425,11 @@ CRecord CUnifiedRecord::GetTextDetails()
 
 void CUnifiedRecord::SetTextDetails(const std::map<std::string, std::string> &details)
 {
-    std::shared_ptr<UDMF::Text> resText = std::reinterpret_pointer_cast<UDMF::Text>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::Text> resText = std::static_pointer_cast<UDMF::Text>(this->unifiedRecord_);
+    if (!resText) {
+        LOGE("SetTextDetails failed, resText is null.");
+        return;
+    }
     OHOS::UDMF::UDDetails udDetails;
     for (auto &param : details) {
         udDetails[param.first] = param.second;
@@ -378,53 +439,101 @@ void CUnifiedRecord::SetTextDetails(const std::map<std::string, std::string> &de
 
 char *CUnifiedRecord::GetHyperLinkUrl()
 {
-    std::shared_ptr<UDMF::Link> resLink = std::reinterpret_pointer_cast<UDMF::Link>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::Link> resLink = std::static_pointer_cast<UDMF::Link>(this->unifiedRecord_);
+    if (!resLink) {
+        LOGE("GetHyperLinkUrl failed, resLink is null.");
+        return nullptr;
+    }
     std::string res = resLink->GetUrl();
     return Utils::MallocCString(res);
 }
 
 void CUnifiedRecord::SetHyperLinkUrl(const char *url)
 {
-    std::shared_ptr<UDMF::Link> resLink = std::reinterpret_pointer_cast<UDMF::Link>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::Link> resLink = std::static_pointer_cast<UDMF::Link>(this->unifiedRecord_);
+    if (!resLink) {
+        LOGE("SetHyperLinkUrl failed, resLink is null.");
+        return;
+    }
+    if (!url) {
+        LOGE("SetHyperLinkUrl failed, url is null.");
+        return;
+    }
     resLink->SetUrl(url);
 }
 
 char *CUnifiedRecord::GetHyperLinkDescription()
 {
-    std::shared_ptr<UDMF::Link> resLink = std::reinterpret_pointer_cast<UDMF::Link>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::Link> resLink = std::static_pointer_cast<UDMF::Link>(this->unifiedRecord_);
+    if (!resLink) {
+        LOGE("GetHyperLinkDescription failed, resLink is null.");
+        return nullptr;
+    }
     std::string res = resLink->GetDescription();
     return Utils::MallocCString(res);
 }
 
 void CUnifiedRecord::SetHyperLinkDescription(const char *description)
 {
-    std::shared_ptr<UDMF::Link> resLink = std::reinterpret_pointer_cast<UDMF::Link>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::Link> resLink = std::static_pointer_cast<UDMF::Link>(this->unifiedRecord_);
+    if (!resLink) {
+        LOGE("SetHyperLinkDescription failed, resLink is null.");
+        return;
+    }
+    if (!description) {
+        LOGE("SetHyperLinkDescription failed, description is null.");
+        return;
+    }
     resLink->SetDescription(description);
 }
 
 char *CUnifiedRecord::GetPlainTextContent()
 {
-    std::shared_ptr<UDMF::PlainText> resText = std::reinterpret_pointer_cast<UDMF::PlainText>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::PlainText> resText = std::static_pointer_cast<UDMF::PlainText>(this->unifiedRecord_);
+    if (!resText) {
+        LOGE("GetPlainTextContent failed, resText is null.");
+        return nullptr;
+    }
     std::string res = resText->GetContent();
     return Utils::MallocCString(res);
 }
 
 void CUnifiedRecord::SetPlainTextContent(const char *text)
 {
-    std::shared_ptr<UDMF::PlainText> resText = std::reinterpret_pointer_cast<UDMF::PlainText>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::PlainText> resText = std::static_pointer_cast<UDMF::PlainText>(this->unifiedRecord_);
+    if (!resText) {
+        LOGE("SetPlainTextContent failed, resText is null.");
+        return;
+    }
+    if (!text) {
+        LOGE("SetPlainTextContent failed, text is null.");
+        return;
+    }
     resText->SetContent(text);
 }
 
 char *CUnifiedRecord::GetPlainTextAbstract()
 {
-    std::shared_ptr<UDMF::PlainText> resText = std::reinterpret_pointer_cast<UDMF::PlainText>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::PlainText> resText = std::static_pointer_cast<UDMF::PlainText>(this->unifiedRecord_);
+    if (!resText) {
+        LOGE("GetPlainTextAbstract failed, resText is null.");
+        return nullptr;
+    }
     std::string res = resText->GetAbstract();
     return Utils::MallocCString(res);
 }
 
 void CUnifiedRecord::SetPlainTextAbstract(const char *abstr)
 {
-    std::shared_ptr<UDMF::PlainText> resText = std::reinterpret_pointer_cast<UDMF::PlainText>(this->unifiedRecord_);
+    std::shared_ptr<UDMF::PlainText> resText = std::static_pointer_cast<UDMF::PlainText>(this->unifiedRecord_);
+    if (!resText) {
+        LOGE("SetPlainTextAbstract failed, resText is null.");
+        return;
+    }
+    if (!abstr) {
+        LOGE("SetPlainTextAbstract failed, abstr is null.");
+        return;
+    }
     resText->SetAbstract(abstr);
 }
 
