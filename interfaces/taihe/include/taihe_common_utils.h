@@ -34,6 +34,10 @@ static constexpr int PARAMETERSERROR = 401;
 static const std::string NEW_INSTANCE_LIB = "libudmf_data_napi.z.so";
 static constexpr int NOPERMISSION = 201;
 static constexpr int ESETTINGSEXISTED = 20400001;
+static constexpr int ENOSYSTEMPERMISSION = 202;
+static constexpr int EINVALIDTYPEID = 20400004;
+static constexpr int EFORMATERROR = 20400002;
+static constexpr int ECONTENTERROR = 20400003;
 Intention ConvertIntention(::ohos::data::unifiedDataChannel::Intention value);
 ::taihe::array<::taihe::string> ConvertStringVectorToTaiheArray(const std::vector<std::string>& stringVector);
 ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,
