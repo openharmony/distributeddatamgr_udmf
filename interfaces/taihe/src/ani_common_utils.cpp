@@ -30,9 +30,9 @@ constexpr const char* CLASSNAME_LONG = "std.core.Long";
 constexpr const char* CLASSNAME_DOUBLE = "std.core.Double";
 constexpr const char* CLASSNAME_STRING = "std.core.String";
 constexpr const char* CLASSNAME_BOOLEAN = "std.core.Boolean";
-constexpr const char* CLASSNAME_ARRAY_BUFFER = "std.code.ArrayBuffer";
+constexpr const char* CLASSNAME_ARRAY_BUFFER = "escompat.ArrayBuffer";
 constexpr const char* CLASSNAME_UINT8_ARRAY = "escompat.Uint8Array";
-constexpr const char* CLASSNAME_RECORD = "std.code.Record";
+constexpr const char* CLASSNAME_RECORD = "std.core.Record";
 constexpr const char* CLASSNAME_OBJECT = "std.core.Object";
 constexpr const int MAX_KEY_COUNT = 10 * 1024;
 constexpr const int MAX_DATA_BYTES = 100 * 1024 * 1024;
@@ -74,7 +74,7 @@ ani_ref WrapMapParams(ani_env *env, const std::map<std::string, int64_t> &mapPar
     return mapParamsRef;
 }
 
-ani_status SetTimestamp(ani_env *env, double timestamp, ani_object &aniDate)
+ani_status SetTimestamp(ani_env *env, long timestamp, ani_object &aniDate)
 {
     ani_class cls {};
     auto status = env->FindClass("std.core.Date", &cls);
@@ -84,15 +84,15 @@ ani_status SetTimestamp(ani_env *env, double timestamp, ani_object &aniDate)
     }
     ani_method ctorMethod {};
     status = env->Class_FindMethod(cls, "<ctor>",
-        "X{C{std.core.Double}C{std.core.String}C{std.core.Date}}:", &ctorMethod);
+        "X{C{std.core.Long}C{std.core.String}C{std.core.Date}}:", &ctorMethod);
     if (status != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "Class_FindMethod failed, status:%{public}d", status);
         return status;
     }
     ani_object aniDoubleObject {};
-    status = SetDouble(env, timestamp, aniDoubleObject);
+    status = SetLong(env, timestamp, aniDoubleObject);
     if (status != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "SetDouble failed, status:%{public}d", status);
+        LOG_ERROR(UDMF_ANI, "SetLong failed, status:%{public}d", status);
         return status;
     }
     status = env->Object_New(cls, ctorMethod, &aniDate, aniDoubleObject);

@@ -962,7 +962,7 @@ OHOS::UDMF::UnifiedDataProperties ConvertUnifiedDataProperties(::taiheChannel::U
     ::taihe::optional<::taihe::callback<uintptr_t(::taihe::string_view type)>> getDelayDataOpt;
 
     ani_object aniTimeStamp {};
-    SetTimestamp(taihe::get_env(), static_cast<double>(value.timestamp), aniTimeStamp);
+    SetTimestamp(taihe::get_env(), value.timestamp, aniTimeStamp);
     auto timestampOpt = ::taihe::optional<uintptr_t>::make(reinterpret_cast<uintptr_t>(aniTimeStamp));
 
     auto taiheProperties = ::taiheChannel::UnifiedDataProperties {
