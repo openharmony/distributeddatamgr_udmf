@@ -235,6 +235,9 @@ interface TypeDescriptor {
     Equals(thiz : TypeDescriptor): bool;
 }
 
+@ctor("TypeDescriptor")
+function CreateTypeDescriptor(): TypeDescriptor;
+
 union TypeDescriptorUnion {
     desc: TypeDescriptor;
     @null empty;

@@ -191,6 +191,10 @@ namespace UDMF {
     return ::ohos::data::uniformTypeDescriptor::TypeDescriptorUnion::make_desc(std::move(holder));
 }
 
+::ohos::data::uniformTypeDescriptor::TypeDescriptor CreateTypeDescriptor() {
+return taihe::make_holder<TypeDescriptorImpl, ::ohos::data::uniformTypeDescriptor::TypeDescriptor>();
+}
+
 void registerTypeDescriptorsSync(
     ::taihe::array_view<::ohos::data::uniformTypeDescriptor::TypeDescriptor> typeDescriptors)
 {
@@ -287,6 +291,7 @@ TH_EXPORT_CPP_API_GetUniformDataTypesByFilenameExtension(OHOS::UDMF::GetUniformD
 TH_EXPORT_CPP_API_GetUniformDataTypeByMIMEType(OHOS::UDMF::GetUniformDataTypeByMIMEType);
 TH_EXPORT_CPP_API_getUniformDataTypeByFilenameExtension(OHOS::UDMF::GetUniformDataTypeByFilenameExtension);
 TH_EXPORT_CPP_API_GetTypeDescriptor(OHOS::UDMF::GetTypeDescriptor);
+TH_EXPORT_CPP_API_CreateTypeDescriptor(OHOS::UDMF::CreateTypeDescriptor);
 TH_EXPORT_CPP_API_registerTypeDescriptorsSync(OHOS::UDMF::registerTypeDescriptorsSync);
 TH_EXPORT_CPP_API_unregisterTypeDescriptorsSync(OHOS::UDMF::unregisterTypeDescriptorsSync);
 // NOLINTEND
