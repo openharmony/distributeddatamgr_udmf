@@ -168,6 +168,11 @@ std::uint8_t *TLVObject::GetStartCursor()
     return 0;
 }
 
+size_t TLVObject::CalDestSize() const
+{
+    return file_ == nullptr ? buffer_->size() - cursor_ -sizeof(TLVHead) : buffer_->size();
+}
+
 bool TLVObject::SaveBufferToFile()
 {
     return true;

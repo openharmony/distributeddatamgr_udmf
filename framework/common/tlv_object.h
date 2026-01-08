@@ -75,9 +75,9 @@ public:
     bool SaveBufferToFileFront(size_t tagCursor, uint32_t len);
     bool LoadBufferFormFile(size_t size);
 
-
 private:
     void PrepareBufferForFile(size_t size);
+    size_t CalDestSize() const;
     std::uint8_t *GetStartCursor();
 
     std::size_t total_ {0};
@@ -104,7 +104,7 @@ template <typename T> bool TLVObject::WriteBasic(TAG type, const T &value)
     tlvHead->tag = HostToNet(static_cast<uint16_t>(type));
     tlvHead->len = HostToNet((uint32_t)sizeof(value));
     auto valueBuff = HostToNet(value);
-    if (memcpy_s(tlvHead->value, sizeof(value), &valueBuff, sizeof(value)) != EOK) {
+    if (memcpy_s(tlvHead->value, CalDestSize(), &valueBuff, sizeof(value)) != EOK) {
         return false;
     }
     cursor_ += sizeof(TLVHead) + sizeof(value);
@@ -124,7 +124,7 @@ template <typename T> bool TLVObject::ReadBasic(T &value, const TLVHead &head)
         return false;
     }
     auto startCursor = GetStartCursor();
-    auto ret = memcpy_s(&value, sizeof(T), startCursor, sizeof(T));
+    auto ret = memcpy_s(&value, sizeof(value), startCursor, sizeof(T));
     if (ret != EOK) {
         return false;
     }

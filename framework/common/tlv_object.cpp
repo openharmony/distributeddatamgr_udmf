@@ -105,6 +105,11 @@ size_t TLVObject::Count(const std::vector<uint8_t> &value)
     return size;
 }
 
+size_t TLVObject::CalDestSize() const
+{
+    return file_ == nullptr ? buffer_->size() - cursor_ -sizeof(TLVHead) : buffer_->size();
+}
+
 size_t TLVObject::Count(const std::monostate &value)
 {
     auto size = sizeof(TLVHead);
@@ -130,7 +135,7 @@ bool TLVObject::Write(TAG tag, const std::string &value)
     tlvHead->tag = HostToNet(static_cast<uint16_t>(tag));
     tlvHead->len = HostToNet((uint32_t)value.size());
     if (!value.empty()) {
-        auto err = memcpy_s(tlvHead->value, value.size(), value.c_str(), value.size());
+        auto err = memcpy_s(tlvHead->value, CalDestSize(), value.c_str(), value.size());
         if (err != EOK) {
             LOG_ERROR(UDMF_FRAMEWORK, "memcpy error in tlv write. tag=%{public}hu, value's size=%{public}zu", tag,
                 value.size());
@@ -167,7 +172,7 @@ bool TLVObject::Write(TAG tag, const std::vector<uint8_t> &value)
     tlvHead->tag = HostToNet(static_cast<uint16_t>(tag));
     tlvHead->len = HostToNet(static_cast<uint32_t>(value.size()));
     if (!value.empty()) {
-        auto err = memcpy_s(tlvHead->value, value.size(), value.data(), value.size());
+        auto err = memcpy_s(tlvHead->value, CalDestSize(), value.data(), value.size());
         if (err != EOK) {
             LOG_ERROR(UDMF_FRAMEWORK, "memcpy error in tlv write u8 vector. tag=%{public}hu", tag);
             return false;
