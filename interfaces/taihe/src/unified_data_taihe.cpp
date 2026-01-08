@@ -62,7 +62,7 @@ UnifiedDataTaihe::UnifiedDataTaihe()
     this->value_ = std::make_shared<UnifiedData>();
     auto properties = this->value_->GetProperties();
     ani_object aniTimeStamp {};
-    SetTimestamp(taihe::get_env(), static_cast<double>(properties->timestamp), aniTimeStamp);
+    SetTimestamp(taihe::get_env(), properties->timestamp, aniTimeStamp);
     this->propertiesValue_.timestamp = ::taihe::optional<uintptr_t>::make(reinterpret_cast<uintptr_t>(aniTimeStamp));
 }
 
@@ -322,7 +322,7 @@ bool UnifiedDataTaihe::HasType(::taihe::string_view type)
     }
     auto properties = this->value_->GetProperties();
     ani_object aniTimeStamp {};
-    SetTimestamp(taihe::get_env(), static_cast<double>(properties->timestamp), aniTimeStamp);
+    SetTimestamp(taihe::get_env(), properties->timestamp, aniTimeStamp);
     this->propertiesValue_.timestamp = ::taihe::optional<uintptr_t>::make(reinterpret_cast<uintptr_t>(aniTimeStamp));
     return this->propertiesValue_;
 }
