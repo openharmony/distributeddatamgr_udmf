@@ -122,6 +122,11 @@ template <> bool Reading(Object &output, TLVObject &data, const TLVHead &head)
     return true;
 }
 
+bool CheckAndAdd(size_t &currentSize, size_t partSize)
+{
+    return true;
+}
+
 template <> size_t CountBufferSize(const UnifiedKey &input, TLVObject &data)
 {
     return sizeof(TLVHead);

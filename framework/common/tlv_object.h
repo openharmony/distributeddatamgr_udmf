@@ -32,6 +32,16 @@ struct TLVHead {
 };
 #pragma pack()
 
+class API_EXPORT RecursiveGuard {
+public:
+    RecursiveGuard();
+    ~RecursiveGuard();
+    bool IsValid() const;
+private:
+    static constexpr uint32_t MAX_DEPTH = 512;
+    static thread_local inline uint32_t depth_ = 0;
+};
+
 class API_EXPORT TLVObject {
 public:
     TLVObject() = default;

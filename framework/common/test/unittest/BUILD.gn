@@ -125,6 +125,7 @@ ohos_unittest("UdmfTypesUtilAbnormalTest") {
   module_out_path = module_output_path
 
   sources = [
+    "${udmf_framework_path}/common/endian_converter.cpp",
     "${udmf_framework_path}/common/tlv_object.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
     "${udmf_framework_path}/common/udmf_utils.cpp",
@@ -141,6 +142,7 @@ ohos_unittest("UdmfTypesUtilAbnormalTest") {
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/dynamic/pixelmap_loader.cpp",
     "udmf_types_util_abnormal_test.cpp",
   ]
 
@@ -168,9 +170,12 @@ ohos_unittest("TlvUtilTest") {
   module_out_path = module_output_path
 
   sources = [
+    "${udmf_framework_path}/common/endian_converter.cpp",
+    "${udmf_framework_path}/common/tlv_util.cpp",
     "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
     "${udmf_framework_path}/innerkitsimpl/convert/udmf_conversion.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/dynamic/pixelmap_loader.cpp",
     "tlv_util_test.cpp",
   ]
 

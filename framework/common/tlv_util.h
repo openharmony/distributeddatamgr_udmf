@@ -29,27 +29,11 @@ namespace OHOS {
 namespace TLVUtil {
 using namespace OHOS::UDMF;
 
-class RecursiveGuard {
-public:
-    RecursiveGuard()
-    {
-        depth_++;
+#define CHECK_RECURSIVE_GUARD()  \
+    RecursiveGuard guard;        \
+    if (!guard.IsValid()) {      \
+        return 0;                \
     }
-
-    ~RecursiveGuard()
-    {
-        depth_--;
-    }
-
-    bool IsValid()
-    {
-        return depth_ <= MAX_DEPTH;
-    }
-
-private:
-    static constexpr uint32_t MAX_DEPTH = 20;
-    static thread_local inline uint32_t depth_ = 0;
-};
 
 template <typename T> bool API_EXPORT ReadTlv(T &output, TLVObject &data, TAG tag);
 
@@ -164,6 +148,7 @@ template <> bool API_EXPORT Reading(Summary &output, TLVObject &data, const TLVH
 template <> size_t API_EXPORT CountBufferSize(const DataLoadInfo &input, TLVObject &data);
 template <> bool API_EXPORT Writing(const DataLoadInfo &input, TLVObject &data, TAG tag);
 template <> bool API_EXPORT Reading(DataLoadInfo &output, TLVObject &data, const TLVHead &head);
+bool CheckAndAdd(size_t &currentSize, size_t partSize);
 
 template <typename T> bool ReadTlv(T &output, TLVObject &data, TAG tag)
 {
@@ -193,11 +178,13 @@ template <typename T> void InitWhenFirst(const T &input, TLVObject &data)
 
 template <typename T> size_t CountBufferSize(const T &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
     return data.CountBasic(input);
 }
 
 template <typename T> bool Writing(const T &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     return data.WriteBasic(tag, input);
 }
@@ -209,6 +196,8 @@ template <typename T> bool Reading(T &output, TLVObject &data, const TLVHead &he
 
 template <typename T> size_t CountBufferSize(const std::shared_ptr<T> &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
+
     if (input == nullptr) {
         return data.CountHead();
     }
@@ -217,6 +206,7 @@ template <typename T> size_t CountBufferSize(const std::shared_ptr<T> &input, TL
 
 template <typename T> bool Writing(const std::shared_ptr<T> &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     if (input == nullptr) {
         return false;
     }
@@ -226,6 +216,7 @@ template <typename T> bool Writing(const std::shared_ptr<T> &input, TLVObject &d
 
 template <typename T> bool Reading(std::shared_ptr<T> &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (output == nullptr) {
         output = std::make_shared<T>();
     }
@@ -234,15 +225,24 @@ template <typename T> bool Reading(std::shared_ptr<T> &output, TLVObject &data, 
 
 template <typename T> size_t CountBufferSize(const std::vector<T> &input, TLVObject &data)
 {
-    auto size = data.CountHead() + data.CountBasic(input.size());
+    CHECK_RECURSIVE_GUARD();
+    auto size = data.CountHead();
+    bool isWithinMax = CheckAndAdd(size, data.CountBasic(input.size()));
+    if (!isWithinMax) {
+        return 0;
+    }
     for (auto item : input) {
-        size += CountBufferSize(item, data);
+        isWithinMax = CheckAndAdd(size, CountBufferSize(item, data));
+        if (!isWithinMax) {
+            return 0;
+        }
     }
     return size;
 }
 
 template <typename T> bool Writing(const std::vector<T> &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -261,6 +261,7 @@ template <typename T> bool Writing(const std::vector<T> &input, TLVObject &data,
 
 template <typename T> bool Reading(std::vector<T> &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (head.len > data.GetTotal() - data.GetCursor()) {
         return false;
     }
@@ -287,15 +288,22 @@ template <typename T> bool Reading(std::vector<T> &output, TLVObject &data, cons
 
 template <typename T, typename R> size_t CountBufferSize(const std::map<T, R> &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
     auto size = data.CountHead();
-    for (auto item : input) {
-        size += data.CountHead() + CountBufferSize(item.first, data) + CountBufferSize(item.second, data);
+    bool isWithinMax;
+    for (const auto &item : input) {
+        isWithinMax = CheckAndAdd(size, data.CountHead()) && CheckAndAdd(size, CountBufferSize(item.first, data))
+        && CheckAndAdd(size, CountBufferSize(item.second, data));
+        if (!isWithinMax) {
+            return 0;
+        }
     }
     return size;
 }
 
 template <typename T, typename R> bool Writing(const std::map<T, R> &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -320,6 +328,7 @@ template <typename T, typename R> bool Writing(const std::map<T, R> &input, TLVO
 
 template <typename T, typename R> bool Reading(std::map<T, R> &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (head.len > data.GetTotal() - data.GetCursor()) {
         return false;
     }
@@ -369,11 +378,16 @@ size_t CountVariant(TLVObject &data, uint32_t step, const _InTp &input)
 
 template <typename... _Types> size_t CountBufferSize(const std::variant<_Types...> &input, TLVObject &data)
 {
+    CHECK_RECURSIVE_GUARD();
+
     if (input.index() > size_t(std::numeric_limits<uint32_t>::max())) {
         return 0;
     }
     uint32_t index = static_cast<uint32_t>(input.index());
-    return data.CountHead() + data.CountBasic(index) + CountVariant<decltype(input), _Types...>(data, 0, input);
+    auto size = data.CountHead();
+    bool isWithinMax = CheckAndAdd(size, data.CountBasic(index))
+        && CheckAndAdd(size, CountVariant<decltype(input), _Types...>(data, 0, input));
+    return isWithinMax ? size : 0;
 }
 
 template <typename _InTp> bool WriteVariant(TLVObject &data, uint32_t step, const _InTp &input, TAG tag)
@@ -393,6 +407,7 @@ bool WriteVariant(TLVObject &data, uint32_t step, const _InTp &input, TAG tag)
 
 template <typename... _Types> bool Writing(const std::variant<_Types...> &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -425,6 +440,7 @@ bool ReadVariant(TLVObject &data, uint32_t step, uint32_t index, _OutTp &value, 
 
 template <typename... _Types> bool Reading(std::variant<_Types...> &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (head.len > data.GetTotal() - data.GetCursor()) {
         return false;
     }
@@ -452,15 +468,24 @@ template <typename... _Types> bool Reading(std::variant<_Types...> &output, TLVO
 
 template <typename T> size_t CountBufferSize(const std::set<T> &input, TLVObject &data)
 {
-    auto size = data.CountHead() + data.CountBasic(input.size());
+    CHECK_RECURSIVE_GUARD();
+    auto size = data.CountHead();
+    bool isWithinMax = CheckAndAdd(size, data.CountBasic(input.size()));
+    if (!isWithinMax) {
+        return 0;
+    }
     for (const auto &item : input) {
-        size += CountBufferSize(item, data);
+        isWithinMax = CheckAndAdd(size, CountBufferSize(item, data));
+        if (!isWithinMax) {
+            return 0;
+        }
     }
     return size;
 }
 
 template <typename T> bool Writing(const std::set<T> &input, TLVObject &data, TAG tag)
 {
+    CHECK_RECURSIVE_GUARD();
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
@@ -477,6 +502,7 @@ template <typename T> bool Writing(const std::set<T> &input, TLVObject &data, TA
 
 template <typename T> bool Reading(std::set<T> &output, TLVObject &data, const TLVHead &head)
 {
+    CHECK_RECURSIVE_GUARD();
     if (head.len > data.GetTotal() - data.GetCursor()) {
         return false;
     }

@@ -16,6 +16,22 @@
 
 namespace OHOS {
 namespace UDMF {
+
+RecursiveGuard::RecursiveGuard()
+{
+    depth_++;
+}
+
+RecursiveGuard::~RecursiveGuard()
+{
+    depth_--;
+}
+
+bool RecursiveGuard::IsValid() const
+{
+    return depth_ <= MAX_DEPTH;
+}
+
 TLVObject::TLVObject(std::vector<std::uint8_t> &buffer)
 {
     total_ += buffer.size();
