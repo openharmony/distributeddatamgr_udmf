@@ -79,15 +79,15 @@ void SummaryTaihe::SetSummary(::taihe::map_view<::taihe::string, int64_t> summar
     }
 }
 
-::taihe::map<::taihe::string, int64_t> SummaryTaihe::GetOverview()
+::taihe::map<::taihe::string, int64_t> SummaryTaihe::GetSummary()
 {
     ::taihe::map<::taihe::string, int64_t> summary;
- 	auto summaryCopy = this->value_->summary;
- 	for (auto &item : summaryCopy) {
+    auto summaryCopy = this->value_->summary;
+    for (auto &item : summaryCopy) {
         if (item.first.empty()) {
             continue;
         }
- 	        summary.emplace(::taihe::string(item.first), item.second);
+        summary.emplace(::taihe::string(item.first), item.second);
     }
     return summary;
 }
