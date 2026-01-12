@@ -155,6 +155,8 @@ interface Summary {
   GetSummary(): @record Map<String, i64>;
   @set("summary")
   SetSummary(summary: @record Map<String, i64>): void;
+  @get("overview")
+ 	GetOverview(): @record Map<String, i64>;
   GetInner(): i64;
 }
 
