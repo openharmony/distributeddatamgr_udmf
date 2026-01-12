@@ -26,7 +26,8 @@ constexpr const char* REFERENCE_URL = "referenceURL";
 constexpr const char* ICON_FILE = "iconFile";
 constexpr const char* OWNER = "ownerBundle";
 constexpr const char* INSTALLERS = "installerBundles";
-constexpr const int32_t MAX_UTD_CUSTOM_SIZE = 1024 * 1024;
+constexpr const size_t MAX_UTD_CUSTOM_SIZE = 1024 * 1024;
+constexpr const size_t JSON_DUMP_INDENT = 4;
 
 CustomUtdJsonParser::CustomUtdJsonParser()
 {
@@ -42,23 +43,19 @@ bool CustomUtdJsonParser::ParseStoredCustomUtdJson(const std::string &jsonData,
     if (jsonData.empty()) {
         return false;
     }
-
-    cJSON* jsonRoot = cJSON_Parse(jsonData.c_str());
-    if (jsonRoot == nullptr) {
-        LOG_ERROR(UDMF_CLIENT, "Failed to parse JSON: invalid format");
+    auto jsonRoot = json::parse(jsonData, nullptr, false);
+    if (jsonRoot.is_discarded()) {
+        LOG_ERROR(UDMF_CLIENT, "Failed to parse JSON: invalid format.");
         return false;
     }
-    if (!cJSON_IsObject(jsonRoot)) {
+    if (!jsonRoot.is_object()) {
         LOG_ERROR(UDMF_CLIENT, "Parsed JSON root is not an object");
-        cJSON_Delete(jsonRoot);
         return false;
     }
-    if (!GetTypeDescriptors(*jsonRoot, UTD_CUSTOM, typesCfg)) {
+    if (!GetTypeDescriptors(jsonRoot, UTD_CUSTOM, typesCfg)) {
         LOG_ERROR(UDMF_CLIENT, "Failed to get type descriptors");
-        cJSON_Delete(jsonRoot);
         return false;
     }
-    cJSON_Delete(jsonRoot);
     return true;
 }
 
@@ -69,139 +66,117 @@ bool CustomUtdJsonParser::ParseUserCustomUtdJson(const std::string &jsonData,
     if (jsonData.empty()) {
         return false;
     }
-    // parse utd-adt.json to TypeDescriptorCfg obj
-    cJSON* jsonRoot = cJSON_Parse(jsonData.c_str());
-    if (jsonRoot == nullptr) {
-        LOG_ERROR(UDMF_CLIENT, "Parse failed: invalid JSON format.");
+    auto jsonRoot = json::parse(jsonData, nullptr, false);
+    if (jsonRoot.is_discarded()) {
+        LOG_ERROR(UDMF_CLIENT, "Failed to parse JSON: invalid format.");
         return false;
     }
-    if (!cJSON_IsObject(jsonRoot)) {
+    if (!jsonRoot.is_object()) {
         LOG_ERROR(UDMF_CLIENT, "Parsed JSON root is not an object");
-        cJSON_Delete(jsonRoot);
         return false;
     }
-    if (!GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_DECLARATION, typesDeclarations) ||
-        !GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_REFERENCE, typesReference)) {
+    if (!GetTypeDescriptors(jsonRoot, UTD_CUSTOM_DECLARATION, typesDeclarations) ||
+        !GetTypeDescriptors(jsonRoot, UTD_CUSTOM_REFERENCE, typesReference)) {
         LOG_ERROR(UDMF_CLIENT, "Failed to get type descriptors");
-        cJSON_Delete(jsonRoot);
         return false;
     }
-    cJSON_Delete(jsonRoot);
     LOG_INFO(UDMF_CLIENT, "DeclarationsSize:%{public}zu, ReferenceSize:%{public}zu",
-        typesDeclarations.size(), typesReference.size());
+             typesDeclarations.size(), typesReference.size());
     return true;
 }
 
 bool CustomUtdJsonParser::ConvertUtdCfgsToJson(const std::vector<TypeDescriptorCfg> &typesCfg, std::string &jsonData)
 {
-    json* root = cJSON_CreateObject();
-    json* CustomUTDs = cJSON_CreateArray();
-    for (auto utdTypeCfg : typesCfg) {
-        json* jsonItem = cJSON_CreateObject();
-        if (jsonItem == nullptr) {
-            LOG_ERROR(UDMF_CLIENT, "Create jsonItem failed.");
-            cJSON_Delete(CustomUTDs);
-            cJSON_Delete(root);
-            return false;
-        }
-        cJSON_AddStringToObject(jsonItem, TYPEID, utdTypeCfg.typeId.c_str());
-        std::vector<std::string> belongingToTypes(utdTypeCfg.belongingToTypes.begin(),
-                                                  utdTypeCfg.belongingToTypes.end());
-        AddJsonStringArray(belongingToTypes, BELONGINGTOTYPES, *jsonItem);
-        AddJsonStringArray(utdTypeCfg.filenameExtensions, FILE_NAME_EXTENSTENSIONS, *jsonItem);
-        AddJsonStringArray(utdTypeCfg.mimeTypes, MIME_TYPES, *jsonItem);
-        cJSON_AddStringToObject(jsonItem, DESCRIPTION, utdTypeCfg.description.c_str());
-        cJSON_AddStringToObject(jsonItem, REFERENCE_URL, utdTypeCfg.referenceURL.c_str());
-        cJSON_AddStringToObject(jsonItem, ICON_FILE, utdTypeCfg.iconFile.c_str());
-        cJSON_AddStringToObject(jsonItem, OWNER, utdTypeCfg.ownerBundle.c_str());
-        std::vector<std::string> installerBundles(utdTypeCfg.installerBundles.begin(),
-                                                  utdTypeCfg.installerBundles.end());
-        AddJsonStringArray(installerBundles, INSTALLERS, *jsonItem);
+    json root;
+    json customUtds = json::array();
 
-        cJSON_AddItemToArray(CustomUTDs, jsonItem);
+    for (const auto &utdTypeCfg : typesCfg) {
+        json item;
+        item[TYPEID] = utdTypeCfg.typeId;
+        item[BELONGINGTOTYPES] = utdTypeCfg.belongingToTypes;
+        item[FILE_NAME_EXTENSTENSIONS] = utdTypeCfg.filenameExtensions;
+        item[MIME_TYPES] = utdTypeCfg.mimeTypes;
+        item[DESCRIPTION] = utdTypeCfg.description;
+        item[REFERENCE_URL] = utdTypeCfg.referenceURL;
+        item[ICON_FILE] = utdTypeCfg.iconFile;
+        item[OWNER] = utdTypeCfg.ownerBundle;
+        item[INSTALLERS] = utdTypeCfg.installerBundles;
+        customUtds.push_back(std::move(item));
     }
-    cJSON_AddItemToObject(root, UTD_CUSTOM, CustomUTDs);
-
-    char* jsonCStr = cJSON_Print(root);
-    if (jsonCStr == nullptr) {
-        LOG_ERROR(UDMF_CLIENT, "cJSON_Print failed.");
-        cJSON_Delete(root);
-        return false;
-    }
-    jsonData = jsonCStr;
-    cJSON_free(static_cast<void*>(jsonCStr));
-    cJSON_Delete(root);
-    return true;
-}
-
-bool CustomUtdJsonParser::AddJsonStringArray(const std::vector<std::string> &datas, const std::string &nodeName,
-                                             json &node)
-{
-    json *arrayNode = cJSON_AddArrayToObject(&node, nodeName.c_str());
-    for (const auto &data : datas) {
-        json* item = cJSON_CreateString(data.c_str());
-        cJSON_AddItemToArray(arrayNode, item);
-    }
+    
+    root[UTD_CUSTOM] = customUtds;
+    jsonData = root.dump(JSON_DUMP_INDENT);
     return true;
 }
 
 bool CustomUtdJsonParser::GetTypeDescriptors(const json &jsonRoot, const std::string &nodeName,
                                              std::vector<TypeDescriptorCfg> &typesCfg)
 {
-    if (cJSON_HasObjectItem(&jsonRoot, nodeName.c_str())) {
-        cJSON *subNode = cJSON_GetObjectItem(&jsonRoot, nodeName.c_str());
-        int itemNum = cJSON_GetArraySize(subNode);
-        if (itemNum > MAX_UTD_CUSTOM_SIZE) {
-            LOG_ERROR(UDMF_CLIENT, "itemNum is too large, itemNum:%{public}d", itemNum);
+    if (!jsonRoot.contains(nodeName)) {
+        return true;
+    }
+    if (!jsonRoot[nodeName].is_array()) {
+        LOG_ERROR(UDMF_CLIENT, "subNode %{public}s is null or not array.", nodeName.c_str());
+        return false;
+    }
+    const auto &subNode = jsonRoot[nodeName];
+    if (subNode.size() > MAX_UTD_CUSTOM_SIZE) {
+        LOG_ERROR(UDMF_CLIENT, "itemNum is too large");
+        return false;
+    }
+
+    for (const auto &item : subNode) {
+        if (!item.is_object()) {
+            LOG_ERROR(UDMF_CLIENT, "item is not object.");
             return false;
         }
-        for (int i = 0; i < itemNum; i++) {
-            const cJSON *node = cJSON_GetArrayItem(subNode, i);
-            TypeDescriptorCfg typeCfg;
-            typeCfg.typeId = GetStringValue(node, TYPEID);
-            typeCfg.belongingToTypes = GetStringArrayValue(node, BELONGINGTOTYPES);
-            typeCfg.filenameExtensions = GetStringArrayValue(node, FILE_NAME_EXTENSTENSIONS);
-            typeCfg.mimeTypes = GetStringArrayValue(node, MIME_TYPES);
-            typeCfg.description = GetStringValue(node, DESCRIPTION);
-            typeCfg.referenceURL = GetStringValue(node, REFERENCE_URL);
-            typeCfg.iconFile = GetStringValue(node, ICON_FILE);
-            typeCfg.ownerBundle = GetStringValue(node, OWNER);
-            std::vector<std::string> installerBundles = GetStringArrayValue(node, INSTALLERS);
-            typeCfg.installerBundles.insert(installerBundles.begin(), installerBundles.end());
-            typesCfg.push_back(typeCfg);
-        }
+
+        TypeDescriptorCfg typeCfg;
+        typeCfg.typeId = GetStringValue(&item, TYPEID);
+        typeCfg.belongingToTypes = GetStringArrayValue(&item, BELONGINGTOTYPES);
+        typeCfg.filenameExtensions = GetStringArrayValue(&item, FILE_NAME_EXTENSTENSIONS);
+        typeCfg.mimeTypes = GetStringArrayValue(&item, MIME_TYPES);
+        typeCfg.description = GetStringValue(&item, DESCRIPTION);
+        typeCfg.referenceURL = GetStringValue(&item, REFERENCE_URL);
+        typeCfg.iconFile = GetStringValue(&item, ICON_FILE);
+        typeCfg.ownerBundle = GetStringValue(&item, OWNER);
+        auto installers = GetStringArrayValue(&item, INSTALLERS);
+        typeCfg.installerBundles.insert(installers.begin(), installers.end());
+        typesCfg.push_back(std::move(typeCfg));
     }
     return true;
 }
 
 std::string CustomUtdJsonParser::GetStringValue(const json *node, const std::string &nodeName)
 {
-    std::string value;
-    if (!cJSON_IsNull(node) && cJSON_IsObject(node) && cJSON_HasObjectItem(node, nodeName.c_str())) {
-        cJSON *subNode = cJSON_GetObjectItem(node, nodeName.c_str());
-        if (cJSON_IsString(subNode)) {
-            value = cJSON_GetStringValue(subNode);
+    if (!node->is_object()) {
+        return "";
+    }
+    for (auto it = node->begin(); it != node->end(); ++it) {
+        if (strcasecmp(it.key().c_str(), nodeName.c_str()) == 0) {
+            return it.value().is_string() ? it.value().get<std::string>() : "";
         }
     }
-    return value;
+    return "";
 }
 
 std::vector<std::string> CustomUtdJsonParser::GetStringArrayValue(const json *node, const std::string &nodeName)
 {
-    std::vector<std::string> values;
-    if (!cJSON_IsNull(node) && cJSON_IsObject(node) && cJSON_HasObjectItem(node, nodeName.c_str())) {
-        cJSON *subNode = cJSON_GetObjectItem(node, nodeName.c_str());
-        if (cJSON_IsNull(subNode) || !cJSON_IsArray(subNode)) {
-            return values;
+    std::vector<std::string> result;
+    if (!node->is_object()) {
+        return result;
+    }
+    for (auto it = node->begin(); it != node->end(); ++it) {
+        if (strcasecmp(it.key().c_str(), nodeName.c_str()) != 0 || !it.value().is_array()) {
+            continue;
         }
-        for (int i = 0; i < cJSON_GetArraySize(subNode); i++) {
-            json *item = cJSON_GetArrayItem(subNode, i);
-            if (cJSON_IsString(item)) {
-                values.emplace_back(cJSON_GetStringValue(item));
+        for (const auto &element : it.value()) {
+            if (element.is_string()) {
+                result.push_back(element.get<std::string>());
             }
         }
     }
-    return values;
+    return result;
 }
 } // namespace UDMF
 } // namespace OHOS

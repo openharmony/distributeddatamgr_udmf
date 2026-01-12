@@ -15,18 +15,14 @@
 
 #ifndef UDMF_CUSTOM_UTD_JSON_PARSER_H
 #define UDMF_CUSTOM_UTD_JSON_PARSER_H
-#include <string>
-#include <vector>
-#include <set>
-#include <map>
-#include <cstdint>
-#include "cJSON.h"
+#include <nlohmann/json.hpp>
+
 #include "utd_common.h"
 namespace OHOS {
 namespace UDMF {
 class CustomUtdJsonParser {
 public:
-    using json = cJSON;
+    using json = nlohmann::json;
     CustomUtdJsonParser();
     ~CustomUtdJsonParser();
     bool ParseStoredCustomUtdJson(const std::string &jsonData, std::vector<TypeDescriptorCfg> &typesCfg);
@@ -37,7 +33,6 @@ public:
                             std::vector<TypeDescriptorCfg> &typesCfg);
 
 private:
-    bool AddJsonStringArray(const std::vector<std::string> &datas, const std::string &nodeName, json &node);
     std::string GetStringValue(const json *node, const std::string &nodeName);
     std::vector<std::string> GetStringArrayValue(const json *node, const std::string &nodeName);
 };

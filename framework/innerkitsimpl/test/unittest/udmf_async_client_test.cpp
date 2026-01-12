@@ -992,7 +992,7 @@ HWTEST_F(UdmfAsyncClientTest, GetInnerDataParams003, TestSize.Level1)
 
     OH_UdmfDataLoadInfo *info = OH_UdmfDataLoadInfo_Create();
     for (auto i = 0; i < 1001; ++i) {
-        OH_UdmfDataLoadInfo_SetType(info, std::to_string(i));
+        OH_UdmfDataLoadInfo_SetType(info, std::to_string(i).c_str());
     }
     OH_UdmfGetDataParams_SetAcceptableInfo(&param, info);
     

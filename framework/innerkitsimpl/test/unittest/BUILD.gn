@@ -283,7 +283,6 @@ ohos_unittest("UtdClientTest") {
 
   external_deps = common_external_deps
   external_deps += [
-    "cJSON:cjson",
     "os_account:os_account_innerkits",
   ]
 
@@ -321,7 +320,6 @@ ohos_unittest("UtdConcurrentUpdateTest") {
 
   external_deps = common_external_deps
   external_deps += [
-    "cJSON:cjson",
     "os_account:os_account_innerkits",
   ]
 
@@ -359,7 +357,6 @@ ohos_unittest("UtdDynamicUpdateTest") {
 
   external_deps = common_external_deps
   external_deps += [
-    "cJSON:cjson",
     "os_account:os_account_innerkits",
   ]
 

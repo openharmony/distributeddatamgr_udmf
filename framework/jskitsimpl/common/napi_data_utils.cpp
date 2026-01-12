@@ -659,7 +659,7 @@ napi_status NapiDataUtils::SetValue(napi_env env, const ProgressInfo &in, napi_v
 
 napi_status NapiDataUtils::SetValue(napi_env env, const DataLoadInfo &in, napi_value &out)
 {
-    LOG_ERROR(UDMF_KITS_NAPI, "napi_value <- DataLoadInfo");
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value <- DataLoadInfo");
     napi_create_object(env, &out);
 
     napi_value jsRecordCount = nullptr;
