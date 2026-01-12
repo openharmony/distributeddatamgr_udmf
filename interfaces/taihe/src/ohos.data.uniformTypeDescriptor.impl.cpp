@@ -258,7 +258,8 @@ void registerTypeDescriptorsSync(
     LOG_ERROR(UDMF_ANI, "RegisterTypeDescriptors end");
 }
 
-void unregisterTypeDescriptorsSync(::taihe::array_view<::taihe::string> typeIds) {
+void unregisterTypeDescriptorsSync(::taihe::array_view<::taihe::string> typeIds)
+{
     LOG_ERROR(UDMF_ANI, "unregisterTypeDescriptorsSync start");
     std::vector<std::string> ids(typeIds.size());
     std::transform(typeIds.begin(), typeIds.end(), ids.begin(),
