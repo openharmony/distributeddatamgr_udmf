@@ -191,53 +191,42 @@ namespace UDMF {
     return ::ohos::data::uniformTypeDescriptor::TypeDescriptorUnion::make_desc(std::move(holder));
 }
 
-::ohos::data::uniformTypeDescriptor::TypeDescriptor CreateTypeDescriptor() {
-return taihe::make_holder<TypeDescriptorImpl, ::ohos::data::uniformTypeDescriptor::TypeDescriptor>();
+::ohos::data::uniformTypeDescriptor::TypeDescriptor CreateTypeDescriptor()
+{
+    return taihe::make_holder<TypeDescriptorImpl, ::ohos::data::uniformTypeDescriptor::TypeDescriptor>();
 }
 
-void registerTypeDescriptorsSync(
-    ::taihe::array_view<::ohos::data::uniformTypeDescriptor::TypeDescriptor> typeDescriptors)
+void registerTypeDescriptorsSync(::taihe::array_view<::ohos::data::uniformTypeDescriptor::TypeDescriptor> typeDescriptors)
 {
-    LOG_ERROR(UDMF_ANI, "registerTypeDescriptorsSync start");
     std::vector<TypeDescriptorCfg> descriptors;
     descriptors.reserve(typeDescriptors.size());
-    LOG_ERROR(UDMF_ANI, "reserve");
     for (size_t i = 0; i < typeDescriptors.size(); ++i) {
-        LOG_ERROR(UDMF_ANI, "typeDescriptors start");
         TypeDescriptorCfg cfg;
         auto& taiheDesc = typeDescriptors[i];
-        
         cfg.typeId = std::string(taiheDesc->GetTypeId());
         cfg.description = std::string(taiheDesc->GetDescription());
         cfg.referenceURL = std::string(taiheDesc->GetReferenceURL());
         cfg.iconFile = std::string(taiheDesc->GetIconFile());
-        LOG_ERROR(UDMF_ANI, "cfg set");
         auto belongingToTypes = taiheDesc->GetBelongingToTypes();
         cfg.belongingToTypes.reserve(belongingToTypes.size());
         for (size_t j = 0; j < belongingToTypes.size(); ++j) {
-            LOG_ERROR(UDMF_ANI, "belongingToTypes.size");
             cfg.belongingToTypes.emplace_back(std::string(belongingToTypes[j]));
         }
-
         auto filenameExtensions = taiheDesc->GetFilenameExtensions();
         cfg.filenameExtensions.reserve(filenameExtensions.size());
+        cfg.filenameExtensions.reserve(filenameExtensions.size());
         for (size_t j = 0; j < filenameExtensions.size(); ++j) {
-            LOG_ERROR(UDMF_ANI, "filenameExtensions.size");
             cfg.filenameExtensions.emplace_back(std::string(filenameExtensions[j]));
         }
- 
         auto mimeTypes = taiheDesc->GetMimeTypes();
         cfg.mimeTypes.reserve(mimeTypes.size());
         for (size_t j = 0; j < mimeTypes.size(); ++j) {
-            LOG_ERROR(UDMF_ANI, "mimeTypes.size");
             cfg.mimeTypes.emplace_back(std::string(mimeTypes[j]));
         }
         descriptors.emplace_back(cfg);
-        LOG_ERROR(UDMF_ANI, "typeDescriptors.size end");
     }
-    LOG_ERROR(UDMF_ANI, "RegisterTypeDescriptors start");
     Status status = UtdClient::GetInstance().RegisterTypeDescriptors(descriptors);
-    LOG_ERROR(UDMF_ANI, "status start");
+    LOG_ERROR(UDMF_ANI, "status start, status:%{public}d", status);
 
     if (status == E_NO_SYSTEM_PERMISSION) {
         set_business_error(ENOSYSTEMPERMISSION, "Permission denied!");
@@ -253,18 +242,19 @@ void registerTypeDescriptorsSync(
         LOG_ERROR(UDMF_ANI, "status start:E_CONTENT_ERROR");
     } else if (status != E_OK) {
         set_business_error(PARAMETERSERROR, "RegisterTypeDescriptors failed!");
-        LOG_ERROR(UDMF_ANI, "status start:E_OK");
+        LOG_ERROR(UDMF_ANI, "status start!=E_OK");
     }
     LOG_ERROR(UDMF_ANI, "RegisterTypeDescriptors end");
 }
 
 void unregisterTypeDescriptorsSync(::taihe::array_view<::taihe::string> typeIds)
 {
-    LOG_ERROR(UDMF_ANI, "unregisterTypeDescriptorsSync start");
     std::vector<std::string> ids(typeIds.size());
     std::transform(typeIds.begin(), typeIds.end(), ids.begin(),
         [](::taihe::string val) { return std::string(val); });
-    LOG_ERROR(UDMF_ANI, "UnregisterTypeDescriptors start");
+    for (size_t i = 0; i < ids.size(); ++i) {
+    LOG_ERROR(UDMF_ANI, "ids[%{public}zu]: %{public}s", i, ids[i].c_str());
+}    
     Status status = UtdClient::GetInstance().UnregisterTypeDescriptors(ids);
     LOG_ERROR(UDMF_ANI, "status start, status:%{public}d", status);
 
@@ -279,7 +269,7 @@ void unregisterTypeDescriptorsSync(::taihe::array_view<::taihe::string> typeIds)
         LOG_ERROR(UDMF_ANI, "status start:E_INVALID_TYPE_ID");
     } else if (status != E_OK) {
         set_business_error(PARAMETERSERROR, "UnregisterTypeDescriptors failed!");
-        LOG_ERROR(UDMF_ANI, "status start:E_OK");
+        LOG_ERROR(UDMF_ANI, "status start!=E_OK");
     }
     LOG_ERROR(UDMF_ANI, "UnregisterTypeDescriptors end");
 }
