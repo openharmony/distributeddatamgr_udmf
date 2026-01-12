@@ -196,7 +196,8 @@ namespace UDMF {
     return taihe::make_holder<TypeDescriptorImpl, ::ohos::data::uniformTypeDescriptor::TypeDescriptor>();
 }
 
-void registerTypeDescriptorsSync(::taihe::array_view<::ohos::data::uniformTypeDescriptor::TypeDescriptor> typeDescriptors)
+void registerTypeDescriptorsSync(
+    ::taihe::array_view<::ohos::data::uniformTypeDescriptor::TypeDescriptor> typeDescriptors)
 {
     std::vector<TypeDescriptorCfg> descriptors;
     descriptors.reserve(typeDescriptors.size());

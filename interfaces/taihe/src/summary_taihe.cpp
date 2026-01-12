@@ -79,7 +79,7 @@ void SummaryTaihe::SetSummary(::taihe::map_view<::taihe::string, int64_t> summar
     }
 }
 
-::taihe::map<::taihe::string, int64_t> SummaryTaihe::GetSummary()
+::taihe::map<::taihe::string, int64_t> SummaryTaihe::GetOverview()
 {
     ::taihe::map<::taihe::string, int64_t> summary;
     auto summaryCopy = this->value_->summary;
