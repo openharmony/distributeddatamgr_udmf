@@ -203,7 +203,7 @@ void registerTypeDescriptorsSync(
     descriptors.reserve(typeDescriptors.size());
     for (size_t i = 0; i < typeDescriptors.size(); ++i) {
         TypeDescriptorCfg cfg;
-        auto& taiheDesc = typeDescriptors[i];
+        auto &taiheDesc = typeDescriptors[i];
         cfg.typeId = std::string(taiheDesc->GetTypeId());
         cfg.description = std::string(taiheDesc->GetDescription());
         cfg.referenceURL = std::string(taiheDesc->GetReferenceURL());
@@ -214,7 +214,6 @@ void registerTypeDescriptorsSync(
             cfg.belongingToTypes.emplace_back(std::string(belongingToTypes[j]));
         }
         auto filenameExtensions = taiheDesc->GetFilenameExtensions();
-        cfg.filenameExtensions.reserve(filenameExtensions.size());
         cfg.filenameExtensions.reserve(filenameExtensions.size());
         for (size_t j = 0; j < filenameExtensions.size(); ++j) {
             cfg.filenameExtensions.emplace_back(std::string(filenameExtensions[j]));
@@ -227,19 +226,19 @@ void registerTypeDescriptorsSync(
         descriptors.emplace_back(cfg);
     }
     Status status = UtdClient::GetInstance().RegisterTypeDescriptors(descriptors);
-    LOG_ERROR(UDMF_ANI, "status start, status:%{public}d", status);
+    LOG_INFO(UDMF_ANI, "status start, status:%{public}d", status);
 
     if (status == E_NO_SYSTEM_PERMISSION) {
-        set_business_error(ENOSYSTEMPERMISSION, "Permission denied!");
+        set_business_error(NO_SYSTEM_PERMISSION, "Permission denied!");
         LOG_ERROR(UDMF_ANI, "status start:E_NO_SYSTEM_PERMISSION");
     } else if (status == E_NO_PERMISSION) {
-        set_business_error(NOPERMISSION, "Permission denied!");
+        set_business_error(NO_PERMISSION, "Permission denied!");
         LOG_ERROR(UDMF_ANI, "status start:E_NO_PERMISSION");
     } else if (status == E_FORMAT_ERROR) {
-        set_business_error(EFORMATERROR, "Error typeDescriptors format!");
+        set_business_error(FORMAT_ERROR, "Error typeDescriptors format!");
         LOG_ERROR(UDMF_ANI, "status start:E_FORMAT_ERROR");
     } else if (status == E_CONTENT_ERROR) {
-        set_business_error(ECONTENTERROR, "Error typeDescriptors content!");
+        set_business_error(CONTENT_ERROR, "Error typeDescriptors content!");
         LOG_ERROR(UDMF_ANI, "status start:E_CONTENT_ERROR");
     } else if (status != E_OK) {
         set_business_error(PARAMETERSERROR, "RegisterTypeDescriptors failed!");
@@ -253,20 +252,17 @@ void unregisterTypeDescriptorsSync(::taihe::array_view<::taihe::string> typeIds)
     std::vector<std::string> ids(typeIds.size());
     std::transform(typeIds.begin(), typeIds.end(), ids.begin(),
         [](::taihe::string val) { return std::string(val); });
-    for (size_t i = 0; i < ids.size(); ++i) {
-    LOG_ERROR(UDMF_ANI, "ids[%{public}zu]: %{public}s", i, ids[i].c_str());
-}    
     Status status = UtdClient::GetInstance().UnregisterTypeDescriptors(ids);
-    LOG_ERROR(UDMF_ANI, "status start, status:%{public}d", status);
+    LOG_INFO(UDMF_ANI, "status start, status:%{public}d", status);
 
     if (status == E_NO_SYSTEM_PERMISSION) {
-        set_business_error(ENOSYSTEMPERMISSION, "Permission denied!");
+        set_business_error(NO_SYSTEM_PERMISSION, "Permission denied!");
         LOG_ERROR(UDMF_ANI, "status start:E_NO_SYSTEM_PERMISSION");
     } else if (status == E_NO_PERMISSION) {
-        set_business_error(NOPERMISSION, "Permission denied!");
+        set_business_error(NO_PERMISSION, "Permission denied!");
         LOG_ERROR(UDMF_ANI, "status start:E_NO_PERMISSION");
     } else if (status == E_INVALID_TYPE_ID) {
-        set_business_error(EINVALIDTYPEID, "Error TypeId!");
+        set_business_error(INVALID_TYPE_ID, "Error TypeId!");
         LOG_ERROR(UDMF_ANI, "status start:E_INVALID_TYPE_ID");
     } else if (status != E_OK) {
         set_business_error(PARAMETERSERROR, "UnregisterTypeDescriptors failed!");

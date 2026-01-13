@@ -202,7 +202,7 @@ void RemoveAppShareOptions(::taiheChannel::Intention intention)
     std::transform(intentionInner.begin(), intentionInner.end(), intentionInner.begin(), ::tolower);
     auto status = UdmfClient::GetInstance().RemoveAppShareOption(intentionInner);
     if (status == E_NO_PERMISSION) {
-        taihe::set_business_error(NOPERMISSION, "Permission denied!");
+        taihe::set_business_error(NO_PERMISSION, "Permission denied!");
     }
     return;
 }
@@ -225,10 +225,10 @@ void SetAppShareOptions(::taiheChannel::Intention intention, ::taiheChannel::Sha
     std::transform(intentionInner.begin(), intentionInner.end(), intentionInner.begin(), ::tolower);
     auto status = UdmfClient::GetInstance().SetAppShareOption(intentionInner, shareOptionsInner);
     if (status == E_NO_PERMISSION) {
-        taihe::set_business_error(NOPERMISSION, "Permission denied!");
+        taihe::set_business_error(NO_PERMISSION, "Permission denied!");
     }
     if (status == E_SETTINGS_EXISTED) {
-        taihe::set_business_error(ESETTINGSEXISTED,
+        taihe::set_business_error(SETTINGS_EXISTED,
             "Settings already exist. To reconfigure, remove the existing sharing options.");
     }
     if (status != E_OK) {
