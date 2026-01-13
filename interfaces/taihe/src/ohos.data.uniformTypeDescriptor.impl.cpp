@@ -37,14 +37,14 @@ namespace OHOS {
 namespace UDMF {
 const std::unordered_map<Status, std::pair<int, const char*>> REG_ERR_MAP = {
     {E_NO_SYSTEM_PERMISSION, {NO_SYSTEM_PERMISSION, "Permission denied!"}},
-    {E_NO_PERMISSION,        {NO_PERMISSION,        "Permission denied!"}},
+    {E_NO_PERMISSION,        {NOPERMISSION,        "Permission denied!"}},
     {E_FORMAT_ERROR,         {FORMAT_ERROR,         "Error typeDescriptors format!"}},
     {E_CONTENT_ERROR,        {CONTENT_ERROR,        "Error typeDescriptors content!"}},
 };
 
 const std::unordered_map<Status, std::pair<int, const char*>> UNREG_ERR_MAP = {
     {E_NO_SYSTEM_PERMISSION, {NO_SYSTEM_PERMISSION, "Permission denied!"}},
-    {E_NO_PERMISSION,        {NO_PERMISSION,        "Permission denied!"}},
+    {E_NO_PERMISSION,        {NOPERMISSION,        "Permission denied!"}},
     {E_INVALID_TYPE_ID,      {INVALID_TYPE_ID,      "Error TypeId!"}},
 };
 

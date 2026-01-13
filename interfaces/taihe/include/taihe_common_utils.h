@@ -32,8 +32,8 @@ namespace OHOS {
 namespace UDMF {
 static constexpr int PARAMETERSERROR = 401;
 static const std::string NEW_INSTANCE_LIB = "libudmf_data_napi.z.so";
-static constexpr int NO_PERMISSION = 201;
-static constexpr int SETTINGS_EXISTED = 20400001;
+static constexpr int NOPERMISSION = 201;
+static constexpr int ESETTINGSEXISTED = 20400001;
 static constexpr int NO_SYSTEM_PERMISSION = 202;
 static constexpr int INVALID_TYPE_ID = 20400004;
 static constexpr int FORMAT_ERROR = 20400002;
