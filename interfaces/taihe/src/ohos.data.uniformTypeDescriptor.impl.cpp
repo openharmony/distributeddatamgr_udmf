@@ -35,6 +35,34 @@ constexpr size_t MAX_BELONGS_LEN = 1024;
 
 namespace OHOS {
 namespace UDMF {
+const std::unordered_map<Status, std::pair<int, const char*>> REG_ERR_MAP = {
+    {E_NO_SYSTEM_PERMISSION, {NO_SYSTEM_PERMISSION, "Permission denied!"}},
+    {E_NO_PERMISSION,        {NO_PERMISSION,        "Permission denied!"}},
+    {E_FORMAT_ERROR,         {FORMAT_ERROR,         "Error typeDescriptors format!"}},
+    {E_CONTENT_ERROR,        {CONTENT_ERROR,        "Error typeDescriptors content!"}},
+};
+
+const std::unordered_map<Status, std::pair<int, const char*>> UNREG_ERR_MAP = {
+    {E_NO_SYSTEM_PERMISSION, {NO_SYSTEM_PERMISSION, "Permission denied!"}},
+    {E_NO_PERMISSION,        {NO_PERMISSION,        "Permission denied!"}},
+    {E_INVALID_TYPE_ID,      {INVALID_TYPE_ID,      "Error TypeId!"}},
+};
+
+inline void HandleStatus(const std::unordered_map<Status, std::pair<int, const char*>>& errMap,
+                         Status status,
+                         const char* defaultMsg)
+{
+    auto it = errMap.find(status);
+    if (it != errMap.end()) {
+        set_business_error(it->second.first, it->second.second);
+        LOG_ERROR(UDMF_ANI, "status:%{public}s", it->second.second);
+    } else if (status != E_OK) {
+        set_business_error(PARAMETERSERROR, defaultMsg);
+        LOG_ERROR(UDMF_ANI, "status:other error%{public}d", status);
+    } else {
+        LOG_INFO(UDMF_ANI, "status:E_OK success");
+    }
+}
 
 ::taihe::array<::taihe::string> GetUniformDataTypesByMIMEType(::taihe::string_view mimeType,
                                                               ::taihe::optional_view<::taihe::string> belongsTo)
@@ -227,24 +255,7 @@ void registerTypeDescriptorsSync(
     }
     Status status = UtdClient::GetInstance().RegisterTypeDescriptors(descriptors);
     LOG_INFO(UDMF_ANI, "status start, status:%{public}d", status);
-
-    if (status == E_NO_SYSTEM_PERMISSION) {
-        set_business_error(NO_SYSTEM_PERMISSION, "Permission denied!");
-        LOG_ERROR(UDMF_ANI, "status start:E_NO_SYSTEM_PERMISSION");
-    } else if (status == E_NO_PERMISSION) {
-        set_business_error(NO_PERMISSION, "Permission denied!");
-        LOG_ERROR(UDMF_ANI, "status start:E_NO_PERMISSION");
-    } else if (status == E_FORMAT_ERROR) {
-        set_business_error(FORMAT_ERROR, "Error typeDescriptors format!");
-        LOG_ERROR(UDMF_ANI, "status start:E_FORMAT_ERROR");
-    } else if (status == E_CONTENT_ERROR) {
-        set_business_error(CONTENT_ERROR, "Error typeDescriptors content!");
-        LOG_ERROR(UDMF_ANI, "status start:E_CONTENT_ERROR");
-    } else if (status != E_OK) {
-        set_business_error(PARAMETERSERROR, "RegisterTypeDescriptors failed!");
-        LOG_ERROR(UDMF_ANI, "status start!=E_OK");
-    }
-    LOG_ERROR(UDMF_ANI, "RegisterTypeDescriptors end");
+    HandleStatus(REG_ERR_MAP, status, "RegisterTypeDescriptors failed!");
 }
 
 void unregisterTypeDescriptorsSync(::taihe::array_view<::taihe::string> typeIds)
@@ -254,21 +265,7 @@ void unregisterTypeDescriptorsSync(::taihe::array_view<::taihe::string> typeIds)
         [](::taihe::string val) { return std::string(val); });
     Status status = UtdClient::GetInstance().UnregisterTypeDescriptors(ids);
     LOG_INFO(UDMF_ANI, "status start, status:%{public}d", status);
-
-    if (status == E_NO_SYSTEM_PERMISSION) {
-        set_business_error(NO_SYSTEM_PERMISSION, "Permission denied!");
-        LOG_ERROR(UDMF_ANI, "status start:E_NO_SYSTEM_PERMISSION");
-    } else if (status == E_NO_PERMISSION) {
-        set_business_error(NO_PERMISSION, "Permission denied!");
-        LOG_ERROR(UDMF_ANI, "status start:E_NO_PERMISSION");
-    } else if (status == E_INVALID_TYPE_ID) {
-        set_business_error(INVALID_TYPE_ID, "Error TypeId!");
-        LOG_ERROR(UDMF_ANI, "status start:E_INVALID_TYPE_ID");
-    } else if (status != E_OK) {
-        set_business_error(PARAMETERSERROR, "UnregisterTypeDescriptors failed!");
-        LOG_ERROR(UDMF_ANI, "status start!=E_OK");
-    }
-    LOG_ERROR(UDMF_ANI, "UnregisterTypeDescriptors end");
+    HandleStatus(UNREG_ERR_MAP, status, "UnregisterTypeDescriptors failed!");
 }
 } // namespace UDMF
 } // namespace OHOS
