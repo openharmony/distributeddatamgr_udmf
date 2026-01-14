@@ -47,7 +47,7 @@ ani_status SetArrayBuffer(ani_env *env, std::vector<uint8_t> value, ani_arraybuf
 ani_status SetMap(ani_env *env, std::map<std::string, int64_t> &value, ani_object &arrayBufferObj);
 ani_status SetSet(ani_env *env, std::set<std::string> &in, ani_object &out);
 ani_status SetAcceptableInfo(ani_env *env, DataLoadInfo &in, ani_object &out);
-ani_status SetTimestamp(ani_env *env, double timestamp, ani_object &aniDate);
+ani_status SetTimestamp(ani_env *env, long timestamp, ani_object &aniDate);
 ani_status SetString(ani_env *env, const std::string &value, ani_object &stringObj);
 bool SetFieldRef(ani_env *env, ani_class cls, ani_object object, const std::string &fieldName, ani_ref value);
 bool InnerWrapMapParams(ani_env *env, ani_class wantCls, ani_object wantObject,

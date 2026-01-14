@@ -33,6 +33,7 @@ constexpr const char* CLASSNAME_BOOLEAN = "std.core.Boolean";
 constexpr const char* CLASSNAME_ARRAY_BUFFER = "escompat.ArrayBuffer";
 constexpr const char* CLASSNAME_UINT8_ARRAY = "escompat.Uint8Array";
 constexpr const char* CLASSNAME_RECORD = "std.core.Record";
+constexpr const char* CLASSNAME_SET = "std.core.Set";
 constexpr const char* CLASSNAME_OBJECT = "std.core.Object";
 constexpr const char* CLASSNAME_DATA_LOAD_INFO = "@ohos.data.unifiedDataChannel.unifiedDataChannel.DataLoadInfoInner";
 constexpr const int MAX_COLLECTION_SIZE = 10 * 1024;
