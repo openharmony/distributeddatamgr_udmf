@@ -30,9 +30,8 @@ const std::unordered_map<Status, std::pair<int, const char*>> REG_ERR_MAP = {
     {E_INVALID_TYPE_ID,      {INVALID_TYPE_ID,      "Error TypeId!"}},
 };
 
-void HandleStatus(const std::unordered_map<Status, std::pair<int, const char*>> &errMap,
-                         Status status,
-                         const char* defaultMsg)
+void HandleStatus(const std::unordered_map<Status, std::pair<int, const char*>> &errMap, Status status,
+    const char* defaultMsg)
 {
     auto it = errMap.find(status);
     if (it != errMap.end()) {
