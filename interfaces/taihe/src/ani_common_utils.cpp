@@ -34,9 +34,9 @@ constexpr const char* CLASSNAME_ARRAY_BUFFER = "escompat.ArrayBuffer";
 constexpr const char* CLASSNAME_UINT8_ARRAY = "escompat.Uint8Array";
 constexpr const char* CLASSNAME_RECORD = "std.core.Record";
 constexpr const char* CLASSNAME_OBJECT = "std.core.Object";
-constexpr const int MAX_KEY_COUNT = 10 * 1024;
+constexpr const char* CLASSNAME_DATA_LOAD_INFO = "@ohos.data.unifiedDataChannel.unifiedDataChannel.DataLoadInfoInner";
+constexpr const int MAX_COLLECTION_SIZE = 10 * 1024;
 constexpr const int MAX_DATA_BYTES = 100 * 1024 * 1024;
-
 
 ani_ref WrapMapParams(ani_env *env, const std::map<std::string, int64_t> &mapParams)
 {
@@ -123,6 +123,18 @@ ani_status SetInt(ani_env *env, int32_t value, ani_object &intObj)
     return ANI_OK;
 }
 
+ani_status SetString(ani_env *env, const std::string &value, ani_object &stringObj)
+{
+    ani_status status = ANI_ERROR;
+    ani_string aniStr = nullptr;
+    if ((status = env->String_NewUTF8(value.data(), value.size(), &aniStr)) != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "String_NewUTF8 failed, status : %{public}d", status);
+        return status;
+    }
+    stringObj = static_cast<ani_object>(aniStr);
+    return ANI_OK;
+}
+
 ani_status SetLong(ani_env *env, int64_t value, ani_object &longObj)
 {
     ani_class longCls;
@@ -183,7 +195,7 @@ ani_status SetBoolean(ani_env *env, bool value, ani_object &boolObj)
     return ANI_OK;
 }
 
-ani_status SetMap(ani_env *env, std::map<std::string, int64_t> value, ani_object &mapObj)
+ani_status SetMap(ani_env *env, std::map<std::string, int64_t> &value, ani_object &mapObj)
 {
     ani_class recordCls;
     ani_status status = ANI_ERROR;
@@ -196,7 +208,7 @@ ani_status SetMap(ani_env *env, std::map<std::string, int64_t> value, ani_object
         LOG_ERROR(UDMF_ANI, "Class_FindMethod failed, status : %{public}d", status);
         return status;
     }
-    if ((status = env->Object_New(recordCls, recordCtor, &mapObj, mapObj)) != ANI_OK) {
+    if ((status = env->Object_New(recordCls, recordCtor, &mapObj)) != ANI_OK) {
         LOG_ERROR(UDMF_ANI, "Object_New failed, status : %{public}d", status);
         return status;
     }
@@ -214,7 +226,7 @@ ani_status SetMap(ani_env *env, std::map<std::string, int64_t> value, ani_object
             continue;
         }
         ani_method recordSetter;
-        if ((status = env->Class_FindMethod(recordCls, "$_set", "Y:", &recordSetter)) != ANI_OK) {
+        if ((status = env->Class_FindMethod(recordCls, "$_set", "YY:", &recordSetter)) != ANI_OK) {
             LOG_WARN(UDMF_ANI, "FindClass failed, status : %{public}d", status);
             continue;
         }
@@ -223,6 +235,75 @@ ani_status SetMap(ani_env *env, std::map<std::string, int64_t> value, ani_object
             LOG_WARN(UDMF_ANI, "Object_CallMethod_Void status : %{public}d", status);
             continue;
         }
+    }
+    return ANI_OK;
+}
+
+ani_status SetSet(ani_env *env, std::set<std::string> &in, ani_object &out)
+{
+    ani_class setCls;
+    ani_status status = ANI_ERROR;
+    if ((status = env->FindClass(CLASSNAME_SET, &setCls)) != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "FindClass failed, status : %{public}d", status);
+        return status;
+    }
+    ani_method setCtor;
+    if ((status = env->Class_FindMethod(setCls, "<ctor>", "C{std.core.Array}:", &setCtor)) != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Class_FindMethod failed, status : %{public}d", status);
+        return status;
+    }
+    ani_array typesArray;
+    ani_ref initValue = {};
+    env->GetUndefined(&initValue);
+    env->Array_New(in.size(), initValue, &typesArray);
+    ani_size index = 0;
+    for (const auto &type : in) {
+        ani_object aniType;
+        status = SetString(env, type, aniType);
+        if (status != ANI_OK) {
+            LOG_ERROR(UDMF_ANI, "SetString fail %{public}d", status);
+            return status;
+        }
+        env->Array_Set(typesArray, index, aniType);
+        index++;
+    }
+    if ((status = env->Object_New(setCls, setCtor, &out, typesArray)) != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Object_New failed, status : %{public}d", status);
+        return status;
+    }
+    return ANI_OK;
+}
+
+ani_status SetAcceptableInfo(ani_env *env, DataLoadInfo &in, ani_object &out)
+{
+    ani_class cls;
+    auto status = env->FindClass(CLASSNAME_DATA_LOAD_INFO, &cls);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Find class fail, status: %{public}d", status);
+        return status;
+    }
+    ani_object recordCount;
+    status = SetLong(env, in.recordCount, recordCount);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "SetSet fail, status: %{public}d", status);
+        return status;
+    }
+    ani_object types;
+    status = SetSet(env, in.types, types);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "SetSet fail, status: %{public}d", status);
+        return status;
+    }
+    ani_method ctor;
+    status = env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Find method fail, status: %{public}d", status);
+        return status;
+    }
+    status = env->Object_New(cls, ctor, &out, recordCount, types);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Create object fail, status: %{public}d", status);
+        return status;
     }
     return ANI_OK;
 }
@@ -479,7 +560,7 @@ ani_status GetMap(ani_env *env, ani_object in, std::shared_ptr<Object> &out, int
         return status;
     }
     out = std::make_shared<Object>();
-    for (int loopCount = 0; loopCount < MAX_KEY_COUNT; ++loopCount) {
+    for (int loopCount = 0; loopCount < MAX_COLLECTION_SIZE; ++loopCount) {
         ani_ref next;
         ani_boolean done;
         status = env->Object_CallMethodByName_Ref(static_cast<ani_object>(keys), "next", nullptr, &next);
@@ -520,6 +601,86 @@ ani_status GetMap(ani_env *env, ani_object in, std::shared_ptr<Object> &out, int
             continue;
         }
         out->value_[key] = value;
+    }
+    return ANI_OK;
+}
+
+ani_status GetSet(ani_env *env, ani_object in, std::set<std::string> &out)
+{
+    ani_ref values;
+    ani_status status = env->Object_CallMethodByName_Ref(in, "keys", ":C{std.core.IterableIterator}", &values);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Failed to get values iterator, status %{public}d", status);
+        return status;
+    }
+    for (int loopCount = 0; loopCount < MAX_COLLECTION_SIZE; ++loopCount) {
+        ani_ref next;
+        ani_boolean done;
+        status = env->Object_CallMethodByName_Ref(static_cast<ani_object>(values), "next", nullptr, &next);
+        if (status != ANI_OK) {
+            LOG_ERROR(UDMF_ANI, "Failed to get next key, status %{public}d", status);
+            break;
+        }
+        status = env->Object_GetFieldByName_Boolean(static_cast<ani_object>(next), "done", &done);
+        if (status != ANI_OK) {
+            LOG_ERROR(UDMF_ANI, "Failed to check iterator done, status %{public}d", status);
+            break;
+        }
+        if (done) {
+            break;
+        }
+        ani_ref typeRef;
+        status = env->Object_GetFieldByName_Ref(static_cast<ani_object>(next), "value", &typeRef);
+        if (status != ANI_OK) {
+            LOG_WARN(UDMF_ANI, "Failed to get key value, status %{public}d", status);
+            continue;
+        }
+        std::string type;
+        status = GetString(env, static_cast<ani_object>(typeRef), type);
+        if (status != ANI_OK) {
+            LOG_WARN(UDMF_ANI, "Failed to get sring for key, status %{public}d", status);
+            continue;
+        }
+        out.insert(std::move(type));
+    }
+    return ANI_OK;
+}
+
+ani_status GetAcceptableInfo(ani_env *env, ani_object in, DataLoadInfo &out)
+{
+    if (IsNullOrUndefined(env, in)) {
+        LOG_ERROR(UDMF_ANI, "dataLoadInfo is null or undefined.");
+        return ANI_ERROR;
+    }
+    ani_ref recordCountRef;
+    auto status = env->Object_GetPropertyByName_Ref(in, "recordCount", &recordCountRef);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Long failed, status: %{public}d", status);
+        return status;
+    }
+    if (!IsNullOrUndefined(env, static_cast<ani_object>(recordCountRef))) {
+        int64_t recordCount;
+        status = GetLong(env, static_cast<ani_object>(recordCountRef), recordCount);
+        if (status != ANI_OK || recordCount < 0 || recordCount > UINT32_MAX) {
+            LOG_ERROR(UDMF_ANI, "get record count failed or recordCount out of range");
+            return ANI_ERROR;
+        }
+        out.recordCount = static_cast<uint32_t>(recordCount);
+    }
+    ani_ref types;
+    status = env->Object_GetPropertyByName_Ref(in, "types", &types);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Ref failed, status: %{public}d", status);
+        return status;
+    }
+    if (!IsNullOrUndefined(env, static_cast<ani_object>(types))) {
+        status = GetSet(env, static_cast<ani_object>(types), out.types);
+        if (status != ANI_OK) {
+            LOG_ERROR(UDMF_ANI, "GetSet failed.");
+            return status;
+        }
+    } else {
+        LOG_ERROR(UDMF_ANI, "IsNullOrUndefined 222");
     }
     return ANI_OK;
 }
