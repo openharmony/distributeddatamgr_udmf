@@ -38,6 +38,10 @@ static constexpr int NO_SYSTEM_PERMISSION = 202;
 static constexpr int INVALID_TYPE_ID = 20400004;
 static constexpr int FORMAT_ERROR = 20400002;
 static constexpr int CONTENT_ERROR = 20400003;
+extern const std::unordered_map<Status, std::pair<int, const char*>> REG_ERR_MAP;
+void HandleStatus(const std::unordered_map<Status, std::pair<int, const char*>> &errMap,
+                         Status status,
+                         const char* defaultMsg);
 Intention ConvertIntention(::ohos::data::unifiedDataChannel::Intention value);
 ::taihe::array<::taihe::string> ConvertStringVectorToTaiheArray(const std::vector<std::string>& stringVector);
 ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,

@@ -22,6 +22,28 @@
 
 namespace OHOS {
 namespace UDMF {
+const std::unordered_map<Status, std::pair<int, const char*>> REG_ERR_MAP = {
+    {E_NO_SYSTEM_PERMISSION, {NO_SYSTEM_PERMISSION, "Permission denied!"}},
+    {E_NO_PERMISSION,        {NOPERMISSION,        "Permission denied!"}},
+    {E_FORMAT_ERROR,         {FORMAT_ERROR,         "Error typeDescriptors format!"}},
+    {E_CONTENT_ERROR,        {CONTENT_ERROR,        "Error typeDescriptors content!"}},
+    {E_INVALID_TYPE_ID,      {INVALID_TYPE_ID,      "Error TypeId!"}},
+};
+
+void HandleStatus(const std::unordered_map<Status, std::pair<int, const char*>> &errMap,
+                         Status status,
+                         const char* defaultMsg)
+{
+    auto it = errMap.find(status);
+    if (it != errMap.end()) {
+        taihe::set_business_error(it->second.first, it->second.second);
+        LOG_ERROR(UDMF_ANI, "status:%{public}s", it->second.second);
+    } else if (status != E_OK) {
+        taihe::set_business_error(PARAMETERSERROR, defaultMsg);
+        LOG_ERROR(UDMF_ANI, "status:other error%{public}d", status);
+    }
+}
+
 using ConvertorToTaiheFunc = ::taiheChannel::ValueType (*)(std::shared_ptr<Object>);
 static const std::map<std::string, ConvertorToTaiheFunc> CONVERTORS_TO_TAIHE = {
     {"general.plain-text", ConvertPlainText},
