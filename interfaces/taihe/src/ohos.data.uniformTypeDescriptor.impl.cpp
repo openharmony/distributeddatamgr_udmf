@@ -35,6 +35,7 @@ constexpr size_t MAX_BELONGS_LEN = 1024;
 
 namespace OHOS {
 namespace UDMF {
+
 ::taihe::array<::taihe::string> GetUniformDataTypesByMIMEType(::taihe::string_view mimeType,
                                                               ::taihe::optional_view<::taihe::string> belongsTo)
 {
