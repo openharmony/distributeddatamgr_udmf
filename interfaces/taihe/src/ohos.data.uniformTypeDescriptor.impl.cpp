@@ -190,6 +190,53 @@ namespace UDMF {
         ::ohos::data::uniformTypeDescriptor::TypeDescriptor>(nativeDesc);
     return ::ohos::data::uniformTypeDescriptor::TypeDescriptorUnion::make_desc(std::move(holder));
 }
+
+::ohos::data::uniformTypeDescriptor::TypeDescriptor CreateTypeDescriptor()
+{
+    return taihe::make_holder<TypeDescriptorImpl, ::ohos::data::uniformTypeDescriptor::TypeDescriptor>();
+}
+
+void registerTypeDescriptorsSync(
+    ::taihe::array_view<::ohos::data::uniformTypeDescriptor::TypeDescriptor> typeDescriptors)
+{
+    std::vector<TypeDescriptorCfg> descriptors;
+    descriptors.reserve(typeDescriptors.size());
+    for (size_t i = 0; i < typeDescriptors.size(); ++i) {
+        TypeDescriptorCfg cfg;
+        auto &taiheDesc = typeDescriptors[i];
+        cfg.typeId = std::string(taiheDesc->GetTypeId());
+        cfg.description = std::string(taiheDesc->GetDescription());
+        cfg.referenceURL = std::string(taiheDesc->GetReferenceURL());
+        cfg.iconFile = std::string(taiheDesc->GetIconFile());
+        auto belongingToTypes = taiheDesc->GetBelongingToTypes();
+        cfg.belongingToTypes.reserve(belongingToTypes.size());
+        for (size_t j = 0; j < belongingToTypes.size(); ++j) {
+            cfg.belongingToTypes.emplace_back(std::string(belongingToTypes[j]));
+        }
+        auto filenameExtensions = taiheDesc->GetFilenameExtensions();
+        cfg.filenameExtensions.reserve(filenameExtensions.size());
+        for (size_t j = 0; j < filenameExtensions.size(); ++j) {
+            cfg.filenameExtensions.emplace_back(std::string(filenameExtensions[j]));
+        }
+        auto mimeTypes = taiheDesc->GetMimeTypes();
+        cfg.mimeTypes.reserve(mimeTypes.size());
+        for (size_t j = 0; j < mimeTypes.size(); ++j) {
+            cfg.mimeTypes.emplace_back(std::string(mimeTypes[j]));
+        }
+        descriptors.emplace_back(cfg);
+    }
+    Status status = UtdClient::GetInstance().RegisterTypeDescriptors(descriptors);
+    HandleStatus(REG_ERR_MAP, status, "RegisterTypeDescriptors failed!");
+}
+
+void unregisterTypeDescriptorsSync(::taihe::array_view<::taihe::string> typeIds)
+{
+    std::vector<std::string> ids(typeIds.size());
+    std::transform(typeIds.begin(), typeIds.end(), ids.begin(),
+        [](::taihe::string val) { return std::string(val); });
+    Status status = UtdClient::GetInstance().UnregisterTypeDescriptors(ids);
+    HandleStatus(REG_ERR_MAP, status, "UnregisterTypeDescriptors failed!");
+}
 } // namespace UDMF
 } // namespace OHOS
 
@@ -199,4 +246,7 @@ TH_EXPORT_CPP_API_GetUniformDataTypesByFilenameExtension(OHOS::UDMF::GetUniformD
 TH_EXPORT_CPP_API_GetUniformDataTypeByMIMEType(OHOS::UDMF::GetUniformDataTypeByMIMEType);
 TH_EXPORT_CPP_API_getUniformDataTypeByFilenameExtension(OHOS::UDMF::GetUniformDataTypeByFilenameExtension);
 TH_EXPORT_CPP_API_GetTypeDescriptor(OHOS::UDMF::GetTypeDescriptor);
+TH_EXPORT_CPP_API_CreateTypeDescriptor(OHOS::UDMF::CreateTypeDescriptor);
+TH_EXPORT_CPP_API_registerTypeDescriptorsSync(OHOS::UDMF::registerTypeDescriptorsSync);
+TH_EXPORT_CPP_API_unregisterTypeDescriptorsSync(OHOS::UDMF::unregisterTypeDescriptorsSync);
 // NOLINTEND

@@ -235,6 +235,9 @@ interface TypeDescriptor {
     Equals(thiz : TypeDescriptor): bool;
 }
 
+@ctor("TypeDescriptor")
+function CreateTypeDescriptor(): TypeDescriptor;
+
 union TypeDescriptorUnion {
     desc: TypeDescriptor;
     @null empty;
@@ -245,3 +248,7 @@ function GetUniformDataTypesByFilenameExtension(filenameExtension: String, belon
 function GetUniformDataTypeByMIMEType(mimeType: String, belongsTo: Optional<String>): String;
 function getUniformDataTypeByFilenameExtension(filenameExtension: String, belongsTo: Optional<String>): String;
 function GetTypeDescriptor(typeId: String): TypeDescriptorUnion;
+@gen_promise("registerTypeDescriptors")
+function registerTypeDescriptorsSync(typeDescriptors: Array<TypeDescriptor>): void;
+@gen_promise("unregisterTypeDescriptors")
+function unregisterTypeDescriptorsSync(typeIds: Array<String>): void;
