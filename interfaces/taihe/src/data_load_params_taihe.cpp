@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -89,7 +89,7 @@ bool DataLoadParamsTaihe::SetLoadHandler(
         LOG_INFO(UDMF_ANI, "Load handler Start.");
         auto seqKey = UTILS::GetSequenceKey(udKey);
         if (seqKey.empty()) {
-            LOG_ERROR(UDMF_KITS_NAPI, "Error udKey:%{public}s", udKey.c_str());
+            LOG_ERROR(UDMF_ANI, "Error udKey:%{public}s", udKey.c_str());
             return;
         }
         bool anifnExist = anifns.ComputeIfPresent(seqKey, [&](const std::string &key, ani_fn_object &anifn) {
@@ -116,7 +116,9 @@ bool DataLoadParamsTaihe::SetLoadHandler(
             vm->DetachCurrentThread();
             return false;
         });
-        if (!anifnExist) { LOG_INFO(UDMF_ANI, "No listener exist."); }
+        if (!anifnExist) {
+            LOG_INFO(UDMF_ANI, "No listener exists."); 
+        }
     };
     return true;
 }
@@ -152,7 +154,7 @@ int32_t DataLoadParamsTaihe::HandleUnifiedData(ani_env *env, std::string udKey, 
     }
     auto ret = UdmfClient::GetInstance().PushDelayData(udKey, *data);
     if (ret != E_OK) {
-        LOG_ERROR(UDMF_KITS_NAPI, "SetData failed, status=%{public}d", ret);
+        LOG_ERROR(UDMF_ANI, "SetData failed, status=%{public}d", ret);
     }
     return ret;
 }

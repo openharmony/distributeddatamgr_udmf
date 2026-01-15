@@ -680,8 +680,6 @@ ani_status GetAcceptableInfo(ani_env *env, ani_object in, DataLoadInfo &out)
             LOG_ERROR(UDMF_ANI, "GetSet failed.");
             return status;
         }
-    } else {
-        LOG_ERROR(UDMF_ANI, "IsNullOrUndefined 222");
     }
     return ANI_OK;
 }
