@@ -117,7 +117,7 @@ bool DataLoadParamsTaihe::SetLoadHandler(
             return false;
         });
         if (!anifnExist) {
-            LOG_INFO(UDMF_ANI, "No listener exists."); 
+            LOG_INFO(UDMF_ANI, "No listener exists.");
         }
     };
     return true;
