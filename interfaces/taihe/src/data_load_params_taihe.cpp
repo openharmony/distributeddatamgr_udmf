@@ -106,6 +106,7 @@ bool DataLoadParamsTaihe::SetLoadHandler(
             }
             ani_ref result;
             status = CallHandler(workerEnv, anifn, acceptableInfo, isAsync, result);
+            env->GlobalReference_Delete(anifn);
             if (status != ANI_OK) {
                 LOG_ERROR(UDMF_ANI, "CallHandler failed, status=%{public}d", status);
                 vm->DetachCurrentThread();
@@ -192,4 +193,4 @@ ani_status DataLoadParamsTaihe::CallHandler(ani_env *env, ani_fn_object &anifn,
     return status;
 }
 } // namespace UDMF
-} // namespace OHOS
+} // namespace OHOS
