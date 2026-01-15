@@ -106,7 +106,7 @@ bool DataLoadParamsTaihe::SetLoadHandler(
             }
             ani_ref result;
             status = CallHandler(workerEnv, anifn, acceptableInfo, isAsync, result);
-            env->GlobalReference_Delete(anifn);
+            workerEnv->GlobalReference_Delete(anifn);
             if (status != ANI_OK) {
                 LOG_ERROR(UDMF_ANI, "CallHandler failed, status=%{public}d", status);
                 vm->DetachCurrentThread();
