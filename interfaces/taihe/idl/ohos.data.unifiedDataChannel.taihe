@@ -170,6 +170,17 @@ struct ProgressInfo {
 
 struct DataLoadInfo {
   recordCount: Optional<i64>;
+  types: Optional<@sts_type("Set<String>") Opaque>;
+}
+
+@!sts_inject("""
+export type DelayedDataLoadHandler = (acceptableInfo?: DataLoadInfo) => Promise<UnifiedData | null>;
+""")
+
+struct DataLoadParams {
+  loadHandler: (@optional acceptableInfo: Optional<DataLoadInfo>) => UnifiedDataOrNull;
+  dataLoadInfo: DataLoadInfo;
+  delayedDataLoadHandler:  @sts_type("DelayedDataLoadHandler") Opaque;
 }
 
 struct GetDataParams {
@@ -1519,6 +1530,16 @@ class ProgressInfoInner implements ProgressInfo {
     }
 }
 
+class DataLoadInfoInner implements DataLoadInfo {
+    recordCount: (long | undefined);
+    types: (Set<String> | undefined);
+    constructor(recordCount: (long | undefined), types: (Set<String> | undefined))
+    {
+        this.recordCount = recordCount;
+        this.types = types;
+    }
+}
+
 export function summaryTransferStatic(input: Any): object {
     return summaryTransferStaticImpl(ESValue.wrap(input));
 }
@@ -1570,6 +1591,16 @@ export function applicationDefinedRecordTransferStatic(input: Any): object {
 
 export function applicationDefinedRecordTransferDynamic(input: object): Any {
     return applicationDefinedRecordTransferDynamicImpl((input as ApplicationDefinedRecord).inner);
+}
+
+async function delayedDataLoadHandlerFuncAsync(
+    handler: DelayedDataLoadHandler, info: DataLoadInfo): Promise<UnifiedData | null> {
+    return handler(info);
+}
+
+function delayedDataLoadHandlerFunc(handler: DelayedDataLoadHandler, info: DataLoadInfo): UnifiedData | null {
+    let ret = await delayedDataLoadHandlerFuncAsync(handler, info);
+    return ret;
 }
 """)
 

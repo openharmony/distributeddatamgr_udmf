@@ -74,6 +74,7 @@ taihe_shared_library("udmf_taihe_native") {
     "src/ani_constructor.cpp",
     "src/application_defined_record_taihe.cpp",
     "src/audio_taihe.cpp",
+    "src/data_load_params_taihe.cpp",
     "src/defined_appitem_taihe.cpp",
     "src/defined_form_taihe.cpp",
     "src/defined_pixelmap_taihe.cpp",

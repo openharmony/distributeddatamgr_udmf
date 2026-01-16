@@ -137,17 +137,11 @@ bool GetDataParamsTaihe::SetAcceptableInfo(ani_env *env, ani_object in, GetDataP
         LOG_ERROR(UDMF_ANI, "dataLoadInfo is null or undefined.");
         return false;
     }
-    ani_long recordCount;
-    status = env->Object_GetPropertyByName_Long(dataLoadInfo, "recordCount", &recordCount);
+    status = GetAcceptableInfo(env, dataLoadInfo, getDataParams.acceptableInfo);
     if (status != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "Object_GetPropertyByName_Long failed.");
+        LOG_ERROR(UDMF_ANI, "GetAcceptableInfo failed.");
         return false;
     }
-    if (recordCount < 0 || recordCount > UINT32_MAX) {
-        LOG_ERROR(UDMF_ANI, "recordCount out of range");
-        return false;
-    }
-    getDataParams.acceptableInfo.recordCount = static_cast<uint32_t>(recordCount);
     return true;
 }
 

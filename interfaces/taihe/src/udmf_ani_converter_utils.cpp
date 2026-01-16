@@ -16,6 +16,7 @@
 #define LOG_TAG "UDMF_ANI_CONVERTER_UTILS"
 
 #include "ani_common_utils.h"
+#include "data_load_params_taihe.h"
 #include "get_data_params_taihe.h"
 #include "logger.h"
 #include "ohos.data.unifiedDataChannel.proj.hpp"
@@ -184,5 +185,11 @@ GetDataParams AniConverter::UnwrapGetDataParams(ani_env *env, ani_object object,
     return params;
 }
 
+DataLoadParams AniConverter::UnwrapDataLoadParams(ani_env *env, ani_object object)
+{
+    DataLoadParams params;
+    DataLoadParamsTaihe::Convert2NativeValue(env, object, params);
+    return params;
+}
 } // namespace UDMF
 } // namespace OHOS
