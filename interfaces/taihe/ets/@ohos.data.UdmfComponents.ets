@@ -17,6 +17,7 @@ import { AnimatorResult } from '@ohos.animator'
 import { State, Watch, PropRef } from '@ohos.arkui.stateManagement'
 import common from '@ohos.app.ability.common';
 import I18n from '@ohos.i18n';
+import { BusinessError } from '@ohos.base';
 import image from '@ohos.multimedia.image';
 import uniformDataStruct from '@ohos.data.uniformDataStruct';
 import {
@@ -26,7 +27,6 @@ import {
   Column,
   Row,
   Text,
-  BusinessError,
   Button,
   Margin,
   ImageFit,
