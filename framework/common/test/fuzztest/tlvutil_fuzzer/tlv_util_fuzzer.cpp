@@ -473,11 +473,9 @@ void ReadingDataLoadInfoFuzz(FuzzedDataProvider &provider)
     std::uint8_t data2 = provider.ConsumeIntegral<uint8_t>();
     std::vector<std::uint8_t> buffer = { data1, data2 };
     DataLoadInfo input;
-    input.deviceId = provider.ConsumeRandomLengthString();
     input.sequenceKey = provider.ConsumeRandomLengthString();
     input.recordCount = provider.ConsumeIntegral<uint32_t>();
     input.types.emplace(provider.ConsumeRandomLengthString());
-    input.udKey = provider.ConsumeRandomLengthString();
     DataLoadInfo output;
 
     TLVObject data(buffer);

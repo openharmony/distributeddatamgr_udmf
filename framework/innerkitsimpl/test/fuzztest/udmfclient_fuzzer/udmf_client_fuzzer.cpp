@@ -710,6 +710,21 @@ void RemoveAppShareOptionFuzz(FuzzedDataProvider &provider)
     UdmfClient::GetInstance().RemoveAppShareOption(intentionStr);
 }
 
+void GetParentTypeFuzz(FuzzedDataProvider &provider)
+{
+    Summary oldSummary;
+    Summary newSummary;
+ 
+    size_t summarySize = provider.ConsumeIntegralInRange<size_t>(0, 10);
+    for (size_t i = 0; i < summarySize; ++i) {
+        std::string key = provider.ConsumeRandomLengthString();
+        int64_t value = provider.ConsumeIntegral<int64_t>();
+        oldSummary.summary[key] = value;
+    }
+    oldSummary.totalSize = provider.ConsumeIntegral<int64_t>();
+    UdmfClient::GetInstance().GetParentType(oldSummary, newSummary);
+}
+
 void SetDelayInfoFuzz(FuzzedDataProvider &provider)
 {
     DataLoadInfo dataLoadInfo1 {
@@ -826,6 +841,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::SetAppShareOptionFuzz(provider);
     OHOS::GetAppShareOptionFuzz(provider);
     OHOS::RemoveAppShareOptionFuzz(provider);
+    OHOS::GetParentTypeFuzz(provider);
     OHOS::SetDelayInfoFuzz(provider);
     OHOS::PushDelayDataFuzz(provider);
     OHOS::GetBundleNameByUdKeyFuzz(provider);

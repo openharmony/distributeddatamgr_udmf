@@ -91,7 +91,7 @@ std::vector<std::string> UdmfImgExtractor::ExecuteXPath(xmlDocPtr doc, const cha
 
     std::vector<std::string> results;
     xmlNodeSetPtr nodeSet = result->nodesetval;
-    for (size_t i = 0; i < nodeSet->nodeNr; ++i) {
+    for (auto i = 0; i < nodeSet->nodeNr; ++i) {
         xmlNodePtr node = nodeSet->nodeTab[i];
         if (node == nullptr) {
             continue;

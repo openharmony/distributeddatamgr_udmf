@@ -494,6 +494,20 @@ HWTEST_F(UtdDynamicUpdateTest, permissiontest001, TestSize.Level1)
 };
 
 /**
+* @tc.name: RegServiceNotifier001
+* @tc.desc: Manual trigger register notifier
+* @tc.type: FUNC
+*/
+HWTEST_F(UtdDynamicUpdateTest, RegServiceNotifier001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "RegServiceNotifier001 begin.");
+    AllocHapToken1();
+    auto status = UtdClient::GetInstance().RegServiceNotifier();
+    ASSERT_TRUE(status == E_OK);
+    LOG_INFO(UDMF_TEST, "RegServiceNotifier001 end.");
+};
+
+/**
 * @tc.name: TypeDescriptor001
 * @tc.desc: Normal test case
 * @tc.type: FUNC
@@ -739,7 +753,7 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds010, TestSize.Level1)
 
 /**
  @tc.name: InstallDynamicUtds011
- @tc.desc: Abnormal test, error mimetype size
+ @tc.desc: Abnormal test, error mimeTypes size
  @tc.type: FUNC
 */
 HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds011, TestSize.Level1)
@@ -788,6 +802,25 @@ HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds012, TestSize.Level1)
 };
 
 /**
+ @tc.name: InstallDynamicUtds013
+ @tc.desc: Abnormal test, error fileExtentions size
+ @tc.type: FUNC
+*/
+HWTEST_F(UtdDynamicUpdateTest, InstallDynamicUtds013, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "InstallDynamicUtds013 begin.");
+    AllocFoundationToken();
+    std::string bundleName = HAP_BUNDLE_NAME;
+    std::vector<TypeDescriptorCfg> customTypeCfgs(1);
+    customTypeCfgs[0].typeId = bundleName + ".ppp";
+    customTypeCfgs[0].belongingToTypes = {"general.file"};
+    customTypeCfgs[0].filenameExtensions = std::vector<std::string>(51, ".ppp");
+    auto status = UtdClient::GetInstance().InstallDynamicUtds(bundleName, customTypeCfgs);
+    EXPECT_EQ(status, E_FORMAT_ERROR);
+    LOG_INFO(UDMF_TEST, "InstallDynamicUtds013 end.");
+}
+
+/**
  @tc.name: UninstallDynamicUtds001
  @tc.desc: Abnormal test, typeId not exist
  @tc.type: FUNC
@@ -796,9 +829,9 @@ HWTEST_F(UtdDynamicUpdateTest, UninstallDynamicUtds001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "UninstallDynamicUtds001 begin.");
     AllocFoundationToken();
-
-    std::vector<std::string> typeIds = {std::string(HAP_BUNDLE_NAME) + ".sss"};
-    auto status = UtdClient::GetInstance().UninstallDynamicUtds(HAP_BUNDLE_NAME, typeIds);
+    std::string bundleName = HAP_BUNDLE_NAME;
+    std::vector<std::string> typeIds = {bundleName + ".sss"};
+    auto status = UtdClient::GetInstance().UninstallDynamicUtds(bundleName, typeIds);
     EXPECT_EQ(status, E_INVALID_TYPE_ID);
     LOG_INFO(UDMF_TEST, "UninstallDynamicUtds001 end.");
 }
@@ -825,5 +858,45 @@ HWTEST_F(UtdDynamicUpdateTest, UninstallDynamicUtds002, TestSize.Level1)
     status = UtdClient::GetInstance().UninstallDynamicUtds(bundleName, {customTypeCfgs[0].typeId});
     EXPECT_EQ(status, E_OK);
     LOG_INFO(UDMF_TEST, "UninstallDynamicUtds002 end.");
+}
+
+/**
+ @tc.name: CustomUtdStoreUninstallDynamicUtds001
+ @tc.desc: Normal test
+ @tc.type: FUNC
+*/
+HWTEST_F(UtdDynamicUpdateTest, CustomUtdStoreUninstallDynamicUtds001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CustomUtdStoreUninstallDynamicUtds001 begin.");
+    AllocFoundationToken();
+
+    auto utds = CustomUtdStore::GetInstance().GetDynamicUtd(false, USER_ID);
+    auto size = utds.size();
+
+    std::string bundleName = HAP_BUNDLE_NAME;
+    std::vector<TypeDescriptorCfg> customTypeCfgs(1);
+    customTypeCfgs[0].typeId = bundleName + ".ppp";
+    customTypeCfgs[0].belongingToTypes = {"general.file"};
+    auto status = UtdClient::GetInstance().InstallDynamicUtds(bundleName, customTypeCfgs);
+    EXPECT_EQ(status, E_OK);
+
+    UtdUpdateContext context = {
+        .bundleName = SYS_HAP_BUNDLE_NAME,
+        .userId = USER_ID,
+        .presetCfgs = PresetTypeDescriptors::GetInstance().GetPresetTypes(),
+        .installedCustomUtdCfgs = CustomUtdStore::GetInstance().GetCustomUtd(false, USER_ID),
+        .installedDynamicUtdCfgs = CustomUtdStore::GetInstance().GetDynamicUtd(false, USER_ID),
+    };
+
+    status = CustomUtdStore::GetInstance().UninstallDynamicUtds(context);
+    EXPECT_EQ(status, E_OK);
+
+    context.bundleName = bundleName;
+    status = CustomUtdStore::GetInstance().UninstallDynamicUtds(context);
+    EXPECT_EQ(status, E_OK);
+
+    utds = CustomUtdStore::GetInstance().GetDynamicUtd(false, USER_ID);
+    EXPECT_EQ(utds.size(), size);
+    LOG_INFO(UDMF_TEST, "CustomUtdStoreUninstallDynamicUtds001 end.");
 }
 } // namespace OHOS::Test

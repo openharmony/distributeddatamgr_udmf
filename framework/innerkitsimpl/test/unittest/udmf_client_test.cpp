@@ -4226,6 +4226,39 @@ HWTEST_F(UdmfClientTest, SetData036, TestSize.Level1)
 }
 
 /**
+* @tc.name: GetParentType001
+* @tc.desc: test Summary fileType
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetParentType001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetParentType001 begin.");
+    Summary oldSummary;
+    std::map<std::string, int64_t> sumMap = {
+        { "general.file", 10 },
+        { "general.png", 10 },
+        { "general.html", 10 },
+        { "general.jpeg", 10 },
+        { "general.avi", 10 },
+        { "com.adobe.pdf", 10 },
+        { "general.text", 10 },
+        { "aabbcc", 10 }
+    };
+    oldSummary.summary = std::move(sumMap);
+    oldSummary.totalSize = 80;
+    Summary newSummary;
+    auto ret = UdmfClient::GetInstance().GetParentType(oldSummary, newSummary);
+    ASSERT_EQ(ret, E_OK);
+    EXPECT_EQ(newSummary.totalSize, 80);
+    EXPECT_EQ(newSummary.summary["general.file"], 20);
+    EXPECT_EQ(newSummary.summary["general.image"], 20);
+    EXPECT_EQ(newSummary.summary["general.html"], 10);
+    EXPECT_EQ(newSummary.summary["general.video"], 10);
+    EXPECT_EQ(newSummary.summary["aabbcc"], 10);
+    EXPECT_EQ(newSummary.summary["general.text"], 10);
+}
+
+/**
  * @tc.name: GetBundleNameByUdKey001
  * @tc.desc: test GetBundleNameByUdKey with valid UD key
  * @tc.type: FUNC
