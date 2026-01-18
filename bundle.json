@@ -53,7 +53,8 @@
         "//foundation/distributeddatamgr/udmf:udmf_packages",
         "//foundation/distributeddatamgr/udmf/interfaces/components:udmfcomponents",
         "//foundation/distributeddatamgr/udmf/conf:utd_conf",
-        "//foundation/distributeddatamgr/udmf/interfaces/taihe:udmf_taihe"
+        "//foundation/distributeddatamgr/udmf/interfaces/taihe:udmf_taihe",
+        "//foundation/distributeddatamgr/udmf/interfaces/taihe/ets:udmf_components_ets"
       ],
       "inner_kits": [
         {
