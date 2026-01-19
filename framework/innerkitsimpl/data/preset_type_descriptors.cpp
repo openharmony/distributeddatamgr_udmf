@@ -17,7 +17,6 @@
 #include "preset_type_descriptors.h"
 #include <sstream>
 #include <fstream>
-#include "cJSON.h"
 #include "custom_utd_json_parser.h"
 #include "logger.h"
 
@@ -25,6 +24,7 @@ namespace OHOS {
 namespace UDMF {
 static constexpr const char *UTD_CONF_PATH = "/system/etc/utd/conf/";
 static constexpr const char *UNIFORM_DATA_TYPES_JSON_PATH = "uniform_data_types.json";
+using json = nlohmann::json;
 
 PresetTypeDescriptors::PresetTypeDescriptors()
 {
@@ -69,18 +69,20 @@ void PresetTypeDescriptors::InitDescriptors()
     }
     fin.close();
     CustomUtdJsonParser utdJsonParser;
-    cJSON* jsonRoot = cJSON_Parse(oss.str().c_str());
-    if (jsonRoot != NULL && cJSON_IsObject(jsonRoot)) {
+    auto jsonRoot = json::parse(oss.str(), nullptr, false);
+    if (jsonRoot.is_discarded()) {
+        LOG_ERROR(UDMF_CLIENT, "Failed to parse uniform data types json file");
+        return;
+    }
+    if (jsonRoot.is_object()) {
         std::lock_guard<std::recursive_mutex> lock(mutex_);
         if (!typeDescriptors_.empty()) {
             LOG_INFO(UDMF_CLIENT, "Preset type descriptors already init, utd size is %{public}zu",
                 typeDescriptors_.size());
-            cJSON_Delete(jsonRoot);
             return;
         }
-        utdJsonParser.GetTypeDescriptors(*jsonRoot, UTD_CUSTOM_DECLARATION, typeDescriptors_);
+        utdJsonParser.GetTypeDescriptors(jsonRoot, UTD_CUSTOM_DECLARATION, typeDescriptors_);
     }
-    cJSON_Delete(jsonRoot);
     LOG_INFO(UDMF_CLIENT, "Preset type descriptors init success, utd size is %{public}zu", typeDescriptors_.size());
 };
 } // namespace UDMF

@@ -91,7 +91,6 @@ ohos_shared_library("udmf_client") {
     "access_token:libaccesstoken_sdk",
     "app_file_service:fileuri_native",
     "bundle_framework:appexecfwk_core",
-    "cJSON:cjson",
     "c_utils:utils",
     "dfs_service:distributed_file_daemon_kit_inner",
     "hilog:libhilog",
@@ -163,7 +162,6 @@ ohos_shared_library("utd_client") {
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
-    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
@@ -172,7 +170,6 @@ ohos_shared_library("utd_client") {
     "samgr:samgr_proxy",
   ]
 
-  public_external_deps = [ "cJSON:cjson" ]
   use_exceptions = true
   innerapi_tags = [ "platformsdk" ]
   subsystem_name = "distributeddatamgr"

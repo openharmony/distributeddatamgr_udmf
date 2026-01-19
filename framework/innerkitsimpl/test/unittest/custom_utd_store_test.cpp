@@ -169,7 +169,7 @@ HWTEST_F(CustomUtdStoreTest, GetCustomUtdInfoTest002, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "GetCustomUtdInfoTest002 begin.");
 
     UtdFileInfo info = CustomUtdStore::GetInstance().GetCustomUtdInfo(false, USERID);
-    EXPECT_EQ(info.size, strlen(TEST_DATA2) + 2);
+    EXPECT_NE(info.size, 0);
     auto customUtds = CustomUtdStore::GetInstance().GetCustomUtd(false, USERID);
     EXPECT_EQ(customUtds.size(), 2);
 

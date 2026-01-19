@@ -903,4 +903,107 @@ HWTEST_F(UdmfAsyncClientTest, Clear001, TestSize.Level1)
     EXPECT_EQ(status, E_ERROR);
     LOG_INFO(UDMF_TEST, "Clear001 end.");
 }
+
+/* *
+ * @tc.name: GetInnerDataParams001
+ * @tc.desc: Abnormal test, empty key
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfAsyncClientTest, GetInnerDataParams001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetInnerDataParams001 begin.");
+    OH_UdmfGetDataParams param;
+    OH_UdmfGetDataParams_SetProgressIndicator(&param, Udmf_ProgressIndicator::UDMF_DEFAULT);
+    OH_UdmfGetDataParams_SetDestUri(&param, "/test/demo");
+    OH_UdmfGetDataParams_SetFileConflictOptions(&param, Udmf_FileConflictOptions::UDMF_SKIP);
+    OH_Udmf_DataProgressListener dataProgressListener = [](OH_Udmf_ProgressInfo *progressInfo, OH_UdmfData *data) {
+        auto progress = OH_UdmfProgressInfo_GetProgress(progressInfo);
+        auto status = OH_UdmfProgressInfo_GetStatus(progressInfo);
+        LOG_INFO(UDMF_TEST, "Callback begin status=%{public}d, progress=%{public}d.", status, progress);
+        if (data == nullptr) {
+            ASSERT_TRUE(progress != 0);
+            return;
+        }
+        unsigned int count = 0;
+        OH_UdmfData_GetRecords(data, &count);
+        ASSERT_EQ(1, count);
+    };
+    OH_UdmfGetDataParams_SetDataProgressListener(&param, dataProgressListener);
+    
+    QueryOption query = {
+        .intention = UD_INTENTION_DRAG,
+        .key = ""
+    };
+
+    GetDataParams dataParams;
+    auto status = DataParamsConversion::GetInnerDataParams(param, query, dataParams);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+    LOG_INFO(UDMF_TEST, "GetInnerDataParams001 end.");
+}
+
+/* *
+ * @tc.name: GetInnerDataParams002
+ * @tc.desc: Abnormal test, progressListener is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfAsyncClientTest, GetInnerDataParams002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetInnerDataParams002 begin.");
+    OH_UdmfGetDataParams param;
+    OH_UdmfGetDataParams_SetProgressIndicator(&param, Udmf_ProgressIndicator::UDMF_DEFAULT);
+    OH_UdmfGetDataParams_SetDestUri(&param, "/test/demo");
+    OH_UdmfGetDataParams_SetFileConflictOptions(&param, Udmf_FileConflictOptions::UDMF_SKIP);
+    QueryOption query = {
+        .intention = UD_INTENTION_DRAG,
+        .key = "udmf://drag/com.example.test/L]WQ=JezoKgDc8\\Rz`q6koADcGRdKMnf"
+    };
+
+    GetDataParams dataParams;
+    auto status = DataParamsConversion::GetInnerDataParams(param, query, dataParams);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+    LOG_INFO(UDMF_TEST, "GetInnerDataParams002 end.");
+}
+
+/* *
+ * @tc.name: GetInnerDataParams003
+ * @tc.desc: Abnormal test, type count exceed limit
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfAsyncClientTest, GetInnerDataParams003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetInnerDataParams003 begin.");
+    OH_UdmfGetDataParams param;
+    OH_UdmfGetDataParams_SetProgressIndicator(&param, Udmf_ProgressIndicator::UDMF_DEFAULT);
+    OH_UdmfGetDataParams_SetDestUri(&param, "/test/demo");
+    OH_UdmfGetDataParams_SetFileConflictOptions(&param, Udmf_FileConflictOptions::UDMF_SKIP);
+    OH_Udmf_DataProgressListener dataProgressListener = [](OH_Udmf_ProgressInfo *progressInfo, OH_UdmfData *data) {
+        auto progress = OH_UdmfProgressInfo_GetProgress(progressInfo);
+        auto status = OH_UdmfProgressInfo_GetStatus(progressInfo);
+        LOG_INFO(UDMF_TEST, "Callback begin status=%{public}d, progress=%{public}d.", status, progress);
+        if (data == nullptr) {
+            ASSERT_TRUE(progress != 0);
+            return;
+        }
+        unsigned int count = 0;
+        OH_UdmfData_GetRecords(data, &count);
+        ASSERT_EQ(1, count);
+    };
+    OH_UdmfGetDataParams_SetDataProgressListener(&param, dataProgressListener);
+
+    OH_UdmfDataLoadInfo *info = OH_UdmfDataLoadInfo_Create();
+    for (auto i = 0; i < 1001; ++i) {
+        OH_UdmfDataLoadInfo_SetType(info, std::to_string(i).c_str());
+    }
+    OH_UdmfGetDataParams_SetAcceptableInfo(&param, info);
+    
+    QueryOption query = {
+        .intention = UD_INTENTION_DRAG,
+        .key = "udmf://drag/com.example.test/L]WQ=JezoKgDc8\\Rz`q6koADcGRdKMnf"
+    };
+
+    GetDataParams dataParams;
+    auto status = DataParamsConversion::GetInnerDataParams(param, query, dataParams);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+    LOG_INFO(UDMF_TEST, "GetInnerDataParams003 end.");
+}
 } // OHOS::Test
