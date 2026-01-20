@@ -14,7 +14,7 @@
  */
 
 import { AnimatorResult } from '@ohos.animator'
-import { State, Prop, Watch, PropRef } from '@ohos.arkui.stateManagement'
+import { State, Watch, PropRef } from '@ohos.arkui.stateManagement'
 import common from '@ohos.app.ability.common';
 import I18n from '@ohos.i18n';
 import image from '@ohos.multimedia.image';
