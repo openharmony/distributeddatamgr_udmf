@@ -539,13 +539,13 @@ enum UDType : int32_t {
     OPENHARMONY_GOBRUSHES,
     OPENHARMONY_GOCOLOR,
     OPENHARMONY_DLP,
+    KML,
+    KMZ,
+    GPX,
     IWORK,
     IWORK_KEYNOTE,
     IWORK_NUMBERS,
     IWORK_PAGES,
-    KML,
-    KMZ,
-    GPX,
     UD_BUTT
 };
 

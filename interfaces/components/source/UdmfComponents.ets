@@ -225,10 +225,10 @@ export struct ContentFormCard {
   initAnimator() {
     this.backAnimator = this.getUIContext().createAnimator({
       duration: 300,
-      easing: "friction",
+      easing: 'friction',
       delay: 0,
-      fill: "forwards",
-      direction: "normal",
+      fill: 'forwards',
+      direction: 'normal',
       iterations: 1,
       begin: this.cardWidth,
       end: this.widthEnd
@@ -260,7 +260,8 @@ export struct ContentFormCard {
         defaultWidth = DEFAULT_MID_CARD_WIDTH;
         break;
       default:
-        scale = this.formWidth ? (this.formWidth / DEFAULT_SMALL_CARD_WIDTH) : this.formHeight / DEFAULT_SMALL_CARD_HEIGHT;
+        scale = this.formWidth ?
+            (this.formWidth / DEFAULT_SMALL_CARD_WIDTH) : this.formHeight / DEFAULT_SMALL_CARD_HEIGHT;
         break;
     }
     let minScale = this.formType === FormType.TYPE_SMALL ? SMALL_MIN_CARD_SCALE : MIN_CARD_SCALE;

@@ -509,13 +509,13 @@ static constexpr UtdType UTD_TYPES[] = {
     { OPENHARMONY_GOBRUSHES, "OPENHARMONY_GOBRUSHES", "openharmony.gobrushes" },
     { OPENHARMONY_GOCOLOR, "OPENHARMONY_GOCOLOR", "openharmony.gocolor" },
     { OPENHARMONY_DLP, "OPENHARMONY_DLP", "openharmony.dlp"},
+    { KML, "KML", "general.kml" },
+    { KMZ, "KMZ", "general.kmz" },
+    { GPX, "GPX", "general.gpx" },
     { IWORK, "IWORK", "com.apple.iwork" },
     { IWORK_KEYNOTE, "IWORK_KEYNOTE", "com.apple.iwork.keynote.key" },
     { IWORK_NUMBERS, "IWORK_NUMBERS", "com.apple.iwork.numbers.numbers" },
-    { IWORK_PAGES, "IWORK_PAGES", "com.apple.iwork.pages.pages" },
-    { KML, "KML", "general.kml" },
-    { KMZ, "KMZ", "general.kmz" },
-    { GPX, "GPX", "general.gpx" }
+    { IWORK_PAGES, "IWORK_PAGES", "com.apple.iwork.pages.pages" }
 };
 
 static constexpr std::initializer_list<std::string_view> NOT_NEED_COUNT_VALUE_LIST = {

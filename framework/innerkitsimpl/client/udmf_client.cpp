@@ -326,6 +326,26 @@ Status UdmfClient::GetDataFromCache(const QueryOption &query, UnifiedData &unifi
     return E_NOT_FOUND;
 }
 
+Status UdmfClient::GetParentType(Summary &oldSummary, Summary &newSummary)
+{
+    std::map<std::string, int64_t> tmpSummary;
+    for (const auto &[type, size] : oldSummary.summary) {
+        std::string fileType = UnifiedDataUtils::GetBelongsToFileType(type);
+        if (fileType.empty()) {
+            tmpSummary[type] = size;
+            continue;
+        }
+        if (tmpSummary.find(fileType) != tmpSummary.end()) {
+            tmpSummary[fileType] += size;
+        } else {
+            tmpSummary[fileType] = size;
+        }
+    }
+    newSummary.summary = std::move(tmpSummary);
+    newSummary.totalSize = oldSummary.totalSize;
+    return E_OK;
+}
+
 Status UdmfClient::SetDelayInfo(const DataLoadParams &dataLoadParams, std::string &key)
 {
     if (dataLoadParams.dataLoadInfo.sequenceKey.length() != KEY_LEN) {

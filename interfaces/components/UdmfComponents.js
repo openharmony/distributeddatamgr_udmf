@@ -387,10 +387,10 @@ export class ContentFormCard extends ViewPU {
     initAnimator() {
         this.backAnimator = this.getUIContext().createAnimator({
             duration: 300,
-            easing: "friction",
+            easing: 'friction',
             delay: 0,
-            fill: "forwards",
-            direction: "normal",
+            fill: 'forwards',
+            direction: 'normal',
             iterations: 1,
             begin: this.cardWidth,
             end: this.widthEnd

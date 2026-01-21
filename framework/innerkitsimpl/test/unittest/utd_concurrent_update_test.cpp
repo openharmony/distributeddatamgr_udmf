@@ -242,7 +242,9 @@ HWTEST_F(UtdConcurrentUpdateTest, MultiThreadUpdate002, TestSize.Level1)
         for (int j = 1; j <= numThreads; ++j) {
             threads.emplace_back(worker, j);
         }
-        for (auto &t : threads) { t.join(); }
+        for (auto &t : threads) {
+            t.join();
+        }
 
         auto dynamicTypeCfgs = CustomUtdStore::GetInstance().GetDynamicUtd(false, USERID);
         if (op) {
@@ -262,5 +264,6 @@ HWTEST_F(UtdConcurrentUpdateTest, MultiThreadUpdate002, TestSize.Level1)
     }
     auto dynamicTypeCfgs = CustomUtdStore::GetInstance().GetDynamicUtd(false, USERID);
     EXPECT_EQ(dynamicTypeCfgs.size(), prevSize);
+    LOG_INFO(UDMF_CLIENT, "MultiThreadUpdate002 done");
 };
 } // namespace OHOS::Test

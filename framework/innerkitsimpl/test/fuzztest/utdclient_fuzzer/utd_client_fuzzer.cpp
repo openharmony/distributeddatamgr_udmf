@@ -119,6 +119,40 @@ void UninstallCustomUtdsFuzz(FuzzedDataProvider &provider)
     UtdClient::GetInstance().UninstallCustomUtds(bundleName, user);
 }
 
+void RegisterTypeDescriptorsFuzz(FuzzedDataProvider &provider)
+{
+    std::string str = provider.ConsumeRandomLengthString();
+    std::vector<std::string> vec;
+    size_t dataSize = provider.ConsumeIntegralInRange<size_t>(1, 50);
+    for (size_t i = 0; i < dataSize; i++) {
+        vec.push_back(str);
+    }
+
+    std::vector<TypeDescriptorCfg> descriptors;
+    for (size_t i = 0; i < dataSize; i++) {
+        TypeDescriptorCfg descriptor;
+        descriptor.typeId = str;
+        descriptor.filenameExtensions = vec;
+        descriptor.belongingToTypes = vec;
+        descriptor.mimeTypes = vec;
+        descriptor.description = str;
+        descriptor.ownerBundle = str;
+        descriptors.push_back(descriptor);
+    }
+    UtdClient::GetInstance().RegisterTypeDescriptors(descriptors);
+}
+
+void UnregisterTypeDescriptorsFuzz(FuzzedDataProvider &provider)
+{
+    std::string str = provider.ConsumeRandomLengthString();
+    std::vector<std::string> vec;
+    size_t dataSize = provider.ConsumeIntegralInRange<size_t>(1, 50);
+    for (size_t i = 0; i < dataSize; i++) {
+        vec.push_back(str);
+    }
+    UtdClient::GetInstance().UnregisterTypeDescriptors(vec);
+}
+
 }
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
@@ -138,5 +172,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::IsUtdFuzz(provider);
     OHOS::InstallCustomUtdsFuzz(provider);
     OHOS::UninstallCustomUtdsFuzz(provider);
+    OHOS::RegisterTypeDescriptorsFuzz(provider);
+    OHOS::UnregisterTypeDescriptorsFuzz(provider);
     return 0;
 }

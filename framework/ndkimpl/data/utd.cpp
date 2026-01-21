@@ -121,6 +121,7 @@ static const char** GetTypesByCondition(const char* condition, unsigned int* cou
         typeIds[0] = typeId;
     } else {
         LOG_ERROR(UDMF_CAPI, "Allocate memory fail!");
+        delete[] typeId;
     }
     return typeIds;
 }

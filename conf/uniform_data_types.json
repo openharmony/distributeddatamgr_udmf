@@ -6577,6 +6577,51 @@
             "referenceURL": "https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/apis/js-apis-data-uniformTypeDescriptor.md#uniformdatatype"
         },
         {
+            "typeId": "general.kml",
+            "belongingToTypes": [
+                "general.xml",
+                "general.navigation"
+            ],
+            "filenameExtensions": [
+                ".kml"
+            ],
+            "mimeTypes": [
+                "application/vnd.google-earth.kml+xml"
+            ],
+            "description": "Keyhole Markup Language (KML) is an XML notation for expressing geographic annotation and visualization within two-dimensional maps and three-dimensional Earth browsers",
+            "referenceURL": "https://www.ogc.org/standards/kml"
+        },
+        {
+            "typeId": "general.kmz",
+            "belongingToTypes": [
+                "general.archive",
+                "general.navigation"
+            ],
+            "filenameExtensions": [
+                ".kmz"
+            ],
+            "mimeTypes": [
+                "application/vnd.google-earth.kmz"
+            ],
+            "description": "Keyhole Markup Language files when compressed",
+            "referenceURL": "https://www.ogc.org/standards/kml"
+        },
+        {
+            "typeId": "general.gpx",
+            "belongingToTypes": [
+                "general.xml",
+                "general.navigation"
+            ],
+            "filenameExtensions": [
+                ".gpx"
+            ],
+            "mimeTypes": [
+                "application/gpx+xml"
+            ],
+            "description": "GPS Exchange Format(GPX) is an XML scheme dersigned as a common GPS data format for software applications",
+            "referenceURL": "https://www.topografix.com/gpx.asp"
+        },
+        {
             "typeId": "com.apple.iwork",
             "belongingToTypes": [
                 "general.archive"
@@ -6630,51 +6675,6 @@
             ],
             "description": "Apple iWork Pages Document File",
             "referenceURL": "https://www.apple.com.cn/pages"
-        },
-        {
-            "typeId": "general.kml",
-            "belongingToTypes": [
-                "general.xml",
-                "general.navigation"
-            ],
-            "filenameExtensions": [
-                ".kml"
-            ],
-            "mimeTypes": [
-                "application/vnd.google-earth.kml+xml"
-            ],
-            "description": "Keyhole Markup Language (KML) is an XML notation for expressing geographic annotation and visualization within two-dimensional maps and three-dimensional Earth browsers",
-            "referenceURL": "https://www.ogc.org/standards/kml"
-        },
-        {
-            "typeId": "general.kmz",
-            "belongingToTypes": [
-                "general.archive",
-                "general.navigation"
-            ],
-            "filenameExtensions": [
-                ".kmz"
-            ],
-            "mimeTypes": [
-                "application/vnd.google-earth.kmz"
-            ],
-            "description": "Keyhole Markup Language files when compressed",
-            "referenceURL": "https://www.ogc.org/standards/kml"
-        },
-        {
-            "typeId": "general.gpx",
-            "belongingToTypes": [
-                "general.xml",
-                "general.navigation"
-            ],
-            "filenameExtensions": [
-                ".gpx"
-            ],
-            "mimeTypes": [
-                "application/gpx+xml"
-            ],
-            "description": "GPS Exchange Format(GPX) is an XML scheme dersigned as a common GPS data format for software applications",
-            "referenceURL": "https://www.topografix.com/gpx.asp"
         }
     ]
 }
