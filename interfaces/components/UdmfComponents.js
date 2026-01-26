@@ -687,7 +687,6 @@ export class ContentFormCard extends ViewPU {
             Text.borderRadius(this.contentFormData?.description ? 0 : l1);
             Text.onAreaChange(() => {
                 let m2 = this.controller.getLayoutManager();
-                this.lineCount = m2.getLineCount();
                 if (m2.getLineCount() === 2) {
                     this.lineCount = 2;
                 }

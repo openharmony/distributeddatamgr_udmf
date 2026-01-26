@@ -487,7 +487,6 @@ export struct ContentFormCard {
       .borderRadius(this.contentFormData?.description ? 0 : DEFAULT_EMPTY_TEXT_RADIUS)
       .onAreaChange(() => {
         let layoutManager: LayoutManager = this.controller.getLayoutManager();
-        this.lineCount = layoutManager.getLineCount();
         if (layoutManager.getLineCount() === 2) {
           this.lineCount = 2;
         }
