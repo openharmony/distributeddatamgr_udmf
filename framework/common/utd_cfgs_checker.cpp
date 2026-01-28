@@ -163,8 +163,8 @@ bool UtdCfgsChecker::CheckDynamicTypesSize(CustomUtdCfgs &typeCfgs, const UtdUpd
             return typeCfg.ownerBundle == context.bundleName;
         });
     if (static_cast<size_t>(dynamicTypesSize) + typeCfgs.first.size() > MAX_UTD_LENGTH) {
-        LOG_ERROR(UDMF_CLIENT, "dynamic types size exceeds max length, dynamicTypesSize: %{public}d,\
-            installSize: %{public}zu", dynamicTypesSize, typeCfgs.first.size());
+        LOG_ERROR(UDMF_CLIENT, "dynamic types size exceeds max length, dynamicTypesSize: %{public}zu,\
+            installSize: %{public}zu", static_cast<size_t>(dynamicTypesSize), typeCfgs.first.size());
         return false;
     }
     return true;
@@ -222,7 +222,7 @@ bool UtdCfgsChecker::CheckTypeIdUniqueness(const CustomUtdCfgs &typeCfgs,
     }
     for (auto &typeCfg: typeCfgs.second) {
         if (!seenIds.insert(typeCfg.typeId).second) {
-            LOG_ERROR(UDMF_CLIENT, "Find duplicated installing typeIds.");
+            LOG_ERROR(UDMF_CLIENT, "Find duplicated reference typeId.");
             return false;
         }
     }
