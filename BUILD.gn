@@ -46,8 +46,8 @@ group("fuzztest") {
   testonly = true
 
   deps = [
+    "framework/common/test/fuzztest:fuzztest",
     "framework/innerkitsimpl/test/fuzztest:fuzztest",
     "framework/ndkimpl/test/fuzztest:fuzztest",
-    "framework/common/test/fuzztest:fuzztest",
   ]
 }
