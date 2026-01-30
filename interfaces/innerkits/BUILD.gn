@@ -68,13 +68,13 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_pixelmap.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/udmf_img_extractor.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data_helper.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_html_record_process.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/video.cpp",
     "${udmf_framework_path}/innerkitsimpl/dynamic/pixelmap_loader.cpp",
+    "${udmf_framework_path}/innerkitsimpl/dynamic/xml_loader.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/progress_callback.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_notifier_stub.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
@@ -101,7 +101,6 @@ ohos_shared_library("udmf_client") {
     "kv_store:distributeddata_inner",
     "kv_store:distributeddata_mgr",
     "libuv:uv",
-    "libxml2:libxml2",
     "samgr:samgr_proxy",
   ]
 
@@ -212,6 +211,37 @@ ohos_shared_library("pixelmap_wrapper") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "hilog:libhilog",
+  ]
+
+  relative_install_dir = "platformsdk"
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "udmf"
+  subsystem_name = "distributeddatamgr"
+}
+
+ohos_shared_library("xml_wrapper") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  include_dirs = [
+    "${udmf_interfaces_path}/innerkits/dynamic",
+    "${udmf_framework_path}/common",
+  ]
+  sources = [
+    "${udmf_framework_path}/innerkitsimpl/dynamic/xml_wrapper.cpp",
+  ]
+
+  defines = [ "API_EXPORT=__attribute__((visibility (\"default\")))" ]
+
+  deps = []
+
+  external_deps = [
+    "hilog:libhilog",
+    "libxml2:libxml2",
   ]
 
   relative_install_dir = "platformsdk"
