@@ -192,7 +192,7 @@ bool AipNapiUtils::TransJsToStr(napi_env env, napi_value value, std::string &str
         AIP_HILOGE("Error string length invalid");
         return false;
     }
-    if (strlen < 0 || strlen > MAX_STR_PARAM_LEN) {
+    if (strlen > MAX_STR_PARAM_LEN) {
         AIP_HILOGE("The string length invalid");
         return false;
     }
@@ -212,10 +212,6 @@ bool AipNapiUtils::TransJsToStrUnlimited(napi_env env, napi_value value, std::st
     napi_status status = napi_get_value_string_utf8(env, value, nullptr, 0, &strlen);
     if (status != napi_ok) {
         AIP_HILOGE("Error string length invalid");
-        return false;
-    }
-    if (strlen < 0) {
-        AIP_HILOGE("The string length invalid");
         return false;
     }
     std::vector<char> buf(strlen + 1);
