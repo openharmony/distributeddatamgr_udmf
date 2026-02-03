@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Copyright (C) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,23 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef XML_WRAPPER
-#define XML_WRAPPER
+
+#ifndef UDMF_IMG_EXTRACTOR_H
+#define UDMF_IMG_EXTRACTOR_H
 
 #include <libxml/HTMLparser.h>
 #include <libxml/xpath.h>
-#include "udmf_img_extractor.h"
+#include <mutex>
+#include <string>
+#include <vector>
 
-namespace OHOS::UDMF {
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-char **ExtractImgSrc(const char *htmlContent, size_t &vectorSize);
-void DestroyImgSrc(char **typesArray, const size_t &vectorSize);
-#ifdef __cplusplus
+namespace OHOS {
+namespace UDMF {
+class UdmfImgExtractor {
+public:
+    static void FilterFileUris(std::vector<std::string> &uris);
+    static std::vector<std::string> FindAllImgsWithSrc(xmlDocPtr doc);
+    static std::vector<std::string> ExecuteXPath(xmlDocPtr doc, const char *xpathExpr);
+    static std::string SafeXmlToString(const xmlChar *xmlStr);
 };
-#endif
-} // OHOS::UDMF
-
-#endif
+} // namespace UDMF
+} // namespace OHOS
+#endif // UDMF_IMG_EXTRACTOR_H

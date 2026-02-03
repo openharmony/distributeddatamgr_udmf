@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 #define LOG_TAG "XmlmapWrapper"
-#include "xml_wrapper.h"
-#include "logger.h"
 #include <libxml/HTMLparser.h>
 #include <libxml/xpath.h>
+
+#include "logger.h"
+#include "xml_wrapper.h"
+#include "securec.h"
 
 using namespace OHOS::UDMF;
 using namespace std;
@@ -24,117 +26,63 @@ using namespace std;
 #ifdef __cplusplus
 extern "C" {
 #endif
+static std::mutex mutex_;
+static constexpr size_t MAX_TYPES_ARRAY_COUNT = 4 * 1024 * 1024;
 
-char** ExtractImgSrc(const char *htmlContent)
+char **ExtractImgSrc(const char *htmlContent, size_t &vectorSize)
 {
-    pthread_mutex_lock(&g_mutex);
+    std::lock_guard<std::mutex> lock(mutex_);
     int options = HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING;
-    xmlDocPtr doc = htmlReadDoc((const xmlChar *)htmlContent, NULL, NULL, options);
-    if (doc == NULL) {
+    xmlDocPtr doc = htmlReadDoc((const xmlChar *)htmlContent, nullptr, nullptr, options);
+    if (doc == nullptr) {
         LOG_WARN(UDMF_CLIENT, "parse html failed");
-        pthread_mutex_unlock(&g_mutex);
-        return NULL;
+        return nullptr;
     }
 
-    char** uris = FindAllImgsWithSrc(doc);
-    xmlFreeDoc(doc);
-    FilterFileUris(uris);
-    pthread_mutex_unlock(&g_mutex);
-    return uris;
-}
-
-void FilterFileUris(char **uris)
-{
-    const char *prefix = "file:///";
-    size_t prefixLen = strlen(prefix);
-    int writePos = 0;
-
-    for (int readPos = 0; uris[readPos] != NULL; readPos++) {
-        if (uris[readPos] != NULL &&
-            strncmp(uris[readPos], prefix, prefixLen) == 0) {
-            if (writePos != readPos) {
-                uris[writePos] = uris[readPos];
-            }
-            writePos++;
-        } else {
-            if (uris[readPos] != NULL) {
-                free(uris[readPos]);
-                uris[readPos] = NULL;
-            }
-        }
+    std::unique_ptr<xmlDoc, decltype(&xmlFreeDoc)> docGuard(doc, xmlFreeDoc);
+    std::vector<std::string> uris = UdmfImgExtractor::FindAllImgsWithSrc(doc);
+    UdmfImgExtractor::FilterFileUris(uris);
+    vectorSize = uris.size();
+    if (vectorSize == 0 || vectorSize > MAX_TYPES_ARRAY_COUNT) {
+        return nullptr;
     }
-    uris[writePos] = NULL;
-}
-
-char** FindAllImgsWithSrc(xmlDocPtr doc)
-{
-    return ExecuteXPath(doc, "//img[@src]");
-}
-
-char** ExecuteXPath(xmlDocPtr doc, const char *xpathExpr)
-{
-    xmlXPathContextPtr context = xmlXPathNewContext(doc);
-    if (context == NULL) {
-        LOG_WARN(UDMF_CLIENT, "xpath new context failed");
-        return NULL;
+    char **typesArray = new (std::nothrow) char* [vectorSize];
+    if (typesArray == nullptr) {
+        return nullptr;
     }
-
-    xmlXPathObjectPtr result = xmlXPathEvalExpression(reinterpret_cast<const xmlChar *>(xpathExpr), context);
-    xmlXPathFreeContext(context);
-    if (result == NULL) {
-        LOG_WARN(UDMF_CLIENT, "xpath eval expr failed");
-        return NULL;
-    }
-
-    xmlNodeSetPtr nodeSet = result->nodesetval;
-    if (nodeSet == NULL || nodeSet->nodeNr == 0) {
-        xmlXPathFreeObject(result);
-        return NULL;
-    }
-    char **results =  (char**)calloc(nodeSet->nodeNr, sizeof(char*));
-    if (results == NULL) {
-        xmlXPathFreeObject(result);
-        return NULL;
-    }
-
-    int outCount = 0;
-    for (int i = 0; i < nodeSet->nodeNr; ++i) {
-        xmlNodePtr node = nodeSet->nodeTab[i];
-        if (node == NULL) {
-            continue;
+    for (size_t i = 0; i < vectorSize; ++i) {
+        size_t strLen = uris[i].length() + 1;
+        typesArray[i] = new (std::nothrow) char[strLen];
+        if (typesArray[i] == nullptr) {
+            LOG_ERROR(UDMF_CLIENT, "Allocate memory failed");
+            size_t allocatedSize = i + 1;
+            DestroyImgSrc(typesArray, allocatedSize);
+            return nullptr;
         }
 
-        xmlChar *src = xmlGetProp(node, reinterpret_cast<const xmlChar *>("src"));
-        if (src == NULL) {
-            continue;
-        }
-        char *srcStr = SafeXmlToString(src);
-        xmlFree(src);
-
-        if (srcStr != NULL && srcStr[0] != '\0') {
-            results[outCount] = srcStr;
-            outCount++;
-        } else if (srcStr != NULL) {
-            free(srcStr);
+        if (strcpy_s(typesArray[i], strLen, uris[i].c_str()) != 0) {
+            LOG_ERROR(UDMF_CAPI, "String copy failed");
+            unsigned int allocatedSize = i + 1;
+            DestroyImgSrc(typesArray, allocatedSize);
+            return nullptr;
         }
     }
-    results[outCount] = NULL;
-    xmlXPathFreeObject(result);
-    return results;
+    return typesArray;
 }
 
-char* SafeXmlToString(const xmlChar *xmlStr)
+void DestroyImgSrc(char **typesArray, const size_t &vectorSize)
 {
-    if (xmlStr == NULL) {
-        return NULL;
+    if (typesArray == nullptr) {
+        return;
     }
-
-    size_t len = strlen((const char *)xmlStr);
-    char *result = (char*)malloc(len + 1);
-    if (result != NULL) {
-        strcpy(result, (const char *)xmlStr);
+    for (size_t j = 0; j < vectorSize; j++) {
+        if (typesArray[j] != nullptr) {
+            delete[] typesArray[j];
+            typesArray[j] = nullptr;
+        }
     }
-    return result;
+    delete[] typesArray;
+    typesArray = nullptr;
 }
 #ifdef __cplusplus
 };
