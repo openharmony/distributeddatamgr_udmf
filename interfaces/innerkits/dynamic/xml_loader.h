@@ -20,7 +20,7 @@
 #include <mutex>
 
 namespace OHOS::UDMF {
-typedef char** (*LoadExtractImgSrc)(const char *htmlContent);
+typedef char** (*LoadExtractImgSrc)(const char *htmlContent, size_t &vectorSize);
 
 class XmlLoader {
 public:
@@ -38,7 +38,5 @@ private:
 
     std::shared_ptr<void> handler_;
 };
-
 } // namespace OHOS::UDMF
-
-#endif // PIXELMAP_LOADER
+#endif // XML_LOADER

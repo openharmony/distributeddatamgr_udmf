@@ -14,17 +14,17 @@
  */
 #define LOG_TAG "XmlLoader"
 
-#include "xml_loader.h"
-
 #include <dlfcn.h>
 #include <thread>
+
 #include "logger.h"
+#include "xml_loader.h"
 
 namespace OHOS {
 namespace UDMF {
 
-static constexpr const char* XML_WRAPPER_SO_NAME = "libxml_wrapper.z.so";
- static constexpr const char* EXTRACT_IMG_SRC = "ExtractImgSrc";
+static constexpr const char *XML_WRAPPER_SO_NAME = "libxml_wrapper.z.so";
+static constexpr const char *EXTRACT_IMG_SRC = "ExtractImgSrc";
 
 std::weak_ptr<void> XmlLoader::SoAutoUnloadManager::weakHandler_;
 std::mutex XmlLoader::SoAutoUnloadManager::mutex_;
@@ -78,18 +78,22 @@ std::vector<std::string> XmlLoader::ExtractImgSrc(const std::string &htmlContent
         LOG_ERROR(UDMF_KITS_INNER, "dlsym error! msg=%{public}s", dlerror());
         return {};
     }
-    auto uris = loadExtractImgSrc(htmlContent.c_str());
+    size_t vectorSize;
+    auto uris = loadExtractImgSrc(htmlContent.c_str(), vectorSize);
+    if (uris == nullptr) {
+        return {};
+    }
 
     std::vector<std::string> result;
-    if (uris == nullptr) {
-        return result;
-    }
-
-    for (int i = 0; uris[i] != nullptr; ++i) {
+    for (size_t i = 0; i < vectorSize; ++i) {
+        if (uris[i] == nullptr) {
+            LOG_ERROR(UDMF_KITS_INNER, "uris[readPos] is NULL");
+            continue;
+        }
         result.emplace_back(uris[i]);
-        free(uris[i]);
+        delete[] uris[i];
     }
-    free(uris);
+    delete[] uris;
     return result;
 }
 

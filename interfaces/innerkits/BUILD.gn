@@ -233,6 +233,7 @@ ohos_shared_library("xml_wrapper") {
   ]
   sources = [
     "${udmf_framework_path}/innerkitsimpl/dynamic/xml_wrapper.cpp",
+    "${udmf_framework_path}/innerkitsimpl/dynamic/udmf_img_extractor.cpp",
   ]
 
   defines = [ "API_EXPORT=__attribute__((visibility (\"default\")))" ]
@@ -240,6 +241,7 @@ ohos_shared_library("xml_wrapper") {
   deps = []
 
   external_deps = [
+    "c_utils:utils",
     "hilog:libhilog",
     "libxml2:libxml2",
   ]
