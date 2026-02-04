@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+/**
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1412,7 +1412,7 @@ export function insertData(options: Options, data: UnifiedData, callback: AsyncC
         callback(new BusinessError(), ret as string);
     })
     .catch((ret: Any): void => {
-        let data: string;
+        let data: string = "";
         callback(ret as BusinessError, data);
     });
 }
@@ -1449,7 +1449,7 @@ export function queryData(options: Options, callback: AsyncCallback<Array<Unifie
         callback(new BusinessError(), ret as Array<UnifiedData>);
     })
     .catch((ret: Any): void => {
-        let data: Array<UnifiedData>;
+        let data: Array<UnifiedData> = new Array<UnifiedData>();
         callback(ret as BusinessError, data);
     });
 }
@@ -1476,7 +1476,7 @@ export function updateData(options: Options, data: UnifiedData, callback: AsyncC
         callback(null, ret as undefined);
     })
     .catch((ret: Any): void => {
-        let data: undefined;
+        let data: undefined = undefined;
         callback(ret as BusinessError, data);
     });
 }
@@ -1513,7 +1513,7 @@ export function deleteData(options: Options, callback: AsyncCallback<Array<Unifi
         callback(new BusinessError(), ret as Array<UnifiedData>);
     })
     .catch((ret: Any): void => {
-        let data: Array<UnifiedData>;
+        let data: Array<UnifiedData> = new Array<UnifiedData>();
         callback(ret as BusinessError, data);
     });
 }
