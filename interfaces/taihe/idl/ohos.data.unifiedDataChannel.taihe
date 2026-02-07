@@ -1600,7 +1600,9 @@ async function delayedDataLoadHandlerFuncAsync(
 }
 
 function delayedDataLoadHandlerFunc(handler: DelayedDataLoadHandler, info: DataLoadInfo): UnifiedData | null {
-    let ret = await delayedDataLoadHandlerFuncAsync(handler, info);
+    let ret = waitForCompletion(async () => {
+      return await delayedDataLoadHandlerFuncAsync(handler, info);
+    })
     return ret;
 }
 """)
