@@ -26,7 +26,7 @@ using namespace OHOS::UDMF;
 
 static constexpr const int32_t MAX_UTD_SIZE = 50;
 
-typedef Status (UtdClient::*GetUtdByConditionPtr)(const std::string&, std::string&, std::string);
+typedef Status (UtdClient::*GetUtdByConditionPtr)(const std::string&, std::vector<std::string>&, const std::string&);
 
 static void DestroyArrayPtr(const char** &arrayPtr, unsigned int& count)
 {
@@ -70,7 +70,7 @@ static const char** CreateStrArrByVector(const std::vector<std::string>& paramVe
         }
         if (strcpy_s(buffer, paramVector[i].size() + 1, paramVector[i].c_str()) != UDMF_E_OK) {
             LOG_ERROR(UDMF_CAPI, "String copy fail!");
-            unsigned int allocatedSize = i + 1;
+            unsigned int allocatedSize = i;
             delete[] buffer;
             DestroyArrayPtr(charPtr, allocatedSize);
             *count = 0;
@@ -99,31 +99,13 @@ static const char** GetTypesByCondition(const char* condition, unsigned int* cou
     if (condition == nullptr || count == nullptr || funcPtr == nullptr) {
         return nullptr;
     }
-    std::string typeIdStr;
-    Status result = (UtdClient::GetInstance().*funcPtr)(condition, typeIdStr, DEFAULT_TYPE_ID);
-    if (result != Status::E_OK || typeIdStr.empty()) {
+    std::vector<std::string> typeIdVec;
+    Status result = (UtdClient::GetInstance().*funcPtr)(condition, typeIdVec, DEFAULT_TYPE_ID);
+    if (result != Status::E_OK || typeIdVec.empty()) {
         LOG_ERROR(UDMF_CAPI, "Failed to obtain typeId by invoking the native function.");
         return nullptr;
     }
-    auto typeId = new (std::nothrow) char[typeIdStr.size() + 1];
-    if (typeId == nullptr) {
-        LOG_ERROR(UDMF_CAPI, "obtain typeId's memory error!");
-        return nullptr;
-    }
-    if (strcpy_s(typeId, typeIdStr.size() + 1, typeIdStr.c_str()) != UDMF_E_OK) {
-        LOG_ERROR(UDMF_CAPI, "str copy error!");
-        delete[] typeId;
-        return nullptr;
-    }
-    *count = 1;
-    const char** typeIds = new (std::nothrow) const char* [*count]();
-    if (typeIds != nullptr) {
-        typeIds[0] = typeId;
-    } else {
-        LOG_ERROR(UDMF_CAPI, "Allocate memory fail!");
-        delete[] typeId;
-    }
-    return typeIds;
+    return CreateStrArrByVector(typeIdVec, count);
 }
 
 OH_Utd* OH_Utd_Create(const char* typeId)
@@ -215,12 +197,12 @@ const char** OH_Utd_GetMimeTypes(OH_Utd* pThis, unsigned int* count)
 
 const char** OH_Utd_GetTypesByFilenameExtension(const char* extension, unsigned int* count)
 {
-    return GetTypesByCondition(extension, count, &UtdClient::GetUniformDataTypeByFilenameExtension);
+    return GetTypesByCondition(extension, count, &UtdClient::GetUniformDataTypesByFilenameExtension);
 }
 
 const char** OH_Utd_GetTypesByMimeType(const char* mimeType, unsigned int* count)
 {
-    return GetTypesByCondition(mimeType, count, &UtdClient::GetUniformDataTypeByMIMEType);
+    return GetTypesByCondition(mimeType, count, &UtdClient::GetUniformDataTypesByMIMEType);
 }
 
 bool OH_Utd_BelongsTo(const char* srcTypeId, const char* destTypeId)
