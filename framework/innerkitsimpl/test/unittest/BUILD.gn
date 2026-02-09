@@ -534,8 +534,8 @@ ohos_unittest("HtmlTest") {
   sources = [
     "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/udmf_img_extractor.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/dynamic/xml_loader.cpp",
     "html_test.cpp",
   ]
 
@@ -886,7 +886,6 @@ ohos_unittest("UdmfClientAbnormalTest") {
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_form.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/udmf_img_extractor.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_html_record_process.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",

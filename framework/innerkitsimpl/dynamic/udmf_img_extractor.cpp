@@ -22,40 +22,6 @@
 namespace OHOS {
 namespace UDMF {
 
-UdmfImgExtractor &UdmfImgExtractor::GetInstance()
-{
-    static UdmfImgExtractor instance;
-    return instance;
-}
-
-UdmfImgExtractor::UdmfImgExtractor()
-{
-    std::lock_guard lock(mutex_);
-    xmlInitParser();
-}
-
-UdmfImgExtractor::~UdmfImgExtractor()
-{
-    std::lock_guard lock(mutex_);
-    xmlCleanupParser();
-}
-
-std::vector<std::string> UdmfImgExtractor::ExtractImgSrc(const std::string &htmlContent)
-{
-    std::lock_guard lock(mutex_);
-    int options = HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING;
-    xmlDocPtr doc = htmlReadDoc(reinterpret_cast<const xmlChar *>(htmlContent.c_str()), nullptr, nullptr, options);
-    if (doc == nullptr) {
-        LOG_WARN(UDMF_CLIENT, "parse html failed");
-        return {};
-    }
-
-    std::unique_ptr<xmlDoc, decltype(&xmlFreeDoc)> docGuard(doc, xmlFreeDoc);
-    auto uris = FindAllImgsWithSrc(doc);
-    FilterFileUris(uris);
-    return uris;
-}
-
 void UdmfImgExtractor::FilterFileUris(std::vector<std::string> &uris)
 {
     uris.erase(std::remove_if(uris.begin(), uris.end(),

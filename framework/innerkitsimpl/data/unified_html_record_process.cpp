@@ -21,7 +21,7 @@
 #include "file_uri.h"
 #include "html.h"
 #include "logger.h"
-#include "udmf_img_extractor.h"
+#include "xml_loader.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -148,7 +148,8 @@ std::vector<UriInfo> UnifiedHtmlRecordProcess::GetValueStr(const ValueType &valu
     if (uriInfos.empty()) {
         return {};
     }
-    auto validImgSrcList = UdmfImgExtractor::GetInstance().ExtractImgSrc(content);
+    XmlLoader xmlLoader;
+    auto validImgSrcList = xmlLoader.ExtractImgSrc(content);
     RemoveInvalidImgSrc(validImgSrcList, uriInfos);
     return uriInfos;
 }
