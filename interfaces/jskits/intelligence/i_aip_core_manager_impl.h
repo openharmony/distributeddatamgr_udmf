@@ -27,7 +27,6 @@ class IAipCoreManagerImpl : public IAipCoreManager {
 public:
     IAipCoreManagerImpl() = default;
     ~IAipCoreManagerImpl() = default;
-
     int32_t InitTextModel(const ModelConfigData &config) override;
     int32_t InitImageModel(const ModelConfigData &config) override;
     int32_t LoadTextModel() override;
@@ -38,7 +37,6 @@ public:
     int32_t ReleaseImageModel() override;
     int32_t GetImageEmbedding(std::string uri, std::vector<float> &results) override;
     int32_t SplitText(std::string text, int32_t size, float overlap, std::vector<std::string> &results) override;
-
     bool CheckDeviceType() override;
 };
 } // namespace DataIntelligence
