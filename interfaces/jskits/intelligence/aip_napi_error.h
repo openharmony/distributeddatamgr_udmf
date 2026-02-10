@@ -47,7 +47,6 @@ enum NativeErrCode : int32_t {
     NATIVE_E_HIGH_VECTOR_SIMILARITY_THRESHOLD,
     NATIVE_E_RERANK_METHOD_MISMATCH,
     NATIVE_E_EMPTY_PARAMETER,
-
 };
 
 enum TsErrCode : int32_t {
