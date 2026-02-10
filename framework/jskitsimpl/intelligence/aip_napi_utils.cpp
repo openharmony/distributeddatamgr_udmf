@@ -54,6 +54,7 @@ bool AipNapiUtils::LoadAlgoLibrary(const std::string &libraryName, AipCoreManage
     char libRealPath[PATH_MAX] = {};
     if (realpath(libraryName.c_str(), libRealPath) == nullptr) {
         AIP_HILOGE("get absolute algoPath error, %{public}d", errno);
+        return false;
     }
 
     aipMgrHandler.handle = dlopen(libRealPath, RTLD_LAZY);
@@ -70,6 +71,7 @@ bool AipNapiUtils::LoadAlgoLibrary(const std::string &libraryName, AipCoreManage
         AIP_HILOGE("Failed to create and destroy algo");
         return false;
     }
+    
     aipMgrHandler.pAipManager = aipMgrHandler.create();
     AIP_HILOGD("Exit");
     return true;
