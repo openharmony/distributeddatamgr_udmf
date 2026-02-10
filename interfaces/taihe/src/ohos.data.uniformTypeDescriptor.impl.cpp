@@ -183,7 +183,6 @@ namespace UDMF {
         return ::ohos::data::uniformTypeDescriptor::TypeDescriptorUnion::make_empty();
     }
     if (nativeDesc == nullptr) {
-        set_business_error(PARAMETERSERROR, "Type descriptor not found for the specified nativeTypeId.");
         return ::ohos::data::uniformTypeDescriptor::TypeDescriptorUnion::make_empty();
     }
     auto holder = taihe::make_holder<TypeDescriptorImpl,
