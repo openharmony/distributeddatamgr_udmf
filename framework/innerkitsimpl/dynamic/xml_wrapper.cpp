@@ -35,7 +35,7 @@ char **ExtractImgSrc(const char *htmlContent, size_t &vectorSize)
     int options = HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING;
     xmlDocPtr doc = htmlReadDoc((const xmlChar *)htmlContent, nullptr, nullptr, options);
     if (doc == nullptr) {
-        LOG_WARN(UDMF_CLIENT, "parse html failed");
+        LOG_WARN(UDMF_KITS_INNER, "parse html failed");
         return nullptr;
     }
 
@@ -54,14 +54,14 @@ char **ExtractImgSrc(const char *htmlContent, size_t &vectorSize)
         size_t strLen = uris[i].length() + 1;
         typesArray[i] = new (std::nothrow) char[strLen];
         if (typesArray[i] == nullptr) {
-            LOG_ERROR(UDMF_CLIENT, "Allocate memory failed");
+            LOG_ERROR(UDMF_KITS_INNER, "Allocate memory failed");
             size_t allocatedSize = i + 1;
             DestroyImgSrc(typesArray, allocatedSize);
             return nullptr;
         }
 
         if (strcpy_s(typesArray[i], strLen, uris[i].c_str()) != 0) {
-            LOG_ERROR(UDMF_CAPI, "String copy failed");
+            LOG_ERROR(UDMF_KITS_INNER, "String copy failed");
             unsigned int allocatedSize = i + 1;
             DestroyImgSrc(typesArray, allocatedSize);
             return nullptr;
