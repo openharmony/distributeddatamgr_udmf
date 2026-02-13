@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Huawei Device Co., Ltd.
+ * Copyright (C) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,18 +26,10 @@ namespace OHOS {
 namespace UDMF {
 class UdmfImgExtractor {
 public:
-    static UdmfImgExtractor &GetInstance();
-    std::vector<std::string> ExtractImgSrc(const std::string &htmlContent);
-
-private:
-    UdmfImgExtractor();
-    ~UdmfImgExtractor();
-    void FilterFileUris(std::vector<std::string> &uris);
-    std::vector<std::string> FindAllImgsWithSrc(xmlDocPtr doc);
-    std::vector<std::string> ExecuteXPath(xmlDocPtr doc, const char *xpathExpr);
-    std::string SafeXmlToString(const xmlChar *xmlStr);
-
-    std::mutex mutex_;
+    static void FilterFileUris(std::vector<std::string> &uris);
+    static std::vector<std::string> FindAllImgsWithSrc(xmlDocPtr doc);
+    static std::vector<std::string> ExecuteXPath(xmlDocPtr doc, const char *xpathExpr);
+    static std::string SafeXmlToString(const xmlChar *xmlStr);
 };
 } // namespace UDMF
 } // namespace OHOS

@@ -227,7 +227,7 @@ ani_status SetMap(ani_env *env, std::map<std::string, int64_t> &value, ani_objec
             continue;
         }
         ani_method recordSetter;
-        if ((status = env->Class_FindMethod(recordCls, "$_set", "YY:", &recordSetter)) != ANI_OK) {
+        if ((status = env->Class_FindMethod(recordCls, "$_set", "Y:", &recordSetter)) != ANI_OK) {
             LOG_WARN(UDMF_ANI, "FindClass failed, status : %{public}d", status);
             continue;
         }

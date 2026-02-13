@@ -18,6 +18,7 @@ group("udmf_packages") {
     deps = [
       "interfaces/components:udmfcomponents",
       "interfaces/innerkits:pixelmap_wrapper",
+      "interfaces/innerkits:xml_wrapper",
       "interfaces/innerkits:udmf_client",
       "interfaces/innerkits:utd_client",
       "interfaces/innerkits/aipcore:aip_core_mgr_static",

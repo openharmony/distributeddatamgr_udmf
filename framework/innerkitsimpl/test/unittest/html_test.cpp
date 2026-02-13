@@ -21,7 +21,7 @@
 #include "logger.h"
 #include "udmf_capi_common.h"
 #include "html.h"
-#include "udmf_img_extractor.h"
+#include "xml_loader.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
@@ -174,7 +174,7 @@ HWTEST_F(HtmlTest, SetPlainContent002, TestSize.Level1)
 HWTEST_F(HtmlTest, ExtractImgSrc001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "ExtractImgSrc001 begin.");
-    UdmfImgExtractor extractor;
+    XmlLoader xmlLoader;
 
     std::string html = R"HTML(
         <html>
@@ -186,7 +186,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc001, TestSize.Level1)
         </html>
     )HTML";
 
-    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    std::vector<std::string> uris = xmlLoader.ExtractImgSrc(html);
 
     ASSERT_EQ(uris.size(), 3);
     EXPECT_EQ(uris[0], "file:///example.com/img1.png");
@@ -203,7 +203,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc001, TestSize.Level1)
 HWTEST_F(HtmlTest, ExtractImgSrc002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "ExtractImgSrc002 begin.");
-    UdmfImgExtractor extractor;
+    XmlLoader xmlLoader;
 
     std::string html = R"HTML(
         <html>
@@ -215,7 +215,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc002, TestSize.Level1)
         </html>
     )HTML";
 
-    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    std::vector<std::string> uris = xmlLoader.ExtractImgSrc(html);
     EXPECT_TRUE(uris.empty());
     LOG_INFO(UDMF_TEST, "ExtractImgSrc002 end.");
 }
@@ -228,7 +228,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc002, TestSize.Level1)
 HWTEST_F(HtmlTest, ExtractImgSrc003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "ExtractImgSrc003 begin.");
-    UdmfImgExtractor extractor;
+    XmlLoader xmlLoader;
 
     std::string html = R"HTML(
         <html>
@@ -237,7 +237,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc003, TestSize.Level1)
             </body>
         </html>
     )HTML";
-    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    std::vector<std::string> uris = xmlLoader.ExtractImgSrc(html);
     EXPECT_TRUE(uris.empty());
     LOG_INFO(UDMF_TEST, "ExtractImgSrc003 end.");
 }
@@ -250,7 +250,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc003, TestSize.Level1)
 HWTEST_F(HtmlTest, ExtractImgSrc004, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "ExtractImgSrc004 begin.");
-    UdmfImgExtractor extractor;
+    XmlLoader xmlLoader;
 
     std::string html = R"HTML(
         <html>
@@ -260,7 +260,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc004, TestSize.Level1)
         </html>
     )HTML";
 
-    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    std::vector<std::string> uris = xmlLoader.ExtractImgSrc(html);
     EXPECT_TRUE(uris.empty());
     LOG_INFO(UDMF_TEST, "ExtractImgSrc004 end.");
 }
@@ -273,7 +273,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc004, TestSize.Level1)
 HWTEST_F(HtmlTest, ExtractImgSrc005, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "ExtractImgSrc005 begin.");
-    UdmfImgExtractor extractor;
+    XmlLoader xmlLoader;
 
     std::string html = R"HTML(
         <html>
@@ -286,7 +286,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc005, TestSize.Level1)
         </html>
     )HTML";
 
-    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    std::vector<std::string> uris = xmlLoader.ExtractImgSrc(html);
     EXPECT_EQ(uris.size(), 1);
     EXPECT_EQ(uris[0], "file:///invalid/local.png");
     LOG_INFO(UDMF_TEST, "ExtractImgSrc005 end.");
@@ -300,7 +300,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc005, TestSize.Level1)
 HWTEST_F(HtmlTest, ExtractImgSrc006, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "ExtractImgSrc006 begin.");
-    UdmfImgExtractor extractor;
+    XmlLoader xmlLoader;
 
     std::string html = R"HTML(
         <html>
@@ -313,7 +313,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc006, TestSize.Level1)
         </html>
     )HTML";
 
-    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    std::vector<std::string> uris = xmlLoader.ExtractImgSrc(html);
     EXPECT_EQ(uris.size(), 2);
     EXPECT_EQ(uris[0], "file:///inside-span.com/img.png");
     EXPECT_EQ(uris[1], "file:///outside-span.com/img.png");
@@ -328,7 +328,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc006, TestSize.Level1)
 HWTEST_F(HtmlTest, ExtractImgSrc007, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "ExtractImgSrc007 begin.");
-    UdmfImgExtractor extractor;
+    XmlLoader xmlLoader;
 
     std::string html = R"HTML(
         <html>
@@ -338,7 +338,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc007, TestSize.Level1)
         </html>
     )HTML";
 
-    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    std::vector<std::string> uris = xmlLoader.ExtractImgSrc(html);
     EXPECT_EQ(uris.size(), 0);
     LOG_INFO(UDMF_TEST, "ExtractImgSrc007 end.");
 }
@@ -351,7 +351,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc007, TestSize.Level1)
 HWTEST_F(HtmlTest, ExtractImgSrc008, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "ExtractImgSrc008 begin.");
-    UdmfImgExtractor extractor;
+    XmlLoader xmlLoader;
 
     std::string html = R"HTML(
         <html>
@@ -363,7 +363,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc008, TestSize.Level1)
         </html>
     )HTML";
 
-    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    std::vector<std::string> uris = xmlLoader.ExtractImgSrc(html);
     EXPECT_EQ(uris.size(), 0);
     LOG_INFO(UDMF_TEST, "ExtractImgSrc008 end.");
 }
@@ -376,7 +376,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc008, TestSize.Level1)
 HWTEST_F(HtmlTest, ExtractImgSrc009, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "ExtractImgSrc009 begin.");
-    UdmfImgExtractor extractor;
+    XmlLoader xmlLoader;
 
     std::string html = R"HTML(
         <html>
@@ -387,7 +387,7 @@ HWTEST_F(HtmlTest, ExtractImgSrc009, TestSize.Level1)
         </html>
     )HTML";
 
-    std::vector<std::string> uris = extractor.ExtractImgSrc(html);
+    std::vector<std::string> uris = xmlLoader.ExtractImgSrc(html);
     EXPECT_EQ(uris.size(), 0);
     LOG_INFO(UDMF_TEST, "ExtractImgSrc009 end.");
 }
