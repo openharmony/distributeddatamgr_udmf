@@ -262,7 +262,6 @@ ohos_shared_library("intelligence_napi") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "ability_runtime:napi_base_context",
-    "ability_runtime:napi_common",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
