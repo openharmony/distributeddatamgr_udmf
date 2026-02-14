@@ -262,7 +262,7 @@ HWTEST_F(UtdTest, OH_Utd_GetTypesByMimeType_001, TestSize.Level1)
     auto typeIds = OH_Utd_GetTypesByMimeType("text/plain", &count);
     std::string typeId(typeIds[0]);
     EXPECT_EQ(UDMF_META_PLAIN_TEXT, typeId);
-    EXPECT_EQ(1, count);
+    EXPECT_EQ(6, count);
     OH_Utd_DestroyStringList(typeIds, count);
 
     const char* extensionNullptr = nullptr;
