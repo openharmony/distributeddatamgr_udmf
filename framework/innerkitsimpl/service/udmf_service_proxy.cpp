@@ -51,11 +51,11 @@ UdmfServiceProxy::UdmfServiceProxy(const sptr<IRemoteObject> &object) : IRemoteP
 {
 }
 
-int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
+int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData, const Summary &summary, std::string &key)
 {
     UdmfConversion::InitValueObject(unifiedData);
     MessageParcel reply;
-    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_DATA, reply, option, unifiedData);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_DATA, reply, option, unifiedData, summary);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x!", status);
         return status;

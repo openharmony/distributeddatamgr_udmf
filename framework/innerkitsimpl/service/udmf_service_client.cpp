@@ -116,6 +116,27 @@ int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedDat
         LOG_ERROR(UDMF_SERVICE, "UnifiedData is invalid.");
         return E_INVALID_PARAMETERS;
     }
+    bool isSaInvoke = UTILS::IsTokenNative(IPCShell::GetSelfTokenID());
+    if (isSaInvoke && unifiedData.HasFileType()) {
+        LOG_ERROR(UDMF_SERVICE, "The setting data initiated by SA cannot contain a file type");
+        return E_INVALID_PARAMETERS;
+    }
+    if (UnifiedDataHelper::ExceedKVSizeLimit(unifiedData)) {
+        auto status = UnifiedDataHelper::ProcessBigData(unifiedData, option.intention, isSaInvoke);
+        if (status != E_OK) {
+            LOG_ERROR(UDMF_SERVICE, "Process big data error, status = %{public}d", status);
+            return status;
+        }
+    }
+    Summary summary;
+    UnifiedDataHelper::GetSummary(unifiedData, summary);
+    return udmfProxy_->SetData(option, unifiedData, summary, key);
+}
+    }
+    if (!unifiedData.IsValid()) {
+        LOG_ERROR(UDMF_SERVICE, "UnifiedData is invalid.");
+        return E_INVALID_PARAMETERS;
+    }
     bool isSaInvoke = UTILS::IsTokenNative(IPCSkeleton::GetSelfTokenID());
     if (isSaInvoke && unifiedData.HasFileType()) {
         LOG_ERROR(UDMF_SERVICE, "The setting data initiated by the SA cannot contain the file type");

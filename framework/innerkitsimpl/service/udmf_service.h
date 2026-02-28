@@ -38,7 +38,7 @@ public:
     UdmfService() = default;
     virtual ~UdmfService() = default;
 
-    virtual int32_t SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key) = 0;
+    virtual int32_t SetData(CustomOption &option, UnifiedData &unifiedData, const Summary &summary, std::string &key) = 0;
     virtual int32_t GetData(const QueryOption &query, UnifiedData &unifiedData) = 0;
     virtual int32_t GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet) = 0;
     virtual int32_t UpdateData(const QueryOption &query, UnifiedData &unifiedData) = 0;
