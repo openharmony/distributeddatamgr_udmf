@@ -51,7 +51,8 @@ UdmfServiceProxy::UdmfServiceProxy(const sptr<IRemoteObject> &object) : IRemoteP
 {
 }
 
-int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData, const Summary &summary, std::string &key)
+int32_t UdmfServiceProxy::SetData(CustomOption &option, UnifiedData &unifiedData,
+    const Summary &summary, std::string &key)
 {
     UdmfConversion::InitValueObject(unifiedData);
     MessageParcel reply;
