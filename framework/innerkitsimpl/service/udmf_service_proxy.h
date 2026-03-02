@@ -35,7 +35,7 @@ class UdmfServiceProxy : public IRemoteProxy<IUdmfService> {
 public:
     explicit UdmfServiceProxy(const sptr<IRemoteObject> &object);
 
-    int32_t SetData(CustomOption &option, UnifiedData &unifiedData, const Summary &summary, std::string &key) override;
+    int32_t SetData(CustomOption &option, UnifiedData &unifiedData, Summary &summary, std::string &key) override;
     int32_t GetData(const QueryOption &query, UnifiedData &unifiedData) override;
     int32_t GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet) override;
     int32_t UpdateData(const QueryOption &query, UnifiedData &unifiedData) override;

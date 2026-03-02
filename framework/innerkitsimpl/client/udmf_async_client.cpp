@@ -23,6 +23,7 @@
 #include "progress_callback.h"
 #include "udmf_client.h"
 #include "udmf_copy_file.h"
+#include "unified_data_helper.h"
 #ifndef IOS_PLATFORM
 #include "udmf_executor.h"
 #endif
@@ -384,7 +385,9 @@ Status UdmfAsyncClient::SetProgressData(const std::string &businessUdKey)
     progressRecord->SetAbstract(std::to_string(GetCurrentTimeMillis()));
     UnifiedData progressData;
     progressData.AddRecord(progressRecord);
-    auto status = serviceClient->SetData(cusomOption, progressData, progressKey);
+    Summary summary;
+    UnifiedDataHelper::GetSummary(progressData, summary);
+    auto status = serviceClient->SetData(cusomOption, progressData, summary, progressKey);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Set progress data error, status = %{public}d", status);
         return static_cast<Status>(status);

@@ -104,7 +104,7 @@ void UdmfServiceClient::ServiceDeathRecipient::OnRemoteDied(const wptr<IRemoteOb
 }
 
 int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedData,
-    const Summary &summary, std::string &key)
+    Summary &summary, std::string &key)
 {
     LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}d", option.intention);
     if (option.intention == UD_INTENTION_DATA_HUB) {
@@ -129,7 +129,7 @@ int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedDat
             return status;
         }
     }
-    return udmfProxy_->SetData(option, unifiedData, key);
+    return udmfProxy_->SetData(option, unifiedData, summary, key);
 }
 
 int32_t UdmfServiceClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
