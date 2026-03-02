@@ -279,12 +279,12 @@ int32_t UdmfServiceProxy::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IR
     return E_OK;
 }
 
-int32_t UdmfServiceProxy::PushDelayData(const std::string &key, UnifiedData &unifiedData)
+int32_t UdmfServiceProxy::PushDelayData(const std::string &key, UnifiedData &unifiedData, Summary &summary)
 {
     UdmfConversion::InitValueObject(unifiedData);
     MessageParcel reply;
 
-    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_DELAY_DATA, reply, key, unifiedData);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::SET_DELAY_DATA, reply, key, unifiedData, summary);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x", status);
         return status;

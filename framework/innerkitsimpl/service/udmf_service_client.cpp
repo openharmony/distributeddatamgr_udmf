@@ -317,9 +317,9 @@ int32_t UdmfServiceClient::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<I
     return udmfProxy_->SetDelayInfo(dataLoadInfo, iUdmfNotifier, key);
 }
 
-int32_t UdmfServiceClient::PushDelayData(const std::string &key, UnifiedData &unifiedData)
+int32_t UdmfServiceClient::PushDelayData(const std::string &key, UnifiedData &unifiedData, Summary &summary)
 {
-    return udmfProxy_->PushDelayData(key, unifiedData);
+    return udmfProxy_->PushDelayData(key, unifiedData, summary);
 }
 
 int32_t UdmfServiceClient::GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,

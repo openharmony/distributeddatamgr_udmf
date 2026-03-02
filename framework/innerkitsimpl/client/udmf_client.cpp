@@ -384,7 +384,9 @@ Status UdmfClient::PushDelayData(const std::string &key, UnifiedData &unifiedDat
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         return E_IPC;
     }
-    auto status = service->PushDelayData(key, unifiedData);
+    Summary summary;
+    UnifiedDataHelper::GetSummary(unifiedData, summary);
+    auto status = service->PushDelayData(key, unifiedData, summary);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d", status);
     }
