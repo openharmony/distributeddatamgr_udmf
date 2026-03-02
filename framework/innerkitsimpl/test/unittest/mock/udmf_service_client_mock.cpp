@@ -35,12 +35,12 @@ int32_t UdmfServiceClient::GetAppShareOption(const std::string &intention, int32
     }
 }
 
-int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
+int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedData, Summary &summary, std::string &key)
 {
     if (MUdmfServiceClient::udmfServiceClient == nullptr) {
         return -1;
     } else {
-        return MUdmfServiceClient::udmfServiceClient->SetData(option, unifiedData, key);
+        return MUdmfServiceClient::udmfServiceClient->SetData(option, unifiedData, summary, key);
     }
 }
 
@@ -71,12 +71,12 @@ int32_t UdmfServiceClient::DeleteData(const QueryOption &query, std::vector<Unif
     }
 }
 
-int32_t UdmfServiceClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
+int32_t UdmfServiceClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData, Summary &summary)
 {
     if (MUdmfServiceClient::udmfServiceClient == nullptr) {
         return -1;
     } else {
-        return MUdmfServiceClient::udmfServiceClient->UpdateData(query, unifiedData);
+        return MUdmfServiceClient::udmfServiceClient->UpdateData(query, unifiedData, summary);
     }
 }
 
@@ -163,12 +163,12 @@ int32_t UdmfServiceClient::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<I
     }
 }
 
-int32_t UdmfServiceClient::PushDelayData(const std::string &key, UnifiedData &unifiedData)
+int32_t UdmfServiceClient::PushDelayData(const std::string &key, UnifiedData &unifiedData, Summary &summary)
 {
     if (MUdmfServiceClient::udmfServiceClient == nullptr) {
         return -1;
     } else {
-        return MUdmfServiceClient::udmfServiceClient->PushDelayData(key, unifiedData);
+        return MUdmfServiceClient::udmfServiceClient->PushDelayData(key, unifiedData, summary);
     }
 }
 
