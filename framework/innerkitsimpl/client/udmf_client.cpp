@@ -160,7 +160,7 @@ Status UdmfClient::GetBatchData(const QueryOption &query, std::vector<UnifiedDat
     return static_cast<Status>(ret);
 }
 
-Status UdmfClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
+Status UdmfClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData, Summary &summary)
 {
     DdsTrace trace(
         std::string(TAG) + std::string(__FUNCTION__), TraceSwitch::BYTRACE_ON | TraceSwitch::TRACE_CHAIN_ON);
@@ -169,7 +169,7 @@ Status UdmfClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         return E_IPC;
     }
-    int32_t ret = service->UpdateData(query, unifiedData);
+    int32_t ret = service->UpdateData(query, unifiedData, summary);
     if (ret != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
     }
