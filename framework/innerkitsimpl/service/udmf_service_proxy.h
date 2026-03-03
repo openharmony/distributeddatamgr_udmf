@@ -35,7 +35,7 @@ class UdmfServiceProxy : public IRemoteProxy<IUdmfService> {
 public:
     explicit UdmfServiceProxy(const sptr<IRemoteObject> &object);
 
-    int32_t SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key) override;
+    int32_t SetData(CustomOption &option, UnifiedData &unifiedData, Summary &summary, std::string &key) override;
     int32_t GetData(const QueryOption &query, UnifiedData &unifiedData) override;
     int32_t GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet) override;
     int32_t UpdateData(const QueryOption &query, UnifiedData &unifiedData) override;
@@ -51,7 +51,7 @@ public:
     int32_t ClearAsynProcessByKey(const std::string &businessUdKey) override;
     int32_t SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
         std::string &key) override;
-    int32_t PushDelayData(const std::string &key, UnifiedData &unifiedData) override;
+    int32_t PushDelayData(const std::string &key, UnifiedData &unifiedData, Summary &summary) override;
     int32_t GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
         sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData) override;
 private:

@@ -38,7 +38,8 @@ public:
     UdmfService() = default;
     virtual ~UdmfService() = default;
 
-    virtual int32_t SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key) = 0;
+    virtual int32_t SetData(CustomOption &option, UnifiedData &unifiedData,
+        Summary &summary, std::string &key) = 0;
     virtual int32_t GetData(const QueryOption &query, UnifiedData &unifiedData) = 0;
     virtual int32_t GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet) = 0;
     virtual int32_t UpdateData(const QueryOption &query, UnifiedData &unifiedData) = 0;
@@ -54,7 +55,7 @@ public:
     virtual int32_t ClearAsynProcessByKey(const std::string &businessUdKey) = 0;
     virtual int32_t SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<IRemoteObject> iUdmfNotifier,
         std::string &key) = 0;
-    virtual int32_t PushDelayData(const std::string &key, UnifiedData &unifiedData) = 0;
+    virtual int32_t PushDelayData(const std::string &key, UnifiedData &unifiedData, Summary &summary) = 0;
     virtual int32_t GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,
         sptr<IRemoteObject> iUdmfNotifier, std::shared_ptr<UnifiedData> unifiedData) = 0;
 };

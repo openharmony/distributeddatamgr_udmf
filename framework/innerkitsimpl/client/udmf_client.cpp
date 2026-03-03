@@ -91,7 +91,9 @@ Status UdmfClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::
             return E_OK;
         }
     }
-    int32_t ret = service->SetData(option, unifiedData, key);
+    Summary summary;
+    UnifiedDataHelper::GetSummary(unifiedData, summary);
+    int32_t ret = service->SetData(option, unifiedData, summary, key);
     if (ret != E_OK) {
         RadarReporterAdapter::ReportFail(std::string(__FUNCTION__),
             BizScene::SET_DATA, SetDataStage::SET_DATA_END, StageRes::FAILED, ret, BizState::DFX_END);
@@ -380,7 +382,9 @@ Status UdmfClient::PushDelayData(const std::string &key, UnifiedData &unifiedDat
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         return E_IPC;
     }
-    auto status = service->PushDelayData(key, unifiedData);
+    Summary summary;
+    UnifiedDataHelper::GetSummary(unifiedData, summary);
+    auto status = service->PushDelayData(key, unifiedData, summary);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Failed, ret = %{public}d", status);
     }

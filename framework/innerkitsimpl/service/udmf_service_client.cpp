@@ -103,7 +103,8 @@ void UdmfServiceClient::ServiceDeathRecipient::OnRemoteDied(const wptr<IRemoteOb
     instance_ = nullptr;
 }
 
-int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedData, std::string &key)
+int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedData,
+    Summary &summary, std::string &key)
 {
     LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}d", option.intention);
     if (option.intention == UD_INTENTION_DATA_HUB) {
@@ -128,7 +129,7 @@ int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedDat
             return status;
         }
     }
-    return udmfProxy_->SetData(option, unifiedData, key);
+    return udmfProxy_->SetData(option, unifiedData, summary, key);
 }
 
 int32_t UdmfServiceClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
@@ -316,9 +317,9 @@ int32_t UdmfServiceClient::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<I
     return udmfProxy_->SetDelayInfo(dataLoadInfo, iUdmfNotifier, key);
 }
 
-int32_t UdmfServiceClient::PushDelayData(const std::string &key, UnifiedData &unifiedData)
+int32_t UdmfServiceClient::PushDelayData(const std::string &key, UnifiedData &unifiedData, Summary &summary)
 {
-    return udmfProxy_->PushDelayData(key, unifiedData);
+    return udmfProxy_->PushDelayData(key, unifiedData, summary);
 }
 
 int32_t UdmfServiceClient::GetDataIfAvailable(const std::string &key, const DataLoadInfo &dataLoadInfo,

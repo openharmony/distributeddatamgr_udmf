@@ -29,7 +29,7 @@ public:
 public:
     virtual std::shared_ptr<UdmfServiceClient> GetInstance() = 0;
 
-    virtual int32_t SetData(CustomOption &, UnifiedData &, std::string &) = 0;
+    virtual int32_t SetData(CustomOption &, UnifiedData &, Summary &, std::string &) = 0;
     virtual int32_t GetData(const QueryOption &, UnifiedData &) = 0;
     virtual int32_t GetBatchData(const QueryOption &, std::vector<UnifiedData> &) = 0;
     virtual int32_t UpdateData(const QueryOption &, UnifiedData &) = 0;
@@ -44,7 +44,7 @@ public:
     virtual int32_t ObtainAsynProcess(AsyncProcessInfo&) = 0;
     virtual int32_t ClearAsynProcessByKey(const std::string &businessUdKey) = 0;
     virtual int32_t SetDelayInfo(const DataLoadInfo &, sptr<IRemoteObject>, std::string &) = 0;
-    virtual int32_t PushDelayData(const std::string &, const UnifiedData &) = 0;
+    virtual int32_t PushDelayData(const std::string &, const UnifiedData &, Summary &) = 0;
     virtual int32_t GetDataIfAvailable(const std::string &key, const DataLoadInfo &, sptr<IRemoteObject>,
         std::shared_ptr<UnifiedData>) = 0;
 public:
@@ -54,7 +54,7 @@ public:
 class UdmfServiceClientMock : public MUdmfServiceClient {
 public:
     MOCK_METHOD(std::shared_ptr<UdmfServiceClient>, GetInstance, ());
-    MOCK_METHOD(int32_t, SetData, (CustomOption &, UnifiedData &, std::string &));
+    MOCK_METHOD(int32_t, SetData, (CustomOption &, UnifiedData &, Summary &, std::string &));
     MOCK_METHOD(int32_t, GetData, (const QueryOption &, UnifiedData &));
     MOCK_METHOD(int32_t, GetBatchData, (const QueryOption &, std::vector<UnifiedData> &));
     MOCK_METHOD(int32_t, UpdateData, (const QueryOption &, UnifiedData &));
@@ -69,7 +69,7 @@ public:
     MOCK_METHOD(int32_t, ObtainAsynProcess, (AsyncProcessInfo&));
     MOCK_METHOD(int32_t, ClearAsynProcessByKey, (const std::string &));
     MOCK_METHOD(int32_t, SetDelayInfo, (const DataLoadInfo &, sptr<IRemoteObject>, std::string &));
-    MOCK_METHOD(int32_t, PushDelayData, (const std::string &, const UnifiedData &));
+    MOCK_METHOD(int32_t, PushDelayData, (const std::string &, const UnifiedData &, Summary &));
     MOCK_METHOD(int32_t, GetDataIfAvailable, (const std::string &, const DataLoadInfo &, sptr<IRemoteObject>,
         std::shared_ptr<UnifiedData>));
 };
