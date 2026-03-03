@@ -428,9 +428,7 @@ Status UdmfAsyncClient::UpdateProgressData(const std::string &progressUdKey, con
     progressRecord->SetAbstract(std::to_string(GetCurrentTimeMillis()));
     UnifiedData progressData;
     progressData.AddRecord(progressRecord);
-    Summary summary;
-    UnifiedDataHelper::GetSummary(progressData, summary);
-    auto status = serviceClient->UpdateData(queryOption, progressData, summary);
+    auto status = serviceClient->UpdateData(queryOption, progressData);
     if (status != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "Update progress data error, status = %{public}d", status);
         return static_cast<Status>(status);
