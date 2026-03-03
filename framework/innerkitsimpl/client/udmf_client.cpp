@@ -169,9 +169,7 @@ Status UdmfClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData
         LOG_ERROR(UDMF_CLIENT, "Service unavailable");
         return E_IPC;
     }
-    Summary summary;
-    UnifiedDataHelper::GetSummary(unifiedData, summary);
-    int32_t ret = service->UpdateData(query, unifiedData, summary);
+    int32_t ret = service->UpdateData(query, unifiedData);
     if (ret != E_OK) {
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
     }

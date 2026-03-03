@@ -181,7 +181,7 @@ int32_t UdmfServiceClient::GetBatchData(const QueryOption &query, std::vector<Un
     return E_OK;
 }
 
-int32_t UdmfServiceClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData, Summary &summary)
+int32_t UdmfServiceClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
 {
     LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}s", query.key.c_str());
     UnifiedKey key(query.key);
@@ -209,7 +209,7 @@ int32_t UdmfServiceClient::UpdateData(const QueryOption &query, UnifiedData &uni
             return E_FS_ERROR;
         }
     }
-    return udmfProxy_->UpdateData(query, unifiedData, summary);
+    return udmfProxy_->UpdateData(query, unifiedData);
 }
 
 int32_t UdmfServiceClient::DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)

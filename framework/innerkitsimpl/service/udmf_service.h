@@ -42,7 +42,7 @@ public:
         Summary &summary, std::string &key) = 0;
     virtual int32_t GetData(const QueryOption &query, UnifiedData &unifiedData) = 0;
     virtual int32_t GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet) = 0;
-    virtual int32_t UpdateData(const QueryOption &query, UnifiedData &unifiedData, Summary &summary) = 0;
+    virtual int32_t UpdateData(const QueryOption &query, UnifiedData &unifiedData) = 0;
     virtual int32_t DeleteData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet) = 0;
     virtual int32_t GetSummary(const QueryOption &query, Summary &summary) = 0;
     virtual int32_t AddPrivilege(const QueryOption &query, Privilege &privilege) = 0;

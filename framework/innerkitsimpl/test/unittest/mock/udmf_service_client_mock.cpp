@@ -71,12 +71,12 @@ int32_t UdmfServiceClient::DeleteData(const QueryOption &query, std::vector<Unif
     }
 }
 
-int32_t UdmfServiceClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData, Summary &summary)
+int32_t UdmfServiceClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
 {
     if (MUdmfServiceClient::udmfServiceClient == nullptr) {
         return -1;
     } else {
-        return MUdmfServiceClient::udmfServiceClient->UpdateData(query, unifiedData, summary);
+        return MUdmfServiceClient::udmfServiceClient->UpdateData(query, unifiedData);
     }
 }
 

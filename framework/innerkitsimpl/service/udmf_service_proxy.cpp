@@ -101,11 +101,11 @@ int32_t UdmfServiceProxy::GetBatchData(const QueryOption &query, std::vector<Uni
     return status;
 }
 
-int32_t UdmfServiceProxy::UpdateData(const QueryOption &query, UnifiedData &unifiedData, Summary &summary)
+int32_t UdmfServiceProxy::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
 {
     UdmfConversion::InitValueObject(unifiedData);
     MessageParcel reply;
-    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::UPDATE_DATA, reply, query, unifiedData, summary);
+    int32_t status = IPC_SEND(UdmfServiceInterfaceCode::UPDATE_DATA, reply, query, unifiedData);
     if (status != E_OK) {
         LOG_ERROR(UDMF_SERVICE, "status:0x%{public}x!", status);
         return status;

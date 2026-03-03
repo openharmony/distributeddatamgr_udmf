@@ -32,7 +32,7 @@ public:
     virtual int32_t SetData(CustomOption &, UnifiedData &, Summary &, std::string &) = 0;
     virtual int32_t GetData(const QueryOption &, UnifiedData &) = 0;
     virtual int32_t GetBatchData(const QueryOption &, std::vector<UnifiedData> &) = 0;
-    virtual int32_t UpdateData(const QueryOption &, UnifiedData &, Summary &) = 0;
+    virtual int32_t UpdateData(const QueryOption &, UnifiedData &) = 0;
     virtual int32_t DeleteData(const QueryOption &, std::vector<UnifiedData> &) = 0;
     virtual int32_t GetSummary(const QueryOption &, Summary &) = 0;
     virtual int32_t AddPrivilege(const QueryOption &, Privilege &) = 0;
@@ -57,7 +57,7 @@ public:
     MOCK_METHOD(int32_t, SetData, (CustomOption &, UnifiedData &, Summary &, std::string &));
     MOCK_METHOD(int32_t, GetData, (const QueryOption &, UnifiedData &));
     MOCK_METHOD(int32_t, GetBatchData, (const QueryOption &, std::vector<UnifiedData> &));
-    MOCK_METHOD(int32_t, UpdateData, (const QueryOption &, UnifiedData &, Summary &));
+    MOCK_METHOD(int32_t, UpdateData, (const QueryOption &, UnifiedData &));
     MOCK_METHOD(int32_t, DeleteData, (const QueryOption &, std::vector<UnifiedData> &));
     MOCK_METHOD(int32_t, GetSummary, (const QueryOption &, Summary &));
     MOCK_METHOD(int32_t, AddPrivilege, (const QueryOption &, Privilege &));
