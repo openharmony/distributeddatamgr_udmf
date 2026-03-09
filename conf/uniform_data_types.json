@@ -6675,6 +6675,32 @@
             ],
             "description": "Apple iWork Pages Document File",
             "referenceURL": "https://www.apple.com.cn/pages"
+        },
+        {
+            "TypeId": "com.huawei.hmos.musiccreate.gofile",
+            "BelongingToTypes": [
+                "general.archive"
+            ],
+            "FilenameExtensions": [
+                ".gomusic"
+            ],
+            "MIMETypes": [],
+            "Description": "This is a file format for musiccreate project",
+            "ReferenceURL": ""
+        },
+        {
+            "TypeId": "com.apple.coreaudio-format",
+            "BelongingToTypes": [
+                "general.audio"
+            ],
+            "FilenameExtensions": [
+                ".caf"
+            ],
+            "MIMETypes": [
+                "audio/x-caf"
+            ],
+            "Description": "Apple’s Core Audio Format (CAF) is a file format for storing and transporting digital audio data.",
+            "ReferenceURL": "https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_intro/CAF_intro.html"
         }
     ]
 }

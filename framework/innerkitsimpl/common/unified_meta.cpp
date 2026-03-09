@@ -515,7 +515,9 @@ static constexpr UtdType UTD_TYPES[] = {
     { IWORK, "IWORK", "com.apple.iwork" },
     { IWORK_KEYNOTE, "IWORK_KEYNOTE", "com.apple.iwork.keynote.key" },
     { IWORK_NUMBERS, "IWORK_NUMBERS", "com.apple.iwork.numbers.numbers" },
-    { IWORK_PAGES, "IWORK_PAGES", "com.apple.iwork.pages.pages" }
+    { IWORK_PAGES, "IWORK_PAGES", "com.apple.iwork.pages.pages" },
+    { MUSICCREATE_GOFILE, "MUSICCREATE_GOFILE", "com.huawei.hmos.musiccreate.gofile" },
+    { COREAUDIO_FORMAT, "COREAUDIO_FORMAT", "com.apple.coreaudio-format" }
 };
 
 static constexpr std::initializer_list<std::string_view> NOT_NEED_COUNT_VALUE_LIST = {
