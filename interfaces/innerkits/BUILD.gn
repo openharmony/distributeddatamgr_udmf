@@ -119,6 +119,8 @@ ohos_shared_library("udmf_client") {
     "-fvisibility=hidden",
     "-O2",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 config("utd_client_config") {

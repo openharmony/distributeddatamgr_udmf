@@ -33,6 +33,7 @@ ohos_fuzztest("UtdFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Werror=vla",
   ]
 
   sources = [ "utd_fuzzer.cpp" ]

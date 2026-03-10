@@ -33,6 +33,7 @@ ohos_fuzztest("UdmfFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Werror=vla",
   ]
 
   sources = [ "udmf_fuzzer.cpp" ]

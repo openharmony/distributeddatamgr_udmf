@@ -57,6 +57,8 @@ ohos_unittest("UtdTest") {
   deps = common_deps
 
   external_deps = common_external_deps
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdsTest") {
@@ -69,6 +71,8 @@ ohos_unittest("UdsTest") {
   deps = common_deps
 
   external_deps = common_external_deps
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdmfTest") {
@@ -100,6 +104,8 @@ ohos_unittest("UdmfTest") {
   external_deps = common_external_deps
 
   external_deps += [ "kv_store:distributeddata_inner" ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("DataProviderImplTest") {
@@ -117,6 +123,8 @@ ohos_unittest("DataProviderImplTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ###############################################################################

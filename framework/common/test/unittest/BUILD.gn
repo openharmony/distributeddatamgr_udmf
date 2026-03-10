@@ -77,6 +77,8 @@ ohos_unittest("UtdCfgsCheckerTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdmfTypesUtilTest") {
@@ -94,6 +96,8 @@ ohos_unittest("UdmfTypesUtilTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdmfTypesUtilMockTest") {
@@ -119,6 +123,8 @@ ohos_unittest("UdmfTypesUtilMockTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdmfTypesUtilAbnormalTest") {
@@ -164,6 +170,8 @@ ohos_unittest("UdmfTypesUtilAbnormalTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("TlvUtilTest") {
@@ -199,6 +207,8 @@ ohos_unittest("TlvUtilTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("EndianConverterTest") {
@@ -219,6 +229,8 @@ ohos_unittest("EndianConverterTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("CopyFileTest") {
@@ -257,6 +269,8 @@ ohos_unittest("CopyFileTest") {
   ]
 
   use_exceptions = true
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("TlvObjectTest") {
@@ -274,6 +288,8 @@ ohos_unittest("TlvObjectTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ###############################################################################
