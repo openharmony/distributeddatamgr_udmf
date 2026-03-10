@@ -1932,4 +1932,1837 @@ HWTEST_F(UdmfClientTest, QueryData001, TestSize.Level1)
     ASSERT_EQ(status, E_INVALID_PARAMETERS);
     LOG_INFO(UDMF_TEST, "QueryData001 end.");
 }
+
+/**
+* @tc.name: QueryData002
+* @tc.desc: Query data with valid params
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, QueryData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "QueryData002 begin.");
+
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    auto originSize = unifiedDataSet.size();
+    unifiedDataSet.clear();
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetContent("content1");
+    data.AddRecord(plainText);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    query = { .key = key };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    auto size = static_cast<int32_t>(unifiedDataSet.size());
+    ASSERT_EQ(size, 1);
+    std::shared_ptr<UnifiedRecord> record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    auto type = record2->GetType();
+    ASSERT_EQ(type, UDType::PLAIN_TEXT);
+    auto plainText2 = static_cast<PlainText *>(record2.get());
+    ASSERT_EQ(plainText2->GetContent(), "content1");
+
+    UnifiedData data2;
+    plainText = std::make_shared<PlainText>();
+    plainText->SetContent("content2");
+    data2.AddRecord(plainText);
+    status = UdmfClient::GetInstance().SetData(customOption, data2, key);
+    ASSERT_EQ(status, E_OK);
+
+    unifiedDataSet.clear();
+    query = { .key = key, .intention = UD_INTENTION_DATA_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    size = static_cast<int32_t>(unifiedDataSet.size());
+    ASSERT_EQ(size, 1);
+    record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    type = record2->GetType();
+    ASSERT_EQ(type, UDType::PLAIN_TEXT);
+    plainText2 = static_cast<PlainText *>(record2.get());
+    ASSERT_EQ(plainText2->GetContent(), "content2");
+
+    unifiedDataSet.clear();
+    query = { .intention = UD_INTENTION_DATA_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), originSize + 2);
+
+    LOG_INFO(UDMF_TEST, "QueryData002 end.");
+}
+
+/**
+* @tc.name: DeleteData001
+* @tc.desc: Delete data with invalid params
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, DeleteData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "DeleteData001 begin.");
+    std::vector<UnifiedData> unifiedDataSet;
+    QueryOption queryOption = {};
+    auto status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    queryOption = { .key = "udmf://drag/ohos.test.demo1/abcde" };
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    queryOption = { .intention = UD_INTENTION_DRAG };
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    queryOption = { .key = "udmf://DataHub/ohos.test.demo1/abcde", .intention = UD_INTENTION_DRAG };
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+
+    queryOption = { .key = "udmf://drag/ohos.test.demo1/abcde", .intention = UD_INTENTION_DATA_HUB };
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+    LOG_INFO(UDMF_TEST, "DeleteData001 end.");
+}
+
+/**
+* @tc.name: DeleteData002
+* @tc.desc: Delete data with valid params
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, DeleteData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "DeleteData002 begin.");
+
+    CustomOption customOption = { .intention = UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetContent("content1");
+    data.AddRecord(plainText);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption queryOption = { .key = key };
+    SetHapToken2();
+
+    std::vector<UnifiedData> unifiedDataSet;
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(0, unifiedDataSet.size());
+
+    SetHapToken1();
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(1, unifiedDataSet.size());
+
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
+    ASSERT_TRUE(unifiedDataSet.empty());
+
+    queryOption = { .intention = UD_INTENTION_DATA_HUB };
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
+    ASSERT_TRUE(!unifiedDataSet.empty());
+
+    status = UdmfClient::GetInstance().DeleteData(queryOption, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+
+    unifiedDataSet.clear();
+    queryOption = { .key = key };
+    status = UdmfClient::GetInstance().GetBatchData(queryOption, unifiedDataSet);
+    ASSERT_TRUE(unifiedDataSet.empty());
+    LOG_INFO(UDMF_TEST, "DeleteData002 end.");
+}
+
+/**
+* @tc.name: SetData022
+* @tc.desc: Set two over 2MB record of data with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData022, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData022 begin.");
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData inputData;
+    std::string key;
+    UDDetails details;
+    std::string value;
+    int64_t maxSize = 512 * 1024;
+    for (int64_t i = 0; i < maxSize; ++i) {
+        value += "11";
+    }
+    details.insert({ value, value });
+    details.insert({ "udmf_key", "udmf_value" });
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
+    for (int i = 0; i < 2; ++i) {
+        inputData.AddRecord(text);
+    }
+    UnifiedDataHelper::SetRootPath("/data/udmf_test/");
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption queryOption = { .key = key };
+    UnifiedData outputData;
+    status = UdmfClient::GetInstance().GetData(queryOption, outputData);
+    ASSERT_EQ(status, E_OK);
+    UnifiedDataHelper::SetRootPath("");
+
+    LOG_INFO(UDMF_TEST, "SetData022 end.");
+}
+
+/**
+* @tc.name: SetData023
+* @tc.desc: Set 200MB record of data with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData023, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData023 begin.");
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData inputData;
+    std::string key;
+    UDDetails details;
+    std::string value;
+    int64_t maxSize = 512 * 1024;
+    for (int64_t i = 0; i < maxSize; ++i) {
+        value += "11";
+    }
+    details.insert({ value, value });
+    Text text;
+    text.SetDetails(details);
+    for (int64_t i = 0; i < 100; ++i) {
+        auto record = std::make_shared<Text>();
+        inputData.AddRecord(record);
+    }
+    auto records = inputData.GetRecords();
+    LOG_INFO(UDMF_TEST, "SetData023 inputData.size() = %{public}zu", records.size());
+    UnifiedDataHelper::SetRootPath("/data/udmf_test/");
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption queryOption = { .key = key };
+    UnifiedData outputData;
+    status = UdmfClient::GetInstance().GetData(queryOption, outputData);
+    ASSERT_EQ(status, E_OK);
+    UnifiedDataHelper::SetRootPath("");
+
+    LOG_INFO(UDMF_TEST, "SetData023 end.");
+}
+
+/**
+* @tc.name: SetData024
+* @tc.desc: Set over 200MB record of data with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData024, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData024 begin.");
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData inputData;
+    std::string key;
+    UDDetails details;
+    std::string value;
+    int64_t maxSize = 512 * 1024;
+    for (int64_t i = 0; i < maxSize; ++i) {
+        value += "11";
+    }
+    details.insert({ value, value });
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
+    for (int64_t i = 0; i < 101; ++i) {
+        inputData.AddRecord(text);
+    }
+    auto records = inputData.GetRecords();
+    LOG_INFO(UDMF_TEST, "SetData024 inputData.size() = %{public}zu", records.size());
+
+    UnifiedDataHelper::SetRootPath("/data/udmf_test/");
+    auto status = UdmfClient::GetInstance().SetData(customOption, inputData, key);
+    ASSERT_EQ(status, E_INVALID_PARAMETERS);
+    UnifiedDataHelper::SetRootPath("");
+
+    LOG_INFO(UDMF_TEST, "SetData024 end.");
+}
+
+/**
+* @tc.name: SetData025
+* @tc.desc: Set PixelMap record with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData025, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData025 begin.");
+    
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data1;
+    std::string key;
+    auto systemDefinedPixelMap1 = std::make_shared<SystemDefinedPixelMap>();
+    UDDetails details1;
+    details1.insert({ "udmf_key", "udmf_value" });
+    systemDefinedPixelMap1->SetDetails(details1);
+    std::vector<uint8_t> rawData1 = { 1, 2, 3, 4, 5 };
+
+    systemDefinedPixelMap1->SetRawData(rawData1);
+    data1.AddRecord(systemDefinedPixelMap1);
+    auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege(option2);
+    SetHapToken2();
+    UnifiedData data2;
+    status = UdmfClient::GetInstance().GetData(option2, data2);
+    ASSERT_EQ(status, E_OK);
+
+    std::shared_ptr<UnifiedRecord> record2 = data2.GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    auto type = record2->GetType();
+    ASSERT_EQ(type, UDType::SYSTEM_DEFINED_PIXEL_MAP);
+
+    auto systemDefinedRecord2 = static_cast<SystemDefinedRecord *>(record2.get());
+    ASSERT_NE(systemDefinedRecord2, nullptr);
+    CompareDetails(systemDefinedRecord2->GetDetails());
+
+    auto systemDefinedPixelMap2 = static_cast<SystemDefinedPixelMap *>(record2.get());
+    ASSERT_NE(systemDefinedPixelMap2, nullptr);
+    auto rawData2 = systemDefinedPixelMap2->GetRawData();
+    EXPECT_EQ(rawData1.size(), rawData2.size());
+    for (uint32_t i = 0; i < rawData1.size(); ++i) {
+        EXPECT_EQ(rawData1[i], rawData2[i]);
+    }
+
+    LOG_INFO(UDMF_TEST, "SetData025 end.");
+}
+
+/**
+* @tc.name: SetData026
+* @tc.desc: Set more record with valid params and get data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData026, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData026 begin.");
+    
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data1;
+    std::string key;
+    auto systemDefinedPixelMap1 = std::make_shared<SystemDefinedPixelMap>();
+    UDDetails details1;
+    details1.insert({ "udmf_key", "udmf_value" });
+    systemDefinedPixelMap1->SetDetails(details1);
+    std::vector<uint8_t> rawData1 = { 1, 2, 3, 4, 5 };
+
+    systemDefinedPixelMap1->SetRawData(rawData1);
+    std::shared_ptr<UnifiedRecord> record2 = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "this is a content");
+    data1.AddRecord(systemDefinedPixelMap1);
+    data1.AddRecord(record2);
+    auto status = UdmfClient::GetInstance().SetData(option1, data1, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege(option2);
+    SetHapToken2();
+    UnifiedData data2;
+    status = UdmfClient::GetInstance().GetData(option2, data2);
+    ASSERT_EQ(status, E_OK);
+
+    std::shared_ptr<UnifiedRecord> record3 = data2.GetRecordAt(0);
+    ASSERT_NE(record3, nullptr);
+    auto type = record3->GetType();
+    ASSERT_EQ(type, UDType::SYSTEM_DEFINED_PIXEL_MAP);
+
+    auto systemDefinedRecord2 = static_cast<SystemDefinedRecord *>(record3.get());
+    ASSERT_NE(systemDefinedRecord2, nullptr);
+    CompareDetails(systemDefinedRecord2->GetDetails());
+
+    auto systemDefinedPixelMap2 = static_cast<SystemDefinedPixelMap *>(record3.get());
+    ASSERT_NE(systemDefinedPixelMap2, nullptr);
+    auto rawData2 = systemDefinedPixelMap2->GetRawData();
+    EXPECT_EQ(rawData1.size(), rawData2.size());
+    for (uint32_t i = 0; i < rawData1.size(); ++i) {
+        EXPECT_EQ(rawData1[i], rawData2[i]);
+    }
+
+    std::shared_ptr<UnifiedRecord> record4 = data2.GetRecordAt(1);
+    auto plainText = static_cast<PlainText *>(record4.get());
+    ASSERT_EQ(UDType::PLAIN_TEXT, plainText->GetType());
+    ASSERT_EQ("this is a content", plainText->GetContent());
+
+    LOG_INFO(UDMF_TEST, "SetData026 end.");
+}
+
+/**
+* @tc.name: SetData027
+* @tc.desc: Set Html record value is null str and get uris data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData027, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData027 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    std::string html = "";
+    auto obj = std::make_shared<Object>();
+    obj->value_["uniformDataType"] = "general.html";
+    obj->value_["htmlContent"] = html;
+    obj->value_["plainContent"] = "htmlPlainContent";
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_["detail1"] = "detail1";
+    obj2->value_["detail2"] = "detail2";
+    obj->value_["details"] = obj2;
+    auto htmlRecord = std::make_shared<Html>(UDType::HTML, obj);
+    data.AddRecord(htmlRecord);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+
+    std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
+    ASSERT_NE(readRecord, nullptr);
+    auto readHtmlRecord = std::static_pointer_cast<Html>(readRecord);
+    EXPECT_EQ(readHtmlRecord->GetHtmlContent(), html);
+    auto uris = readRecord->GetUris();
+    EXPECT_EQ(uris.size(), 0);
+
+    LOG_INFO(UDMF_TEST, "SetData027 end.");
+}
+
+/**
+* @tc.name: SetData028
+* @tc.desc: Set Html record include invalid value and get uris data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData028, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData028 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    std::string html = "<img data-ohos='clipboard' src=>"
+                        "<img data-ohos='clipboard' src='https://data/storage/el2/base/haps/102.png'>"
+                        "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/103.png'>"
+                        "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/104.png'>";
+    auto obj = std::make_shared<Object>();
+    obj->value_["uniformDataType"] = "general.html";
+    obj->value_["htmlContent"] = html;
+    obj->value_["plainContent"] = "htmlPlainContent";
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_["detail1"] = "detail1";
+    obj2->value_["detail2"] = "detail2";
+    obj->value_["details"] = obj2;
+    auto htmlRecord = std::make_shared<Html>(UDType::HTML, obj);
+    data.AddRecord(htmlRecord);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+
+    std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
+    ASSERT_NE(readRecord, nullptr);
+    auto readHtmlRecord = std::static_pointer_cast<Html>(readRecord);
+    EXPECT_EQ(readHtmlRecord->GetHtmlContent(), html);
+    auto uris = readRecord->GetUris();
+    EXPECT_EQ(uris.size(), 0);
+
+    LOG_INFO(UDMF_TEST, "SetData028 end.");
+}
+
+/**
+* @tc.name: SetData029
+* @tc.desc: Set Html record include valid value and get uris data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData029, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData029 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    std::string html = "<img data-ohos='clipboard' src='file:///data/storage/el2/base/haps/101.png'>"
+                        "<img data-ohos='clipboard' src=\"file:///data/storage/el2/base/haps/102.png\">";
+    auto obj = std::make_shared<Object>();
+    obj->value_["uniformDataType"] = "general.html";
+    obj->value_["htmlContent"] = html;
+    obj->value_["plainContent"] = "htmlPlainContent";
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_["detail1"] = "detail1";
+    obj2->value_["detail2"] = "detail2";
+    obj->value_["details"] = obj2;
+    auto htmlRecord = std::make_shared<Html>(UDType::HTML, obj);
+    data.AddRecord(htmlRecord);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+    std::string tmpUri1 = "file://ohos.test.demo1/data/storage/el2/base/haps/101.png";
+    std::string tmpUri2 = "file://ohos.test.demo1/data/storage/el2/base/haps/102.png";
+    AppFileService::ModuleFileUri::FileUri fileUri1(tmpUri1);
+    AppFileService::ModuleFileUri::FileUri fileUri2(tmpUri2);
+    std::string readHtml = "<img data-ohos='clipboard' src='";
+    readHtml += FILE_SCHEME_PREFIX + fileUri1.GetRealPath() + "'><img data-ohos='clipboard' src=\"";
+    readHtml += FILE_SCHEME_PREFIX + fileUri2.GetRealPath() + "\">";
+    std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
+    ASSERT_NE(readRecord, nullptr);
+    auto readHtmlRecord = std::static_pointer_cast<Html>(readRecord);
+    EXPECT_EQ(readHtmlRecord->GetHtmlContent(), readHtml);
+    auto uris = readRecord->GetUris();
+    EXPECT_EQ(uris.size(), 2);
+
+    LOG_INFO(UDMF_TEST, "SetData029 end.");
+}
+
+/**
+* @tc.name: SetData030
+* @tc.desc: Set Html record include valid value and get uris data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData030, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData030 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    std::string html = "<img data-ohos='clipboard' src='file:///data/storage/el2/base/haps/101.png'>"
+                        "<img data-ohos='clipboard' src='https://data/storage/el2/base/haps/102.png'>"
+                        "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/103.png'>";
+    std::string uriSrc = "file:///data/storage/el2/base/haps/101.png";
+    auto obj = std::make_shared<Object>();
+    obj->value_["uniformDataType"] = "general.html";
+    obj->value_["htmlContent"] = html;
+    obj->value_["plainContent"] = "htmlPlainContent";
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_["detail1"] = "detail1";
+    obj2->value_["detail2"] = "detail2";
+    obj->value_["details"] = obj2;
+    auto htmlRecord = std::make_shared<Html>(UDType::HTML, obj);
+    data.AddRecord(htmlRecord);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+    std::string tmpUri1 = "file://ohos.test.demo1/data/storage/el2/base/haps/101.png";
+    AppFileService::ModuleFileUri::FileUri fileUri1(tmpUri1);
+    std::string readHtml = "<img data-ohos='clipboard' src='";
+    readHtml += FILE_SCHEME_PREFIX + fileUri1.GetRealPath() + "'>";
+    readHtml += "<img data-ohos='clipboard' src='https://data/storage/el2/base/haps/102.png'>"
+        "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/103.png'>";
+    std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
+    ASSERT_NE(readRecord, nullptr);
+    auto readHtmlRecord = std::static_pointer_cast<Html>(readRecord);
+    EXPECT_EQ(readHtmlRecord->GetHtmlContent(), readHtml);
+    auto uris = readRecord->GetUris();
+    EXPECT_EQ(uris.size(), 1);
+    EXPECT_EQ(uris[0].oriUri, uriSrc);
+    EXPECT_TRUE(uris[0].dfsUri.empty());
+
+    LOG_INFO(UDMF_TEST, "SetData030 end.");
+}
+
+/**
+* @tc.name: SetData031
+* @tc.desc: Set Html entry is null str and get uris data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData031, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData031 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "http://demo.com";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    std::string html = "";
+    auto htmlRecord = Html(html, "abstract");
+    htmlRecord.InitObject();
+    record->AddEntry(htmlRecord.GetUtdId(), htmlRecord.GetOriginValue());
+    data.AddRecord(record);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+
+    std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
+    ASSERT_NE(readRecord, nullptr);
+    auto entryValue = readRecord->GetEntry(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML));
+    auto object = std::get<std::shared_ptr<Object>>(entryValue);
+    ASSERT_NE(object, nullptr);
+    auto iter = object->value_.find(HTML_CONTENT);
+    ASSERT_TRUE(iter != object->value_.end());
+    EXPECT_TRUE(std::holds_alternative<std::string>(iter->second));
+    auto content = std::get<std::string>(iter->second);
+    EXPECT_EQ(content, html);
+    auto uris = readRecord->GetUris();
+    EXPECT_EQ(uris.size(), 0);
+
+    LOG_INFO(UDMF_TEST, "SetData031 end.");
+}
+
+/**
+* @tc.name: SetData032
+* @tc.desc: Set Html entry include invalid value and get uris data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData032, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData032 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "http://demo.com";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    std::string html = "<img data-ohos='clipboard' src=>"
+                        "<img data-ohos='clipboard' src='https://data/storage/el2/base/haps/102.png'>"
+                        "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/103.png'>"
+                        "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/104.png'>";
+    auto htmlRecord = Html(html, "abstract");
+    htmlRecord.InitObject();
+    record->AddEntry(htmlRecord.GetUtdId(), htmlRecord.GetOriginValue());
+    data.AddRecord(record);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+
+    std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
+    ASSERT_NE(readRecord, nullptr);
+    auto entryValue = readRecord->GetEntry(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML));
+    auto object = std::get<std::shared_ptr<Object>>(entryValue);
+    ASSERT_NE(object, nullptr);
+    auto iter = object->value_.find(HTML_CONTENT);
+    ASSERT_TRUE(iter != object->value_.end());
+    EXPECT_TRUE(std::holds_alternative<std::string>(iter->second));
+    auto content = std::get<std::string>(iter->second);
+    EXPECT_EQ(content, html);
+    auto uris = readRecord->GetUris();
+    EXPECT_EQ(uris.size(), 0);
+
+    LOG_INFO(UDMF_TEST, "SetData032 end.");
+}
+
+/**
+* @tc.name: SetData033
+* @tc.desc: Set Html entry include valid value and get uris data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData033, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData033 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "http://demo.com";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    std::string html = "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/101.png'>"
+                        "<img data-ohos='clipboard' src='https://data/storage/el2/base/haps/102.png'>"
+                        "<img data-ohos='clipboard' src='file:///data/storage/el2/base/haps/103.png'>";
+    std::string uriSrc = "file:///data/storage/el2/base/haps/103.png";
+    auto htmlRecord = Html(html, "abstract");
+    htmlRecord.InitObject();
+    record->AddEntry(htmlRecord.GetUtdId(), htmlRecord.GetOriginValue());
+    data.AddRecord(record);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+    std::string tmpUri1 = "file://ohos.test.demo1/data/storage/el2/base/haps/103.png";
+    AppFileService::ModuleFileUri::FileUri fileUri1(tmpUri1);
+    std::string readHtml = "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/101.png'>"
+                            "<img data-ohos='clipboard' src='https://data/storage/el2/base/haps/102.png'>"
+                            "<img data-ohos='clipboard' src='";
+    readHtml += FILE_SCHEME_PREFIX + fileUri1.GetRealPath() + "'>";
+    std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
+    ASSERT_NE(readRecord, nullptr);
+    auto entryValue = readRecord->GetEntry(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML));
+    auto object = std::get<std::shared_ptr<Object>>(entryValue);
+    ASSERT_NE(object, nullptr);
+    auto iter = object->value_.find(HTML_CONTENT);
+    ASSERT_TRUE(iter != object->value_.end());
+    EXPECT_TRUE(std::holds_alternative<std::string>(iter->second));
+    auto content = std::get<std::string>(iter->second);
+    EXPECT_EQ(content, readHtml);
+    auto uris = readRecord->GetUris();
+    EXPECT_EQ(uris.size(), 1);
+    EXPECT_EQ(uris[0].oriUri, uriSrc);
+    EXPECT_TRUE(uris[0].dfsUri.empty());
+
+    LOG_INFO(UDMF_TEST, "SetData033 end.");
+}
+
+/**
+* @tc.name: SetData034
+* @tc.desc: test html record process
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData034, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData034 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data1;
+    std::shared_ptr<UnifiedRecord> record = std::make_shared<UnifiedRecord>();
+    data1.AddRecord(record);
+    std::string key;
+    UnifiedHtmlRecordProcess::RebuildHtmlRecord(data1);
+    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(data1);
+    UnifiedData data;
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetContent("plainContent");
+    data.AddRecord(plainText);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "this is a content");
+    record1->ClearUris();
+    data.AddRecord(record1);
+    auto file = std::make_shared<File>();
+    file->SetRemoteUri("remoteUri");
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    file->SetDetails(details);
+    data.AddRecord(file);
+    UnifiedHtmlRecordProcess::RebuildHtmlRecord(data);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+
+    LOG_INFO(UDMF_TEST, "SetData034 end.");
+}
+
+/**
+* @tc.name: SetData035
+* @tc.desc: test html record process
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData035, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData035 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    auto text = std::make_shared<Text>();
+    data.AddRecord(text);
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetContent("plainContent");
+    data.AddRecord(plainText);
+    auto html = std::make_shared<Html>();
+    html->SetPlainContent("htmlContent");
+    data.AddRecord(html);
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    UnifiedData data1;
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[PLAIN_CONTENT] = "http://demo.com";
+    obj->value_[HTML_CONTENT] = 10;
+    plainText->AddEntry("general.html", obj);
+    data1.AddRecord(plainText);
+    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(data1);
+    UnifiedHtmlRecordProcess::RebuildHtmlRecord(data1);
+    UnifiedData data2;
+    text->AddEntry("general.html", "");
+    data2.AddRecord(text);
+    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(data2);
+    UnifiedHtmlRecordProcess::RebuildHtmlRecord(data2);
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+
+    LOG_INFO(UDMF_TEST, "SetData035 end.");
+}
+
+/**
+* @tc.name: SetData037
+* @tc.desc: The same application schema is file, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData037, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData037 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "file:///data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken1();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("file:///data/storage/el2/base/haps/101.png", std::get<std::string>(readFileUri->value_[FILE_URI_PARAM]));
+
+    LOG_INFO(UDMF_TEST, "SetData037 end.");
+}
+
+/**
+* @tc.name: SetData038
+* @tc.desc: different application schema is file, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData038, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData038 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "file:///data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege(option2);
+    SetHapToken2();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_INVALID_PARAMETERS, status);
+
+    LOG_INFO(UDMF_TEST, "SetData038 end.");
+}
+
+/**
+* @tc.name: SetData039
+* @tc.desc: different application schema is file, no addPrivilege, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData039, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData039 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "file:///data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken2();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_NO_PERMISSION);
+
+    LOG_INFO(UDMF_TEST, "SetData039 end.");
+}
+
+/**
+* @tc.name: SetData040
+* @tc.desc: no schema for the same application, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData040, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData040 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "/data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken1();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("/data/storage/el2/base/haps/101.png", std::get<std::string>(readFileUri->value_[FILE_URI_PARAM]));
+
+    LOG_INFO(UDMF_TEST, "SetData040 end.");
+}
+
+/**
+* @tc.name: SetData041
+* @tc.desc: no schema for different applications, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData041, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData041 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "/data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege(option2);
+    SetHapToken2();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_INVALID_PARAMETERS, status);
+
+    LOG_INFO(UDMF_TEST, "SetData041 end.");
+}
+
+/**
+* @tc.name: SetData042
+* @tc.desc: no schema for different applications, no addPrivilege, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData042, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData042 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "/data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken2();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_NO_PERMISSION);
+
+    LOG_INFO(UDMF_TEST, "SetData042 end.");
+}
+
+/**
+* @tc.name: SetData043
+* @tc.desc: The same application schema is file, authority is not empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData043, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData043 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "file://ohos.test.demo1/data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken1();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("file://ohos.test.demo1/data/storage/el2/base/haps/101.png",
+        std::get<std::string>(readFileUri->value_[FILE_URI_PARAM]));
+
+    LOG_INFO(UDMF_TEST, "SetData043 end.");
+}
+
+/**
+* @tc.name: SetData044
+* @tc.desc: different application schema is file, file not exist, authority is not empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData044, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData044 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "file://ohos.test.demo1/data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege(option2);
+    SetHapToken2();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_NO_PERMISSION, status);
+
+    LOG_INFO(UDMF_TEST, "SetData044 end.");
+}
+
+/**
+* @tc.name: SetData045
+* @tc.desc: different application schema is file, no addPrivilege, authority is not empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData045, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData045 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "file://ohos.test.demo1/data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken2();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_NO_PERMISSION);
+
+    LOG_INFO(UDMF_TEST, "SetData045 end.");
+}
+
+/**
+* @tc.name: SetData046
+* @tc.desc: The same application schema is https, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData046, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData046 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "https://data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken1();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("https://data/storage/el2/base/haps/101.png",
+        std::get<std::string>(readFileUri->value_[FILE_URI_PARAM]));
+
+    LOG_INFO(UDMF_TEST, "SetData046 end.");
+}
+
+/**
+* @tc.name: SetData047
+* @tc.desc: different application schema is https, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData047, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData047 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "https://data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    AddPrivilege(option2);
+    SetHapToken2();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("https://data/storage/el2/base/haps/101.png",
+        std::get<std::string>(readFileUri->value_[FILE_URI_PARAM]));
+
+    LOG_INFO(UDMF_TEST, "SetData047 end.");
+}
+
+/**
+* @tc.name: SetData048
+* @tc.desc: different application schema is https, no addPrivilege, authority is empty
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData048, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData048 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "https://data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken2();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_NO_PERMISSION);
+
+    LOG_INFO(UDMF_TEST, "SetData048 end.");
+}
+
+/**
+* @tc.name: SetData049
+* @tc.desc: Normal test of SetData, record is nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData049, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData049 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "https://data/storage/el2/base/haps/101.png";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    data.AddRecord(nullptr);
+    data.AddRecord(record);
+    SetHapToken1();
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    UnifiedData readData;
+    SetHapToken1();
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("https://data/storage/el2/base/haps/101.png",
+        std::get<std::string>(readFileUri->value_[FILE_URI_PARAM]));
+
+    LOG_INFO(UDMF_TEST, "SetData049 end.");
+}
+
+/**
+* @tc.name: SetData050
+* @tc.desc: Set Html entry include valid value and get uris data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, SetData050, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData050 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    std::vector<std::string> htmlContents;
+
+    for (int i = 0; i < 100; i++) {
+        std::shared_ptr<Object> obj = std::make_shared<Object>();
+        obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+        obj->value_[FILE_URI_PARAM] = "http://demo.com/image" + std::to_string(i);
+        obj->value_[FILE_TYPE] = "image/png";
+
+        auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+
+        std::string currentHtml = "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/" +
+            std::to_string(100 + i) + ".png'>";
+        htmlContents.push_back(currentHtml);
+
+        auto htmlRecord = Html(currentHtml, "abstract");
+        htmlRecord.InitObject();
+
+        record->AddEntry(htmlRecord.GetUtdId(), htmlRecord.GetOriginValue());
+        data.AddRecord(record);
+    }
+
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    AddPrivilege1(option2);
+    SetHapToken1();
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(status, E_OK);
+    for (int i = 0; i < 100; i++) {
+        std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(i);
+        ASSERT_NE(readRecord, nullptr);
+        auto entryValue = readRecord->GetEntry(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML));
+        auto object = std::get<std::shared_ptr<Object>>(entryValue);
+        ASSERT_NE(object, nullptr);
+        auto iter = object->value_.find(HTML_CONTENT);
+        ASSERT_TRUE(iter != object->value_.end());
+        EXPECT_TRUE(std::holds_alternative<std::string>(iter->second));
+        auto content = std::get<std::string>(iter->second);
+        EXPECT_EQ(content, htmlContents[i]);
+        auto uris = readRecord->GetUris();
+        EXPECT_EQ(uris.size(), 0);
+    }
+
+    LOG_INFO(UDMF_TEST, "SetData050 end.");
+}
+
+/**
+* @tc.name: GetSummary003
+* @tc.desc: Get summary data
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetSummary003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary003 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::string value;
+    int64_t maxSize = 512 * 1024;
+    for (int64_t i = 0; i < maxSize; ++i) {
+        value += "11";
+    }
+    details.insert({ value, value });
+
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
+    data.AddRecord(text);
+
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetDetails(details);
+    plainText->SetContent("content");
+    plainText->SetAbstract("abstract");
+    data.AddRecord(plainText);
+
+    UnifiedDataHelper::SetRootPath("/data/udmf_test/");
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    UnifiedDataHelper::SetRootPath("");
+
+    QueryOption option2 = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+
+    auto size = text->GetSize();
+    size += plainText->GetSize();
+
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(summary.totalSize, size);
+    ASSERT_EQ(summary.summary["general.text"], text->GetSize());
+    ASSERT_EQ(summary.summary["general.plain-text"], plainText->GetSize());
+
+    LOG_INFO(UDMF_TEST, "GetSummary003 end.");
+}
+
+/**
+* @tc.name: IsRemoteData
+* @tc.desc: is remote data, result false: not remote data, true: remote data.
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, IsRemoteData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsRemoteData001 begin.");
+
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
+    data.AddRecord(text);
+
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetDetails(details);
+    plainText->SetContent("content");
+    plainText->SetAbstract("abstract");
+    data.AddRecord(plainText);
+
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption option2 = { .key = key };
+    bool result = true;
+    status = UdmfClient::GetInstance().IsRemoteData(option2, result);
+
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(result, false);
+
+    LOG_INFO(UDMF_TEST, "IsRemoteData001 end.");
+}
+
+/**
+* @tc.name: GetTypesLabels001
+* @tc.desc: test GetTypesLabels
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetTypesLabels001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetTypesLabels001 begin.");
+    UnifiedData data;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    auto text = std::make_shared<Text>();
+    text->SetDetails(details);
+    auto plainText = std::make_shared<PlainText>();
+    plainText->SetDetails(details);
+    std::vector<std::shared_ptr<UnifiedRecord>> records = {text, plainText, nullptr};
+    data.AddRecords(records);
+
+    std::vector<std::string> types = {"general.text", "general.plain-text"};
+    ASSERT_EQ(data.GetTypesLabels(), types);
+    ASSERT_EQ(data.HasType("general.text"), true);
+    ASSERT_EQ(data.HasType("general.plain-text"), true);
+    ASSERT_EQ(data.HasType("general.html"), false);
+}
+
+/**
+* @tc.name: QueryUDSData001
+* @tc.desc: QueryUDSData001
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, QueryUDSData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "QueryUDSData001 begin.");
+
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    std::shared_ptr<UnifiedRecord> record1 = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "plainTextContent");
+    data.AddRecord(record1);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    query = { .key = key };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), 1);
+    std::shared_ptr<UnifiedRecord> record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    ASSERT_EQ(record2->GetType(), UDType::PLAIN_TEXT);
+    ValueType value = record2->GetValue();
+    ASSERT_NE(std::get_if<std::string>(&value), nullptr);
+    ASSERT_EQ(std::get<std::string>(value), "plainTextContent");
+    LOG_INFO(UDMF_TEST, "QueryUDSData001 end.");
+}
+
+/**
+* @tc.name: QueryUDSData002
+* @tc.desc: QueryUDSData002
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, QueryUDSData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "QueryUDSData002 begin.");
+
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    auto obj = std::make_shared<Object>();
+    obj->value_["uniformDataType"] = "general.plain-text";
+    obj->value_["textContent"] = "plainTextContent";
+    obj->value_["abstract"] = "plainTextAbstract";
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_["detail1"] = "detail1";
+    obj2->value_["detail2"] = "detail2";
+    obj->value_["details"] = obj2;
+    auto record = std::make_shared<PlainText>(UDType::PLAIN_TEXT, obj);
+    data.AddRecord(record);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    unifiedDataSet.clear();
+    query = { .key = key, .intention = UD_INTENTION_DATA_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), 1);
+    auto record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    ASSERT_EQ(record2->GetType(), UDType::PLAIN_TEXT);
+    auto value = record2->GetValue();
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&value), nullptr);
+    obj = std::get<std::shared_ptr<Object>>(value);
+
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["uniformDataType"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["uniformDataType"]), "general.plain-text");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["textContent"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["textContent"]), "plainTextContent");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["abstract"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["abstract"]), "plainTextAbstract");
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&obj->value_["details"]), nullptr);
+    obj2 = std::get<std::shared_ptr<Object>>(obj->value_["details"]);
+
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail1"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail1"]), "detail1");
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail2"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail2"]), "detail2");
+    LOG_INFO(UDMF_TEST, "QueryUDSData002 end.");
+}
+
+/**
+* @tc.name: QueryUDSData003
+* @tc.desc: QueryUDSData003
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, QueryUDSData003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "QueryUDSData003 begin.");
+
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    auto obj = std::make_shared<Object>();
+    obj->value_["uniformDataType"] = "general.hyperlink";
+    obj->value_["url"] = "www.xxx";
+    obj->value_["description"] = "hyperlinkDescription";
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_["detail1"] = "detail1";
+    obj2->value_["detail2"] = "detail2";
+    obj->value_["details"] = obj2;
+    auto record = std::make_shared<Link>(UDType::HYPERLINK, obj);
+    data.AddRecord(record);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    unifiedDataSet.clear();
+    query = { .key = key, .intention = UD_INTENTION_DATA_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), 1);
+    auto record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    ASSERT_EQ(record2->GetType(), UDType::HYPERLINK);
+    auto value = record2->GetValue();
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&value), nullptr);
+    obj = std::get<std::shared_ptr<Object>>(value);
+
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["uniformDataType"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["uniformDataType"]), "general.hyperlink");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["url"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["url"]), "www.xxx");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["description"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["description"]), "hyperlinkDescription");
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&obj->value_["details"]), nullptr);
+    obj2 = std::get<std::shared_ptr<Object>>(obj->value_["details"]);
+
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail1"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail1"]), "detail1");
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail2"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail2"]), "detail2");
+    LOG_INFO(UDMF_TEST, "QueryUDSData003 end.");
+}
+
+/**
+* @tc.name: QueryUDSData004
+* @tc.desc: QueryUDSData004
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, QueryUDSData004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "QueryUDSData004 begin.");
+
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    auto obj = std::make_shared<Object>();
+    obj->value_["uniformDataType"] = "general.html";
+    obj->value_["htmlContent"] = "www.xxx";
+    obj->value_["plainContent"] = "htmlPlainContent";
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_["detail1"] = "detail1";
+    obj2->value_["detail2"] = "detail2";
+    obj->value_["details"] = obj2;
+    auto record = std::make_shared<Html>(UDType::HTML, obj);
+    data.AddRecord(record);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    unifiedDataSet.clear();
+    query = { .key = key, .intention = UD_INTENTION_DATA_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), 1);
+    auto record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    ASSERT_EQ(record2->GetType(), UDType::HTML);
+    auto value = record2->GetValue();
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&value), nullptr);
+    obj = std::get<std::shared_ptr<Object>>(value);
+
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["uniformDataType"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["uniformDataType"]), "general.html");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["htmlContent"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["htmlContent"]), "www.xxx");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["plainContent"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["plainContent"]), "htmlPlainContent");
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&obj->value_["details"]), nullptr);
+    obj2 = std::get<std::shared_ptr<Object>>(obj->value_["details"]);
+
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail1"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail1"]), "detail1");
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail2"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail2"]), "detail2");
+    LOG_INFO(UDMF_TEST, "QueryUDSData004 end.");
+}
+
+/**
+* @tc.name: QueryUDSData005
+* @tc.desc: QueryUDSData005
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, QueryUDSData005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "QueryUDSData005 begin.");
+
+    QueryOption query = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    std::vector<UnifiedData> unifiedDataSet;
+    auto status = UdmfClient::GetInstance().DeleteData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    unifiedDataSet.clear();
+
+    CustomOption customOption = { .intention = Intention::UD_INTENTION_DATA_HUB };
+    UnifiedData data;
+    auto obj = std::make_shared<Object>();
+    obj->value_["uniformDataType"] = "openharmony.app-item";
+    obj->value_["appId"] = "app-itemAppId";
+    obj->value_["appName"] = "app-itemAppName";
+    obj->value_["appIconId"] = "app-itemAppIconId";
+    obj->value_["appLabelId"] = "app-itemAppLabelId";
+    obj->value_["bundleName"] = "app-itemBundleName";
+    obj->value_["abilityName"] = "app-itemAbilityName";
+    auto obj2 = std::make_shared<Object>();
+    obj2->value_["detail1"] = "detail1";
+    obj2->value_["detail2"] = 1234;
+    obj->value_["details"] = obj2;
+    auto record = std::make_shared<SystemDefinedAppItem>(UDType::SYSTEM_DEFINED_APP_ITEM, obj);
+    data.AddRecord(record);
+    std::string key;
+    status = UdmfClient::GetInstance().SetData(customOption, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    unifiedDataSet.clear();
+    query = { .key = key, .intention = UD_INTENTION_DATA_HUB };
+    status = UdmfClient::GetInstance().GetBatchData(query, unifiedDataSet);
+    ASSERT_EQ(status, E_OK);
+    ASSERT_EQ(unifiedDataSet.size(), 1);
+    auto record2 = unifiedDataSet[0].GetRecordAt(0);
+    ASSERT_NE(record2, nullptr);
+    ASSERT_EQ(record2->GetType(), UDType::SYSTEM_DEFINED_APP_ITEM);
+    auto value = record2->GetValue();
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&value), nullptr);
+    obj = std::get<std::shared_ptr<Object>>(value);
+
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["uniformDataType"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["uniformDataType"]), "openharmony.app-item");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["appId"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["appId"]), "app-itemAppId");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["appName"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["appName"]), "app-itemAppName");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["appIconId"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["appIconId"]), "app-itemAppIconId");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["appLabelId"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["appLabelId"]), "app-itemAppLabelId");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["bundleName"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["bundleName"]), "app-itemBundleName");
+    ASSERT_NE(std::get_if<std::string>(&obj->value_["abilityName"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj->value_["abilityName"]), "app-itemAbilityName");
+
+    ASSERT_NE(std::get_if<std::shared_ptr<Object>>(&obj->value_["details"]), nullptr);
+    obj2 = std::get<std::shared_ptr<Object>>(obj->value_["details"]);
+
+    ASSERT_NE(std::get_if<std::string>(&obj2->value_["detail1"]), nullptr);
+    ASSERT_EQ(std::get<std::string>(obj2->value_["detail1"]), "detail1");
+    ASSERT_NE(std::get_if<int32_t>(&obj2->value_["detail2"]), nullptr);
+    ASSERT_EQ(std::get<int32_t>(obj2->value_["detail2"]), 1234);
+    LOG_INFO(UDMF_TEST, "QueryUDSData005 end.");
+}
+
+/**
+* @tc.name: GetSummary004
+* @tc.desc: Get summary data for entries
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, GetSummary004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary004 begin.");
+    CustomOption option1 = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    UDDetails details;
+    details.insert({ "udmf_key", "udmf_value" });
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = "http://demo.com";
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(FILE_URI, obj);
+    auto plainText = PlainText("content", "abstract");
+    auto size1 = plainText.GetSize();
+    plainText.InitObject();
+    record->AddEntry(plainText.GetUtdId2(), plainText.GetOriginValue());
+    auto image = Image("uri");
+    image.SetDetails(details);
+    auto size2 = image.GetSize();
+    image.InitObject();
+    record->AddEntry(image.GetUtdId2(), image.GetOriginValue());
+    std::vector<uint8_t> raw = {1, 2, 3, 4, 5};
+    SystemDefinedPixelMap pixelMap = SystemDefinedPixelMap(raw);
+    pixelMap.SetDetails(details);
+    auto size3 = pixelMap.GetSize();
+    pixelMap.InitObject();
+    record->AddEntry(pixelMap.GetUtdId2(), pixelMap.GetOriginValue());
+    raw = {1, 2, 3, 4, 5};
+    auto applicationDefinedRecord = ApplicationDefinedRecord("my.type", raw);
+    auto size4 = applicationDefinedRecord.GetSize();
+    applicationDefinedRecord.InitObject();
+    record->AddEntry(applicationDefinedRecord.GetUtdId2(), applicationDefinedRecord.GetOriginValue());
+    data.AddRecord(record);
+    auto status = UdmfClient::GetInstance().SetData(option1, data, key);
+    ASSERT_EQ(status, E_OK);
+    QueryOption option2 = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(option2, summary);
+    ASSERT_EQ(status, E_OK);
+    EXPECT_EQ(summary.summary["general.plain-text"], size1);
+    EXPECT_EQ(summary.summary["general.image"], size2);
+    EXPECT_EQ(summary.summary["openharmony.pixel-map"], size3);
+    EXPECT_EQ(summary.summary["ApplicationDefinedType"], size4);
+    EXPECT_EQ(summary.totalSize, record->GetSize());
+    UnifiedData readData;
+    status = UdmfClient::GetInstance().GetData(option2, readData);
+    ASSERT_EQ(E_OK, status);
+    ASSERT_EQ(1, readData.GetRecords().size());
+    auto readRecord = readData.GetRecordAt(0);
+    auto entries = readRecord->GetEntries();
+    ASSERT_EQ(4, entries->size());
+    auto readFileUri = std::get<std::shared_ptr<Object>>(entries->at("general.file-uri"));
+    EXPECT_EQ("general.image", std::get<std::string>(readFileUri->value_[FILE_TYPE]));
+    EXPECT_EQ("uri", std::get<std::string>(readFileUri->value_[ORI_URI]));
+    auto readPlainText = std::get<std::shared_ptr<Object>>(entries->at("general.plain-text"));
+    EXPECT_EQ("abstract", std::get<std::string>(readPlainText->value_[ABSTRACT]));
+    auto readPixelMap = std::get<std::shared_ptr<Object>>(entries->at("openharmony.pixel-map"));
+    EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readPixelMap->value_[PIXEL_MAP]).size());
+    auto readDefinedRecord = std::get<std::shared_ptr<Object>>(entries->at("my.type"));
+    EXPECT_EQ(5, std::get<std::vector<uint8_t>>(readDefinedRecord->value_[ARRAY_BUFFER]).size());
+    auto valueType = readRecord->GetValue();
+    EXPECT_TRUE(std::holds_alternative<std::monostate>(readRecord->GetValue()));
+    LOG_INFO(UDMF_TEST, "GetSummary004 end.");
+}
+
 } // OHOS::Test
