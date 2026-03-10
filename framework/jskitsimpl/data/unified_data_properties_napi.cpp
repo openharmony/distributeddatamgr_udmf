@@ -29,6 +29,7 @@ napi_value UnifiedDataPropertiesNapi::Constructor(napi_env env)
         DECLARE_NAPI_GETTER_SETTER("shareOptions", GetShareOptions, SetShareOptions),
         DECLARE_NAPI_GETTER("timestamp", GetTimestamp),
         DECLARE_NAPI_GETTER_SETTER("getDelayData", GetDelayData, SetDelayData),
+        DECLARE_NAPI_GETTER_SETTER("uriAuthorizationPolicies", GetUriAuthorizationPolicies, SetUriAuthorizationPolicies),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "UnifiedDataProperties", properties, count, UnifiedDataPropertiesNapi::New);
@@ -218,6 +219,41 @@ napi_value UnifiedDataPropertiesNapi::SetDelayData(napi_env env, napi_callback_i
     ctxt->status = napi_create_reference(env, handler, 1, &ref);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "napi_create_reference failed");
     properties->delayDataRef_ = ref;
+    return nullptr;
+}
+
+napi_value UnifiedDataPropertiesNapi::GetUriAuthorizationPolicies(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    auto properties = GetPropertiesNapi(env, info, ctxt);
+    ASSERT_ERR(ctxt->env, (properties != nullptr && properties->value_ != nullptr),
+        Status::E_ERROR, "invalid object!");
+    auto policies = UriPermissionUtil::ToInt32(properties->value_->uriAuthorizationPolicies);
+    ctxt->status = NapiDataUtils::SetValue(env, policies, ctxt->output);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "get uriAuthorizationPolicies failed");
+    return ctxt->output;
+}
+
+napi_value UnifiedDataPropertiesNapi::SetUriAuthorizationPolicies(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    std::vector<int32_t> uriAuthorizationPolicies;
+    auto input = [env, ctxt, &uriAuthorizationPolicies](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_ERROR, "Mandatory parameters are left unspecified");
+        if (!NapiDataUtils::IsUndefinedOrNull(env, argv[0])) {
+            ctxt->status = NapiDataUtils::GetValue(env, argv[0], uriAuthorizationPolicies);
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, Status::E_ERROR,
+                "parameter uriAuthorizationPolicies type must be Array<number>");
+        }
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
+    auto properties = static_cast<UnifiedDataPropertiesNapi *>(ctxt->native);
+    ASSERT_ERR(ctxt->env, (properties != nullptr && properties->value_ != nullptr),
+        Status::E_ERROR, "invalid object!");
+    properties->value_->uriAuthorizationPolicies = UriPermissionUtil::FromInt32(uriAuthorizationPolicies);
     return nullptr;
 }
 } // namespace UDMF

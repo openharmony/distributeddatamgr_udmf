@@ -26,6 +26,7 @@ public:
     ShareOptions shareOptions = CROSS_DEVICE;
     std::int64_t timestamp {0};
     bool isRemote {false};
+    std::vector<UriPermission> uriAuthorizationPolicies;
 };
 } // namespace UDMF
 } // namespace OHOS

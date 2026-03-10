@@ -967,6 +967,13 @@ OHOS::UDMF::UnifiedDataProperties ConvertUnifiedDataProperties(::taiheChannel::U
     if (value.shareOptions.has_value()) {
         properties.shareOptions = ConvertShareOptions(value.shareOptions.value());
     }
+    if (value.uriAuthorizationPolicies.has_value()) {
+        auto policies = value.uriAuthorizationPolicies.value();
+        properties.uriAuthorizationPolicies.reserve(policies.size());
+        for (const auto &policy : policies) {
+            properties.uriAuthorizationPolicies.push_back(static_cast<UriPermission>(policy));
+        }
+    }
     return properties;
 }
 
@@ -986,12 +993,24 @@ OHOS::UDMF::UnifiedDataProperties ConvertUnifiedDataProperties(::taiheChannel::U
     SetTimestamp(taihe::get_env(), value.timestamp, aniTimeStamp);
     auto timestampOpt = ::taihe::optional<uintptr_t>::make(reinterpret_cast<uintptr_t>(aniTimeStamp));
 
+    ::taihe::optional<::taihe::array<int32_t>> uriAuthorizationPoliciesOpt;
+    if (!value.uriAuthorizationPolicies.empty()) {
+        std::vector<int32_t> policies;
+        policies.reserve(value.uriAuthorizationPolicies.size());
+        for (const auto &policy : value.uriAuthorizationPolicies) {
+            policies.push_back(static_cast<int32_t>(policy));
+        }
+        uriAuthorizationPoliciesOpt = ::taihe::optional<::taihe::array<int32_t>>::make(
+            ::taihe::array<int32_t>(::taihe::copy_data, policies.data(), policies.size()));
+    }
+
     auto taiheProperties = ::taiheChannel::UnifiedDataProperties {
         std::move(tagOpt),
         std::move(timestampOpt),
         std::move(shareOptionsOpt),
         std::move(getDelayDataOpt),
         std::move(extrasOpt),
+        std::move(uriAuthorizationPoliciesOpt),
     };
     return taiheProperties;
 }

@@ -39,6 +39,8 @@ public:
     ::taihe::string GetHtmlContent();
     void SetPlainContent(const ::taihe::string_view &plainContent);
     ::taihe::string GetPlainContent();
+    ::taihe::optional<::taihe::array<int32_t>> GetUriAuthorizationPolicies();
+    void SetUriAuthorizationPolicies(const ::taihe::optional<::taihe::array<int32_t>> &uriAuthorizationPolicies);
     int64_t GetInner();
 
     std::shared_ptr<Html> value_;

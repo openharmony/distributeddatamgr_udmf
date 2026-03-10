@@ -45,6 +45,8 @@ private:
     static napi_value GetTimestamp(napi_env env, napi_callback_info info);
     static napi_value GetDelayData(napi_env env, napi_callback_info info);
     static napi_value SetDelayData(napi_env env, napi_callback_info info);
+    static napi_value GetUriAuthorizationPolicies(napi_env env, napi_callback_info info);
+    static napi_value SetUriAuthorizationPolicies(napi_env env, napi_callback_info info);
 };
 } // namespace UDMF
 } // namespace OHOS

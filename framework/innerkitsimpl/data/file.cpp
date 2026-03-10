@@ -16,6 +16,22 @@
 
 namespace OHOS {
 namespace UDMF {
+namespace {
+void UpdateUriAuthorizationPolicies(const std::shared_ptr<Object> &object,
+    const std::vector<UriPermission> &uriAuthorizationPolicies)
+{
+    if (object == nullptr) {
+        return;
+    }
+    if (uriAuthorizationPolicies.empty()) {
+        object->value_.erase(URI_AUTHORIZATION_POLICIES);
+        return;
+    }
+    uint32_t permissionMask = UriPermissionUtil::ToMask(uriAuthorizationPolicies);
+    object->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(permissionMask);
+}
+} // namespace
+
 File::File() : UnifiedRecord(FILE)
 {
     SetType(FILE);
@@ -40,6 +56,10 @@ File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
         object->GetValue(ORI_URI, oriUri_);
         object->GetValue(REMOTE_URI, remoteUri_);
         object->GetValue(FILE_TYPE, fileType_);
+        int32_t permissionMask = 0;
+        if (object->GetValue(URI_AUTHORIZATION_POLICIES, permissionMask) && permissionMask >= 0) {
+            uriAuthorizationPolicies_ = UriPermissionUtil::FromMask(static_cast<uint32_t>(permissionMask));
+        }
         std::shared_ptr<Object> detailObj = nullptr;
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
@@ -110,7 +130,22 @@ void File::InitObject()
             object->value_[FILE_TYPE] = "general.file";
         }
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        UpdateUriAuthorizationPolicies(object, uriAuthorizationPolicies_);
         object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
+    }
+}
+
+std::vector<UriPermission> File::GetUriAuthorizationPolicies() const
+{
+    return uriAuthorizationPolicies_;
+}
+
+void File::SetUriAuthorizationPolicies(const std::vector<UriPermission> &uriAuthorizationPolicies)
+{
+    uriAuthorizationPolicies_ = uriAuthorizationPolicies;
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        UpdateUriAuthorizationPolicies(object, uriAuthorizationPolicies_);
     }
 }
 

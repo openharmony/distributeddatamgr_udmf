@@ -34,6 +34,8 @@ public:
     static napi_value SetDetails(napi_env env, napi_callback_info info);
     static napi_value GetUri(napi_env env, napi_callback_info info);
     static napi_value SetUri(napi_env env, napi_callback_info info);
+    static napi_value GetUriAuthorizationPolicies(napi_env env, napi_callback_info info);
+    static napi_value SetUriAuthorizationPolicies(napi_env env, napi_callback_info info);
     std::shared_ptr<File> value_;
 
 private:

@@ -72,6 +72,10 @@ public:
     static napi_status GetValue(napi_env env, napi_value in, std::vector<std::string> &out);
     static napi_status SetValue(napi_env env, const std::vector<std::string> &in, napi_value &out);
 
+    /* napi_value <-> std::vector<int32_t> */
+    static napi_status GetValue(napi_env env, napi_value in, std::vector<int32_t> &out);
+    static napi_status SetValue(napi_env env, const std::vector<int32_t> &in, napi_value &out);
+
     /* napi_value <-> std::vector<uint8_t> */
     static napi_status GetValue(napi_env env, napi_value in, std::vector<uint8_t> &out);
     static napi_status SetValue(napi_env env, const std::vector<uint8_t> &in, napi_value &out);

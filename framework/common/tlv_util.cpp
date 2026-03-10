@@ -369,6 +369,13 @@ template <> size_t CountBufferSize(const UnifiedDataProperties &input, TLVObject
     bool isWithinMax = CheckAndAdd(size, data.Count(input.tag)) && CheckAndAdd(size, data.CountBasic(input.timestamp))
         && CheckAndAdd(size, data.CountBasic(static_cast<int32_t>(input.shareOptions)))
         && CheckAndAdd(size, TLVUtil::CountBufferSize(input.extras, data));
+    if (!isWithinMax) {
+        return 0;
+    }
+    if (!input.uriAuthorizationPolicies.empty()) {
+        auto permissionMask = UriPermissionUtil::ToMask(input.uriAuthorizationPolicies);
+        isWithinMax = CheckAndAdd(size, data.CountBasic(permissionMask));
+    }
     return isWithinMax ? size : 0;
 }
 
@@ -389,6 +396,12 @@ template <> bool Writing(const UnifiedDataProperties &input, TLVObject &data, TA
     }
     if (!TLVUtil::Writing(input.extras, data, TAG::TAG_PROPERTIES_EXTRAS)) {
         return false;
+    }
+    if (!input.uriAuthorizationPolicies.empty()) {
+        auto permissionMask = UriPermissionUtil::ToMask(input.uriAuthorizationPolicies);
+        if (!data.WriteBasic(TAG::TAG_PROPERTIES_URI_AUTHORIZATION, permissionMask)) {
+            return false;
+        }
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
 }
@@ -420,6 +433,14 @@ template <> bool Reading(UnifiedDataProperties &output, TLVObject &data, const T
             case static_cast<uint16_t>(TAG::TAG_PROPERTIES_EXTRAS):
                 result = TLVUtil::Reading(output.extras, data, headItem);
                 break;
+            case static_cast<uint16_t>(TAG::TAG_PROPERTIES_URI_AUTHORIZATION): {
+                uint32_t permissionMask = 0;
+                result = data.ReadBasic(permissionMask, headItem);
+                if (result) {
+                    output.uriAuthorizationPolicies = UriPermissionUtil::FromMask(permissionMask);
+                }
+                break;
+            }
             default:
                 result = data.Skip(headItem);
         }

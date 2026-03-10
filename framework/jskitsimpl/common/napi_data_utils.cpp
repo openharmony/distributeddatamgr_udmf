@@ -183,6 +183,45 @@ napi_status NapiDataUtils::SetValue(napi_env env, const std::vector<std::string>
     return status;
 }
 
+/* napi_value <-> std::vector<int32_t> */
+napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::vector<int32_t> &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value -> std::vector<int32_t>");
+    out.clear();
+    bool isArray = false;
+    napi_status status = napi_is_array(env, in, &isArray);
+    LOG_ERROR_RETURN(status == napi_ok && isArray, "invalid type", napi_invalid_arg);
+    uint32_t length = 0;
+    status = napi_get_array_length(env, in, &length);
+    LOG_ERROR_RETURN(status == napi_ok, "invalid length", napi_invalid_arg);
+    out.reserve(length);
+    for (uint32_t i = 0; i < length; ++i) {
+        napi_value item = nullptr;
+        status = napi_get_element(env, in, i, &item);
+        LOG_ERROR_RETURN((item != nullptr) && (status == napi_ok), "no element", napi_invalid_arg);
+        int32_t value = 0;
+        status = GetValue(env, item, value);
+        LOG_ERROR_RETURN(status == napi_ok, "not an int32", napi_invalid_arg);
+        out.push_back(value);
+    }
+    return status;
+}
+
+napi_status NapiDataUtils::SetValue(napi_env env, const std::vector<int32_t> &in, napi_value &out)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "napi_value <- std::vector<int32_t>");
+    napi_status status = napi_create_array_with_length(env, in.size(), &out);
+    LOG_ERROR_RETURN(status == napi_ok, "create array failed!", status);
+    int index = 0;
+    for (auto &item : in) {
+        napi_value element = nullptr;
+        SetValue(env, item, element);
+        status = napi_set_element(env, out, index++, element);
+        LOG_ERROR_RETURN((status == napi_ok), "napi_set_element failed!", status);
+    }
+    return status;
+}
+
 /* napi_value <-> std::vector<uint8_t> */
 napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::vector<uint8_t> &out)
 {
@@ -526,6 +565,20 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL_BASE(env, napi_typeof(env, attributeValueNapi, &valueType), napi_invalid_arg);
         napi_status status = napi_ok;
+        bool isArray = false;
+        NAPI_CALL_BASE(env, napi_is_array(env, attributeValueNapi, &isArray), napi_invalid_arg);
+        if (isArray) {
+            if (attributeName != URI_AUTHORIZATION_POLICIES) {
+                return napi_invalid_arg;
+            }
+            std::vector<int32_t> permissions;
+            status = GetValue(env, attributeValueNapi, permissions);
+            if (status != napi_ok) {
+                return status;
+            }
+            object->value_[attributeName] = static_cast<int32_t>(UriPermissionUtil::ToMask(permissions));
+            continue;
+        }
         if (valueType == napi_valuetype::napi_object) {
             status = ProcessNapiObject(env, in, attributeName, attributeValueNapi, object);
             if (status != napi_ok) {
@@ -586,6 +639,14 @@ napi_status NapiDataUtils::SetValue(napi_env env, const std::shared_ptr<Object> 
     napi_create_object(env, &out);
     for (auto &[key, value] : object->value_) {
         napi_value valueNapi = nullptr;
+        if (key == URI_AUTHORIZATION_POLICIES && std::holds_alternative<int32_t>(value)) {
+            auto permissionMask = std::get<int32_t>(value);
+            auto policies = UriPermissionUtil::ToInt32(
+                UriPermissionUtil::FromMask(static_cast<uint32_t>(permissionMask)));
+            NAPI_CALL_BASE(env, SetValue(env, policies, valueNapi), napi_generic_failure);
+            napi_set_named_property(env, out, key.c_str(), valueNapi);
+            continue;
+        }
         if (std::holds_alternative<std::vector<uint8_t>>(value) &&
             (udsAttributeKeySet.find(key) == udsAttributeKeySet.end())) {
             auto array = std::get<std::vector<uint8_t>>(value);

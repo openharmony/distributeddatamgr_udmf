@@ -141,6 +141,7 @@ struct UnifiedDataProperties {
   shareOptions: Optional<ShareOptions>;
   getDelayData: Optional<(type: String) => @sts_type("UnifiedData") Opaque>;
   extras: Optional<@sts_type("Record<String, RecordData>") Opaque>;
+  uriAuthorizationPolicies: Optional<Array<i32>>;
 }
 
 @ctor("UnifiedDataProperties")
@@ -240,6 +241,10 @@ interface FileInner {
   GetDetails(): Optional<@record Map<String, String>>;
   @set("details")
   SetDetails(details: @record Map<String, String>): void;
+  @get("uriAuthorizationPolicies")
+  GetUriAuthorizationPolicies(): Optional<Array<i32>>;
+  @set("uriAuthorizationPolicies")
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<i32>>): void;
   GetInner(): i64;
 }
 
@@ -382,6 +387,10 @@ interface HTMLInner {
   SetPlainContent(plainContent: String): void;
   @get("plainContent")
   GetPlainContent(): String;
+  @get("uriAuthorizationPolicies")
+  GetUriAuthorizationPolicies(): Optional<Array<i32>>;
+  @set("uriAuthorizationPolicies")
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<i32>>): void;
   GetInner(): i64;
 }
 

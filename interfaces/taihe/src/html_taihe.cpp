@@ -146,6 +146,36 @@ void HtmlTaihe::SetPlainContent(const ::taihe::string_view &plainContent)
     return ::taihe::string(this->value_->GetPlainContent());
 }
 
+::taihe::optional<::taihe::array<int32_t>> HtmlTaihe::GetUriAuthorizationPolicies()
+{
+    auto policies = this->value_->GetUriAuthorizationPolicies();
+    if (policies.empty()) {
+        return ::taihe::optional<::taihe::array<int32_t>>();
+    }
+    std::vector<int32_t> values;
+    values.reserve(policies.size());
+    for (const auto &policy : policies) {
+        values.push_back(static_cast<int32_t>(policy));
+    }
+    return ::taihe::optional<::taihe::array<int32_t>>::make(
+        ::taihe::array<int32_t>(::taihe::copy_data, values.data(), values.size()));
+}
+
+void HtmlTaihe::SetUriAuthorizationPolicies(
+    const ::taihe::optional<::taihe::array<int32_t>> &uriAuthorizationPolicies)
+{
+    if (!uriAuthorizationPolicies.has_value()) {
+        return;
+    }
+    auto policies = uriAuthorizationPolicies.value();
+    std::vector<UriPermission> vecPolicies;
+    vecPolicies.reserve(policies.size());
+    for (const auto &policy : policies) {
+        vecPolicies.push_back(static_cast<UriPermission>(policy));
+    }
+    this->value_->SetUriAuthorizationPolicies(vecPolicies);
+}
+
 int64_t HtmlTaihe::GetInner()
 {
     return reinterpret_cast<int64_t>(this);

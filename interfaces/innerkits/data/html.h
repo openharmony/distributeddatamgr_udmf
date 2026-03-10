@@ -35,9 +35,13 @@ public:
     void API_EXPORT SetPlainContent(const std::string &htmlContent);
     void InitObject() override;
 
+    std::vector<UriPermission> API_EXPORT GetUriAuthorizationPolicies() const;
+    void API_EXPORT SetUriAuthorizationPolicies(const std::vector<UriPermission> &uriAuthorizationPolicies);
+
 private:
     std::string htmlContent_;
     std::string plainContent_;
+    std::vector<UriPermission> uriAuthorizationPolicies_;
 };
 } // namespace UDMF
 } // namespace OHOS
