@@ -140,6 +140,7 @@ ohos_source_set("arkui_x_udmf_data_inner") {
     "${arkui_path}/napi/:ace_napi",
     "${arkui_x_c_utils_path}/base:utilsbase",
     "${arkui_x_hilog_path}/interfaces/native/innerkits:libhilog_${target_os}",
+    "${third_party_path}/cJSON:cjson_static",
   ]
 
   configs = [
