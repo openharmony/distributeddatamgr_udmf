@@ -63,4 +63,6 @@ ohos_shared_library("libudmf") {
   subsystem_name = "distributeddatamgr"
   output_name = "udmf"
   output_extension = "so"
+
+  cflags = [ "-Werror=vla" ]
 }

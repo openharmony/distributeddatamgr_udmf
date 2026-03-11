@@ -27,7 +27,10 @@ ohos_static_library("aip_core_mgr_static") {
     cfi_cross_dso = true
     debug = false
   }
-  cflags = [ "-Wno-c99-designator" ]
+  cflags = [
+    "-Wno-c99-designator",
+    "-Werror=vla"
+    ]
   public_configs = [ ":aip_core_manager_config" ]
 
   subsystem_name = "distributeddatamgr"

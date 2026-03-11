@@ -112,6 +112,8 @@ ohos_unittest("UdmfClientTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdmfClientFileMangerTest") {
@@ -160,6 +162,8 @@ ohos_unittest("UdmfClientFileMangerTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdmfClientSystemHapTest") {
@@ -172,6 +176,8 @@ ohos_unittest("UdmfClientSystemHapTest") {
   deps = common_deps
 
   external_deps = common_external_deps
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdmfClientHapPermissionTest") {
@@ -193,6 +199,8 @@ ohos_unittest("UdmfClientHapPermissionTest") {
   deps = common_deps
 
   external_deps = common_external_deps
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdmfClientSaInvokeTest") {
@@ -203,6 +211,8 @@ ohos_unittest("UdmfClientSaInvokeTest") {
   deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
 
   external_deps = common_external_deps
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdmfAsyncClientTest") {
@@ -240,6 +250,8 @@ ohos_unittest("UdmfAsyncClientTest") {
   ]
 
   use_exceptions = true
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdmfDelayDataTest") {
@@ -250,6 +262,8 @@ ohos_unittest("UdmfDelayDataTest") {
   deps = common_deps
 
   external_deps = common_external_deps
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UtdClientTest") {
@@ -290,6 +304,8 @@ ohos_unittest("UtdClientTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UtdConcurrentUpdateTest") {
@@ -327,6 +343,8 @@ ohos_unittest("UtdConcurrentUpdateTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UtdDynamicUpdateTest") {
@@ -364,6 +382,8 @@ ohos_unittest("UtdDynamicUpdateTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UtdNotifierTest") {
@@ -402,6 +422,8 @@ ohos_unittest("UtdNotifierTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("NdkDataConversionTest") {
@@ -420,6 +442,8 @@ ohos_unittest("NdkDataConversionTest") {
   deps = common_deps
 
   external_deps = common_external_deps
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("ApplicationDefineRecordTest") {
@@ -441,6 +465,8 @@ ohos_unittest("ApplicationDefineRecordTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("AudioTest") {
@@ -463,6 +489,8 @@ ohos_unittest("AudioTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("FileDataTest") {
@@ -484,6 +512,8 @@ ohos_unittest("FileDataTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("FlexibleTypeTest") {
@@ -504,6 +534,8 @@ ohos_unittest("FlexibleTypeTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("FolderTest") {
@@ -526,6 +558,8 @@ ohos_unittest("FolderTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("HtmlTest") {
@@ -549,6 +583,8 @@ ohos_unittest("HtmlTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("ImageTest") {
@@ -571,6 +607,8 @@ ohos_unittest("ImageTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("LinkTest") {
@@ -593,6 +631,8 @@ ohos_unittest("LinkTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("PlainTextTest") {
@@ -615,6 +655,8 @@ ohos_unittest("PlainTextTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("PresetTypeDescriptorsTest") {
@@ -636,6 +678,8 @@ ohos_unittest("PresetTypeDescriptorsTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("SystemDefinedAppitemTest") {
@@ -659,6 +703,8 @@ ohos_unittest("SystemDefinedAppitemTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("SystemDefinedFormTest") {
@@ -681,6 +727,8 @@ ohos_unittest("SystemDefinedFormTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("SystemDefinedPixelMapTest") {
@@ -704,6 +752,8 @@ ohos_unittest("SystemDefinedPixelMapTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("SystemDefinedRecordTest") {
@@ -725,6 +775,8 @@ ohos_unittest("SystemDefinedRecordTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("TextTest") {
@@ -746,6 +798,8 @@ ohos_unittest("TextTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UnifiedDataTest") {
@@ -768,6 +822,8 @@ ohos_unittest("UnifiedDataTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UnifiedDataHelperTest") {
@@ -783,6 +839,8 @@ ohos_unittest("UnifiedDataHelperTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UnifiedRecordTest") {
@@ -803,6 +861,8 @@ ohos_unittest("UnifiedRecordTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("VideoTest") {
@@ -824,6 +884,8 @@ ohos_unittest("VideoTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UnifiedMetaTest") {
@@ -839,6 +901,8 @@ ohos_unittest("UnifiedMetaTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UnifiedKeyTest") {
@@ -854,6 +918,8 @@ ohos_unittest("UnifiedKeyTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdmfClientAbnormalTest") {
@@ -918,6 +984,8 @@ ohos_unittest("UdmfClientAbnormalTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdmfClientInnerTest") {
@@ -967,6 +1035,8 @@ ohos_unittest("UdmfClientInnerTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ohos_unittest("UdmfConversionTest") {
@@ -990,6 +1060,8 @@ ohos_unittest("UdmfConversionTest") {
     "private=public",
     "protected=public",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 ###############################################################################
