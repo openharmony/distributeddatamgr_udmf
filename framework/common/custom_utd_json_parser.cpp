@@ -43,7 +43,7 @@ bool CustomUtdJsonParser::ParseStoredCustomUtdJson(const std::string &jsonData,
     if (jsonData.empty()) {
         return false;
     }
-    auto jsonRoot = json::parse(jsonData, nullptr, false);
+    auto jsonRoot = json::parse(jsonData, nullptr, false, true);
     if (jsonRoot.is_discarded()) {
         LOG_ERROR(UDMF_CLIENT, "Failed to parse JSON: invalid format.");
         return false;
@@ -66,7 +66,7 @@ bool CustomUtdJsonParser::ParseUserCustomUtdJson(const std::string &jsonData,
     if (jsonData.empty()) {
         return false;
     }
-    auto jsonRoot = json::parse(jsonData, nullptr, false);
+    auto jsonRoot = json::parse(jsonData, nullptr, false, true);
     if (jsonRoot.is_discarded()) {
         LOG_ERROR(UDMF_CLIENT, "Failed to parse JSON: invalid format.");
         return false;

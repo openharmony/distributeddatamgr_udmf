@@ -54,6 +54,46 @@ constexpr const char* TEST_DATA2 = "{\
     \"ownerBundle\":\"com.example.utdtest2\"\
     }]}";
 
+constexpr const char *TEST_STORED_JSON_WITH_COMMENT = R"({
+    // custom utd comment
+    "CustomUTDs": [
+        {
+            "TypeId": "com.example.custom.comment.image",
+            "BelongingToTypes": ["general.image"],
+            "FilenameExtensions": [".img"],
+            "MIMETypes": ["application/img"],
+            "Description": "Comment custom image",
+            "ReferenceURL": "",
+            "iconFile": "resources/img.png" // inline comment
+        }
+    ]
+})";
+
+constexpr const char *TEST_USER_JSON_WITH_COMMENT = R"({
+    // declaration comment
+    "UniformDataTypeDeclarations": [
+        {
+            "TypeId": "com.example.thread.comment.image",
+            "BelongingToTypes": ["general.image"],
+            "FilenameExtensions": [".myImage"],
+            "MIMETypes": ["application/myImage"],
+            "Description": "My commented image.",
+            "ReferenceURL": ""
+        }
+    ],
+    /* reference comment */
+    "ReferenceUniformDataTypeDeclarations": [
+        {
+            "TypeId": "com.example.thread.comment.audio",
+            "BelongingToTypes": ["general.audio"],
+            "FilenameExtensions": [".myAudio"],
+            "MIMETypes": ["application/myAudio"],
+            "Description": "My commented audio.",
+            "ReferenceURL": ""
+        }
+    ]
+})";
+
 class CustomUtdStoreTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -283,6 +323,27 @@ HWTEST_F(CustomUtdStoreTest, ParseStoredCustomUtdJson005, TestSize.Level1) {
 }
 
 /**
+ * @tc.name: ParseStoredCustomUtdJson006
+ * @tc.desc: valid json with comments
+ * @tc.type: FUNC
+ */
+HWTEST_F(CustomUtdStoreTest, ParseStoredCustomUtdJson006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseStoredCustomUtdJson006 begin.");
+
+    CustomUtdJsonParser parser;
+    std::vector<TypeDescriptorCfg> typesCfg;
+    bool ret = parser.ParseStoredCustomUtdJson(TEST_STORED_JSON_WITH_COMMENT, typesCfg);
+
+    EXPECT_TRUE(ret);
+    ASSERT_EQ(typesCfg.size(), 1u);
+    EXPECT_EQ(typesCfg[0].typeId, "com.example.custom.comment.image");
+    EXPECT_EQ(typesCfg[0].description, "Comment custom image");
+
+    LOG_INFO(UDMF_TEST, "ParseStoredCustomUtdJson006 end.");
+}
+
+/**
  * @tc.name: ParseUserCustomUtdJsonTest001
  * @tc.desc: parse a valid JSON containing declarations and references.
  * @tc.type: FUNC
@@ -392,5 +453,27 @@ HWTEST_F(CustomUtdStoreTest, ParseUserCustomUtdJsonTest004, TestSize.Level1)
     EXPECT_TRUE(declarations.empty());
     EXPECT_TRUE(references.empty());
     LOG_INFO(UDMF_TEST, "ParseUserCustomUtdJsonTest004 end.");
+}
+
+/**
+ * @tc.name: ParseUserCustomUtdJsonTest005
+ * @tc.desc: Verify ParseUserCustomUtdJson supports json comments.
+ * @tc.type: FUNC
+ */
+HWTEST_F(CustomUtdStoreTest, ParseUserCustomUtdJsonTest005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseUserCustomUtdJsonTest005 begin.");
+    std::vector<TypeDescriptorCfg> declarations;
+    std::vector<TypeDescriptorCfg> references;
+
+    CustomUtdJsonParser parser;
+    bool result = parser.ParseUserCustomUtdJson(TEST_USER_JSON_WITH_COMMENT, declarations, references);
+
+    EXPECT_TRUE(result);
+    ASSERT_EQ(declarations.size(), 1u);
+    ASSERT_EQ(references.size(), 1u);
+    EXPECT_EQ(declarations[0].typeId, "com.example.thread.comment.image");
+    EXPECT_EQ(references[0].typeId, "com.example.thread.comment.audio");
+    LOG_INFO(UDMF_TEST, "ParseUserCustomUtdJsonTest005 end.");
 }
 } // OHOS::Test
