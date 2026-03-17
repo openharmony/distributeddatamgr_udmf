@@ -107,6 +107,7 @@ enum class TAG : uint16_t {
     TAG_URI_PERMISSION,
     TAG_SUMMARY_TAG,
     TAG_PERMISSION_VERSION,
+    TAG_URI_PERMISSION_MASK,
 };
 }
 #endif //UDMF_TLV_TAG_H

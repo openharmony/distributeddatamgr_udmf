@@ -875,7 +875,8 @@ template <> size_t CountBufferSize(const UriInfo &input, TLVObject &data)
     size_t size = data.CountHead();
     bool isWithinMax = CheckAndAdd(size, data.CountBasic(input.position))
         && CheckAndAdd(size, data.Count(input.oriUri)) && CheckAndAdd(size, data.Count(input.dfsUri))
-        && CheckAndAdd(size, data.Count(input.authUri)) && CheckAndAdd(size, data.CountBasic(input.permission));
+        && CheckAndAdd(size, data.Count(input.authUri)) && CheckAndAdd(size, data.CountBasic(input.permission))
+        && CheckAndAdd(size, data.CountBasic(input.permissionMask));
     return isWithinMax ? size : 0;
 }
 
@@ -900,6 +901,9 @@ template <> bool Writing(const UriInfo &input, TLVObject &data, TAG tag)
     if (!data.WriteBasic(TAG::TAG_URI_PERMISSION, input.permission)) {
         return false;
     }
+    if (!data.WriteBasic(TAG::TAG_URI_PERMISSION_MASK, input.permissionMask)) {
+        return false;
+    }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
 }
 
@@ -912,6 +916,7 @@ template <> bool Reading(UriInfo &output, TLVObject &data, const TLVHead &head)
     }
     auto endCursor = data.GetCursor() + head.len;
     output.permission = 0;
+    output.permissionMask = 0;
     while (data.GetCursor() < endCursor) {
         TLVHead headItem{};
         if (!data.ReadHead(headItem)) {
@@ -933,6 +938,9 @@ template <> bool Reading(UriInfo &output, TLVObject &data, const TLVHead &head)
                 break;
             case static_cast<uint16_t>(TAG::TAG_URI_PERMISSION):
                 result = data.ReadBasic(output.permission, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_URI_PERMISSION_MASK):
+                result = data.ReadBasic(output.permissionMask, headItem);
                 break;
             default:
                 result = data.Skip(headItem);

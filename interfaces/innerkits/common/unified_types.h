@@ -129,6 +129,7 @@ struct UriInfo {
     std::string dfsUri;
     uint32_t position;
     int32_t permission {1};
+    uint32_t permissionMask {0};
 };
 
 struct DataLoadInfo {

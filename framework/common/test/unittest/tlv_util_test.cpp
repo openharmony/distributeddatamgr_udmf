@@ -1600,6 +1600,7 @@ HWTEST_F(TlvUtilTest, WritingAndReading_018, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "WritingAndReading_018 begin.");
     UriInfo input;
     input.authUri = "file://ohos.test.demo1/data/storage/el2/base/haps/local.png";
+    input.permissionMask = UriPermissionUtil::READ_FLAG | UriPermissionUtil::PERSIST_FLAG;
     std::vector<uint8_t> dataBytes;
     auto tlvObject = TLVObject(dataBytes);
     EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_URI_PERMISSION));
@@ -1607,6 +1608,7 @@ HWTEST_F(TlvUtilTest, WritingAndReading_018, TestSize.Level1)
     UriInfo output;
     TLVHead head;
     EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+    EXPECT_EQ(input.permissionMask, output.permissionMask);
 
     LOG_INFO(UDMF_TEST, "WritingAndReading_018 end.");
 }
