@@ -137,7 +137,7 @@ void FileTaihe::SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::str
 
 ::taihe::optional<::taihe::array<int32_t>> FileTaihe::GetUriAuthorizationPolicies()
 {
-    auto policies = this->value_->GetUriAuthorizationPolicies();
+    auto policies = UriPermissionUtil::FromMask(this->value_->GetUriAuthorizationPolicyMask());
     if (policies.empty()) {
         return ::taihe::optional<::taihe::array<int32_t>>();
     }
@@ -162,7 +162,7 @@ void FileTaihe::SetUriAuthorizationPolicies(
     for (const auto &policy : policies) {
         vecPolicies.push_back(static_cast<UriPermission>(policy));
     }
-    this->value_->SetUriAuthorizationPolicies(vecPolicies);
+    this->value_->SetUriAuthorizationPolicyMask(UriPermissionUtil::ToMask(vecPolicies));
 }
 
 int64_t FileTaihe::GetInner()

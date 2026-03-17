@@ -158,7 +158,8 @@ napi_value HtmlNapi::GetUriAuthorizationPolicies(napi_env env, napi_callback_inf
     auto html = GetHtml(env, info, ctxt);
     ASSERT_ERR(
         ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_ERROR, "invalid object!");
-    auto policies = UriPermissionUtil::ToInt32(html->value_->GetUriAuthorizationPolicies());
+    auto policies = UriPermissionUtil::ToInt32(
+        UriPermissionUtil::FromMask(html->value_->GetUriAuthorizationPolicyMask()));
     ctxt->status = NapiDataUtils::SetValue(env, policies, ctxt->output);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "get uriAuthorizationPolicies failed!");
     return ctxt->output;
@@ -184,7 +185,7 @@ napi_value HtmlNapi::SetUriAuthorizationPolicies(napi_env env, napi_callback_inf
     auto html = static_cast<HtmlNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_ERROR, "invalid object!");
-    html->value_->SetUriAuthorizationPolicies(UriPermissionUtil::FromInt32(uriAuthorizationPolicies));
+    html->value_->SetUriAuthorizationPolicyMask(UriPermissionUtil::ToMask(uriAuthorizationPolicies));
     return nullptr;
 }
 } // namespace UDMF

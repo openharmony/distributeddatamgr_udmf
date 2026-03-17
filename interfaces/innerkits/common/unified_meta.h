@@ -67,6 +67,7 @@ constexpr const char* LINK_URL = "linkUrl";
 constexpr const char* APPLICATION_DEFINED_RECORD_MARK = "applicationDefinedRecordMark";
 constexpr const char* GENERAL_FILE_URI = "general.file-uri";
 constexpr const char* PERMISSION_POLICY = "permission-policy";
+constexpr const char* PERMISSION_POLICY_EXT = "permission-policy-ext";
 constexpr const char* URI_AUTHORIZATION_POLICIES = "uriAuthorizationPolicies";
 
 enum UDType : int32_t {

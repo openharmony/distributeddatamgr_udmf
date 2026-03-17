@@ -155,7 +155,8 @@ napi_value FileNapi::GetUriAuthorizationPolicies(napi_env env, napi_callback_inf
     auto file = GetFile(env, info, ctxt);
     ASSERT_ERR(
         ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_ERROR, "invalid object!");
-    auto policies = UriPermissionUtil::ToInt32(file->value_->GetUriAuthorizationPolicies());
+    auto policies = UriPermissionUtil::ToInt32(
+        UriPermissionUtil::FromMask(file->value_->GetUriAuthorizationPolicyMask()));
     ctxt->status = NapiDataUtils::SetValue(env, policies, ctxt->output);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "get uriAuthorizationPolicies failed!");
     return ctxt->output;
@@ -181,7 +182,7 @@ napi_value FileNapi::SetUriAuthorizationPolicies(napi_env env, napi_callback_inf
     auto file = static_cast<FileNapi *>(ctxt->native);
     ASSERT_ERR(
         ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_ERROR, "invalid object!");
-    file->value_->SetUriAuthorizationPolicies(UriPermissionUtil::FromInt32(uriAuthorizationPolicies));
+    file->value_->SetUriAuthorizationPolicyMask(UriPermissionUtil::ToMask(uriAuthorizationPolicies));
     return nullptr;
 }
 } // namespace UDMF

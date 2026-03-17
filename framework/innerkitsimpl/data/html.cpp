@@ -19,22 +19,6 @@
 
 namespace OHOS {
 namespace UDMF {
-namespace {
-void UpdateUriAuthorizationPolicies(const std::shared_ptr<Object> &object,
-    const std::vector<UriPermission> &uriAuthorizationPolicies)
-{
-    if (object == nullptr) {
-        return;
-    }
-    if (uriAuthorizationPolicies.empty()) {
-        object->value_.erase(URI_AUTHORIZATION_POLICIES);
-        return;
-    }
-    uint32_t permissionMask = UriPermissionUtil::ToMask(uriAuthorizationPolicies);
-    object->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(permissionMask);
-}
-} // namespace
-
 Html::Html()
 {
     SetType(HTML);
@@ -64,7 +48,7 @@ Html::Html(UDType type, ValueType value) : Text(type, value)
         object->GetValue(PLAIN_CONTENT, plainContent_);
         int32_t permissionMask = 0;
         if (object->GetValue(URI_AUTHORIZATION_POLICIES, permissionMask) && permissionMask >= 0) {
-            uriAuthorizationPolicies_ = UriPermissionUtil::FromMask(static_cast<uint32_t>(permissionMask));
+            uriAuthorizationPolicyMask_ = UriPermissionUtil::NormalizeMask(static_cast<uint32_t>(permissionMask));
         }
         std::shared_ptr<Object> detailObj = nullptr;
         if (object->GetValue(DETAILS, detailObj)) {
@@ -124,22 +108,34 @@ void Html::InitObject()
         object->value_[HTML_CONTENT] = htmlContent_;
         object->value_[PLAIN_CONTENT] = plainContent_;
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
-        UpdateUriAuthorizationPolicies(object, uriAuthorizationPolicies_);
+        uriAuthorizationPolicyMask_ = UriPermissionUtil::NormalizeMask(uriAuthorizationPolicyMask_);
+        if (uriAuthorizationPolicyMask_ == 0) {
+            object->value_.erase(URI_AUTHORIZATION_POLICIES);
+        } else {
+            object->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(uriAuthorizationPolicyMask_);
+        }
         object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
     }
 }
 
-std::vector<UriPermission> Html::GetUriAuthorizationPolicies() const
+uint32_t Html::GetUriAuthorizationPolicyMask() const
 {
-    return uriAuthorizationPolicies_;
+    return uriAuthorizationPolicyMask_;
 }
 
-void Html::SetUriAuthorizationPolicies(const std::vector<UriPermission> &uriAuthorizationPolicies)
+void Html::SetUriAuthorizationPolicyMask(uint32_t uriAuthorizationPolicyMask)
 {
-    uriAuthorizationPolicies_ = uriAuthorizationPolicies;
+    uriAuthorizationPolicyMask_ = UriPermissionUtil::NormalizeMask(uriAuthorizationPolicyMask);
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        UpdateUriAuthorizationPolicies(object, uriAuthorizationPolicies_);
+        if (object == nullptr) {
+            return;
+        }
+        if (uriAuthorizationPolicyMask_ == 0) {
+            object->value_.erase(URI_AUTHORIZATION_POLICIES);
+        } else {
+            object->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(uriAuthorizationPolicyMask_);
+        }
     }
 }
 } // namespace UDMF

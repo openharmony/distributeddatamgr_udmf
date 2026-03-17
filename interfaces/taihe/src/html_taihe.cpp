@@ -148,7 +148,7 @@ void HtmlTaihe::SetPlainContent(const ::taihe::string_view &plainContent)
 
 ::taihe::optional<::taihe::array<int32_t>> HtmlTaihe::GetUriAuthorizationPolicies()
 {
-    auto policies = this->value_->GetUriAuthorizationPolicies();
+    auto policies = UriPermissionUtil::FromMask(this->value_->GetUriAuthorizationPolicyMask());
     if (policies.empty()) {
         return ::taihe::optional<::taihe::array<int32_t>>();
     }
@@ -173,7 +173,7 @@ void HtmlTaihe::SetUriAuthorizationPolicies(
     for (const auto &policy : policies) {
         vecPolicies.push_back(static_cast<UriPermission>(policy));
     }
-    this->value_->SetUriAuthorizationPolicies(vecPolicies);
+    this->value_->SetUriAuthorizationPolicyMask(UriPermissionUtil::ToMask(vecPolicies));
 }
 
 int64_t HtmlTaihe::GetInner()
