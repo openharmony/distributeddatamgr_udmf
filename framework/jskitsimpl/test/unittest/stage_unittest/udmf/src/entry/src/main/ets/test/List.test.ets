@@ -16,9 +16,11 @@
 import stageUdmfCallBackTest from './StageUdmfCallBacktest.ets';
 import stageUdmfPromiseTest from './StageUdmfPromisetest.ets';
 import StageUdmfFileMangerTest from './StageUdmfFileMangertest.ets';
+import StageUdmfJsTest from './StageUdmfJsTest.ets';
 
 export default function testsuite() {
   stageUdmfCallBackTest();
   stageUdmfPromiseTest();
   StageUdmfFileMangerTest();
+  StageUdmfJsTest();
 }
