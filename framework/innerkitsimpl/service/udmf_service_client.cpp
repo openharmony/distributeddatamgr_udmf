@@ -21,6 +21,8 @@
 #include "system_ability_definition.h"
 #include "udmf_utils.h"
 #include "unified_data_helper.h"
+#include "audit_helper.h"
+#include <parameter.h>
 
 #include "logger.h"
 
@@ -29,6 +31,9 @@ namespace UDMF {
 std::shared_ptr<UdmfServiceClient> UdmfServiceClient::instance_;
 std::mutex UdmfServiceClient::mutex_;
 sptr<DistributedKv::IKvStoreDataService> UdmfServiceClient::kvDataServiceProxy_;
+
+constexpr const char *IS_ENTERPRISE_DEVICE = "const.edm.is_enterprise_device";
+constexpr int32_t UID_TRANSFORM_DIVISOR = 200000;
 
 UdmfServiceClient::UdmfServiceClient(const sptr<IUdmfService> &proxy) : udmfProxy_(proxy)
 {
@@ -143,6 +148,14 @@ int32_t UdmfServiceClient::GetData(const QueryOption &query, UnifiedData &unifie
 
     auto err = udmfProxy_->GetData(query, unifiedData);
     if (err == E_OK) {
+        char isEnterpriseDeviceValue[PARAM_VALUE_LEN_MAX] = {0};
+        GetParameter(IS_ENTERPRISE_DEVICE, "false", isEnterpriseDeviceValue, PARAM_VALUE_LEN_MAX);
+        std::string isEnterpriseDevice(isEnterpriseDeviceValue);
+        if (isEnterpriseDevice == "true") {
+            int32_t userId = IPCSkeleton::GetCallingUid() / UID_TRANSFORM_DIVISOR;
+            uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
+            AuditHelper::ReportDragAuditEvent(unifiedData, userId, tokenId);
+        }
         if (UnifiedDataHelper::IsTempUData(unifiedData)) {
             if (!UnifiedDataHelper::Unpack(unifiedData)) {
                 LOG_ERROR(UDMF_SERVICE, "failed to unpack unified data");

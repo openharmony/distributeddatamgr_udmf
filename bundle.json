@@ -36,6 +36,7 @@
         "hisysevent",
         "hitrace",
         "image_framework",
+        "init",
         "ipc",
         "kv_store",
         "napi",
