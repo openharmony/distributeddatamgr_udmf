@@ -42,6 +42,7 @@ private:
     std::string htmlContent_;
     std::string plainContent_;
     uint32_t uriAuthorizationPolicyMask_ {0};
+    bool hasUriAuthorizationPolicyMask_ {false};
 };
 } // namespace UDMF
 } // namespace OHOS

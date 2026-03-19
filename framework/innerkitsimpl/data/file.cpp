@@ -42,6 +42,7 @@ File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
         object->GetValue(FILE_TYPE, fileType_);
         int32_t permissionMask = 0;
         if (object->GetValue(URI_AUTHORIZATION_POLICIES, permissionMask) && permissionMask >= 0) {
+            hasUriAuthorizationPolicyMask_ = true;
             uriAuthorizationPolicyMask_ = UriPermissionUtil::NormalizeMask(static_cast<uint32_t>(permissionMask));
         }
         std::shared_ptr<Object> detailObj = nullptr;
@@ -115,7 +116,7 @@ void File::InitObject()
         }
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
         uriAuthorizationPolicyMask_ = UriPermissionUtil::NormalizeMask(uriAuthorizationPolicyMask_);
-        if (uriAuthorizationPolicyMask_ == 0) {
+        if (!hasUriAuthorizationPolicyMask_) {
             object->value_.erase(URI_AUTHORIZATION_POLICIES);
         } else {
             object->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(uriAuthorizationPolicyMask_);
@@ -131,17 +132,14 @@ uint32_t File::GetUriAuthorizationPolicyMask() const
 
 void File::SetUriAuthorizationPolicyMask(uint32_t uriAuthorizationPolicyMask)
 {
+    hasUriAuthorizationPolicyMask_ = true;
     uriAuthorizationPolicyMask_ = UriPermissionUtil::NormalizeMask(uriAuthorizationPolicyMask);
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
         if (object == nullptr) {
             return;
         }
-        if (uriAuthorizationPolicyMask_ == 0) {
-            object->value_.erase(URI_AUTHORIZATION_POLICIES);
-        } else {
-            object->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(uriAuthorizationPolicyMask_);
-        }
+        object->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(uriAuthorizationPolicyMask_);
     }
 }
 

@@ -336,7 +336,7 @@ HWTEST_F(TlvUtilTest, WritingAndReading_002, TestSize.Level1)
     runtime.createPackage = "package";
     runtime.isPrivate = true;
     runtime.appId = "appId";
-    runtime.permissionVersion = PERMISSION_VERSION_CURRENT;
+    runtime.permissionPolicyMode = PERMISSION_POLICY_MODE_MASK;
 
     std::vector<uint8_t> dataBytes;
     auto tlvObject = TLVObject(dataBytes);
@@ -357,7 +357,7 @@ HWTEST_F(TlvUtilTest, WritingAndReading_002, TestSize.Level1)
     EXPECT_EQ(runtime.privileges[1].writePermission, runtimeResult.privileges[1].writePermission);
     EXPECT_EQ(runtime.privileges[1].tokenId, runtimeResult.privileges[1].tokenId);
     EXPECT_EQ(runtime.appId, runtimeResult.appId);
-    EXPECT_EQ(runtime.permissionVersion, runtimeResult.permissionVersion);
+    EXPECT_EQ(runtime.permissionPolicyMode, runtimeResult.permissionPolicyMode);
 
     LOG_INFO(UDMF_TEST, "WritingAndReading_002 end.");
 }

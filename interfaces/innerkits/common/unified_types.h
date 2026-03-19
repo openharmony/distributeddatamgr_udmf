@@ -25,8 +25,10 @@
 
 namespace OHOS {
 namespace UDMF {
-constexpr int32_t PERMISSION_VERSION_LEGACY = 0;
-constexpr int32_t PERMISSION_VERSION_CURRENT = 1;
+enum PermissionPolicyMode : int32_t {
+    PERMISSION_POLICY_MODE_LEGACY = 0,
+    PERMISSION_POLICY_MODE_MASK = 1,
+};
 
 enum DataStatus : int32_t {
     WORKING = 0,
@@ -76,7 +78,7 @@ struct Runtime {
     std::string sdkVersion;
     Visibility visibility {};
     std::string appId;
-    int32_t permissionVersion {PERMISSION_VERSION_LEGACY};
+    int32_t permissionPolicyMode {PERMISSION_POLICY_MODE_LEGACY};
 };
 
 /*

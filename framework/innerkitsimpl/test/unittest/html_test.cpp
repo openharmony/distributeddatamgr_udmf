@@ -391,4 +391,47 @@ HWTEST_F(HtmlTest, ExtractImgSrc009, TestSize.Level1)
     EXPECT_EQ(uris.size(), 0);
     LOG_INFO(UDMF_TEST, "ExtractImgSrc009 end.");
 }
+
+/**
+* @tc.name: Html006
+* @tc.desc: Verify URI_AUTHORIZATION_POLICIES is absent when not explicitly set
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, Html006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html006 begin.");
+    Html html("html", "plain");
+    html.InitObject();
+    auto value = html.GetValue();
+    ASSERT_TRUE(std::holds_alternative<std::shared_ptr<Object>>(value));
+    auto object = std::get<std::shared_ptr<Object>>(value);
+    ASSERT_NE(object, nullptr);
+    EXPECT_EQ(object->value_.find(URI_AUTHORIZATION_POLICIES), object->value_.end());
+    LOG_INFO(UDMF_TEST, "Html006 end.");
+}
+
+/**
+* @tc.name: Html007
+* @tc.desc: Verify explicit NONE policy is preserved as 0
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, Html007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html007 begin.");
+    Html html("html", "plain");
+    html.SetUriAuthorizationPolicyMask(0);
+    html.InitObject();
+    auto value = html.GetValue();
+    ASSERT_TRUE(std::holds_alternative<std::shared_ptr<Object>>(value));
+    auto object = std::get<std::shared_ptr<Object>>(value);
+    ASSERT_NE(object, nullptr);
+    auto iter = object->value_.find(URI_AUTHORIZATION_POLICIES);
+    ASSERT_NE(iter, object->value_.end());
+    ASSERT_TRUE(std::holds_alternative<int32_t>(iter->second));
+    EXPECT_EQ(std::get<int32_t>(iter->second), 0);
+
+    Html htmlFromObject(UDType::HTML, value);
+    EXPECT_EQ(htmlFromObject.GetUriAuthorizationPolicyMask(), 0);
+    LOG_INFO(UDMF_TEST, "Html007 end.");
+}
 } // OHOS::Test

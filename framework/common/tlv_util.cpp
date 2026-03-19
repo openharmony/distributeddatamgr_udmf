@@ -666,7 +666,7 @@ template <> size_t CountBufferSize(const Runtime &input, TLVObject &data)
         && CheckAndAdd(size, TLVUtil::CountBufferSize(input.privileges, data))
         && CheckAndAdd(size, data.CountBasic(static_cast<int32_t>(input.visibility)))
         && CheckAndAdd(size, data.Count(input.appId))
-        && CheckAndAdd(size, data.CountBasic(input.permissionVersion));
+        && CheckAndAdd(size, data.CountBasic(input.permissionPolicyMode));
     return isWithinMax ? size : 0;
 }
 
@@ -721,7 +721,7 @@ template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
     if (!TLVUtil::Writing(input.appId, data, TAG::TAG_APP_ID)) {
         return false;
     }
-    if (!data.WriteBasic(TAG::TAG_PERMISSION_VERSION, input.permissionVersion)) {
+    if (!data.WriteBasic(TAG::TAG_PERMISSION_POLICY_MODE, input.permissionPolicyMode)) {
         return false;
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
@@ -793,8 +793,8 @@ template <> bool Reading(Runtime &output, TLVObject &data, const TLVHead &head)
             case static_cast<uint16_t>(TAG::TAG_APP_ID):
                 result = data.Read(output.appId, headItem);
                 break;
-            case static_cast<uint16_t>(TAG::TAG_PERMISSION_VERSION):
-                result = data.ReadBasic(output.permissionVersion, headItem);
+            case static_cast<uint16_t>(TAG::TAG_PERMISSION_POLICY_MODE):
+                result = data.ReadBasic(output.permissionPolicyMode, headItem);
                 break;
             default:
                 result = data.Skip(headItem);
