@@ -37,7 +37,6 @@ public:
     void SetUri(const ::taihe::string_view &uri);
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
     void SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details);
-    ::taihe::optional<::taihe::array<int32_t>> GetUriAuthorizationPolicies();
     void SetUriAuthorizationPolicies(const ::taihe::optional<::taihe::array<int32_t>> &uriAuthorizationPolicies);
     int64_t GetInner();
 
