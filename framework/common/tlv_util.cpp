@@ -277,7 +277,12 @@ template <> size_t CountBufferSize(const UnifiedData &input, TLVObject &data)
 {
     CHECK_RECURSIVE_GUARD();
     auto size = data.CountHead();
-    bool isWithinMax = CheckAndAdd(size, data.Count(input.GetSdkVersion()))
+    bool isWithinMax = CheckAndAdd(size, data.Count(input.GetSdkVersion()));
+    auto runtime = input.GetRuntime();
+    if (runtime != nullptr) {
+        isWithinMax = isWithinMax && CheckAndAdd(size, TLVUtil::CountBufferSize(*runtime, data));
+    }
+    isWithinMax = isWithinMax
         && CheckAndAdd(size, TLVUtil::CountBufferSize(input.GetRecords(), data))
         && CheckAndAdd(size, TLVUtil::CountBufferSize(input.GetProperties(), data));
     return isWithinMax ? size : 0;
@@ -291,6 +296,12 @@ template <> bool Writing(const UnifiedData &input, TLVObject &data, TAG tag)
     data.OffsetHead();
     if (!data.Write(TAG::TAG_VERSION, input.GetSdkVersion())) {
         return false;
+    }
+    auto runtime = input.GetRuntime();
+    if (runtime != nullptr) {
+        if (!TLVUtil::Writing(*runtime, data, TAG::TAG_RUNTIME)) {
+            return false;
+        }
     }
     if (!TLVUtil::Writing(input.GetRecords(), data, TAG::TAG_UNIFIED_RECORD)) {
         return false;
@@ -320,6 +331,14 @@ template <> bool Reading(UnifiedData &output, TLVObject &data, const TLVHead &he
                 return false;
             }
             output.SetSdkVersion(version);
+            continue;
+        }
+        if (headItem.tag == static_cast<uint16_t>(TAG::TAG_RUNTIME)) {
+            Runtime runtime;
+            if (!Reading(runtime, data, headItem)) {
+                return false;
+            }
+            output.SetRuntime(runtime);
             continue;
         }
         if (headItem.tag == static_cast<uint16_t>(TAG::TAG_UNIFIED_RECORD)) {
