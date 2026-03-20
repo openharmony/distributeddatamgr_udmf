@@ -34,6 +34,8 @@ sptr<DistributedKv::IKvStoreDataService> UdmfServiceClient::kvDataServiceProxy_;
 
 constexpr const char *IS_ENTERPRISE_DEVICE = "const.edm.is_enterprise_device";
 constexpr int32_t UID_TRANSFORM_DIVISOR = 200000;
+constexpr const char *ENTERPRISE_DEVICE_TRUE = "true";
+constexpr const char *ENTERPRISE_DEVICE_FALSE = "false";
 
 UdmfServiceClient::UdmfServiceClient(const sptr<IUdmfService> &proxy) : udmfProxy_(proxy)
 {
@@ -149,9 +151,9 @@ int32_t UdmfServiceClient::GetData(const QueryOption &query, UnifiedData &unifie
     auto err = udmfProxy_->GetData(query, unifiedData);
     if (err == E_OK) {
         char isEnterpriseDeviceValue[PARAM_VALUE_LEN_MAX] = {0};
-        GetParameter(IS_ENTERPRISE_DEVICE, "false", isEnterpriseDeviceValue, PARAM_VALUE_LEN_MAX);
+        GetParameter(IS_ENTERPRISE_DEVICE, ENTERPRISE_DEVICE_FALSE, isEnterpriseDeviceValue, PARAM_VALUE_LEN_MAX);
         std::string isEnterpriseDevice(isEnterpriseDeviceValue);
-        if (isEnterpriseDevice == "true") {
+        if (isEnterpriseDevice == ENTERPRISE_DEVICE_TRUE) {
             int32_t userId = IPCSkeleton::GetCallingUid() / UID_TRANSFORM_DIVISOR;
             uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
             AuditHelper::ReportDragAuditEvent(unifiedData, userId, tokenId);

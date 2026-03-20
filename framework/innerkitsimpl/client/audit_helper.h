@@ -22,9 +22,6 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 #include "unified_data.h"
-#include "unified_meta.h"
-#include "unified_data_properties.h"
-#include "unified_record.h"
 #include "visibility.h"
 #include "pixelmap_loader.h"
 
@@ -38,12 +35,12 @@ public:
 private:
     static std::string UDTypeToString(UDType type);
     static nlohmann::json ConvertValueToJson(const ValueType &value);
-    static nlohmann::json ConvertWantToJson(const std::shared_ptr<OHOS::AAFwk::Want> &want);
+    static nlohmann::json ConvertWantToJson(std::shared_ptr<OHOS::AAFwk::Want> want);
     static nlohmann::json ConvertWantParamsToJson(const OHOS::AAFwk::WantParams &wantParams);
-    static nlohmann::json ConvertPixelMapToJson(const std::shared_ptr<OHOS::Media::PixelMap> &pixelMap);
-    static nlohmann::json ConvertObjectToJson(const std::shared_ptr<Object> &object);
+    static nlohmann::json ConvertPixelMapToJson(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
+    static nlohmann::json ConvertObjectToJson(std::shared_ptr<Object> object);
     static nlohmann::json ConvertEntriesToJson(const std::map<std::string, ValueType> &entries);
-    static nlohmann::json ConvertRecordToJson(const std::shared_ptr<UnifiedRecord> &record, size_t index);
+    static nlohmann::json ConvertRecordToJson(std::shared_ptr<UnifiedRecord> record, size_t index);
     static void PublishAuditEvent(const nlohmann::json &auditData);
 };
 

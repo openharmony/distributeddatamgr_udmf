@@ -26,9 +26,6 @@
 #include "udmf_executor.h"
 #include <nlohmann/json.hpp>
 #include <chrono>
-#include <variant>
-#include <memory>
-#include <string>
 
 namespace OHOS {
 namespace UDMF {
@@ -36,9 +33,14 @@ namespace UDMF {
 constexpr const char *DRAG_AUDIT_EVENT = "usual.event.DRAG_AUDIT";
 static constexpr size_t MAX_THREADS = 10;
 static constexpr size_t MIN_THREADS = 0;
-static UdmfExecutor auditExecutor(MAX_THREADS, MIN_THREADS);
 
-nlohmann::json AuditHelper::ConvertWantToJson(const std::shared_ptr<OHOS::AAFwk::Want> &want)
+static UdmfExecutor &GetAuditExecutor()
+{
+    static UdmfExecutor auditExecutor(MAX_THREADS, MIN_THREADS);
+    return auditExecutor;
+}
+
+nlohmann::json AuditHelper::ConvertWantToJson(std::shared_ptr<OHOS::AAFwk::Want> want)
 {
     nlohmann::json wantJson;
     if (want != nullptr) {
@@ -58,7 +60,7 @@ nlohmann::json AuditHelper::ConvertWantToJson(const std::shared_ptr<OHOS::AAFwk:
     return wantJson;
 }
 
-nlohmann::json AuditHelper::ConvertPixelMapToJson(const std::shared_ptr<OHOS::Media::PixelMap> &pixelMap)
+nlohmann::json AuditHelper::ConvertPixelMapToJson(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
 {
     nlohmann::json pixelMapJson;
     std::vector<uint8_t> encodedData;
@@ -72,7 +74,7 @@ nlohmann::json AuditHelper::ConvertPixelMapToJson(const std::shared_ptr<OHOS::Me
     return pixelMapJson;
 }
 
-nlohmann::json AuditHelper::ConvertObjectToJson(const std::shared_ptr<Object> &object)
+nlohmann::json AuditHelper::ConvertObjectToJson(std::shared_ptr<Object> object)
 {
     if (object != nullptr) {
         return ConvertEntriesToJson(object->value_);
@@ -115,13 +117,13 @@ nlohmann::json AuditHelper::ConvertValueToJson(const ValueType &value)
 nlohmann::json AuditHelper::ConvertEntriesToJson(const std::map<std::string, ValueType> &entries)
 {
     nlohmann::json entriesJson;
-    for (const auto& [key, val] : entries) {
+    for (const auto &[key, val] : entries) {
         entriesJson[key] = ConvertValueToJson(val);
     }
     return entriesJson;
 }
 
-nlohmann::json AuditHelper::ConvertRecordToJson(const std::shared_ptr<UnifiedRecord> &record, size_t index)
+nlohmann::json AuditHelper::ConvertRecordToJson(std::shared_ptr<UnifiedRecord> record, size_t index)
 {
     auto entries = record->GetEntries();
     if (entries != nullptr && !entries->empty()) {
@@ -178,7 +180,7 @@ void AuditHelper::ReportDragAuditEvent(const UnifiedData &unifiedData, int32_t u
         PublishAuditEvent(root);
     };
 
-    auditExecutor.Execute(task);
+    GetAuditExecutor().Execute(task);
 }
 } // namespace UDMF
 } // namespace OHOS
