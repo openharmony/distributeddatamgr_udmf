@@ -155,6 +155,8 @@ private:
     };
     static constexpr int32_t STR_MAX_SIZE = 256;
 
+    static napi_status ProcessUriAuthorizationPolicies(napi_env env, napi_value attributeValueNapi,
+        std::shared_ptr<Object> object);
     static napi_status ProcessNapiObject(napi_env env, napi_value in, std::string &attributeName,
         napi_value attributeValueNapi, std::shared_ptr<Object> object);
 };

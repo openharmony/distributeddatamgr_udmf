@@ -37,7 +37,7 @@ napi_value HtmlNapi::Constructor(napi_env env)
         /* Html properties */
         DECLARE_NAPI_GETTER_SETTER("htmlContent", GetHtmlContent, SetHtmlContent),
         DECLARE_NAPI_GETTER_SETTER("plainContent", GetPlainContent, SetPlainContent),
-        DECLARE_NAPI_GETTER_SETTER("uriAuthorizationPolicies", GetUriAuthorizationPolicies, SetUriAuthorizationPolicies),
+        DECLARE_NAPI_GETTER_SETTER("uriAuthorizationPolicies", nullptr, SetUriAuthorizationPolicies),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "HTML", properties, count, HtmlNapi::New);
@@ -149,20 +149,6 @@ napi_value HtmlNapi::SetHtmlContent(napi_env env, napi_callback_info info)
         ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_ERROR, "invalid object!");
     html->value_->SetHtmlContent(htmlContent);
     return nullptr;
-}
-
-napi_value HtmlNapi::GetUriAuthorizationPolicies(napi_env env, napi_callback_info info)
-{
-    LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
-    auto ctxt = std::make_shared<ContextBase>();
-    auto html = GetHtml(env, info, ctxt);
-    ASSERT_ERR(
-        ctxt->env, (html != nullptr && html->value_ != nullptr), Status::E_ERROR, "invalid object!");
-    auto policies = UriPermissionUtil::ToInt32(
-        UriPermissionUtil::FromMask(html->value_->GetUriAuthorizationPolicyMask()));
-    ctxt->status = NapiDataUtils::SetValue(env, policies, ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "get uriAuthorizationPolicies failed!");
-    return ctxt->output;
 }
 
 napi_value HtmlNapi::SetUriAuthorizationPolicies(napi_env env, napi_callback_info info)

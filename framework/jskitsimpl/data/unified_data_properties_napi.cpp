@@ -29,7 +29,8 @@ napi_value UnifiedDataPropertiesNapi::Constructor(napi_env env)
         DECLARE_NAPI_GETTER_SETTER("shareOptions", GetShareOptions, SetShareOptions),
         DECLARE_NAPI_GETTER("timestamp", GetTimestamp),
         DECLARE_NAPI_GETTER_SETTER("getDelayData", GetDelayData, SetDelayData),
-        DECLARE_NAPI_GETTER_SETTER("uriAuthorizationPolicies", GetUriAuthorizationPolicies, SetUriAuthorizationPolicies),
+        DECLARE_NAPI_GETTER_SETTER("uriAuthorizationPolicies",
+            GetUriAuthorizationPolicies, SetUriAuthorizationPolicies),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "UnifiedDataProperties", properties, count, UnifiedDataPropertiesNapi::New);

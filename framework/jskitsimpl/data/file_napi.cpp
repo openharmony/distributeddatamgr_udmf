@@ -34,7 +34,7 @@ napi_value FileNapi::Constructor(napi_env env)
         /* File properties */
         DECLARE_NAPI_GETTER_SETTER("details", GetDetails, SetDetails),
         DECLARE_NAPI_GETTER_SETTER("uri", GetUri, SetUri),
-        DECLARE_NAPI_GETTER_SETTER("uriAuthorizationPolicies", GetUriAuthorizationPolicies, SetUriAuthorizationPolicies),
+        DECLARE_NAPI_GETTER_SETTER("uriAuthorizationPolicies", nullptr, SetUriAuthorizationPolicies),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "File", properties, count, FileNapi::New);
@@ -146,20 +146,6 @@ napi_value FileNapi::SetUri(napi_env env, napi_callback_info info)
         ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_ERROR, "invalid object!");
     file->value_->SetUri(uri);
     return nullptr;
-}
-
-napi_value FileNapi::GetUriAuthorizationPolicies(napi_env env, napi_callback_info info)
-{
-    LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
-    auto ctxt = std::make_shared<ContextBase>();
-    auto file = GetFile(env, info, ctxt);
-    ASSERT_ERR(
-        ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_ERROR, "invalid object!");
-    auto policies = UriPermissionUtil::ToInt32(
-        UriPermissionUtil::FromMask(file->value_->GetUriAuthorizationPolicyMask()));
-    ctxt->status = NapiDataUtils::SetValue(env, policies, ctxt->output);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "get uriAuthorizationPolicies failed!");
-    return ctxt->output;
 }
 
 napi_value FileNapi::SetUriAuthorizationPolicies(napi_env env, napi_callback_info info)

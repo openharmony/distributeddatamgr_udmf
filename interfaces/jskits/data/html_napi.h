@@ -41,7 +41,6 @@ private:
     static napi_value SetHtmlContent(napi_env env, napi_callback_info info);
     static napi_value GetPlainContent(napi_env env, napi_callback_info info);
     static napi_value SetPlainContent(napi_env env, napi_callback_info info);
-    static napi_value GetUriAuthorizationPolicies(napi_env env, napi_callback_info info);
     static napi_value SetUriAuthorizationPolicies(napi_env env, napi_callback_info info);
 };
 } // namespace UDMF

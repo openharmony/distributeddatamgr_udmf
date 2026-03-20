@@ -562,23 +562,16 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
                 reinterpret_cast<uint8_t *>(data), reinterpret_cast<uint8_t *>(data) + dataLen);
             continue;
         }
-        napi_valuetype valueType = napi_undefined;
-        NAPI_CALL_BASE(env, napi_typeof(env, attributeValueNapi, &valueType), napi_invalid_arg);
         napi_status status = napi_ok;
-        bool isArray = false;
-        NAPI_CALL_BASE(env, napi_is_array(env, attributeValueNapi, &isArray), napi_invalid_arg);
-        if (isArray) {
-            if (attributeName != URI_AUTHORIZATION_POLICIES) {
-                return napi_invalid_arg;
-            }
-            std::vector<int32_t> permissions;
-            status = GetValue(env, attributeValueNapi, permissions);
+        if (attributeName == URI_AUTHORIZATION_POLICIES) {
+            status = ProcessUriAuthorizationPolicies(env, attributeValueNapi, object);
             if (status != napi_ok) {
                 return status;
             }
-            object->value_[attributeName] = static_cast<int32_t>(UriPermissionUtil::ToMask(permissions));
             continue;
         }
+        napi_valuetype valueType = napi_undefined;
+        NAPI_CALL_BASE(env, napi_typeof(env, attributeValueNapi, &valueType), napi_invalid_arg);
         if (valueType == napi_valuetype::napi_object) {
             status = ProcessNapiObject(env, in, attributeName, attributeValueNapi, object);
             if (status != napi_ok) {
@@ -598,6 +591,21 @@ napi_status NapiDataUtils::GetValue(napi_env env, napi_value in, std::shared_ptr
             return status;
         }
     }
+    return napi_ok;
+}
+
+napi_status NapiDataUtils::ProcessUriAuthorizationPolicies(napi_env env, napi_value attributeValueNapi,
+    std::shared_ptr<Object> object)
+{
+    bool isArray = false;
+    NAPI_CALL_BASE(env, napi_is_array(env, attributeValueNapi, &isArray), napi_invalid_arg);
+    LOG_ERROR_RETURN(isArray, "uriAuthorizationPolicies is not array", napi_invalid_arg);
+    std::vector<int32_t> permissions;
+    napi_status status = GetValue(env, attributeValueNapi, permissions);
+    if (status != napi_ok) {
+        return status;
+    }
+    object->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(UriPermissionUtil::ToMask(permissions));
     return napi_ok;
 }
 
