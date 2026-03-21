@@ -38,6 +38,17 @@ enum ObjectType : int32_t {
     OBJ_OBJECT,
     OBJ_BUTT,
 };
+
+struct IteratorHandles {
+    ani_method nextMethod;
+    ani_field doneField;
+    ani_field valueField;
+};
+
+struct RecordHandles {
+    ani_method getMethod;
+};
+
 ani_ref WrapMapParams(ani_env *env, const std::map<std::string, int64_t> &mapParams);
 ani_status SetInt(ani_env *env, int32_t value, ani_object &intObj);
 ani_status SetLong(ani_env *env, int64_t value, ani_object &longObj);
