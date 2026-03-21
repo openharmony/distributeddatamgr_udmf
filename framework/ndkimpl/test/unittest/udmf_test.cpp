@@ -1072,6 +1072,59 @@ HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesTag001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: OH_Udmf_SetPropertiesUriAuthorizationPolicies001
+ * @tc.desc: set and get properties uriAuthorizationPolicies
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesUriAuthorizationPolicies001, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    ASSERT_NE(data, nullptr);
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    ASSERT_NE(properties, nullptr);
+
+    unsigned int count = 1;
+    EXPECT_EQ(nullptr, OH_UdmfProperty_GetUriAuthorizationPolicies(properties, &count));
+    EXPECT_EQ(count, 0);
+
+    Udmf_UriPermission policies[] = { UDMF_URI_PERMISSION_READ, UDMF_URI_PERMISSION_PERSIST };
+    int result = OH_UdmfProperty_SetUriAuthorizationPolicies(properties, policies, 2);
+    EXPECT_EQ(UDMF_E_OK, result);
+    auto outPolicies = OH_UdmfProperty_GetUriAuthorizationPolicies(properties, &count);
+    ASSERT_NE(outPolicies, nullptr);
+    EXPECT_EQ(count, 2);
+    EXPECT_EQ(outPolicies[0], UDMF_URI_PERMISSION_READ);
+    EXPECT_EQ(outPolicies[1], UDMF_URI_PERMISSION_PERSIST);
+
+    Udmf_UriPermission nonePolicy[] = { UDMF_URI_PERMISSION_NONE };
+    result = OH_UdmfProperty_SetUriAuthorizationPolicies(properties, nonePolicy, 1);
+    EXPECT_EQ(UDMF_E_OK, result);
+    outPolicies = OH_UdmfProperty_GetUriAuthorizationPolicies(properties, &count);
+    ASSERT_NE(outPolicies, nullptr);
+    EXPECT_EQ(count, 1);
+    EXPECT_EQ(outPolicies[0], UDMF_URI_PERMISSION_NONE);
+
+    result = OH_UdmfProperty_SetUriAuthorizationPolicies(properties, nullptr, 1);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    Udmf_UriPermission invalidPolicy[] = { static_cast<Udmf_UriPermission>(100) };
+    result = OH_UdmfProperty_SetUriAuthorizationPolicies(properties, invalidPolicy, 1);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    result = OH_UdmfProperty_SetUriAuthorizationPolicies(properties, nullptr, 0);
+    EXPECT_EQ(UDMF_E_OK, result);
+    outPolicies = OH_UdmfProperty_GetUriAuthorizationPolicies(properties, &count);
+    EXPECT_EQ(outPolicies, nullptr);
+    EXPECT_EQ(count, 0);
+
+    EXPECT_EQ(nullptr, OH_UdmfProperty_GetUriAuthorizationPolicies(nullptr, &count));
+    EXPECT_EQ(nullptr, OH_UdmfProperty_GetUriAuthorizationPolicies(properties, nullptr));
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, OH_UdmfProperty_SetUriAuthorizationPolicies(nullptr, policies, 2));
+
+    OH_UdmfProperty_Destroy(properties);
+    OH_UdmfData_Destroy(data);
+}
+
+/**
  * @tc.name: OH_Udmf_SetPropertiesShareOption001
  * @tc.desc: set properties IN_APP
  * @tc.type: FUNC

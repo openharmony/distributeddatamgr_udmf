@@ -457,6 +457,51 @@ HWTEST_F(UdsTest, OH_UdsHtml_SetPlainContent_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: OH_UdsHtml_SetUriAuthorizationPolicies_001
+ * @tc.desc: Normal testcase of OH_UdsHtml_SetUriAuthorizationPolicies
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsHtml_SetUriAuthorizationPolicies_001, TestSize.Level1)
+{
+    auto html = OH_UdsHtml_Create();
+    ASSERT_NE(html, nullptr);
+    Udmf_UriPermission policies[] = { UDMF_URI_PERMISSION_READ, UDMF_URI_PERMISSION_WRITE };
+    int result = OH_UdsHtml_SetUriAuthorizationPolicies(html, policies, 2);
+    EXPECT_EQ(UDMF_E_OK, result);
+    auto iter = html->obj->value_.find(URI_AUTHORIZATION_POLICIES);
+    ASSERT_NE(iter, html->obj->value_.end());
+    auto permissionMask = std::get_if<int32_t>(&(iter->second));
+    ASSERT_NE(permissionMask, nullptr);
+    EXPECT_EQ(*permissionMask, static_cast<int32_t>(UriPermissionUtil::READ_FLAG | UriPermissionUtil::WRITE_FLAG));
+
+    Udmf_UriPermission nonePolicy[] = { UDMF_URI_PERMISSION_NONE };
+    result = OH_UdsHtml_SetUriAuthorizationPolicies(html, nonePolicy, 1);
+    EXPECT_EQ(UDMF_E_OK, result);
+    iter = html->obj->value_.find(URI_AUTHORIZATION_POLICIES);
+    ASSERT_NE(iter, html->obj->value_.end());
+    permissionMask = std::get_if<int32_t>(&(iter->second));
+    ASSERT_NE(permissionMask, nullptr);
+    EXPECT_EQ(*permissionMask, 0);
+
+    result = OH_UdsHtml_SetUriAuthorizationPolicies(html, nullptr, 0);
+    EXPECT_EQ(UDMF_E_OK, result);
+    EXPECT_EQ(html->obj->value_.find(URI_AUTHORIZATION_POLICIES), html->obj->value_.end());
+
+    result = OH_UdsHtml_SetUriAuthorizationPolicies(nullptr, policies, 2);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    result = OH_UdsHtml_SetUriAuthorizationPolicies(html, nullptr, 2);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    Udmf_UriPermission invalidPolicy[] = { static_cast<Udmf_UriPermission>(100) };
+    result = OH_UdsHtml_SetUriAuthorizationPolicies(html, invalidPolicy, 1);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    html->obj = nullptr;
+    result = OH_UdsHtml_SetUriAuthorizationPolicies(html, policies, 2);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    OH_UdsHtml_Destroy(html);
+}
+
+/**
  * @tc.name: OH_UdsAppItem_Create_001
  * @tc.desc: Normal testcase of OH_UdsAppItem_Create
  * @tc.type: FUNC
@@ -894,6 +939,51 @@ HWTEST_F(UdsTest, OH_UdsFileUri_SetFileType_001, TestSize.Level1)
 
     fileUri->obj = nullptr;
     result = OH_UdsFileUri_SetFileType(fileUri, "file type");
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    OH_UdsFileUri_Destroy(fileUri);
+}
+
+/**
+ * @tc.name: OH_UdsFileUri_SetUriAuthorizationPolicies_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_SetUriAuthorizationPolicies
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdsTest, OH_UdsFileUri_SetUriAuthorizationPolicies_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    ASSERT_NE(fileUri, nullptr);
+    Udmf_UriPermission policies[] = { UDMF_URI_PERMISSION_READ, UDMF_URI_PERMISSION_PERSIST };
+    int result = OH_UdsFileUri_SetUriAuthorizationPolicies(fileUri, policies, 2);
+    EXPECT_EQ(UDMF_E_OK, result);
+    auto iter = fileUri->obj->value_.find(URI_AUTHORIZATION_POLICIES);
+    ASSERT_NE(iter, fileUri->obj->value_.end());
+    auto permissionMask = std::get_if<int32_t>(&(iter->second));
+    ASSERT_NE(permissionMask, nullptr);
+    EXPECT_EQ(*permissionMask, static_cast<int32_t>(UriPermissionUtil::READ_FLAG | UriPermissionUtil::PERSIST_FLAG));
+
+    Udmf_UriPermission nonePolicy[] = { UDMF_URI_PERMISSION_NONE };
+    result = OH_UdsFileUri_SetUriAuthorizationPolicies(fileUri, nonePolicy, 1);
+    EXPECT_EQ(UDMF_E_OK, result);
+    iter = fileUri->obj->value_.find(URI_AUTHORIZATION_POLICIES);
+    ASSERT_NE(iter, fileUri->obj->value_.end());
+    permissionMask = std::get_if<int32_t>(&(iter->second));
+    ASSERT_NE(permissionMask, nullptr);
+    EXPECT_EQ(*permissionMask, 0);
+
+    result = OH_UdsFileUri_SetUriAuthorizationPolicies(fileUri, nullptr, 0);
+    EXPECT_EQ(UDMF_E_OK, result);
+    EXPECT_EQ(fileUri->obj->value_.find(URI_AUTHORIZATION_POLICIES), fileUri->obj->value_.end());
+
+    result = OH_UdsFileUri_SetUriAuthorizationPolicies(nullptr, policies, 2);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    result = OH_UdsFileUri_SetUriAuthorizationPolicies(fileUri, nullptr, 2);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    Udmf_UriPermission invalidPolicy[] = { static_cast<Udmf_UriPermission>(100) };
+    result = OH_UdsFileUri_SetUriAuthorizationPolicies(fileUri, invalidPolicy, 1);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    fileUri->obj = nullptr;
+    result = OH_UdsFileUri_SetUriAuthorizationPolicies(fileUri, policies, 2);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsFileUri_Destroy(fileUri);
 }

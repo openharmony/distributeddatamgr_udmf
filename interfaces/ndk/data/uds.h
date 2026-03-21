@@ -45,6 +45,30 @@ extern "C" {
 #endif
 
 /**
+ * @brief Describes URI authorization permission values.
+ *
+ * @since 26
+ */
+typedef enum Udmf_UriPermission {
+    /**
+     * @brief No URI permission.
+     */
+    UDMF_URI_PERMISSION_NONE = 0,
+    /**
+     * @brief Read URI permission.
+     */
+    UDMF_URI_PERMISSION_READ = 1,
+    /**
+     * @brief Write URI permission.
+     */
+    UDMF_URI_PERMISSION_WRITE = 2,
+    /**
+     * @brief Persist URI permission.
+     */
+    UDMF_URI_PERMISSION_PERSIST = 3,
+} Udmf_UriPermission;
+
+/**
  * @brief Describes the unified data struct of plaintext.
  *
  * @since 12
@@ -418,6 +442,21 @@ int OH_UdsHtml_SetPlainContent(OH_UdsHtml* pThis, const char* plainContent);
 int OH_UdsHtml_SetDetails(OH_UdsHtml* pThis, const OH_UdsDetails* details);
 
 /**
+ * @brief Set URI authorization policies to the {@link OH_UdsHtml}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsHtml}.
+ * @param policies Represents a URI authorization policy array. This parameter can be null only when count is 0.
+ * @param count Represents the number of URI authorization policies. When this value is 0, the policies are cleared.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsHtml Udmf_UriPermission Udmf_ErrCode
+ * @since 26
+ */
+int OH_UdsHtml_SetUriAuthorizationPolicies(OH_UdsHtml* pThis,
+    const Udmf_UriPermission* policies, unsigned int count);
+
+/**
  * @brief Creation a pointer to the instance of the {@link OH_UdsAppItem}.
  *
  * @return If the operation is successful, a pointer to the instance of the {@link OH_UdsAppItem}
@@ -710,6 +749,21 @@ int OH_UdsFileUri_SetFileType(OH_UdsFileUri* pThis, const char* fileType);
  * @since 22
  */
 int OH_UdsFileUri_SetDetails(OH_UdsFileUri* pThis, const OH_UdsDetails* details);
+
+/**
+ * @brief Set URI authorization policies to the {@link OH_UdsFileUri}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdsFileUri}.
+ * @param policies Represents a URI authorization policy array. This parameter can be null only when count is 0.
+ * @param count Represents the number of URI authorization policies. When this value is 0, the policies are cleared.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdsFileUri Udmf_UriPermission Udmf_ErrCode
+ * @since 26
+ */
+int OH_UdsFileUri_SetUriAuthorizationPolicies(OH_UdsFileUri* pThis,
+    const Udmf_UriPermission* policies, unsigned int count);
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdsPixelMap}.

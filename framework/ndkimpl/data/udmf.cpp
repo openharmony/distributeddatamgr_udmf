@@ -1055,6 +1055,18 @@ const char* OH_UdmfProperty_GetExtrasStringParam(OH_UdmfProperty* properties, co
     return properties->extraStr.c_str();
 }
 
+const Udmf_UriPermission* OH_UdmfProperty_GetUriAuthorizationPolicies(OH_UdmfProperty* properties,
+    unsigned int* count)
+{
+    if (!IsUnifiedPropertiesValid(properties) || count == nullptr) {
+        return nullptr;
+    }
+    std::lock_guard<std::mutex> lock(properties->mutex);
+    ConvertToNdkUriPermissions(properties->properties_->uriAuthorizationPolicies, properties->uriAuthorizationPolicies_);
+    *count = static_cast<unsigned int>(properties->uriAuthorizationPolicies_.size());
+    return *count == 0 ? nullptr : properties->uriAuthorizationPolicies_.data();
+}
+
 int OH_UdmfProperty_SetTag(OH_UdmfProperty* properties, const char* tag)
 {
     if (!IsUnifiedPropertiesValid(properties) || tag == nullptr) {
@@ -1100,6 +1112,21 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* properties, const char
     }
     std::lock_guard<std::mutex> lock(properties->mutex);
     properties->properties_->extras.SetParam(key, OHOS::AAFwk::String::Box(param));
+    return UDMF_E_OK;
+}
+
+int OH_UdmfProperty_SetUriAuthorizationPolicies(OH_UdmfProperty* properties,
+    const Udmf_UriPermission* policies, unsigned int count)
+{
+    if (!IsUnifiedPropertiesValid(properties)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    std::vector<UriPermission> innerPolicies;
+    if (!ConvertToInnerUriPermissions(policies, count, innerPolicies)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    std::lock_guard<std::mutex> lock(properties->mutex);
+    properties->properties_->uriAuthorizationPolicies = innerPolicies;
     return UDMF_E_OK;
 }
 
