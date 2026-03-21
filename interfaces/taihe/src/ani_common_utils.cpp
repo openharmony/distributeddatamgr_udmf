@@ -548,6 +548,54 @@ ani_status GetUint8Array(ani_env *env, ani_object in, std::vector<uint8_t> &out)
     return ANI_OK;
 }
 
+ani_status GetIteratorHandles(ani_env *env, IteratorHandles &iterHandles)
+{
+    ani_class iteratorClass;
+    auto status = env->FindClass("std.core.IterableIterator", &iteratorClass);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Failed to find IterableIterator class, status %{public}d", status);
+        return status;
+    }
+    status = env->Class_FindMethod(iteratorClass, "next", nullptr, &iterHandles.nextMethod);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Failed to find next method, status %{public}d", status);
+        return status;
+    }
+    ani_class iteratorResultClass;
+    status = env->FindClass("std.core.IterableIterator.IteratorResult", &iteratorResultClass);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Failed to find IteratorResult class, status %{public}d", status);
+        return status;
+    }
+    status = env->Class_FindField(iteratorResultClass, "done", &iterHandles.doneField);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Failed to find done field, status %{public}d", status);
+        return status;
+    }
+    status = env->Class_FindField(iteratorResultClass, "value", &iterHandles.valueField);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Failed to find value field, status %{public}d", status);
+        return status;
+    }
+    return ANI_OK;
+}
+
+ani_status GetRecordHandles(ani_env *env, RecordHandles &recordHandles)
+{
+    ani_class recordClass;
+    auto status = env->FindClass(CLASSNAME_RECORD, &recordClass);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Failed to find Record class, status %{public}d", status);
+        return status;
+    }
+    status = env->Class_FindMethod(recordClass, "$_get", nullptr, &recordHandles.getMethod);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Failed to find $_get method, status %{public}d", status);
+        return status;
+    }
+    return ANI_OK;
+}
+
 ani_status GetMap(ani_env *env, ani_object in, std::shared_ptr<Object> &out, int depth)
 {
     if (depth > MAX_RECURSIVE) {
@@ -560,16 +608,26 @@ ani_status GetMap(ani_env *env, ani_object in, std::shared_ptr<Object> &out, int
         LOG_ERROR(UDMF_ANI, "Failed to get keys iterator, status %{public}d", status);
         return status;
     }
+    IteratorHandles iterHandles;
+    status = GetIteratorHandles(env, iterHandles);
+    if (status != ANI_OK) {
+        return status;
+    }
+    RecordHandles recordHandles;
+    status = GetRecordHandles(env, recordHandles);
+    if (status != ANI_OK) {
+        return status;
+    }
     out = std::make_shared<Object>();
     for (int loopCount = 0; loopCount < MAX_COLLECTION_SIZE; ++loopCount) {
         ani_ref next;
         ani_boolean done;
-        status = env->Object_CallMethodByName_Ref(static_cast<ani_object>(keys), "next", nullptr, &next);
+        status = env->Object_CallMethod_Ref(static_cast<ani_object>(keys), iterHandles.nextMethod, nullptr, &next);
         if (status != ANI_OK) {
             LOG_ERROR(UDMF_ANI, "Failed to get next key, status %{public}d", status);
             break;
         }
-        status = env->Object_GetFieldByName_Boolean(static_cast<ani_object>(next), "done", &done);
+        status = env->Object_GetField_Boolean(static_cast<ani_object>(next), iterHandles.doneField, &done);
         if (status != ANI_OK) {
             LOG_ERROR(UDMF_ANI, "Failed to check iterator done, status %{public}d", status);
             break;
@@ -578,13 +636,13 @@ ani_status GetMap(ani_env *env, ani_object in, std::shared_ptr<Object> &out, int
             break;
         }
         ani_ref key_value;
-        status = env->Object_GetFieldByName_Ref(static_cast<ani_object>(next), "value", &key_value);
+        status = env->Object_GetField_Ref(static_cast<ani_object>(next), iterHandles.valueField, &key_value);
         if (status != ANI_OK) {
             LOG_WARN(UDMF_ANI, "Failed to get key value, status %{public}d", status);
             continue;
         }
         ani_ref value_obj;
-        status = env->Object_CallMethodByName_Ref(in, "$_get", nullptr, &value_obj, key_value);
+        status = env->Object_CallMethod_Ref(in, recordHandles.getMethod, nullptr, &value_obj, key_value);
         if (status != ANI_OK) {
             LOG_WARN(UDMF_ANI, "Failed to get value for key, status %{public}d", status);
             continue;
@@ -614,15 +672,20 @@ ani_status GetSet(ani_env *env, ani_object in, std::set<std::string> &out)
         LOG_ERROR(UDMF_ANI, "Failed to get values iterator, status %{public}d", status);
         return status;
     }
+    IteratorHandles iterHandles;
+    status = GetIteratorHandles(env, iterHandles);
+    if (status != ANI_OK) {
+        return status;
+    }
     for (int loopCount = 0; loopCount < MAX_COLLECTION_SIZE; ++loopCount) {
         ani_ref next;
         ani_boolean done;
-        status = env->Object_CallMethodByName_Ref(static_cast<ani_object>(values), "next", nullptr, &next);
+        status = env->Object_CallMethod_Ref(static_cast<ani_object>(values), iterHandles.nextMethod, nullptr, &next);
         if (status != ANI_OK) {
             LOG_ERROR(UDMF_ANI, "Failed to get next key, status %{public}d", status);
             break;
         }
-        status = env->Object_GetFieldByName_Boolean(static_cast<ani_object>(next), "done", &done);
+        status = env->Object_GetField_Boolean(static_cast<ani_object>(next), iterHandles.doneField, &done);
         if (status != ANI_OK) {
             LOG_ERROR(UDMF_ANI, "Failed to check iterator done, status %{public}d", status);
             break;
@@ -631,7 +694,7 @@ ani_status GetSet(ani_env *env, ani_object in, std::set<std::string> &out)
             break;
         }
         ani_ref typeRef;
-        status = env->Object_GetFieldByName_Ref(static_cast<ani_object>(next), "value", &typeRef);
+        status = env->Object_GetField_Ref(static_cast<ani_object>(next), iterHandles.valueField, &typeRef);
         if (status != ANI_OK) {
             LOG_WARN(UDMF_ANI, "Failed to get key value, status %{public}d", status);
             continue;
