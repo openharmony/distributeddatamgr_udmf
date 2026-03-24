@@ -790,19 +790,6 @@ int OH_UdmfProperty_GetExtrasIntParam(OH_UdmfProperty* pThis,
 const char* OH_UdmfProperty_GetExtrasStringParam(OH_UdmfProperty* pThis, const char* key);
 
 /**
- * @brief Get URI authorization policies from the {@link OH_UdmfProperty}.
- *
- * @param pThis Represents a pointer to an instance of {@link OH_UdmfProperty}.
- * @param count Returns the number of URI authorization policies.
- * @return Returns a pointer to the URI authorization policy array when input parameters are valid,
- *         otherwise return nullptr.
- * @see OH_UdmfProperty Udmf_UriPermission
- * @since 26
- */
-const Udmf_UriPermission* OH_UdmfProperty_GetUriAuthorizationPolicies(OH_UdmfProperty* pThis,
-    unsigned int* count);
-
-/**
  * @brief Set tag value to {@link OH_UdmfProperty} .
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfProperty}.
@@ -858,19 +845,17 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* pThis,
     const char* key, const char* param);
 
 /**
- * @brief Set URI authorization policies to the {@link OH_UdmfProperty}.
+ * @brief Set auth permission to the {@link OH_UdmfProperty}.
  *
  * @param pThis Represents a pointer to an instance of {@link OH_UdmfProperty}.
- * @param policies Represents a URI authorization policy array. This parameter can be null only when count is 0.
- * @param count Represents the number of URI authorization policies. When this value is 0, the policies are cleared.
+ * @param authPolicy Represents auth permission.
  * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @see OH_UdmfProperty Udmf_UriPermission Udmf_ErrCode
- * @since 26
+ * @see OH_UdmfProperty Udmf_ErrCode
+ * @since 25
  */
-int OH_UdmfProperty_SetUriAuthorizationPolicies(OH_UdmfProperty* pThis,
-    const Udmf_UriPermission* policies, unsigned int count);
+int OH_UdmfProperty_SetAuthPermission(OH_UdmfProperty* pThis, int authPolicy);
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdmfOptions}.

@@ -457,16 +457,15 @@ HWTEST_F(UdsTest, OH_UdsHtml_SetPlainContent_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OH_UdsHtml_SetUriAuthorizationPolicies_001
- * @tc.desc: Normal testcase of OH_UdsHtml_SetUriAuthorizationPolicies
+ * @tc.name: OH_UdsHtml_SetAuthPolicy_001
+ * @tc.desc: Normal testcase of OH_UdsHtml_SetAuthPolicy
  * @tc.type: FUNC
  */
-HWTEST_F(UdsTest, OH_UdsHtml_SetUriAuthorizationPolicies_001, TestSize.Level1)
+HWTEST_F(UdsTest, OH_UdsHtml_SetAuthPolicy_001, TestSize.Level1)
 {
     auto html = OH_UdsHtml_Create();
     ASSERT_NE(html, nullptr);
-    Udmf_UriPermission policies[] = { UDMF_URI_PERMISSION_READ, UDMF_URI_PERMISSION_WRITE };
-    int result = OH_UdsHtml_SetUriAuthorizationPolicies(html, policies, 2);
+    int result = OH_UdsHtml_SetAuthPolicy(html, UDMF_PERM_READ | UDMF_PERM_WRITE);
     EXPECT_EQ(UDMF_E_OK, result);
     auto iter = html->obj->value_.find(URI_AUTHORIZATION_POLICIES);
     ASSERT_NE(iter, html->obj->value_.end());
@@ -474,8 +473,7 @@ HWTEST_F(UdsTest, OH_UdsHtml_SetUriAuthorizationPolicies_001, TestSize.Level1)
     ASSERT_NE(permissionMask, nullptr);
     EXPECT_EQ(*permissionMask, static_cast<int32_t>(UriPermissionUtil::READ_FLAG | UriPermissionUtil::WRITE_FLAG));
 
-    Udmf_UriPermission nonePolicy[] = { UDMF_URI_PERMISSION_NONE };
-    result = OH_UdsHtml_SetUriAuthorizationPolicies(html, nonePolicy, 1);
+    result = OH_UdsHtml_SetAuthPolicy(html, UDMF_PERM_NONE);
     EXPECT_EQ(UDMF_E_OK, result);
     iter = html->obj->value_.find(URI_AUTHORIZATION_POLICIES);
     ASSERT_NE(iter, html->obj->value_.end());
@@ -483,20 +481,15 @@ HWTEST_F(UdsTest, OH_UdsHtml_SetUriAuthorizationPolicies_001, TestSize.Level1)
     ASSERT_NE(permissionMask, nullptr);
     EXPECT_EQ(*permissionMask, 0);
 
-    result = OH_UdsHtml_SetUriAuthorizationPolicies(html, nullptr, 0);
-    EXPECT_EQ(UDMF_E_OK, result);
-    EXPECT_EQ(html->obj->value_.find(URI_AUTHORIZATION_POLICIES), html->obj->value_.end());
-
-    result = OH_UdsHtml_SetUriAuthorizationPolicies(nullptr, policies, 2);
+    result = OH_UdsHtml_SetAuthPolicy(nullptr, UDMF_PERM_READ);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
-    result = OH_UdsHtml_SetUriAuthorizationPolicies(html, nullptr, 2);
+    result = OH_UdsHtml_SetAuthPolicy(html, -1);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
-    Udmf_UriPermission invalidPolicy[] = { static_cast<Udmf_UriPermission>(100) };
-    result = OH_UdsHtml_SetUriAuthorizationPolicies(html, invalidPolicy, 1);
+    result = OH_UdsHtml_SetAuthPolicy(html, 1 << 3);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     html->obj = nullptr;
-    result = OH_UdsHtml_SetUriAuthorizationPolicies(html, policies, 2);
+    result = OH_UdsHtml_SetAuthPolicy(html, UDMF_PERM_READ);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsHtml_Destroy(html);
 }
@@ -944,16 +937,15 @@ HWTEST_F(UdsTest, OH_UdsFileUri_SetFileType_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OH_UdsFileUri_SetUriAuthorizationPolicies_001
- * @tc.desc: Normal testcase of OH_UdsFileUri_SetUriAuthorizationPolicies
+ * @tc.name: OH_UdsFileUri_SetAuthPolicy_001
+ * @tc.desc: Normal testcase of OH_UdsFileUri_SetAuthPolicy
  * @tc.type: FUNC
  */
-HWTEST_F(UdsTest, OH_UdsFileUri_SetUriAuthorizationPolicies_001, TestSize.Level1)
+HWTEST_F(UdsTest, OH_UdsFileUri_SetAuthPolicy_001, TestSize.Level1)
 {
     auto fileUri = OH_UdsFileUri_Create();
     ASSERT_NE(fileUri, nullptr);
-    Udmf_UriPermission policies[] = { UDMF_URI_PERMISSION_READ, UDMF_URI_PERMISSION_PERSIST };
-    int result = OH_UdsFileUri_SetUriAuthorizationPolicies(fileUri, policies, 2);
+    int result = OH_UdsFileUri_SetAuthPolicy(fileUri, UDMF_PERM_READ | UDMF_PERM_PERSIST);
     EXPECT_EQ(UDMF_E_OK, result);
     auto iter = fileUri->obj->value_.find(URI_AUTHORIZATION_POLICIES);
     ASSERT_NE(iter, fileUri->obj->value_.end());
@@ -961,8 +953,7 @@ HWTEST_F(UdsTest, OH_UdsFileUri_SetUriAuthorizationPolicies_001, TestSize.Level1
     ASSERT_NE(permissionMask, nullptr);
     EXPECT_EQ(*permissionMask, static_cast<int32_t>(UriPermissionUtil::READ_FLAG | UriPermissionUtil::PERSIST_FLAG));
 
-    Udmf_UriPermission nonePolicy[] = { UDMF_URI_PERMISSION_NONE };
-    result = OH_UdsFileUri_SetUriAuthorizationPolicies(fileUri, nonePolicy, 1);
+    result = OH_UdsFileUri_SetAuthPolicy(fileUri, UDMF_PERM_NONE);
     EXPECT_EQ(UDMF_E_OK, result);
     iter = fileUri->obj->value_.find(URI_AUTHORIZATION_POLICIES);
     ASSERT_NE(iter, fileUri->obj->value_.end());
@@ -970,20 +961,15 @@ HWTEST_F(UdsTest, OH_UdsFileUri_SetUriAuthorizationPolicies_001, TestSize.Level1
     ASSERT_NE(permissionMask, nullptr);
     EXPECT_EQ(*permissionMask, 0);
 
-    result = OH_UdsFileUri_SetUriAuthorizationPolicies(fileUri, nullptr, 0);
-    EXPECT_EQ(UDMF_E_OK, result);
-    EXPECT_EQ(fileUri->obj->value_.find(URI_AUTHORIZATION_POLICIES), fileUri->obj->value_.end());
-
-    result = OH_UdsFileUri_SetUriAuthorizationPolicies(nullptr, policies, 2);
+    result = OH_UdsFileUri_SetAuthPolicy(nullptr, UDMF_PERM_READ);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
-    result = OH_UdsFileUri_SetUriAuthorizationPolicies(fileUri, nullptr, 2);
+    result = OH_UdsFileUri_SetAuthPolicy(fileUri, -1);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
-    Udmf_UriPermission invalidPolicy[] = { static_cast<Udmf_UriPermission>(100) };
-    result = OH_UdsFileUri_SetUriAuthorizationPolicies(fileUri, invalidPolicy, 1);
+    result = OH_UdsFileUri_SetAuthPolicy(fileUri, 1 << 3);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
 
     fileUri->obj = nullptr;
-    result = OH_UdsFileUri_SetUriAuthorizationPolicies(fileUri, policies, 2);
+    result = OH_UdsFileUri_SetAuthPolicy(fileUri, UDMF_PERM_READ);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdsFileUri_Destroy(fileUri);
 }

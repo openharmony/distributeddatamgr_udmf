@@ -22,7 +22,6 @@
 #include "unified_meta.h"
 #include <mutex>
 #include <cstdint>
-#include <vector>
 
 # define MAX_GENERAL_ENTRY_SIZE (100 * 1024 * 1024)
 
@@ -118,7 +117,6 @@ struct OH_UdmfProperty {
     std::shared_ptr<OHOS::UDMF::UnifiedDataProperties> properties_;
     std::mutex mutex;
     std::string extraStr;
-    std::vector<Udmf_UriPermission> uriAuthorizationPolicies_;
 };
 
 struct OH_Udmf_ProgressInfo {
@@ -163,36 +161,20 @@ bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid);
 
 bool IsInvalidUdsObjectByType(const UdsObject* pThis, const OHOS::UDMF::UDType& type);
 
-inline bool IsUriPermissionValid(Udmf_UriPermission permission)
+inline bool IsAuthPolicyValid(int authPolicy)
 {
-    return permission >= UDMF_URI_PERMISSION_NONE && permission <= UDMF_URI_PERMISSION_PERSIST;
-}
-
-inline bool ConvertToInnerUriPermissions(const Udmf_UriPermission* policies, unsigned int count,
-    std::vector<OHOS::UDMF::UriPermission>& out)
-{
-    if (count > 0 && policies == nullptr) {
+    if (authPolicy < 0) {
         return false;
     }
-    out.clear();
-    out.reserve(count);
-    for (unsigned int i = 0; i < count; ++i) {
-        if (!IsUriPermissionValid(policies[i])) {
-            return false;
-        }
-        out.emplace_back(static_cast<OHOS::UDMF::UriPermission>(policies[i]));
-    }
-    return true;
+    constexpr uint32_t validPolicy = OHOS::UDMF::UriPermissionUtil::READ_FLAG |
+        OHOS::UDMF::UriPermissionUtil::WRITE_FLAG | OHOS::UDMF::UriPermissionUtil::PERSIST_FLAG;
+    auto authPolicyMask = static_cast<uint32_t>(authPolicy);
+    return (authPolicyMask & ~validPolicy) == 0;
 }
 
-inline void ConvertToNdkUriPermissions(const std::vector<OHOS::UDMF::UriPermission>& policies,
-    std::vector<Udmf_UriPermission>& out)
+inline uint32_t NormalizeAuthPolicy(int authPolicy)
 {
-    out.clear();
-    out.reserve(policies.size());
-    for (const auto& policy : policies) {
-        out.emplace_back(static_cast<Udmf_UriPermission>(policy));
-    }
+    return OHOS::UDMF::UriPermissionUtil::NormalizeMask(static_cast<uint32_t>(authPolicy));
 }
 
 #endif

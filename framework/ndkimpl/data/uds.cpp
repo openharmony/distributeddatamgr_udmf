@@ -159,24 +159,18 @@ static int SetUdsDetails(UdsObject* pThis, const OH_UdsDetails* details, NdkStru
     return UDMF_E_OK;
 }
 
-static int SetUdsUriAuthorizationPolicies(UdsObject* pThis, const Udmf_UriPermission* policies, unsigned int count,
-    NdkStructId ndkStructId)
+static int SetUdsAuthPolicy(UdsObject* pThis, int authPolicy, NdkStructId ndkStructId)
 {
     if (IsInvalidUdsObjectPtr(pThis, ndkStructId)) {
         LOG_ERROR(UDMF_CAPI, "invalid para.");
         return UDMF_E_INVALID_PARAM;
     }
-    std::vector<UriPermission> innerPolicies;
-    if (!ConvertToInnerUriPermissions(policies, count, innerPolicies)) {
-        LOG_ERROR(UDMF_CAPI, "invalid uri authorization policies.");
+    if (!IsAuthPolicyValid(authPolicy)) {
+        LOG_ERROR(UDMF_CAPI, "invalid auth policy.");
         return UDMF_E_INVALID_PARAM;
     }
     std::lock_guard<std::mutex> lock(pThis->mutex);
-    if (count == 0) {
-        pThis->obj->value_.erase(URI_AUTHORIZATION_POLICIES);
-        return UDMF_E_OK;
-    }
-    pThis->obj->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(UriPermissionUtil::ToMask(innerPolicies));
+    pThis->obj->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(NormalizeAuthPolicy(authPolicy));
     return UDMF_E_OK;
 }
 
@@ -418,10 +412,9 @@ int OH_UdsHtml_SetDetails(OH_UdsHtml* pThis, const OH_UdsDetails* details)
     return SetUdsDetails(pThis, details, NdkStructId::UDS_HTML_STRUCT_ID);
 }
 
-int OH_UdsHtml_SetUriAuthorizationPolicies(OH_UdsHtml* pThis,
-    const Udmf_UriPermission* policies, unsigned int count)
+int OH_UdsHtml_SetAuthPolicy(OH_UdsHtml* pThis, int authPolicy)
 {
-    return SetUdsUriAuthorizationPolicies(pThis, policies, count, NdkStructId::UDS_HTML_STRUCT_ID);
+    return SetUdsAuthPolicy(pThis, authPolicy, NdkStructId::UDS_HTML_STRUCT_ID);
 }
 
 OH_UdsAppItem* OH_UdsAppItem_Create()
@@ -604,10 +597,9 @@ int OH_UdsFileUri_SetDetails(OH_UdsFileUri* pThis, const OH_UdsDetails* details)
     return SetUdsDetails(pThis, details, NdkStructId::UDS_FILE_URI_STRUCT_ID);
 }
 
-int OH_UdsFileUri_SetUriAuthorizationPolicies(OH_UdsFileUri* pThis,
-    const Udmf_UriPermission* policies, unsigned int count)
+int OH_UdsFileUri_SetAuthPolicy(OH_UdsFileUri* pThis, int authPolicy)
 {
-    return SetUdsUriAuthorizationPolicies(pThis, policies, count, NdkStructId::UDS_FILE_URI_STRUCT_ID);
+    return SetUdsAuthPolicy(pThis, authPolicy, NdkStructId::UDS_FILE_URI_STRUCT_ID);
 }
 
 OH_UdsPixelMap* OH_UdsPixelMap_Create()

@@ -1072,53 +1072,32 @@ HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesTag001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OH_Udmf_SetPropertiesUriAuthorizationPolicies001
- * @tc.desc: set and get properties uriAuthorizationPolicies
+ * @tc.name: OH_Udmf_SetPropertiesAuthPermission001
+ * @tc.desc: set properties auth permission
  * @tc.type: FUNC
  */
-HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesUriAuthorizationPolicies001, TestSize.Level1)
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesAuthPermission001, TestSize.Level1)
 {
     OH_UdmfData *data = OH_UdmfData_Create();
     ASSERT_NE(data, nullptr);
     OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
     ASSERT_NE(properties, nullptr);
 
-    unsigned int count = 1;
-    EXPECT_EQ(nullptr, OH_UdmfProperty_GetUriAuthorizationPolicies(properties, &count));
-    EXPECT_EQ(count, 0);
-
-    Udmf_UriPermission policies[] = { UDMF_URI_PERMISSION_READ, UDMF_URI_PERMISSION_PERSIST };
-    int result = OH_UdmfProperty_SetUriAuthorizationPolicies(properties, policies, 2);
+    int result = OH_UdmfProperty_SetAuthPermission(properties, UDMF_PERM_READ | UDMF_PERM_PERSIST);
     EXPECT_EQ(UDMF_E_OK, result);
-    auto outPolicies = OH_UdmfProperty_GetUriAuthorizationPolicies(properties, &count);
-    ASSERT_NE(outPolicies, nullptr);
-    EXPECT_EQ(count, 2);
-    EXPECT_EQ(outPolicies[0], UDMF_URI_PERMISSION_READ);
-    EXPECT_EQ(outPolicies[1], UDMF_URI_PERMISSION_PERSIST);
+    EXPECT_EQ(UriPermissionUtil::ToMask(properties->properties_->uriAuthorizationPolicies),
+        static_cast<uint32_t>(UDMF_PERM_READ | UDMF_PERM_PERSIST));
 
-    Udmf_UriPermission nonePolicy[] = { UDMF_URI_PERMISSION_NONE };
-    result = OH_UdmfProperty_SetUriAuthorizationPolicies(properties, nonePolicy, 1);
+    result = OH_UdmfProperty_SetAuthPermission(properties, UDMF_PERM_NONE);
     EXPECT_EQ(UDMF_E_OK, result);
-    outPolicies = OH_UdmfProperty_GetUriAuthorizationPolicies(properties, &count);
-    ASSERT_NE(outPolicies, nullptr);
-    EXPECT_EQ(count, 1);
-    EXPECT_EQ(outPolicies[0], UDMF_URI_PERMISSION_NONE);
+    EXPECT_EQ(UriPermissionUtil::ToMask(properties->properties_->uriAuthorizationPolicies),
+        static_cast<uint32_t>(UDMF_PERM_NONE));
 
-    result = OH_UdmfProperty_SetUriAuthorizationPolicies(properties, nullptr, 1);
+    result = OH_UdmfProperty_SetAuthPermission(properties, -1);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
-    Udmf_UriPermission invalidPolicy[] = { static_cast<Udmf_UriPermission>(100) };
-    result = OH_UdmfProperty_SetUriAuthorizationPolicies(properties, invalidPolicy, 1);
+    result = OH_UdmfProperty_SetAuthPermission(properties, 1 << 3);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
-
-    result = OH_UdmfProperty_SetUriAuthorizationPolicies(properties, nullptr, 0);
-    EXPECT_EQ(UDMF_E_OK, result);
-    outPolicies = OH_UdmfProperty_GetUriAuthorizationPolicies(properties, &count);
-    EXPECT_EQ(outPolicies, nullptr);
-    EXPECT_EQ(count, 0);
-
-    EXPECT_EQ(nullptr, OH_UdmfProperty_GetUriAuthorizationPolicies(nullptr, &count));
-    EXPECT_EQ(nullptr, OH_UdmfProperty_GetUriAuthorizationPolicies(properties, nullptr));
-    EXPECT_EQ(UDMF_E_INVALID_PARAM, OH_UdmfProperty_SetUriAuthorizationPolicies(nullptr, policies, 2));
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, OH_UdmfProperty_SetAuthPermission(nullptr, UDMF_PERM_READ));
 
     OH_UdmfProperty_Destroy(properties);
     OH_UdmfData_Destroy(data);
