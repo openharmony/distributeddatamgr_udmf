@@ -32,7 +32,7 @@ private:
     public:
         static std::shared_ptr<void> GetHandler();
     private:
-        static std::weak_ptr<void> weakHandler_;
+        static std::shared_ptr<void> sharedHandler_;
         static std::mutex mutex_;
     };
 

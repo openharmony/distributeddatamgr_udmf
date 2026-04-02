@@ -15,7 +15,6 @@
 #define LOG_TAG "XmlLoader"
 
 #include <dlfcn.h>
-#include <thread>
 
 #include "logger.h"
 #include "xml_loader.h"
@@ -26,16 +25,14 @@ namespace UDMF {
 static constexpr const char *XML_WRAPPER_SO_NAME = "libxml_wrapper.z.so";
 static constexpr const char *EXTRACT_IMG_SRC = "ExtractImgSrc";
 
-std::weak_ptr<void> XmlLoader::SoAutoUnloadManager::weakHandler_;
+std::shared_ptr<void> XmlLoader::SoAutoUnloadManager::sharedHandler_;
 std::mutex XmlLoader::SoAutoUnloadManager::mutex_;
 
 std::shared_ptr<void> XmlLoader::SoAutoUnloadManager::GetHandler()
 {
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (auto real = weakHandler_.lock()) {
-            return real;
-        }
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (sharedHandler_ != nullptr) {
+        return sharedHandler_;
     }
     LOG_INFO(UDMF_KITS_INNER, "dlopen start");
     void *rawHandler = dlopen(XML_WRAPPER_SO_NAME, RTLD_NOW);
@@ -45,18 +42,10 @@ std::shared_ptr<void> XmlLoader::SoAutoUnloadManager::GetHandler()
     }
 
     auto deleter = [](void *h) {
-        if (h) dlclose(h);
+        (void)h;
     };
-    std::shared_ptr<void> sp(rawHandler, deleter);
-
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (auto existed = weakHandler_.lock()) {
-            return existed;
-        }
-        weakHandler_ = sp;
-        return sp;
-    }
+    sharedHandler_ = std::shared_ptr<void>(rawHandler, deleter);
+    return sharedHandler_;
 }
 
 XmlLoader::XmlLoader()
