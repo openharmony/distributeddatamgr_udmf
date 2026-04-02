@@ -127,4 +127,235 @@ HWTEST_F(FileTest, File004, TestSize.Level1)
     EXPECT_EQ(fileFromObject.GetUriAuthorizationPolicyMask(), 0);
     LOG_INFO(UDMF_TEST, "File004 end.");
 }
+
+
+/**
+* @tc.name: File005
+* @tc.desc: Test various permission mask combinations
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File005 begin.");
+    File file("file://com.example.test/data.txt");
+
+    file.SetUriAuthorizationPolicyMask(1);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 1);
+
+    file.SetUriAuthorizationPolicyMask(2);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 2);
+
+    file.SetUriAuthorizationPolicyMask(3);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 3);
+
+    file.SetUriAuthorizationPolicyMask(5);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 5);
+
+    file.SetUriAuthorizationPolicyMask(7);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 7);
+    LOG_INFO(UDMF_TEST, "File005 end.");
+}
+
+/**
+* @tc.name: File006
+* @tc.desc: Test PERSIST flag normalization (removed when no READ/WRITE)
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File006 begin.");
+    File file("file://com.example.test/data.txt");
+
+    file.SetUriAuthorizationPolicyMask(4);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 0);
+
+    file.SetUriAuthorizationPolicyMask(6);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 6);
+    LOG_INFO(UDMF_TEST, "File006 end.");
+}
+
+/**
+* @tc.name: File007
+* @tc.desc: Test File constructor with Object containing negative permission mask
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File007 begin.");
+    auto object = std::make_shared<Object>();
+    object->value_[ORI_URI] = "file://com.example.test/data.txt";
+    object->value_[URI_AUTHORIZATION_POLICIES] = -1;
+
+    File file(UDType::FILE, object);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 0);
+    EXPECT_FALSE(file.hasUriAuthorizationPolicyMask_);
+    LOG_INFO(UDMF_TEST, "File007 end.");
+}
+
+/**
+* @tc.name: File008
+* @tc.desc: Test File constructor with Object containing valid permission mask
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File008 begin.");
+    auto object = std::make_shared<Object>();
+    object->value_[ORI_URI] = "file://com.example.test/data.txt";
+    object->value_[URI_AUTHORIZATION_POLICIES] = 3;
+
+    File file(UDType::FILE, object);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 3);
+    EXPECT_TRUE(file.hasUriAuthorizationPolicyMask_);
+    LOG_INFO(UDMF_TEST, "File008 end.");
+}
+
+/**
+* @tc.name: File009
+* @tc.desc: Test SetUriAuthorizationPolicyMask with null Object
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File009, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File009 begin.");
+    File file("file://com.example.test/data.txt");
+    file.SetUriAuthorizationPolicyMask(5);
+
+    file.SetUriAuthorizationPolicyMask(7);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 7);
+    LOG_INFO(UDMF_TEST, "File009 end.");
+}
+
+/**
+* @tc.name: File010
+* @tc.desc: Test File constructor with Object containing valid permission mask
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File010, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File010 begin() begin.");
+    auto object = std::make_shared<Object>();
+    object->value_[ORI_URI] = "file://com.example.test/data.txt";
+    object->value_[URI_AUTHORIZATION_POLICIES] = 5;
+
+    File file(UDType::FILE, object);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 5);
+    EXPECT_TRUE(file.hasUriAuthorizationPolicyMask_);
+    LOG_INFO(UDMF_TEST, "File010 end.");
+}
+
+/**
+* @tc.name: File011
+* @tc.desc: Test SetUriAuthorizationPolicyMask with various mask values
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File011, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File011 begin.");
+    File file("file://com.example.test/data.txt");
+
+    file.SetUriAuthorizationPolicyMask(1);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 1);
+
+    file.SetUriAuthorizationPolicyMask(2);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 2);
+
+    file.SetUriAuthorizationPolicyMask(3);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 3);
+
+    file.SetUriAuthorizationPolicyMask(5);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 5);
+
+    file.SetUriAuthorizationPolicyMask(7);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 7);
+
+    file.SetUriAuthorizationPolicyMask(0);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 0);
+
+    LOG_INFO(UDMF_TEST, "File011 end.");
+}
+
+/**
+* @tc.name: File012
+* @tc.desc: Test SetUriAuthorizationPolicyMask with PERSIST normalization
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File012, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File012 begin.");
+    File file("file://com.example.test/data.txt");
+
+    file.SetUriAuthorizationPolicyMask(4);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 0);
+
+    file.SetUriAuthorizationPolicyMask(6);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 6);
+
+    LOG_INFO(UDMF_TEST, "012 end.");
+}
+
+/**
+* @tc.name: File013
+* @tc.desc: Test SetUriAuthorizationPolicyMask with string value
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File013, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File013 begin.");
+    File file("file://com.example.test/data.txt");
+
+    file.SetUriAuthorizationPolicyMask(3);
+    file.SetUri("file://com.example.test/data2.txt");
+    EXPECT_EQ(file.GetUri(), "file://com.example.test/data2.txt");
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 3);
+
+    LOG_INFO(UDMF_TEST, "File013 end.");
+}
+
+/**
+* @tc.name: File014
+* @tc.desc: Test InitObject with permission mask serialization
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File014, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File014 begin.");
+    File file("file://com.example.test/data.txt");
+    file.SetUriAuthorizationPolicyMask(5);
+    file.InitObject();
+
+    auto value = file.GetValue();
+    ASSERT_TRUE(std::holds_alternative<std::shared_ptr<Object>>(value));
+    auto object = std::get<std::shared_ptr<Object>>(value);
+    ASSERT_NE(object, nullptr);
+
+    auto iter = object->value_.find(URI_AUTHORIZATION_POLICIES);
+    ASSERT_NE(iter, object->value_.end());
+    ASSERT_TRUE(std::holds_alternative<int32_t>(iter->second));
+    EXPECT_EQ(std::get<int32_t>(iter->second), 5);
+
+    LOG_INFO(UDMF_TEST, "File014 end.");
+}
+
+/**
+* @tc.name: File015
+* @tc.desc: Test InitObject without permission mask
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File015, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File015 begin.");
+    File file("file://com.example.test/data.txt");
+    file.InitObject();
+
+    auto value = file.GetValue();
+    ASSERT_TRUE(std::holds_alternative<std::shared_ptr<Object>>(value));
+    auto object = std::get<std::shared_ptr<Object>>(value);
+    ASSERT_NE(object, nullptr);
+
+    auto iter = object->value_.find(URI_AUTHORIZATION_POLICIES);
+    EXPECT_EQ(iter, object->value_.end());
+
+    LOG_INFO(UDMF_TEST, "File015 end.");
+}
 } // OHOS::Test

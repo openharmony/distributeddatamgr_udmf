@@ -1072,6 +1072,23 @@ HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesTag001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: OH_Udmf_SetPropertiesTag002
+ * @tc.desc: Test OH_UdmfProperty_SetTag with empty tag
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesTag002, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    std::string emptyTag("");
+    int result = OH_UdmfProperty_SetTag(properties, emptyTag.c_str());
+    EXPECT_EQ(UDMF_E_OK, result);
+    EXPECT_EQ(emptyTag, OH_UdmfProperty_GetTag(properties));
+    OH_UdmfProperty_Destroy(properties);
+    OH_UdmfData_Destroy(data);
+}
+
+/**
  * @tc.name: OH_Udmf_SetPropertiesAuthPermission001
  * @tc.desc: set properties auth permission
  * @tc.type: FUNC
@@ -1099,6 +1116,112 @@ HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesAuthPermission001, TestSize.Level1)
     EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     EXPECT_EQ(UDMF_E_INVALID_PARAM, OH_UdmfProperty_SetAuthPermission(nullptr, UDMF_PERM_READ));
 
+    OH_UdmfProperty_Destroy(properties);
+    OH_UdmfData_Destroy(data);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesAuthPermission002
+ * @tc.desc: Test OH_UdmfProperty_SetAuthPermission with null properties
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesAuthPermission002, TestSize.Level1)
+{
+    int result = OH_UdmfProperty_SetAuthPermission(nullptr, UDMF_PERM_READ);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesAuthPermission003
+ * @tc.desc: Test OH_UdmfProperty_SetAuthPermission with invalid negative auth policy
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesAuthPermission003, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    int result = OH_UdmfProperty_SetAuthPermission(properties, -1);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    OH_UdmfProperty_Destroy(properties);
+    OH_UdmfData_Destroy(data);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesAuthPermission004
+ * @tc.desc: Test OH_UdmfProperty_SetAuthPermission with invalid high bit auth policy
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesAuthPermission004, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    int result = OH_UdmfProperty_SetAuthPermission(properties, 1 << 3);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    OH_UdmfProperty_Destroy(properties);
+    OH_UdmfData_Destroy(data);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesAuthPermission005
+ * @tc.desc: Test OH_UdmfProperty_SetAuthPermission with all valid permissions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesAuthPermission005, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    int result = OH_UdmfProperty_SetAuthPermission(properties, UDMF_PERM_READ | UDMF_PERM_WRITE | UDMF_PERM_PERSIST);
+    EXPECT_EQ(UDMF_E_OK, result);
+    EXPECT_EQ(UriPermissionUtil::ToMask(properties->properties_->uriAuthorizationPolicies),
+        static_cast<uint32_t>(UDMF_PERM_READ | UDMF_PERM_WRITE | UDMF_PERM_PERSIST));
+    OH_UdmfProperty_Destroy(properties);
+    OH_UdmfData_Destroy(data);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesAuthPermission006
+ * @tc.desc: Test OH_UdmfProperty_SetAuthPermission with zero permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesAuthPermission006, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    int result = OH_UdmfProperty_SetAuthPermission(properties, UDMF_PERM_NONE);
+    EXPECT_EQ(UDMF_E_OK, result);
+    EXPECT_FALSE(properties->properties_->uriAuthorizationPolicies.empty());
+    OH_UdmfProperty_Destroy(properties);
+    OH_UdmfData_Destroy(data);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesAuthPermission007
+ * @tc.desc: Test OH_UdmfProperty_SetAuthPermission with read and write permissions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesAuthPermission007, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    int result = OH_UdmfProperty_SetAuthPermission(properties, UDMF_PERM_READ | UDMF_PERM_WRITE);
+    EXPECT_EQ(UDMF_E_OK, result);
+    EXPECT_EQ(UriPermissionUtil::ToMask(properties->properties_->uriAuthorizationPolicies),
+        static_cast<uint32_t>(UDMF_PERM_READ | UDMF_PERM_WRITE));
+    OH_UdmfProperty_Destroy(properties);
+    OH_UdmfData_Destroy(data);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesAuthPermission008
+ * @tc.desc: Test OH_UdmfProperty_SetAuthPermission with invalid permission mask
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesAuthPermission008, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    int result = OH_UdmfProperty_SetAuthPermission(properties, 0x08);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
     OH_UdmfProperty_Destroy(properties);
     OH_UdmfData_Destroy(data);
 }
@@ -1172,10 +1295,195 @@ HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesExtrasStringParam001, TestSize.Level1)
     OH_UdmfData *data = OH_UdmfData_Create();
     OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
     std::string str("str");
-    int result = OH_UdmfProperty_SetExtrasStringParam(properties, "keyStr", str.c_str());
-    EXPECT_EQ(UDMF_E_OK, result);
+    int intResult = OH_UdmfProperty_SetExtrasStringParam(properties, "keyStr", str.c_str());
+    EXPECT_EQ(UDMF_E_OK, intResult);
     std::string actualStr(OH_UdmfProperty_GetExtrasStringParam(properties, "keyStr"));
     EXPECT_EQ(str, actualStr);
+    OH_UdmfData_Destroy(data);
+    OH_UdmfProperty_Destroy(properties);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesExtrasStringParam002
+ * @tc.desc: Test OH_UdmfProperty_SetExtrasStringParam with null properties
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesExtrasStringParam002, TestSize.Level1)
+{
+    std::string str("str");
+    int result = OH_UdmfProperty_SetExtrasStringParam(nullptr, "keyStr", str.c_str());
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesExtrasStringParam003
+ * @tc.desc: Test OH_UdmfProperty_SetExtrasStringParam with null key
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesExtrasStringParam003, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    std::string str("str");
+    int result = OH_UdmfProperty_SetExtrasStringParam(properties, nullptr, str.c_str());
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    OH_UdmfData_Destroy(data);
+    OH_UdmfProperty_Destroy(properties);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesExtrasStringParam004
+ * @tc.desc: Test OH_UdmfProperty_SetExtrasStringParam with null param
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesExtrasStringParam004, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    int result = OH_UdmfProperty_SetExtrasStringParam(properties, "keyStr", nullptr);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    OH_UdmfData_Destroy(data);
+    OH_UdmfProperty_Destroy(properties);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesExtrasStringParam005
+ * @tc.desc: Test OH_UdmfProperty_SetExtrasStringParam with empty string param
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesExtrasStringParam005, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    std::string emptyStr("");
+    int result = OH_UdmfProperty_SetExtrasStringParam(properties, "keyStr", emptyStr.c_str());
+    EXPECT_EQ(UDMF_E_OK, result);
+    const char* retrieved = OH_UdmfProperty_GetExtrasStringParam(properties, "keyStr");
+    EXPECT_EQ(emptyStr, std::string(retrieved));
+    OH_UdmfData_Destroy(data);
+    OH_UdmfProperty_Destroy(properties);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesExtrasStringParam006
+ * @tc.desc: Test OH_UdmfProperty_SetExtrasStringParam with special characters
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesExtrasStringParam006, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    std::string specialStr("测试@#$%^&*()");
+    int result = OH_UdmfProperty_SetExtrasStringParam(properties, "specialKey", specialStr.c_str());
+    EXPECT_EQ(UDMF_E_OK, result);
+    const char* retrieved = OH_UdmfProperty_GetExtrasStringParam(properties, "specialKey");
+    EXPECT_EQ(specialStr, std::string(retrieved));
+    OH_UdmfData_Destroy(data);
+    OH_UdmfProperty_Destroy(properties);
+}
+
+/**
+ * @tc.name: OH_Udmf_SetPropertiesExtrasStringParam007
+ * @tc.desc: Test OH_UdmfProperty_SetExtrasStringParam with long string
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_SetPropertiesExtrasStringParam007, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    std::string longStr(1000, 'A');
+    int result = OH_UdmfProperty_SetExtrasStringParam(properties, "longKey", longStr.c_str());
+    EXPECT_EQ(UDMF_E_OK, result);
+    const char* retrieved = OH_UdmfProperty_GetExtrasStringParam(properties, "longKey");
+    EXPECT_EQ(longStr, std::string(retrieved));
+    OH_UdmfData_Destroy(data);
+    OH_UdmfProperty_Destroy(properties);
+}
+
+/**
+ * @tc.name: OH_Udmf_GetExtrasStringParam002
+ * @tc.desc: Test OH_UdmfProperty_GetExtrasStringParam with non-existent key
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_GetExtrasStringParam002, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    char* key;
+    const char* result = OH_UdmfProperty_GetExtrasStringParam(properties, key);
+    EXPECT_EQ(nullptr, result);
+    OH_UdmfData_Destroy(data);
+    OH_UdmfProperty_Destroy(properties);
+}
+
+/**
+ * @tc.name: OH_Udmf_GetExtrasStringParam003
+ * @tc.desc: Test OH_UdmfProperty_GetExtrasStringParam with null properties
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_GetExtrasStringParam003, TestSize.Level1)
+{
+    const char* result = OH_UdmfProperty_GetExtrasStringParam(nullptr, "keyStr");
+    EXPECT_EQ(nullptr, result);
+}
+
+/**
+ * @tc.name: OH_Udmf_GetExtrasStringParam004
+ * @tc.desc: Test OH_UdmfProperty_GetExtrasStringParam with with null key
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_GetExtrasStringParam004, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    const char* result = OH_UdmfProperty_GetExtrasStringParam(properties, nullptr);
+    EXPECT_EQ(nullptr, result);
+    OH_UdmfData_Destroy(data);
+    OH_UdmfProperty_Destroy(properties);
+}
+
+/**
+ * @tc.name: OH_Udmf_GetExtrasStringParam005
+ * @tc.desc: Test OH_UdmfProperty_GetExtrasStringParam with empty string key
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_GetExtrasStringParam005, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    std::string testStr("testValue");
+    OH_UdmfProperty_SetExtrasStringParam(properties, "", testStr.c_str());
+    const char* result = OH_UdmfProperty_GetExtrasStringParam(properties, "");
+    EXPECT_EQ(testStr, std::string(result));
+    OH_UdmfData_Destroy(data);
+    OH_UdmfProperty_Destroy(properties);
+}
+
+/**
+ * @tc.name: OH_Udmf_GetExtrasStringParam006
+ * @tc.desc: Test OH_UdmfProperty_GetExtrasStringParam after multiple sets
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_GetExtrasStringParam006, TestSize.Level1)
+{
+    OH_UdmfData *data = OH_UdmfData_Create();
+    OH_UdmfProperty *properties = OH_UdmfProperty_Create(data);
+    
+    std::string str1("value1");
+    std::string str2("value2");
+    std::string str3("value3");
+    
+    OH_UdmfProperty_SetExtrasStringParam(properties, "key1", str1.c_str());
+    OH_UdmfProperty_SetExtrasStringParam(properties, "key2", str2.c_str());
+    OH_UdmfProperty_SetExtrasStringParam(properties, "key3", str3.c_str());
+    
+    const char* result1 = OH_UdmfProperty_GetExtrasStringParam(properties, "key1");
+    EXPECT_EQ(str1, std::string(result1));
+    const char* result2 = OH_UdmfProperty_GetExtrasStringParam(properties, "key2");
+    EXPECT_EQ(str2, std::string(result2));
+    const char* result3 = OH_UdmfProperty_GetExtrasStringParam(properties, "key3");
+    EXPECT_EQ(str3, std::string(result3));
+    
     OH_UdmfData_Destroy(data);
     OH_UdmfProperty_Destroy(properties);
 }

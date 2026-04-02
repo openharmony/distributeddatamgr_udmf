@@ -596,10 +596,10 @@ HWTEST_F(UdsTest, OH_UdsAppItem_GetIconId_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OH_UdsAppItem_GetLabelId_001
- * @tc.desc: Normal testcase of OH_UdsAppItem_GetLabelId
- * @tc.type: FUNC
- */
+* @tc.name: OH_UdsAppItem_GetLabelId_001
+* @tc.desc: Normal testcase of OH_UdsAppItem_GetLabelId
+* @tc.type: FUNC
+*/
 HWTEST_F(UdsTest, OH_UdsAppItem_GetLabelId_001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "OH_UdsAppItem_GetLabelId_001 begin.");
@@ -615,6 +615,44 @@ HWTEST_F(UdsTest, OH_UdsAppItem_GetLabelId_001, TestSize.Level1)
     EXPECT_EQ(nullptr, OH_UdsAppItem_GetLabelId(appItemNullptr));
     OH_UdsAppItem_Destroy(appItemNullptr);
     LOG_INFO(UDMF_TEST, "OH_UdsAppItem_GetLabelId_001 end.");
+}
+
+/**
+* @tc.name: OH_UdsFileUri_SetAuthPolicy_001
+* @tc.desc: Normal testcase of OH_UdsFileUri_SetAuthPolicy
+* @tc.type: FUNC
+*/
+HWTEST_F(UdsTest, OH_UdsFileUri_SetAuthPolicy_001, TestSize.Level1)
+{
+    auto fileUri = OH_UdsFileUri_Create();
+    ASSERT_NE(fileUri, nullptr);
+    int result = OH_UdsFileUri_SetAuthPolicy(fileUri, UDMF_PERM_READ | UDMF_PERM_WRITE);
+    EXPECT_EQ(UDMF_E_OK, result);
+    auto iter = fileUri->obj->value_.find(URI_AUTHORIZATION_POLICIES);
+    ASSERT_NE(iter, fileUri->obj->value_.end());
+    auto permissionMask = std::get_if<int32_t>(&(iter->second));
+    ASSERT_NE(permissionMask, nullptr);
+    EXPECT_EQ(*permissionMask, static_cast<int32_t>(UriPermissionUtil::READ_FLAG | UriPermissionUtil::WRITE_FLAG));
+
+    result = OH_UdsFileUri_SetAuthPolicy(fileUri, UDMF_PERM_NONE);
+    EXPECT_EQ(UDMF_E_OK, result);
+    iter = fileUri->obj->value_.find(URI_AUTHORIZATION_POLICIES);
+    ASSERT_NE(iter, fileUri->obj->value_.end());
+    permissionMask = std::get_if<int32_t>(&(iter->second));
+    ASSERT_NE(permissionMask, nullptr);
+    EXPECT_EQ(*permissionMask, 0);
+
+    result = OH_UdsFileUri_SetAuthPolicy(nullptr, UDMF_PERM_READ);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    result = OH_UdsFileUri_SetAuthPolicy(fileUri, -1);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    result = OH_UdsFileUri_SetAuthPolicy(fileUri, 1 << 3);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+
+    fileUri->obj = nullptr;
+    result = OH_UdsFileUri_SetAuthPolicy(fileUri, UDMF_PERM_READ);
+    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
+    OH_UdsFileUri_Destroy(fileUri);
 }
 
 /**
@@ -937,45 +975,7 @@ HWTEST_F(UdsTest, OH_UdsFileUri_SetFileType_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OH_UdsFileUri_SetAuthPolicy_001
- * @tc.desc: Normal testcase of OH_UdsFileUri_SetAuthPolicy
- * @tc.type: FUNC
- */
-HWTEST_F(UdsTest, OH_UdsFileUri_SetAuthPolicy_001, TestSize.Level1)
-{
-    auto fileUri = OH_UdsFileUri_Create();
-    ASSERT_NE(fileUri, nullptr);
-    int result = OH_UdsFileUri_SetAuthPolicy(fileUri, UDMF_PERM_READ | UDMF_PERM_PERSIST);
-    EXPECT_EQ(UDMF_E_OK, result);
-    auto iter = fileUri->obj->value_.find(URI_AUTHORIZATION_POLICIES);
-    ASSERT_NE(iter, fileUri->obj->value_.end());
-    auto permissionMask = std::get_if<int32_t>(&(iter->second));
-    ASSERT_NE(permissionMask, nullptr);
-    EXPECT_EQ(*permissionMask, static_cast<int32_t>(UriPermissionUtil::READ_FLAG | UriPermissionUtil::PERSIST_FLAG));
-
-    result = OH_UdsFileUri_SetAuthPolicy(fileUri, UDMF_PERM_NONE);
-    EXPECT_EQ(UDMF_E_OK, result);
-    iter = fileUri->obj->value_.find(URI_AUTHORIZATION_POLICIES);
-    ASSERT_NE(iter, fileUri->obj->value_.end());
-    permissionMask = std::get_if<int32_t>(&(iter->second));
-    ASSERT_NE(permissionMask, nullptr);
-    EXPECT_EQ(*permissionMask, 0);
-
-    result = OH_UdsFileUri_SetAuthPolicy(nullptr, UDMF_PERM_READ);
-    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
-    result = OH_UdsFileUri_SetAuthPolicy(fileUri, -1);
-    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
-    result = OH_UdsFileUri_SetAuthPolicy(fileUri, 1 << 3);
-    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
-
-    fileUri->obj = nullptr;
-    result = OH_UdsFileUri_SetAuthPolicy(fileUri, UDMF_PERM_READ);
-    EXPECT_EQ(UDMF_E_INVALID_PARAM, result);
-    OH_UdsFileUri_Destroy(fileUri);
-}
-
-/**
- * @tc.name: OH_UdsPixelMap_Create_001
+* @tc.name: OH_UdsPixelMap_Create_001
  * @tc.desc: Normal testcase of OH_UdsPixelMap_Create
  * @tc.type: FUNC
  */
