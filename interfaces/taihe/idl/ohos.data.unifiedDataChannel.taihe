@@ -586,84 +586,84 @@ function ConvertRecordsToEntriesSync(data: UnifiedDataInner): void;
 @!sts_inject("""
 
 export class UnifiedData {
-  inner: UnifiedDataInner;
+  unifiedDataInner: UnifiedDataInner;
   getInner(): long {
-    return this.inner.getInner();
+    return this.unifiedDataInner.getInner();
   }
   constructor() {
-    this.inner = createUnifiedData();
+    this.unifiedDataInner = createUnifiedData();
   }
   constructor(inner: UnifiedDataInner) {
-    this.inner = inner;
+    this.unifiedDataInner = inner;
   }
   constructor(unifiedRecord: UnifiedRecord) {
     if (unifiedRecord instanceof Folder) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as Folder).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as Folder).folderInner);
     } else if (unifiedRecord instanceof Audio) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as Audio).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as Audio).audioInner);
     } else if (unifiedRecord instanceof Video) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as Video).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as Video).videoInner);
     } else if (unifiedRecord instanceof Image) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as Image).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as Image).imageInner);
     } else if (unifiedRecord instanceof PlainText) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as PlainText).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as PlainText).plainTextInner);
     } else if (unifiedRecord instanceof HTML) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as HTML).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as HTML).htmlInner);
     } else if (unifiedRecord instanceof Hyperlink) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as Hyperlink).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as Hyperlink).hyperlinkInner);
     } else if (unifiedRecord instanceof SystemDefinedForm) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedForm).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedForm).systemDefinedFormInner);
     } else if (unifiedRecord instanceof SystemDefinedAppItem) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedAppItem).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedAppItem).systemDefinedAppItemInner);
     } else if (unifiedRecord instanceof SystemDefinedPixelMap) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedPixelMap).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedPixelMap).systemDefinedPixelMapInner);
     } else if (unifiedRecord instanceof Text) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as Text).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as Text).textInner);
     } else if (unifiedRecord instanceof File) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as File).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as File).fileInner);
     } else if (unifiedRecord instanceof SystemDefinedRecord) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedRecord).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as SystemDefinedRecord).systemDefinedRecordInner);
     } else if (unifiedRecord instanceof ApplicationDefinedRecord) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as ApplicationDefinedRecord).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as ApplicationDefinedRecord).applicationDefinedRecordInner);
     } else if (unifiedRecord instanceof UnifiedRecord) {
-      this.inner = createUnifiedDataWithParams((unifiedRecord as UnifiedRecord).inner);
+      this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as UnifiedRecord).unifiedRecordInner);
     }
   }
   addRecord(unifiedRecord: UnifiedRecord) {
     if (unifiedRecord instanceof Folder) {
-      this.inner.addRecord((unifiedRecord as Folder).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as Folder).folderInner);
     } else if (unifiedRecord instanceof Audio) {
-      this.inner.addRecord((unifiedRecord as Audio).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as Audio).audioInner);
     } else if (unifiedRecord instanceof Video) {
-      this.inner.addRecord((unifiedRecord as Video).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as Video).videoInner);
     } else if (unifiedRecord instanceof Image) {
-      this.inner.addRecord((unifiedRecord as Image).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as Image).imageInner);
     } else if (unifiedRecord instanceof PlainText) {
-      this.inner.addRecord((unifiedRecord as PlainText).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as PlainText).plainTextInner);
     } else if (unifiedRecord instanceof HTML) {
-      this.inner.addRecord((unifiedRecord as HTML).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as HTML).htmlInner);
     } else if (unifiedRecord instanceof Hyperlink) {
-      this.inner.addRecord((unifiedRecord as Hyperlink).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as Hyperlink).hyperlinkInner);
     } else if (unifiedRecord instanceof SystemDefinedForm) {
-      this.inner.addRecord((unifiedRecord as SystemDefinedForm).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as SystemDefinedForm).systemDefinedFormInner);
     } else if (unifiedRecord instanceof SystemDefinedAppItem) {
-      this.inner.addRecord((unifiedRecord as SystemDefinedAppItem).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as SystemDefinedAppItem).systemDefinedAppItemInner);
     } else if (unifiedRecord instanceof SystemDefinedPixelMap) {
-      this.inner.addRecord((unifiedRecord as SystemDefinedPixelMap).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as SystemDefinedPixelMap).systemDefinedPixelMapInner);
     } else if (unifiedRecord instanceof Text) {
-      this.inner.addRecord((unifiedRecord as Text).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as Text).textInner);
     } else if (unifiedRecord instanceof File) {
-      this.inner.addRecord((unifiedRecord as File).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as File).fileInner);
     } else if (unifiedRecord instanceof SystemDefinedRecord) {
-      this.inner.addRecord((unifiedRecord as SystemDefinedRecord).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as SystemDefinedRecord).systemDefinedRecordInner);
     } else if (unifiedRecord instanceof ApplicationDefinedRecord) {
-      this.inner.addRecord((unifiedRecord as ApplicationDefinedRecord).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as ApplicationDefinedRecord).applicationDefinedRecordInner);
     } else if (unifiedRecord instanceof UnifiedRecord) {
-      this.inner.addRecord((unifiedRecord as UnifiedRecord).inner);
+      this.unifiedDataInner.addRecord((unifiedRecord as UnifiedRecord).unifiedRecordInner);
     }
   }
   getRecords(): Array<UnifiedRecord> {
-    let records = this.inner.getRecords();
+    let records = this.unifiedDataInner.getRecords();
     let arr: Array<UnifiedRecord> = new Array<UnifiedRecord>();
     for (let i = 0; i < records.length; i++ ) {
       if (records[i] instanceof UnifiedRecordInner) {
@@ -701,699 +701,699 @@ export class UnifiedData {
     return arr;
   }
   hasType(type: string): boolean {
-    return this.inner.hasType(type);
+    return this.unifiedDataInner.hasType(type);
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.unifiedDataInner.getTypes();
   }
   get properties(): UnifiedDataProperties {
-    return this.inner.properties;
+    return this.unifiedDataInner.properties;
   }
   set properties(properties: UnifiedDataProperties) {
-    this.inner.properties = properties;
+    this.unifiedDataInner.properties = properties;
   }
 }
 
 export class UnifiedRecord {
-  inner: UnifiedRecordInner;
+  unifiedRecordInner: UnifiedRecordInner;
   constructor() {
-    this.inner = createUnifiedRecord();
+    this.unifiedRecordInner = createUnifiedRecord();
   }
   constructor(inner: UnifiedRecordInner) {
-    this.inner = inner;
+    this.unifiedRecordInner = inner;
   }
 
   constructor(type: string, value: ValueType) {
-    this.inner = createUnifiedRecordWithParams(type, value);
+    this.unifiedRecordInner = createUnifiedRecordWithParams(type, value);
   }
   getType(): string {
-    return this.inner.getType();
+    return this.unifiedRecordInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.unifiedRecordInner.getValue();
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.unifiedRecordInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.unifiedRecordInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.unifiedRecordInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.unifiedRecordInner.getEntries();
   }
 }
 
 export class File extends UnifiedRecord {
-  inner: FileInner;
+  fileInner: FileInner;
   constructor() {
-    this.inner = createUnifiedFile();
+    this.fileInner = createUnifiedFile();
   }
   constructor(inner: FileInner) {
-    this.inner = inner;
+    this.fileInner = inner;
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.fileInner.getValue();
   }
   getType(): string {
-    return this.inner.getType();
+    return this.fileInner.getType();
   }
   get details(): Record<String, String> | undefined {
-    return this.inner.details;
+    return this.fileInner.details;
   }
   set details(details: Record<String, String>) {
-    this.inner.details = details;
+    this.fileInner.details = details;
   }
   get uri(): string {
-    return this.inner.uri;
+    return this.fileInner.uri;
   }
   set uri(uri: string) {
-    this.inner.uri = uri;
+    this.fileInner.uri = uri;
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.fileInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.fileInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.fileInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.fileInner.getEntries();
   }
 }
 
 export class Folder extends File {
-  inner: FolderInner;
+  folderInner: FolderInner;
   constructor() {
-    this.inner = createUnifiedFolder();
+    this.folderInner = createUnifiedFolder();
   }
   constructor(inner: FolderInner) {
-    this.inner = inner;
+    this.folderInner = inner;
   }
   getType(): string {
-    return this.inner.getType();
+    return this.folderInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.folderInner.getValue();
   }
   get uri(): string {
-    return this.inner.uri;
+    return this.folderInner.uri;
   }
   set uri(uri: string) {
-    this.inner.uri = uri;
+    this.folderInner.uri = uri;
   }
   get details(): Record<String, String> | undefined {
-    return this.inner.details;
+    return this.folderInner.details;
   }
   set details(details: Record<String, String>) {
-    this.inner.details = details;
+    this.folderInner.details = details;
   }
   get folderUri(): string {
-    return this.inner.folderUri;
+    return this.folderInner.folderUri;
   }
   set folderUri(folderUri: string) {
-    this.inner.folderUri = folderUri;
+    this.folderInner.folderUri = folderUri;
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.folderInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.folderInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.folderInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.folderInner.getEntries();
   }
 }
 
 export class Audio extends File {
-  inner: AudioInner;
+  audioInner: AudioInner;
   constructor() {
-    this.inner = createUnifiedAudio();
+    this.audioInner = createUnifiedAudio();
   }
   constructor(inner: AudioInner) {
-    this.inner = inner;
+    this.audioInner = inner;
   }
   getType(): string {
-    return this.inner.getType();
+    return this.audioInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.audioInner.getValue();
   }
   get uri(): string {
-    return this.inner.uri;
+    return this.audioInner.uri;
   }
   set uri(uri: string) {
-    this.inner.uri = uri;
+    this.audioInner.uri = uri;
   }
   get details(): Record<String, String> | undefined {
-    return this.inner.details;
+    return this.audioInner.details;
   }
   set details(details: Record<String, String>) {
-    this.inner.details = details;
+    this.audioInner.details = details;
   }
   get audioUri(): string {
-    return this.inner.audioUri;
+    return this.audioInner.audioUri;
   }
   set audioUri(audioUri: string) {
-    this.inner.audioUri = audioUri;
+    this.audioInner.audioUri = audioUri;
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.audioInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.audioInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.audioInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.audioInner.getEntries();
   }
 }
 
 export class Video extends File {
-  inner: VideoInner;
+  videoInner: VideoInner;
   constructor() {
-    this.inner = createUnifiedVideo();
+    this.videoInner = createUnifiedVideo();
   }
   constructor(inner: VideoInner) {
-    this.inner = inner;
+    this.videoInner = inner;
   }
   getType(): string {
-    return this.inner.getType();
+    return this.videoInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.videoInner.getValue();
   }
   get uri(): string {
-    return this.inner.uri;
+    return this.videoInner.uri;
   }
   set uri(uri: string) {
-    this.inner.uri = uri;
+    this.videoInner.uri = uri;
   }
   get details(): Record<String, String> | undefined {
-    return this.inner.details;
+    return this.videoInner.details;
   }
   set details(details: Record<String, String>) {
-    this.inner.details = details;
+    this.videoInner.details = details;
   }
   get videoUri(): string {
-    return this.inner.videoUri;
+    return this.videoInner.videoUri;
   }
   set videoUri(videoUri: string) {
-    this.inner.videoUri = videoUri;
+    this.videoInner.videoUri = videoUri;
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.videoInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.videoInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.videoInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.videoInner.getEntries();
   }
 }
 
 export class Image extends File {
-  inner: ImageInner;
+  imageInner: ImageInner;
   constructor() {
-    this.inner = createUnifiedImage();
+    this.imageInner = createUnifiedImage();
   }
   constructor(inner: ImageInner) {
-    this.inner = inner;
+    this.imageInner = inner;
   }
   getType(): string {
-    return this.inner.getType();
+    return this.imageInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.imageInner.getValue();
   }
   get uri(): string {
-    return this.inner.uri;
+    return this.imageInner.uri;
   }
   set uri(uri: string) {
-    this.inner.uri = uri;
+    this.imageInner.uri = uri;
   }
   get details(): Record<String, String> | undefined {
-    return this.inner.details;
+    return this.imageInner.details;
   }
   set details(details: Record<String, String>) {
-    this.inner.details = details;
+    this.imageInner.details = details;
   }
   get imageUri(): string {
-    return this.inner.imageUri;
+    return this.imageInner.imageUri;
   }
   set imageUri(imageUri: string) {
-    this.inner.imageUri = imageUri;
+    this.imageInner.imageUri = imageUri;
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.imageInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.imageInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.imageInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.imageInner.getEntries();
   }
 }
 
 export class Text extends UnifiedRecord {
-  inner: TextInner;
+  textInner: TextInner;
   constructor() {
-    this.inner = createText();
+    this.textInner = createText();
   }
   constructor(inner: TextInner) {
-    this.inner = inner;
+    this.textInner = inner;
   }
   getType(): string {
-    return this.inner.getType();
+    return this.textInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.textInner.getValue();
   }
   get details(): Record<string, string>| undefined {
-    return this.inner.details;
+    return this.textInner.details;
   }
   set details(info: Record<string, string>) {
-    this.inner.details = info;
+    this.textInner.details = info;
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.textInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.textInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.textInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.textInner.getEntries();
   }
 }
 
 export class PlainText extends Text {
-  inner: PlainTextInner;
+  plainTextInner: PlainTextInner;
   constructor() {
-    this.inner = createPlainText();
+    this.plainTextInner = createPlainText();
   }
   constructor(inner: PlainTextInner) {
-    this.inner = inner;
+    this.plainTextInner = inner;
   }
   get details(): Record<string, string>| undefined {
-    return this.inner.details;
+    return this.plainTextInner.details;
   }
   set details(info: Record<string, string>) {
-    this.inner.details = info;
+    this.plainTextInner.details = info;
   }
   get textContent(): string {
-    return this.inner.textContent;
+    return this.plainTextInner.textContent;
   }
   set textContent(text: string) {
-    this.inner.textContent = text;
+    this.plainTextInner.textContent = text;
   }
   get textAbstract(): string {
-    return this.inner.textAbstract;
+    return this.plainTextInner.textAbstract;
   }
   set textAbstract(textAbstract: string) {
-    this.inner.textAbstract = textAbstract;
+    this.plainTextInner.textAbstract = textAbstract;
   }
   getType(): string {
-    return this.inner.getType();
+    return this.plainTextInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.plainTextInner.getValue();
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.plainTextInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.plainTextInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.plainTextInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.plainTextInner.getEntries();
   }
 }
 
 export class HTML extends Text {
-  inner: HTMLInner;
+  htmlInner: HTMLInner;
   constructor() {
-    this.inner = createHtml();
+    this.htmlInner = createHtml();
   }
   constructor(inner: HTMLInner) {
-    this.inner = inner;
+    this.htmlInner = inner;
   }
   get details(): Record<string, string>| undefined {
-    return this.inner.details;
+    return this.htmlInner.details;
   }
   set details(info: Record<string, string>) {
-    this.inner.details = info;
+    this.htmlInner.details = info;
   }
   get htmlContent(): string {
-    return this.inner.htmlContent;
+    return this.htmlInner.htmlContent;
   }
   set htmlContent(html: string) {
-    this.inner.htmlContent = html;
+    this.htmlInner.htmlContent = html;
   }
   get plainContent(): string {
-    return this.inner.plainContent;
+    return this.htmlInner.plainContent;
   }
   set plainContent(plain: string) {
-    this.inner.plainContent = plain;
+    this.htmlInner.plainContent = plain;
   }
   getType(): string {
-    return this.inner.getType();
+    return this.htmlInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.htmlInner.getValue();
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.htmlInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.htmlInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.htmlInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.htmlInner.getEntries();
   }
 }
 
 export class Hyperlink extends Text {
-  inner: HyperlinkInner;
+  hyperlinkInner: HyperlinkInner;
   constructor() {
-    this.inner = createHyperlink();
+    this.hyperlinkInner = createHyperlink();
   }
   constructor(inner: HyperlinkInner) {
-    this.inner = inner;
+    this.hyperlinkInner = inner;
   }
   get details(): Record<string, string>| undefined {
-    return this.inner.details;
+    return this.hyperlinkInner.details;
   }
   set details(info: Record<string, string>) {
-    this.inner.details = info;
+    this.hyperlinkInner.details = info;
   }
   get url(): string {
-    return this.inner.url;
+    return this.hyperlinkInner.url;
   }
   set url(url: string) {
-    this.inner.url = url;
+    this.hyperlinkInner.url = url;
   }
   get description(): string {
-    return this.inner.description;
+    return this.hyperlinkInner.description;
   }
   set description(description: string) {
-    this.inner.description = description;
+    this.hyperlinkInner.description = description;
   }
   getType(): string {
-    return this.inner.getType();
+    return this.hyperlinkInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.hyperlinkInner.getValue();
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.hyperlinkInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.hyperlinkInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.hyperlinkInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.hyperlinkInner.getEntries();
   }
 }
 
 export class SystemDefinedRecord extends UnifiedRecord {
-  inner: SystemDefinedRecordInner;
+  systemDefinedRecordInner: SystemDefinedRecordInner;
   constructor() {
-    this.inner = createSystemDefinedRecord();
+    this.systemDefinedRecordInner = createSystemDefinedRecord();
   }
   constructor(inner: SystemDefinedRecordInner) {
-    this.inner = inner;
+    this.systemDefinedRecordInner = inner;
   }
   getType(): string {
-    return this.inner.getType();
+    return this.systemDefinedRecordInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.systemDefinedRecordInner.getValue();
   }
   get details(): Record<String, DetailsValue> | undefined {
-    return this.inner.details;
+    return this.systemDefinedRecordInner.details;
   }
   set details(details: Record<String, DetailsValue>) {
-    this.inner.details = details;
+    this.systemDefinedRecordInner.details = details;
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.systemDefinedRecordInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.systemDefinedRecordInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.systemDefinedRecordInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.systemDefinedRecordInner.getEntries();
   }
 }
 
 export class SystemDefinedForm extends SystemDefinedRecord {
-  inner: SystemDefinedFormInner;
+  systemDefinedFormInner: SystemDefinedFormInner;
   constructor() {
-    this.inner = createSystemDefinedForm();
+    this.systemDefinedFormInner = createSystemDefinedForm();
   }
   constructor(inner: SystemDefinedFormInner) {
-    this.inner = inner;
+    this.systemDefinedFormInner = inner;
   }
   getType(): string {
-    return this.inner.getType();
+    return this.systemDefinedFormInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.systemDefinedFormInner.getValue();
   }
   get details(): Record<String, DetailsValue> | undefined {
-    return this.inner.details;
+    return this.systemDefinedFormInner.details;
   }
   set details(details: Record<String, DetailsValue>) {
-    this.inner.details = details;
+    this.systemDefinedFormInner.details = details;
   }
   get formId(): int {
-    return this.inner.formId;
+    return this.systemDefinedFormInner.formId;
   }
   set formId(formId: int) {
-    this.inner.formId = formId;
+    this.systemDefinedFormInner.formId = formId;
   }
   get formName(): String {
-    return this.inner.formName;
+    return this.systemDefinedFormInner.formName;
   }
   set formName(formName: String) {
-    this.inner.formName = formName;
+    this.systemDefinedFormInner.formName = formName;
   }
   get bundleName(): String {
-    return this.inner.bundleName;
+    return this.systemDefinedFormInner.bundleName;
   }
   set bundleName(bundleName: String) {
-    this.inner.bundleName = bundleName;
+    this.systemDefinedFormInner.bundleName = bundleName;
   }
   get abilityName(): String {
-    return this.inner.abilityName;
+    return this.systemDefinedFormInner.abilityName;
   }
   set abilityName(abilityName: String) {
-    this.inner.abilityName = abilityName;
+    this.systemDefinedFormInner.abilityName = abilityName;
   }
   get module(): String {
-    return this.inner.module;
+    return this.systemDefinedFormInner.module;
   }
   set module(module: String) {
-    this.inner.module = module;
+    this.systemDefinedFormInner.module = module;
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.systemDefinedFormInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.systemDefinedFormInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.systemDefinedFormInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.systemDefinedFormInner.getEntries();
   }
 }
 
 export class SystemDefinedAppItem extends SystemDefinedRecord {
-  inner: SystemDefinedAppItemInner;
+  systemDefinedAppItemInner: SystemDefinedAppItemInner;
   constructor() {
-    this.inner = createSystemDefinedAppItem();
+    this.systemDefinedAppItemInner = createSystemDefinedAppItem();
   }
   constructor(inner: SystemDefinedAppItemInner) {
-    this.inner = inner;
+    this.systemDefinedAppItemInner = inner;
   }
   getType(): string {
-    return this.inner.getType();
+    return this.systemDefinedAppItemInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.systemDefinedAppItemInner.getValue();
   }
   get details(): Record<String, DetailsValue> | undefined {
-    return this.inner.details;
+    return this.systemDefinedAppItemInner.details;
   }
   set details(details: Record<String, DetailsValue>) {
-    this.inner.details = details;
+    this.systemDefinedAppItemInner.details = details;
   }
   get appId(): String {
-    return this.inner.appId;
+    return this.systemDefinedAppItemInner.appId;
   }
   set appId(appId: String) {
-    this.inner.appId = appId;
+    this.systemDefinedAppItemInner.appId = appId;
   }
   get appName(): String {
-    return this.inner.appName;
+    return this.systemDefinedAppItemInner.appName;
   }
   set appName(appName: String) {
-    this.inner.appName = appName;
+    this.systemDefinedAppItemInner.appName = appName;
   }
   get appIconId(): String {
-    return this.inner.appIconId;
+    return this.systemDefinedAppItemInner.appIconId;
   }
   set appIconId(appIconId: String) {
-    this.inner.appIconId = appIconId;
+    this.systemDefinedAppItemInner.appIconId = appIconId;
   }
   get appLabelId(): String {
-    return this.inner.appLabelId;
+    return this.systemDefinedAppItemInner.appLabelId;
   }
   set appLabelId(appLabelId: String) {
-    this.inner.appLabelId = appLabelId;
+    this.systemDefinedAppItemInner.appLabelId = appLabelId;
   }
   get bundleName(): String {
-    return this.inner.bundleName;
+    return this.systemDefinedAppItemInner.bundleName;
   }
   set bundleName(bundleName: String) {
-    this.inner.bundleName = bundleName;
+    this.systemDefinedAppItemInner.bundleName = bundleName;
   }
   get abilityName(): String {
-    return this.inner.abilityName;
+    return this.systemDefinedAppItemInner.abilityName;
   }
   set abilityName(abilityName: String) {
-    this.inner.abilityName = abilityName;
+    this.systemDefinedAppItemInner.abilityName = abilityName;
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.systemDefinedAppItemInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.systemDefinedAppItemInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.systemDefinedAppItemInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.systemDefinedAppItemInner.getEntries();
   }
 }
 
 export class SystemDefinedPixelMap extends SystemDefinedRecord {
-  inner: SystemDefinedPixelMapInner;
+  systemDefinedPixelMapInner: SystemDefinedPixelMapInner;
   constructor() {
-    this.inner = createSystemDefinedPixelMap();
+    this.systemDefinedPixelMapInner = createSystemDefinedPixelMap();
   }
   constructor(inner: SystemDefinedPixelMapInner) {
-    this.inner = inner;
+    this.systemDefinedPixelMapInner = inner;
   }
   getType(): string {
-    return this.inner.getType();
+    return this.systemDefinedPixelMapInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.systemDefinedPixelMapInner.getValue();
   }
   get details(): Record<String, DetailsValue> | undefined {
-    return this.inner.details;
+    return this.systemDefinedPixelMapInner.details;
   }
   set details(details: Record<String, DetailsValue>) {
-    this.inner.details = details;
+    this.systemDefinedPixelMapInner.details = details;
   }
   get rawData(): Uint8Array | undefined {
-    return this.inner.rawData;
+    return this.systemDefinedPixelMapInner.rawData;
   }
   set rawData(rawData: Uint8Array) {
-    this.inner.rawData = rawData;
+    this.systemDefinedPixelMapInner.rawData = rawData;
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.systemDefinedPixelMapInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.systemDefinedPixelMapInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.systemDefinedPixelMapInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.systemDefinedPixelMapInner.getEntries();
   }
 }
 
 export class ApplicationDefinedRecord extends UnifiedRecord {
-  inner: ApplicationDefinedRecordInner;
+  applicationDefinedRecordInner: ApplicationDefinedRecordInner;
   constructor() {
-    this.inner = createApplicationDefinedRecord();
+    this.applicationDefinedRecordInner = createApplicationDefinedRecord();
   }
   constructor(inner: ApplicationDefinedRecordInner) {
-    this.inner = inner;
+    this.applicationDefinedRecordInner = inner;
   }
   getType(): string {
-    return this.inner.getType();
+    return this.applicationDefinedRecordInner.getType();
   }
   getValue(): ValueType {
-    return this.inner.getValue();
+    return this.applicationDefinedRecordInner.getValue();
   }
   get applicationDefinedType(): String {
-    return this.inner.applicationDefinedType;
+    return this.applicationDefinedRecordInner.applicationDefinedType;
   }
   set applicationDefinedType(applicationDefinedType: String) {
-    this.inner.applicationDefinedType = applicationDefinedType;
+    this.applicationDefinedRecordInner.applicationDefinedType = applicationDefinedType;
   }
   get rawData(): Uint8Array | undefined {
-    return this.inner.rawData;
+    return this.applicationDefinedRecordInner.rawData;
   }
   set rawData(rawData: Uint8Array) {
-    this.inner.rawData = rawData;
+    this.applicationDefinedRecordInner.rawData = rawData;
   }
   getTypes(): Array<string> {
-    return this.inner.getTypes();
+    return this.applicationDefinedRecordInner.getTypes();
   }
   addEntry(type: string, value: ValueType) {
-    this.inner.addEntry(type, value);
+    this.applicationDefinedRecordInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
-    return this.inner.getEntry(type);
+    return this.applicationDefinedRecordInner.getEntry(type);
   }
   getEntries(): Record<String, ValueType> {
-    return this.inner.getEntries();
+    return this.applicationDefinedRecordInner.getEntries();
   }
 }
 
 export function insertData(options: Options, data: UnifiedData): Promise<string> {
     return new Promise<string>((resolve, reject): void => {
         taskpool.execute((): string => {
-            return insertDataSync(options, data.inner);
+            return insertDataSync(options, data.unifiedDataInner);
         })
         .then((ret: Any): void => {
             resolve(ret as string);
@@ -1406,7 +1406,7 @@ export function insertData(options: Options, data: UnifiedData): Promise<string>
 
 export function insertData(options: Options, data: UnifiedData, callback: AsyncCallback<string>): void {
     taskpool.execute((): string => {
-        return insertDataSync(options, data.inner);
+        return insertDataSync(options, data.unifiedDataInner);
     })
     .then((ret: Any): void => {
         callback(new BusinessError(), ret as string);
@@ -1457,7 +1457,7 @@ export function queryData(options: Options, callback: AsyncCallback<Array<Unifie
 export function updateData(options: Options, data: UnifiedData): Promise<void> {
     return new Promise<void>((resolve, reject): void => {
         taskpool.execute((): void => {
-            return updateDataSync(options, data.inner);
+            return updateDataSync(options, data.unifiedDataInner);
         })
         .then((ret: Any): void => {
             resolve(ret as undefined);
@@ -1470,7 +1470,7 @@ export function updateData(options: Options, data: UnifiedData): Promise<void> {
 
 export function updateData(options: Options, data: UnifiedData, callback: AsyncCallback<void>): void {
     taskpool.execute((): void => {
-        return updateDataSync(options, data.inner);
+        return updateDataSync(options, data.unifiedDataInner);
     })
     .then((ret: Any): void => {
         callback(null, ret as undefined);
@@ -1519,7 +1519,7 @@ export function deleteData(options: Options, callback: AsyncCallback<Array<Unifi
 }
 
 export function convertRecordsToEntries(data: UnifiedData): void {
-    return convertRecordsToEntriesSync(data.inner);
+    return convertRecordsToEntriesSync(data.unifiedDataInner);
 }
 
 class ProgressInfoInner implements ProgressInfo {
@@ -1555,7 +1555,7 @@ export function systemDefinedFormTransferStatic(input: Any): object {
 }
 
 export function systemDefinedFormTransferDynamic(input: object): Any {
-    return systemDefinedFormTransferDynamicImpl((input as SystemDefinedForm).inner);
+    return systemDefinedFormTransferDynamicImpl((input as SystemDefinedForm).systemDefinedFormInner);
 }
 
 export function systemDefinedRecordTransferStatic(input: Any): object {
@@ -1564,7 +1564,7 @@ export function systemDefinedRecordTransferStatic(input: Any): object {
 }
 
 export function systemDefinedRecordTransferDynamic(input: object): Any {
-    return systemDefinedRecordTransferDynamicImpl((input as SystemDefinedRecord).inner);
+    return systemDefinedRecordTransferDynamicImpl((input as SystemDefinedRecord).systemDefinedRecordInner);
 }
 
 export function systemDefinedAppItemTransferStatic(input: Any): object {
@@ -1573,7 +1573,7 @@ export function systemDefinedAppItemTransferStatic(input: Any): object {
 }
 
 export function systemDefinedAppItemTransferDynamic(input: object): Any {
-    return systemDefinedAppItemTransferDynamicImpl((input as SystemDefinedAppItem).inner);
+    return systemDefinedAppItemTransferDynamicImpl((input as SystemDefinedAppItem).systemDefinedAppItemInner);
 }
 
 export function systemDefinedPixelMapTransferStatic(input: Any): object {
@@ -1582,7 +1582,7 @@ export function systemDefinedPixelMapTransferStatic(input: Any): object {
 }
 
 export function systemDefinedPixelMapTransferDynamic(input: object): Any {
-    return systemDefinedPixelMapTransferDynamicImpl((input as SystemDefinedPixelMap).inner);
+    return systemDefinedPixelMapTransferDynamicImpl((input as SystemDefinedPixelMap).systemDefinedPixelMapInner);
 }
 
 export function applicationDefinedRecordTransferStatic(input: Any): object {
@@ -1591,7 +1591,7 @@ export function applicationDefinedRecordTransferStatic(input: Any): object {
 }
 
 export function applicationDefinedRecordTransferDynamic(input: object): Any {
-    return applicationDefinedRecordTransferDynamicImpl((input as ApplicationDefinedRecord).inner);
+    return applicationDefinedRecordTransferDynamicImpl((input as ApplicationDefinedRecord).applicationDefinedRecordInner);
 }
 
 async function delayedDataLoadHandlerFuncAsync(
