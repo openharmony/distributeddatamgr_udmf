@@ -37,7 +37,8 @@ public:
     void SetUri(const ::taihe::string_view &uri);
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
     void SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details);
-    void SetUriAuthorizationPolicies(const ::taihe::optional<::taihe::array<int32_t>> &uriAuthorizationPolicies);
+    void SetUriAuthorizationPolicies(
+        const ::taihe::optional<::taihe::array<::taiheChannel::UriPermission>> &uriAuthorizationPolicies);
     int64_t GetInner();
 
     std::shared_ptr<File> value_;

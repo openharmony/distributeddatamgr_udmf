@@ -127,6 +127,13 @@ enum FileConflictOptions: i32 {
   SKIP = 1
 }
 
+enum UriPermission : i32 {
+  NONE  = 0,
+  READ  = 1,
+  WRITE = 2,
+  PERSIST = 3
+}
+
 struct Options {
   intention: Optional<Intention>;
   key: Optional<String>;
@@ -141,7 +148,7 @@ struct UnifiedDataProperties {
   shareOptions: Optional<ShareOptions>;
   getDelayData: Optional<(type: String) => @sts_type("UnifiedData") Opaque>;
   extras: Optional<@sts_type("Record<String, RecordData>") Opaque>;
-  uriAuthorizationPolicies: Optional<Array<i32>>;
+  uriAuthorizationPolicies: Optional<Array<UriPermission>>;
 }
 
 @ctor("UnifiedDataProperties")
@@ -242,7 +249,7 @@ interface FileInner {
   @set("details")
   SetDetails(details: @record Map<String, String>): void;
   @set("uriAuthorizationPolicies")
-  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<i32>>): void;
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<UriPermission>>): void;
   GetInner(): i64;
 }
 
@@ -386,7 +393,7 @@ interface HTMLInner {
   @get("plainContent")
   GetPlainContent(): String;
   @set("uriAuthorizationPolicies")
-  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<i32>>): void;
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<UriPermission>>): void;
   GetInner(): i64;
 }
 
@@ -961,6 +968,9 @@ export class Image extends File {
   set imageUri(imageUri: string) {
     this.imageInner.imageUri = imageUri;
   }
+  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
+    this.inner.uriAuthorizationPolicies = policy;
+  }
   getTypes(): Array<string> {
     return this.imageInner.getTypes();
   }
@@ -1080,6 +1090,9 @@ export class HTML extends Text {
   }
   set plainContent(plain: string) {
     this.htmlInner.plainContent = plain;
+  }
+  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
+    this.inner.uriAuthorizationPolicies = policy;
   }
   getType(): string {
     return this.htmlInner.getType();

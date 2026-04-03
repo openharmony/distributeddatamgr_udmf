@@ -48,6 +48,7 @@ struct HTML {
   htmlContent: String;
   plainContent: Optional<String>;
   details: Optional<@record Map<String, String>>;
+  uriAuthorizationPolicies: Optional<Array<i32>>;
 }
 
 struct OpenHarmonyAppItem {
@@ -86,6 +87,7 @@ struct FileUri {
   oriUri: String;
   fileType: String;
   details: Optional<@record Map<String, DetailsValue>>;
+  uriAuthorizationPolicies: Optional<Array<i32>>;
 }
 
 struct PixelMap {

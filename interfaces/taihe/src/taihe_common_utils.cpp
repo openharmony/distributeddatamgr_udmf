@@ -121,6 +121,43 @@ OHOS::UDMF::Intention ConvertIntention(::taiheChannel::Intention value)
     }
 }
 
+UriPermission ConvertUriPermission(::taiheChannel::UriPermission value)
+{
+    switch (value.get_key()) {
+        case ::taiheChannel::UriPermission::key_t::NONE:
+            return OHOS::UDMF::UriPermission::NONE;
+        case ::taiheChannel::UriPermission::key_t::READ:
+            return OHOS::UDMF::UriPermission::READ;
+        case ::taiheChannel::UriPermission::key_t::WRITE:
+            return OHOS::UDMF::UriPermission::WRITE;
+        case ::taiheChannel::UriPermission::key_t::PERSIST:
+            return OHOS::UDMF::UriPermission::PERSIST;
+        default:
+            return OHOS::UDMF::UriPermission::NONE;
+    }
+}
+
+::taiheChannel::UriPermission ConvertUriPermission(OHOS::UDMF::UriPermission value)
+{
+    switch (value) {
+        case OHOS::UDMF::UriPermission::NONE:
+            return ::ohos::data::unifiedDataChannel::UriPermission(
+                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(0));
+        case OHOS::UDMF::UriPermission::READ:
+            return ::ohos::data::unifiedDataChannel::UriPermission(
+                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(1));
+        case OHOS::UDMF::UriPermission::WRITE:
+            return ::ohos::data::unifiedDataChannel::UriPermission(
+                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(2));
+        case OHOS::UDMF::UriPermission::PERSIST:
+            return ::ohos::data::unifiedDataChannel::UriPermission(
+                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(3));
+        default:
+            return ::ohos::data::unifiedDataChannel::UriPermission(
+                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(0));
+    }
+}
+
 ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,
     ::taiheChannel::ValueType const& value)
 {
@@ -644,11 +681,20 @@ std::shared_ptr<Object> ConvertHyperlink(::taiheStruct::Hyperlink &link)
         auto thDetails = ConvertUDDetailsToString(details);
         thOpDetails.emplace(std::move(thDetails));
     }
+    ::taihe::optional<::taihe::array<int32_t>> uriAuthorizationPoliciesOpt;
+    int32_t uriAuthorizationPolicies = 0;
+    if (udsObj->GetValue(URI_AUTHORIZATION_POLICIES, uriAuthorizationPolicies) && uriAuthorizationPolicies >= 0) {
+        auto policies = UriPermissionUtil::ToInt32(
+            UriPermissionUtil::FromMask(static_cast<uint32_t>(uriAuthorizationPolicies)));
+        uriAuthorizationPoliciesOpt = ::taihe::optional<::taihe::array<int32_t>>::make(
+            ::taihe::array<int32_t>(::taihe::copy_data, policies.data(), policies.size()));
+    }
     ::ohos::data::uniformDataStruct::HTML html = ::ohos::data::uniformDataStruct::HTML {
         std::move(thType),
         std::move(thHtmlContent),
         std::move(thPlainContentOpt),
-        std::move(thOpDetails)
+        std::move(thOpDetails),
+        std::move(uriAuthorizationPoliciesOpt)
     };
     return ::taiheChannel::ValueType::make_html(html);
 }
@@ -664,6 +710,11 @@ std::shared_ptr<Object> ConvertHTML(::taiheStruct::HTML &html)
     if (html.details.has_value()) {
         auto udDetails = ConvertUDDetails(html.details.value());
         obj->value_[DETAILS] = ObjectUtils::ConvertToObject(udDetails);
+    }
+    if (html.uriAuthorizationPolicies.has_value()) {
+        std::vector<int32_t> policies(html.uriAuthorizationPolicies.value().begin(),
+            html.uriAuthorizationPolicies.value().end());
+        obj->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(UriPermissionUtil::ToMask(policies));
     }
     return obj;
 }
@@ -878,11 +929,20 @@ std::shared_ptr<Object> ConvertForm(::taiheStruct::Form &form)
         auto thDetails = ConvertUDSUDDetailsToUnion(details);
         thOpDetails.emplace(std::move(thDetails));
     }
+    ::taihe::optional<::taihe::array<int32_t>> uriAuthorizationPoliciesOpt;
+    int32_t uriAuthorizationPolicies = 0;
+    if (udsObj->GetValue(URI_AUTHORIZATION_POLICIES, uriAuthorizationPolicies) && uriAuthorizationPolicies >= 0) {
+        auto policies = UriPermissionUtil::ToInt32(
+            UriPermissionUtil::FromMask(static_cast<uint32_t>(uriAuthorizationPolicies)));
+        uriAuthorizationPoliciesOpt = ::taihe::optional<::taihe::array<int32_t>>::make(
+            ::taihe::array<int32_t>(::taihe::copy_data, policies.data(), policies.size()));
+    }
     ::ohos::data::uniformDataStruct::FileUri fileUri = ::ohos::data::uniformDataStruct::FileUri {
         std::move(thType),
         std::move(thOriUri),
         std::move(thFileType),
-        std::move(thOpDetails)
+        std::move(thOpDetails),
+        std::move(uriAuthorizationPoliciesOpt)
     };
     return ::taiheChannel::ValueType::make_fileUri(fileUri);
 }
@@ -896,6 +956,11 @@ std::shared_ptr<Object> ConvertFileUri(::taiheStruct::FileUri &file)
     if (file.details.has_value()) {
         auto udDetails = ConvertUDSUDDetailsToUnion(file.details.value());
         obj->value_[DETAILS] = ObjectUtils::ConvertToObject(udDetails);
+    }
+    if (file.uriAuthorizationPolicies.has_value()) {
+        std::vector<int32_t> policies(file.uriAuthorizationPolicies.value().begin(),
+            file.uriAuthorizationPolicies.value().end());
+        obj->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(UriPermissionUtil::ToMask(policies));
     }
     return obj;
 }
@@ -971,7 +1036,7 @@ OHOS::UDMF::UnifiedDataProperties ConvertUnifiedDataProperties(::taiheChannel::U
         auto policies = value.uriAuthorizationPolicies.value();
         properties.uriAuthorizationPolicies.reserve(policies.size());
         for (const auto &policy : policies) {
-            properties.uriAuthorizationPolicies.push_back(static_cast<UriPermission>(policy));
+            properties.uriAuthorizationPolicies.push_back(ConvertUriPermission(policy));
         }
     }
     return properties;
@@ -993,15 +1058,16 @@ OHOS::UDMF::UnifiedDataProperties ConvertUnifiedDataProperties(::taiheChannel::U
     SetTimestamp(taihe::get_env(), value.timestamp, aniTimeStamp);
     auto timestampOpt = ::taihe::optional<uintptr_t>::make(reinterpret_cast<uintptr_t>(aniTimeStamp));
 
-    ::taihe::optional<::taihe::array<int32_t>> uriAuthorizationPoliciesOpt;
+    ::taihe::optional<::taihe::array<::taiheChannel::UriPermission>> uriAuthorizationPoliciesOpt;
     if (!value.uriAuthorizationPolicies.empty()) {
-        std::vector<int32_t> policies;
+        std::vector<::taiheChannel::UriPermission> policies;
         policies.reserve(value.uriAuthorizationPolicies.size());
         for (const auto &policy : value.uriAuthorizationPolicies) {
-            policies.push_back(static_cast<int32_t>(policy));
+            policies.push_back(ConvertUriPermission(policy));
         }
-        uriAuthorizationPoliciesOpt = ::taihe::optional<::taihe::array<int32_t>>::make(
-            ::taihe::array<int32_t>(::taihe::copy_data, policies.data(), policies.size()));
+        uriAuthorizationPoliciesOpt =
+            ::taihe::optional<::taihe::array<::taiheChannel::UriPermission>>::make(
+                ::taihe::array<::taiheChannel::UriPermission>(::taihe::copy_data, policies.data(), policies.size()));
     }
 
     auto taiheProperties = ::taiheChannel::UnifiedDataProperties {
