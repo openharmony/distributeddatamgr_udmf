@@ -275,6 +275,8 @@ interface FolderInner {
   GetFolderUri(): String;
   @set("folderUri")
   SetFolderUri(folderUri: String): void;
+  @set("uriAuthorizationPolicies")
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<UriPermission>>): void;
   GetInner(): i64;
 }
 
@@ -300,6 +302,8 @@ interface AudioInner {
   GetAudioUri(): String;
   @set("audioUri")
   SetAudioUri(audioUri: String): void;
+  @set("uriAuthorizationPolicies")
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<UriPermission>>): void;
   GetInner(): i64;
 }
 
@@ -325,6 +329,8 @@ interface VideoInner {
   GetVideoUri(): String;
   @set("videoUri")
   SetVideoUri(videoUri: String): void;
+  @set("uriAuthorizationPolicies")
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<UriPermission>>): void;
   GetInner(): i64;
 }
 
@@ -350,6 +356,8 @@ interface ImageInner {
   GetImageUri(): String;
   @set("imageUri")
   SetImageUri(imageUri: String): void;
+  @set("uriAuthorizationPolicies")
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<UriPermission>>): void;
   GetInner(): i64;
 }
 
@@ -784,6 +792,9 @@ export class File extends UnifiedRecord {
   set uri(uri: string) {
     this.fileInner.uri = uri;
   }
+  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
+    this.inner.uriAuthorizationPolicies = policy;
+  }
   getTypes(): Array<string> {
     return this.fileInner.getTypes();
   }
@@ -817,6 +828,9 @@ export class Folder extends File {
   }
   set uri(uri: string) {
     this.folderInner.uri = uri;
+  }
+  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
+    this.inner.uriAuthorizationPolicies = policy;
   }
   get details(): Record<String, String> | undefined {
     return this.folderInner.details;
@@ -864,6 +878,9 @@ export class Audio extends File {
   set uri(uri: string) {
     this.audioInner.uri = uri;
   }
+  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
+    this.inner.uriAuthorizationPolicies = policy;
+  }
   get details(): Record<String, String> | undefined {
     return this.audioInner.details;
   }
@@ -909,6 +926,9 @@ export class Video extends File {
   }
   set uri(uri: string) {
     this.videoInner.uri = uri;
+  }
+  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
+    this.inner.uriAuthorizationPolicies = policy;
   }
   get details(): Record<String, String> | undefined {
     return this.videoInner.details;
@@ -956,6 +976,9 @@ export class Image extends File {
   set uri(uri: string) {
     this.imageInner.uri = uri;
   }
+  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
+    this.inner.uriAuthorizationPolicies = policy;
+  }
   get details(): Record<String, String> | undefined {
     return this.imageInner.details;
   }
@@ -967,9 +990,6 @@ export class Image extends File {
   }
   set imageUri(imageUri: string) {
     this.imageInner.imageUri = imageUri;
-  }
-  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
-    this.inner.uriAuthorizationPolicies = policy;
   }
   getTypes(): Array<string> {
     return this.imageInner.getTypes();

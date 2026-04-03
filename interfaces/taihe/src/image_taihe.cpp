@@ -126,6 +126,21 @@ void ImageTaihe::SetUri(const ::taihe::string_view &uri)
         ConvertUDDetailsToString(this->value_->GetDetails()));
 }
 
+void ImageTaihe::SetUriAuthorizationPolicies(
+    const ::taihe::optional<::taihe::array<::taiheChannel::UriPermission>> &uriAuthorizationPolicies)
+{
+    if (!uriAuthorizationPolicies.has_value()) {
+        return;
+    }
+    auto policies = uriAuthorizationPolicies.value();
+    std::vector<UriPermission> vecPolicies;
+    vecPolicies.reserve(policies.size());
+    for (const auto &policy : policies) {
+        vecPolicies.push_back(ConvertUriPermission(policy));
+    }
+    this->value_->SetUriAuthorizationPolicyMask(UriPermissionUtil::ToMask(vecPolicies));
+}
+
 void ImageTaihe::SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details)
 {
     if (details.size() == 0) {

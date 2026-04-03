@@ -37,6 +37,7 @@ napi_value VideoNapi::Constructor(napi_env env)
         DECLARE_NAPI_GETTER_SETTER("uri", FileNapi::GetUri, FileNapi::SetUri),
         /* Video properties */
         DECLARE_NAPI_GETTER_SETTER("videoUri", GetVideoUri, SetVideoUri),
+        DECLARE_NAPI_GETTER_SETTER("uriAuthorizationPolicies", nullptr, FileNapi::SetUriAuthorizationPolicies),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "Video", properties, count, VideoNapi::New);

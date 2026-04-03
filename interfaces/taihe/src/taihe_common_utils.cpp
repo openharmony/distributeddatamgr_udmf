@@ -19,6 +19,7 @@
 #include "pixel_map_taihe_ani.h"
 #include "taihe_common_utils.h"
 #include "unified_meta.h"
+#include "uri_permission_util.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -142,19 +143,19 @@ UriPermission ConvertUriPermission(::taiheChannel::UriPermission value)
     switch (value) {
         case OHOS::UDMF::UriPermission::NONE:
             return ::ohos::data::unifiedDataChannel::UriPermission(
-                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(0));
+                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(NONE));
         case OHOS::UDMF::UriPermission::READ:
             return ::ohos::data::unifiedDataChannel::UriPermission(
-                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(1));
+                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(READ));
         case OHOS::UDMF::UriPermission::WRITE:
             return ::ohos::data::unifiedDataChannel::UriPermission(
-                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(2));
+                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(WRITE));
         case OHOS::UDMF::UriPermission::PERSIST:
             return ::ohos::data::unifiedDataChannel::UriPermission(
-                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(3));
+                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(PERSIST));
         default:
             return ::ohos::data::unifiedDataChannel::UriPermission(
-                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(0));
+                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(NONE));
     }
 }
 

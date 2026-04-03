@@ -39,6 +39,8 @@ public:
     void SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details);
     ::taihe::string GetVideoUri();
     void SetVideoUri(const ::taihe::string_view &videoUri);
+    void SetUriAuthorizationPolicies(
+        const ::taihe::optional<::taihe::array<::taiheChannel::UriPermission>> &uriAuthorizationPolicies);
     int64_t GetInner();
 
     std::shared_ptr<Video> value_;

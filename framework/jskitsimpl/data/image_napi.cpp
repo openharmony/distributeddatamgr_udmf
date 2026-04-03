@@ -37,6 +37,7 @@ napi_value ImageNapi::Constructor(napi_env env)
         DECLARE_NAPI_GETTER_SETTER("uri", FileNapi::GetUri, FileNapi::SetUri),
         /* Image properties */
         DECLARE_NAPI_GETTER_SETTER("imageUri", GetImageUri, SetImageUri),
+        DECLARE_NAPI_GETTER_SETTER("uriAuthorizationPolicies", nullptr, FileNapi::SetUriAuthorizationPolicies),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "Image", properties, count, ImageNapi::New);

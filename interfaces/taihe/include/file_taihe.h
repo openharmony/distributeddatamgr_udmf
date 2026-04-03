@@ -19,6 +19,7 @@
 #include "file.h"
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
+#include "uri_permission_util.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {

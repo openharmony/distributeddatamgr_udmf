@@ -34,6 +34,7 @@
 #include "text_taihe.h"
 #include "unified_data_taihe.h"
 #include "unified_record_taihe.h"
+#include "uri_permission_util.h"
 #include "video_taihe.h"
 
 namespace OHOS {
