@@ -159,7 +159,7 @@ static int SetUdsDetails(UdsObject* pThis, const OH_UdsDetails* details, NdkStru
     return UDMF_E_OK;
 }
 
-static int SetUdsAuthPolicy(UdsObject* pThis, int authPolicy, NdkStructId ndkStructId)
+static int SetUdsAuthPolicy(UdsObject* pThis, uint32_t authPolicy, NdkStructId ndkStructId)
 {
     if (IsInvalidUdsObjectPtr(pThis, ndkStructId)) {
         LOG_ERROR(UDMF_CAPI, "invalid para.");
@@ -412,7 +412,7 @@ int OH_UdsHtml_SetDetails(OH_UdsHtml* pThis, const OH_UdsDetails* details)
     return SetUdsDetails(pThis, details, NdkStructId::UDS_HTML_STRUCT_ID);
 }
 
-int OH_UdsHtml_SetAuthPolicy(OH_UdsHtml* pThis, int authPolicy)
+int OH_UdsHtml_SetAuthPolicy(OH_UdsHtml* pThis, uint32_t authPolicy)
 {
     return SetUdsAuthPolicy(pThis, authPolicy, NdkStructId::UDS_HTML_STRUCT_ID);
 }
@@ -597,7 +597,7 @@ int OH_UdsFileUri_SetDetails(OH_UdsFileUri* pThis, const OH_UdsDetails* details)
     return SetUdsDetails(pThis, details, NdkStructId::UDS_FILE_URI_STRUCT_ID);
 }
 
-int OH_UdsFileUri_SetAuthPolicy(OH_UdsFileUri* pThis, int authPolicy)
+int OH_UdsFileUri_SetAuthPolicy(OH_UdsFileUri* pThis, uint32_t authPolicy)
 {
     return SetUdsAuthPolicy(pThis, authPolicy, NdkStructId::UDS_FILE_URI_STRUCT_ID);
 }

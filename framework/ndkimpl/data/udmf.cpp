@@ -1103,7 +1103,7 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* properties, const char
     return UDMF_E_OK;
 }
 
-int OH_UdmfProperty_SetAuthPermission(OH_UdmfProperty* properties, int authPolicy)
+int OH_UdmfProperty_SetAuthPermission(OH_UdmfProperty* properties, uint32_t authPolicy)
 {
     if (!IsUnifiedPropertiesValid(properties)) {
         return UDMF_E_INVALID_PARAM;

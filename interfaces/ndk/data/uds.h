@@ -452,7 +452,7 @@ int OH_UdsHtml_SetDetails(OH_UdsHtml* pThis, const OH_UdsDetails* details);
  * @since 26.0.0
  * @see OH_UdsHtml Udmf_ErrCode
  */
-int OH_UdsHtml_SetAuthPolicy(OH_UdsHtml* pThis, int authPolicy);
+int OH_UdsHtml_SetAuthPolicy(OH_UdsHtml* pThis, uint32_t authPolicy);
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdsAppItem}.
@@ -759,7 +759,7 @@ int OH_UdsFileUri_SetDetails(OH_UdsFileUri* pThis, const OH_UdsDetails* details)
  * @see OH_UdsFileUri Udmf_ErrCode
  * @since 26.0.0
  */
-int OH_UdsFileUri_SetAuthPolicy(OH_UdsFileUri* pThis, int authPolicy);
+int OH_UdsFileUri_SetAuthPolicy(OH_UdsFileUri* pThis, uint32_t authPolicy);
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdsPixelMap}.

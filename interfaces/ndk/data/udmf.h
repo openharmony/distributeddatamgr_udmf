@@ -855,7 +855,7 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* pThis,
  * @see OH_UdmfProperty Udmf_ErrCode
  * @since 26.0.0
  */
-int OH_UdmfProperty_SetAuthPermission(OH_UdmfProperty* pThis, int authPolicy);
+int OH_UdmfProperty_SetAuthPermission(OH_UdmfProperty* pThis, uint32_t authPolicy);
 
 /**
  * @brief Creation a pointer to the instance of the {@link OH_UdmfOptions}.

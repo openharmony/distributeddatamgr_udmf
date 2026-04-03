@@ -19,7 +19,7 @@
 #include "unified_record.h"
 #include "unified_data.h"
 #include "udmf.h"
-#include "unified_meta.h"
+#include "uri_permission_util.h"
 #include <mutex>
 #include <cstdint>
 
@@ -161,20 +161,19 @@ bool IsInvalidUdsObjectPtr(const UdsObject* pThis, int cid);
 
 bool IsInvalidUdsObjectByType(const UdsObject* pThis, const OHOS::UDMF::UDType& type);
 
-inline bool IsAuthPolicyValid(int authPolicy)
+inline bool IsAuthPolicyValid(uint32_t authPolicy)
 {
     if (authPolicy < 0) {
         return false;
     }
     constexpr uint32_t validPolicy = OHOS::UDMF::UriPermissionUtil::READ_FLAG |
         OHOS::UDMF::UriPermissionUtil::WRITE_FLAG | OHOS::UDMF::UriPermissionUtil::PERSIST_FLAG;
-    auto authPolicyMask = static_cast<uint32_t>(authPolicy);
-    return (authPolicyMask & ~validPolicy) == 0;
+    return (authPolicy & ~validPolicy) == 0;
 }
 
-inline uint32_t NormalizeAuthPolicy(int authPolicy)
+inline uint32_t NormalizeAuthPolicy(uint32_t authPolicy)
 {
-    return OHOS::UDMF::UriPermissionUtil::NormalizeMask(static_cast<uint32_t>(authPolicy));
+    return OHOS::UDMF::UriPermissionUtil::NormalizeMask(authPolicy);
 }
 
 #endif
