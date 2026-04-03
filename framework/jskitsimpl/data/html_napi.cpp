@@ -18,6 +18,7 @@
 #include "html.h"
 #include "text_napi.h"
 #include "unified_record_napi.h"
+#include "uri_permission_util.h"
 
 namespace OHOS {
 namespace UDMF {

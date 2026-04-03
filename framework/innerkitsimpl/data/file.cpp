@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "file.h"
+#include "uri_permission_util.h"
 
 namespace OHOS {
 namespace UDMF {

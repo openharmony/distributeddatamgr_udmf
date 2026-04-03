@@ -17,6 +17,7 @@
 
 #include "file.h"
 #include "unified_record_napi.h"
+#include "uri_permission_util.h"
 
 namespace OHOS {
 namespace UDMF {

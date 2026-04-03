@@ -20,6 +20,7 @@
 #include "logger.h"
 #include "pixelmap_loader.h"
 #include "tlv_object.h"
+#include "uri_permission_util.h"
 
 namespace OHOS {
 namespace TLVUtil {

@@ -653,21 +653,6 @@ enum class UriPermission : unsigned int {
     PERSIST = 3,
 };
 
-namespace UriPermissionUtil {
-constexpr uint32_t READ_FLAG = 1u << 0;
-constexpr uint32_t WRITE_FLAG = 1u << 1;
-constexpr uint32_t PERSIST_FLAG = 1u << 2;
-
-bool API_EXPORT IsValid(int32_t permission);
-uint32_t API_EXPORT ToMask(UriPermission permission);
-uint32_t API_EXPORT ToMask(const std::vector<UriPermission> &permissions);
-uint32_t API_EXPORT ToMask(const std::vector<int32_t> &permissions);
-uint32_t API_EXPORT NormalizeMask(uint32_t mask);
-std::vector<UriPermission> API_EXPORT FromMask(uint32_t mask);
-std::vector<int32_t> API_EXPORT ToInt32(const std::vector<UriPermission> &permissions);
-std::vector<UriPermission> API_EXPORT FromInt32(const std::vector<int32_t> &permissions);
-} // namespace UriPermissionUtil
-
 enum PermissionPolicy : int32_t {
     UNKNOW = 0,
     NO_PERMISSION,

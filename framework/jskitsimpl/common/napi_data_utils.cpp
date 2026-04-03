@@ -14,6 +14,7 @@
  */
 #define LOG_TAG "NapiDataUtils"
 #include "napi_data_utils.h"
+#include "uri_permission_util.h"
 
 namespace OHOS {
 namespace UDMF {

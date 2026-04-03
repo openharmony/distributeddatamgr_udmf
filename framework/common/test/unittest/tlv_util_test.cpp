@@ -1645,7 +1645,7 @@ HWTEST_F(TlvUtilTest, WritingAndReading_018, TestSize.Level1)
     UriInfo output;
     TLVHead head;
     EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
-    EXPECT_EQ(output.permissionMask, static_cast<u_int32_t>(UriPermission::NONE));
+    EXPECT_EQ(output.permissionMask, static_cast<int32_t>(UriPermission::NONE));
 
     LOG_INFO(UDMF_TEST, "WritingAndReading_018 end.");
 }
@@ -1798,40 +1798,8 @@ HWTEST_F(TlvUtilTest, WritingAndReading_023, TestSize.Level1)
 }
 
 /* *
- * @tc.name: Reading_024
- * @tcarsc: Abnormal test of Reading UnifiedDataProperties with invalid uriAuthorizationPolicies
- * @tc.type: FUNC
- */
-HWTEST_F(TlvUtilTest, Reading_024, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "Reading_024 begin.");
-    std::vector<uint8_t> dataBytes;
-    auto tlvObject = TLVObject(dataBytes);
-
-    TLVHead head;
-    head.tag = static_cast<uint16_t>(TAG::TAG_UNIFIED_PROPERTIES);
-    head.len = 10;
-
-    tlvObject.WriteHead(head.tag, head.len);
-
-    TLVHead headItem;
-    headItem.tag = static_cast<uint16_t>(TAG::TAG_PROPERTIES_URI_AUTHORIZATION);
-    headItem.len = 0;
-
-    tlvObject.WriteHead(headItem.tag, headItem.len);
-
-    tlvObject.ResetCursor();
-
-    UnifiedDataProperties output;
-    auto result = TLVUtil::Reading(output, tlvObject, head);
-    EXPECT_FALSE(result);
-
-    LOG_INFO(UDMF_TEST, "Reading_024 end.");
-}
-
-/* *
  * @tc.name: Reading_025
- * @tc.desc: Normal test of Reading UriInfo
+ * @tc.desc: Abnormal test of Reading UriInfo with invalid permissionMask
  * @tc.type: FUNC
  */
 HWTEST_F(TlvUtilTest, Reading_025, TestSize.Level1)

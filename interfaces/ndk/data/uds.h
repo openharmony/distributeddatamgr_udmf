@@ -449,7 +449,7 @@ int OH_UdsHtml_SetDetails(OH_UdsHtml* pThis, const OH_UdsDetails* details);
  * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
- * @since 22
+ * @since 26.0.0
  * @see OH_UdsHtml Udmf_ErrCode
  */
 int OH_UdsHtml_SetAuthPolicy(OH_UdsHtml* pThis, int authPolicy);
@@ -757,7 +757,7 @@ int OH_UdsFileUri_SetDetails(OH_UdsFileUri* pThis, const OH_UdsDetails* details)
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdsFileUri Udmf_ErrCode
- * @since 25
+ * @since 26.0.0
  */
 int OH_UdsFileUri_SetAuthPolicy(OH_UdsFileUri* pThis, int authPolicy);
 

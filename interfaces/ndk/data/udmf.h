@@ -853,7 +853,7 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* pThis,
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
  * @see OH_UdmfProperty Udmf_ErrCode
- * @since 25
+ * @since 26.0.0
  */
 int OH_UdmfProperty_SetAuthPermission(OH_UdmfProperty* pThis, int authPolicy);
 

@@ -233,7 +233,7 @@ HWTEST_F(FileTest, File009, TestSize.Level1)
 */
 HWTEST_F(FileTest, File010, TestSize.Level1)
 {
-    LOG_INFO(UDMF_TEST, "File010 begin() begin.");
+    LOG_INFO(UDMF_TEST, "File010 begin.");
     auto object = std::make_shared<Object>();
     object->value_[ORI_URI] = "file://com.example.test/data.txt";
     object->value_[URI_AUTHORIZATION_POLICIES] = 5;
@@ -291,7 +291,7 @@ HWTEST_F(FileTest, File012, TestSize.Level1)
     file.SetUriAuthorizationPolicyMask(6);
     EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 6);
 
-    LOG_INFO(UDMF_TEST, "012 end.");
+    LOG_INFO(UDMF_TEST, "File012 end.");
 }
 
 /**
