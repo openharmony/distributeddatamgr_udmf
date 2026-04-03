@@ -143,19 +143,19 @@ UriPermission ConvertUriPermission(::taiheChannel::UriPermission value)
     switch (value) {
         case OHOS::UDMF::UriPermission::NONE:
             return ::ohos::data::unifiedDataChannel::UriPermission(
-                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(NONE));
+                ::ohos::data::unifiedDataChannel::UriPermission::key_t::NONE);
         case OHOS::UDMF::UriPermission::READ:
             return ::ohos::data::unifiedDataChannel::UriPermission(
-                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(READ));
+                ::ohos::data::unifiedDataChannel::UriPermission::key_t::READ);
         case OHOS::UDMF::UriPermission::WRITE:
             return ::ohos::data::unifiedDataChannel::UriPermission(
-                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(WRITE));
+                ::ohos::data::unifiedDataChannel::UriPermission::key_t::WRITE);
         case OHOS::UDMF::UriPermission::PERSIST:
             return ::ohos::data::unifiedDataChannel::UriPermission(
-                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(PERSIST));
+                ::ohos::data::unifiedDataChannel::UriPermission::key_t::PERSIST);
         default:
             return ::ohos::data::unifiedDataChannel::UriPermission(
-                static_cast<::ohos::data::unifiedDataChannel::UriPermission::key_t>(NONE));
+                ::ohos::data::unifiedDataChannel::UriPermission::key_t::NONE);
     }
 }
 

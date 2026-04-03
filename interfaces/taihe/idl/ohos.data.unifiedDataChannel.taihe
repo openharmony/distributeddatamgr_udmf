@@ -793,7 +793,7 @@ export class File extends UnifiedRecord {
     this.fileInner.uri = uri;
   }
   set uriAuthorizationPolicies(policy: Array<UriPermission>) {
-    this.inner.uriAuthorizationPolicies = policy;
+    this.fileInner.uriAuthorizationPolicies = policy;
   }
   getTypes(): Array<string> {
     return this.fileInner.getTypes();
@@ -830,7 +830,7 @@ export class Folder extends File {
     this.folderInner.uri = uri;
   }
   set uriAuthorizationPolicies(policy: Array<UriPermission>) {
-    this.inner.uriAuthorizationPolicies = policy;
+    this.folderInner.uriAuthorizationPolicies = policy;
   }
   get details(): Record<String, String> | undefined {
     return this.folderInner.details;
@@ -879,7 +879,7 @@ export class Audio extends File {
     this.audioInner.uri = uri;
   }
   set uriAuthorizationPolicies(policy: Array<UriPermission>) {
-    this.inner.uriAuthorizationPolicies = policy;
+    this.audioInner.uriAuthorizationPolicies = policy;
   }
   get details(): Record<String, String> | undefined {
     return this.audioInner.details;
@@ -928,7 +928,7 @@ export class Video extends File {
     this.videoInner.uri = uri;
   }
   set uriAuthorizationPolicies(policy: Array<UriPermission>) {
-    this.inner.uriAuthorizationPolicies = policy;
+    this.videoInner.uriAuthorizationPolicies = policy;
   }
   get details(): Record<String, String> | undefined {
     return this.videoInner.details;
@@ -977,7 +977,7 @@ export class Image extends File {
     this.imageInner.uri = uri;
   }
   set uriAuthorizationPolicies(policy: Array<UriPermission>) {
-    this.inner.uriAuthorizationPolicies = policy;
+    this.imageInner.uriAuthorizationPolicies = policy;
   }
   get details(): Record<String, String> | undefined {
     return this.imageInner.details;
@@ -1112,7 +1112,7 @@ export class HTML extends Text {
     this.htmlInner.plainContent = plain;
   }
   set uriAuthorizationPolicies(policy: Array<UriPermission>) {
-    this.inner.uriAuthorizationPolicies = policy;
+    this.htmlInner.uriAuthorizationPolicies = policy;
   }
   getType(): string {
     return this.htmlInner.getType();

@@ -35,6 +35,7 @@
 #include "unified_meta.h"
 #include "unified_record.h"
 #include "unified_types.h"
+#include "uri_permission_util.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;

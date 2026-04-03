@@ -21,6 +21,7 @@
 #include "logger.h"
 #include "udmf_capi_common.h"
 #include "unified_meta.h"
+#include "uri_permission_util.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;

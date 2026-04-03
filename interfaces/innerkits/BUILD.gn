@@ -48,6 +48,7 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/common/udmf_radar_reporter.cpp",
     "${udmf_framework_path}/common/udmf_types_util.cpp",
     "${udmf_framework_path}/common/udmf_utils.cpp",
+    "${udmf_framework_path}/innerkitsimpl/client/audit_helper.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/getter_system.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_async_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/client/udmf_client.cpp",
@@ -92,12 +93,14 @@ ohos_shared_library("udmf_client") {
     "access_token:libaccesstoken_sdk",
     "app_file_service:fileuri_native",
     "bundle_framework:appexecfwk_core",
+    "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "dfs_service:distributed_file_daemon_kit_inner",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "hitrace:libhitracechain",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "kv_store:distributeddata_mgr",
@@ -120,6 +123,8 @@ ohos_shared_library("udmf_client") {
     "-fvisibility=hidden",
     "-O2",
   ]
+
+  cflags = [ "-Werror=vla" ]
 }
 
 config("utd_client_config") {

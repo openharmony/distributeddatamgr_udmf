@@ -39,6 +39,7 @@
 
 #ifndef UDS_H
 #define UDS_H
+#include <inttypes.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,25 +48,33 @@ extern "C" {
 /**
  * @brief Describes authorization permission values.
  *
- * @since 25
+ * @since 26.0.0
  */
 typedef enum Udmf_AuthPermission {
     /**
      * @brief No permission.
+     *
+     * @since 26.0.0
      */
     UDMF_PERM_NONE = 0,
     /**
      * @brief Read permission.
+     *
+     * @since 26.0.0
      */
-    UDMF_PERM_READ = 1 << 0,
+    UDMF_PERM_READ = 1u << 0,
     /**
      * @brief Write permission.
+     *
+     * @since 26.0.0
      */
-    UDMF_PERM_WRITE = 1 << 1,
+    UDMF_PERM_WRITE = 1u << 1,
     /**
      * @brief Persist permission.
+     *
+     * @since 26.0.0
      */
-    UDMF_PERM_PERSIST = 1 << 2,
+    UDMF_PERM_PERSIST = 1u << 2,
 } Udmf_AuthPermission;
 
 /**

@@ -29,6 +29,7 @@
 #include "udmf_capi_common.h"
 #include "udmf_client.h"
 #include "plain_text.h"
+#include "uri_permission_util.h"
 #include "udmf_meta.h"
 #include "data_provider_impl.h"
 #include "image.h"

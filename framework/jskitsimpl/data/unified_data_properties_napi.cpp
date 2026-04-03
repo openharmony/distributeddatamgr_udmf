@@ -17,6 +17,7 @@
 
 #include "napi_data_utils.h"
 #include "unified_data.h"
+#include "uri_permission_util.h"
 
 namespace OHOS {
 namespace UDMF {

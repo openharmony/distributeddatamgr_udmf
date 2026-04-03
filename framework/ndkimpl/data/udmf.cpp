@@ -26,6 +26,7 @@
 #include "logger.h"
 #include "ndk_data_conversion.h"
 #include "plain_text.h"
+#include "uri_permission_util.h"
 #include "securec.h"
 #include "string_wrapper.h"
 #include "system_defined_appitem.h"

@@ -19,6 +19,7 @@
 #include "taihe_common_utils.h"
 #include "taihe/runtime.hpp"
 #include "unified_record_taihe.h"
+#include "uri_permission_util.h"
 
 namespace OHOS {
 namespace UDMF {

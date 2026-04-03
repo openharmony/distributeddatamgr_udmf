@@ -23,6 +23,7 @@
 #include "nativetoken_kit.h"
 #include "logger.h"
 #include "pixelmap_native_impl.h"
+#include "uri_permission_util.h"
 #include "uds.h"
 #include "udmf_capi_common.h"
 #include "udmf_meta.h"
