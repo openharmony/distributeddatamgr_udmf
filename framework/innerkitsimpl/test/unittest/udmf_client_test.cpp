@@ -2669,7 +2669,7 @@ HWTEST_F(UdmfClientTest, SetData034, TestSize.Level1)
     data1.AddRecord(record);
     std::string key;
     UnifiedHtmlRecordProcess::RebuildHtmlRecord(data1);
-    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(data1);
+    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(*record);
     UnifiedData data;
     auto plainText = std::make_shared<PlainText>();
     plainText->SetContent("plainContent");
@@ -2726,12 +2726,12 @@ HWTEST_F(UdmfClientTest, SetData035, TestSize.Level1)
     obj->value_[HTML_CONTENT] = 10;
     plainText->AddEntry("general.html", obj);
     data1.AddRecord(plainText);
-    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(data1);
+    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(*plainText);
     UnifiedHtmlRecordProcess::RebuildHtmlRecord(data1);
     UnifiedData data2;
     text->AddEntry("general.html", "");
     data2.AddRecord(text);
-    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(data2);
+    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(*text);
     UnifiedHtmlRecordProcess::RebuildHtmlRecord(data2);
     QueryOption option2 = { .key = key };
     AddPrivilege1(option2);
@@ -4663,7 +4663,7 @@ HWTEST_F(UdmfClientTest, HtmlData001, TestSize.Level1)
     plainText->AddEntry("general.html", obj);
     data.AddRecord(plainText);
 
-    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(data);
+    UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(*plainText);
     ASSERT_EQ(plainText->GetUris().size(), 1);
     EXPECT_EQ(plainText->GetUris()[0].oriUri, "file:///valid/local.png");
 

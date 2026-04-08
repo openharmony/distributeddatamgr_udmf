@@ -19,6 +19,7 @@
 #include "taihe_common_utils.h"
 #include "taihe/runtime.hpp"
 #include "unified_record_taihe.h"
+#include "uri_permission_util.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -144,6 +145,21 @@ void HtmlTaihe::SetPlainContent(const ::taihe::string_view &plainContent)
 ::taihe::string HtmlTaihe::GetPlainContent()
 {
     return ::taihe::string(this->value_->GetPlainContent());
+}
+
+void HtmlTaihe::SetUriAuthorizationPolicies(
+    const ::taihe::optional<::taihe::array<::taiheChannel::UriPermission>> &uriAuthorizationPolicies)
+{
+    if (!uriAuthorizationPolicies.has_value()) {
+        return;
+    }
+    auto policies = uriAuthorizationPolicies.value();
+    std::vector<UriPermission> vecPolicies;
+    vecPolicies.reserve(policies.size());
+    for (const auto &policy : policies) {
+        vecPolicies.push_back(ConvertUriPermission(policy));
+    }
+    this->value_->SetUriAuthorizationPolicyMask(UriPermissionUtil::ToMask(vecPolicies));
 }
 
 int64_t HtmlTaihe::GetInner()

@@ -113,32 +113,30 @@ std::string UnifiedHtmlRecordProcess::RebuildHtmlContent(const std::string &str,
     return strResult;
 }
 
-void UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(UnifiedData &unifiedData)
+void UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(UnifiedRecord &record)
 {
     LOG_DEBUG(UDMF_CLIENT, "start");
+    record.ClearUris();
     auto utdId = UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML);
-    for (auto &record : unifiedData.GetRecords()) {
-        if (record == nullptr) {
-            continue;
-        }
-        record->ClearUris();
-        if (!record->HasType(utdId)) {
-            continue;
-        }
-        auto htmlData = record->GetEntry(utdId);
-        if (std::holds_alternative<std::shared_ptr<Object>>(htmlData)) {
-            auto uriInfos = GetValueStr(htmlData);
-            if (!uriInfos.empty()) {
-                LOG_INFO(UDMF_CLIENT, "split uris size=%{public}zu", uriInfos.size());
-                record->SetUris(std::move(uriInfos));
-            }
+    if (!record.HasType(utdId)) {
+        return;
+    }
+    auto htmlData = record.GetEntry(utdId);
+    if (std::holds_alternative<std::shared_ptr<Object>>(htmlData)) {
+        auto object = std::get<std::shared_ptr<Object>>(htmlData);
+        auto uriInfos = GetValueStr(object);
+        if (!uriInfos.empty()) {
+            LOG_INFO(UDMF_CLIENT, "split uris size=%{public}zu", uriInfos.size());
+            record.SetUris(std::move(uriInfos));
         }
     }
 }
 
-std::vector<UriInfo> UnifiedHtmlRecordProcess::GetValueStr(const ValueType &value)
+std::vector<UriInfo> UnifiedHtmlRecordProcess::GetValueStr(std::shared_ptr<Object> object)
 {
-    auto object = std::get<std::shared_ptr<Object>>(value);
+    if (object == nullptr) {
+        return {};
+    }
     auto iter = object->value_.find(HTML_CONTENT);
     if (iter == object->value_.end() || !std::holds_alternative<std::string>(iter->second)) {
         return {};

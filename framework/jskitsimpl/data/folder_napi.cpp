@@ -37,6 +37,7 @@ napi_value FolderNapi::Constructor(napi_env env)
         DECLARE_NAPI_GETTER_SETTER("uri", FileNapi::GetUri, FileNapi::SetUri),
         /* Folder properties */
         DECLARE_NAPI_GETTER_SETTER("folderUri", GetFolderUri, SetFolderUri),
+        DECLARE_NAPI_GETTER_SETTER("uriAuthorizationPolicies", nullptr, FileNapi::SetUriAuthorizationPolicies),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "Folder", properties, count, FolderNapi::New);

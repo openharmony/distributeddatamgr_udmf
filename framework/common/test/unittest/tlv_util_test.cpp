@@ -35,10 +35,12 @@
 #include "unified_meta.h"
 #include "unified_record.h"
 #include "unified_types.h"
+#include "uri_permission_util.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
 using namespace OHOS;
+inline constexpr size_t MAX_SIZE = 1 * 1024 * 1024 * 1024; //1G
 
 namespace OHOS::Test {
 class TlvUtilTest : public testing::Test {
@@ -213,7 +215,7 @@ HWTEST_F(TlvUtilTest, CountBufferSize_004, TestSize.Level1)
     EXPECT_EQ(4 * sizeof(TLVHead) + sizeof(int32_t), TLVUtil::CountBufferSize(privilege, tlvObject));
 
     Runtime runtime;
-    EXPECT_EQ(21 * sizeof(TLVHead) + sizeof(bool) + sizeof(size_t) + 2 * sizeof(int64_t) + 3 * sizeof(int32_t) +
+    EXPECT_EQ(22 * sizeof(TLVHead) + sizeof(bool) + sizeof(size_t) + 2 * sizeof(int64_t) + 4 * sizeof(int32_t) +
         2 * sizeof(uint32_t),
         TLVUtil::CountBufferSize(runtime, tlvObject));
     LOG_INFO(UDMF_TEST, "CountBufferSize_004 end.");
@@ -336,6 +338,7 @@ HWTEST_F(TlvUtilTest, WritingAndReading_002, TestSize.Level1)
     runtime.createPackage = "package";
     runtime.isPrivate = true;
     runtime.appId = "appId";
+    runtime.permissionPolicyMode = PERMISSION_POLICY_MODE_MASK;
 
     std::vector<uint8_t> dataBytes;
     auto tlvObject = TLVObject(dataBytes);
@@ -356,6 +359,7 @@ HWTEST_F(TlvUtilTest, WritingAndReading_002, TestSize.Level1)
     EXPECT_EQ(runtime.privileges[1].writePermission, runtimeResult.privileges[1].writePermission);
     EXPECT_EQ(runtime.privileges[1].tokenId, runtimeResult.privileges[1].tokenId);
     EXPECT_EQ(runtime.appId, runtimeResult.appId);
+    EXPECT_EQ(runtime.permissionPolicyMode, runtimeResult.permissionPolicyMode);
 
     LOG_INFO(UDMF_TEST, "WritingAndReading_002 end.");
 }
@@ -1172,7 +1176,7 @@ HWTEST_F(TlvUtilTest, CountBufferSize_009, TestSize.Level1)
     input.authUri = "file://ohos.test.demo1/data/storage/el2/base/haps/local.png";
     std::vector<uint8_t> dataBytes;
     auto tlvObject = TLVObject(dataBytes);
-    const size_t expectedSize = 6 * sizeof(TLVHead) + sizeof(uint32_t) + input.authUri.size() + sizeof(int32_t);
+    const size_t expectedSize = 7 * sizeof(TLVHead) + sizeof(uint32_t) + input.authUri.size() + 2 * sizeof(int32_t);
     EXPECT_EQ(expectedSize, TLVUtil::CountBufferSize(input, tlvObject));
     LOG_INFO(UDMF_TEST, "CountBufferSize_009 end.");
 }
@@ -1190,6 +1194,42 @@ HWTEST_F(TlvUtilTest, CountBufferSize_010, TestSize.Level1)
     auto tlvObject = TLVObject(dataBytes);
     EXPECT_EQ(0, TLVUtil::CountBufferSize(input, tlvObject));
     LOG_INFO(UDMF_TEST, "CountBufferSize_010 end.");
+}
+
+/* *
+ * @tc.name: CountBufferSize_011
+ * @tc.desc: test UnifiedDataProperties with uriAuthorizationPolicies for countBufferSize
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, CountBufferSize_011, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CountBufferSize_011 begin.");
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+
+    UnifiedDataProperties properties;
+    properties.uriAuthorizationPolicies = { UriPermission::READ, UriPermission::WRITE };
+    auto size = TLVUtil::CountBufferSize(properties, tlvObject);
+    EXPECT_NE(0, size);
+    LOG_INFO(UDMF_TEST, "CountBufferSize_011 end.");
+}
+
+/* *
+ * @tc.name: CountBufferSize_012
+ * @tc.desc: test UnifiedDataProperties with large size for countBufferSize
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, CountBufferSize_012, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "CountBufferSize_012 begin.");
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    
+    UnifiedDataProperties properties;
+    properties.tag = std::string(MAX_SIZE, 'a');
+    auto size = TLVUtil::CountBufferSize(properties, tlvObject);
+    EXPECT_GT(size, 0);
+    LOG_INFO(UDMF_TEST, "CountBufferSize_012 end.");
 }
 
 /* *
@@ -1598,6 +1638,7 @@ HWTEST_F(TlvUtilTest, WritingAndReading_018, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "WritingAndReading_018 begin.");
     UriInfo input;
     input.authUri = "file://ohos.test.demo1/data/storage/el2/base/haps/local.png";
+    input.permissionMask = UriPermissionUtil::READ_FLAG | UriPermissionUtil::PERSIST_FLAG;
     std::vector<uint8_t> dataBytes;
     auto tlvObject = TLVObject(dataBytes);
     EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_URI_PERMISSION));
@@ -1605,6 +1646,7 @@ HWTEST_F(TlvUtilTest, WritingAndReading_018, TestSize.Level1)
     UriInfo output;
     TLVHead head;
     EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+    EXPECT_EQ(output.permissionMask, static_cast<int32_t>(UriPermission::NONE));
 
     LOG_INFO(UDMF_TEST, "WritingAndReading_018 end.");
 }
@@ -1682,6 +1724,102 @@ HWTEST_F(TlvUtilTest, WritingAndReading_021, TestSize.Level1)
     EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
 
     LOG_INFO(UDMF_TEST, "WritingAndReading_021 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_022
+ * @tc.desc: test UnifiedDataProperties with uriAuthorizationPolicies for Writing And Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_022, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_022 begin.");
+    OHOS::AAFwk::WantParams wantParams;
+    std::string idKey = "test";
+    int32_t idValue = 456;
+    wantParams.SetParam(idKey, OHOS::AAFwk::Integer::Box(idValue));
+    UnifiedDataProperties properties;
+    properties.tag = "props";
+    properties.shareOptions = CROSS_APP;
+    properties.timestamp = 20;
+    properties.extras = wantParams;
+    properties.uriAuthorizationPolicies = { UriPermission::READ, UriPermission::WRITE };
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    auto result = TLVUtil::Writing(properties, tlvObject, TAG::TAG_UNIFIED_PROPERTIES);
+    EXPECT_TRUE(result);
+
+    tlvObject.ResetCursor();
+    UnifiedDataProperties propertiesResult;
+    result = TLVUtil::ReadTlv(propertiesResult, tlvObject, TAG::TAG_UNIFIED_PROPERTIES);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(properties.tag, propertiesResult.tag);
+    EXPECT_EQ(properties.shareOptions, propertiesResult.shareOptions);
+    EXPECT_EQ(properties.timestamp, propertiesResult.timestamp);
+    EXPECT_EQ(idValue, propertiesResult.extras.GetIntParam(idKey, 0));
+    EXPECT_EQ(properties.uriAuthorizationPolicies, propertiesResult.uriAuthorizationPolicies);
+    LOG_INFO(UDMF_TEST, "WritingAndReading_022 end.");
+}
+
+/* *
+ * @tc.name: WritingAndReading_023
+ * @tc.desc: test UnifiedDataProperties with empty uriAuthorizationPolicies for Writing And Reading
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReading_023, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReading_023 begin.");
+    OHOS::AAFwk::WantParams wantParams;
+    std::string idKey = "test";
+    int32_t idValue = 789;
+    wantParams.SetParam(idKey, OHOS::AAFwk::Integer::Box(idValue));
+    UnifiedDataProperties properties;
+    properties.tag = "props";
+    properties.shareOptions = CROSS_APP;
+    properties.timestamp = 30;
+    properties.extras = wantParams;
+    properties.uriAuthorizationPolicies.clear();
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    auto result = TLVUtil::Writing(properties, tlvObject, TAG::TAG_UNIFIED_PROPERTIES);
+    EXPECT_TRUE(result);
+
+    tlvObject.ResetCursor();
+    UnifiedDataProperties propertiesResult;
+    result = TLVUtil::ReadTlv(propertiesResult, tlvObject, TAG::TAG_UNIFIED_PROPERTIES);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(properties.tag, propertiesResult.tag);
+    EXPECT_EQ(properties.shareOptions, propertiesResult.shareOptions);
+    EXPECT_EQ(properties.timestamp, propertiesResult.timestamp);
+    EXPECT_EQ(idValue, propertiesResult.extras.GetIntParam(idKey, 0));
+    EXPECT_TRUE(propertiesResult.uriAuthorizationPolicies.empty());
+    LOG_INFO(UDMF_TEST, "WritingAndReading_023 end.");
+}
+
+/* *
+ * @tc.name: Reading_025
+ * @tc.desc: Abnormal test of Reading UriInfo with invalid permissionMask
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, Reading_025, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Reading_025 begin.");
+    UriInfo input;
+    input.oriUri = "file://test.com/data.txt";
+    input.permissionMask = 0;
+
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_URI_PERMISSION_MASK));
+
+    tlvObject.ResetCursor();
+    UriInfo output;
+    TLVHead head;
+    EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+
+    LOG_INFO(UDMF_TEST, "Reading_025 end.");
 }
 
 /* *

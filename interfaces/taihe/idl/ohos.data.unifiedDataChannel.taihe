@@ -127,6 +127,13 @@ enum FileConflictOptions: i32 {
   SKIP = 1
 }
 
+enum UriPermission : i32 {
+  NONE  = 0,
+  READ  = 1,
+  WRITE = 2,
+  PERSIST = 3
+}
+
 struct Options {
   intention: Optional<Intention>;
   key: Optional<String>;
@@ -141,6 +148,7 @@ struct UnifiedDataProperties {
   shareOptions: Optional<ShareOptions>;
   getDelayData: Optional<(type: String) => @sts_type("UnifiedData") Opaque>;
   extras: Optional<@sts_type("Record<String, RecordData>") Opaque>;
+  uriAuthorizationPolicies: Optional<Array<UriPermission>>;
 }
 
 @ctor("UnifiedDataProperties")
@@ -240,6 +248,8 @@ interface FileInner {
   GetDetails(): Optional<@record Map<String, String>>;
   @set("details")
   SetDetails(details: @record Map<String, String>): void;
+  @set("uriAuthorizationPolicies")
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<UriPermission>>): void;
   GetInner(): i64;
 }
 
@@ -265,6 +275,8 @@ interface FolderInner {
   GetFolderUri(): String;
   @set("folderUri")
   SetFolderUri(folderUri: String): void;
+  @set("uriAuthorizationPolicies")
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<UriPermission>>): void;
   GetInner(): i64;
 }
 
@@ -290,6 +302,8 @@ interface AudioInner {
   GetAudioUri(): String;
   @set("audioUri")
   SetAudioUri(audioUri: String): void;
+  @set("uriAuthorizationPolicies")
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<UriPermission>>): void;
   GetInner(): i64;
 }
 
@@ -315,6 +329,8 @@ interface VideoInner {
   GetVideoUri(): String;
   @set("videoUri")
   SetVideoUri(videoUri: String): void;
+  @set("uriAuthorizationPolicies")
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<UriPermission>>): void;
   GetInner(): i64;
 }
 
@@ -340,6 +356,8 @@ interface ImageInner {
   GetImageUri(): String;
   @set("imageUri")
   SetImageUri(imageUri: String): void;
+  @set("uriAuthorizationPolicies")
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<UriPermission>>): void;
   GetInner(): i64;
 }
 
@@ -382,6 +400,8 @@ interface HTMLInner {
   SetPlainContent(plainContent: String): void;
   @get("plainContent")
   GetPlainContent(): String;
+  @set("uriAuthorizationPolicies")
+  SetUriAuthorizationPolicies(uriAuthorizationPolicies: Optional<Array<UriPermission>>): void;
   GetInner(): i64;
 }
 
@@ -772,6 +792,9 @@ export class File extends UnifiedRecord {
   set uri(uri: string) {
     this.fileInner.uri = uri;
   }
+  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
+    this.fileInner.uriAuthorizationPolicies = policy;
+  }
   getTypes(): Array<string> {
     return this.fileInner.getTypes();
   }
@@ -805,6 +828,9 @@ export class Folder extends File {
   }
   set uri(uri: string) {
     this.folderInner.uri = uri;
+  }
+  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
+    this.folderInner.uriAuthorizationPolicies = policy;
   }
   get details(): Record<String, String> | undefined {
     return this.folderInner.details;
@@ -852,6 +878,9 @@ export class Audio extends File {
   set uri(uri: string) {
     this.audioInner.uri = uri;
   }
+  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
+    this.audioInner.uriAuthorizationPolicies = policy;
+  }
   get details(): Record<String, String> | undefined {
     return this.audioInner.details;
   }
@@ -898,6 +927,9 @@ export class Video extends File {
   set uri(uri: string) {
     this.videoInner.uri = uri;
   }
+  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
+    this.videoInner.uriAuthorizationPolicies = policy;
+  }
   get details(): Record<String, String> | undefined {
     return this.videoInner.details;
   }
@@ -943,6 +975,9 @@ export class Image extends File {
   }
   set uri(uri: string) {
     this.imageInner.uri = uri;
+  }
+  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
+    this.imageInner.uriAuthorizationPolicies = policy;
   }
   get details(): Record<String, String> | undefined {
     return this.imageInner.details;
@@ -1075,6 +1110,9 @@ export class HTML extends Text {
   }
   set plainContent(plain: string) {
     this.htmlInner.plainContent = plain;
+  }
+  set uriAuthorizationPolicies(policy: Array<UriPermission>) {
+    this.htmlInner.uriAuthorizationPolicies = policy;
   }
   getType(): string {
     return this.htmlInner.getType();

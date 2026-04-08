@@ -18,6 +18,7 @@
 #include "taihe_common_utils.h"
 #include "taihe/runtime.hpp"
 #include "unified_record_taihe.h"
+#include "uri_permission_util.h"
 #include "video_taihe.h"
 
 namespace OHOS {
@@ -123,6 +124,21 @@ void VideoTaihe::SetUri(const ::taihe::string_view &uri)
 {
     return ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>>::make(
         ConvertUDDetailsToString(this->value_->GetDetails()));
+}
+
+void VideoTaihe::SetUriAuthorizationPolicies(
+    const ::taihe::optional<::taihe::array<::taiheChannel::UriPermission>> &uriAuthorizationPolicies)
+{
+    if (!uriAuthorizationPolicies.has_value()) {
+        return;
+    }
+    auto policies = uriAuthorizationPolicies.value();
+    std::vector<UriPermission> vecPolicies;
+    vecPolicies.reserve(policies.size());
+    for (const auto &policy : policies) {
+        vecPolicies.push_back(ConvertUriPermission(policy));
+    }
+    this->value_->SetUriAuthorizationPolicyMask(UriPermissionUtil::ToMask(vecPolicies));
 }
 
 void VideoTaihe::SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details)

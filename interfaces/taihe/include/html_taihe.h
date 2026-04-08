@@ -19,6 +19,7 @@
 #include "html.h"
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
+#include "uri_permission_util.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
@@ -39,6 +40,8 @@ public:
     ::taihe::string GetHtmlContent();
     void SetPlainContent(const ::taihe::string_view &plainContent);
     ::taihe::string GetPlainContent();
+    void SetUriAuthorizationPolicies(
+        const ::taihe::optional<::taihe::array<::taiheChannel::UriPermission>> &uriAuthorizationPolicies);
     int64_t GetInner();
 
     std::shared_ptr<Html> value_;

@@ -20,6 +20,7 @@
 #include "logger.h"
 #include "pixelmap_loader.h"
 #include "tlv_object.h"
+#include "uri_permission_util.h"
 
 namespace OHOS {
 namespace TLVUtil {
@@ -369,6 +370,13 @@ template <> size_t CountBufferSize(const UnifiedDataProperties &input, TLVObject
     bool isWithinMax = CheckAndAdd(size, data.Count(input.tag)) && CheckAndAdd(size, data.CountBasic(input.timestamp))
         && CheckAndAdd(size, data.CountBasic(static_cast<int32_t>(input.shareOptions)))
         && CheckAndAdd(size, TLVUtil::CountBufferSize(input.extras, data));
+    if (!isWithinMax) {
+        return 0;
+    }
+    if (!input.uriAuthorizationPolicies.empty()) {
+        auto permissionMask = UriPermissionUtil::ToMask(input.uriAuthorizationPolicies);
+        isWithinMax = CheckAndAdd(size, data.CountBasic(permissionMask));
+    }
     return isWithinMax ? size : 0;
 }
 
@@ -389,6 +397,12 @@ template <> bool Writing(const UnifiedDataProperties &input, TLVObject &data, TA
     }
     if (!TLVUtil::Writing(input.extras, data, TAG::TAG_PROPERTIES_EXTRAS)) {
         return false;
+    }
+    if (!input.uriAuthorizationPolicies.empty()) {
+        auto permissionMask = UriPermissionUtil::ToMask(input.uriAuthorizationPolicies);
+        if (!data.WriteBasic(TAG::TAG_PROPERTIES_URI_AUTHORIZATION, permissionMask)) {
+            return false;
+        }
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
 }
@@ -420,6 +434,14 @@ template <> bool Reading(UnifiedDataProperties &output, TLVObject &data, const T
             case static_cast<uint16_t>(TAG::TAG_PROPERTIES_EXTRAS):
                 result = TLVUtil::Reading(output.extras, data, headItem);
                 break;
+            case static_cast<uint16_t>(TAG::TAG_PROPERTIES_URI_AUTHORIZATION): {
+                uint32_t permissionMask = 0;
+                result = data.ReadBasic(permissionMask, headItem);
+                if (result) {
+                    output.uriAuthorizationPolicies = UriPermissionUtil::FromMask(permissionMask);
+                }
+                break;
+            }
             default:
                 result = data.Skip(headItem);
         }
@@ -644,7 +666,8 @@ template <> size_t CountBufferSize(const Runtime &input, TLVObject &data)
         && CheckAndAdd(size, data.Count(input.sdkVersion))
         && CheckAndAdd(size, TLVUtil::CountBufferSize(input.privileges, data))
         && CheckAndAdd(size, data.CountBasic(static_cast<int32_t>(input.visibility)))
-        && CheckAndAdd(size, data.Count(input.appId));
+        && CheckAndAdd(size, data.Count(input.appId))
+        && CheckAndAdd(size, data.CountBasic(input.permissionPolicyMode));
     return isWithinMax ? size : 0;
 }
 
@@ -697,6 +720,9 @@ template <> bool Writing(const Runtime &input, TLVObject &data, TAG tag)
         return false;
     }
     if (!TLVUtil::Writing(input.appId, data, TAG::TAG_APP_ID)) {
+        return false;
+    }
+    if (!data.WriteBasic(TAG::TAG_PERMISSION_POLICY_MODE, input.permissionPolicyMode)) {
         return false;
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
@@ -767,6 +793,9 @@ template <> bool Reading(Runtime &output, TLVObject &data, const TLVHead &head)
                 break;
             case static_cast<uint16_t>(TAG::TAG_APP_ID):
                 result = data.Read(output.appId, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_PERMISSION_POLICY_MODE):
+                result = data.ReadBasic(output.permissionPolicyMode, headItem);
                 break;
             default:
                 result = data.Skip(headItem);
@@ -847,7 +876,8 @@ template <> size_t CountBufferSize(const UriInfo &input, TLVObject &data)
     size_t size = data.CountHead();
     bool isWithinMax = CheckAndAdd(size, data.CountBasic(input.position))
         && CheckAndAdd(size, data.Count(input.oriUri)) && CheckAndAdd(size, data.Count(input.dfsUri))
-        && CheckAndAdd(size, data.Count(input.authUri)) && CheckAndAdd(size, data.CountBasic(input.permission));
+        && CheckAndAdd(size, data.Count(input.authUri)) && CheckAndAdd(size, data.CountBasic(input.permission))
+        && CheckAndAdd(size, data.CountBasic(input.permissionMask));
     return isWithinMax ? size : 0;
 }
 
@@ -872,6 +902,9 @@ template <> bool Writing(const UriInfo &input, TLVObject &data, TAG tag)
     if (!data.WriteBasic(TAG::TAG_URI_PERMISSION, input.permission)) {
         return false;
     }
+    if (!data.WriteBasic(TAG::TAG_URI_PERMISSION_MASK, input.permissionMask)) {
+        return false;
+    }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
 }
 
@@ -884,6 +917,7 @@ template <> bool Reading(UriInfo &output, TLVObject &data, const TLVHead &head)
     }
     auto endCursor = data.GetCursor() + head.len;
     output.permission = 0;
+    output.permissionMask = 0;
     while (data.GetCursor() < endCursor) {
         TLVHead headItem{};
         if (!data.ReadHead(headItem)) {
@@ -905,6 +939,9 @@ template <> bool Reading(UriInfo &output, TLVObject &data, const TLVHead &head)
                 break;
             case static_cast<uint16_t>(TAG::TAG_URI_PERMISSION):
                 result = data.ReadBasic(output.permission, headItem);
+                break;
+            case static_cast<uint16_t>(TAG::TAG_URI_PERMISSION_MASK):
+                result = data.ReadBasic(output.permissionMask, headItem);
                 break;
             default:
                 result = data.Skip(headItem);

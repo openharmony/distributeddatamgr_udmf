@@ -391,4 +391,200 @@ HWTEST_F(HtmlTest, ExtractImgSrc009, TestSize.Level1)
     EXPECT_EQ(uris.size(), 0);
     LOG_INFO(UDMF_TEST, "ExtractImgSrc009 end.");
 }
+
+/**
+* @tc.name: Html006
+* @tc.desc: Verify URI_AUTHORIZATION_POLICIES is absent when not explicitly set
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, Html006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html006 begin.");
+    Html html("html", "plain");
+    html.InitObject();
+    auto value = html.GetValue();
+    ASSERT_TRUE(std::holds_alternative<std::shared_ptr<Object>>(value));
+    auto object = std::get<std::shared_ptr<Object>>(value);
+    ASSERT_NE(object, nullptr);
+    EXPECT_EQ(object->value_.find(URI_AUTHORIZATION_POLICIES), object->value_.end());
+    LOG_INFO(UDMF_TEST, "Html006 end.");
+}
+
+/**
+* @tc.name: Html007
+* @tc.desc: Verify explicit NONE policy is preserved as 0
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, Html007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html007 begin.");
+    Html html("html", "plain");
+    html.SetUriAuthorizationPolicyMask(0);
+    html.InitObject();
+    auto value = html.GetValue();
+    ASSERT_TRUE(std::holds_alternative<std::shared_ptr<Object>>(value));
+    auto object = std::get<std::shared_ptr<Object>>(value);
+    ASSERT_NE(object, nullptr);
+    auto iter = object->value_.find(URI_AUTHORIZATION_POLICIES);
+    ASSERT_NE(iter, object->value_.end());
+    ASSERT_TRUE(std::holds_alternative<int32_t>(iter->second));
+    EXPECT_EQ(std::get<int32_t>(iter->second), 0);
+
+    Html htmlFromObject(UDType::HTML, value);
+    EXPECT_EQ(htmlFromObject.GetUriAuthorizationPolicyMask(), 0);
+    LOG_INFO(UDMF_TEST, "Html007 end.");
+}
+
+/**
+* @tc.name: Html008
+* @tc.desc: Test various permission mask combinations for Html
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, Html008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html008 begin.");
+    Html html("html", "plain");
+
+    html.SetUriAuthorizationPolicyMask(1);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 1);
+
+    html.SetUriAuthorizationPolicyMask(2);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 2);
+
+    html.SetUriAuthorizationPolicyMask(3);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 3);
+
+    html.SetUriAuthorizationPolicyMask(5);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 5);
+
+    html.SetUriAuthorizationPolicyMask(7);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 7);
+    LOG_INFO(UDMF_TEST, "Html008 end.");
+}
+
+/**
+* @tc.name: Html009
+* @tc.desc: Test PERSIST flag normalization for Html
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, Html009, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html009 begin.");
+    Html html("html", "plain");
+
+    html.SetUriAuthorizationPolicyMask(4);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 0);
+
+    html.SetUriAuthorizationPolicyMask(6);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 6);
+    LOG_INFO(UDMF_TEST, "Html009 end.");
+}
+
+/**
+* @tc.name: Html010
+* @tc.desc: Test Html constructor with Object containing negative permission mask
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, Html010, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html010 begin.");
+    auto object = std::make_shared<Object>();
+    object->value_[HTML_CONTENT] = "html";
+    object->value_[PLAIN_CONTENT] = "plain";
+    object->value_[URI_AUTHORIZATION_POLICIES] = -1;
+
+    Html html(UDType::HTML, object);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 0);
+    EXPECT_FALSE(html.hasUriAuthorizationPolicyMask_);
+    LOG_INFO(UDMF_TEST, "Html010 end.");
+}
+
+/**
+* @tc.name: Html011
+* @tc.desc: Test Html constructor with Object containing valid permission mask
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, Html011, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html011 begin.");
+    auto object = std::make_shared<Object>();
+    object->value_[HTML_CONTENT] = "html";
+    object->value_[PLAIN_CONTENT] = "plain";
+    object->value_[URI_AUTHORIZATION_POLICIES] = 5;
+
+    Html html(UDType::HTML, object);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 5);
+    EXPECT_TRUE(html.hasUriAuthorizationPolicyMask_);
+    LOG_INFO(UDMF_TEST, "Html011 end.");
+}
+
+/**
+ * @tc.name: Html012
+ * @tc.desc: Test SetUriAuthorizationPolicyMask with null Object
+ * @tc.type: FUNC
+ */
+HWTEST_F(HtmlTest, Html012, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html012 begin.");
+    Html html("html", "plain");
+
+    html.SetUriAuthorizationPolicyMask(7);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 7);
+    LOG_INFO(UDMF_TEST, "Html012 end.");
+}
+
+/**
+ * @tc.name: Html013
+ * @tc.desc: Test SetUriAuthorizationPolicyMask with Object and then update
+ * @tc.type: FUNC
+ */
+HWTEST_F(HtmlTest, Html013, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html013 begin.");
+    Html html("html", "plain");
+    html.InitObject();
+
+    html.SetUriAuthorizationPolicyMask(3);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 3);
+
+    html.SetUriAuthorizationPolicyMask(5);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 5);
+
+    html.SetUriAuthorizationPolicyMask(1);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 1);
+    LOG_INFO(UDMF_TEST, "Html013 end.");
+}
+
+/**
+ * @tc.name: Html014
+ * @tc.desc: Test SetUriAuthorizationPolicyMask with large mask value
+ * @tc.type: FUNC
+ */
+HWTEST_F(HtmlTest, Html014, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html014 begin.");
+    Html html("html", "plain");
+    html.InitObject();
+
+    html.SetUriAuthorizationPolicyMask(0xFFFFFFFF);
+    uint32_t normalizedMask = html.GetUriAuthorizationPolicyMask();
+    EXPECT_EQ(normalizedMask, 0xFFFFFFFF);
+    LOG_INFO(UDMF_TEST, "Html014 end.");
+}
+
+/**
+ * @tc.name: Html015
+ * @tc.desc: Test SetUriAuthorizationPolicyMask preserves hasUriAuthorizationPolicyMask flag
+ * @tc.type: FUNC
+ */
+HWTEST_F(HtmlTest, Html015, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html015 begin.");
+    Html html("html", "plain");
+
+    EXPECT_FALSE(html.hasUriAuthorizationPolicyMask_);
+    html.SetUriAuthorizationPolicyMask(5);
+    EXPECT_TRUE(html.hasUriAuthorizationPolicyMask_);
+    LOG_INFO(UDMF_TEST, "Html015 end.");
+}
 } // OHOS::Test

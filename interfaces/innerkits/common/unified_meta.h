@@ -67,6 +67,8 @@ constexpr const char* LINK_URL = "linkUrl";
 constexpr const char* APPLICATION_DEFINED_RECORD_MARK = "applicationDefinedRecordMark";
 constexpr const char* GENERAL_FILE_URI = "general.file-uri";
 constexpr const char* PERMISSION_POLICY = "permission-policy";
+constexpr const char* URI_PERMISSION_MASK = "uriPermissionMask";
+constexpr const char* URI_AUTHORIZATION_POLICIES = "uriAuthorizationPolicies";
 
 enum UDType : int32_t {
     ENTITY = 0,
@@ -642,6 +644,13 @@ enum ShareOptions : int32_t {
     CROSS_APP,
     CROSS_DEVICE,
     SHARE_OPTIONS_BUTT,
+};
+
+enum class UriPermission : unsigned int {
+    NONE = 0,
+    READ = 1,
+    WRITE = 2,
+    PERSIST = 3,
 };
 
 enum PermissionPolicy : int32_t {

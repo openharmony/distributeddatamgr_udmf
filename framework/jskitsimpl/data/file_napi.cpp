@@ -17,6 +17,7 @@
 
 #include "file.h"
 #include "unified_record_napi.h"
+#include "uri_permission_util.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -34,6 +35,7 @@ napi_value FileNapi::Constructor(napi_env env)
         /* File properties */
         DECLARE_NAPI_GETTER_SETTER("details", GetDetails, SetDetails),
         DECLARE_NAPI_GETTER_SETTER("uri", GetUri, SetUri),
+        DECLARE_NAPI_GETTER_SETTER("uriAuthorizationPolicies", nullptr, SetUriAuthorizationPolicies),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "File", properties, count, FileNapi::New);
@@ -144,6 +146,30 @@ napi_value FileNapi::SetUri(napi_env env, napi_callback_info info)
     ASSERT_ERR(
         ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_ERROR, "invalid object!");
     file->value_->SetUri(uri);
+    return nullptr;
+}
+
+napi_value FileNapi::SetUriAuthorizationPolicies(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    std::vector<int32_t> uriAuthorizationPolicies;
+    auto input = [env, ctxt, &uriAuthorizationPolicies](size_t argc, napi_value *argv) {
+        ASSERT_BUSINESS_ERR(ctxt, argc >= 1,
+            Status::E_INVALID_PARAMETERS, "Parameter error: Mandatory parameters are left unspecified");
+        if (!NapiDataUtils::IsUndefinedOrNull(env, argv[0])) {
+            ctxt->status = NapiDataUtils::GetValue(env, argv[0], uriAuthorizationPolicies);
+            ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok,
+                Status::E_INVALID_PARAMETERS,
+                "Parameter error: parameter uriAuthorizationPolicies type must be Array<number>");
+        }
+    };
+    ctxt->GetCbInfoSync(env, info, input);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, ctxt->error);
+    auto file = static_cast<FileNapi *>(ctxt->native);
+    ASSERT_ERR(
+        ctxt->env, (file != nullptr && file->value_ != nullptr), Status::E_ERROR, "invalid object!");
+    file->value_->SetUriAuthorizationPolicyMask(UriPermissionUtil::ToMask(uriAuthorizationPolicies));
     return nullptr;
 }
 } // namespace UDMF

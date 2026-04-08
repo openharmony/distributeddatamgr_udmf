@@ -39,6 +39,8 @@ public:
     void SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details);
     ::taihe::string GetAudioUri();
     void SetAudioUri(const ::taihe::string_view &audioUri);
+    void SetUriAuthorizationPolicies(
+        const ::taihe::optional<::taihe::array<::taiheChannel::UriPermission>> &uriAuthorizationPolicies);
     int64_t GetInner();
 
     std::shared_ptr<Audio> value_;

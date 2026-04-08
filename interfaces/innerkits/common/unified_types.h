@@ -25,6 +25,11 @@
 
 namespace OHOS {
 namespace UDMF {
+enum PermissionPolicyMode : int32_t {
+    PERMISSION_POLICY_MODE_LEGACY = 0,
+    PERMISSION_POLICY_MODE_MASK = 1,
+};
+
 enum DataStatus : int32_t {
     WORKING = 0,
     HISTORY,
@@ -73,6 +78,7 @@ struct Runtime {
     std::string sdkVersion;
     Visibility visibility {};
     std::string appId;
+    int32_t permissionPolicyMode {PERMISSION_POLICY_MODE_LEGACY};
 };
 
 /*
@@ -125,6 +131,7 @@ struct UriInfo {
     std::string dfsUri;
     uint32_t position;
     int32_t permission {1};
+    uint32_t permissionMask {0};
 };
 
 struct DataLoadInfo {

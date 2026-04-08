@@ -21,6 +21,7 @@
 #include "logger.h"
 #include "udmf_capi_common.h"
 #include "unified_meta.h"
+#include "uri_permission_util.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
@@ -903,5 +904,165 @@ HWTEST_F(UnifiedMetaTest, GetBelongsToFileType, TestSize.Level1)
     utdId = "com.adobe.pdf";
     fileType = UnifiedDataUtils::GetBelongsToFileType(utdId);
     EXPECT_EQ(fileType, "general.file");
+}
+
+/**
+* @tc.name: UriPermissionUtil_IsValid_001
+* @tc.desc: Test UriPermissionUtil::IsValid with various values
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, UriPermissionUtil_IsValid_001, TestSize.Level1)
+{
+    EXPECT_TRUE(UriPermissionUtil::IsValid(0));
+    EXPECT_TRUE(UriPermissionUtil::IsValid(1));
+    EXPECT_TRUE(UriPermissionUtil::IsValid(2));
+    EXPECT_TRUE(UriPermissionUtil::IsValid(3));
+    EXPECT_FALSE(UriPermissionUtil::IsValid(-1));
+    EXPECT_FALSE(UriPermissionUtil::IsValid(4));
+    EXPECT_FALSE(UriPermissionUtil::IsValid(100));
+}
+
+/**
+* @tc.name: UriPermissionUtil_ToMask_001
+* @tc.desc: Test UriPermissionUtil::ToMask with UriPermission enum
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, UriPermissionUtil_ToMask_001, TestSize.Level1)
+{
+    EXPECT_EQ(UriPermissionUtil::ToMask(UriPermission::NONE), 0);
+    EXPECT_EQ(UriPermissionUtil::ToMask(UriPermission::READ), 1);
+    EXPECT_EQ(UriPermissionUtil::ToMask(UriPermission::WRITE), 2);
+    EXPECT_EQ(UriPermissionUtil::ToMask(UriPermission::PERSIST), 4);
+}
+
+/**
+* @tc.name: UriPermissionUtil_ToMask_002
+* @tc.desc: Test UriPermissionUtil::ToMask with vector<UriPermission>
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, UriPermissionUtil_ToMask_002, TestSize.Level1)
+{
+    std::vector<UriPermission> empty;
+    EXPECT_EQ(UriPermissionUtil::ToMask(empty), 0);
+
+    std::vector<UriPermission> readOnly = {UriPermission::READ};
+    EXPECT_EQ(UriPermissionUtil::ToMask(readOnly), 1);
+
+    std::vector<UriPermission> writeOnly = {UriPermission::WRITE};
+    EXPECT_EQ(UriPermissionUtil::ToMask(writeOnly), 2);
+
+    std::vector<UriPermission> readWrite = {UriPermission::READ, UriPermission::WRITE};
+    EXPECT_EQ(UriPermissionUtil::ToMask(readWrite), 3);
+
+    std::vector<UriPermission> readPersist = {UriPermission::READ, UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(readPersist), 5);
+
+    std::vector<UriPermission> all = {UriPermission::READ, UriPermission::WRITE, UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(all), 7);
+}
+
+/**
+* @tc.name: UriPermissionUtil_ToMask_003
+* @tc.desc: Test UriPermissionUtil::ToMask with vector<int32_t>
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, UriPermissionUtil_ToMask_003, TestSize.Level1)
+{
+    std::vector<int32_t> empty;
+    EXPECT_EQ(UriPermissionUtil::ToMask(empty), 0);
+
+    std::vector<int32_t> valid = {1, 2, 4};
+    EXPECT_EQ(UriPermissionUtil::ToMask(valid), 3);
+
+    std::vector<int32_t> withInvalid = {1, -1, 2, 100, 4};
+    EXPECT_EQ(UriPermissionUtil::ToMask(withInvalid), 3);
+
+    std::vector<int32_t> allInvalid = {-1, 100, 3};
+    EXPECT_EQ(UriPermissionUtil::ToMask(allInvalid), 0);
+}
+
+/**
+* @tc.name: UriPermissionUtil_NormalizeMask_001
+* @tc.desc: Test UriPermissionUtil::NormalizeMask
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, UriPermissionUtil_NormalizeMask_001, TestSize.Level1)
+{
+    EXPECT_EQ(UriPermissionUtil::NormalizeMask(0), 0);
+    EXPECT_EQ(UriPermissionUtil::NormalizeMask(1), 1);
+    EXPECT_EQ(UriPermissionUtil::NormalizeMask(2), 2);
+    EXPECT_EQ(UriPermissionUtil::NormalizeMask(3), 3);
+    EXPECT_EQ(UriPermissionUtil::NormalizeMask(4), 0);
+    EXPECT_EQ(UriPermissionUtil::NormalizeMask(5), 5);
+    EXPECT_EQ(UriPermissionUtil::NormalizeMask(6), 6);
+    EXPECT_EQ(UriPermissionUtil::NormalizeMask(7), 7);
+    EXPECT_EQ(UriPermissionUtil::NormalizeMask(8), 8);
+}
+
+/**
+* @tc.name: UriPermissionUtil_FromMask_001
+* @tc.desc: Test UriPermissionUtil::FromMask with various masks
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, UriPermissionUtil_FromMask_001, TestSize.Level1)
+{
+    auto result0 = UriPermissionUtil::FromMask(0);
+    EXPECT_EQ(result0.size(), 1);
+    EXPECT_EQ(result0[0], UriPermission::NONE);
+
+    auto result1 = UriPermissionUtil::FromMask(1);
+    EXPECT_EQ(result1.size(), 1);
+    EXPECT_EQ(result1[0], UriPermission::READ);
+
+    auto result2 = UriPermissionUtil::FromMask(2);
+    EXPECT_EQ(result2.size(), 1);
+    EXPECT_EQ(result2[0], UriPermission::WRITE);
+
+    auto result3 = UriPermissionUtil::FromMask(3);
+    EXPECT_EQ(result3.size(), 2);
+
+    auto result5 = UriPermissionUtil::FromMask(5);
+    EXPECT_EQ(result5.size(), 2);
+
+    auto result7 = UriPermissionUtil::FromMask(7);
+    EXPECT_EQ(result7.size(), 3);
+}
+
+/**
+* @tc.name: UriPermissionUtil_ToInt32_001
+* @tc.desc: Test UriPermissionUtil::ToInt32
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, UriPermissionUtil_ToInt32_001, TestSize.Level1)
+{
+    std::vector<UriPermission> empty;
+    auto resultEmpty = UriPermissionUtil::ToInt32(empty);
+    EXPECT_TRUE(resultEmpty.empty());
+
+    std::vector<UriPermission> permissions = {UriPermission::READ, UriPermission::WRITE};
+    auto result = UriPermissionUtil::ToInt32(permissions);
+    EXPECT_EQ(result.size(), 2);
+    EXPECT_EQ(result[0], 1);
+    EXPECT_EQ(result[1], 2);
+}
+
+/**
+* @tc.name: UriPermissionUtil_FromInt32_001
+* @tc.desc: Test UriPermissionUtil::FromInt32
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedMetaTest, UriPermissionUtil_FromInt32_001, TestSize.Level1)
+{
+    std::vector<int32_t> empty;
+    auto resultEmpty = UriPermissionUtil::FromInt32(empty);
+    EXPECT_TRUE(resultEmpty.empty());
+
+    std::vector<int32_t> valid = {1, 2, 4};
+    auto result = UriPermissionUtil::FromInt32(valid);
+    EXPECT_EQ(result.size(), 2);
+
+    std::vector<int32_t> withInvalid = {1, -1, 2, 100};
+    auto resultFiltered = UriPermissionUtil::FromInt32(withInvalid);
+    EXPECT_EQ(resultFiltered.size(), 2);
 }
 } // OHOS::Test

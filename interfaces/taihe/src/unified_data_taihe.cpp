@@ -34,6 +34,7 @@
 #include "text_taihe.h"
 #include "unified_data_taihe.h"
 #include "unified_record_taihe.h"
+#include "uri_permission_util.h"
 #include "video_taihe.h"
 
 namespace OHOS {
@@ -45,6 +46,7 @@ namespace UDMF {
     ::taihe::optional<::ohos::data::unifiedDataChannel::ShareOptions> shareOptionsOpt;
     ::taihe::optional<::taihe::callback<uintptr_t(::taihe::string_view type)>> getDelayDataOpt;
     ::taihe::optional<uintptr_t> timestampOpt;
+    ::taihe::optional<::taihe::array<::taiheChannel::UriPermission>> uriAuthorizationPoliciesOpt;
 
     auto taiheProperties = ::taiheChannel::UnifiedDataProperties {
         std::move(tagOpt),
@@ -52,6 +54,7 @@ namespace UDMF {
         std::move(shareOptionsOpt),
         std::move(getDelayDataOpt),
         std::move(extrasOpt),
+        std::move(uriAuthorizationPoliciesOpt),
     };
     return taiheProperties;
 }

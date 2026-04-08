@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "file.h"
+#include "uri_permission_util.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -40,6 +41,11 @@ File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
         object->GetValue(ORI_URI, oriUri_);
         object->GetValue(REMOTE_URI, remoteUri_);
         object->GetValue(FILE_TYPE, fileType_);
+        int32_t permissionMask = 0;
+        if (object->GetValue(URI_AUTHORIZATION_POLICIES, permissionMask) && permissionMask >= 0) {
+            hasUriAuthorizationPolicyMask_ = true;
+            uriAuthorizationPolicyMask_ = UriPermissionUtil::NormalizeMask(static_cast<uint32_t>(permissionMask));
+        }
         std::shared_ptr<Object> detailObj = nullptr;
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
@@ -110,7 +116,31 @@ void File::InitObject()
             object->value_[FILE_TYPE] = "general.file";
         }
         object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        uriAuthorizationPolicyMask_ = UriPermissionUtil::NormalizeMask(uriAuthorizationPolicyMask_);
+        if (!hasUriAuthorizationPolicyMask_) {
+            object->value_.erase(URI_AUTHORIZATION_POLICIES);
+        } else {
+            object->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(uriAuthorizationPolicyMask_);
+        }
         object->value_.insert_or_assign(VALUE_TYPE, std::move(value));
+    }
+}
+
+uint32_t File::GetUriAuthorizationPolicyMask() const
+{
+    return uriAuthorizationPolicyMask_;
+}
+
+void File::SetUriAuthorizationPolicyMask(uint32_t uriAuthorizationPolicyMask)
+{
+    hasUriAuthorizationPolicyMask_ = true;
+    uriAuthorizationPolicyMask_ = UriPermissionUtil::NormalizeMask(uriAuthorizationPolicyMask);
+    if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        if (object == nullptr) {
+            return;
+        }
+        object->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(uriAuthorizationPolicyMask_);
     }
 }
 

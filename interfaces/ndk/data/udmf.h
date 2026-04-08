@@ -845,6 +845,19 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* pThis,
     const char* key, const char* param);
 
 /**
+ * @brief Set auth permission to the {@link OH_UdmfProperty}.
+ *
+ * @param pThis Represents a pointer to an instance of {@link OH_UdmfProperty}.
+ * @param authPolicy Represents auth permission.
+ * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
+ *         {@link UDMF_E_OK} success.
+ *         {@link UDMF_E_INVALID_PARAM} The error code for common invalid args.
+ * @see OH_UdmfProperty Udmf_ErrCode
+ * @since 26.0.0
+ */
+int OH_UdmfProperty_SetAuthPermission(OH_UdmfProperty* pThis, uint32_t authPolicy);
+
+/**
  * @brief Creation a pointer to the instance of the {@link OH_UdmfOptions}.
  *
  * @return If the operation is successful, a pointer to the instance of the {@link OH_UdmfOptions}

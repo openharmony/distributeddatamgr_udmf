@@ -37,11 +37,16 @@ public:
     UDDetails API_EXPORT GetDetails() const;
     void InitObject() override;
 
+    uint32_t API_EXPORT GetUriAuthorizationPolicyMask() const;
+    void API_EXPORT SetUriAuthorizationPolicyMask(uint32_t uriAuthorizationPolicyMask);
+
 protected:
     std::string oriUri_;
     std::string remoteUri_;
     UDDetails details_ {};
     std::string fileType_;
+    uint32_t uriAuthorizationPolicyMask_ {0};
+    bool hasUriAuthorizationPolicyMask_ {false};
 };
 } // namespace UDMF
 } // namespace OHOS

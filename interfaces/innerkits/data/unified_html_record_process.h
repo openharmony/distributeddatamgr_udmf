@@ -22,7 +22,7 @@ namespace OHOS {
 namespace UDMF {
 class UnifiedHtmlRecordProcess {
 public:
-    static void API_EXPORT GetUriFromHtmlRecord(UnifiedData &unifiedData);
+    static void API_EXPORT GetUriFromHtmlRecord(UnifiedRecord &record);
     static void API_EXPORT RebuildHtmlRecord(UnifiedData &unifiedData);
 private:
     static std::vector<UriInfo> SplitHtmlStr(const std::string &htmlContent);
@@ -33,7 +33,7 @@ private:
     static bool IsLocalURI(const std::string &uri) noexcept;
     static void RebuildEntry(const std::vector<UriInfo> &uris, const ValueType &value);
     static std::string RebuildHtmlContent(const std::string &str, const std::vector<UriInfo> &uris);
-    static std::vector<UriInfo> GetValueStr(const ValueType &value);
+    static std::vector<UriInfo> GetValueStr(std::shared_ptr<Object> object);
     static void ProcessEntry(const std::shared_ptr<UnifiedRecord> &record);
     static void RemoveInvalidImgSrc(const std::vector<std::string> &validImgSrcList,
         std::vector<UriInfo> &imgSrcMap) noexcept;

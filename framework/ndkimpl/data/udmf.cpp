@@ -26,6 +26,7 @@
 #include "logger.h"
 #include "ndk_data_conversion.h"
 #include "plain_text.h"
+#include "uri_permission_util.h"
 #include "securec.h"
 #include "string_wrapper.h"
 #include "system_defined_appitem.h"
@@ -1100,6 +1101,19 @@ int OH_UdmfProperty_SetExtrasStringParam(OH_UdmfProperty* properties, const char
     }
     std::lock_guard<std::mutex> lock(properties->mutex);
     properties->properties_->extras.SetParam(key, OHOS::AAFwk::String::Box(param));
+    return UDMF_E_OK;
+}
+
+int OH_UdmfProperty_SetAuthPermission(OH_UdmfProperty* properties, uint32_t authPolicy)
+{
+    if (!IsUnifiedPropertiesValid(properties)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    if (!IsAuthPolicyValid(authPolicy)) {
+        return UDMF_E_INVALID_PARAM;
+    }
+    std::lock_guard<std::mutex> lock(properties->mutex);
+    properties->properties_->uriAuthorizationPolicies = UriPermissionUtil::FromMask(NormalizeAuthPolicy(authPolicy));
     return UDMF_E_OK;
 }
 

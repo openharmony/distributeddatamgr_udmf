@@ -19,6 +19,7 @@
 #include "file.h"
 #include "ohos.data.unifiedDataChannel.proj.hpp"
 #include "ohos.data.unifiedDataChannel.impl.hpp"
+#include "uri_permission_util.h"
 
 namespace taiheChannel = ohos::data::unifiedDataChannel;
 namespace OHOS {
@@ -37,6 +38,8 @@ public:
     void SetUri(const ::taihe::string_view &uri);
     ::taihe::optional<::taihe::map<::taihe::string, ::taihe::string>> GetDetails();
     void SetDetails(const ::taihe::map_view<::taihe::string, ::taihe::string> &details);
+    void SetUriAuthorizationPolicies(
+        const ::taihe::optional<::taihe::array<::taiheChannel::UriPermission>> &uriAuthorizationPolicies);
     int64_t GetInner();
 
     std::shared_ptr<File> value_;

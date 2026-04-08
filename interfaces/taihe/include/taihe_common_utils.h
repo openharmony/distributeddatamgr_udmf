@@ -42,6 +42,8 @@ extern const std::unordered_map<Status, std::pair<int, const char*>> REG_ERR_MAP
 void HandleStatus(const std::unordered_map<Status, std::pair<int, const char*>> &errMap, Status status,
     const char* defaultMsg);
 Intention ConvertIntention(::ohos::data::unifiedDataChannel::Intention value);
+UriPermission ConvertUriPermission(::ohos::data::unifiedDataChannel::UriPermission value);
+::ohos::data::unifiedDataChannel::UriPermission ConvertUriPermission(OHOS::UDMF::UriPermission value);
 ::taihe::array<::taihe::string> ConvertStringVectorToTaiheArray(const std::vector<std::string>& stringVector);
 ValueType ConvertValueType(ani_env *env, const ::taihe::string_view &type,
     ::ohos::data::unifiedDataChannel::ValueType const& value);
