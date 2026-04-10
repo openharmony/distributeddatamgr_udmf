@@ -86,6 +86,7 @@ arkui_x_public_source = [
   "${udmf_framework_path}/innerkitsimpl/client/getter_system.cpp",
   "${udmf_framework_path}/innerkitsimpl/dynamic/pixelmap_loader.cpp",
   "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
+  "${udmf_framework_path}/innerkitsimpl/common/uri_permission_util.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/application_defined_record.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/audio.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/file.cpp",
