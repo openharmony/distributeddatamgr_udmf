@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,8 @@
  */
 
 #define LOG_TAG "UDMF_ANI_COMMON_UTILS"
+
+#include <utility>
 
 #include "ani_common_want.h"
 #include "ani_common_utils.h"
@@ -392,39 +394,88 @@ ObjectType GetObjectType(ani_env *env, ani_object obj)
     return ObjectType::OBJ_BUTT;
 }
 
+static ani_status GetObjectProperties(ani_env *env, ani_array aniKeys, std::vector<std::string> &keysOutput)
+{
+    ani_size size = 0;
+    auto status = env->Array_GetLength(aniKeys, &size);
+    if (ANI_OK != status) {
+        LOG_ERROR(UDMF_ANI, "Array_GetLength fail");
+        return status;
+    }
+    ani_class instanceMethodClass {};
+    status = env->FindClass("std.core.reflect.InstanceField", &instanceMethodClass);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "FindClass fail %{public}d", status);
+        return status;
+    }
+    ani_method getNameMethod {};
+    status = env->Class_FindMethod(instanceMethodClass, "getName", ":C{std.core.String}", &getNameMethod);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Class_FindMethod fail %{public}d", status);
+        return status;
+    }
+
+    for (ani_size i = 0; i < size; i++) {
+        ani_ref ref {};
+        status = env->Array_Get(aniKeys, i, &ref);
+        if (status != ANI_OK) {
+            LOG_ERROR(UDMF_ANI, "Array_Get fail");
+            return status;
+        }
+        ani_ref stringRef {};
+        status = env->Object_CallMethod_Ref(static_cast<ani_object>(ref), getNameMethod, &stringRef);
+        if (status != ANI_OK) {
+            LOG_ERROR(UDMF_ANI, "Object_CallMethodByName_Ref fail");
+            return status;
+        }
+
+        std::string key;
+        status = GetString(env, static_cast<ani_object>(stringRef), key);
+        if (status != ANI_OK) {
+            LOG_ERROR(UDMF_ANI, "GetString fail");
+            return status;
+        }
+        keysOutput.emplace_back(std::move(key));
+    }
+    return ANI_OK;
+}
+
 std::vector<std::string> GetObjectKeys(ani_env *env, ani_object obj)
 {
+    static constexpr const char *SIGNATURE = "C{std.core.Class}:C{std.core.Array}";
+
     std::vector<std::string> keys;
-    ani_class cls {};
-    env->FindClass(CLASSNAME_OBJECT, &cls);
-    ani_ref result;
-    auto status = env->Class_CallStaticMethodByName_Ref(
-        cls, "keys", "C{std.core.Object}:C{std.core.Array}", &result, obj);
+    ani_namespace reflect {};
+    auto status = env->FindNamespace("std.core.reflect", &reflect);
     if (status != ANI_OK) {
-        LOG_ERROR(UDMF_ANI, "Class_CallStaticMethodByName_Ref fail %{public}d", status);
-        return keys;
+        LOG_ERROR(UDMF_ANI, "FindNamespace fail %{public}d", status);
+        return {};
     }
-    ani_array aniKeys = static_cast<ani_array>(result);
-    ani_size size;
-    if (ANI_OK != env->Array_GetLength(aniKeys, &size)) {
-        LOG_ERROR(UDMF_ANI, "Array_GetLength fail");
-        return keys;
+    ani_function getFieldsMethod {};
+    status = env->Namespace_FindFunction(reflect, "getInstanceFieldsRecursive", SIGNATURE, &getFieldsMethod);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Namespace_FindFunction fail %{public}d", status);
+        return {};
     }
-    for (ani_size i = 0; i < size ; i++) {
-        ani_ref string_ref;
-        auto status = env->Array_Get(aniKeys, i, &string_ref);
-        if (status != ANI_OK) {
-            LOG_WARN(UDMF_ANI, "Array_Get fail");
-            continue;
-        }
-        std::string key;
-        status = GetString(env, static_cast<ani_object>(string_ref), key);
-        if (status != ANI_OK) {
-            LOG_WARN(UDMF_ANI, "GetString fail");
-            continue;
-        }
-        keys.emplace_back(key);
+    ani_type objType {};
+    status = env->Object_GetType(obj, &objType);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Object_GetType fail %{public}d", status);
+        return {};
     }
+
+    ani_ref result {};
+    status = env->Function_Call_Ref(getFieldsMethod, &result, static_cast<ani_class>(objType));
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "Function_Call_Ref fail %{public}d", status);
+        return {};
+    }
+    status = GetObjectProperties(env, static_cast<ani_array>(result), keys);
+    if (status != ANI_OK) {
+        LOG_ERROR(UDMF_ANI, "GetObjectProperties fail %{public}d", status);
+        return {};
+    }
+
     return keys;
 }
 
