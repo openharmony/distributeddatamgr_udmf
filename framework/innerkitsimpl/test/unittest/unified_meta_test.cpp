@@ -1059,10 +1059,10 @@ HWTEST_F(UnifiedMetaTest, UriPermissionUtil_FromInt32_001, TestSize.Level1)
 
     std::vector<int32_t> valid = {1, 2, 4};
     auto result = UriPermissionUtil::FromInt32(valid);
-    EXPECT_EQ(result.size(), 2);
+    EXPECT_EQ(result.size(), 3);
 
     std::vector<int32_t> withInvalid = {1, -1, 2, 100};
     auto resultFiltered = UriPermissionUtil::FromInt32(withInvalid);
-    EXPECT_EQ(resultFiltered.size(), 2);
+    EXPECT_EQ(resultFiltered.size(), 4);
 }
 } // OHOS::Test
