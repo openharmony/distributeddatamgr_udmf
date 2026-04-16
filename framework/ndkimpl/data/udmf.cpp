@@ -1110,6 +1110,8 @@ int OH_UdmfProperty_SetAuthPermission(OH_UdmfProperty* properties, uint32_t auth
         return UDMF_E_INVALID_PARAM;
     }
     if (!IsAuthPolicyValid(authPolicy)) {
+        LOG_ERROR(UDMF_CAPI, "invalid auth policy.");
+        properties->properties_->uriAuthorizationPolicies.emplace_back(UriPermission::NONE);
         return UDMF_E_INVALID_PARAM;
     }
     std::lock_guard<std::mutex> lock(properties->mutex);

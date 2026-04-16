@@ -103,6 +103,7 @@ std::vector<UriPermission> FromInt32(const std::vector<int32_t> &permissions)
     values.reserve(permissions.size());
     for (const auto &permission : permissions) {
         if (!IsValid(permission)) {
+            values.emplace_back(UriPermission::NONE);
             continue;
         }
         values.emplace_back(static_cast<UriPermission>(permission));

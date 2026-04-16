@@ -167,6 +167,7 @@ static int SetUdsAuthPolicy(UdsObject* pThis, uint32_t authPolicy, NdkStructId n
     }
     if (!IsAuthPolicyValid(authPolicy)) {
         LOG_ERROR(UDMF_CAPI, "invalid auth policy.");
+        pThis->obj->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(UriPermission::NONE);
         return UDMF_E_INVALID_PARAM;
     }
     std::lock_guard<std::mutex> lock(pThis->mutex);
