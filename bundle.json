@@ -46,7 +46,8 @@
         "selinux_adapter",
         "libuv",
         "libxml2",
-	      "runtime_core"
+        "runtime_core",
+        "json"
       ]
     },
     "build": {
