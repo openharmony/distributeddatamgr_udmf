@@ -115,6 +115,7 @@ taihe_shared_library("udmf_taihe_native") {
     "hilog:libhilog",
     "image_framework:image_taihe",
     "ipc:ipc_single",
+    "json:nlohmann_json_static",
     "runtime_core:ani_helpers",
   ]
   public_configs = [ ":taihe_config" ]

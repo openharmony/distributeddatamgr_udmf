@@ -20,6 +20,7 @@
 #include "ani_common_want.h"
 #include "ani_common_utils.h"
 #include "logger.h"
+#include "nlohmann/json.hpp"
 #include "pixel_map_taihe_ani.h"
 
 namespace OHOS {

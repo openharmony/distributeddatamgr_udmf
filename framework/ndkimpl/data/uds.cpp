@@ -16,6 +16,8 @@
 
 #include "uds.h"
 
+#include <iomanip>
+
 #include "logger.h"
 #include "ndk_data_conversion.h"
 #include "pixel_map.h"
