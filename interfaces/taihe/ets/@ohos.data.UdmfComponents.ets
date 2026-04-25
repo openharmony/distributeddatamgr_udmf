@@ -255,7 +255,7 @@ export struct ContentFormCard {
     this.initCardStyle(this.formWidth, NaN);
   }
 
-  initAnimator() {
+  initAnimator(): void {
     let anima: AnimatorResult = this.getUIContext().createAnimator({
       duration: 300,
       easing: 'friction',
@@ -364,7 +364,7 @@ export struct ContentFormCard {
   }
 
   @Builder
-  ThumbImage() {
+  ThumbImage(): void {
     Column() {
       if (this.formHeight > 0) {
         Image(this.thumbImage ? this.thumbImage : this.defaultThumbImage)
@@ -388,7 +388,7 @@ export struct ContentFormCard {
   }
 
   @Builder
-  CardDivider() {
+  CardDivider(): void {
     Divider()
       .height(1)//.color(CARD_DIVIDER_COLOR)
       .opacity(0.5)
@@ -399,7 +399,7 @@ export struct ContentFormCard {
   }
 
   @Builder
-  AppView() {
+  AppView(): void {
     Row({ space: this.formStyle.appNameMarginLeft * this.cardScale } as RowOptions) {
       Image(this.appImage)
         .width(this.formStyle.appIconSize * this.cardScale)
@@ -434,7 +434,7 @@ export struct ContentFormCard {
   }
 
   @Builder
-  TitleText() {
+  TitleText(): void {
     Text(this.contentFormData?.title)
       .fontSize(this.formStyle.titleFontSize * this.cardScale)
       .fontColor(TITLE_FONT_COLOR)
@@ -452,7 +452,7 @@ export struct ContentFormCard {
   }
 
   @Builder
-  Card4x4() {
+  Card4x4(): void {
     Column() {
       Image(this.thumbImage ? this.thumbImage : this.defaultThumbImage)
         .objectFit(ImageFit.Cover)
@@ -495,7 +495,7 @@ export struct ContentFormCard {
   }
 
   @Builder
-  DescriptionView() {
+  DescriptionView(): void {
     Text(this.contentFormData?.description ? this.contentFormData?.description : ' ', { controller: this.controller })
       .fontColor(DESCRIPTION_FONT_COLOR)
       .fontWeight(FontWeight.Regular)
@@ -524,7 +524,7 @@ export struct ContentFormCard {
   }
 
   @Builder
-  Card4x2() {
+  Card4x2(): void {
     Column() {
       if (this.contentFormData?.title === '') { // show the card only thumbData
         this.ThumbImage()
@@ -570,7 +570,7 @@ export struct ContentFormCard {
   }
 
   @Builder
-  Card2x1() {
+  Card2x1(): void {
     Column() {
       if (this.contentFormData?.title === '') { // show the card only thumbData
         this.ThumbImage()
@@ -617,7 +617,7 @@ export struct ContentFormCard {
     .constraintSize(this.getThumbViewConstraintSize())
   }
 
-  build() {
+  build(): void {
     Column() {
       if (this.initSystemLanguage() && this.formType === FormType.TYPE_BIG) {
         this.Card4x4();
