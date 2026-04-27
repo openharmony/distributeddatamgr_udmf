@@ -46,3 +46,11 @@ udmf_service_path = "${udmf_root_path}/service"
 kv_store_path = "//foundation/distributeddatamgr/kv_store"
 
 developer_test_path = "//test/testfwk/developer_test"
+
+declare_args() {
+  udmf_api_metrics_enabled = true
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.hiviewdfx_api_metrics_ext)) {
+    udmf_api_metrics_enabled = false
+  }
+}
