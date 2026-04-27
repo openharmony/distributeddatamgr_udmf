@@ -16,6 +16,7 @@
 #include "file_napi.h"
 
 #include "file.h"
+#include "histogram_wrapper.h"
 #include "unified_record_napi.h"
 #include "uri_permission_util.h"
 
@@ -151,6 +152,7 @@ napi_value FileNapi::SetUri(napi_env env, napi_callback_info info)
 
 napi_value FileNapi::SetUriAuthorizationPolicies(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.File.uriAuthorizationPolicies", true);
     LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::vector<int32_t> uriAuthorizationPolicies;

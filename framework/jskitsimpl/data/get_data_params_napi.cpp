@@ -19,6 +19,7 @@
 #include "logger.h"
 #include "napi_data_utils.h"
 #include "unified_data_napi.h"
+#include "histogram_wrapper.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -30,6 +31,7 @@ ConcurrentMap<std::string, napi_threadsafe_function> GetDataParamsNapi::tsfns;
 bool GetDataParamsNapi::Convert2NativeValue(napi_env env, napi_value in,
     GetDataParams &getDataParams, const std::string &key)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.GetDataParams.dataProgressListener", true);
     LOG_DEBUG(UDMF_KITS_NAPI, "Start.");
 
     napi_value jsProgressIndicator = nullptr;

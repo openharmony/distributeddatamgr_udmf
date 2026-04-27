@@ -81,6 +81,12 @@ ohos_shared_library("unifieddatachannel_napi") {
     "napi:ace_napi",
   ]
 
+  if (udmf_api_metrics_enabled) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines = [ "UDMF_API_METRICS_ENABLED" ]
+  }
+
+
   public_external_deps = [ "image_framework:image" ]
   cflags = [
     "-fvisibility=hidden",
@@ -123,6 +129,11 @@ ohos_shared_library("uniformtypedescriptor_napi") {
     "ipc:ipc_core",
     "napi:ace_napi",
   ]
+
+  if (udmf_api_metrics_enabled) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines = [ "UDMF_API_METRICS_ENABLED" ]
+  }
 
   public_external_deps = [ "image_framework:image" ]
   cflags = [
@@ -188,6 +199,11 @@ ohos_shared_library("udmf_data_napi") {
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
   ]
+
+  if (udmf_api_metrics_enabled) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines = [ "UDMF_API_METRICS_ENABLED" ]
+  }
 
   public_external_deps = [ "image_framework:image" ]
   cflags = [

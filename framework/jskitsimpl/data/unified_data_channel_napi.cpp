@@ -16,6 +16,7 @@
 #include "unified_data_channel_napi.h"
 
 #include "async_task_params.h"
+#include "histogram_wrapper.h"
 #include "napi_data_utils.h"
 #include "unified_data_napi.h"
 
@@ -96,6 +97,7 @@ napi_status UnifiedDataChannelNapi::SetNamedProperty(napi_env env, napi_value &o
 
 napi_value UnifiedDataChannelNapi::InsertData(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.insertData", true);
     LOG_DEBUG(UDMF_KITS_NAPI, "InsertData is called!");
     struct InsertContext : public ContextBase {
         std::string key;
@@ -388,6 +390,7 @@ napi_value UnifiedDataChannelNapi::SetAppShareOptions(napi_env env, napi_callbac
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
             "Parameter error:The parameter shareOption must be within the scope of the ShareOptions enumeration.");
     };
+    HISTOGRAM_ENUMERATION("Udmf.APICall.setAppShareOptions", shareOptionValue, HISTOGRAM_SHAREOPTION_BOUNDARY);
     ctxt->GetCbInfoSync(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "SetAppShareOption Exit");
     auto status = E_OK;
@@ -406,6 +409,7 @@ napi_value UnifiedDataChannelNapi::SetAppShareOptions(napi_env env, napi_callbac
 
 napi_value UnifiedDataChannelNapi::RemoveAppShareOptions(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.removeAppShareOptions", true);
     LOG_DEBUG(UDMF_KITS_NAPI, "RemoveAppShareOption is called!");
     std::string intention;
     auto ctxt = std::make_shared<ContextBase>();
