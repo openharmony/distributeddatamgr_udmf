@@ -21,7 +21,6 @@
 #ifdef UDMF_API_METRICS_ENABLED
 #include "histogram_plugin_macros.h"
 #else
-// 空实现宏
 #define HISTOGRAM_BOOLEAN(name, value) ((void)0)
 #define HISTOGRAM_ENUMERATION(name, sample, boundary) ((void)0)
 #endif

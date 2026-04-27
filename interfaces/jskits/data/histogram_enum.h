@@ -22,5 +22,5 @@ namespace UDMF {
 constexpr int32_t HISTOGRAM_SHAREOPTION_BOUNDARY = 2; // CROSS_APP + 1
 
 }
-} // namespace OHOS::MiscServices
+} // namespace OHOS::UDMF
 #endif // OHOS_DISTRIBUTED_DATA_UDMF_HISTOGRAM_ENUM_H
