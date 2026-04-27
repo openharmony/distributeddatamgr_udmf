@@ -15,6 +15,7 @@
 #define LOG_TAG "HtmlNapi"
 #include "html_napi.h"
 
+#include "histogram_wrapper.h"
 #include "html.h"
 #include "text_napi.h"
 #include "unified_record_napi.h"
@@ -154,6 +155,7 @@ napi_value HtmlNapi::SetHtmlContent(napi_env env, napi_callback_info info)
 
 napi_value HtmlNapi::SetUriAuthorizationPolicies(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.HTML.uriAuthorizationPolicies", true);
     LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::vector<int32_t> uriAuthorizationPolicies;

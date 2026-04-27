@@ -13,6 +13,7 @@
 * limitations under the License.
 */
 #define LOG_TAG "UniformTypeDescriptorNapi"
+#include "histogram_wrapper.h"
 #include "uniform_type_descriptor_napi.h"
 #include "napi_data_utils.h"
 #include "utd_client.h"
@@ -239,6 +240,7 @@ napi_value UniformTypeDescriptorNapi::GetMultiUniformDataTypesByMIMEType(napi_en
 
 napi_value UniformTypeDescriptorNapi::RegisterTypeDescriptors(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.registerTypeDescriptors", true);
     auto ctxt = std::make_shared<ContextBase>();
     auto descriptors = std::make_shared<std::vector<TypeDescriptorCfg>>();
     auto input = [env, ctxt, descriptors](size_t argc, napi_value *argv) {
@@ -264,6 +266,7 @@ napi_value UniformTypeDescriptorNapi::RegisterTypeDescriptors(napi_env env, napi
 
 napi_value UniformTypeDescriptorNapi::UnregisterTypeDescriptors(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.unregisterTypeDescriptors", true);
     auto ctxt = std::make_shared<ContextBase>();
     auto typeIds = std::make_shared<std::vector<std::string>>();
     auto input = [env, ctxt, typeIds](size_t argc, napi_value *argv) {
