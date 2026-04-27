@@ -390,8 +390,8 @@ napi_value UnifiedDataChannelNapi::SetAppShareOptions(napi_env env, napi_callbac
         ASSERT_BUSINESS_ERR(ctxt, ctxt->status == napi_ok, E_INVALID_PARAMETERS,
             "Parameter error:The parameter shareOption must be within the scope of the ShareOptions enumeration.");
     };
-    HISTOGRAM_ENUMERATION("Udmf.APICall.setAppShareOptions", shareOptionValue, HISTOGRAM_SHAREOPTION_BOUNDARY);
     ctxt->GetCbInfoSync(env, info, input);
+    HISTOGRAM_ENUMERATION("Udmf.APICall.setAppShareOptions", shareOptionValue, HISTOGRAM_SHAREOPTION_BOUNDARY);
     ASSERT_NULL(!ctxt->isThrowError, "SetAppShareOption Exit");
     auto status = E_OK;
     ASSERT_ERR(ctxt->env, intention == "Drag",
