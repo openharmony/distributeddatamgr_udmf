@@ -14,6 +14,7 @@
  */
 #define LOG_TAG "UnifiedDataPropertiesNapi"
 #include "unified_data_properties_napi.h"
+#include "histogram_wrapper.h"
 
 #include "napi_data_utils.h"
 #include "unified_data.h"
@@ -239,6 +240,7 @@ napi_value UnifiedDataPropertiesNapi::GetUriAuthorizationPolicies(napi_env env, 
 
 napi_value UnifiedDataPropertiesNapi::SetUriAuthorizationPolicies(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.UnifiedDataProperties.uriAuthorizationPolicies", true);
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
     std::vector<int32_t> uriAuthorizationPolicies;

@@ -22,6 +22,7 @@
 #include "video.h"
 #include "audio.h"
 #include "folder.h"
+#include "histogram_wrapper.h"
 #include "system_defined_appitem.h"
 #include "system_defined_form.h"
 #include "system_defined_pixelmap.h"
@@ -213,6 +214,7 @@ UnifiedRecordNapi *UnifiedRecordNapi::GetUnifiedRecord(
 
 napi_value UnifiedRecordNapi::GetType(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.UnifiedRecord.getType", true);
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto uRecord = GetUnifiedRecord(env, info, ctxt);
@@ -236,6 +238,7 @@ napi_value UnifiedRecordNapi::GetTypes(napi_env env, napi_callback_info info)
 
 napi_value UnifiedRecordNapi::GetValue(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.UnifiedRecord.getValue", true);
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     auto ctxt = std::make_shared<ContextBase>();
     auto uRecord = GetUnifiedRecord(env, info, ctxt);

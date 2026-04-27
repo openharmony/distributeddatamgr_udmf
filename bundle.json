@@ -47,7 +47,8 @@
         "libuv",
         "libxml2",
         "runtime_core",
-        "json"
+        "json",
+        "api_metrics"
       ]
     },
     "build": {
