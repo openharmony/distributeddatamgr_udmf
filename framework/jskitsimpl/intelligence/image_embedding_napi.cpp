@@ -20,6 +20,7 @@
 #include "aip_log.h"
 #include "aip_napi_error.h"
 #include "aip_napi_utils.h"
+#include "histogram_wrapper.h"
 #include "i_aip_core_manager_impl.h"
 
 #undef LOG_TAG
@@ -196,6 +197,7 @@ void ImageEmbeddingNapi::Destructor(napi_env env, void *nativeObject, void *fina
 
 napi_value ImageEmbeddingNapi::GetImageEmbeddingModel(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.ImageEmbedding.getImageEmbeddingModel", true);
     AIP_HILOGE("Enter");
     size_t argc = ARG_1;
     napi_value args[ARG_1] = { nullptr };
@@ -395,6 +397,7 @@ void ImageEmbeddingNapi::GetImgEmbeddingModelCompleteCB(napi_env env, napi_statu
 
 napi_value ImageEmbeddingNapi::GetEmbedding(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.ImageEmbedding.getEmbedding", true);
     AIP_HILOGE("Enter");
     size_t argc = ARG_1;
     napi_value args[ARG_1] = { nullptr };

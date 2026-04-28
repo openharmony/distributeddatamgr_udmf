@@ -285,6 +285,12 @@ ohos_shared_library("intelligence_napi") {
   ]
 
   defines = [ "LOG_DOMAIN = 0xD001660" ]
+
+  if (udmf_api_metrics_enabled) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines += [ "UDMF_API_METRICS_ENABLED" ]
+  }
+  
   relative_install_dir = "module/data"
   subsystem_name = "distributeddatamgr"
   part_name = "udmf"
