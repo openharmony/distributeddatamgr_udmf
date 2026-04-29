@@ -284,7 +284,7 @@ ohos_shared_library("intelligence_napi") {
     "napi:ace_napi",
   ]
 
-  defines = [ "LOG_DOMAIN = 0xD001660" ]
+  defines = [ "LOG_DOMAIN = 0xD001660", ]
 
   if (udmf_api_metrics_enabled) {
     external_deps += [ "api_metrics:histogrammanager" ]
