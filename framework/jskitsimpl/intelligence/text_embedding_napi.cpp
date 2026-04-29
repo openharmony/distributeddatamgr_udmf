@@ -20,6 +20,7 @@
 #include "aip_log.h"
 #include "aip_napi_error.h"
 #include "aip_napi_utils.h"
+#include "histogram_wrapper.h"
 #include "i_aip_core_manager_impl.h"
 
 #undef LOG_TAG
@@ -229,6 +230,7 @@ void TextEmbeddingNapi::Destructor(napi_env env, void *nativeObject, void *final
 
 napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.TextEmbedding.getTextEmbeddingModel", true);
     AIP_HILOGE("Enter");
     size_t argc = ARG_1;
     napi_value args[ARG_1] = { nullptr };
@@ -425,6 +427,7 @@ void TextEmbeddingNapi::GetTextEmbeddingModelCompleteCB(napi_env env, napi_statu
 
 napi_value TextEmbeddingNapi::SplitText(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.TextEmbedding.splitText", true);
     AIP_HILOGI("Enter");
     size_t argc = ARG_2;
     napi_value args[ARG_2] = { nullptr };
@@ -604,6 +607,7 @@ bool TextEmbeddingNapi::GetProperties(napi_env env, napi_value args, napi_value 
 
 napi_value TextEmbeddingNapi::GetEmbedding(napi_env env, napi_callback_info info)
 {
+    HISTOGRAM_BOOLEAN("Udmf.APICall.TextEmbedding.getEmbedding", true);
     AIP_HILOGE("Enter");
     size_t argc = ARG_1;
     napi_value args[ARG_1] = { nullptr };
