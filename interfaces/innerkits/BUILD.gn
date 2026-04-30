@@ -170,6 +170,7 @@ ohos_shared_library("utd_client") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "json:nlohmann_json_static",
     "kv_store:distributeddata_mgr",
     "os_account:os_account_innerkits",
     "samgr:samgr_proxy",
