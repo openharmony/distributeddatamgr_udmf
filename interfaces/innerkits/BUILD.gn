@@ -88,6 +88,7 @@ ohos_shared_library("udmf_client") {
   deps = [ "../innerkits:utd_client" ]
 
   external_deps = [
+    "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:dataobs_manager",
     "access_token:libaccesstoken_sdk",
@@ -95,23 +96,19 @@ ohos_shared_library("udmf_client") {
     "bundle_framework:appexecfwk_core",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
+    "cJSON:cjson",
     "dfs_service:distributed_file_daemon_kit_inner",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "hitrace:libhitracechain",
+    "image_framework:image",
     "init:libbegetutil",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "kv_store:distributeddata_mgr",
     "libuv:uv",
     "samgr:samgr_proxy",
-  ]
-
-  public_external_deps = [
-    "ability_base:want",
-    "cJSON:cjson",
-    "image_framework:image",
   ]
 
   innerapi_tags = [ "platformsdk" ]

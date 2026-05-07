@@ -56,14 +56,13 @@ ohos_shared_library("cj_unified_data_channel_ffi") {
       "c_utils:utils",
       "hilog:libhilog",
       "image_framework:cj_image_ffi",
+      "image_framework:image",
       "ipc:ipc_core",
       "kv_store:distributeddata_inner",
       "napi:ace_napi",
       "napi:cj_bind_ffi",
       "napi:cj_bind_native",
     ]
-
-    public_external_deps = [ "image_framework:image" ]
   }
 
   # cflags = [ "-fvisibility=hidden" ]
@@ -114,14 +113,13 @@ ohos_shared_library("cj_uniform_type_descriptor_ffi") {
       "c_utils:utils",
       "hilog:libhilog",
       "image_framework:cj_image_ffi",
+      "image_framework:image",
       "ipc:ipc_core",
       "kv_store:distributeddata_inner",
       "napi:ace_napi",
       "napi:cj_bind_ffi",
       "napi:cj_bind_native",
     ]
-
-    public_external_deps = [ "image_framework:image" ]
   }
 
   # cflags = [ "-fvisibility=hidden" ]

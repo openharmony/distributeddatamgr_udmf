@@ -76,6 +76,7 @@ ohos_shared_library("unifieddatachannel_napi") {
     "ability_runtime:napi_common",
     "c_utils:utils",
     "hilog:libhilog",
+    "image_framework:image",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
@@ -86,8 +87,6 @@ ohos_shared_library("unifieddatachannel_napi") {
     defines = [ "UDMF_API_METRICS_ENABLED" ]
   }
 
-
-  public_external_deps = [ "image_framework:image" ]
   cflags = [
     "-fvisibility=hidden",
     "-O2",
@@ -127,6 +126,7 @@ ohos_shared_library("uniformtypedescriptor_napi") {
     "ability_runtime:napi_common",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "image_framework:image",
     "napi:ace_napi",
   ]
 
@@ -135,7 +135,6 @@ ohos_shared_library("uniformtypedescriptor_napi") {
     defines = [ "UDMF_API_METRICS_ENABLED" ]
   }
 
-  public_external_deps = [ "image_framework:image" ]
   cflags = [
     "-fvisibility=hidden",
     "-O2",
@@ -196,6 +195,7 @@ ohos_shared_library("udmf_data_napi") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "image_framework:image",
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
   ]
@@ -205,7 +205,6 @@ ohos_shared_library("udmf_data_napi") {
     defines = [ "UDMF_API_METRICS_ENABLED" ]
   }
 
-  public_external_deps = [ "image_framework:image" ]
   cflags = [
     "-fvisibility=hidden",
     "-O2",
@@ -242,9 +241,9 @@ ohos_static_library("udmf_js_common") {
     "ability_runtime:napi_common",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "image_framework:image",
     "napi:ace_napi",
   ]
-  public_external_deps = [ "image_framework:image" ]
   subsystem_name = "distributeddatamgr"
   part_name = "udmf"
 }
