@@ -649,7 +649,7 @@ export class UnifiedData {
       this.unifiedDataInner = createUnifiedDataWithParams((unifiedRecord as UnifiedRecord).unifiedRecordInner);
     }
   }
-  addRecord(unifiedRecord: UnifiedRecord) {
+  addRecord(unifiedRecord: UnifiedRecord): void {
     if (unifiedRecord instanceof Folder) {
       this.unifiedDataInner.addRecord((unifiedRecord as Folder).folderInner);
     } else if (unifiedRecord instanceof Audio) {
@@ -755,7 +755,7 @@ export class UnifiedRecord {
   getTypes(): Array<string> {
     return this.unifiedRecordInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.unifiedRecordInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -798,7 +798,7 @@ export class File extends UnifiedRecord {
   getTypes(): Array<string> {
     return this.fileInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.fileInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -847,7 +847,7 @@ export class Folder extends File {
   getTypes(): Array<string> {
     return this.folderInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.folderInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -896,7 +896,7 @@ export class Audio extends File {
   getTypes(): Array<string> {
     return this.audioInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.audioInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -945,7 +945,7 @@ export class Video extends File {
   getTypes(): Array<string> {
     return this.videoInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.videoInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -994,7 +994,7 @@ export class Image extends File {
   getTypes(): Array<string> {
     return this.imageInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.imageInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -1028,7 +1028,7 @@ export class Text extends UnifiedRecord {
   getTypes(): Array<string> {
     return this.textInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.textInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -1074,7 +1074,7 @@ export class PlainText extends Text {
   getTypes(): Array<string> {
     return this.plainTextInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.plainTextInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -1123,7 +1123,7 @@ export class HTML extends Text {
   getTypes(): Array<string> {
     return this.htmlInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.htmlInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -1169,7 +1169,7 @@ export class Hyperlink extends Text {
   getTypes(): Array<string> {
     return this.hyperlinkInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.hyperlinkInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -1203,7 +1203,7 @@ export class SystemDefinedRecord extends UnifiedRecord {
   getTypes(): Array<string> {
     return this.systemDefinedRecordInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.systemDefinedRecordInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -1267,7 +1267,7 @@ export class SystemDefinedForm extends SystemDefinedRecord {
   getTypes(): Array<string> {
     return this.systemDefinedFormInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.systemDefinedFormInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -1337,7 +1337,7 @@ export class SystemDefinedAppItem extends SystemDefinedRecord {
   getTypes(): Array<string> {
     return this.systemDefinedAppItemInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.systemDefinedAppItemInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -1377,7 +1377,7 @@ export class SystemDefinedPixelMap extends SystemDefinedRecord {
   getTypes(): Array<string> {
     return this.systemDefinedPixelMapInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.systemDefinedPixelMapInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
@@ -1417,7 +1417,7 @@ export class ApplicationDefinedRecord extends UnifiedRecord {
   getTypes(): Array<string> {
     return this.applicationDefinedRecordInner.getTypes();
   }
-  addEntry(type: string, value: ValueType) {
+  addEntry(type: string, value: ValueType): void {
     this.applicationDefinedRecordInner.addEntry(type, value);
   }
   getEntry(type: String): ValueType {
