@@ -55,6 +55,7 @@ ohos_shared_library("libudmf") {
     "image_framework:image_native",
     "image_framework:pixelmap",
     "ipc:ipc_single",
+    "napi:ace_napi",
     "kv_store:distributeddata_inner",
   ]
 
