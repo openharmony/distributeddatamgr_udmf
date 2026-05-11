@@ -44,6 +44,7 @@ common_external_deps = [
   "image_framework:image_native",
   "image_framework:pixelmap",
   "ipc:ipc_single",
+  "napi:ace_napi",
   "samgr:samgr_proxy",
 ]
 

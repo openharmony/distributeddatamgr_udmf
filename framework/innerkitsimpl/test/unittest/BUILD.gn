@@ -63,6 +63,7 @@ common_external_deps = [
   "kv_store:distributeddata_inner",
   "kv_store:distributeddata_mgr",
   "libxml2:libxml2",
+  "napi:ace_napi",
   "samgr:samgr_proxy",
 ]
 
