@@ -278,6 +278,18 @@ void ImageEmbeddingImpl::releaseModel()
     return ::taihe::array<double>(res);
 }
 
+OHOS::DataIntelligence::NetworkSyncPolicy ConvertNetworkSyncPolicy(::ohos::data::intelligence::NetworkPolicy policy)
+{
+    switch (policy.get_key()) {
+        case ::ohos::data::intelligence::NetworkPolicy::key_t::WIFI_ONLY:
+            return OHOS::DataIntelligence::NetworkSyncPolicy::SYNC_WIFI_ONLY;
+        case ::ohos::data::intelligence::NetworkPolicy::key_t::WIFI_AND_CELLULAR:
+            return OHOS::DataIntelligence::NetworkSyncPolicy::SYNC_WIFI_AND_CELLULAR;
+        default:
+            return OHOS::DataIntelligence::NetworkSyncPolicy::SYNC_WIFI_ONLY;
+    }
+}
+
 ::ohos::data::intelligence::TextEmbedding getTextEmbeddingModelSync(
     ::ohos::data::intelligence::ModelConfig const& config)
 {
@@ -289,15 +301,23 @@ void ImageEmbeddingImpl::releaseModel()
         return ::taihe::make_holder<TextEmbeddingImpl, ::ohos::data::intelligence::TextEmbedding>();
     }
     OHOS::DataIntelligence::ModelConfigData cfgData {
-        .versionValue = config.version,
+        .versionValue = static_cast<int32_t>(config.version),
         .isNPUAvailableValue = config.isNpuAvailable,
         .cachePathValue = ""
-        
     };
     if (config.isNpuAvailable && config.cachePath.has_value()) {
-        cfgData.cachePathValue =  std::string(config.cachePath.value());
+        cfgData.cachePathValue = std::string(config.cachePath.value());
     }
-    int32_t ret = textAipCoreManager_ ->InitTextModel(cfgData);
+    if (config.modelInfo.has_value()) {
+        cfgData.modelInfo.modelType = std::string(config.modelInfo.value().modelType);
+        if (config.modelInfo.value().modelVersion.has_value()) {
+            cfgData.modelInfo.modelVersion = std::string(config.modelInfo.value().modelVersion.value());
+        }
+    }
+    if (config.networkPolicy.has_value()) {
+        cfgData.syncPolicyValue = ConvertNetworkSyncPolicy(config.networkPolicy.value());
+    }
+    int32_t ret = textAipCoreManager_->InitTextModel(cfgData);
     if (ret != ERR_OK) {
         LOG_ERROR(UDMF_ANI, "GetTextEmbeddingModel failed! ret:%{public}d", ret);
         if (ret == DEVICE_EXCEPTION_ERROR) {
@@ -310,6 +330,43 @@ void ImageEmbeddingImpl::releaseModel()
     return textEmbed;
 }
 
+::taihe::array<::ohos::data::intelligence::CloudModelInfo> getSupportedCloudModelSync()
+{
+    ::ohos::data::intelligence::TextEmbedding textEmbed =
+        taihe::make_holder<TextEmbeddingImpl, ::ohos::data::intelligence::TextEmbedding>();
+    (void)textEmbed;
+    if (!textAipCoreManager_) {
+        LOG_ERROR(UDMF_ANI, "textAipCoreManager_ is nullptr");
+        taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
+        return ::taihe::array<::ohos::data::intelligence::CloudModelInfo>(nullptr, 0);
+    }
+
+    std::vector<OHOS::DataIntelligence::CloudModelInfo> result;
+    int32_t ret = textAipCoreManager_->GetSupportedCloudModel(result);
+    if (ret != ERR_OK) {
+        LOG_ERROR(UDMF_ANI, "GetSupportedCloudModel failed! ret:%{public}d", ret);
+        if (ret == DEVICE_EXCEPTION_ERROR) {
+            taihe::set_business_error(DEVICE_EXCEPTION_ERROR, "The device does not support this API.");
+        } else {
+            taihe::set_business_error(RET_INNER_ERROR, "Inner error.");
+        }
+        return ::taihe::array<::ohos::data::intelligence::CloudModelInfo>(nullptr, 0);
+    }
+
+    std::vector<::ohos::data::intelligence::CloudModelInfo> res;
+    for (auto const &modelInfo : result) {
+        ::taihe::optional<::taihe::string> modelVersion;
+        if (!modelInfo.modelVersion.empty()) {
+            ::taihe::string modelVersionT = ::taihe::string(std::move(modelInfo.modelVersion));
+            modelVersion.emplace(std::move(modelVersionT));
+        }
+        taihe::string modelType = ::taihe::string(modelInfo.modelType);
+        ::ohos::data::intelligence::CloudModelInfo modelIndoT =
+            ::ohos::data::intelligence::CloudModelInfo{std::move(modelType), std::move(modelVersion)};
+        res.push_back(modelIndoT);
+    }
+    return ::taihe::array<::ohos::data::intelligence::CloudModelInfo>(res);
+}
 
 ::ohos::data::intelligence::ImageEmbedding getImageEmbeddingModelSync(
     ::ohos::data::intelligence::ModelConfig const& config)
@@ -322,14 +379,14 @@ void ImageEmbeddingImpl::releaseModel()
         return taihe::make_holder<ImageEmbeddingImpl, ::ohos::data::intelligence::ImageEmbedding>();
     }
     OHOS::DataIntelligence::ModelConfigData cfgData {
-        .versionValue = config.version,
+        .versionValue = static_cast<int32_t>(config.version),
         .isNPUAvailableValue = config.isNpuAvailable,
         .cachePathValue = ""
     };
     if (config.isNpuAvailable && config.cachePath.has_value()) {
-        cfgData.cachePathValue =  std::string(config.cachePath.value());
+        cfgData.cachePathValue = std::string(config.cachePath.value());
     }
-    int32_t ret = imageAipCoreManager_ ->InitImageModel(cfgData);
+    int32_t ret = imageAipCoreManager_->InitImageModel(cfgData);
     if (ret != ERR_OK) {
         LOG_ERROR(UDMF_ANI, "getImageEmbeddingModel failed! ret:%{public}d", ret);
         if (ret == DEVICE_EXCEPTION_ERROR) {
@@ -384,6 +441,7 @@ void ImageEmbeddingImpl::releaseModel()
 // Since these macros are auto-generate, lint will cause false positive.
 // NOLINTBEGIN
 TH_EXPORT_CPP_API_getTextEmbeddingModelSync(intelligence::getTextEmbeddingModelSync);
+TH_EXPORT_CPP_API_getSupportedCloudModelSync(intelligence::getSupportedCloudModelSync);
 TH_EXPORT_CPP_API_getImageEmbeddingModelSync(intelligence::getImageEmbeddingModelSync);
 TH_EXPORT_CPP_API_splitTextSync(intelligence::splitTextSync);
 // NOLINTEND

@@ -38,6 +38,7 @@ public:
     int32_t GetImageEmbedding(std::string uri, std::vector<float> &results) override;
     int32_t SplitText(std::string text, int32_t size, float overlap, std::vector<std::string> &results) override;
     bool CheckDeviceType() override;
+    int32_t GetSupportedCloudModel(std::vector<CloudModelInfo> &results) override;
 };
 } // namespace DataIntelligence
 } // namespace OHOS

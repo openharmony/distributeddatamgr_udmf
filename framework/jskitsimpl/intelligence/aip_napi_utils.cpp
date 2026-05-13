@@ -30,7 +30,6 @@ namespace {
 using namespace OHOS::AppDataMgrJsKit;
 static constexpr uint32_t MAX_VALUE_LENGTH = 1024 * 1024 * 8; // the max length of all kand of out string value
 static constexpr uint8_t CONFIG_LENGTH_1 = 2;
-static constexpr uint8_t CONFIG_LENGTH_2 = 3;
 static constexpr uint32_t MAX_STR_PARAM_LEN = 512;
 constexpr const char *PATH_SPLIT = "/";
 struct OperatorInfo {
@@ -288,7 +287,7 @@ void AipNapiUtils::SetPropertyName(napi_env env, napi_value targetObj, const cha
     }
 }
 
-bool AipNapiUtils::CheckModelConfig(napi_env env, napi_value value)
+bool AipNapiUtils::CheckModelConfig(napi_env env, napi_value value, uint8_t maxConfigLength)
 {
     napi_valuetype valuetype;
     napi_status status = napi_typeof(env, value, &valuetype);
@@ -311,8 +310,8 @@ bool AipNapiUtils::CheckModelConfig(napi_env env, napi_value value)
         return false;
     }
 
-    if (length != CONFIG_LENGTH_1 && length != CONFIG_LENGTH_2) {
-        AIP_HILOGE("The modelConfig length is failed");
+    if (length < CONFIG_LENGTH_1 || length > maxConfigLength) {
+        AIP_HILOGE("The modelConfig length is failed, len is %{public}u", length);
         return false;
     }
     return true;

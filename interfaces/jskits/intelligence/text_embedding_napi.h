@@ -37,6 +37,7 @@ public:
     static napi_value GetEmbedding(napi_env env, napi_callback_info info);
     static napi_value SplitText(napi_env env, napi_callback_info info);
     static napi_value GetTextEmbeddingModel(napi_env env, napi_callback_info info);
+    static napi_value GetSupportedCloudModel(napi_env env, napi_callback_info info);
     static napi_value TextConstructor(napi_env env, napi_callback_info info);
     static void Destructor(napi_env env, void *nativeObject, void *finalize);
     struct AsyncGetTextEmbeddingModelData {
@@ -44,6 +45,12 @@ public:
         napi_deferred deferred;
         ModelConfigData config;
         napi_value res;
+        int32_t ret;
+    };
+    struct AsyncGetSupportedCloudModelData {
+        napi_async_work asyncWork;
+        napi_deferred deferred;
+        std::vector<CloudModelInfo> results;
         int32_t ret;
     };
 
@@ -71,7 +78,19 @@ private:
     static bool CreateAsyncTextModelExecution(napi_env env, AsyncGetTextEmbeddingModelData *asyncModelData);
     static void GetTextEmbeddingModelExecutionCB(napi_env env, void *data);
     static void GetTextEmbeddingModelCompleteCB(napi_env env, napi_status status, void *data);
+    static bool CreateAsyncSupportedCloudModelExecution(napi_env env,
+        AsyncGetSupportedCloudModelData *asyncModelData);
+    static void GetSupportedCloudModelExecutionCB(napi_env env, void *data);
+    static void GetSupportedCloudModelCompleteCB(napi_env env, napi_status status, void *data);
     static bool ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *textModelConfig);
+    static bool CreateCloudModelInfo(napi_env env, const CloudModelInfo &modelInfo, napi_value &result);
+    static bool ParseCloudModelInfo(napi_env env, napi_value modelInfo, CloudModelInfo &result);
+    static napi_status CreateNetworkPolicy(napi_env env, napi_value exports);
+    static napi_status CreateModelVersion(napi_env env, napi_value exports);
+    static bool ParseModelVersion(napi_env env, napi_value arg, ModelConfigData *textModelConfig);
+    static bool ParseIsNpuAvailable(napi_env env, napi_value arg, ModelConfigData *textModelConfig);
+    static bool ParseModelInfo(napi_env env, napi_value arg, ModelConfigData *textModelConfig);
+    static bool ParseNetworkPolicy(napi_env env, napi_value arg, ModelConfigData *textModelConfig);
 
     static thread_local napi_ref sConstructor_;
     static AipCoreManagerHandle textAipCoreMgrHandle_;
