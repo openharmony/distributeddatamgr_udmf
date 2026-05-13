@@ -32,6 +32,7 @@
         "cJSON",
         "c_utils",
         "dfs_service",
+        "ets_frontend",
         "hilog",
         "hisysevent",
         "hitrace",
