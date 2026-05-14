@@ -653,10 +653,7 @@ void TextEmbeddingNapi::GetSupportedCloudModelCompleteCB(napi_env env, napi_stat
         AIP_HILOGE("napi_create_array_with_length failed");
         ThrowIntelligenceErrByPromise(env, INNER_ERROR, "GetSupportedCloudModelCompleteCB failed", result);
         napi_reject_deferred(env, modelData->deferred, result);
-        status = napi_delete_async_work(env, modelData->asyncWork);
-        if (status != napi_ok) {
-            AIP_HILOGE("napi_delete_async_work failed");
-        }
+        napi_delete_async_work(env, modelData->asyncWork);
         delete modelData;
         return;
     }
@@ -680,10 +677,7 @@ void TextEmbeddingNapi::GetSupportedCloudModelCompleteCB(napi_env env, napi_stat
     if (isResolved) {
         napi_resolve_deferred(env, modelData->deferred, result);
     }
-    status = napi_delete_async_work(env, modelData->asyncWork);
-    if (status != napi_ok) {
-        AIP_HILOGE("napi_delete_async_work failed");
-    }
+    napi_delete_async_work(env, modelData->asyncWork);
     delete modelData;
 }
 
