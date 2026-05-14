@@ -21,7 +21,6 @@ static { loadLibrary("udmf_taihe_native.z"); }
 
 enum ModelVersion : i32 {
     BASIC_MODEL = 0,
-    CLOUD_MODEL = 1,
 }
 
 enum NetworkPolicy : i32 {
