@@ -332,9 +332,6 @@ OHOS::DataIntelligence::NetworkSyncPolicy ConvertNetworkSyncPolicy(::ohos::data:
 
 ::taihe::array<::ohos::data::intelligence::CloudModelInfo> getSupportedCloudModelSync()
 {
-    ::ohos::data::intelligence::TextEmbedding textEmbed =
-        taihe::make_holder<TextEmbeddingImpl, ::ohos::data::intelligence::TextEmbedding>();
-    (void)textEmbed;
     if (!textAipCoreManager_) {
         LOG_ERROR(UDMF_ANI, "textAipCoreManager_ is nullptr");
         taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
