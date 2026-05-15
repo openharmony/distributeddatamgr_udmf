@@ -48,7 +48,7 @@ public:
     static void SetInt32Property(napi_env env, napi_value targetObj, int32_t value, const char *propName);
     static void SetStringProperty(napi_env env, napi_value targetObj, std::string value, const char *propName);
     static void SetPropertyName(napi_env env, napi_value targetObj, const char *propName, napi_value propValue);
-    static bool CheckModelConfig(napi_env env, napi_value value);
+    static bool CheckModelConfig(napi_env env, napi_value value, uint8_t maxConfigLength = 3);
 
     static napi_status Convert2Value(napi_env env, napi_value in, bool &out);
     static napi_status Convert2Value(napi_env env, napi_value in, std::vector<uint8_t> &out);

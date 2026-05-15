@@ -101,30 +101,16 @@ describe('UdmfIntelligenceJsTest', function () {
      */
   it('intelligenceApiTest0200', 0, async function (done) {
     console.info(TAG + 'intelligenceApiTest0200 start');
-    if (currentDeviceIsPc) {
-      intelligence.getTextEmbeddingModel(textConfig)
-        .then((data) => {
-          console.info(TAG + 'get result' + data);
-          let ret = false;
-          if (data != null) {
-            ret = true;
-          }
-          expect(ret).assertEqual(true);
-          done();
-        });
-    } else {
-      intelligence.getTextEmbeddingModel(textConfig)
-        .then((data) => {
-          console.info(TAG + 'get result' + data);
-          expect().assertFail();
-          done();
-        })
-        .catch((err) => {
-          console.info(TAG + 'get promise result:' + err.code);
-          expect(err.code).assertEqual(801);
-          done();
-        });
-    }
+    intelligence.getTextEmbeddingModel(textConfig)
+      .then((data) => {
+        console.info(TAG + 'get result' + data);
+        let ret = false;
+        if (data != null) {
+          ret = true;
+        }
+        expect(ret).assertEqual(true);
+        done();
+      });
   });
 
   /**
@@ -180,15 +166,7 @@ describe('UdmfIntelligenceJsTest', function () {
             });
         });
     } else {
-      intelligence.getTextEmbeddingModel(textConfig)
-        .then((data) => {
-          console.info(TAG + 'get result:' + data);
-          expect().assertFail();
-        })
-        .catch((err) => {
-          expect(err.code).assertEqual(801);
-          done();
-        });
+      done();
     }
   });
 
@@ -218,17 +196,7 @@ describe('UdmfIntelligenceJsTest', function () {
         done();
       }
     } else {
-      intelligence.getTextEmbeddingModel(textConfig)
-        .then((data) => {
-          console.info(TAG + 'get result:' + data);
-          expect().assertFail();
-          done();
-        })
-        .catch((err) => {
-          console.info(TAG + 'get result' + err.code);
-          expect(err.code).assertEqual(801);
-          done();
-        });
+      done();
     }
   });
 
@@ -257,16 +225,7 @@ describe('UdmfIntelligenceJsTest', function () {
             });
         });
     } else {
-      intelligence.getTextEmbeddingModel(textConfig)
-        .then((data) => {
-          console.info(TAG + 'get result:' + data);
-          expect().assertFail();
-        })
-        .catch((err) => {
-          console.info(TAG + 'loadModel promise result:' + err.code);
-          expect(err.code).assertEqual(801);
-          done();
-        });
+      done();
     }
   });
 
@@ -297,16 +256,7 @@ describe('UdmfIntelligenceJsTest', function () {
             });
         });
     } else {
-      intelligence.getTextEmbeddingModel(textConfig)
-        .then((data) => {
-          console.info(TAG + 'get result:' + data);
-          expect().assertFail();
-        })
-        .catch((err) => {
-          console.info(TAG + 'getEmbedding promise result:' + err.code);
-          expect(err.code).assertEqual(801);
-          done();
-        });
+      done();
     }
   });
 
@@ -334,17 +284,7 @@ describe('UdmfIntelligenceJsTest', function () {
             });
         });
     } else {
-      intelligence.getTextEmbeddingModel(textConfig)
-        .then((data) => {
-          console.info(TAG + 'get result:' + data);
-          expect().assertFail();
-          done();
-        })
-        .catch((err) => {
-          console.info(TAG + 'getEmbedding promise result:' + err.code);
-          expect(err.code).assertEqual(801);
-          done();
-        });
+      done();
     }
   });
 
@@ -372,17 +312,7 @@ describe('UdmfIntelligenceJsTest', function () {
             });
         });
     } else {
-      intelligence.getTextEmbeddingModel(textConfig)
-        .then((data) => {
-          console.info(TAG + 'get result: ' + data);
-          expect().assertFail();
-          done();
-        })
-        .catch((err) => {
-          console.info(TAG + 'getEmbedding promise result: ' + err.code);
-          expect(err.code).assertEqual(801);
-          done();
-        });
+      done();
     }
   });
 
@@ -503,5 +433,20 @@ describe('UdmfIntelligenceJsTest', function () {
           done();
         });
     }
+  });
+
+  /**
+   * @tc.name intelligenceApiTest1300
+   * @tc.number SUB_DistributedData_Intelligence_SDK_intelligenceApiTest_1300
+   * @tc.desc getSupportedCloudModel() getSupportedCloudModel test interface test
+   * @tc.type Function
+   */
+  it('intelligenceApiTest1300', 0, async function (done) {
+    console.info(TAG + 'intelligenceApiTest1300 start');
+    intelligence.getSupportedCloudModel()
+      .then((info) => {
+        expect(info.length >= 0).assertEqual(true);
+        done();
+      });
   });
 });

@@ -23,10 +23,22 @@ enum ModelVersion : i32 {
     BASIC_MODEL = 0,
 }
 
+enum NetworkPolicy : i32 {
+    WIFI_ONLY = 0,
+    WIFI_AND_CELLULAR = 1,
+}
+
+struct CloudModelInfo {
+    modelType: String;
+    modelVersion: Optional<String>;
+}
+
 struct ModelConfig {
     version: ModelVersion;
     isNpuAvailable: bool;
     cachePath: Optional<String>;
+    modelInfo: Optional<CloudModelInfo>;
+    networkPolicy: Optional<NetworkPolicy>;
 }
 
 interface TextEmbedding {
@@ -53,6 +65,8 @@ struct SplitConfig {
 
 @gen_promise("getTextEmbeddingModel")
 function getTextEmbeddingModelSync(config: ModelConfig): TextEmbedding;
+@gen_promise("getSupportedCloudModel")
+function getSupportedCloudModelSync(): Array<CloudModelInfo>;
 @gen_promise("getImageEmbeddingModel")
 function getImageEmbeddingModelSync(config: ModelConfig): ImageEmbedding;
 @gen_promise("splitText")

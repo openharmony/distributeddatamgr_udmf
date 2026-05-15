@@ -76,5 +76,10 @@ bool IAipCoreManagerImpl::CheckDeviceType()
     return false;
 }
 
+int32_t IAipCoreManagerImpl::GetSupportedCloudModel(std::vector<CloudModelInfo> &results)
+{
+    return DEVICE_EXCEPTION;
+}
+
 } // namespace DataIntelligence
 } // namespace OHOS

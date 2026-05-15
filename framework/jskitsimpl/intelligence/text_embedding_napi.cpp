@@ -33,10 +33,13 @@ const int32_t ERR_OK = 0;
 static constexpr uint8_t ARG_0 = 0;
 static constexpr uint8_t ARG_1 = 1;
 static constexpr uint8_t ARG_2 = 2;
+static constexpr uint8_t TEXT_MODEL_CONFIG_MAX_LENGTH = 5;
 
 static constexpr uint8_t NUM_0 = 0;
 static constexpr uint8_t NUM_1 = 1;
 static constexpr uint8_t BASIC_MODEL = 0;
+static constexpr int32_t WIFI_ONLY = 0;
+static constexpr int32_t WIFI_AND_CELLULAR = 1;
 static constexpr uint32_t MAX_STR_PARAM_LEN = 512;
 static const std::string CLASS_NAME = "TextEmbedding";
 const std::vector<std::string> EXPECTED_SPLITTEXT_ARG_TYPES = { "string", "object" };
@@ -143,45 +146,69 @@ static napi_value StartInit(napi_env env, napi_value exports, struct TextEmbeddi
     return exports;
 }
 
+napi_status TextEmbeddingNapi::CreateNetworkPolicy(napi_env env, napi_value exports)
+{
+    napi_value networkPolicy;
+    auto status = napi_create_object(env, &networkPolicy);
+    if (status != napi_ok) {
+        AIP_HILOGE("Failed create object");
+        return status;
+    }
+    AipNapiUtils::SetInt32Property(env, networkPolicy, WIFI_ONLY, "WIFI_ONLY");
+    AipNapiUtils::SetInt32Property(env, networkPolicy, WIFI_AND_CELLULAR, "WIFI_AND_CELLULAR");
+    AipNapiUtils::SetPropertyName(env, exports, "NetworkPolicy", networkPolicy);
+    return napi_ok;
+}
+
+napi_status TextEmbeddingNapi::CreateModelVersion(napi_env env, napi_value exports)
+{
+    napi_value modelVersion;
+    napi_status status = napi_create_object(env, &modelVersion);
+    if (status != napi_ok) {
+        AIP_HILOGE("Failed create object");
+        return status;
+    }
+
+    AipNapiUtils::SetInt32Property(env, modelVersion, BASIC_MODEL, "BASIC_MODEL");
+    AipNapiUtils::SetPropertyName(env, exports, "ModelVersion", modelVersion);
+    return napi_ok;
+}
+
 napi_value TextEmbeddingNapi::Init(napi_env env, napi_value exports)
 {
     AIP_HILOGD("Enter");
     if (!AipNapiUtils::LoadAlgoLibrary(AIP_MANAGER_PATH, textAipCoreMgrHandle_)) {
         AIP_HILOGE("LoadAlgoLibrary failed");
     }
-
     if (textAipCoreMgrHandle_.pAipManager != nullptr) {
         textAipCoreManager_ = AipNapiUtils::GetAlgoObj(textAipCoreMgrHandle_);
     } else {
         textAipCoreManager_ = new (std::nothrow) IAipCoreManagerImpl();
     }
-
     if (textAipCoreManager_ == nullptr) {
         AIP_HILOGE("GetAlgoObj failed");
         return nullptr;
     }
-
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("loadModel", LoadModel),
         DECLARE_NAPI_FUNCTION("releaseModel", ReleaseModel),
         DECLARE_NAPI_FUNCTION("getEmbedding", GetEmbedding),
     };
-
     napi_property_descriptor static_prop[] = {
         DECLARE_NAPI_STATIC_FUNCTION("getTextEmbeddingModel", GetTextEmbeddingModel),
+        DECLARE_NAPI_STATIC_FUNCTION("getSupportedCloudModel", GetSupportedCloudModel),
         DECLARE_NAPI_STATIC_FUNCTION("splitText", SplitText),
     };
-
-    napi_value modelVersion;
-    napi_status status = napi_create_object(env, &modelVersion);
+    napi_status status = CreateModelVersion(env, exports);
     if (status != napi_ok) {
-        AIP_HILOGE("Failed create object");
+        AIP_HILOGE("Failed create modelVersion");
         return nullptr;
     }
-
-    AipNapiUtils::SetInt32Property(env, modelVersion, BASIC_MODEL, "BASIC_MODEL");
-    AipNapiUtils::SetPropertyName(env, exports, "ModelVersion", modelVersion);
-
+    status = CreateNetworkPolicy(env, exports);
+    if (status != napi_ok) {
+        AIP_HILOGE("Failed create networkPolicy");
+        return nullptr;
+    }
     struct TextEmbeddingConstructorInfo info = {
         .className = CLASS_NAME,
         .classRef = &sConstructor_,
@@ -191,7 +218,6 @@ napi_value TextEmbeddingNapi::Init(napi_env env, napi_value exports)
         .staticProperty = static_prop,
         .staticPropertyCount = sizeof(static_prop) / sizeof(static_prop[NUM_0]),
     };
-
     if (StartInit(env, exports, info)) {
         return nullptr;
     }
@@ -247,7 +273,7 @@ napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_
         return nullptr;
     }
 
-    ModelConfigData textModelConfig;
+    ModelConfigData textModelConfig {};
     if (!ParseModelConfig(env, args, argc, &textModelConfig)) {
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "ParseModelConfig failed");
         return nullptr;
@@ -265,6 +291,8 @@ napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_
         .asyncWork = nullptr,
         .deferred = deferred,
         .config = textModelConfig,
+        .res = nullptr,
+        .ret = INNER_ERROR,
     };
     if (asyncGetTextEmbeddingModelData == nullptr) {
         AIP_HILOGE("new asyncGetTextEmbeddingModelData error.");
@@ -281,22 +309,79 @@ napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_
     return promise;
 }
 
-bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *textModelConfig)
+bool TextEmbeddingNapi::CreateCloudModelInfo(napi_env env, const CloudModelInfo &modelInfo, napi_value &result)
 {
-    AIP_HILOGI("Enter");
-    if (textModelConfig == nullptr) {
-        AIP_HILOGE("The modelConfig is null");
-        return false;
-    }
-    if (!AipNapiUtils::CheckModelConfig(env, args[ARG_0])) {
-        AIP_HILOGE("The modelConfig is failed");
+    napi_status status = napi_create_object(env, &result);
+    if (status != napi_ok) {
+        AIP_HILOGE("napi_create_object failed");
         return false;
     }
 
+    napi_value modelType = nullptr;
+    status = napi_create_string_utf8(env, modelInfo.modelType.c_str(), NAPI_AUTO_LENGTH, &modelType);
+    if (status != napi_ok) {
+        AIP_HILOGE("napi_create_string_utf8 modelType failed");
+        return false;
+    }
+    status = napi_set_named_property(env, result, "modelType", modelType);
+    if (status != napi_ok) {
+        AIP_HILOGE("napi_set_named_property modelType failed");
+        return false;
+    }
+
+    if (!modelInfo.modelVersion.empty()) {
+        napi_value modelVersion = nullptr;
+        status = napi_create_string_utf8(env, modelInfo.modelVersion.c_str(), NAPI_AUTO_LENGTH, &modelVersion);
+        if (status != napi_ok) {
+            AIP_HILOGE("napi_create_string_utf8 modelVersion failed");
+            return false;
+        }
+        status = napi_set_named_property(env, result, "modelVersion", modelVersion);
+        if (status != napi_ok) {
+            AIP_HILOGE("napi_set_named_property modelVersion failed");
+            return false;
+        }
+    }
+    return true;
+}
+
+bool TextEmbeddingNapi::ParseCloudModelInfo(napi_env env, napi_value modelInfo, CloudModelInfo &result)
+{
+    napi_valuetype valueType = napi_undefined;
+    napi_status status = napi_typeof(env, modelInfo, &valueType);
+    if (status != napi_ok || valueType != napi_object) {
+        AIP_HILOGE("modelInfo is not object");
+        return false;
+    }
+
+    napi_value modelType = nullptr;
+    status = napi_get_named_property(env, modelInfo, "modelType", &modelType);
+    if (status != napi_ok || !AipNapiUtils::TransJsToStr(env, modelType, result.modelType)) {
+        AIP_HILOGE("get modelType failed");
+        return false;
+    }
+
+    bool hasModelVersion = false;
+    status = napi_has_named_property(env, modelInfo, "modelVersion", &hasModelVersion);
+    if (status != napi_ok) {
+        AIP_HILOGE("has modelVersion failed");
+        return false;
+    }
+    if (hasModelVersion) {
+        napi_value modelVersion = nullptr;
+        status = napi_get_named_property(env, modelInfo, "modelVersion", &modelVersion);
+        if (status != napi_ok || !AipNapiUtils::TransJsToStr(env, modelVersion, result.modelVersion)) {
+            AIP_HILOGE("get modelVersion failed");
+            return false;
+        }
+    }
+    return true;
+}
+
+bool TextEmbeddingNapi::ParseModelVersion(napi_env env, napi_value arg, ModelConfigData *textModelConfig)
+{
     napi_value version;
-    napi_value isNPUAvailable;
-    napi_value cachePath;
-    napi_status status = napi_get_named_property(env, args[ARG_0], "version", &version);
+    napi_status status = napi_get_named_property(env, arg, "version", &version);
     if (status != napi_ok) {
         AIP_HILOGE("napi get version property failed");
         return false;
@@ -311,8 +396,14 @@ bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t 
         AIP_HILOGE("The version value is invalid");
         return false;
     }
+    return true;
+}
 
-    status = napi_get_named_property(env, args[ARG_0], "isNpuAvailable", &isNPUAvailable);
+bool TextEmbeddingNapi::ParseIsNpuAvailable(napi_env env, napi_value arg, ModelConfigData *textModelConfig)
+{
+    napi_value isNPUAvailable;
+    napi_value cachePath;
+    napi_status status = napi_get_named_property(env, arg, "isNpuAvailable", &isNPUAvailable);
     if (status != napi_ok) {
         AIP_HILOGE("napi get isNpuAvailable property failed");
         return false;
@@ -322,9 +413,8 @@ bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t 
         AIP_HILOGE("Trans isNPUAvailable failed");
         return false;
     }
-
     if (textModelConfig->isNPUAvailableValue) {
-        status = napi_get_named_property(env, args[ARG_0], "cachePath", &cachePath);
+        status = napi_get_named_property(env, arg, "cachePath", &cachePath);
         if (status != napi_ok) {
             AIP_HILOGE("napi get cachePath property failed");
             return false;
@@ -338,6 +428,78 @@ bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t 
         textModelConfig->cachePathValue = "";
     }
     return true;
+}
+
+bool TextEmbeddingNapi::ParseModelInfo(napi_env env, napi_value arg, ModelConfigData *textModelConfig)
+{
+    napi_value modelInfo;
+    bool hasModelInfo = false;
+    napi_status status = napi_has_named_property(env, arg, "modelInfo", &hasModelInfo);
+    if (status != napi_ok) {
+        AIP_HILOGE("Get modelInfo failed");
+        return false;
+    }
+    if (!hasModelInfo) {
+        return true;
+    }
+    status = napi_get_named_property(env, arg, "modelInfo", &modelInfo);
+    if (status != napi_ok || !ParseCloudModelInfo(env, modelInfo, textModelConfig->modelInfo)) {
+        AIP_HILOGE("Parse modelInfo failed");
+        return false;
+    }
+    return true;
+}
+
+bool TextEmbeddingNapi::ParseNetworkPolicy(napi_env env, napi_value arg, ModelConfigData *textModelConfig)
+{
+    napi_value networkPolicy;
+    bool hasNetworkPolicy = false;
+    napi_status status = napi_has_named_property(env, arg, "networkPolicy", &hasNetworkPolicy);
+    if (status != napi_ok) {
+        AIP_HILOGE("Get networkPolicy failed");
+        return false;
+    }
+    if (!hasNetworkPolicy) {
+        return true;
+    }
+    int32_t policy = WIFI_ONLY;
+    status = napi_get_named_property(env, arg, "networkPolicy", &networkPolicy);
+    if (status != napi_ok || !AipNapiUtils::TransJsToInt32(env, networkPolicy, policy)) {
+        AIP_HILOGE("Parse networkPolicy failed");
+        return false;
+    }
+    if (policy != WIFI_ONLY && policy != WIFI_AND_CELLULAR) {
+        AIP_HILOGE("NetworkPolicy is invalid");
+        return false;
+    }
+    textModelConfig->syncPolicyValue = static_cast<NetworkSyncPolicy>(policy);
+    return true;
+}
+
+bool TextEmbeddingNapi::ParseModelConfig(napi_env env, napi_value *args, size_t argc, ModelConfigData *textModelConfig)
+{
+    AIP_HILOGI("Enter");
+    if (textModelConfig == nullptr) {
+        AIP_HILOGE("The modelConfig is null");
+        return false;
+    }
+    if (!AipNapiUtils::CheckModelConfig(env, args[ARG_0], TEXT_MODEL_CONFIG_MAX_LENGTH)) {
+        AIP_HILOGE("The modelConfig is failed");
+        return false;
+    }
+    if (!ParseModelVersion(env, args[ARG_0], textModelConfig)) {
+        AIP_HILOGE("Parse version fail");
+        return false;
+    }
+    if (!ParseIsNpuAvailable(env, args[ARG_0], textModelConfig)) {
+        AIP_HILOGE("Parse isNpuAvailable fail");
+        return false;
+    }
+    if (!ParseModelInfo(env, args[ARG_0], textModelConfig)) {
+        AIP_HILOGE("Parse modelInfo fail");
+        return false;
+    }
+    return ParseNetworkPolicy(env, args[ARG_0], textModelConfig);
 }
 
 bool TextEmbeddingNapi::CreateAsyncTextModelExecution(napi_env env, AsyncGetTextEmbeddingModelData *asyncModelData)
@@ -360,6 +522,7 @@ bool TextEmbeddingNapi::CreateAsyncTextModelExecution(napi_env env, AsyncGetText
     status = napi_queue_async_work_with_qos(env, asyncModelData->asyncWork, napi_qos_default);
     if (status != napi_ok) {
         AIP_HILOGE("napi_queue_async_work_with_qos failed");
+        napi_delete_async_work(env, asyncModelData->asyncWork);
         return false;
     }
     return true;
@@ -372,6 +535,7 @@ void TextEmbeddingNapi::GetTextEmbeddingModelExecutionCB(napi_env env, void *dat
     AsyncGetTextEmbeddingModelData *modelData = static_cast<AsyncGetTextEmbeddingModelData *>(data);
     if (textAipCoreManager_ == nullptr) {
         AIP_HILOGE("pAipManager is nullptr");
+        modelData->ret = INNER_ERROR;
         return;
     }
     auto config = modelData->config;
@@ -398,7 +562,9 @@ void TextEmbeddingNapi::GetTextEmbeddingModelCompleteCB(napi_env env, napi_statu
         status = napi_get_reference_value(env, sConstructor_, &constructor);
         if (status != napi_ok) {
             AIP_HILOGE("napi_get_reference_value failed");
-            napi_get_undefined(env, &result);
+            ThrowIntelligenceErrByPromise(env, INNER_ERROR, "napi_get_reference_value failed", result);
+            napi_reject_deferred(env, modelData->deferred, result);
+            napi_delete_async_work(env, modelData->asyncWork);
             delete modelData;
             return;
         }
@@ -406,7 +572,9 @@ void TextEmbeddingNapi::GetTextEmbeddingModelCompleteCB(napi_env env, napi_statu
         status = napi_new_instance(env, constructor, 0, nullptr, &result);
         if (status != napi_ok) {
             AIP_HILOGE("napi_new_instance failed");
-            napi_get_undefined(env, &result);
+            ThrowIntelligenceErrByPromise(env, INNER_ERROR, "napi_new_instance failed", result);
+            napi_reject_deferred(env, modelData->deferred, result);
+            napi_delete_async_work(env, modelData->asyncWork);
             delete modelData;
             return;
         }
@@ -424,6 +592,136 @@ void TextEmbeddingNapi::GetTextEmbeddingModelCompleteCB(napi_env env, napi_statu
     delete modelData;
 }
 
+bool TextEmbeddingNapi::CreateAsyncSupportedCloudModelExecution(napi_env env,
+    AsyncGetSupportedCloudModelData *asyncModelData)
+{
+    AIP_HILOGI("Enter");
+    napi_value resourceName;
+    napi_status status = napi_create_string_utf8(env, "GetSupportedCloudModel", NAPI_AUTO_LENGTH, &resourceName);
+    if (status != napi_ok) {
+        AIP_HILOGE("napi_create_string_utf8 failed");
+        return false;
+    }
+
+    status = napi_create_async_work(env, nullptr, resourceName, GetSupportedCloudModelExecutionCB,
+        GetSupportedCloudModelCompleteCB, static_cast<void *>(asyncModelData), &asyncModelData->asyncWork);
+    if (status != napi_ok) {
+        AIP_HILOGE("napi_create_async_work failed");
+        return false;
+    }
+
+    status = napi_queue_async_work_with_qos(env, asyncModelData->asyncWork, napi_qos_default);
+    if (status != napi_ok) {
+        AIP_HILOGE("napi_queue_async_work_with_qos failed");
+        napi_delete_async_work(env, asyncModelData->asyncWork);
+        return false;
+    }
+    return true;
+}
+
+void TextEmbeddingNapi::GetSupportedCloudModelExecutionCB(napi_env env, void *data)
+{
+    AIP_HILOGD("Enter");
+    AsyncGetSupportedCloudModelData *modelData = static_cast<AsyncGetSupportedCloudModelData *>(data);
+    if (textAipCoreManager_ == nullptr) {
+        AIP_HILOGE("pAipManager is nullptr");
+        modelData->ret = INNER_ERROR;
+        return;
+    }
+    modelData->ret = textAipCoreManager_->GetSupportedCloudModel(modelData->results);
+    AIP_HILOGD("Exit");
+}
+
+void TextEmbeddingNapi::GetSupportedCloudModelCompleteCB(napi_env env, napi_status status, void *data)
+{
+    AIP_HILOGD("Enter");
+    AsyncGetSupportedCloudModelData *modelData = static_cast<AsyncGetSupportedCloudModelData *>(data);
+    napi_value result = nullptr;
+    if (modelData->ret != ERR_OK) {
+        if (modelData->ret == DEVICE_EXCEPTION) {
+            ThrowIntelligenceErrByPromise(env, DEVICE_EXCEPTION, "GetSupportedCloudModelCompleteCB failed", result);
+        } else {
+            ThrowIntelligenceErrByPromise(env, INNER_ERROR, "GetSupportedCloudModelCompleteCB failed", result);
+        }
+        napi_reject_deferred(env, modelData->deferred, result);
+        napi_delete_async_work(env, modelData->asyncWork);
+        delete modelData;
+        return;
+    }
+    status = napi_create_array_with_length(env, modelData->results.size(), &result);
+    if (status != napi_ok) {
+        AIP_HILOGE("napi_create_array_with_length failed");
+        ThrowIntelligenceErrByPromise(env, INNER_ERROR, "GetSupportedCloudModelCompleteCB failed", result);
+        napi_reject_deferred(env, modelData->deferred, result);
+        napi_delete_async_work(env, modelData->asyncWork);
+        delete modelData;
+        return;
+    }
+    bool isResolved = true;
+    for (size_t i = 0; i < modelData->results.size(); ++i) {
+        napi_value item = nullptr;
+        if (!CreateCloudModelInfo(env, modelData->results[i], item)) {
+            ThrowIntelligenceErrByPromise(env, INNER_ERROR, "CreateCloudModelInfo failed", result);
+            napi_reject_deferred(env, modelData->deferred, result);
+            isResolved = false;
+            break;
+        }
+        status = napi_set_element(env, result, i, item);
+        if (status != napi_ok) {
+            ThrowIntelligenceErrByPromise(env, INNER_ERROR, "napi_set_element failed", result);
+            napi_reject_deferred(env, modelData->deferred, result);
+            isResolved = false;
+            break;
+        }
+    }
+    if (isResolved) {
+        napi_resolve_deferred(env, modelData->deferred, result);
+    }
+    napi_delete_async_work(env, modelData->asyncWork);
+    delete modelData;
+}
+
+napi_value TextEmbeddingNapi::GetSupportedCloudModel(napi_env env, napi_callback_info info)
+{
+    HISTOGRAM_BOOLEAN("Udmf.APICall.TextEmbedding.getSupportedCloudModel", true);
+    AIP_HILOGD("Enter");
+    size_t argc = ARG_1;
+    napi_value args[ARG_1] = { nullptr };
+    napi_value jsThis = nullptr;
+
+    napi_status status = napi_get_cb_info(env, info, &argc, args, &jsThis, nullptr);
+    if (status != napi_ok || argc != NUM_0) {
+        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "napi_get_cb_info failed");
+        return nullptr;
+    }
+
+    napi_value promise = nullptr;
+    napi_deferred deferred = nullptr;
+    status = napi_create_promise(env, &deferred, &promise);
+    if (status != napi_ok) {
+        ThrowIntelligenceErr(env, INNER_ERROR, "create promise failed");
+        return nullptr;
+    }
+
+    auto asyncData = new (std::nothrow) AsyncGetSupportedCloudModelData{
+        .asyncWork = nullptr,
+        .deferred = deferred,
+        .results = {},
+        .ret = INNER_ERROR,
+    };
+    if (asyncData == nullptr) {
+        AIP_HILOGE("new AsyncGetSupportedCloudModelData error");
+        ThrowIntelligenceErr(env, INNER_ERROR, "new AsyncGetSupportedCloudModelData failed");
+        return nullptr;
+    }
+
+    if (!CreateAsyncSupportedCloudModelExecution(env, asyncData)) {
+        ThrowIntelligenceErr(env, INNER_ERROR, "create AsyncSupportedCloudModelExecution failed");
+        delete asyncData;
+        return nullptr;
+    }
+    return promise;
+}
 
 napi_value TextEmbeddingNapi::SplitText(napi_env env, napi_callback_info info)
 {

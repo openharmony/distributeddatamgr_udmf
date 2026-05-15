@@ -25,10 +25,22 @@
 
 namespace OHOS {
 namespace DataIntelligence {
+enum NetworkSyncPolicy : int32_t {
+    SYNC_WIFI_ONLY = 0,
+    SYNC_WIFI_AND_CELLULAR = 1
+};
+
+struct CloudModelInfo {
+    std::string modelType;
+    std::string modelVersion;
+};
+
 struct ModelConfigData {
-    int32_t versionValue;
-    bool isNPUAvailableValue;
+    int32_t versionValue = 0;
+    bool isNPUAvailableValue = false;
     std::string cachePathValue;
+    CloudModelInfo modelInfo;
+    NetworkSyncPolicy syncPolicyValue = SYNC_WIFI_ONLY;
 };
 
 class IAipCoreManager {
@@ -48,6 +60,7 @@ public:
     virtual int32_t GetImageEmbedding(std::string uri, std::vector<float> &results) = 0;
     virtual int32_t SplitText(std::string text, int32_t size, float overlap, std::vector<std::string> &results) = 0;
     virtual bool CheckDeviceType() = 0;
+    virtual int32_t GetSupportedCloudModel(std::vector<CloudModelInfo> &results) = 0;
 };
 
 struct AipCoreManagerHandle {

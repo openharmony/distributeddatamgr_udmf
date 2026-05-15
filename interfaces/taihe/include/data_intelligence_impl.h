@@ -51,6 +51,7 @@ bool LoadAlgoLibrary(const std::string &fileName, OHOS::DataIntelligence::AipCor
 bool UnLoadAlgoLibrary(OHOS::DataIntelligence::AipCoreManagerHandle &managerHandle);
 ::ohos::data::intelligence::TextEmbedding getTextEmbeddingModelSync(
     ::ohos::data::intelligence::ModelConfig const& config);
+::taihe::array<::ohos::data::intelligence::CloudModelInfo> getSupportedCloudModelSync();
 ::ohos::data::intelligence::ImageEmbedding getImageEmbeddingModelSync(
     ::ohos::data::intelligence::ModelConfig const& config);
 ::taihe::array<::taihe::string> splitTextSync(::taihe::string_view text,
