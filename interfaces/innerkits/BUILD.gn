@@ -106,9 +106,6 @@ ohos_shared_library("udmf_client") {
     "kv_store:distributeddata_mgr",
     "libuv:uv",
     "samgr:samgr_proxy",
-  ]
-
-  public_external_deps = [
     "ability_base:want",
     "cJSON:cjson",
     "image_framework:image",

@@ -14,7 +14,7 @@
  */
 #define LOG_TAG "UnifiedDataHelper"
 #include "unified_data_helper.h"
-
+#include <cinttypes>
 #include "common_func.h"
 #include "directory_ex.h"
 #include "file_ex.h"

@@ -22,6 +22,8 @@
 #include "udmf_capi_common.h"
 #include "unified_meta.h"
 #include "uri_permission_util.h"
+#include "want.h"
+#include "pixel_map.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;

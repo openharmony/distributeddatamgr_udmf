@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #define LOG_TAG "UnifiedData"
+#include <cinttypes>
 #include "logger.h"
 #include "unified_data.h"
 #include "utd_client.h"

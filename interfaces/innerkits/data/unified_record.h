@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <mutex>
 #include "entry_getter.h"
 #include "unified_meta.h"
 #include "visibility.h"

@@ -33,6 +33,8 @@
 #include "unified_data.h"
 #include "pixelmap_native_impl.h"
 #include "system_defined_pixelmap.h"
+#include "want.h"
+#include "pixel_map.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;

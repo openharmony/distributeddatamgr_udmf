@@ -18,6 +18,7 @@
 #include "file.h"
 #include "getter_system.h"
 #include "logger.h"
+#include "uri.h"
 #include "utd_client.h"
 
 namespace OHOS {

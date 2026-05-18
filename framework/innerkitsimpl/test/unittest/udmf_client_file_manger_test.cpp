@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <thread>
 #include <chrono>
+#include <cinttypes>
 
 #include "token_setproc.h"
 #include "accesstoken_kit.h"
