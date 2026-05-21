@@ -22,6 +22,7 @@
 #include "logger.h"
 #include "file.h"
 #include "unified_meta.h"
+#include "uri_permission_util.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
@@ -357,5 +358,131 @@ HWTEST_F(FileTest, File015, TestSize.Level1)
     EXPECT_EQ(iter, object->value_.end());
 
     LOG_INFO(UDMF_TEST, "File015 end.");
+}
+
+/**
+* @tc.name: File016
+* @tc.desc: Test SetUriAuthorizationPolicyMask with large mask value normalization
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File016, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File016 begin.");
+    File file("file://com.example.test/data.txt");
+
+    file.SetUriAuthorizationPolicyMask(0xFFFFFFFF);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 7);
+
+    constexpr uint32_t invalidHighBit = 8u;
+    file.SetUriAuthorizationPolicyMask(invalidHighBit);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 0);
+
+    constexpr uint32_t allValidFlags =
+        UriPermissionUtil::READ_FLAG | UriPermissionUtil::WRITE_FLAG | UriPermissionUtil::PERSIST_FLAG;
+    file.SetUriAuthorizationPolicyMask(allValidFlags | invalidHighBit);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), allValidFlags);
+
+    LOG_INFO(UDMF_TEST, "File016 end.");
+}
+
+/**
+* @tc.name: File017
+* @tc.desc: Test UriPermission ToMask with NONE combined with other permissions.
+*           This test focuses on File class usage scenarios. For comprehensive
+*           UriPermissionUtil tests, see UnifiedMetaTest::UriPermissionUtil_ToMask_002.
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File017, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File017 begin.");
+    std::vector<UriPermission> noneOnly = {UriPermission::NONE};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneOnly), 0);
+
+    std::vector<UriPermission> noneWithRead = {UriPermission::NONE, UriPermission::READ};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneWithRead), 0);
+
+    std::vector<UriPermission> noneWithWrite = {UriPermission::NONE, UriPermission::WRITE};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneWithWrite), 0);
+
+    std::vector<UriPermission> noneWithPersist = {UriPermission::NONE, UriPermission::READ, UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneWithPersist), 0);
+
+    std::vector<UriPermission> noneWithAll = {
+        UriPermission::NONE, UriPermission::READ, UriPermission::WRITE, UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneWithAll), 0);
+
+    LOG_INFO(UDMF_TEST, "File017 end.");
+}
+
+/**
+* @tc.name: File018
+* @tc.desc: Test UriPermission ToMask with int32 vector containing NONE.
+*           This test focuses on File class usage scenarios with int32 API.
+*           For comprehensive UriPermissionUtil tests, see UnifiedMetaTest::UriPermissionUtil_ToMask_003.
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File018, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File018 begin.");
+    std::vector<int32_t> noneOnly = {0};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneOnly), 0);
+
+    std::vector<int32_t> noneWithRead = {0, 1};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneWithRead), 0);
+
+    std::vector<int32_t> noneWithWrite = {0, 2};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneWithWrite), 0);
+
+    std::vector<int32_t> noneWithReadWrite = {0, 1, 2};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneWithReadWrite), 0);
+
+    LOG_INFO(UDMF_TEST, "File018 end.");
+}
+
+/**
+* @tc.name: File019
+* @tc.desc: Test valid permission combinations
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File019, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File019 begin.");
+    std::vector<UriPermission> read = {UriPermission::READ};
+    EXPECT_EQ(UriPermissionUtil::ToMask(read), 1);
+
+    std::vector<UriPermission> write = {UriPermission::WRITE};
+    EXPECT_EQ(UriPermissionUtil::ToMask(write), 2);
+
+    std::vector<UriPermission> readWrite = {UriPermission::READ, UriPermission::WRITE};
+    EXPECT_EQ(UriPermissionUtil::ToMask(readWrite), 3);
+
+    std::vector<UriPermission> readPersist = {UriPermission::READ, UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(readPersist), 5);
+
+    std::vector<UriPermission> writePersist = {UriPermission::WRITE, UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(writePersist), 6);
+
+    std::vector<UriPermission> all = {UriPermission::READ, UriPermission::WRITE, UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(all), 7);
+
+    LOG_INFO(UDMF_TEST, "File019 end.");
+}
+
+/**
+* @tc.name: File020
+* @tc.desc: Test invalid PERSIST alone returns NONE
+* @tc.type: FUNC
+*/
+HWTEST_F(FileTest, File020, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "File020 begin.");
+    std::vector<UriPermission> persistOnly = {UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(persistOnly), 0);
+
+    File file("file://com.example.test/data.txt");
+    file.SetUriAuthorizationPolicyMask(4);
+    EXPECT_EQ(file.GetUriAuthorizationPolicyMask(), 0);
+
+    LOG_INFO(UDMF_TEST, "File020 end.");
 }
 } // OHOS::Test
