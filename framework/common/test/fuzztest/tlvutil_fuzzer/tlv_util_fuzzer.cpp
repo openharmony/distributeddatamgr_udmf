@@ -34,6 +34,8 @@
 #include "unified_data_helper.h"
 #include "int_wrapper.h"
 #include "pixelmap_native_impl.h"
+#include "pixel_map.h"
+#include "want.h"
 
 using namespace OHOS;
 using namespace OHOS::Security::AccessToken;

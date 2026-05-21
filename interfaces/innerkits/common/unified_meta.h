@@ -25,10 +25,15 @@
 #include <variant>
 #include <vector>
 #include "visibility.h"
-#include "pixel_map.h"
 #include "string_ex.h"
-#include "want.h"
 #include "unified_key.h"
+namespace OHOS::Media {
+class PixelMap;
+}
+
+namespace OHOS::AAFwk {
+class Want;
+}
 
 namespace OHOS {
 namespace UDMF {

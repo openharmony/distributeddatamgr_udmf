@@ -17,9 +17,11 @@
 #define UDMF_UNIFIED_TYPES_H
 
 #include <map>
+#include <set>
 #include <string>
 
 #include "error_code.h"
+#include "iremote_object.h"
 #include "unified_key.h"
 #include "unified_meta.h"
 

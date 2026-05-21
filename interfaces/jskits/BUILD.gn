@@ -76,8 +76,8 @@ ohos_shared_library("unifieddatachannel_napi") {
     "ability_runtime:napi_common",
     "c_utils:utils",
     "hilog:libhilog",
-    "image_framework:image",
     "ipc:ipc_core",
+    "image_framework:image",
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
   ]
@@ -244,6 +244,7 @@ ohos_static_library("udmf_js_common") {
     "image_framework:image",
     "napi:ace_napi",
   ]
+
   subsystem_name = "distributeddatamgr"
   part_name = "udmf"
 }

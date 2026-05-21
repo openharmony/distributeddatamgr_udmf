@@ -44,6 +44,8 @@
 #include "unified_html_record_process.h"
 #include "progress_callback.h"
 #include "video.h"
+#include "want.h"
+#include "pixel_map.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;

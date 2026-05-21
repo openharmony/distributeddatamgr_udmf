@@ -15,6 +15,8 @@
 #include "tlv_util.h"
 
 #include "logger.h"
+#include "want.h"
+#include "pixel_map.h"
 
 namespace OHOS {
 namespace TLVUtil {

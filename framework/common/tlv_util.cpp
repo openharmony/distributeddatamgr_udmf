@@ -18,9 +18,11 @@
 #include "tlv_util.h"
 #include "udmf_utils.h"
 #include "logger.h"
+#include "pixel_map.h"
 #include "pixelmap_loader.h"
 #include "tlv_object.h"
 #include "uri_permission_util.h"
+#include "want.h"
 
 namespace OHOS {
 namespace TLVUtil {

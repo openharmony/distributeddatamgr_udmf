@@ -39,6 +39,8 @@
 #include "progress_callback.h"
 #include "video.h"
 #include <nlohmann/json.hpp>
+#include "want.h"
+#include "pixel_map.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;

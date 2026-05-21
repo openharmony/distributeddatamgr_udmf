@@ -36,6 +36,8 @@
 #include "unified_record.h"
 #include "unified_types.h"
 #include "uri_permission_util.h"
+#include "want.h"
+#include "pixel_map.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
