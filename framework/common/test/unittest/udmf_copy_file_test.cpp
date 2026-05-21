@@ -160,4 +160,80 @@ HWTEST_F(CopyFileTest, HandleRecord002, TestSize.Level1)
     bool result = UdmfCopyFile::GetInstance().HandleRecord(record, context);
     ASSERT_FALSE(result);
 }
+
+/**
+* @tc.name: HandleProgress001
+* @tc.desc: test HandleProgress with lambda capture this
+* @tc.type: FUNC
+*/
+HWTEST_F(CopyFileTest, HandleProgress001, TestSize.Level1)
+{
+    auto asyncHelper = std::make_shared<AsyncHelper>();
+    UdmfCopyFile::CopyContext context(asyncHelper);
+    std::string srcUri = "test_src.txt";
+    std::string destUri = "test_dest.txt";
+    uint64_t processSize = 100;
+    
+    UdmfCopyFile::GetInstance().HandleProgress(srcUri, destUri, context, processSize);
+    EXPECT_TRUE(context.asyncHelper->progressQueue.IsCancel() || context.totalSize >= 1);
+}
+
+/**
+* @tc.name: HandleProgress002
+* @tc.desc: test HandleProgress with cancel state
+* @tc.type: FUNC
+*/
+HWTEST_F(CopyFileTest, HandleProgress002, TestSize.Level1)
+{
+    auto asyncHelper = std::make_shared<AsyncHelper>();
+    asyncHelper->progressQueue.Cancel();
+    UdmfCopyFile::CopyContext context(asyncHelper);
+    std::string srcUri = "test_src.txt";
+    std::string destUri = "test_dest.txt";
+    uint64_t processSize = 100;
+    
+    UdmfCopyFile::GetInstance().HandleProgress(srcUri, destUri, context, processSize);
+    EXPECT_TRUE(context.asyncHelper->progressQueue.IsCancel());
+}
+
+/**
+* @tc.name: CopyFileWithProgress001
+* @tc.desc: test CopyFile with progress callback
+* @tc.type: FUNC
+*/
+HWTEST_F(CopyFileTest, CopyFileWithProgress001, TestSize.Level1)
+{
+    std::string srcUri = "test_src.txt";
+    std::string destUri = "test_dest.txt";
+    auto record = std::make_shared<UnifiedRecord>();
+    auto asyncHelper = std::make_shared<AsyncHelper>();
+    UdmfCopyFile::CopyContext context(asyncHelper);
+    
+    bool result = UdmfCopyFile::GetInstance().CopyFile(srcUri, destUri, record, context);
+    EXPECT_TRUE(result);
+}
+
+/**
+* @tc.name: IsRemote001
+* @tc.desc: test IsRemote with network parameter
+* @tc.type: FUNC
+*/
+HWTEST_F(CopyFileTest, IsRemote001, TestSize.Level1)
+{
+    std::string remoteUri = "file://data/test.txt?networkid=device123";
+    bool result = UdmfCopyFile::GetInstance().IsRemote(remoteUri);
+    EXPECT_TRUE(result);
+}
+
+/**
+* @tc.name: IsRemote002
+* @tc.desc: test IsRemote without network parameter
+* @tc.type: FUNC
+*/
+HWTEST_F(CopyFileTest, IsRemote002, TestSize.Level1)
+{
+    std::string localUri = "file://data/test.txt";
+    bool result = UdmfCopyFile::GetInstance().IsRemote(localUri);
+    EXPECT_FALSE(result);
+}
 } // OHOS::Test

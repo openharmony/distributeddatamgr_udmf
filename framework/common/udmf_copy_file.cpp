@@ -141,7 +141,8 @@ bool UdmfCopyFile::CopyFile(const std::string &srcUri, const std::string &destFi
 {
     uint64_t fileSize = 0;
     using ProcessCallBack = std::function<void(uint64_t processSize, uint64_t totalFileSize)>;
-    ProcessCallBack listener = [&](uint64_t processSize, uint64_t totalFileSize) {
+    ProcessCallBack listener = [this, &fileSize, &srcUri, &destFileUri, &context](
+        uint64_t processSize, uint64_t totalFileSize) {
         fileSize = totalFileSize;
         HandleProgress(srcUri, destFileUri, context, processSize);
     };
@@ -166,7 +167,7 @@ void UdmfCopyFile::HandleProgress(const std::string &srcUri, const std::string &
 {
     if (context.asyncHelper->progressQueue.IsCancel()) {
         LOG_INFO(UDMF_CLIENT, "Cancel copy.");
-        std::thread([&]() {
+        std::thread([srcUri, destFileUri, &context]() {
             auto ret = Storage::DistributedFile::FileCopyManager::GetInstance().Cancel(srcUri, destFileUri);
             if (ret != E_OK) {
                 LOG_ERROR(UDMF_CLIENT, "Cancel failed. errno=%{public}d", ret);

@@ -80,4 +80,57 @@ HWTEST_F(DataProviderImplTest, GetValueByType001, TestSize.Level1)
     EXPECT_TRUE(std::holds_alternative<std::monostate>(ret));
     LOG_INFO(UDMF_TEST, "GetValueByType001 end.");
 }
+
+/**
+* @tc.name: GetValueByType002
+* @tc.desc: test GetValueByType with null innerProvider
+* @tc.type: FUNC
+*/
+HWTEST_F(DataProviderImplTest, GetValueByType002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetValueByType002 begin.");
+    DataProviderImpl dataProviderImpl;
+    dataProviderImpl.innerProvider_ = nullptr;
+    std::string utdId = "general.plain-text";
+    ValueType ret = dataProviderImpl.GetValueByType(utdId);
+    EXPECT_TRUE(std::holds_alternative<std::monostate>(ret));
+    LOG_INFO(UDMF_TEST, "GetValueByType002 end.");
+}
+
+/**
+* @tc.name: GetValueByType003
+* @tc.desc: test GetValueByType with null callback
+* @tc.type: FUNC
+*/
+HWTEST_F(DataProviderImplTest, GetValueByType003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetValueByType003 begin.");
+    DataProviderImpl dataProviderImpl;
+    dataProviderImpl.innerProvider_ = OH_UdmfRecordProvider_Create();
+    dataProviderImpl.innerProvider_->callback = nullptr;
+    std::string utdId = "general.plain-text";
+    ValueType ret = dataProviderImpl.GetValueByType(utdId);
+    EXPECT_TRUE(std::holds_alternative<std::monostate>(ret));
+    OH_UdmfRecordProvider_Destroy(dataProviderImpl.innerProvider_);
+    dataProviderImpl.innerProvider_ = nullptr;
+    LOG_INFO(UDMF_TEST, "GetValueByType003 end.");
+}
+
+/**
+* @tc.name: GetValueByType004
+* @tc.desc: test GetValueByType with empty utdId
+* @tc.type: FUNC
+*/
+HWTEST_F(DataProviderImplTest, GetValueByType004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetValueByType004 begin.");
+    DataProviderImpl dataProviderImpl;
+    dataProviderImpl.innerProvider_ = OH_UdmfRecordProvider_Create();
+    std::string utdId = "";
+    ValueType ret = dataProviderImpl.GetValueByType(utdId);
+    EXPECT_TRUE(std::holds_alternative<std::monostate>(ret));
+    OH_UdmfRecordProvider_Destroy(dataProviderImpl.innerProvider_);
+    dataProviderImpl.innerProvider_ = nullptr;
+    LOG_INFO(UDMF_TEST, "GetValueByType004 end.");
+}
 } // OHOS::Test

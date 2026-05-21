@@ -29,16 +29,16 @@ static { loadLibraryWithPermissionCheck("udmf_taihe_native.z", "@ohos.data.unifi
 from ohos.data.uniformDataStruct use PlainText, Hyperlink, HTML, OpenHarmonyAppItem, ContentForm, Form, FileUri, PixelMap;
 
 union RecordData {
-  @undefined undefinedType;
-  @null nullType;
+  undefinedType: @undefined unit;
+  nullType: @null unit;
   recordMap: @record Map<String, RecordData>;
   recordArray: Array<RecordData>;
   object: Opaque;
 }
 
 union ValueType {
-  @undefined undefinedType;
-  @null nullType;
+  undefinedType: @undefined unit;
+  nullType: @null unit;
   intType: i32;
   longType: i64;
   doubleType: f64;
@@ -85,7 +85,7 @@ union AllRecords {
 
 union UnifiedDataOrNull {
   unifiedData: @sts_type("UnifiedData") Opaque;
-  @null nullType;
+  nullType: @null unit;
 }
 
 enum Intention: String {

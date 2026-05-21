@@ -4380,4 +4380,86 @@ HWTEST_F(UDMFTest, OH_UDMF_GetDataElementAt001, TestSize.Level1)
     OH_UdmfData_Destroy(data);
     OH_UdmfData_Destroy(data1);
 }
+
+/**
+ * @tc.name: OH_UdmfRecord_GetGeneralEntry_MemoryFree001
+ * @tc.desc: test memory cleanup when GetGeneralEntry fails
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecord_GetGeneralEntry_MemoryFree001, TestSize.Level1)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    char typeId[] = "ApplicationDefined-testType";
+    unsigned char entry[] = "testData";
+    unsigned int count = sizeof(entry);
+    
+    int addRes = OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
+    EXPECT_EQ(addRes, UDMF_E_OK);
+    
+    unsigned int getCount = 0;
+    unsigned char *getEntry = nullptr;
+    int getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId, &getEntry, &getCount);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    EXPECT_EQ(getCount, count);
+    
+    OH_UdmfRecord_Destroy(record);
+}
+
+/**
+ * @tc.name: OH_UdmfRecord_GetGeneralEntry_MemoryFree002
+ * @tc.desc: test multiple GetGeneralEntry calls and memory cleanup
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecord_GetGeneralEntry_MemoryFree002, TestSize.Level1)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    char typeId[] = "ApplicationDefined-testType";
+    unsigned char entry[] = "testData123456789";
+    unsigned int count = sizeof(entry);
+    
+    int addRes = OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
+    EXPECT_EQ(addRes, UDMF_E_OK);
+    
+    unsigned int getCount1 = 0;
+    unsigned char *getEntry1 = nullptr;
+    int getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId, &getEntry1, &getCount1);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    EXPECT_EQ(getCount1, count);
+    
+    unsigned int getCount2 = 0;
+    unsigned char *getEntry2 = nullptr;
+    getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId, &getEntry2, &getCount2);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    EXPECT_EQ(getCount2, count);
+    EXPECT_EQ(getEntry1, getEntry2);
+    
+    OH_UdmfRecord_Destroy(record);
+}
+
+/**
+ * @tc.name: OH_UdmfRecord_GeneralEntry_LargeData001
+ * @tc.desc: test GetGeneralEntry with large data
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecord_GeneralEntry_LargeData001, TestSize.Level1)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    char typeId[] = "ApplicationDefined-largeType";
+    std::vector<unsigned char> largeEntry(1024, 'A');
+    
+    int addRes = OH_UdmfRecord_AddGeneralEntry(record, typeId, largeEntry.data(), largeEntry.size());
+    EXPECT_EQ(addRes, UDMF_E_OK);
+    
+    unsigned int getCount = 0;
+    unsigned char *getEntry = nullptr;
+    int getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId, &getEntry, &getCount);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    EXPECT_EQ(getCount, largeEntry.size());
+    
+    for (unsigned int i = 0; i < getCount; i++) {
+        EXPECT_EQ(getEntry[i], 'A');
+    }
+    
+    OH_UdmfRecord_Destroy(record);
+}
 }

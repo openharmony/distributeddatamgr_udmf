@@ -132,7 +132,7 @@ int32_t Graph::GetIndex(const std::string &node)
 
 bool Graph::IsDAG()
 {
-    return DfsUnconnectedGraph([&](uint32_t currNode) -> bool { return false; });
+    return DfsUnconnectedGraph([](uint32_t currNode) -> bool { return false; });
 }
 } // namespace UDMF
 } // namespace OHOS

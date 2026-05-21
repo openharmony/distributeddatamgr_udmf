@@ -357,4 +357,64 @@ HWTEST_F(GraphTest, DfsHasData002, TestSize.Level1)
     EXPECT_EQ(isFind, false);
     LOG_INFO(UDMF_TEST, "DfsHasData002 end.");
 }
+
+/**
+* @tc.name: IsDAG001
+* @tc.desc: test IsDAG with lambda capture modification
+* @tc.type: FUNC
+*/
+HWTEST_F(GraphTest, IsDAG001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsDAG001 begin.");
+    uint32_t vextexNum = 3;
+    vector<vector<uint32_t>> edges = {
+        {TestNodes::POINT_A, TestNodes::POINT_B},
+        {TestNodes::POINT_B, TestNodes::POINT_C},
+    };
+    Graph graph(vextexNum, {});
+    for (uint32_t i = 0; i < edges.size(); i++) {
+        graph.AddEdge(edges[i][0], edges[i][1]);
+    }
+    bool isDAG = graph.IsDAG();
+    EXPECT_TRUE(isDAG);
+    LOG_INFO(UDMF_TEST, "IsDAG001 end.");
+}
+
+/**
+* @tc.name: IsDAG002
+* @tc.desc: test IsDAG with cycle graph
+* @tc.type: FUNC
+*/
+HWTEST_F(GraphTest, IsDAG002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsDAG002 begin.");
+    uint32_t vextexNum = 3;
+    vector<vector<uint32_t>> edges = {
+        {TestNodes::POINT_A, TestNodes::POINT_B},
+        {TestNodes::POINT_B, TestNodes::POINT_C},
+        {TestNodes::POINT_C, TestNodes::POINT_A},
+    };
+    Graph graph(vextexNum, {});
+    for (uint32_t i = 0; i < edges.size(); i++) {
+        graph.AddEdge(edges[i][0], edges[i][1]);
+    }
+    bool isDAG = graph.IsDAG();
+    EXPECT_FALSE(isDAG);
+    LOG_INFO(UDMF_TEST, "IsDAG002 end.");
+}
+
+/**
+* @tc.name: IsDAG003
+* @tc.desc: test IsDAG with empty graph
+* @tc.type: FUNC
+*/
+HWTEST_F(GraphTest, IsDAG003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsDAG003 begin.");
+    uint32_t vextexNum = 5;
+    Graph graph(vextexNum, {});
+    bool isDAG = graph.IsDAG();
+    EXPECT_TRUE(isDAG);
+    LOG_INFO(UDMF_TEST, "IsDAG003 end.");
+}
 } // OHOS::Test
