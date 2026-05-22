@@ -75,6 +75,7 @@ config("arkui_x_udmf_config") {
     "${arkui_x_graphic_surface_path}/interfaces/inner_api/utils",
     "${third_party_skia_path}",
     "${udmf_interfaces_path}/innerkits/dynamic",
+    "//plugins/pasteboard/mock",
   ]
   defines = [ "CROSS_PLATFORM" ]
   if (udmf_feature_upgrade_skia) {

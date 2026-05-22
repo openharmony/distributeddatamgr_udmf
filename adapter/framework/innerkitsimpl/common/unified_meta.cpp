@@ -19,6 +19,7 @@
 #include "logger.h"
 #include "unified_key.h"
 #include "utd_client.h"
+#include "pixel_map.h"
 
 namespace OHOS {
 namespace UDMF {
