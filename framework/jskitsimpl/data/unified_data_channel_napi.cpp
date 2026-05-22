@@ -127,6 +127,9 @@ napi_value UnifiedDataChannelNapi::InsertData(napi_env env, napi_callback_info i
     };
     ctxt->GetCbInfo(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "Insert Exit");
+    if (unifiedDataNapi == nullptr) {
+        return nullptr;
+    }
     ctxt->unifiedData = unifiedDataNapi->value_;
     ctxt->intention = UnifiedDataUtils::GetIntentionByString(intention);
     ctxt->visibility = static_cast<Visibility>(visibility);
@@ -169,6 +172,9 @@ napi_value UnifiedDataChannelNapi::UpdateData(napi_env env, napi_callback_info i
     };
     ctxt->GetCbInfo(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "Update Exit");
+    if (unifiedDataNapi == nullptr) {
+        return nullptr;
+    }
     ctxt->unifiedData = unifiedDataNapi->value_;
     auto execute = [ctxt]() {
         QueryOption option = { .key = ctxt->key };
@@ -290,6 +296,9 @@ napi_value UnifiedDataChannelNapi::ConvertRecordsToEntries(napi_env env, napi_ca
     };
     ctxt->GetCbInfo(env, info, input);
     ASSERT_NULL(!ctxt->isThrowError, "ConvertRecordsToEntries Exit");
+    if (unifiedDataNapi == nullptr) {
+        return nullptr;
+    }
     ctxt->unifiedData = unifiedDataNapi->value_;
     ctxt->unifiedData->ConvertRecordsToEntries();
     return nullptr;

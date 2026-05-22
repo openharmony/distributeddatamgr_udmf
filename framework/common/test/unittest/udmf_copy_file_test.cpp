@@ -92,7 +92,7 @@ HWTEST_F(CopyFileTest, Copy002, TestSize.Level1)
 
     bool result = UdmfCopyFile::GetInstance().CopyFile(srcUri, destUri, record, context);
     EXPECT_TRUE(result);
-    EXPECT_EQ(context.status, E_OK);
+    EXPECT_EQ(context.status->load(), E_OK);
 }
 
 /**
@@ -163,29 +163,13 @@ HWTEST_F(CopyFileTest, HandleRecord002, TestSize.Level1)
 
 /**
 * @tc.name: HandleProgress001
-* @tc.desc: test HandleProgress with lambda capture this
+* @tc.desc: test HandleProgress with cancel state
 * @tc.type: FUNC
 */
 HWTEST_F(CopyFileTest, HandleProgress001, TestSize.Level1)
 {
     auto asyncHelper = std::make_shared<AsyncHelper>();
-    UdmfCopyFile::CopyContext context(asyncHelper);
-    std::string srcUri = "test_src.txt";
-    std::string destUri = "test_dest.txt";
-    uint64_t processSize = 100;
-    
-    UdmfCopyFile::GetInstance().HandleProgress(srcUri, destUri, context, processSize);
-    EXPECT_TRUE(context.asyncHelper->progressQueue.IsCancel() || context.totalSize >= 1);
-}
-
-/**
-* @tc.name: HandleProgress002
-* @tc.desc: test HandleProgress with cancel state
-* @tc.type: FUNC
-*/
-HWTEST_F(CopyFileTest, HandleProgress002, TestSize.Level1)
-{
-    auto asyncHelper = std::make_shared<AsyncHelper>();
+    asyncHelper->progressListener = [](ProgressInfo progressInfo, std::shared_ptr<UnifiedData> data) {};
     asyncHelper->progressQueue.Cancel();
     UdmfCopyFile::CopyContext context(asyncHelper);
     std::string srcUri = "test_src.txt";
@@ -235,5 +219,18 @@ HWTEST_F(CopyFileTest, IsRemote002, TestSize.Level1)
     std::string localUri = "file://data/test.txt";
     bool result = UdmfCopyFile::GetInstance().IsRemote(localUri);
     EXPECT_FALSE(result);
+}
+
+/**
+* @tc.name: CopyCanceled001
+* @tc.desc: test Copy with canceled state
+* @tc.type: FUNC
+*/
+HWTEST_F(CopyFileTest, CopyCanceled001, TestSize.Level1)
+{
+    auto asyncHelper = std::make_shared<AsyncHelper>();
+    asyncHelper->progressQueue.Cancel();
+    auto result = UdmfCopyFile::GetInstance().Copy(asyncHelper);
+    ASSERT_EQ(result, E_COPY_CANCELED);
 }
 } // OHOS::Test

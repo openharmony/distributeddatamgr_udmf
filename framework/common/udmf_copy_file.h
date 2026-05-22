@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include <atomic>
 
 #include "unified_data.h"
 #include "async_task_params.h"
@@ -35,13 +36,13 @@ private:
         std::shared_ptr<AsyncHelper> asyncHelper;
         uint64_t finishSize = 0;
         uint64_t totalSize = 0;
-        Status status = E_OK;
+        std::shared_ptr<std::atomic<Status>> status = std::make_shared<std::atomic<Status>>(E_OK);
         std::shared_ptr<UnifiedData> processedData;
 
         explicit CopyContext(std::shared_ptr<AsyncHelper> helper)
             : asyncHelper(helper),
-            totalSize(UdmfCopyFile::GetInstance().GetTotalSize(helper->data->GetFileUris())),
-            processedData(std::make_shared<UnifiedData>()) {}
+              totalSize(UdmfCopyFile::GetInstance().GetTotalSize(helper->data->GetFileUris())),
+              processedData(std::make_shared<UnifiedData>()) {}
     };
 
     UdmfCopyFile() = default;

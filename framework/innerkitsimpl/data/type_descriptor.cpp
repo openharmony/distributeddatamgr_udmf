@@ -127,6 +127,9 @@ Status TypeDescriptor::IsHigherLevelType(const std::string &typeId, bool &checkR
 
 bool TypeDescriptor::Equals(std::shared_ptr<TypeDescriptor> descriptor)
 {
+    if (descriptor == nullptr) {
+        return false;
+    }
     return descriptor->GetTypeId() == this->GetTypeId();
 }
 

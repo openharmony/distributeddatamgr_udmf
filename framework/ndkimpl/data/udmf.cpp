@@ -748,6 +748,7 @@ static int GetValueFromUint8Array(OH_UdmfRecord *record, const char *typeId, Val
         LOG_ERROR(UDMF_CAPI, "memcpy error!");
         delete[] record->recordData;
         record->recordData = nullptr;
+        record->recordDataLen = 0;
         return UDMF_ERR;
     }
     record->lastType = typeId;
