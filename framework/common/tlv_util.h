@@ -411,7 +411,11 @@ template <typename... _Types> bool Writing(const std::variant<_Types...> &input,
     InitWhenFirst(input, data);
     auto tagCursor = data.GetCursor();
     data.OffsetHead();
-    uint32_t index = input.index();
+    size_t indexSize = input.index();
+    if (indexSize > UINT32_MAX) {
+        return false;
+    }
+    uint32_t index = static_cast<uint32_t>(indexSize);
     if (!data.WriteBasic(TAG::TAG_VARIANT_INDEX, index)) {
         return false;
     }

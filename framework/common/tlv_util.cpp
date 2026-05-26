@@ -524,7 +524,7 @@ template <> bool Reading(OHOS::AAFwk::WantParams &output, TLVObject &data, const
         free(buffer);
         return false;
     }
-    if (!parcel->ParseFrom((uintptr_t)buffer, head.len)) {
+    if (!parcel->ParseFrom(reinterpret_cast<uintptr_t>(buffer), head.len)) {
         LOG_ERROR(UDMF_FRAMEWORK, "ParseFrom error in tlv read wantParams. tag=%{public}hu", head.tag);
         free(buffer);
         return false;
@@ -1089,7 +1089,7 @@ template <> bool Reading(std::shared_ptr<OHOS::AAFwk::Want> &output, TLVObject &
         free(buffer);
         return false;
     }
-    if (!parcel->ParseFrom((uintptr_t)buffer, head.len)) {
+    if (!parcel->ParseFrom(reinterpret_cast<uintptr_t>(buffer), head.len)) {
         LOG_ERROR(UDMF_FRAMEWORK, "ParseFrom error in tlv read want. tag=%{public}hu", head.tag);
         free(buffer);
         return false;

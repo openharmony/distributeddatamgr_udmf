@@ -1904,4 +1904,114 @@ HWTEST_F(TlvUtilTest, RecursiveWritingAndReading001, TestSize.Level1)
     EXPECT_FALSE(result);
     LOG_INFO(UDMF_TEST, "RecursiveWritingAndReading001 end.");
 }
+
+/* *
+ * @tc.name: ValueTypeWriting001
+ * @tc.desc: test ValueType writing with size_t to uint32_t conversion
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, ValueTypeWriting001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ValueTypeWriting001 begin.");
+    ValueType value = std::monostate();
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(value, tlvObject, TAG::TAG_OBJECT_VALUE));
+    LOG_INFO(UDMF_TEST, "ValueTypeWriting001 end.");
+}
+
+/* *
+ * @tc.name: ValueTypeWriting002
+ * @tc.desc: test ValueType writing with string type
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, ValueTypeWriting002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ValueTypeWriting002 begin.");
+    ValueType value = std::string("test string");
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(value, tlvObject, TAG::TAG_OBJECT_VALUE));
+    LOG_INFO(UDMF_TEST, "ValueTypeWriting002 end.");
+}
+
+/* *
+ * @tc.name: ValueTypeWriting003
+ * @tc.desc: test ValueType writing with int32 type
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, ValueTypeWriting003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ValueTypeWriting003 begin.");
+    ValueType value = static_cast<int32_t>(123456);
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(value, tlvObject, TAG::TAG_OBJECT_VALUE));
+    LOG_INFO(UDMF_TEST, "ValueTypeWriting003 end.");
+}
+
+/* *
+ * @tc.name: ValueTypeWriting004
+ * @tc.desc: test ValueType writing with double type
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, ValueTypeWriting004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ValueTypeWriting004 begin.");
+    ValueType value = 3.14159;
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(value, tlvObject, TAG::TAG_OBJECT_VALUE));
+    LOG_INFO(UDMF_TEST, "ValueTypeWriting004 end.");
+}
+
+/* *
+ * @tc.name: ValueTypeWritingAndReading001
+ * @tc.desc: test ValueType writing and reading round trip
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, ValueTypeWritingAndReading001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ValueTypeWritingAndReading001 begin.");
+    ValueType input = std::string("round trip test");
+    std::vector<uint8_t> dataBytes;
+    auto tlvObject = TLVObject(dataBytes);
+    EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_OBJECT_VALUE));
+
+    tlvObject.ResetCursor();
+    ValueType output;
+    TLVHead head;
+    EXPECT_TRUE(tlvObject.ReadHead(head));
+    EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+    EXPECT_EQ(output.index(), input.index());
+    if (output.index() == input.index()) {
+        EXPECT_EQ(std::get<std::string>(input), std::get<std::string>(output));
+    }
+    LOG_INFO(UDMF_TEST, "ValueTypeWritingAndReading001 end.");
+}
+
+/* *
+ * @tc.name: VariantIndexConversion001
+ * @tc.desc: test variant index conversion safety
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, VariantIndexConversion001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "VariantIndexConversion001 begin.");
+    std::variant<int32_t, std::string, double> variantValue = static_cast<int32_t>(42);
+    size_t index = variantValue.index();
+    EXPECT_EQ(index, 0);
+    EXPECT_LE(index, UINT32_MAX);
+    
+    variantValue = std::string("test");
+    index = variantValue.index();
+    EXPECT_EQ(index, 1);
+    EXPECT_LE(index, UINT32_MAX);
+    
+    variantValue = 2.718;
+    index = variantValue.index();
+    EXPECT_EQ(index, 2);
+    EXPECT_LE(index, UINT32_MAX);
+    LOG_INFO(UDMF_TEST, "VariantIndexConversion001 end.");
+}
 }
