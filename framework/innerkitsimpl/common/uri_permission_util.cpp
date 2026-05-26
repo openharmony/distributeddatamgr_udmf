@@ -43,6 +43,9 @@ uint32_t ToMask(const std::vector<UriPermission> &permissions)
 {
     uint32_t mask = 0;
     for (const auto &permission : permissions) {
+        if (permission == UriPermission::NONE) {
+            return 0;
+        }
         mask |= ToMask(permission);
     }
     return NormalizeMask(mask);
@@ -55,6 +58,9 @@ uint32_t ToMask(const std::vector<int32_t> &permissions)
         if (!IsValid(permission)) {
             continue;
         }
+        if (static_cast<UriPermission>(permission) == UriPermission::NONE) {
+            return 0;
+        }
         mask |= ToMask(static_cast<UriPermission>(permission));
     }
     return NormalizeMask(mask);
@@ -65,6 +71,8 @@ uint32_t NormalizeMask(uint32_t mask)
     if ((mask & (READ_FLAG | WRITE_FLAG)) == 0) {
         mask &= ~PERSIST_FLAG;
     }
+    constexpr uint32_t validMask = READ_FLAG | WRITE_FLAG | PERSIST_FLAG;
+    mask &= validMask;
     return mask;
 }
 

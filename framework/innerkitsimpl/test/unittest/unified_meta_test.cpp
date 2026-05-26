@@ -961,6 +961,16 @@ HWTEST_F(UnifiedMetaTest, UriPermissionUtil_ToMask_002, TestSize.Level1)
 
     std::vector<UriPermission> all = {UriPermission::READ, UriPermission::WRITE, UriPermission::PERSIST};
     EXPECT_EQ(UriPermissionUtil::ToMask(all), 7);
+
+    std::vector<UriPermission> noneOnly = {UriPermission::NONE};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneOnly), 0);
+
+    std::vector<UriPermission> noneWithRead = {UriPermission::NONE, UriPermission::READ};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneWithRead), 0);
+
+    std::vector<UriPermission> noneWithAll = {
+        UriPermission::NONE, UriPermission::READ, UriPermission::WRITE, UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneWithAll), 0);
 }
 
 /**
@@ -981,6 +991,15 @@ HWTEST_F(UnifiedMetaTest, UriPermissionUtil_ToMask_003, TestSize.Level1)
 
     std::vector<int32_t> allInvalid = {-1, 100, 3};
     EXPECT_EQ(UriPermissionUtil::ToMask(allInvalid), 0);
+
+    std::vector<int32_t> noneOnly = {0};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneOnly), 0);
+
+    std::vector<int32_t> noneWithRead = {0, 1};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneWithRead), 0);
+
+    std::vector<int32_t> noneWithAll = {0, 1, 2, 3};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneWithAll), 0);
 }
 
 /**
@@ -998,7 +1017,7 @@ HWTEST_F(UnifiedMetaTest, UriPermissionUtil_NormalizeMask_001, TestSize.Level1)
     EXPECT_EQ(UriPermissionUtil::NormalizeMask(5), 5);
     EXPECT_EQ(UriPermissionUtil::NormalizeMask(6), 6);
     EXPECT_EQ(UriPermissionUtil::NormalizeMask(7), 7);
-    EXPECT_EQ(UriPermissionUtil::NormalizeMask(8), 8);
+    EXPECT_EQ(UriPermissionUtil::NormalizeMask(8), 0);
 }
 
 /**

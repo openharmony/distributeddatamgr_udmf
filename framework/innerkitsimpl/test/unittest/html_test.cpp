@@ -22,6 +22,7 @@
 #include "udmf_capi_common.h"
 #include "html.h"
 #include "xml_loader.h"
+#include "uri_permission_util.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
@@ -568,7 +569,7 @@ HWTEST_F(HtmlTest, Html014, TestSize.Level1)
 
     html.SetUriAuthorizationPolicyMask(0xFFFFFFFF);
     uint32_t normalizedMask = html.GetUriAuthorizationPolicyMask();
-    EXPECT_EQ(normalizedMask, 0xFFFFFFFF);
+    EXPECT_EQ(normalizedMask, 7);
     LOG_INFO(UDMF_TEST, "Html014 end.");
 }
 
@@ -586,5 +587,95 @@ HWTEST_F(HtmlTest, Html015, TestSize.Level1)
     html.SetUriAuthorizationPolicyMask(5);
     EXPECT_TRUE(html.hasUriAuthorizationPolicyMask_);
     LOG_INFO(UDMF_TEST, "Html015 end.");
+}
+
+/**
+* @tc.name: Html016
+* @tc.desc: Test UriPermission ToMask with NONE combined with other permissions
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, Html016, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html016 begin.");
+    std::vector<UriPermission> noneOnly = {UriPermission::NONE};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneOnly), 0);
+
+    std::vector<UriPermission> noneWithRead = {UriPermission::NONE, UriPermission::READ};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneWithRead), 0);
+
+    std::vector<UriPermission> noneWithAll = {
+        UriPermission::NONE, UriPermission::READ, UriPermission::WRITE, UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(noneWithAll), 0);
+
+    LOG_INFO(UDMF_TEST, "Html016 end.");
+}
+
+/**
+* @tc.name: Html017
+* @tc.desc: Test valid permission combinations
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, Html017, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html017 begin.");
+    std::vector<UriPermission> read = {UriPermission::READ};
+    EXPECT_EQ(UriPermissionUtil::ToMask(read), 1);
+
+    std::vector<UriPermission> write = {UriPermission::WRITE};
+    EXPECT_EQ(UriPermissionUtil::ToMask(write), 2);
+
+    std::vector<UriPermission> readWrite = {UriPermission::READ, UriPermission::WRITE};
+    EXPECT_EQ(UriPermissionUtil::ToMask(readWrite), 3);
+
+    std::vector<UriPermission> readPersist = {UriPermission::READ, UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(readPersist), 5);
+
+    std::vector<UriPermission> writePersist = {UriPermission::WRITE, UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(writePersist), 6);
+
+    std::vector<UriPermission> all = {UriPermission::READ, UriPermission::WRITE, UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(all), 7);
+
+    LOG_INFO(UDMF_TEST, "Html017 end.");
+}
+
+/**
+* @tc.name: Html018
+* @tc.desc: Test invalid PERSIST alone returns NONE
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, Html018, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html018 begin.");
+    std::vector<UriPermission> persistOnly = {UriPermission::PERSIST};
+    EXPECT_EQ(UriPermissionUtil::ToMask(persistOnly), 0);
+
+    Html html("html", "plain");
+    html.SetUriAuthorizationPolicyMask(4);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 0);
+
+    LOG_INFO(UDMF_TEST, "Html018 end.");
+}
+
+/**
+* @tc.name: Html019
+* @tc.desc: Test SetUriAuthorizationPolicyMask with invalid bit filtering
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, Html019, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html019 begin.");
+    Html html("html", "plain");
+
+    html.SetUriAuthorizationPolicyMask(8);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 0);
+
+    html.SetUriAuthorizationPolicyMask(16);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 0);
+
+    html.SetUriAuthorizationPolicyMask(15);
+    EXPECT_EQ(html.GetUriAuthorizationPolicyMask(), 7);
+
+    LOG_INFO(UDMF_TEST, "Html019 end.");
 }
 } // OHOS::Test
