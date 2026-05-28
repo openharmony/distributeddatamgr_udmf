@@ -33,6 +33,7 @@ namespace UDMF {
 constexpr const char *DRAG_AUDIT_EVENT = "usual.event.DRAG_AUDIT";
 static constexpr size_t MAX_THREADS = 10;
 static constexpr size_t MIN_THREADS = 0;
+static constexpr size_t MAX_DATA_SIZE = 10 * 1024;
 
 static UdmfExecutor &GetAuditExecutor()
 {
@@ -66,6 +67,11 @@ nlohmann::json AuditHelper::ConvertPixelMapToJson(std::shared_ptr<OHOS::Media::P
     std::vector<uint8_t> encodedData;
     PixelMapLoader loader;
     if (loader.EncodeTlv(pixelMap, encodedData)) {
+        if (encodedData.size() > MAX_DATA_SIZE) {
+            LOG_WARN(UDMF_CLIENT, "PixelMap data size %{public}zu exceeds limit %{public}zu, truncated",
+                     encodedData.size(), MAX_DATA_SIZE);
+            encodedData.resize(MAX_DATA_SIZE);
+        }
         pixelMapJson["encodedData"] = nlohmann::json::binary(encodedData);
     } else {
         LOG_ERROR(UDMF_CLIENT, "Encode pixelMap error");
