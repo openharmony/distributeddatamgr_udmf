@@ -30,17 +30,12 @@ public:
     static bool Unpack(UnifiedData &data);
     static void GetSummary(const UnifiedData &data, Summary &summary);
     static int32_t ProcessBigData(UnifiedData &data, Intention intention, bool isSaInvoke);
-    static void GetSummaryFromLoadInfo(const DataLoadInfo &dataLoadInfo, Summary &summary);
 private:
     static void CreateDirIfNotExist(const std::string& dirPath, const mode_t& mode);
     static bool SaveUDataToFile(const std::string &dataFile, UnifiedData &data);
     static bool LoadUDataFromFile(const std::string &dataFile, UnifiedData &data);
-    static void CalRecordSummary(std::map<std::string, ValueType> &entries, Summary &summary);
-    static void FillSummaryFormat(const std::string &utdId, const std::string &specificType, Summary &summary);
-    static void ProcessTypeId(const ValueType &value, std::string &typeId);
     static std::string GetRootPath();
     static bool FileClose(std::FILE *file, bool status);
-    static void UpgradeToParentType(std::string &typeId);
 
 private:
     static std::string rootPath_;

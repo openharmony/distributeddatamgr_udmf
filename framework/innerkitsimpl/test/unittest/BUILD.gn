@@ -27,6 +27,7 @@ config("module_private_config") {
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/innerkitsimpl/data",
     "${udmf_framework_path}/innerkitsimpl/client/",
+    "${udmf_framework_path}/innerkitsimpl/convert",
     "${udmf_framework_path}/innerkitsimpl/service",
     "${udmf_framework_path}/innerkitsimpl/test/unittest/mock/include",
     "${udmf_framework_path}/ndkimpl/data",
@@ -34,6 +35,7 @@ config("module_private_config") {
 }
 
 common_deps = [
+  "${udmf_interfaces_path}/innerkits:udmf_core",
   "${udmf_interfaces_path}/innerkits:udmf_client",
   "${udmf_interfaces_path}/innerkits:utd_client",
   "${udmf_interfaces_path}/ndk:libudmf",
@@ -212,7 +214,10 @@ ohos_unittest("UdmfClientSaInvokeTest") {
 
   sources = [ "udmf_client_sa_invoke_test.cpp" ]
 
-  deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
+  deps = [
+    "${udmf_interfaces_path}/innerkits:udmf_core",
+    "${udmf_interfaces_path}/innerkits:udmf_client",
+  ]
 
   external_deps = common_external_deps
 
@@ -243,6 +248,7 @@ ohos_unittest("UdmfAsyncClientTest") {
   ]
 
   deps = [
+    "${udmf_interfaces_path}/innerkits:udmf_core",
     "${udmf_interfaces_path}/innerkits:udmf_client",
     "${udmf_interfaces_path}/innerkits:utd_client",
     "${udmf_interfaces_path}/ndk:libudmf"

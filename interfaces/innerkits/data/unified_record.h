@@ -75,7 +75,7 @@ public:
     void API_EXPORT SetChannelName(const std::string &channelName);
 
     virtual void InitObject();
-    bool HasFileType(std::string &fileUri) const;
+    bool HasFileType(std::string &fileUri);
     void SetFileUri(const std::string &fileUri);
 
     std::vector<UriInfo> GetUris() const;

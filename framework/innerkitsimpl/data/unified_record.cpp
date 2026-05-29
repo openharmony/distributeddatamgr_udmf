@@ -15,7 +15,6 @@
 #define LOG_TAG "UnifiedRecord"
 #include "unified_record.h"
 
-#include "file.h"
 #include "getter_system.h"
 #include "logger.h"
 #include "uri.h"
@@ -358,18 +357,27 @@ void UnifiedRecord::InitObject()
     }
 }
 
-bool UnifiedRecord::HasFileType(std::string &fileUri) const
+bool UnifiedRecord::HasFileType(std::string &fileUri)
 {
     fileUri.clear();
-    if (std::holds_alternative<std::shared_ptr<Object>>(GetOriginValue())) {
-        auto obj = std::get<std::shared_ptr<Object>>(GetOriginValue());
+    auto value = GetOriginValue();
+    if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        auto obj = std::get<std::shared_ptr<Object>>(value);
         std::lock_guard<std::recursive_mutex> lock(mutex_);
-        if (obj->value_.find(ORI_URI) != obj->value_.end()) {
+        if (obj != nullptr && obj->value_.find(ORI_URI) != obj->value_.end()) {
             obj->GetValue(ORI_URI, fileUri);
         }
     } else if (std::find(std::begin(FILE_TYPES), std::end(FILE_TYPES), GetType()) != std::end(FILE_TYPES)) {
-        auto file = static_cast<const File*>(this);
-        fileUri = file->GetUri();
+        InitObject();
+        value = GetOriginValue();
+        if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
+            return false;
+        }
+        auto obj = std::get<std::shared_ptr<Object>>(value);
+        std::lock_guard<std::recursive_mutex> lock(mutex_);
+        if (obj != nullptr && obj->value_.find(ORI_URI) != obj->value_.end()) {
+            obj->GetValue(ORI_URI, fileUri);
+        }
     } else {
         return false;
     }
@@ -392,11 +400,16 @@ bool UnifiedRecord::HasFileType(std::string &fileUri) const
 
 void UnifiedRecord::SetFileUri(const std::string &fileUri)
 {
-    if (std::find(std::begin(FILE_TYPES), std::end(FILE_TYPES), GetType()) != std::end(FILE_TYPES)) {
+    if (std::holds_alternative<std::shared_ptr<Object>>(GetOriginValue())) {
+        auto obj = std::get<std::shared_ptr<Object>>(GetOriginValue());
         std::lock_guard<std::recursive_mutex> lock(mutex_);
-        auto file = static_cast<File*>(this);
-        file->SetUri(fileUri);
-    } else if (std::holds_alternative<std::shared_ptr<Object>>(GetOriginValue())) {
+        obj->value_[ORI_URI] = fileUri;
+    } else if (std::find(std::begin(FILE_TYPES), std::end(FILE_TYPES), GetType()) != std::end(FILE_TYPES)) {
+        InitObject();
+        if (!std::holds_alternative<std::shared_ptr<Object>>(GetOriginValue())) {
+            LOG_ERROR(UDMF_FRAMEWORK, "Record object init failed.");
+            return;
+        }
         auto obj = std::get<std::shared_ptr<Object>>(GetOriginValue());
         std::lock_guard<std::recursive_mutex> lock(mutex_);
         obj->value_[ORI_URI] = fileUri;
@@ -445,6 +458,9 @@ void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds,
         if (fileUri->GetValue(FILE_TYPE, fileType) && !fileType.empty()) {
             if (isSpecific) {
                 utdIds.emplace(fileType);
+                return;
+            }
+            if (fileType == "general.file") {
                 return;
             }
             std::string fileTypeStr = UnifiedDataUtils::GetBelongsToFileType(fileType);

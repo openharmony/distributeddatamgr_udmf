@@ -18,7 +18,6 @@
 #include "common_func.h"
 #include "directory_ex.h"
 #include "file_ex.h"
-#include "file.h"
 #include "file_uri.h"
 #include "error_code.h"
 #include "logger.h"
@@ -39,6 +38,81 @@ constexpr const char *TEMP_UNIFIED_DATA_SUFFIX = ".ud";
 constexpr const char *TEMP_UNIFIED_DATA_FLAG = "temp_udmf_file_flag";
 static constexpr int WITH_SUMMARY_FORMAT_VER = 1;
 std::string UnifiedDataHelper::rootPath_ = "";
+
+namespace {
+std::shared_ptr<Object> GetObjectFromRecord(std::shared_ptr<UnifiedRecord> record)
+{
+    if (record == nullptr) {
+        return nullptr;
+    }
+    auto value = record->GetOriginValue();
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        record->InitObject();
+        value = record->GetOriginValue();
+    }
+    if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
+        return nullptr;
+    }
+    return std::get<std::shared_ptr<Object>>(value);
+}
+
+std::string GetFileUriFromRecord(std::shared_ptr<UnifiedRecord> record)
+{
+    std::string uri;
+    auto object = GetObjectFromRecord(record);
+    if (object != nullptr) {
+        object->GetValue(ORI_URI, uri);
+        if (!uri.empty()) {
+            return uri;
+        }
+    }
+    auto value = record == nullptr ? ValueType() : record->GetOriginValue();
+    if (std::holds_alternative<std::string>(value)) {
+        uri = std::get<std::string>(value);
+    }
+    return uri;
+}
+
+bool HasTempUnifiedDataFlag(std::shared_ptr<UnifiedRecord> record)
+{
+    auto object = GetObjectFromRecord(record);
+    if (object == nullptr) {
+        return false;
+    }
+    std::shared_ptr<Object> detailsObj = nullptr;
+    if (!object->GetValue(DETAILS, detailsObj)) {
+        return false;
+    }
+    auto details = ObjectUtils::ConvertToUDDetails(detailsObj);
+    return details.find(TEMP_UNIFIED_DATA_FLAG) != details.end();
+}
+
+std::shared_ptr<UnifiedRecord> CreateTempFileRecord(const std::string &uri, const Summary &summary)
+{
+    UDDetails details;
+    details.insert(std::make_pair(TEMP_UNIFIED_DATA_FLAG, true));
+    for (auto &item : summary.summary) {
+        details.insert(std::make_pair(item.first, item.second));
+    }
+
+    auto object = std::make_shared<Object>();
+    object->value_[UNIFORM_DATA_TYPE] = GENERAL_FILE_URI;
+    object->value_[ORI_URI] = uri;
+    object->value_[REMOTE_URI] = std::string();
+    object->value_[FILE_TYPE] = std::string("general.file");
+    object->value_[DETAILS] = ObjectUtils::ConvertToObject(details);
+    object->value_[VALUE_TYPE] = std::monostate();
+
+    auto record = std::make_shared<UnifiedRecord>(UDType::FILE, object);
+    record->SetUtdId(GENERAL_FILE_URI);
+    return record;
+}
+
+void CalRecordSummary(std::map<std::string, ValueType> &entry, Summary &summary);
+void FillSummaryFormat(const std::string &type, const std::string &utdId, Summary &summary);
+void ProcessTypeId(const ValueType &value, std::string &typeId);
+void UpgradeToParentType(std::string &typeId);
+}
 
 void UnifiedDataHelper::SetRootPath(const std::string &rootPath)
 {
@@ -72,13 +146,7 @@ bool UnifiedDataHelper::IsTempUData(UnifiedData &data)
     if (records[0] == nullptr || records[0]->GetType() != UDType::FILE) {
         return false;
     }
-    auto file = static_cast<File*>(records[0].get());
-    if (file == nullptr) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Invalid file record!");
-        return false;
-    }
-    auto details = file->GetDetails();
-    if (details.find(TEMP_UNIFIED_DATA_FLAG) == details.end()) {
+    if (!HasTempUnifiedDataFlag(records[0])) {
         return false;
     }
     LOG_DEBUG(UDMF_FRAMEWORK, "exist temp unified data flag!");
@@ -114,14 +182,6 @@ void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
     }
 }
 
-void UnifiedDataHelper::GetSummaryFromLoadInfo(const DataLoadInfo &dataLoadInfo, Summary &summary)
-{
-    summary.totalSize = dataLoadInfo.recordCount;
-    for (const auto &type : dataLoadInfo.types) {
-        summary.summary.emplace(type, 0);
-    }
-}
-
 bool UnifiedDataHelper::Pack(UnifiedData &data)
 {
     UdmfConversion::InitValueObject(data);
@@ -138,15 +198,8 @@ bool UnifiedDataHelper::Pack(UnifiedData &data)
         return false;
     }
     std::string uri = AppFileService::CommonFunc::GetUriFromPath(filePath);
-    auto fileRecord = std::make_shared<File>(uri);
-    UDDetails details;
-    details.insert(std::make_pair(TEMP_UNIFIED_DATA_FLAG, true));
-    for (auto &item : summary.summary) {
-        details.insert(std::make_pair(item.first, item.second));
-    }
-    fileRecord->SetDetails(details);
     std::vector<std::shared_ptr<UnifiedRecord>> records {};
-    records.emplace_back(fileRecord);
+    records.emplace_back(CreateTempFileRecord(uri, summary));
     data.SetRecords(records);
     return true;
 }
@@ -158,13 +211,13 @@ bool UnifiedDataHelper::Unpack(UnifiedData &data)
         return false;
     }
 
-    auto file = static_cast<File*>(records[0].get());
-    if (file == nullptr) {
+    auto uri = GetFileUriFromRecord(records[0]);
+    if (uri.empty()) {
         LOG_ERROR(UDMF_FRAMEWORK, "Invalid file record!");
         return false;
     }
     UnifiedData tempData;
-    if (!LoadUDataFromFile(file->GetUri(), tempData)) {
+    if (!LoadUDataFromFile(uri, tempData)) {
         LOG_ERROR(UDMF_FRAMEWORK, "Fail to load udata from file!");
         return false;
     }
@@ -258,7 +311,8 @@ int32_t UnifiedDataHelper::ProcessBigData(UnifiedData &data, Intention intention
     return E_OK;
 }
 
-void UnifiedDataHelper::ProcessTypeId(const ValueType &value, std::string &typeId)
+namespace {
+void ProcessTypeId(const ValueType &value, std::string &typeId)
 {
     if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
         return;
@@ -278,7 +332,7 @@ void UnifiedDataHelper::ProcessTypeId(const ValueType &value, std::string &typeI
     }
 }
 
-void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry, Summary &summary)
+void CalRecordSummary(std::map<std::string, ValueType> &entry, Summary &summary)
 {
     for (const auto &[utdId, value] : entry) {
         auto typeId = utdId;
@@ -304,7 +358,7 @@ void UnifiedDataHelper::CalRecordSummary(std::map<std::string, ValueType> &entry
     }
 }
 
-void UnifiedDataHelper::FillSummaryFormat(const std::string &type, const std::string &utdId, Summary &summary)
+void FillSummaryFormat(const std::string &type, const std::string &utdId, Summary &summary)
 {
     Uds_Type udsType = Uds_Type::UDS_OTHER;
     auto find = UDS_UTD_TYPE_MAP.find(utdId);
@@ -318,7 +372,7 @@ void UnifiedDataHelper::FillSummaryFormat(const std::string &type, const std::st
     }
 }
 
-void UnifiedDataHelper::UpgradeToParentType(std::string &typeId)
+void UpgradeToParentType(std::string &typeId)
 {
     std::string fileType = UnifiedDataUtils::GetBelongsToFileType(typeId);
     if (!fileType.empty()) {
@@ -326,6 +380,7 @@ void UnifiedDataHelper::UpgradeToParentType(std::string &typeId)
         return;
     }
     typeId = "general.file"; // When utdId is general.file-uri, the default parent type is general.file.
+}
 }
 
 } // namespace UDMF

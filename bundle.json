@@ -76,6 +76,65 @@
           }
         },
         {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_core",
+          "header": {
+            "header_files": [
+              "getter_system.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/client"
+          }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_core",
+          "header": {
+            "header_files": [
+              "async_task_params.h",
+              "error_code.h",
+              "unified_key.h",
+              "unified_meta.h",
+              "unified_types.h",
+              "uri_permission_util.h",
+              "visibility.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/common"
+          }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_core",
+          "header": {
+            "header_files": [
+              "application_defined_record.h",
+              "audio.h",
+              "file.h",
+              "folder.h",
+              "html.h",
+              "image.h",
+              "link.h",
+              "plain_text.h",
+              "system_defined_appitem.h",
+              "system_defined_form.h",
+              "system_defined_pixelmap.h",
+              "system_defined_record.h",
+              "text.h",
+              "unified_data.h",
+              "unified_data_helper.h",
+              "unified_html_record_process.h",
+              "unified_record.h",
+              "video.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/data"
+          }
+        },
+        {
+          "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_core",
+          "header": {
+            "header_files": [
+              "udmf_conversion.h"
+            ],
+            "header_base":"//foundation/distributeddatamgr/udmf/interfaces/innerkits/convert"
+          }
+        },
+        {
           "name": "//foundation/distributeddatamgr/udmf/interfaces/innerkits:udmf_client",
           "header": {
             "header_files": [

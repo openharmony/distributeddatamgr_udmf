@@ -45,7 +45,10 @@ ohos_shared_library("cj_unified_data_channel_ffi") {
       "${udmf_interfaces_path}/cj/src/utils.cpp",
     ]
 
-    deps = [ "../innerkits:udmf_client" ]
+    deps = [
+      "../innerkits:udmf_client",
+      "../innerkits:udmf_core",
+    ]
 
     external_deps = [
       "ability_base:base",
@@ -102,6 +105,7 @@ ohos_shared_library("cj_uniform_type_descriptor_ffi") {
 
     deps = [
       "../innerkits:udmf_client",
+      "../innerkits:udmf_core",
       "../innerkits:utd_client",
     ]
 

@@ -19,8 +19,8 @@
 #include "ipc_skeleton.h"
 #include "logger.h"
 #include "udmf_async_client.h"
-#include "udmf_types_util.h"
 #include "udmf_conversion.h"
+#include "udmf_types_util.h"
 #include "unified_html_record_process.h"
 
 namespace OHOS {
