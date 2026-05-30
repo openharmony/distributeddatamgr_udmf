@@ -41,7 +41,10 @@ ohos_fuzztest("UdmfClientFuzzTest") {
 
   sources = [ "udmf_client_fuzzer.cpp" ]
 
-  deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
+  deps = [
+    "${udmf_interfaces_path}/innerkits:udmf_core",
+    "${udmf_interfaces_path}/innerkits:udmf_client",
+  ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",

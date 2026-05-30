@@ -39,12 +39,10 @@ ohos_fuzztest("TlvUtilFuzzTest") {
     "-Werror=vla",
   ]
 
-  sources = [
-    "tlv_util_fuzzer.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
-    ]
+  sources = [ "tlv_util_fuzzer.cpp" ]
 
   deps = [
+    "${udmf_interfaces_path}/innerkits:udmf_core",
     "${udmf_interfaces_path}/innerkits:udmf_client",
     "${udmf_interfaces_path}/innerkits:utd_client",
     "${udmf_interfaces_path}/ndk:libudmf"

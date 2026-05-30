@@ -26,7 +26,6 @@
 #include "ipc_skeleton.h"
 #include "udmf_notifier_stub.h"
 #include "unified_data_helper.h"
-#include "unified_html_record_process.h"
 #include "utd_client.h"
 
 namespace OHOS {
@@ -132,9 +131,6 @@ Status UdmfClient::GetData(const QueryOption &query, UnifiedData &unifiedData)
             BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::FAILED, ret, BizState::DFX_END);
         LOG_ERROR(UDMF_CLIENT, "failed! ret = %{public}d", ret);
         return static_cast<Status>(ret);
-    }
-    if (unifiedData.HasType(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML))) {
-        UnifiedHtmlRecordProcess::RebuildHtmlRecord(unifiedData);
     }
     RadarReporterAdapter::ReportNormal(std::string(__FUNCTION__),
         BizScene::GET_DATA, GetDataStage::GET_DATA_END, StageRes::SUCCESS, BizState::DFX_END);

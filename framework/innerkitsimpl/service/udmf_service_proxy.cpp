@@ -18,6 +18,7 @@
 #include "logger.h"
 #include "udmf_types_util.h"
 #include "udmf_conversion.h"
+#include "unified_html_record_process.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -79,6 +80,9 @@ int32_t UdmfServiceProxy::GetData(const QueryOption &query, UnifiedData &unified
     if (!ITypesUtil::Unmarshal(reply, unifiedData)) {
         LOG_ERROR(UDMF_SERVICE, "Unmarshal UnifiedData failed!");
         return E_READ_PARCEL_ERROR;
+    }
+    if (unifiedData.HasType(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML))) {
+        UnifiedHtmlRecordProcess::RebuildHtmlRecord(unifiedData);
     }
     UdmfConversion::ConvertRecordToSubclass(unifiedData);
     return status;

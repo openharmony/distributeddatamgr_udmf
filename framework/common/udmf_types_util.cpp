@@ -17,7 +17,6 @@
 
 #include "logger.h"
 #include "tlv_util.h"
-#include "udmf_conversion.h"
 
 namespace OHOS {
 namespace ITypesUtil {

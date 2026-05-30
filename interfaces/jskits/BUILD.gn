@@ -66,6 +66,7 @@ ohos_shared_library("unifieddatachannel_napi") {
 
   deps = [
     "../innerkits:udmf_client",
+    "../innerkits:udmf_core",
     "../innerkits:utd_client",
     "../jskits:udmf_js_common",
   ]
@@ -117,6 +118,7 @@ ohos_shared_library("uniformtypedescriptor_napi") {
 
   deps = [
     "../innerkits:udmf_client",
+    "../innerkits:udmf_core",
     "../innerkits:utd_client",
     "../jskits:udmf_js_common",
   ]
@@ -184,6 +186,7 @@ ohos_shared_library("udmf_data_napi") {
 
   deps = [
     "../innerkits:udmf_client",
+    "../innerkits:udmf_core",
     "../innerkits:utd_client",
     "../jskits:udmf_js_common",
   ]

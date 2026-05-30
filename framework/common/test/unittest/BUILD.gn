@@ -21,6 +21,7 @@ config("module_private_config") {
     "${udmf_interfaces_path}/innerkits/common",
     "${udmf_interfaces_path}/innerkits/convert",
     "${udmf_framework_path}/innerkitsimpl/data",
+    "${udmf_framework_path}/innerkitsimpl/convert",
     "${udmf_framework_path}/common",
     "${udmf_interfaces_path}/innerkits/data",
     "${udmf_framework_path}/common/unittest/mock/include",
@@ -30,6 +31,7 @@ config("module_private_config") {
 }
 
 common_deps = [
+  "${udmf_interfaces_path}/innerkits:udmf_core",
   "${udmf_interfaces_path}/innerkits:udmf_client",
   "${udmf_interfaces_path}/innerkits:utd_client",
 ]
@@ -157,6 +159,7 @@ ohos_unittest("UdmfTypesUtilAbnormalTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${udmf_interfaces_path}/innerkits:udmf_core",
     "${udmf_interfaces_path}/innerkits:udmf_client",
     "${udmf_interfaces_path}/innerkits:utd_client",
   ]
@@ -195,6 +198,7 @@ ohos_unittest("TlvUtilTest") {
 
   external_deps = [
     "ability_base:base",
+    "ability_base:zuri",
     "ability_base:want",
     "c_utils:utils",
     "hilog:libhilog",

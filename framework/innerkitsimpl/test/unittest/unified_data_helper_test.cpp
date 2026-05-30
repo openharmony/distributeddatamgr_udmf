@@ -252,4 +252,5 @@ HWTEST_F(UnifiedDataHelperTest, GetSummary001, TestSize.Level1)
     EXPECT_EQ(summary.tag, tag);
     LOG_INFO(UDMF_TEST, "GetSummary001 end.");
 }
+
 } // OHOS::Test

@@ -101,6 +101,7 @@ taihe_shared_library("udmf_taihe_native") {
   deps = [
     ":run_udmf_taihe",
     "${udmf_interfaces_path}/innerkits:udmf_client",
+    "${udmf_interfaces_path}/innerkits:udmf_core",
     "${udmf_interfaces_path}/innerkits:utd_client",
     "${udmf_interfaces_path}/innerkits/aipcore:aip_core_mgr_static",
     "${udmf_interfaces_path}/jskits:intelligence_napi",

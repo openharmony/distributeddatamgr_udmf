@@ -34,7 +34,6 @@ private:
     static void RebuildEntry(const std::vector<UriInfo> &uris, const ValueType &value);
     static std::string RebuildHtmlContent(const std::string &str, const std::vector<UriInfo> &uris);
     static std::vector<UriInfo> GetValueStr(std::shared_ptr<Object> object);
-    static void ProcessEntry(const std::shared_ptr<UnifiedRecord> &record);
     static void RemoveInvalidImgSrc(const std::vector<std::string> &validImgSrcList,
         std::vector<UriInfo> &imgSrcMap) noexcept;
 };

@@ -19,7 +19,6 @@
 #include <unordered_set>
 
 #include "file_uri.h"
-#include "html.h"
 #include "logger.h"
 #include "xml_loader.h"
 
@@ -49,27 +48,9 @@ void UnifiedHtmlRecordProcess::RebuildHtmlRecord(UnifiedData &unifiedData)
         if (!record->HasType(utdId)) {
             continue;
         }
-        if (record->GetType() == UDType::HTML) {
-            auto htmlRecord = std::static_pointer_cast<Html>(record);
-            auto rebuildContent = RebuildHtmlContent(htmlRecord->GetHtmlContent(), record->GetUris());
-            if (!rebuildContent.empty()) {
-                htmlRecord->SetHtmlContent(rebuildContent);
-            }
-        } else {
-            ProcessEntry(record);
-        }
-    }
-}
-
-void UnifiedHtmlRecordProcess::ProcessEntry(const std::shared_ptr<UnifiedRecord> &record)
-{
-    if (record->GetInnerEntries() == nullptr) {
-        return;
-    }
-    for (auto &entry : *(record->GetInnerEntries())) {
-        auto udType = static_cast<UDType>(UtdUtils::GetUtdEnumFromUtdId(entry.first));
-        if (udType == UDType::HTML && std::holds_alternative<std::shared_ptr<Object>>(entry.second)) {
-            RebuildEntry(record->GetUris(), entry.second);
+        auto htmlData = record->GetEntry(utdId);
+        if (std::holds_alternative<std::shared_ptr<Object>>(htmlData)) {
+            RebuildEntry(record->GetUris(), htmlData);
         }
     }
 }
