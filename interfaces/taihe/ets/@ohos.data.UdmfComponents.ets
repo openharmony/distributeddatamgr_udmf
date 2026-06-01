@@ -59,7 +59,7 @@ export enum FormType {
   TYPE_SMALL = 2
 }
 
-enum TextType {
+export enum TextType {
   TITLE = 0,
   DESCRIPTION = 1,
   APP_NAME = 2
@@ -117,7 +117,7 @@ const DESCRIPTION_FONT_COLOR: string = '#99182431';
 const DEFAULT_MID_IMAGE_HEIGHT: double = 72; // 4x2卡片，图片默认高度
 const DEFAULT_SMALL_IMAGE_HEIGHT: double = 59; // 2x1卡片，图片默认高度
 
-interface CardStyle {
+export interface CardStyle {
   thumbWidth: double,
   thumbHeight: double,
   thumbMarginLeft?: double,
