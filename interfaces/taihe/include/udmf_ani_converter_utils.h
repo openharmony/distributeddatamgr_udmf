@@ -19,19 +19,20 @@
 #include "ani.h"
 #include "async_task_params.h"
 #include "unified_data.h"
+#include "visibility.h"
 
 namespace OHOS {
 namespace UDMF {
 class AniConverter {
 public:
-    static std::shared_ptr<UnifiedData> UnwrapUnifiedData(ani_env *env, ani_object object);
-    static ani_object WrapUnifiedData(ani_env *env, std::shared_ptr<UnifiedData> unifiedData);
+    static API_EXPORT std::shared_ptr<UnifiedData> UnwrapUnifiedData(ani_env *env, ani_object object);
+    static API_EXPORT ani_object WrapUnifiedData(ani_env *env, std::shared_ptr<UnifiedData> unifiedData);
     static ani_object WrapProgressInfo(ani_env *env, ProgressInfo info);
     static std::shared_ptr<UnifiedRecord> UnwrapUnifiedRecord(ani_env *env, ani_object object);
     static ani_object WrapUnifiedRecord(ani_env *env, std::shared_ptr<UnifiedRecord> unifiedRecord);
-    static ani_object WrapSummary(ani_env *env, std::shared_ptr<Summary> summary);
-    static GetDataParams UnwrapGetDataParams(ani_env *env, ani_object object, const std::string &key);
-    static DataLoadParams UnwrapDataLoadParams(ani_env *env, ani_object object);
+    static API_EXPORT ani_object WrapSummary(ani_env *env, std::shared_ptr<Summary> summary);
+    static API_EXPORT GetDataParams UnwrapGetDataParams(ani_env *env, ani_object object, const std::string &key);
+    static API_EXPORT DataLoadParams UnwrapDataLoadParams(ani_env *env, ani_object object);
 };
 } // namespace UDMF
 } // namespace OHOS
