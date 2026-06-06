@@ -96,8 +96,8 @@ ohos_shared_library("udmf_core") {
   subsystem_name = "distributeddatamgr"
 
   part_name = "udmf"
-  use_exceptions = true
-  cflags_cc = [ "-O2" ]
+  use_exceptions = false
+  cflags_cc = [ "-Oz" ]
 
   cflags = [ "-Werror=vla" ]
 }

@@ -119,6 +119,16 @@ taihe_shared_library("udmf_taihe_native") {
     "json:nlohmann_json_static",
     "runtime_core:ani_helpers",
   ]
+  ldflags = [ "-Wl,--exclude-libs=ALL" ]
+  cflags = [
+    "-fvisibility=hidden",
+    "-Oz",
+  ]
+  cflags_cc = [
+    "-fvisibility=hidden",
+    "-fvisibility-inlines-hidden",
+    "-Oz",
+  ]
   public_configs = [ ":taihe_config" ]
 }
 
