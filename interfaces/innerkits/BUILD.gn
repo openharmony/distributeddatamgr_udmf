@@ -23,7 +23,9 @@ config("udmf_client_config") {
     "${udmf_interfaces_path}/ndk/data",
     "${udmf_framework_path}/common",
     "${udmf_framework_path}/innerkitsimpl/client",
+    "${udmf_framework_path}/innerkitsimpl/common",
     "${udmf_framework_path}/innerkitsimpl/data",
+    "${udmf_framework_path}/innerkitsimpl/dynamic",
     "${udmf_framework_path}/innerkitsimpl/service",
     "${udmf_framework_path}/innerkitsimpl/convert",
     "${udmf_framework_path}/ndkimpl/data",
@@ -48,6 +50,24 @@ config("udmf_core_config") {
   ]
 }
 
+udmf_core_sources = [
+  "${udmf_framework_path}/common/endian_converter.cpp",
+  "${udmf_framework_path}/common/tlv_object.cpp",
+  "${udmf_framework_path}/common/tlv_util.cpp",
+  "${udmf_framework_path}/common/udmf_radar_reporter.cpp",
+  "${udmf_framework_path}/common/udmf_types_util.cpp",
+  "${udmf_framework_path}/common/udmf_utils.cpp",
+  "${udmf_framework_path}/innerkitsimpl/client/getter_system.cpp",
+  "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
+  "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
+  "${udmf_framework_path}/innerkitsimpl/common/uri_permission_util.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/unified_html_record_process.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+  "${udmf_framework_path}/innerkitsimpl/dynamic/pixelmap_loader.cpp",
+  "${udmf_framework_path}/innerkitsimpl/dynamic/xml_loader.cpp",
+]
+
 ohos_shared_library("udmf_core") {
   branch_protector_ret = "pac_ret"
   sanitize = {
@@ -58,23 +78,7 @@ ohos_shared_library("udmf_core") {
     debug = false
   }
 
-  sources = [
-    "${udmf_framework_path}/common/endian_converter.cpp",
-    "${udmf_framework_path}/common/tlv_object.cpp",
-    "${udmf_framework_path}/common/tlv_util.cpp",
-    "${udmf_framework_path}/common/udmf_radar_reporter.cpp",
-    "${udmf_framework_path}/common/udmf_types_util.cpp",
-    "${udmf_framework_path}/common/udmf_utils.cpp",
-    "${udmf_framework_path}/innerkitsimpl/client/getter_system.cpp",
-    "${udmf_framework_path}/innerkitsimpl/common/unified_key.cpp",
-    "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
-    "${udmf_framework_path}/innerkitsimpl/common/uri_permission_util.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/unified_html_record_process.cpp",
-    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
-    "${udmf_framework_path}/innerkitsimpl/dynamic/pixelmap_loader.cpp",
-    "${udmf_framework_path}/innerkitsimpl/dynamic/xml_loader.cpp",
-  ]
+  sources = udmf_core_sources
 
   public_configs = [ ":udmf_core_config" ]
 
@@ -139,13 +143,11 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
   ]
+  sources += udmf_core_sources
 
   public_configs = [ ":udmf_client_config" ]
 
-  deps = [
-    ":udmf_core",
-    "../innerkits:utd_client",
-  ]
+  deps = [ "../innerkits:utd_client" ]
 
   external_deps = [
     "ability_base:zuri",
