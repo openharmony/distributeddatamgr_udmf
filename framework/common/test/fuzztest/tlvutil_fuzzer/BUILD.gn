@@ -43,7 +43,6 @@ ohos_fuzztest("TlvUtilFuzzTest") {
 
   deps = [
     "${udmf_interfaces_path}/innerkits:udmf_core",
-    "${udmf_interfaces_path}/innerkits:udmf_client",
     "${udmf_interfaces_path}/innerkits:utd_client",
     "${udmf_interfaces_path}/ndk:libudmf"
   ]

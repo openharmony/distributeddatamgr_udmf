@@ -35,7 +35,6 @@ config("module_private_config") {
 }
 
 common_deps = [
-  "${udmf_interfaces_path}/innerkits:udmf_core",
   "${udmf_interfaces_path}/innerkits:udmf_client",
   "${udmf_interfaces_path}/innerkits:utd_client",
   "${udmf_interfaces_path}/ndk:libudmf",
@@ -209,10 +208,7 @@ ohos_unittest("UdmfClientSaInvokeTest") {
 
   sources = [ "udmf_client_sa_invoke_test.cpp" ]
 
-  deps = [
-    "${udmf_interfaces_path}/innerkits:udmf_core",
-    "${udmf_interfaces_path}/innerkits:udmf_client",
-  ]
+  deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
 
   external_deps = common_external_deps
 
