@@ -249,6 +249,6 @@ function GetUniformDataTypeByMIMEType(mimeType: String, belongsTo: Optional<Stri
 function getUniformDataTypeByFilenameExtension(filenameExtension: String, belongsTo: Optional<String>): String;
 function GetTypeDescriptor(typeId: String): TypeDescriptorUnion;
 @rename("registerTypeDescriptors")
-function registerTypeDescriptorsSync(typeDescriptors: Array<TypeDescriptor>): void;
+@promise function registerTypeDescriptorsSync(typeDescriptors: Array<TypeDescriptor>): void;
 @rename("unregisterTypeDescriptors")
-function unregisterTypeDescriptorsSync(typeIds: Array<String>): void;
+@promise function unregisterTypeDescriptorsSync(typeIds: Array<String>): void;
