@@ -1062,6 +1062,28 @@ ohos_unittest("AuditHelperTest") {
   ]
 }
 
+ohos_unittest("GetterSystemTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${udmf_framework_path}/innerkitsimpl/client/getter_system.cpp",
+    "getter_system_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+
+  cflags = [ "-Werror=vla" ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
@@ -1073,6 +1095,7 @@ group("unittest") {
     ":FileDataTest",
     ":FlexibleTypeTest",
     ":FolderTest",
+    ":GetterSystemTest",
     ":HtmlTest",
     ":ImageTest",
     ":LinkTest",
