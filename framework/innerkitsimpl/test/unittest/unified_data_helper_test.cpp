@@ -253,4 +253,40 @@ HWTEST_F(UnifiedDataHelperTest, GetSummary001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "GetSummary001 end.");
 }
 
+/**
+* @tc.name: Pack001
+* @tc.desc: Normal testcase of Pack, pack UnifiedData with empty records
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, Pack001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Pack001 begin.");
+    UnifiedData data;
+    bool ret = UnifiedDataHelper::Pack(data);
+    EXPECT_TRUE(ret);
+    auto records = data.GetRecords();
+    EXPECT_EQ(records.size(), 1);
+    EXPECT_EQ(records[0]->GetType(), UDType::FILE);
+    LOG_INFO(UDMF_TEST, "Pack001 end.");
+}
+
+/**
+* @tc.name: Pack002
+* @tc.desc: Normal testcase of Pack, pack UnifiedData with one valid record
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, Pack002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Pack002 begin.");
+    UnifiedData data;
+    auto record = std::make_shared<UnifiedRecord>(UDType::TEXT);
+    record->SetUtdId("general.text");
+    data.AddRecord(record);
+    bool ret = UnifiedDataHelper::Pack(data);
+    EXPECT_TRUE(ret);
+    auto records = data.GetRecords();
+    EXPECT_EQ(records.size(), 1);
+    EXPECT_EQ(records[0]->GetType(), UDType::FILE);
+    LOG_INFO(UDMF_TEST, "Pack002 end.");
+}
 } // OHOS::Test
