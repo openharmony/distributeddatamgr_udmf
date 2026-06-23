@@ -30,7 +30,7 @@ enum NetworkPolicy : i32 {
 
 struct CloudModelInfo {
     modelType: String;
-    modelVersion: Optional<String>;
+    modelVersionCode: Optional<String>;
 }
 
 struct ModelConfig {
