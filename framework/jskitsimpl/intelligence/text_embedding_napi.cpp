@@ -330,15 +330,15 @@ bool TextEmbeddingNapi::CreateCloudModelInfo(napi_env env, const CloudModelInfo 
     }
 
     if (!modelInfo.modelVersion.empty()) {
-        napi_value modelVersion = nullptr;
-        status = napi_create_string_utf8(env, modelInfo.modelVersion.c_str(), NAPI_AUTO_LENGTH, &modelVersion);
+        napi_value modelVersionCode = nullptr;
+        status = napi_create_string_utf8(env, modelInfo.modelVersion.c_str(), NAPI_AUTO_LENGTH, &modelVersionCode);
         if (status != napi_ok) {
             AIP_HILOGE("napi_create_string_utf8 modelVersion failed");
             return false;
         }
-        status = napi_set_named_property(env, result, "modelVersion", modelVersion);
+        status = napi_set_named_property(env, result, "modelVersionCode", modelVersionCode);
         if (status != napi_ok) {
-            AIP_HILOGE("napi_set_named_property modelVersion failed");
+            AIP_HILOGE("napi_set_named_property modelVersionCode failed");
             return false;
         }
     }
@@ -361,17 +361,17 @@ bool TextEmbeddingNapi::ParseCloudModelInfo(napi_env env, napi_value modelInfo, 
         return false;
     }
 
-    bool hasModelVersion = false;
-    status = napi_has_named_property(env, modelInfo, "modelVersion", &hasModelVersion);
+    bool hasModelVersionCode = false;
+    status = napi_has_named_property(env, modelInfo, "modelVersionCode", &hasModelVersionCode);
     if (status != napi_ok) {
-        AIP_HILOGE("has modelVersion failed");
+        AIP_HILOGE("has modelVersionCode failed");
         return false;
     }
-    if (hasModelVersion) {
-        napi_value modelVersion = nullptr;
-        status = napi_get_named_property(env, modelInfo, "modelVersion", &modelVersion);
-        if (status != napi_ok || !AipNapiUtils::TransJsToStr(env, modelVersion, result.modelVersion)) {
-            AIP_HILOGE("get modelVersion failed");
+    if (hasModelVersionCode) {
+        napi_value modelVersionCode = nullptr;
+        status = napi_get_named_property(env, modelInfo, "modelVersionCode", &modelVersionCode);
+        if (status != napi_ok || !AipNapiUtils::TransJsToStr(env, modelVersionCode, result.modelVersion)) {
+            AIP_HILOGE("get modelVersionCode failed");
             return false;
         }
     }

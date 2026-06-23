@@ -310,8 +310,8 @@ OHOS::DataIntelligence::NetworkSyncPolicy ConvertNetworkSyncPolicy(::ohos::data:
     }
     if (config.modelInfo.has_value()) {
         cfgData.modelInfo.modelType = std::string(config.modelInfo.value().modelType);
-        if (config.modelInfo.value().modelVersion.has_value()) {
-            cfgData.modelInfo.modelVersion = std::string(config.modelInfo.value().modelVersion.value());
+        if (config.modelInfo.value().modelVersionCode.has_value()) {
+            cfgData.modelInfo.modelVersion = std::string(config.modelInfo.value().modelVersionCode.value());
         }
     }
     if (config.networkPolicy.has_value()) {
