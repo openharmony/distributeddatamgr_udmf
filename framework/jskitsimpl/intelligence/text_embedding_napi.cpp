@@ -370,7 +370,7 @@ bool TextEmbeddingNapi::ParseCloudModelInfo(napi_env env, napi_value modelInfo, 
     if (hasModelVersionCode) {
         napi_value modelVersionCode = nullptr;
         status = napi_get_named_property(env, modelInfo, "modelVersionCode", &modelVersionCode);
-        if (status != napi_ok || !AipNapiUtils::TransJsToStr(env, modelVersionCode, result.modelVersionCode)) {
+        if (status != napi_ok || !AipNapiUtils::TransJsToStr(env, modelVersionCode, result.modelVersion)) {
             AIP_HILOGE("get modelVersionCode failed");
             return false;
         }
