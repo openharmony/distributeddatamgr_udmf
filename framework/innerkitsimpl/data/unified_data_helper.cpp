@@ -256,7 +256,6 @@ bool UnifiedDataHelper::LoadUDataFromFile(const std::string &dataFile, UnifiedDa
         return false;
     }
     recordTlv.SetFile(file);
-
     if (!TLVUtil::ReadTlv(data, recordTlv, TAG::TAG_UNIFIED_DATA)) {
         LOG_ERROR(UDMF_FRAMEWORK, "TLV Reading failed!");
         return FileClose(file, false);
