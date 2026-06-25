@@ -333,7 +333,7 @@ bool TextEmbeddingNapi::CreateCloudModelInfo(napi_env env, const CloudModelInfo 
         napi_value modelVersionCode = nullptr;
         status = napi_create_string_utf8(env, modelInfo.modelVersion.c_str(), NAPI_AUTO_LENGTH, &modelVersionCode);
         if (status != napi_ok) {
-            AIP_HILOGE("napi_create_string_utf8 modelVersion failed");
+            AIP_HILOGE("napi_create_string_utf8 modelVersionCode failed");
             return false;
         }
         status = napi_set_named_property(env, result, "modelVersionCode", modelVersionCode);
