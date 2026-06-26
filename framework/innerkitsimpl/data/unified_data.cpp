@@ -121,6 +121,9 @@ std::vector<std::string> UnifiedData::GetTypesLabels() const
 bool UnifiedData::HasType(const std::string &type) const
 {
     for (const std::shared_ptr<UnifiedRecord> &record : records_) {
+        if (record == nullptr) {
+            continue;
+        }
         std::vector<std::string> recordTypes = record->GetTypes();
         if (std::find(recordTypes.begin(), recordTypes.end(), type) != recordTypes.end()) {
             return true;
@@ -285,6 +288,9 @@ std::set<std::string> UnifiedData::GetTypIds() const
 {
     std::set<std::string> types;
     for (const auto &record : records_) {
+        if (record == nullptr) {
+            continue;
+        }
         std::set<std::string> recordTypes = record->GetUtdIdsWithAddFileType(true);
         types.insert(recordTypes.begin(), recordTypes.end());
     }

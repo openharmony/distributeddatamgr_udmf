@@ -27,6 +27,9 @@ SystemDefinedForm::SystemDefinedForm(UDType type, ValueType value) : SystemDefin
     SetType(SYSTEM_DEFINED_FORM);
     if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
+        if (object == nullptr) {
+            return;
+        }
         object->GetValue(FORMID, formId_);
         object->GetValue(FORMNAME, formName_);
         object->GetValue(BUNDLE_NAME, bundleName_);

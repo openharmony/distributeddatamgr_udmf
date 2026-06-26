@@ -42,6 +42,9 @@ PlainText::PlainText(UDType type, ValueType value) : Text(type, value)
         content_ = std::get<std::string>(value);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
+        if (object == nullptr) {
+            return;
+        }
         object->GetValue(CONTENT, content_);
         object->GetValue(ABSTRACT, abstract_);
         std::shared_ptr<Object> detailObj = nullptr;

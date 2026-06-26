@@ -58,6 +58,9 @@ void UnifiedHtmlRecordProcess::RebuildHtmlRecord(UnifiedData &unifiedData)
 void UnifiedHtmlRecordProcess::RebuildEntry(const std::vector<UriInfo> &uris, const ValueType &value)
 {
     auto object = std::get<std::shared_ptr<Object>>(value);
+    if (object == nullptr) {
+        return;
+    }
     auto iter = object->value_.find(HTML_CONTENT);
     if (iter != object->value_.end()) {
         if (std::holds_alternative<std::string>(iter->second)) {

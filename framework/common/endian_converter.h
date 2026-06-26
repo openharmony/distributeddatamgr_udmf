@@ -42,7 +42,7 @@ static inline int32_t HostToNet(int32_t value)
 
 static inline int8_t NetToHost(int8_t value)
 {
-    return le32toh(value);
+    return value;
 }
 
 static inline int32_t NetToHost(int32_t value)
@@ -81,7 +81,7 @@ static inline uint32_t HostToNet(uint32_t value)
 
 static inline uint8_t NetToHost(uint8_t value)
 {
-    return le32toh(value);
+    return value;
 }
 
 static inline uint32_t NetToHost(uint32_t value)

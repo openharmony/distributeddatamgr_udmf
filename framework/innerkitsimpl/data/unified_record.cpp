@@ -84,7 +84,7 @@ int64_t UnifiedRecord::GetSize()
     std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto value = std::get<std::shared_ptr<Object>>(value_);
-        if (value->value_.size() == 1) {
+        if (value != nullptr && value->value_.size() == 1) {
             return ObjectUtils::GetValueSize(value_, true) + GetInnerEntriesSize();
         }
     }
@@ -161,6 +161,9 @@ ValueType UnifiedRecord::GetEntry(const std::string &utdId)
             InitObject();
             value = value_;
             auto obj = std::get<std::shared_ptr<Object>>(value_);
+            if (obj == nullptr) {
+                return std::monostate();
+            }
             value_ = obj->value_[VALUE_TYPE];
         }
         return value;
@@ -183,6 +186,9 @@ ValueType UnifiedRecord::GetEntry(const std::string &utdId)
         InitObject();
         auto value = value_;
         auto obj = std::get<std::shared_ptr<Object>>(value_);
+        if (obj == nullptr) {
+            return std::monostate();
+        }
         value_ = obj->value_[VALUE_TYPE];
         if (obj->value_.size() == 1) { // value_ size equals 1 means there are no datas
             return std::monostate();
