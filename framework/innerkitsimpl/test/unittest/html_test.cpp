@@ -678,4 +678,21 @@ HWTEST_F(HtmlTest, Html019, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "Html019 end.");
 }
+
+/**
+* @tc.name: Html020
+* @tc.desc: Test Html constructor with nullptr Object
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, Html020, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "Html020 begin.");
+    std::shared_ptr<Object> nullObj = nullptr;
+    ValueType value = nullObj;
+    Html html(HTML, value);
+    EXPECT_EQ(html.dataType_, HTML);
+    EXPECT_TRUE(html.htmlContent_.empty());
+    EXPECT_TRUE(html.plainContent_.empty());
+    LOG_INFO(UDMF_TEST, "Html020 end.");
+}
 } // OHOS::Test

@@ -177,12 +177,7 @@ void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
             LOG_WARN(UDMF_FRAMEWORK, "record is null");
             continue;
         }
-        auto entries = record->GetEntries();
-        if (entries == nullptr) {
-            LOG_WARN(UDMF_FRAMEWORK, "entries is null");
-            continue;
-        }
-        CalRecordSummary(*entries, summary);
+        CalRecordSummary(*record->GetEntries(), summary);
     }
     summary.version = WITH_SUMMARY_FORMAT_VER;
     auto properties = data.GetProperties();

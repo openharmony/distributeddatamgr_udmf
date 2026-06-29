@@ -72,7 +72,10 @@ void Link::SetUrl(const std::string &url)
     }
     this->url_ = url;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[URL] = url_;
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        if (object != nullptr) {
+            object->value_[URL] = url_;
+        }
     }
 }
 
@@ -88,7 +91,10 @@ void Link::SetDescription(const std::string &description)
     }
     this->description_ = description;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[DESCRIPTION] = description_;
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        if (object != nullptr) {
+            object->value_[DESCRIPTION] = description_;
+        }
     }
 }
 

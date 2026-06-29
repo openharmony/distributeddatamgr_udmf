@@ -106,4 +106,88 @@ HWTEST_F(EndianConverterTest, NetToHost002, TestSize.Level1)
     EXPECT_EQ(ret, value);
     LOG_INFO(UDMF_TEST, "NetToHost002 end.");
 }
+
+/**
+* @tc.name: NetToHost003
+* @tc.desc: Normal testcase of NetToHost for int8_t
+* @tc.type: FUNC
+*/
+HWTEST_F(EndianConverterTest, NetToHost003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "NetToHost003 begin.");
+    int8_t value = 100;
+    int8_t ret = NetToHost(value);
+    EXPECT_EQ(ret, value);
+    LOG_INFO(UDMF_TEST, "NetToHost003 end.");
+}
+
+/**
+* @tc.name: NetToHost004
+* @tc.desc: Boundary testcase of NetToHost for int8_t
+* @tc.type: FUNC
+*/
+HWTEST_F(EndianConverterTest, NetToHost004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "NetToHost004 begin.");
+    int8_t value = INT8_MIN;
+    int8_t ret = NetToHost(value);
+    EXPECT_EQ(ret, value);
+    LOG_INFO(UDMF_TEST, "NetToHost004 end.");
+}
+
+/**
+* @tc.name: NetToHost005
+* @tc.desc: Boundary testcase of NetToHost for int8_t
+* @tc.type: FUNC
+*/
+HWTEST_F(EndianConverterTest, NetToHost005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "NetToHost005 begin.");
+    int8_t value = INT8_MAX;
+    int8_t ret = NetToHost(value);
+    EXPECT_EQ(ret, value);
+    LOG_INFO(UDMF_TEST, "NetToHost005 end.");
+}
+
+/**
+* @tc.name: NetToHost006
+* @tc.desc: Normal testcase of NetToHost for uint8_t
+* @tc.type: FUNC
+*/
+HWTEST_F(EndianConverterTest, NetToHost006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "NetToHost006 begin.");
+    uint8_t value = 200;
+    uint8_t ret = NetToHost(value);
+    EXPECT_EQ(ret, value);
+    LOG_INFO(UDMF_TEST, "NetToHost006 end.");
+}
+
+/**
+* @tc.name: NetToHost007
+* @tc.desc: Boundary testcase of NetToHost for uint8_t
+* @tc.type: FUNC
+*/
+HWTEST_F(EndianConverterTest, NetToHost007, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "NetToHost007 begin.");
+    uint8_t value = 0;
+    uint8_t ret = NetToHost(value);
+    EXPECT_EQ(ret, value);
+    LOG_INFO(UDMF_TEST, "NetToHost007 end.");
+}
+
+/**
+* @tc.name: NetToHost008
+* @tc.desc: Boundary testcase of NetToHost for uint8_t
+* @tc.type: FUNC
+*/
+HWTEST_F(EndianConverterTest, NetToHost008, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "NetToHost008 begin.");
+    uint8_t value = UINT8_MAX;
+    uint8_t ret = NetToHost(value);
+    EXPECT_EQ(ret, value);
+    LOG_INFO(UDMF_TEST, "NetToHost008 end.");
+}
 } // OHOS::Test

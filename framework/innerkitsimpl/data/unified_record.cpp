@@ -162,7 +162,7 @@ ValueType UnifiedRecord::GetEntry(const std::string &utdId)
             value = value_;
             auto obj = std::get<std::shared_ptr<Object>>(value_);
             if (obj == nullptr) {
-                return std::monostate();
+                return value;
             }
             value_ = obj->value_[VALUE_TYPE];
         }
@@ -187,7 +187,7 @@ ValueType UnifiedRecord::GetEntry(const std::string &utdId)
         auto value = value_;
         auto obj = std::get<std::shared_ptr<Object>>(value_);
         if (obj == nullptr) {
-            return std::monostate();
+            return value;
         }
         value_ = obj->value_[VALUE_TYPE];
         if (obj->value_.size() == 1) { // value_ size equals 1 means there are no datas

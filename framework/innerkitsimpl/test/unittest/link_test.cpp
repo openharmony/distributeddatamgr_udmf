@@ -162,4 +162,21 @@ HWTEST_F(LinkTest, SetDescription002, TestSize.Level1)
     EXPECT_NE(link.description_, description);
     LOG_INFO(UDMF_TEST, "SetDescription002 end.");
 }
+
+/**
+* @tc.name: LinkTest005
+* @tc.desc: Test Link constructor with nullptr Object
+* @tc.type: FUNC
+*/
+HWTEST_F(LinkTest, LinkTest005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "LinkTest005 begin.");
+    std::shared_ptr<Object> nullObj = nullptr;
+    ValueType value = nullObj;
+    Link link(HYPERLINK, value);
+    EXPECT_EQ(link.dataType_, HYPERLINK);
+    EXPECT_TRUE(link.url_.empty());
+    EXPECT_TRUE(link.description_.empty());
+    LOG_INFO(UDMF_TEST, "LinkTest005 end.");
+}
 } // OHOS::Test

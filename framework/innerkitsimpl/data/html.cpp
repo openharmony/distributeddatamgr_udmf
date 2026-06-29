@@ -81,7 +81,10 @@ void Html::SetHtmlContent(const std::string &htmlContent)
     }
     this->htmlContent_ = htmlContent;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[HTML_CONTENT] = htmlContent_;
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        if (object != nullptr) {
+            object->value_[HTML_CONTENT] = htmlContent_;
+        }
     }
 }
 

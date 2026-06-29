@@ -1084,6 +1084,33 @@ ohos_unittest("GetterSystemTest") {
   cflags = [ "-Werror=vla" ]
 }
 
+ohos_unittest("UnifiedHtmlRecordProcessTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${udmf_framework_path}/innerkitsimpl/data/html.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_html_record_process.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
+    "${udmf_framework_path}/innerkitsimpl/dynamic/xml_loader.cpp",
+    "unified_html_record_process_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+
+  cflags = [ "-Werror=vla" ]
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
@@ -1107,6 +1134,7 @@ group("unittest") {
     ":SystemDefinedPixelMapTest",
     ":SystemDefinedRecordTest",
     ":TextTest",
+    ":UnifiedHtmlRecordProcessTest",
     ":UnifiedKeyTest",
     ":UdmfAsyncClientTest",
     ":UdmfClientAbnormalTest",

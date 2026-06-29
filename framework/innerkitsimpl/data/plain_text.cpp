@@ -74,7 +74,9 @@ void PlainText::SetContent(const std::string &text)
     this->content_ = text;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[CONTENT] = content_;
+        if (object != nullptr) {
+            object->value_[CONTENT] = content_;
+        }
     }
 }
 
@@ -92,7 +94,9 @@ void PlainText::SetAbstract(const std::string &abstract)
     this->abstract_ = abstract;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[ABSTRACT] = abstract_;
+        if (object != nullptr) {
+            object->value_[ABSTRACT] = abstract_;
+        }
     }
 }
 

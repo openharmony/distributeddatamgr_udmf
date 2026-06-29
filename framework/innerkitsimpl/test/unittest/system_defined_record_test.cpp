@@ -125,4 +125,22 @@ HWTEST_F(SystemDefinedRecordTest, InitObject001, TestSize.Level1)
     EXPECT_NE(details->value_.size(), 0);
     LOG_INFO(UDMF_TEST, "InitObject001 end.");
 }
+
+/**
+* @tc.name: AddProperty003
+* @tc.desc: Abnormal testcase of AddProperty with nullptr Object in value_
+* @tc.type: FUNC
+*/
+HWTEST_F(SystemDefinedRecordTest, AddProperty003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "AddProperty003 begin.");
+    const std::string property = "test_property";
+    UDVariant value = 123;
+    SystemDefinedRecord systemDefinedRecord;
+    std::shared_ptr<Object> nullObj = nullptr;
+    systemDefinedRecord.value_ = ValueType(nullObj);
+    EXPECT_NO_FATAL_FAILURE(systemDefinedRecord.AddProperty(property, value));
+    EXPECT_EQ(systemDefinedRecord.details_[property], value);
+    LOG_INFO(UDMF_TEST, "AddProperty003 end.");
+}
 } // OHOS::Test

@@ -98,4 +98,21 @@ HWTEST_F(PlainTextTest, SetAbstract003, TestSize.Level1)
     EXPECT_NE(plainText.abstract_, abstract);
     LOG_INFO(UDMF_TEST, "SetAbstract003 end.");
 }
+
+/**
+* @tc.name: PlainText002
+* @tc.desc: Test PlainText constructor with nullptr Object
+* @tc.type: FUNC
+*/
+HWTEST_F(PlainTextTest, PlainText002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "PlainText002 begin.");
+    std::shared_ptr<Object> nullObj = nullptr;
+    ValueType value = nullObj;
+    PlainText plainText(PLAIN_TEXT, value);
+    EXPECT_EQ(plainText.dataType_, PLAIN_TEXT);
+    EXPECT_TRUE(plainText.content_.empty());
+    EXPECT_TRUE(plainText.abstract_.empty());
+    LOG_INFO(UDMF_TEST, "PlainText002 end.");
+}
 } // OHOS::Test

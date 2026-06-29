@@ -289,4 +289,20 @@ HWTEST_F(UnifiedDataHelperTest, Pack002, TestSize.Level1)
     EXPECT_EQ(records[0]->GetType(), UDType::FILE);
     LOG_INFO(UDMF_TEST, "Pack002 end.");
 }
+
+/**
+* @tc.name: GetSummary002
+* @tc.desc: Abnormal testcase of GetSummary with nullptr record
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, GetSummary002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary002 begin.");
+    UnifiedData data;
+    data.records_ = {nullptr};
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    EXPECT_EQ(summary.totalSize, 0);
+    LOG_INFO(UDMF_TEST, "GetSummary002 end.");
+}
 } // OHOS::Test

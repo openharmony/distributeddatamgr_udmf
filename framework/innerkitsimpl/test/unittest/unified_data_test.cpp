@@ -510,4 +510,30 @@ HWTEST_F(UnifiedDataTest, ClearUriInfo_001, TestSize.Level0)
     unifiedData.ClearUriInfo();
     EXPECT_TRUE(unifiedData.records_[1]->uris_.empty());
 }
+
+/**
+* @tc.name: HasType_001
+* @tc.desc: Abnormal test of HasType with nullptr record
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataTest, HasType_001, TestSize.Level0)
+{
+    UnifiedData unifiedData;
+    unifiedData.records_ = {nullptr};
+    bool ret = unifiedData.HasType("general.plain-text");
+    EXPECT_FALSE(ret);
+}
+
+/**
+* @tc.name: GetTypIds_001
+* @tc.desc: Abnormal test of GetTypIds with nullptr record
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataTest, GetTypIds_001, TestSize.Level0)
+{
+    UnifiedData unifiedData;
+    unifiedData.records_ = {nullptr};
+    std::set<std::string> types = unifiedData.GetTypIds();
+    EXPECT_TRUE(types.empty());
+}
 } // OHOS::Test
