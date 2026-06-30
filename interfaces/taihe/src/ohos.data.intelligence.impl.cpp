@@ -373,6 +373,11 @@ OHOS::DataIntelligence::NetworkSyncPolicy ConvertNetworkSyncPolicy(::ohos::data:
 {
     ::ohos::data::intelligence::ImageEmbedding imageEmbed =
         taihe::make_holder<ImageEmbeddingImpl, ::ohos::data::intelligence::ImageEmbedding>();
+    if (config.modelInfo.has_value() || config.networkPolicy.has_value()) {
+        LOG_ERROR(UDMF_ANI, "config param check failed, modelInfo or networkPolicy should not have value");
+        taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
+        return taihe::make_holder<ImageEmbeddingImpl, ::ohos::data::intelligence::ImageEmbedding>();
+    }
     if (!imageAipCoreManager_) {
         LOG_ERROR(UDMF_ANI, "imageAipCoreManager_ is nullptr");
         taihe::set_business_error(PARAMETERS_ERROR, "check param error.");
