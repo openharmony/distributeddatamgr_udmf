@@ -49,7 +49,7 @@
         "libuv",
         "libxml2",
         "runtime_core",
-        "json",
+        "bounds_checking_function",
         "api_metrics",
         "taihe_ffi_gen"
       ]
