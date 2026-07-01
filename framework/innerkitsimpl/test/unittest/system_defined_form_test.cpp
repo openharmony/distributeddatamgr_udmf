@@ -149,4 +149,24 @@ HWTEST_F(SystemDefinedFormTest, SystemDefinedFormGetItem001, TestSize.Level1)
     EXPECT_EQ(std::get<std::string>(details[MODULE]), "module");
     LOG_INFO(UDMF_TEST, "SystemDefinedFormGetItem001 end.");
 }
+
+/**
+* @tc.name: SystemDefinedForm002
+* @tc.desc: Test SystemDefinedForm constructor with nullptr Object
+* @tc.type: FUNC
+*/
+HWTEST_F(SystemDefinedFormTest, SystemDefinedForm002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SystemDefinedForm002 begin.");
+    std::shared_ptr<Object> nullObj = nullptr;
+    ValueType value = nullObj;
+    SystemDefinedForm form(SYSTEM_DEFINED_FORM, value);
+    EXPECT_EQ(form.dataType_, SYSTEM_DEFINED_FORM);
+    EXPECT_EQ(form.formId_, -1);
+    EXPECT_TRUE(form.formName_.empty());
+    EXPECT_TRUE(form.bundleName_.empty());
+    EXPECT_TRUE(form.abilityName_.empty());
+    EXPECT_TRUE(form.module_.empty());
+    LOG_INFO(UDMF_TEST, "SystemDefinedForm002 end.");
+}
 } // OHOS::Test

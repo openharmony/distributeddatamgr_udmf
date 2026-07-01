@@ -31,6 +31,9 @@ SystemDefinedRecord::SystemDefinedRecord(UDType type, ValueType value) : Unified
     this->dataType_ = SYSTEM_DEFINED_RECORD;
     if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
+        if (object == nullptr) {
+            return;
+        }
         std::shared_ptr<Object> detailObj = nullptr;
         if (object->GetValue(DETAILS, detailObj)) {
             details_ = ObjectUtils::ConvertToUDDetails(detailObj);
@@ -47,7 +50,10 @@ void SystemDefinedRecord::AddProperty(const std::string &property, UDVariant &va
         details_[property] = value;
     }
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        if (object != nullptr) {
+            object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        }
     }
 }
 
@@ -64,7 +70,10 @@ void SystemDefinedRecord::SetDetails(UDDetails &details)
 {
     this->details_ = details;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        if (object != nullptr) {
+            object->value_[DETAILS] = ObjectUtils::ConvertToObject(details_);
+        }
     }
 }
 

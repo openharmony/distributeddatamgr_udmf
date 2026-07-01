@@ -38,6 +38,9 @@ File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
         oriUri_ = std::get<std::string>(value);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
+        if (object == nullptr) {
+            return;
+        }
         object->GetValue(ORI_URI, oriUri_);
         object->GetValue(REMOTE_URI, remoteUri_);
         object->GetValue(FILE_TYPE, fileType_);

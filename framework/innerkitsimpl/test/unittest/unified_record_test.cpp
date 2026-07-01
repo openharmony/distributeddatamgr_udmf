@@ -328,4 +328,35 @@ HWTEST_F(UnifiedRecordTest, ComputeUris_001, TestSize.Level0)
     const std::function<bool(UriInfo &)> action;
     EXPECT_NO_FATAL_FAILURE(record.ComputeUris(action));
 }
+
+/**
+* @tc.name: GetSize_001
+* @tc.desc: Test GetSize with nullptr Object in value_
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedRecordTest, GetSize_001, TestSize.Level0)
+{
+    UnifiedRecord record;
+    std::shared_ptr<Object> nullObj = nullptr;
+    record.value_ = nullObj;
+    int64_t size = record.GetSize();
+    EXPECT_EQ(size, 0);
+}
+
+/**
+* @tc.name: GetEntry_001
+* @tc.desc: Test GetEntry with nullptr Object already in value_
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedRecordTest, GetEntry_001, TestSize.Level0)
+{
+    UnifiedRecord record(HTML);
+    record.utdId2_ = "general.html";
+    std::shared_ptr<Object> nullObj = nullptr;
+    record.value_ = ValueType(nullObj);
+    ValueType result = record.GetEntry("general.html");
+    EXPECT_TRUE(std::holds_alternative<std::shared_ptr<Object>>(result));
+    auto obj = std::get<std::shared_ptr<Object>>(result);
+    EXPECT_EQ(obj, nullptr);
+}
 } // OHOS::Test

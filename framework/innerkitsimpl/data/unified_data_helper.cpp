@@ -173,6 +173,10 @@ void UnifiedDataHelper::CreateDirIfNotExist(const std::string& dirPath, const mo
 void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
 {
     for (const auto &record : data.GetRecords()) {
+        if (record == nullptr) {
+            LOG_WARN(UDMF_FRAMEWORK, "record is null");
+            continue;
+        }
         CalRecordSummary(*record->GetEntries(), summary);
     }
     summary.version = WITH_SUMMARY_FORMAT_VER;

@@ -45,6 +45,9 @@ Html::Html(UDType type, ValueType value) : Text(type, value)
         htmlContent_ = std::get<std::string>(value);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
+        if (object == nullptr) {
+            return;
+        }
         object->GetValue(HTML_CONTENT, htmlContent_);
         object->GetValue(PLAIN_CONTENT, plainContent_);
         int32_t permissionMask = 0;
@@ -78,7 +81,10 @@ void Html::SetHtmlContent(const std::string &htmlContent)
     }
     this->htmlContent_ = htmlContent;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[HTML_CONTENT] = htmlContent_;
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        if (object != nullptr) {
+            object->value_[HTML_CONTENT] = htmlContent_;
+        }
     }
 }
 

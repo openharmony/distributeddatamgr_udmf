@@ -27,6 +27,9 @@ SystemDefinedForm::SystemDefinedForm(UDType type, ValueType value) : SystemDefin
     SetType(SYSTEM_DEFINED_FORM);
     if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
+        if (object == nullptr) {
+            return;
+        }
         object->GetValue(FORMID, formId_);
         object->GetValue(FORMNAME, formName_);
         object->GetValue(BUNDLE_NAME, bundleName_);
@@ -55,7 +58,10 @@ void SystemDefinedForm::SetFormId(const int32_t &formId)
 {
     this->formId_ = formId;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[FORMID] = formId_;
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        if (object != nullptr) {
+            object->value_[FORMID] = formId_;
+        }
     }
 }
 
@@ -68,7 +74,10 @@ void SystemDefinedForm::SetFormName(const std::string &formName)
 {
     this->formName_ = formName;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[FORMNAME] = formName_;
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        if (object != nullptr) {
+            object->value_[FORMNAME] = formName_;
+        }
     }
 }
 
@@ -81,7 +90,10 @@ void SystemDefinedForm::SetBundleName(const std::string &bundleName)
 {
     this->bundleName_ = bundleName;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[BUNDLE_NAME] = bundleName_;
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        if (object != nullptr) {
+            object->value_[BUNDLE_NAME] = bundleName_;
+        }
     }
 }
 
@@ -94,7 +106,10 @@ void SystemDefinedForm::SetAbilityName(const std::string &abilityName)
 {
     this->abilityName_ = abilityName;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[ABILITY_NAME] = abilityName_;
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        if (object != nullptr) {
+            object->value_[ABILITY_NAME] = abilityName_;
+        }
     }
 }
 
@@ -107,7 +122,10 @@ void SystemDefinedForm::SetModule(const std::string &module)
 {
     this->module_ = module;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
-        std::get<std::shared_ptr<Object>>(value_)->value_[MODULE] = module_;
+        auto object = std::get<std::shared_ptr<Object>>(value_);
+        if (object != nullptr) {
+            object->value_[MODULE] = module_;
+        }
     }
 }
 
