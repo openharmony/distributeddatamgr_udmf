@@ -42,6 +42,7 @@
         "json",
         "kv_store",
         "napi",
+        "node",
         "samgr",
         "app_file_service",
         "os_account",
