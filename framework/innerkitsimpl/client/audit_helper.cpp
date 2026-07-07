@@ -67,11 +67,6 @@ nlohmann::json AuditHelper::ConvertPixelMapToJson(std::shared_ptr<OHOS::Media::P
     std::vector<uint8_t> encodedData;
     PixelMapLoader loader;
     if (loader.EncodeTlv(pixelMap, encodedData)) {
-        if (encodedData.size() > MAX_DATA_SIZE) {
-            LOG_WARN(UDMF_CLIENT, "PixelMap data size %{public}zu exceeds limit %{public}zu, truncated",
-                     encodedData.size(), MAX_DATA_SIZE);
-            encodedData.resize(MAX_DATA_SIZE);
-        }
         pixelMapJson["encodedData"] = nlohmann::json::binary(encodedData);
     } else {
         LOG_ERROR(UDMF_CLIENT, "Encode pixelMap error");
@@ -90,34 +85,44 @@ nlohmann::json AuditHelper::ConvertObjectToJson(std::shared_ptr<Object> object)
 
 nlohmann::json AuditHelper::ConvertValueToJson(const ValueType &value)
 {
+    nlohmann::json result;
     if (std::holds_alternative<std::monostate>(value)) {
-        return nullptr;
+        result = nullptr;
     } else if (std::holds_alternative<int32_t>(value)) {
-        return std::get<int32_t>(value);
+        result = std::get<int32_t>(value);
     } else if (std::holds_alternative<int64_t>(value)) {
-        return std::get<int64_t>(value);
+        result = std::get<int64_t>(value);
     } else if (std::holds_alternative<double>(value)) {
-        return std::get<double>(value);
+        result = std::get<double>(value);
     } else if (std::holds_alternative<bool>(value)) {
-        return std::get<bool>(value);
+        result = std::get<bool>(value);
     } else if (std::holds_alternative<std::string>(value)) {
-        return std::get<std::string>(value);
+        result = std::get<std::string>(value);
     } else if (std::holds_alternative<std::vector<uint8_t>>(value)) {
         auto bytes = std::get<std::vector<uint8_t>>(value);
-        return nlohmann::json::binary(bytes);
+        result = nlohmann::json::binary(bytes);
     } else if (std::holds_alternative<std::shared_ptr<OHOS::AAFwk::Want>>(value)) {
         auto want = std::get<std::shared_ptr<OHOS::AAFwk::Want>>(value);
-        return ConvertWantToJson(want);
+        result = ConvertWantToJson(want);
     } else if (std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(value)) {
         auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value);
-        return ConvertPixelMapToJson(pixelMap);
+        result = ConvertPixelMapToJson(pixelMap);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
         auto object = std::get<std::shared_ptr<Object>>(value);
-        return ConvertObjectToJson(object);
+        result = ConvertObjectToJson(object);
     } else if (std::holds_alternative<std::nullptr_t>(value)) {
-        return nullptr;
+        result = nullptr;
+    } else {
+        result = nullptr;
     }
-    return nullptr;
+
+    size_t jsonSize = result.dump().size();
+    if (jsonSize > MAX_DATA_SIZE) {
+        LOG_WARN(UDMF_CLIENT, "Json data size %{public}zu exceeds limit %{public}zu, return empty",
+                 jsonSize, MAX_DATA_SIZE);
+        return nlohmann::json::object();
+    }
+    return result;
 }
 
 nlohmann::json AuditHelper::ConvertEntriesToJson(const std::map<std::string, ValueType> &entries)
