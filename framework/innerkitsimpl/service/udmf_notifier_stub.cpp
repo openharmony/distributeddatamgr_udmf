@@ -19,6 +19,7 @@
 #include "ipc_skeleton.h"
 #include "logger.h"
 #include "udmf_async_client.h"
+#include "unified_data_helper.h"
 #include "udmf_conversion.h"
 #include "udmf_types_util.h"
 #include "unified_html_record_process.h"
@@ -75,6 +76,10 @@ int32_t DelayDataCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &dat
         return E_READ_PARCEL_ERROR;
     }
     UdmfConversion::ConvertRecordToSubclass(unifiedData);
+    if (UnifiedDataHelper::IsTempUData(unifiedData)) {
+        LOG_ERROR(UDMF_SERVICE, "Delay data contains temp_udmf_file_flag, rejected");
+        return E_INVALID_PARAMETERS;
+    }
 
     if (unifiedData.HasType(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML))) {
         UnifiedHtmlRecordProcess::RebuildHtmlRecord(unifiedData);

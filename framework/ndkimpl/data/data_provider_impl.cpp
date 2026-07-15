@@ -22,12 +22,18 @@ namespace OHOS {
 namespace UDMF {
 void DataProviderImpl::SetInnerProvider(OH_UdmfRecordProvider* provider)
 {
-    innerProvider_ = provider;
+    if (provider == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Provider is nullptr");
+        return;
+    }
+    innerProvider_.callback = provider->callback;
+    innerProvider_.context = provider->context;
+    innerProvider_.finalize = provider->finalize;
 }
 
 OH_UdmfRecordProvider* DataProviderImpl::GetInnerProvider()
 {
-    return innerProvider_;
+    return &innerProvider_;
 }
 
 ValueType DataProviderImpl::GetValueByType(const std::string &utdId)
@@ -35,15 +41,11 @@ ValueType DataProviderImpl::GetValueByType(const std::string &utdId)
     if (utdId.empty()) {
         return std::monostate();
     }
-    if (innerProvider_ == nullptr) {
-        LOG_ERROR(UDMF_CAPI, "innerprovider_ is null!");
-        return std::monostate();
-    }
-    if (innerProvider_->callback == nullptr) {
+    if (innerProvider_.callback == nullptr) {
         LOG_ERROR(UDMF_CAPI, "innerprovider_ callback is null!");
         return std::monostate();
     }
-    auto value = (innerProvider_->callback)(innerProvider_->context, utdId.c_str());
+    auto value = (innerProvider_.callback)(innerProvider_.context, utdId.c_str());
     if (value == nullptr) {
         LOG_ERROR(
             UDMF_CAPI, "get empty data when execute custom callback function");

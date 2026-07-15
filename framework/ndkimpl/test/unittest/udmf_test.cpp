@@ -4462,4 +4462,57 @@ HWTEST_F(UDMFTest, OH_UdmfRecord_GeneralEntry_LargeData001, TestSize.Level1)
     
     OH_UdmfRecord_Destroy(record);
 }
+
+/**
+ * @tc.name: OH_UdmfDataLoadInfo_SetType_MaxTypeCount001
+ * @tc.desc: Test SetType rejects when types count exceeds MAX_TYPE_COUNT (1000)
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfDataLoadInfo_SetType_MaxTypeCount001, TestSize.Level1)
+{
+    OH_UdmfDataLoadInfo* info = OH_UdmfDataLoadInfo_Create();
+    EXPECT_NE(info, nullptr);
+
+    for (int i = 0; i < 1000; ++i) {
+        OH_UdmfDataLoadInfo_SetType(info, ("type_" + std::to_string(i)).c_str());
+    }
+    
+    unsigned int count = 0;
+    OH_UdmfDataLoadInfo_GetTypes(info, &count);
+    EXPECT_EQ(count, 1000);
+
+    OH_UdmfDataLoadInfo_SetType(info, "type_exceed");
+    
+    OH_UdmfDataLoadInfo_GetTypes(info, &count);
+    EXPECT_EQ(count, 1000);
+
+    OH_UdmfDataLoadInfo_Destroy(info);
+}
+
+/**
+ * @tc.name: OH_UdmfDataLoadInfo_SetType_MaxTypeCount002
+ * @tc.desc: Test SetType handles duplicate types near MAX_TYPE_COUNT limit
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfDataLoadInfo_SetType_MaxTypeCount002, TestSize.Level1)
+{
+    OH_UdmfDataLoadInfo* info = OH_UdmfDataLoadInfo_Create();
+    EXPECT_NE(info, nullptr);
+
+    for (int i = 0; i < 999; ++i) {
+        OH_UdmfDataLoadInfo_SetType(info, ("type_" + std::to_string(i)).c_str());
+    }
+    
+    OH_UdmfDataLoadInfo_SetType(info, "type_0");
+    
+    unsigned int count = 0;
+    OH_UdmfDataLoadInfo_GetTypes(info, &count);
+    EXPECT_EQ(count, 999);
+
+    OH_UdmfDataLoadInfo_SetType(info, "type_new");
+    OH_UdmfDataLoadInfo_GetTypes(info, &count);
+    EXPECT_EQ(count, 1000);
+
+    OH_UdmfDataLoadInfo_Destroy(info);
+}
 }

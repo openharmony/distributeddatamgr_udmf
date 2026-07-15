@@ -60,9 +60,11 @@ HWTEST_F(DataProviderImplTest, GetInnerProvider001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetInnerProvider001 begin.");
     DataProviderImpl dataProviderImpl;
-    dataProviderImpl.innerProvider_ = OH_UdmfRecordProvider_Create();
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    dataProviderImpl.SetInnerProvider(provider);
     OH_UdmfRecordProvider* ret = dataProviderImpl.GetInnerProvider();
-    EXPECT_EQ(ret, dataProviderImpl.innerProvider_);
+    EXPECT_NE(ret, nullptr);
+    OH_UdmfRecordProvider_Destroy(provider);
     LOG_INFO(UDMF_TEST, "GetInnerProvider001 end.");
 }
 
@@ -90,7 +92,6 @@ HWTEST_F(DataProviderImplTest, GetValueByType002, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetValueByType002 begin.");
     DataProviderImpl dataProviderImpl;
-    dataProviderImpl.innerProvider_ = nullptr;
     std::string utdId = "general.plain-text";
     ValueType ret = dataProviderImpl.GetValueByType(utdId);
     EXPECT_TRUE(std::holds_alternative<std::monostate>(ret));
@@ -106,13 +107,13 @@ HWTEST_F(DataProviderImplTest, GetValueByType003, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetValueByType003 begin.");
     DataProviderImpl dataProviderImpl;
-    dataProviderImpl.innerProvider_ = OH_UdmfRecordProvider_Create();
-    dataProviderImpl.innerProvider_->callback = nullptr;
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    provider->callback = nullptr;
+    dataProviderImpl.SetInnerProvider(provider);
     std::string utdId = "general.plain-text";
     ValueType ret = dataProviderImpl.GetValueByType(utdId);
     EXPECT_TRUE(std::holds_alternative<std::monostate>(ret));
-    OH_UdmfRecordProvider_Destroy(dataProviderImpl.innerProvider_);
-    dataProviderImpl.innerProvider_ = nullptr;
+    OH_UdmfRecordProvider_Destroy(provider);
     LOG_INFO(UDMF_TEST, "GetValueByType003 end.");
 }
 
@@ -125,12 +126,12 @@ HWTEST_F(DataProviderImplTest, GetValueByType004, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetValueByType004 begin.");
     DataProviderImpl dataProviderImpl;
-    dataProviderImpl.innerProvider_ = OH_UdmfRecordProvider_Create();
+    OH_UdmfRecordProvider* provider = OH_UdmfRecordProvider_Create();
+    dataProviderImpl.SetInnerProvider(provider);
     std::string utdId = "";
     ValueType ret = dataProviderImpl.GetValueByType(utdId);
     EXPECT_TRUE(std::holds_alternative<std::monostate>(ret));
-    OH_UdmfRecordProvider_Destroy(dataProviderImpl.innerProvider_);
-    dataProviderImpl.innerProvider_ = nullptr;
+    OH_UdmfRecordProvider_Destroy(provider);
     LOG_INFO(UDMF_TEST, "GetValueByType004 end.");
 }
 } // OHOS::Test
