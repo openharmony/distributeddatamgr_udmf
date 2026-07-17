@@ -991,10 +991,11 @@ HWTEST_F(UdmfAsyncClientTest, GetInnerDataParams003, TestSize.Level1)
     OH_UdmfGetDataParams_SetDataProgressListener(&param, dataProgressListener);
 
     OH_UdmfDataLoadInfo *info = OH_UdmfDataLoadInfo_Create();
-    for (auto i = 0; i < 1001; ++i) {
+    for (auto i = 0; i < 1000; ++i) {
         OH_UdmfDataLoadInfo_SetType(info, std::to_string(i).c_str());
     }
     OH_UdmfGetDataParams_SetAcceptableInfo(&param, info);
+    param.acceptableInfo.typesCount = 1001;
     
     QueryOption query = {
         .intention = UD_INTENTION_DRAG,

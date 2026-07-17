@@ -22,6 +22,7 @@
 #include "udmf_capi_common.h"
 #include "unified_data_helper.h"
 #include "file_uri.h"
+#include "unified_meta.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
@@ -304,5 +305,63 @@ HWTEST_F(UnifiedDataHelperTest, GetSummary002, TestSize.Level1)
     UnifiedDataHelper::GetSummary(data, summary);
     EXPECT_EQ(summary.totalSize, 0);
     LOG_INFO(UDMF_TEST, "GetSummary002 end.");
+}
+
+/**
+* @tc.name: LoadUDataFromFile_MaxDataSize001
+* @tc.desc: Test MAX_DATA_SIZE constant is correctly defined as 200MB
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, LoadUDataFromFile_MaxDataSize001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "LoadUDataFromFile_MaxDataSize001 begin.");
+    constexpr int64_t expectedMaxSize = 200 * 1024 * 1024;
+    EXPECT_EQ(UnifiedData::MAX_DATA_SIZE, expectedMaxSize);
+    LOG_INFO(UDMF_TEST, "LoadUDataFromFile_MaxDataSize001 end.");
+}
+
+/**
+* @tc.name: IsTempUData_EmptyData001
+* @tc.desc: Test IsTempUData with empty data
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, IsTempUData_EmptyData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsTempUData_EmptyData001 begin.");
+    UnifiedData data;
+    bool ret = UnifiedDataHelper::IsTempUData(data);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "IsTempUData_EmptyData001 end.");
+}
+
+/**
+* @tc.name: IsTempUData_NullptrRecord001
+* @tc.desc: Test IsTempUData with nullptr record
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, IsTempUData_NullptrRecord001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsTempUData_NullptrRecord001 begin.");
+    UnifiedData data;
+    data.records_ = {nullptr};
+    bool ret = UnifiedDataHelper::IsTempUData(data);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "IsTempUData_NullptrRecord001 end.");
+}
+
+/**
+* @tc.name: IsTempUData_NonFileRecord001
+* @tc.desc: Test IsTempUData with non-FILE record
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, IsTempUData_NonFileRecord001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "IsTempUData_NonFileRecord001 begin.");
+    UnifiedData data;
+    auto record = std::make_shared<UnifiedRecord>(UDType::TEXT);
+    data.AddRecord(record);
+    bool ret = UnifiedDataHelper::IsTempUData(data);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "IsTempUData_NonFileRecord001 end.");
 }
 } // OHOS::Test

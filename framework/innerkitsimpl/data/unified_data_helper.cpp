@@ -259,6 +259,11 @@ bool UnifiedDataHelper::LoadUDataFromFile(const std::string &dataFile, UnifiedDa
         LOG_ERROR(UDMF_FRAMEWORK, "failed to open file, error:%{public}s", std::strerror(errno));
         return false;
     }
+    struct stat fileInfo;
+    if (fstat(fileno(file), &fileInfo) != 0 || fileInfo.st_size > UnifiedData::MAX_DATA_SIZE) {
+        LOG_ERROR(UDMF_FRAMEWORK, "failed to get file size or file size exceeds limit");
+        return FileClose(file, false);
+    }
     recordTlv.SetFile(file);
     if (!TLVUtil::ReadTlv(data, recordTlv, TAG::TAG_UNIFIED_DATA)) {
         LOG_ERROR(UDMF_FRAMEWORK, "TLV Reading failed!");

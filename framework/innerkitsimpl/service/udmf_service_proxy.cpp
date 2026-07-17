@@ -18,6 +18,7 @@
 #include "logger.h"
 #include "udmf_types_util.h"
 #include "udmf_conversion.h"
+#include "unified_data_helper.h"
 #include "unified_html_record_process.h"
 
 namespace OHOS {
@@ -315,6 +316,10 @@ int32_t UdmfServiceProxy::GetDataIfAvailable(const std::string &key, const DataL
     }
     if (!unifiedData->IsEmpty()) {
         UdmfConversion::ConvertRecordToSubclass(*unifiedData);
+        if (UnifiedDataHelper::IsTempUData(*unifiedData)) {
+            LOG_ERROR(UDMF_SERVICE, "Delay data contains temp_udmf_file_flag, rejected");
+            return E_INVALID_PARAMETERS;
+        }
     }
     return status;
 }
