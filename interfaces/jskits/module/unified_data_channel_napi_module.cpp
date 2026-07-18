@@ -94,7 +94,7 @@ static napi_module _module = { .nm_version = 1,
     .nm_priv = ((void *)0),
     .reserved = { 0 } };
 
-extern "C" __attribute__((constructor)) void RegisterUDMFUnifiedDataModule(void)
+extern "C" __attribute__((visibility("default"))) void RegisterUDMFUnifiedDataModuleImpl(void)
 {
     napi_module_register(&_module);
     LOG_INFO(UDMF_KITS_NAPI, "module register data.unifiedDataChannel");
