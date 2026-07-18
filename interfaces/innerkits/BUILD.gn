@@ -68,7 +68,7 @@ udmf_core_sources = [
   "${udmf_framework_path}/innerkitsimpl/dynamic/xml_loader.cpp",
 ]
 
-ohos_shared_library("udmf_core") {
+ohos_static_library("udmf_core") {
   branch_protector_ret = "pac_ret"
   sanitize = {
     ubsan = true
@@ -95,8 +95,6 @@ ohos_shared_library("udmf_core") {
     "image_framework:image",
     "ipc:ipc_core",
   ]
-
-  innerapi_tags = [ "platformsdk" ]
   subsystem_name = "distributeddatamgr"
 
   part_name = "udmf"
@@ -143,11 +141,12 @@ ohos_shared_library("udmf_client") {
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_client.cpp",
     "${udmf_framework_path}/innerkitsimpl/service/udmf_service_proxy.cpp",
   ]
-  sources += udmf_core_sources
-
   public_configs = [ ":udmf_client_config" ]
 
-  deps = [ "../innerkits:utd_client" ]
+  deps = [
+    ":udmf_core",
+    ":utd_client",
+  ]
 
   external_deps = [
     "ability_base:zuri",
