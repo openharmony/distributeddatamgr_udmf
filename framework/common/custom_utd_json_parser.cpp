@@ -34,7 +34,6 @@ constexpr const char* ENCODED_STRINGS = "strings";
 constexpr const char* ENCODED_RECORDS = "records";
 constexpr const char* ENCODED_VALUE = "value";
 
-
 CustomUtdJsonParser::CustomUtdJsonParser()
 {
 }
