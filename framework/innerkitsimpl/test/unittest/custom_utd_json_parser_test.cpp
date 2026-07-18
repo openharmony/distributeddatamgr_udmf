@@ -102,4 +102,95 @@ HWTEST_F(CustomUtdJsonParserTest, ParseJsonData001, TestSize.Level1)
 
     LOG_INFO(UDMF_TEST, "ParseJsonData001 end.");
 }
+
+/**
+* @tc.name: ParseEncodedJsonData001
+* @tc.desc: Parse encoded sparse UTD json
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdJsonParserTest, ParseEncodedJsonData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ParseEncodedJsonData001 begin.");
+    const char *testJson = R"({
+        "UniformDataTypeDeclarations": {
+            "fields": [
+                "typeId",
+                "belongingToTypes",
+                "filenameExtensions",
+                "mimeTypes",
+                "description",
+                "referenceURL",
+                "iconFile"
+            ],
+            "strings": [
+                "general.object",
+                "*/*",
+                "Base type for logical hierarchy.",
+                "https://gitee.com/openharmony/docs",
+                "general.text",
+                "text/*",
+                "Base type for all text.",
+                "general.plain-text",
+                ".txt",
+                ".text",
+                "text/plain",
+                "Text of unspecified encoding, with no markup.",
+                "sys.media.ohos_ic_normal_white_grid_txt"
+            ],
+            "records": [
+                [0, [], null, {"value": [1], "Count": 1}, 2, 3],
+                [4, {"value": [0], "Count": 1}, [], {"value": [5], "Count": 1}, 6, 3],
+                [7, {"value": [4], "Count": 1}, {"value": [8, 9], "Count": 2},
+                    {"value": [10], "Count": 1}, 11, 3, 12]
+            ]
+        }
+    })";
+
+    std::vector<TypeDescriptorCfg> typesCfg;
+    std::vector<TypeDescriptorCfg> typesReference;
+    CustomUtdJsonParser parser;
+    bool result = parser.ParseUserCustomUtdJson(testJson, typesCfg, typesReference);
+
+    EXPECT_TRUE(result);
+    ASSERT_EQ(typesCfg.size(), 3);
+    EXPECT_EQ(typesCfg[0].typeId, "general.object");
+    EXPECT_TRUE(typesCfg[0].belongingToTypes.empty());
+    EXPECT_EQ(*(typesCfg[0].mimeTypes.begin()), "*/*");
+    EXPECT_EQ(typesCfg[0].description, "Base type for logical hierarchy.");
+    EXPECT_EQ(typesCfg[0].referenceURL, "https://gitee.com/openharmony/docs");
+
+    EXPECT_EQ(typesCfg[1].typeId, "general.text");
+    EXPECT_EQ(*(typesCfg[1].belongingToTypes.begin()), "general.object");
+    EXPECT_EQ(*(typesCfg[1].mimeTypes.begin()), "text/*");
+    EXPECT_TRUE(typesCfg[1].filenameExtensions.empty());
+
+    EXPECT_EQ(typesCfg[2].typeId, "general.plain-text");
+    EXPECT_EQ(*(typesCfg[2].belongingToTypes.begin()), "general.text");
+    EXPECT_EQ(typesCfg[2].filenameExtensions[0], ".txt");
+    EXPECT_EQ(typesCfg[2].filenameExtensions[1], ".text");
+    EXPECT_EQ(*(typesCfg[2].mimeTypes.begin()), "text/plain");
+    EXPECT_EQ(typesCfg[2].iconFile, "sys.media.ohos_ic_normal_white_grid_txt");
+    LOG_INFO(UDMF_TEST, "ParseEncodedJsonData001 end.");
+}
+
+/**
+* @tc.name: ParseEncodedJsonData002
+* @tc.desc: Reject encoded UTD records without a typeId
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdJsonParserTest, ParseEncodedJsonData002, TestSize.Level1)
+{
+    const char *testJson = R"({
+        "UniformDataTypeDeclarations": {
+            "fields": ["typeId", "description"],
+            "strings": ["description"],
+            "records": [[]]
+        }
+    })";
+    std::vector<TypeDescriptorCfg> typesCfg;
+    std::vector<TypeDescriptorCfg> typesReference;
+    CustomUtdJsonParser parser;
+    EXPECT_FALSE(parser.ParseUserCustomUtdJson(testJson, typesCfg, typesReference));
+    EXPECT_TRUE(typesCfg.empty());
+}
 } // OHOS::Test
