@@ -189,31 +189,61 @@ bool CustomUtdJsonParser::GetEncodedTypeDescriptors(const json &subNode, std::ve
             return false;
         }
         TypeDescriptorCfg typeCfg;
-        if (!GetEncodedTypeDescriptor(strings, record, typeCfg)) {
+        if (!GetEncodedTypeDescriptor(fields, strings, record, typeCfg)) {
             return false;
         }
         if (typeCfg.typeId.empty()) {
-            LOG_WARN(UDMF_CLIENT, "encoded record has empty typeId.");
-            continue;
+            LOG_ERROR(UDMF_CLIENT, "encoded record has empty typeId.");
+            return false;
         }
         typesCfg.push_back(std::move(typeCfg));
     }
     return true;
 }
 
-bool CustomUtdJsonParser::GetEncodedTypeDescriptor(const json &strings, const json &record, TypeDescriptorCfg &typeCfg)
+bool CustomUtdJsonParser::GetEncodedTypeDescriptor(const json &fields, const json &strings, const json &record,
+                                                   TypeDescriptorCfg &typeCfg)
 {
-    if (record.empty()) {
-        return true;
+    if (record.size() > fields.size()) {
+        LOG_ERROR(UDMF_CLIENT, "encoded record has too many fields.");
+        return false;
     }
-    typeCfg.typeId = GetEncodedString(strings, record[0]);
-    for (size_t index = 1; index < record.size(); ++index) {
-        const auto &item = record[index];
-        if (item.is_array() || item.is_object()) {
-            SetEncodedStringArray(typeCfg, GetEncodedStringArray(strings, item));
+    for (size_t index = 0; index < record.size(); ++index) {
+        if (record[index].is_null()) {
             continue;
         }
-        SetEncodedStringValue(typeCfg, GetEncodedString(strings, item));
+        if (!SetEncodedField(typeCfg, fields[index].get<std::string>(), strings, record[index])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool CustomUtdJsonParser::SetEncodedField(TypeDescriptorCfg &typeCfg, const std::string &field,
+                                          const json &strings, const json &value)
+{
+    if (field == TYPEID) {
+        typeCfg.typeId = GetEncodedString(strings, value);
+    } else if (field == BELONGINGTOTYPES) {
+        typeCfg.belongingToTypes = GetEncodedStringArray(strings, value);
+    } else if (field == FILE_NAME_EXTENSTENSIONS) {
+        typeCfg.filenameExtensions = GetEncodedStringArray(strings, value);
+    } else if (field == MIME_TYPES) {
+        typeCfg.mimeTypes = GetEncodedStringArray(strings, value);
+    } else if (field == DESCRIPTION) {
+        typeCfg.description = GetEncodedString(strings, value);
+    } else if (field == REFERENCE_URL) {
+        typeCfg.referenceURL = GetEncodedString(strings, value);
+    } else if (field == ICON_FILE) {
+        typeCfg.iconFile = GetEncodedString(strings, value);
+    } else if (field == OWNER) {
+        typeCfg.ownerBundle = GetEncodedString(strings, value);
+    } else if (field == INSTALLERS) {
+        auto installers = GetEncodedStringArray(strings, value);
+        typeCfg.installerBundles.insert(installers.begin(), installers.end());
+    } else {
+        LOG_ERROR(UDMF_CLIENT, "unknown encoded field.");
+        return false;
     }
     return true;
 }
@@ -251,47 +281,6 @@ std::vector<std::string> CustomUtdJsonParser::GetEncodedStringArray(const json &
         }
     }
     return result;
-}
-
-void CustomUtdJsonParser::SetEncodedStringArray(TypeDescriptorCfg &typeCfg, std::vector<std::string> &&values)
-{
-    if (values.empty()) {
-        return;
-    }
-    const auto &first = values.front();
-    if (!first.empty() && first.front() == '.') {
-        typeCfg.filenameExtensions = std::move(values);
-        return;
-    }
-    if (first.find('/') != std::string::npos || first == "*") {
-        typeCfg.mimeTypes = std::move(values);
-        return;
-    }
-    if (typeCfg.belongingToTypes.empty()) {
-        typeCfg.belongingToTypes = std::move(values);
-        return;
-    }
-    typeCfg.installerBundles.insert(values.begin(), values.end());
-}
-
-void CustomUtdJsonParser::SetEncodedStringValue(TypeDescriptorCfg &typeCfg, std::string &&value)
-{
-    if (value.empty()) {
-        return;
-    }
-    if (value.rfind("http://", 0) == 0 || value.rfind("https://", 0) == 0) {
-        typeCfg.referenceURL = std::move(value);
-        return;
-    }
-    if (value.rfind("sys.media.", 0) == 0 || value.rfind("resources/", 0) == 0) {
-        typeCfg.iconFile = std::move(value);
-        return;
-    }
-    if (typeCfg.description.empty()) {
-        typeCfg.description = std::move(value);
-        return;
-    }
-    typeCfg.ownerBundle = std::move(value);
 }
 
 std::string CustomUtdJsonParser::GetStringValue(const json *node, const std::string &nodeName)

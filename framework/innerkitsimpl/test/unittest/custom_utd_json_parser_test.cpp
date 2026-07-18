@@ -138,8 +138,8 @@ HWTEST_F(CustomUtdJsonParserTest, ParseEncodedJsonData001, TestSize.Level1)
                 "sys.media.ohos_ic_normal_white_grid_txt"
             ],
             "records": [
-                [0, {"value": [1], "Count": 1}, 2, 3],
-                [4, {"value": [0], "Count": 1}, {"value": [5], "Count": 1}, 6, 3],
+                [0, [], null, {"value": [1], "Count": 1}, 2, 3],
+                [4, {"value": [0], "Count": 1}, [], {"value": [5], "Count": 1}, 6, 3],
                 [7, {"value": [4], "Count": 1}, {"value": [8, 9], "Count": 2},
                     {"value": [10], "Count": 1}, 11, 3, 12]
             ]
@@ -171,5 +171,26 @@ HWTEST_F(CustomUtdJsonParserTest, ParseEncodedJsonData001, TestSize.Level1)
     EXPECT_EQ(*(typesCfg[2].mimeTypes.begin()), "text/plain");
     EXPECT_EQ(typesCfg[2].iconFile, "sys.media.ohos_ic_normal_white_grid_txt");
     LOG_INFO(UDMF_TEST, "ParseEncodedJsonData001 end.");
+}
+
+/**
+* @tc.name: ParseEncodedJsonData002
+* @tc.desc: Reject encoded UTD records without a typeId
+* @tc.type: FUNC
+*/
+HWTEST_F(CustomUtdJsonParserTest, ParseEncodedJsonData002, TestSize.Level1)
+{
+    const char *testJson = R"({
+        "UniformDataTypeDeclarations": {
+            "fields": ["typeId", "description"],
+            "strings": ["description"],
+            "records": [[]]
+        }
+    })";
+    std::vector<TypeDescriptorCfg> typesCfg;
+    std::vector<TypeDescriptorCfg> typesReference;
+    CustomUtdJsonParser parser;
+    EXPECT_FALSE(parser.ParseUserCustomUtdJson(testJson, typesCfg, typesReference));
+    EXPECT_TRUE(typesCfg.empty());
 }
 } // OHOS::Test

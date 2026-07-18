@@ -35,11 +35,12 @@ public:
 private:
     bool GetTypeDescriptorsFromArray(const json &subNode, std::vector<TypeDescriptorCfg> &typesCfg);
     bool GetEncodedTypeDescriptors(const json &subNode, std::vector<TypeDescriptorCfg> &typesCfg);
-    bool GetEncodedTypeDescriptor(const json &strings, const json &record, TypeDescriptorCfg &typeCfg);
+    bool GetEncodedTypeDescriptor(const json &fields, const json &strings, const json &record,
+                                  TypeDescriptorCfg &typeCfg);
+    bool SetEncodedField(TypeDescriptorCfg &typeCfg, const std::string &field, const json &strings,
+                         const json &value);
     std::string GetEncodedString(const json &strings, const json &indexNode);
     std::vector<std::string> GetEncodedStringArray(const json &strings, const json &indexNode);
-    void SetEncodedStringArray(TypeDescriptorCfg &typeCfg, std::vector<std::string> &&values);
-    void SetEncodedStringValue(TypeDescriptorCfg &typeCfg, std::string &&value);
     std::string GetStringValue(const json *node, const std::string &nodeName);
     std::vector<std::string> GetStringArrayValue(const json *node, const std::string &nodeName);
 };
