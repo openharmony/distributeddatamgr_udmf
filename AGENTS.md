@@ -1,6 +1,10 @@
 # UDMF - Agent 指令
 
-UDMF 为 OpenHarmony 提供跨应用、跨设备、跨运行时的统一数据定义与数据访问通路。本文档是 Agent 行为护栏，不是项目 README。
+Scope: 仓库根目录 `distributeddatamgr_udmf`。子目录无嵌套指令文件。
+
+Responsibility: 为 OpenHarmony 提供跨应用、跨设备、跨运行时的统一数据定义（UDT）与统一数据访问通路（UnifiedData）。
+
+本文档是 Agent 行为护栏，不是项目 README。
 
 ## 核心原则
 
@@ -164,6 +168,141 @@ NEVER 在本文档中写入密钥、Token、真实服务端点或生产专用变
 | HiLog/HiSysEvent/HiTrace/API Metrics | 可观测性 | 平台提供 | 否 | 功能继续运行但诊断能力下降 |
 | cJSON/json/libxml2 | 配置和结构化数据解析 | 平台提供 | 相关解析关键路径 | 返回解析或配置错误 |
 | MCP Server | 本仓不要求 | N/A | 否 | N/A |
+
+## Where to look
+
+| 任务类型 | 路径 | 补充阅读 |
+|---|---|---|
+| UnifiedData/Record 数据模型 | `interfaces/innerkits/data/`, `framework/innerkitsimpl/data/` | 本文件"数据对象改动影响面" |
+| UTD 类型定义 | `conf/uniform_data_types.json`, `framework/common/utd_*` | 本文件"UTD 类型改动影响面" |
+| NAPI 绑定 | `framework/jskitsimpl/` | - |
+| NDK/C API | `framework/ndkimpl/` | - |
+| CJ/Taihe 绑定 | `interfaces/cj/`, `interfaces/taihe/` | - |
+| TLV 序列化 | `framework/common/tlv_*` | 本文件"踩坑记录" |
+| 单元测试 | `framework/*/test/unittest/` | 本文件"单元测试约定" |
+| 构建目标 | 根 `BUILD.gn` | 必须核对真实目标名 |
+
+## 知识路由规则
+
+以下规则在规划前必须执行：
+
+### Task-based routing
+
+- 数据模型变更 → 必须同时检查 InnerKit、NAPI、NDK、CJ、Taihe 五层绑定
+- TLV 序列化变更 → 确认写、读、size 计算三处同步修改
+- 公开 API 变更 → 阅读 `bundle.json` 确认导出 kits，检查所有绑定层兼容性
+- UTD 类型变更 → 阅读 `conf/uniform_data_types.json` 确认类型图一致性
+
+### Path-based routing
+
+| 路径 | 触发时阅读 |
+|---|---|
+| `interfaces/innerkits/` | 检查所有绑定层兼容性 |
+| `framework/jskitsimpl/` | 检查 NAPI 转换完整性 |
+| `conf/uniform_data_types.json` | 确认类型图和 MIME 映射 |
+
+### Vocabulary-based routing
+
+当任务、issue、日志或变更文件中出现以下术语时，规划前阅读对应内容：
+
+| 术语 | 风险提示 | 阅读 |
+|---|---|---|
+| UnifiedData | 跨五层公开绑定，变更需同步检查 | 本文件"数据对象改动影响面" |
+| UnifiedRecord | 数据记录基类，变更影响所有子类 | 本文件"数据对象改动影响面" |
+| UTD | 类型图依赖，配置变更需验证图一致性 | 本文件"UTD 类型改动影响面" |
+| TypeDescriptor | 类型描述公开 API，变更影响查询接口 | 本文件"UTD 类型改动影响面" |
+| TLV | 写/读/size必须同步，否则序列化失败 | 本文件"踩坑记录" |
+| InnerKit | C++ 公共 API 层，变更影响所有绑定层 | 本文件"内部模块依赖" |
+| NAPI | JS 绑定层，转换必须完整 | 本文件"内部模块依赖" |
+| NDK | C API 层，ABI 兼容性必须保持 | 本文件"内部模块依赖" |
+| CJ/Taihe | 新绑定层，需与 InnerKit 同步 | 本文件"内部模块依赖" |
+
+**MUST**: 规划前必须声明：1) 任务类别 2) 已读文档 3) 发现的约束 4) 是否应使用特定 Skill 或工作流。
+
+## 边界规则
+
+### 架构不变量
+
+- 公共 API 表达稳定的能力意图，不是内部实现细节。
+- 五层绑定（InnerKit、NAPI、NDK、CJ、Taihe）必须保持语义一致。
+- TLV 序列化的写、读、size 计算必须同步修改。
+- UTD 类型图必须保持无环，配置变更需验证图一致性。
+- 模块依赖方向：`conf` → `common` → `innerkits` → `impl` → `bindings`，禁止反向依赖。
+
+### Do not
+
+- 不要绕过权限检查或伪造调用方身份。
+- 不要修改公共 API 签名、错误码或生命周期语义（除非任务明确要求）。
+- 不要在 TLV 变更时只修改写逻辑。
+- 不要删除或绕过既有兼容性适配代码。
+- 不要只在一个绑定层新增公开 API。
+- 不要在 NAPI/ANI/FFI 转换路径留下空错误分支或空 catch。
+- 不要硬编码产品名、输出目录、用户路径、凭据或私有端点。
+- 不要修改生成文件（如有），应修改源模板后重新生成。
+- 不要删除或降级 DFX 日志、事件、跟踪点以通过测试。
+- 不要为通过测试移除权限检查或调用方身份验证。
+
+### Ask before
+
+- 添加新的外部依赖。
+- 变更 UTD typeId 或 MIME 映射。
+- 修改协议格式或持久化数据结构。
+- 执行可能影响已连接设备或用户数据的操作。
+- 删除兼容性适配或迁移逻辑。
+- 修改权限模型或信任边界。
+- 变更公开 API 的错误码或行为语义。
+
+## Done 定义
+
+任务完成仅在以下条件全部满足时：
+
+- 请求的行为已实现。
+- 相关构建/测试/lint 已执行，或已说明无法执行的原因。
+- 最终回复包含：变更摘要、变更文件列表、验证结果、剩余风险。
+- 不包含无关的格式化、重构或附带变更。
+
+### 最小验证
+
+| 检查项 | 命令 |
+|---|---|
+| 格式化 | `git-clang-format origin/master` 或对照 `.clang-format` |
+| 构建 | `./build.sh --product-name <product> --build-target udmf` |
+| 单元测试 | `./build.sh --product-name <product> --build-target udmf_test` |
+| 文档空白 | `git diff --check -- <changed-paths>` |
+
+### 任务级验证
+
+| 变更类型 | 验证要求 |
+|---|---|
+| 公开 API 变更 | 检查五层绑定兼容性，运行 `udmf_test`，更新 API 文档 |
+| 数据模型变更 | 同时检查 InnerKit、NAPI、NDK、CJ、Taihe |
+| TLV 变更 | 确认写、读、size 同步修改，运行相关单元测试 |
+| UTD 配置变更 | 验证类型图无环，MIME 映射一致 |
+
+若验证无法执行：
+
+- 报告具体原因（如环境缺失、权限不足）。
+- 列出已验证项和待验证项。
+- 说明手动验证步骤。
+
+### 最终回复模板
+
+```
+## 变更摘要
+<一句话描述>
+
+## 变更文件
+- `path/to/file1.cpp`: <变更说明>
+- `path/to/file2.h`: <变更说明>
+
+## 验证结果
+- 构建: ✅/❌/⚠️ 未执行（原因）
+- 测试: ✅/❌/⚠️ 未执行（原因）
+- Lint: ✅/❌/⚠️ 未执行（原因）
+
+## 剩余风险
+<如有>
+```
 
 ## 文档索引
 
