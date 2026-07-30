@@ -104,11 +104,20 @@ describe('UdmfIntelligenceJsTest', function () {
     intelligence.getTextEmbeddingModel(textConfig)
       .then((data) => {
         console.info(TAG + 'get result' + data);
-        let ret = false;
-        if (data != null) {
-          ret = true;
+        if (currentDeviceIsPc) {
+          let ret = false;
+          if (data != null) {
+            ret = true;
+          }
+          expect(ret).assertEqual(true);
+        } else {
+          expect().assertFail();
         }
-        expect(ret).assertEqual(true);
+        done();
+      })
+      .catch((err) => {
+        console.info(TAG + 'get promise error:' + err.code);
+        expect(err.code).assertEqual(801);
         done();
       });
   });
@@ -445,7 +454,16 @@ describe('UdmfIntelligenceJsTest', function () {
     console.info(TAG + 'intelligenceApiTest1300 start');
     intelligence.getSupportedCloudModel()
       .then((info) => {
-        expect(info.length >= 0).assertEqual(true);
+        if (currentDeviceIsPc) {
+          expect(info.length >= 0).assertEqual(true);
+        } else {
+          expect().assertFail();
+        }
+        done();
+      })
+      .catch((err) => {
+        console.info(TAG + 'getSupportedCloudModel error:' + err.code);
+        expect(err.code).assertEqual(801);
         done();
       });
   });
