@@ -279,17 +279,9 @@ napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_
         return nullptr;
     }
 
-    napi_value promise = nullptr;
-    napi_deferred deferred = nullptr;
-    status = napi_create_promise(env, &deferred, &promise);
-    if (status != napi_ok) {
-        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "create promise failed");
-        return nullptr;
-    }
-
     auto asyncGetTextEmbeddingModelData = new (std::nothrow) AsyncGetTextEmbeddingModelData{
         .asyncWork = nullptr,
-        .deferred = deferred,
+        .deferred = nullptr,
         .config = textModelConfig,
         .res = nullptr,
         .ret = INNER_ERROR,
@@ -299,6 +291,16 @@ napi_value TextEmbeddingNapi::GetTextEmbeddingModel(napi_env env, napi_callback_
         ThrowIntelligenceErr(env, INNER_ERROR, "new asyncGetTextEmbeddingModelData failed");
         return nullptr;
     }
+
+    napi_value promise = nullptr;
+    napi_deferred deferred = nullptr;
+    status = napi_create_promise(env, &deferred, &promise);
+    if (status != napi_ok) {
+        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "create promise failed");
+        delete asyncGetTextEmbeddingModelData;
+        return nullptr;
+    }
+    asyncGetTextEmbeddingModelData->deferred = deferred;
 
     if (!CreateAsyncTextModelExecution(env, asyncGetTextEmbeddingModelData)) {
         ThrowIntelligenceErr(env, PARAM_EXCEPTION, "create AsyncTextModelExecution failed");
@@ -925,6 +927,11 @@ napi_value TextEmbeddingNapi::GetEmbedding(napi_env env, napi_callback_info info
 
     napi_valuetype valueType = napi_undefined;
     status = napi_typeof(env, args[ARG_0], &valueType);
+    if (valueType == napi_undefined || valueType == napi_null) {
+        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "param is error");
+        return nullptr;
+    }
+
     napi_value promise = nullptr;
     napi_deferred deferred = nullptr;
     status = napi_create_promise(env, &deferred, &promise);
@@ -932,10 +939,7 @@ napi_value TextEmbeddingNapi::GetEmbedding(napi_env env, napi_callback_info info
         ThrowIntelligenceErr(env, INNER_ERROR, "napi_get_cb_info failed");
         return nullptr;
     }
-    if (valueType == napi_undefined || valueType == napi_null) {
-        ThrowIntelligenceErr(env, PARAM_EXCEPTION, "param is error");
-        return nullptr;
-    }
+
     if (valueType == napi_string) {
         StringType(env, args[ARG_0], promise, deferred);
     }

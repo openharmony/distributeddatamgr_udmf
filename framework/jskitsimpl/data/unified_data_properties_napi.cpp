@@ -202,7 +202,7 @@ napi_value UnifiedDataPropertiesNapi::SetDelayData(napi_env env, napi_callback_i
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedDataPropertiesNapi");
     auto ctxt = std::make_shared<ContextBase>();
     napi_value handler;
-    napi_ref ref;
+    napi_ref ref = nullptr;
     auto input = [env, ctxt, &handler](size_t argc, napi_value* argv) {
         ASSERT_BUSINESS_ERR(ctxt, argc >= 1, Status::E_ERROR, "Mandatory parameters are left unspecified");
         napi_valuetype valueType = napi_undefined;
@@ -216,12 +216,14 @@ napi_value UnifiedDataPropertiesNapi::SetDelayData(napi_env env, napi_callback_i
     auto properties = static_cast<UnifiedDataPropertiesNapi *>(ctxt->native);
     ASSERT_ERR(ctxt->env, (properties != nullptr && properties->value_ != nullptr),
         Status::E_ERROR, "invalid object!");
-    if (properties->delayDataRef_ != nullptr) {
-        napi_delete_reference(env, properties->delayDataRef_);
-    }
     ctxt->status = napi_create_reference(env, handler, 1, &ref);
-    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "napi_create_reference failed");
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok && ref != nullptr,
+        Status::E_ERROR, "napi_create_reference failed");
+    napi_ref oldRef = properties->delayDataRef_;
     properties->delayDataRef_ = ref;
+    if (oldRef != nullptr) {
+        napi_delete_reference(env, oldRef);
+    }
     return nullptr;
 }
 
