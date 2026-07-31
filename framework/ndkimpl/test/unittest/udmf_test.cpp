@@ -4515,4 +4515,98 @@ HWTEST_F(UDMFTest, OH_UdmfDataLoadInfo_SetType_MaxTypeCount002, TestSize.Level1)
 
     OH_UdmfDataLoadInfo_Destroy(info);
 }
+
+/**
+ * @tc.name: OH_UdmfRecord_GetGeneralEntry_CacheConsistency001
+ * @tc.desc: Cached recordDataLen should remain correct when switching between different typeIds
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecord_GetGeneralEntry_CacheConsistency001, TestSize.Level1)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    char typeId1[] = "ApplicationDefined-type1";
+    unsigned char entry1[] = "testData1";
+    unsigned int count1 = sizeof(entry1);
+    char typeId2[] = "ApplicationDefined-type2";
+    unsigned char entry2[] = "testData2Longer";
+    unsigned int count2 = sizeof(entry2);
+
+    int addRes = OH_UdmfRecord_AddGeneralEntry(record, typeId1, entry1, count1);
+    EXPECT_EQ(addRes, UDMF_E_OK);
+    addRes = OH_UdmfRecord_AddGeneralEntry(record, typeId2, entry2, count2);
+    EXPECT_EQ(addRes, UDMF_E_OK);
+
+    unsigned int getCount1 = 0;
+    unsigned char *getEntry1 = nullptr;
+    int getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId1, &getEntry1, &getCount1);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    EXPECT_EQ(getCount1, count1);
+
+    unsigned int getCount2 = 0;
+    unsigned char *getEntry2 = nullptr;
+    getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId2, &getEntry2, &getCount2);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    EXPECT_EQ(getCount2, count2);
+
+    unsigned int getCount1Again = 0;
+    unsigned char *getEntry1Again = nullptr;
+    getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId1, &getEntry1Again, &getCount1Again);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    EXPECT_EQ(getCount1Again, count1);
+    EXPECT_TRUE(memcmp(getEntry1Again, entry1, count1) == 0);
+
+    OH_UdmfRecord_Destroy(record);
+}
+
+/**
+ * @tc.name: OH_UdmfRecord_GetGeneralEntry_RecordDataInvariant001
+ * @tc.desc: When recordData is nullptr, recordDataLen should always be 0
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfRecord_GetGeneralEntry_RecordDataInvariant001, TestSize.Level1)
+{
+    OH_UdmfRecord *record = OH_UdmfRecord_Create();
+    EXPECT_EQ(record->recordData, nullptr);
+    EXPECT_EQ(record->recordDataLen, 0u);
+
+    char typeId[] = "ApplicationDefined-testType";
+    unsigned char entry[] = "testData";
+    unsigned int count = sizeof(entry);
+    int addRes = OH_UdmfRecord_AddGeneralEntry(record, typeId, entry, count);
+    EXPECT_EQ(addRes, UDMF_E_OK);
+    unsigned int getCount = 0;
+    unsigned char *getEntry = nullptr;
+    int getRes = OH_UdmfRecord_GetGeneralEntry(record, typeId, &getEntry, &getCount);
+    EXPECT_EQ(getRes, UDMF_E_OK);
+    EXPECT_NE(record->recordData, nullptr);
+    EXPECT_GT(record->recordDataLen, 0u);
+
+    OH_UdmfRecord_Destroy(record);
+}
+
+/**
+ * @tc.name: OH_UdmfDataLoadInfo_SetType_OversizeString001
+ * @tc.desc: When type string exceeds MAX_KEY_STRING_LEN, typesCount should be 0 after SetType
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfDataLoadInfo_SetType_OversizeString001, TestSize.Level1)
+{
+    OH_UdmfDataLoadInfo* info = OH_UdmfDataLoadInfo_Create();
+    EXPECT_NE(info, nullptr);
+
+    OH_UdmfDataLoadInfo_SetType(info, "normal_type");
+    unsigned int count = 0;
+    char** types = OH_UdmfDataLoadInfo_GetTypes(info, &count);
+    EXPECT_NE(types, nullptr);
+    EXPECT_EQ(count, 1u);
+
+    std::string oversizeType(1024 * 1024 + 1, 'A');
+    OH_UdmfDataLoadInfo_SetType(info, oversizeType.c_str());
+
+    types = OH_UdmfDataLoadInfo_GetTypes(info, &count);
+    EXPECT_EQ(types, nullptr);
+    EXPECT_EQ(count, 0u);
+
+    OH_UdmfDataLoadInfo_Destroy(info);
+}
 }
