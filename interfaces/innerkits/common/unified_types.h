@@ -118,6 +118,7 @@ struct AsyncProcessInfo {
     uint32_t permFnished = 0;
     uint32_t permTotal = 0;
     std::string businessUdKey;
+    uint32_t tokenId {0};
 };
 
 struct ProgressInfo {

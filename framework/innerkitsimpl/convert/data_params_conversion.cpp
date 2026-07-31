@@ -62,8 +62,8 @@ Status DataParamsConversion::GetInnerDataParams(OH_UdmfGetDataParams &ndkDataPar
 Status DataParamsConversion::GetDataLoaderParams(const OH_UdmfDataLoadParams &ndkDataParams,
     DataLoadParams &dataLoadParams)
 {
-    if (ndkDataParams.dataLoadHandler == nullptr) {
-        LOG_ERROR(UDMF_CAPI, "DataLoadHandler is null");
+    if (ndkDataParams.dataLoadHandler == nullptr || ndkDataParams.dataLoadInfo.typesCount > MAX_TYPE_COUNT) {
+        LOG_ERROR(UDMF_CAPI, "DataLoadHandler is null or typesCount is too large");
         return Status::E_INVALID_PARAMETERS;
     }
     std::set<std::string> types;
