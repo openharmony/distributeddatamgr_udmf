@@ -449,4 +449,41 @@ describe('UdmfIntelligenceJsTest', function () {
         done();
       });
   });
+
+  /**
+   * @tc.name intelligenceApiTest1400
+   * @tc.number SUB_DistributedData_Intelligence_SDK_intelligenceApiTest_1400
+   * @tc.desc getEmbedding invalid parameters compatibility test
+   * @tc.type Function
+   */
+  it('intelligenceApiTest1400', 0, async function (done) {
+    console.info(TAG + 'intelligenceApiTest1400 start');
+    if (!currentDeviceIsPc) {
+      done();
+      return;
+    }
+    intelligence.getTextEmbeddingModel(textConfig)
+      .then((data) => {
+        let undefinedError;
+        let nullError;
+        try {
+          data.getEmbedding(undefined);
+        } catch (err) {
+          undefinedError = err;
+        }
+        try {
+          data.getEmbedding(null);
+        } catch (err) {
+          nullError = err;
+        }
+        expect(undefinedError.code).assertEqual(401);
+        expect(nullError.code).assertEqual(401);
+        done();
+      })
+      .catch((err) => {
+        console.error(TAG + 'getTextEmbeddingModel failed: ' + err.code);
+        expect().assertFail();
+        done();
+      });
+  });
 });

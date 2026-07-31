@@ -122,6 +122,33 @@ describe('UdmfJSTest', function () {
   });
 
   /**
+   * @tc.name UnifiedDataPropertiesTest004
+   * @tc.desc Test replacing Js UnifiedDataProperties getDelayData callback
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UnifiedDataPropertiesTest004', 0, function () {
+    const TAG = 'UnifiedDataPropertiesTest004';
+    console.info(TAG, 'start');
+    let unifiedData = new UDC.UnifiedData();
+    function callbackA() {
+      let data = new UDC.UnifiedData();
+      data.properties.tag = 'callbackA';
+      return data;
+    }
+    function callbackB() {
+      let data = new UDC.UnifiedData();
+      data.properties.tag = 'callbackB';
+      return data;
+    }
+
+    unifiedData.properties.getDelayData = callbackA;
+    expect(unifiedData.properties.getDelayData('').properties.tag).assertEqual('callbackA');
+    unifiedData.properties.getDelayData = callbackB;
+    expect(unifiedData.properties.getDelayData('').properties.tag).assertEqual('callbackB');
+  });
+
+  /**
    * @tc.name UnifiedDataHasType
    * @tc.desc Test Js UnifiedDataProperties testcase
    * @tc.type: FUNC
