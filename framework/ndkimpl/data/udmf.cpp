@@ -729,19 +729,19 @@ static int GetValueFromUint8Array(OH_UdmfRecord *record, const char *typeId, Val
         return UDMF_ERR;
     }
     std::vector<uint8_t> recordValue;
-    int recordDataLen;
     obj->GetValue(ARRAY_BUFFER, recordValue);
-    obj->GetValue(ARRAY_BUFFER_LENGTH, recordDataLen);
-    record->recordDataLen = recordValue.size();
-    if (record->recordDataLen > MAX_GENERAL_ENTRY_SIZE) {
+    size_t dataSize = recordValue.size();
+    if (dataSize > MAX_GENERAL_ENTRY_SIZE) {
         LOG_INFO(UDMF_CAPI, "data size exceeds maximum size");
         return UDMF_ERR;
     }
+    record->recordDataLen = dataSize;
     if (record->recordData != nullptr) {
         delete[] record->recordData;
     }
     record->recordData = new (std::nothrow) unsigned char[record->recordDataLen];
     if (record->recordData == nullptr) {
+        record->recordDataLen = 0;
         return UDMF_ERR;
     }
     auto err = memcpy_s(record->recordData, record->recordDataLen, recordValue.data(), record->recordDataLen);
@@ -1352,7 +1352,11 @@ void OH_UdmfDataLoadInfo_SetType(OH_UdmfDataLoadInfo* dataLoadInfo, const char* 
         NdkDataConversion::DestroyStringArray(dataLoadInfo->typesArray, dataLoadInfo->typesCount);
     }
     dataLoadInfo->typesArray = NdkDataConversion::StrVectorToTypesArray(typeLabels);
-    dataLoadInfo->typesCount = typeLabels.size();
+    if (dataLoadInfo->typesArray == nullptr) {
+        dataLoadInfo->typesCount = 0;
+    } else {
+        dataLoadInfo->typesCount = typeLabels.size();
+    }
 }
 
 int OH_UdmfDataLoadInfo_GetRecordCount(OH_UdmfDataLoadInfo* dataLoadInfo)
