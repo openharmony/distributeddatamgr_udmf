@@ -26,6 +26,7 @@ namespace UDMF {
 
 class UdmfNotifierStub : public IRemoteStub<IUdmfNotifier> {
 public:
+    bool IsValidProcessName();
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 };
 

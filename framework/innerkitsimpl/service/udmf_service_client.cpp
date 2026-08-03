@@ -129,6 +129,10 @@ int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedDat
         LOG_ERROR(UDMF_SERVICE, "The setting data initiated by the SA cannot contain the file type");
         return E_INVALID_PARAMETERS;
     }
+    if (UnifiedDataHelper::IsTempUData(unifiedData)) {
+        LOG_ERROR(UDMF_SERVICE, "Delay data contains temp_udmf_file_flag, rejected");
+        return E_INVALID_PARAMETERS;
+    }
     if (UnifiedDataHelper::ExceedKVSizeLimit(unifiedData)) {
         auto status = UnifiedDataHelper::ProcessBigData(unifiedData, option.intention, isSaInvoke);
         if (status != E_OK) {
