@@ -26,7 +26,6 @@ namespace UDMF {
 
 class UdmfNotifierStub : public IRemoteStub<IUdmfNotifier> {
 public:
-    bool IsValidProcessName();
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 };
 
@@ -44,6 +43,8 @@ private:
 class DelayDataCallbackStub : public IRemoteStub<IDelayDataCallback> {
 public:
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+private:
+    static bool IsValidProcessName();
 };
 
 class DelayDataCallbackClient : public DelayDataCallbackStub {
