@@ -43,7 +43,7 @@ public:
                                         std::string belongsTo = DEFAULT_TYPE_ID);
     Status API_EXPORT GetUniformDataTypesByMIMEType(const std::string &mimeType, std::vector<std::string> &typeIds,
                                         const std::string &belongsTo = DEFAULT_TYPE_ID);
-    Status API_EXPORT IsUtd(std::string typeId, bool &result);
+    static Status API_EXPORT IsUtd(std::string typeId, bool &result);
     void API_EXPORT InstallCustomUtds(const std::string &bundleName, const std::string &jsonStr, int32_t user);
     void API_EXPORT UninstallCustomUtds(const std::string &bundleName, int32_t user);
     Status API_EXPORT RegisterTypeDescriptors(const std::vector<TypeDescriptorCfg> &descriptors);
