@@ -37,6 +37,7 @@ constexpr const char *TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/
 constexpr const char *TEMP_UNIFIED_DATA_SUFFIX = ".ud";
 constexpr const char *TEMP_UNIFIED_DATA_FLAG = "temp_udmf_file_flag";
 static constexpr int WITH_SUMMARY_FORMAT_VER = 1;
+static constexpr int64_t FILE_SIZE_OVERHEAD = 10 * 1024 * 1024;
 std::string UnifiedDataHelper::rootPath_ = "";
 
 namespace {
@@ -260,7 +261,8 @@ bool UnifiedDataHelper::LoadUDataFromFile(const std::string &dataFile, UnifiedDa
         return false;
     }
     struct stat fileInfo;
-    if (fstat(fileno(file), &fileInfo) != 0 || fileInfo.st_size > UnifiedData::MAX_DATA_SIZE) {
+    if (fstat(fileno(file), &fileInfo) != 0 ||
+        fileInfo.st_size > UnifiedData::MAX_DATA_SIZE + FILE_SIZE_OVERHEAD) {
         LOG_ERROR(UDMF_FRAMEWORK, "failed to get file size or file size exceeds limit");
         return FileClose(file, false);
     }
