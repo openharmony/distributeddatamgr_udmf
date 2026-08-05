@@ -70,6 +70,7 @@ udmf_core_sources = [
 
 ohos_static_library("udmf_core") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
   sanitize = {
     ubsan = true
     boundary_sanitize = true
@@ -106,6 +107,7 @@ ohos_static_library("udmf_core") {
 
 ohos_shared_library("udmf_client") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
   sanitize = {
     ubsan = true
     boundary_sanitize = true
@@ -198,6 +200,7 @@ config("utd_client_config") {
 
 ohos_shared_library("utd_client") {
   branch_protector_ret = "pac_ret"
+  branch_protector_frt = "bti"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
