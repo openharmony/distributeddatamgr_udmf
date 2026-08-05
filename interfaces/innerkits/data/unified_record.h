@@ -82,6 +82,10 @@ public:
     void SetUris(std::vector<UriInfo> uris);
     void API_EXPORT ClearUris();
     void API_EXPORT ComputeUris(const std::function<bool(UriInfo &)> &action);
+    std::vector<std::string> API_EXPORT GetValidatedHtmlUris() const;
+    void API_EXPORT SetValidatedHtmlUris(std::vector<std::string> uris);
+    void API_EXPORT ClearValidatedHtmlUris();
+    int64_t API_EXPORT GetValidatedHtmlUrisSize() const;
 protected:
     UDType dataType_;
     std::string utdId_;
@@ -93,6 +97,7 @@ private:
     std::string uid_; // unique identifier
     std::shared_ptr<std::map<std::string, ValueType>> entries_ = std::make_shared<std::map<std::string, ValueType>>();
     std::vector<UriInfo> uris_ {};
+    std::vector<std::string> validatedHtmlUris_ {};
     uint32_t dataId_ = 0;
     uint32_t recordId_ = 0;
     std::string channelName_;

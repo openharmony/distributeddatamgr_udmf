@@ -1532,12 +1532,14 @@ HWTEST_F(TlvUtilTest, WritingAndReading_013, TestSize.Level1)
  * @tc.name: WritingAndReading_014
  * @tc.desc: test UnifiedRecord for Writing and Reading
  * @tc.type: FUNC
+ * @tc.author: agent
  */
 HWTEST_F(TlvUtilTest, WritingAndReading_014, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "WritingAndReading_014 begin.");
     std::shared_ptr<UnifiedRecord> plainText = std::make_shared<PlainText>(UDType::PLAIN_TEXT, "this is a content");
     std::shared_ptr<UnifiedRecord> html = std::make_shared<Html>(UDType::HTML, "this is a HTML content");
+    html->SetValidatedHtmlUris({"file:///data/storage/el2/base/files/image.png"});
     std::vector<std::shared_ptr<UnifiedRecord>> input = {plainText, html };
     std::vector<uint8_t> dataBytes;
     auto tlvObject = TLVObject(dataBytes);
@@ -1546,6 +1548,11 @@ HWTEST_F(TlvUtilTest, WritingAndReading_014, TestSize.Level1)
     std::vector<std::shared_ptr<UnifiedRecord>> output;
     TLVHead head;
     EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
+    ASSERT_EQ(output.size(), 2U);
+    ASSERT_NE(output[1], nullptr);
+    auto validatedHtmlUris = output[1]->GetValidatedHtmlUris();
+    ASSERT_EQ(validatedHtmlUris.size(), 1U);
+    EXPECT_EQ(validatedHtmlUris[0], "file:///data/storage/el2/base/files/image.png");
 
     LOG_INFO(UDMF_TEST, "WritingAndReading_014 end.");
 }

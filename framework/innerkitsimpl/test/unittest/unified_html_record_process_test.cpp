@@ -105,4 +105,72 @@ HWTEST_F(UnifiedHtmlRecordProcessTest, GetUriFromHtmlRecord001, TestSize.Level1)
     EXPECT_NO_FATAL_FAILURE(UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(html));
     LOG_INFO(UDMF_TEST, "GetUriFromHtmlRecord001 end.");
 }
+
+/**
+* @tc.name: CheckHtmlUris_NonHtmlRecord_PreservesUris
+* @tc.desc: CheckHtmlUris clears transient HTML validation data without changing ordinary URI metadata
+* @tc.type: FUNC
+* @tc.author: agent
+*/
+HWTEST_F(UnifiedHtmlRecordProcessTest, CheckHtmlUris_NonHtmlRecord_PreservesUris, TestSize.Level1)
+{
+    UnifiedData data;
+    auto text = std::make_shared<Text>();
+    UriInfo uriInfo = {
+        .oriUri = "file:///data/storage/el2/base/files/document.txt",
+        .position = 0,
+    };
+    text->SetUris({uriInfo});
+    text->SetValidatedHtmlUris({"file:///stale.png"});
+    data.AddRecord(text);
+
+    UnifiedHtmlRecordProcess::CheckHtmlUris(data);
+
+    auto uris = text->GetUris();
+    ASSERT_EQ(uris.size(), 1);
+    EXPECT_EQ(uris[0].oriUri, uriInfo.oriUri);
+    EXPECT_TRUE(text->GetValidatedHtmlUris().empty());
+}
+
+/**
+* @tc.name: CheckHtmlUris_InvalidHtmlImage_ClearsValidatedHtmlUris
+* @tc.desc: CheckHtmlUris preserves record URI metadata and clears the validated HTML URI result
+* @tc.type: FUNC
+* @tc.author: agent
+*/
+HWTEST_F(UnifiedHtmlRecordProcessTest, CheckHtmlUris_InvalidHtmlImage_ClearsValidatedHtmlUris, TestSize.Level1)
+{
+    UnifiedData data;
+    auto html = std::make_shared<Html>(
+        "<html><body><img src=\"file:///path/that/does/not/exist.png\"></body></html>", "plain");
+    UriInfo forgedUri = {
+        .oriUri = "file:///forged.png",
+        .authUri = "file://forged/forged.png",
+        .position = 0,
+        .permissionMask = 1,
+    };
+    html->SetUris({forgedUri});
+    data.AddRecord(html);
+
+    UnifiedHtmlRecordProcess::CheckHtmlUris(data);
+
+    auto uris = html->GetUris();
+    ASSERT_EQ(uris.size(), 1);
+    EXPECT_EQ(uris[0].oriUri, forgedUri.oriUri);
+    EXPECT_TRUE(html->GetValidatedHtmlUris().empty());
+}
+
+/**
+* @tc.name: MatchImgExtension_TrailingCharacters_ReturnsFalse
+* @tc.desc: Image extensions must match the complete physical file name suffix
+* @tc.type: FUNC
+* @tc.author: agent
+*/
+HWTEST_F(UnifiedHtmlRecordProcessTest, MatchImgExtension_TrailingCharacters_ReturnsFalse, TestSize.Level1)
+{
+    EXPECT_TRUE(UnifiedHtmlRecordProcess::MatchImgExtension("/data/files/image.PNG"));
+    EXPECT_FALSE(UnifiedHtmlRecordProcess::MatchImgExtension("/data/files/image.png:any"));
+    EXPECT_FALSE(UnifiedHtmlRecordProcess::MatchImgExtension("/data/files/image.png?query"));
+    EXPECT_FALSE(UnifiedHtmlRecordProcess::MatchImgExtension("/data/files/.png"));
+}
 } // OHOS::Test

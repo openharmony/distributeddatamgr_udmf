@@ -549,7 +549,8 @@ template <> size_t CountBufferSize(const UnifiedRecord &input, TLVObject &data)
         && CheckAndAdd(size, CountBufferSize(input.GetOriginValue(), data))
         && CheckAndAdd(size, data.Count(input.GetUtdId())) && CheckAndAdd(size, data.Count(input.GetUtdId2()))
         && CheckAndAdd(size, CountBufferSize(input.GetInnerEntries(), data))
-        && CheckAndAdd(size, CountBufferSize(input.GetUris(), data));
+        && CheckAndAdd(size, CountBufferSize(input.GetUris(), data))
+        && CheckAndAdd(size, CountBufferSize(input.GetValidatedHtmlUris(), data));
     return isWithinMax ? size : 0;
 }
 
@@ -578,6 +579,9 @@ template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
         return false;
     }
     if (!TLVUtil::Writing(input.GetUris(), data, TAG::TAG_RECORD_URIS)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.GetValidatedHtmlUris(), data, TAG::TAG_RECORD_VALIDATED_HTML_URIS)) {
         return false;
     }
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
@@ -646,6 +650,14 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
                 }
                 output.SetUris(std::move(uriInfos));
                 break;
+            case static_cast<uint16_t>(TAG::TAG_RECORD_VALIDATED_HTML_URIS): {
+                std::vector<std::string> uris;
+                if (!TLVUtil::Reading(uris, data, headItem)) {
+                    return false;
+                }
+                output.SetValidatedHtmlUris(std::move(uris));
+                break;
+            }
             default:
                 data.Skip(headItem);
         }
