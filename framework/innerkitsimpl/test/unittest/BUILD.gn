@@ -206,11 +206,20 @@ ohos_unittest("UdmfClientHapPermissionTest") {
 ohos_unittest("UdmfClientSaInvokeTest") {
   module_out_path = module_output_path
 
-  sources = [ "udmf_client_sa_invoke_test.cpp" ]
+  sources = udmf_test_impl_sources + [ "udmf_client_sa_invoke_test.cpp" ]
 
-  deps = [ "${udmf_interfaces_path}/innerkits:udmf_client" ]
+  configs = [ ":module_private_config" ]
+
+  use_exceptions = true
+
+  deps = udmf_test_impl_deps
 
   external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
 
   cflags = [ "-Werror=vla" ]
 }
@@ -829,6 +838,27 @@ ohos_unittest("UnifiedDataHelperTest") {
   cflags = [ "-Werror=vla" ]
 }
 
+ohos_unittest("UdmfNotifierStubTest") {
+  module_out_path = module_output_path
+
+  sources = udmf_test_impl_sources + [ "udmf_notifier_stub_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  use_exceptions = true
+
+  deps = udmf_test_impl_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+
+  cflags = [ "-Werror=vla" ]
+}
+
 ohos_unittest("UnifiedRecordTest") {
   module_out_path = module_output_path
 
@@ -1146,6 +1176,7 @@ group("unittest") {
     ":UdmfClientTest",
     ":UdmfConversionTest",
     ":UdmfDelayDataTest",
+    ":UdmfNotifierStubTest",
     ":UnifiedDataHelperTest",
     ":UnifiedDataTest",
     ":UnifiedMetaTest",

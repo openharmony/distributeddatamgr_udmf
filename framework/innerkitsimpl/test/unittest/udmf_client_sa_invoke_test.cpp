@@ -25,6 +25,8 @@
 #include "plain_text.h"
 #include "system_defined_pixelmap.h"
 #include "udmf_client.h"
+#include "file.h"
+#include "unified_data_helper.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
@@ -424,6 +426,56 @@ HWTEST_F(UdmfClientSaInvokeTest, SetData010, TestSize.Level0)
     });
     EXPECT_NO_FATAL_FAILURE(t4.join());
     LOG_INFO(UDMF_TEST, "SetData010 end.");
+}
+
+/**
+* @tc.name: SetData_Security001
+* @tc.desc: Test SetData rejects temp_udmf_file_flag injection in SA context
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientSaInvokeTest, SetData_Security001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData_Security001 begin.");
+    
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string key;
+    
+    auto file = std::make_shared<File>();
+    file->SetType(UDType::FILE);
+    file->SetUtdId("general.file-uri");
+    
+    UDDetails details;
+    details.insert(std::make_pair("temp_udmf_file_flag", true));
+    file->SetDetails(details);
+    
+    data.AddRecord(file);
+    
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    EXPECT_EQ(status, E_INVALID_PARAMETERS);
+    
+    LOG_INFO(UDMF_TEST, "SetData_Security001 end.");
+}
+
+/**
+* @tc.name: SetData_Security002
+* @tc.desc: Test SetData accepts normal file in SA context
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientSaInvokeTest, SetData_Security002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetData_Security002 begin.");
+    
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    auto plainText = std::make_shared<PlainText>("test_content", "test_abstract");
+    UnifiedData data;
+    data.AddRecord(plainText);
+    std::string key;
+    
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    EXPECT_EQ(status, E_OK);
+    
+    LOG_INFO(UDMF_TEST, "SetData_Security002 end.");
 }
 
 } // OHOS::Test
