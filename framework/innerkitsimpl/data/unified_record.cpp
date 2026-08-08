@@ -91,6 +91,16 @@ int64_t UnifiedRecord::GetSize()
     return ObjectUtils::GetValueSize(value_, false) + GetInnerEntriesSize();
 }
 
+int64_t UnifiedRecord::GetValidatedHtmlUrisSize() const
+{
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    int64_t size = 0;
+    for (const auto &uri : validatedHtmlUris_) {
+        size += static_cast<int64_t>(uri.size());
+    }
+    return size;
+}
+
 std::string UnifiedRecord::GetUid() const
 {
     std::lock_guard<std::recursive_mutex> lock(mutex_);
@@ -475,6 +485,24 @@ void UnifiedRecord::AddFileUriType(std::set<std::string> &utdIds,
             }
         }
     }
+}
+
+std::vector<std::string> UnifiedRecord::GetValidatedHtmlUris() const
+{
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    return validatedHtmlUris_;
+}
+
+void UnifiedRecord::SetValidatedHtmlUris(std::vector<std::string> uris)
+{
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    validatedHtmlUris_ = std::move(uris);
+}
+
+void UnifiedRecord::ClearValidatedHtmlUris()
+{
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    validatedHtmlUris_.clear();
 }
 } // namespace UDMF
 } // namespace OHOS

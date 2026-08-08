@@ -124,7 +124,7 @@ bool UnifiedDataHelper::ExceedKVSizeLimit(UnifiedData &data)
 {
     int64_t totalSize = 0;
     for (const auto &record : data.GetRecords()) {
-        auto recordSize = record->GetSize();
+        auto recordSize = record->GetSize() + record->GetValidatedHtmlUrisSize();
         if (recordSize > MAX_SA_DRAG_RECORD_SIZE) {
             LOG_INFO(UDMF_FRAMEWORK, "Exceeded 15.5M record limit, recordSize:%{public}" PRId64 "!", recordSize);
             return true;
@@ -306,7 +306,7 @@ int32_t UnifiedDataHelper::ProcessBigData(UnifiedData &data, Intention intention
     }
     int64_t dataSize = 0;
     for (const auto &record : data.GetRecords()) {
-        auto recordSize = record->GetSize();
+        auto recordSize = record->GetSize() + record->GetValidatedHtmlUrisSize();
         if (recordSize > MAX_SA_DRAG_RECORD_SIZE) {
             LOG_ERROR(UDMF_FRAMEWORK, "Exceeded KV record limit, recordSize:%{public}" PRId64 "!", recordSize);
             return E_INVALID_PARAMETERS;

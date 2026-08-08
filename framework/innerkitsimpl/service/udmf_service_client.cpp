@@ -21,6 +21,7 @@
 #include "system_ability_definition.h"
 #include "udmf_utils.h"
 #include "unified_data_helper.h"
+#include "unified_html_record_process.h"
 #include "audit_helper.h"
 #include <parameter.h>
 
@@ -114,6 +115,11 @@ int32_t UdmfServiceClient::SetData(CustomOption &option, UnifiedData &unifiedDat
     Summary &summary, std::string &key)
 {
     LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}d", option.intention);
+    if (option.intention == UD_INTENTION_DRAG) {
+        UnifiedHtmlRecordProcess::CheckHtmlUris(unifiedData);
+    } else {
+        UnifiedHtmlRecordProcess::ClearValidatedHtmlUris(unifiedData);
+    }
     if (option.intention == UD_INTENTION_DATA_HUB) {
         if (option.visibility != Visibility::VISIBILITY_ALL &&
             option.visibility != Visibility::VISIBILITY_OWN_PROCESS) {
@@ -203,6 +209,7 @@ int32_t UdmfServiceClient::GetBatchData(const QueryOption &query, std::vector<Un
 int32_t UdmfServiceClient::UpdateData(const QueryOption &query, UnifiedData &unifiedData)
 {
     LOG_DEBUG(UDMF_SERVICE, "start, tag: %{public}s", query.key.c_str());
+    UnifiedHtmlRecordProcess::ClearValidatedHtmlUris(unifiedData);
     UnifiedKey key(query.key);
     if (!key.IsValid() || !UnifiedDataUtils::IsPersist(key.intention)) {
         LOG_ERROR(UDMF_SERVICE, "invalid key, key.intention: %{public}s", key.intention.c_str());
@@ -338,6 +345,7 @@ int32_t UdmfServiceClient::SetDelayInfo(const DataLoadInfo &dataLoadInfo, sptr<I
 
 int32_t UdmfServiceClient::PushDelayData(const std::string &key, UnifiedData &unifiedData, Summary &summary)
 {
+    UnifiedHtmlRecordProcess::CheckHtmlUris(unifiedData);
     return udmfProxy_->PushDelayData(key, unifiedData, summary);
 }
 

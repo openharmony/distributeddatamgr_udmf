@@ -45,7 +45,7 @@ int64_t UnifiedData::GetSize()
 {
     int64_t totalSize = 0;
     for (const auto &record : this->records_) {
-        totalSize += record->GetSize();
+        totalSize += record->GetSize() + record->GetValidatedHtmlUrisSize();
     }
     return totalSize;
 }

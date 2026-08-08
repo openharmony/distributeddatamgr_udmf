@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <string>
 
+#include "file_uri.h"
 #include "logger.h"
 #include "udmf_capi_common.h"
 #include "unified_html_record_process.h"
@@ -104,5 +105,106 @@ HWTEST_F(UnifiedHtmlRecordProcessTest, GetUriFromHtmlRecord001, TestSize.Level1)
     html.AddEntry("general.html", nullObj);
     EXPECT_NO_FATAL_FAILURE(UnifiedHtmlRecordProcess::GetUriFromHtmlRecord(html));
     LOG_INFO(UDMF_TEST, "GetUriFromHtmlRecord001 end.");
+}
+
+/**
+* @tc.name: CheckHtmlUris_NonHtmlRecord_PreservesUris
+* @tc.desc: CheckHtmlUris clears transient HTML validation data without changing ordinary URI metadata
+* @tc.type: FUNC
+* @tc.author: agent
+*/
+HWTEST_F(UnifiedHtmlRecordProcessTest, CheckHtmlUris_NonHtmlRecord_PreservesUris, TestSize.Level1)
+{
+    UnifiedData data;
+    auto text = std::make_shared<Text>();
+    UriInfo uriInfo = {
+        .oriUri = "file:///data/storage/el2/base/files/document.txt",
+        .position = 0,
+    };
+    text->SetUris({uriInfo});
+    text->SetValidatedHtmlUris({"file:///stale.png"});
+    data.AddRecord(text);
+
+    UnifiedHtmlRecordProcess::CheckHtmlUris(data);
+
+    auto uris = text->GetUris();
+    ASSERT_EQ(uris.size(), 1);
+    EXPECT_EQ(uris[0].oriUri, uriInfo.oriUri);
+    EXPECT_TRUE(text->GetValidatedHtmlUris().empty());
+}
+
+/**
+* @tc.name: CheckHtmlUris_InvalidHtmlImage_ClearsValidatedHtmlUris
+* @tc.desc: CheckHtmlUris preserves record URI metadata and clears the validated HTML URI result
+* @tc.type: FUNC
+* @tc.author: agent
+*/
+HWTEST_F(UnifiedHtmlRecordProcessTest, CheckHtmlUris_InvalidHtmlImage_ClearsValidatedHtmlUris, TestSize.Level1)
+{
+    UnifiedData data;
+    auto html = std::make_shared<Html>(
+        "<html><body><img src=\"file:///path/that/does/not/exist.png\"></body></html>", "plain");
+    UriInfo forgedUri = {
+        .oriUri = "file:///forged.png",
+        .authUri = "file://forged/forged.png",
+        .position = 0,
+        .permissionMask = 1,
+    };
+    html->SetUris({forgedUri});
+    data.AddRecord(html);
+
+    UnifiedHtmlRecordProcess::CheckHtmlUris(data);
+
+    auto uris = html->GetUris();
+    ASSERT_EQ(uris.size(), 1);
+    EXPECT_EQ(uris[0].oriUri, forgedUri.oriUri);
+    EXPECT_TRUE(html->GetValidatedHtmlUris().empty());
+}
+
+/**
+* @tc.name: MatchImgExtension_TrailingCharacters_ReturnsFalse
+* @tc.desc: Image extensions must match the complete physical file name suffix
+* @tc.type: FUNC
+* @tc.author: agent
+*/
+HWTEST_F(UnifiedHtmlRecordProcessTest, MatchImgExtension_TrailingCharacters_ReturnsFalse, TestSize.Level1)
+{
+    EXPECT_TRUE(UnifiedHtmlRecordProcess::MatchImgExtension("/data/files/image.PNG"));
+    EXPECT_FALSE(UnifiedHtmlRecordProcess::MatchImgExtension("/data/files/image.png:any"));
+    EXPECT_FALSE(UnifiedHtmlRecordProcess::MatchImgExtension("/data/files/image.png?query"));
+    EXPECT_FALSE(UnifiedHtmlRecordProcess::MatchImgExtension("/data/files/.png"));
+}
+
+/**
+* @tc.name: ValidateClientFileUri_ImageDirectory_ReturnsFalse
+* @tc.desc: Reject a real directory whose name has a valid image extension
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedHtmlRecordProcessTest, ValidateClientFileUri_ImageDirectory_ReturnsFalse, TestSize.Level1)
+{
+    char tempRootTemplate[] = "udmf_html_record_XXXXXX";
+    char *tempRoot = mkdtemp(tempRootTemplate);
+    ASSERT_NE(tempRoot, nullptr);
+
+    char currentPath[PATH_MAX] = {};
+    if (getcwd(currentPath, sizeof(currentPath)) == nullptr) {
+        rmdir(tempRoot);
+        FAIL() << "Failed to get current working directory";
+    }
+    std::string imageDirectory = std::string(currentPath) + "/" + tempRoot + "/image.png";
+    if (mkdir(imageDirectory.c_str(), S_IRWXU) != 0) {
+        rmdir(tempRoot);
+        FAIL() << "Failed to create image directory";
+    }
+
+    std::string imageDirectoryUri = "file://" + imageDirectory;
+    AppFileService::ModuleFileUri::FileUri fileUri(imageDirectoryUri);
+    auto physicalPath = fileUri.GetRealPath();
+    EXPECT_FALSE(physicalPath.empty());
+    EXPECT_TRUE(UnifiedHtmlRecordProcess::MatchImgExtension(physicalPath));
+    EXPECT_FALSE(UnifiedHtmlRecordProcess::ValidateClientFileUri(imageDirectoryUri));
+
+    EXPECT_EQ(rmdir(imageDirectory.c_str()), 0);
+    EXPECT_EQ(rmdir(tempRoot), 0);
 }
 } // OHOS::Test

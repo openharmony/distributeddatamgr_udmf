@@ -344,6 +344,29 @@ HWTEST_F(UnifiedRecordTest, GetSize_001, TestSize.Level0)
 }
 
 /**
+* @tc.name: GetSize_ValidatedHtmlUris_IncludesUriBytes
+* @tc.desc: GetSize includes the serialized client-validated HTML URI strings
+* @tc.type: FUNC
+* @tc.author: agent
+*/
+HWTEST_F(UnifiedRecordTest, GetSize_ValidatedHtmlUris_IncludesUriBytes, TestSize.Level1)
+{
+    UnifiedData data;
+    auto record = std::make_shared<Html>("<p>content</p>", "content");
+    data.AddRecord(record);
+    int64_t originalSize = data.GetSize();
+    std::vector<std::string> uris = {
+        "file:///data/storage/el2/base/files/image1.png",
+        "file:///data/storage/el2/base/files/image2.png",
+    };
+    int64_t uriSize = static_cast<int64_t>(uris[0].size() + uris[1].size());
+
+    record->SetValidatedHtmlUris(std::move(uris));
+
+    EXPECT_EQ(data.GetSize(), originalSize + uriSize);
+}
+
+/**
 * @tc.name: GetEntry_001
 * @tc.desc: Test GetEntry with nullptr Object already in value_
 * @tc.type: FUNC

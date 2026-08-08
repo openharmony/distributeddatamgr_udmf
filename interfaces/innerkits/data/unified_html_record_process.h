@@ -24,6 +24,9 @@ class UnifiedHtmlRecordProcess {
 public:
     static void API_EXPORT GetUriFromHtmlRecord(UnifiedRecord &record);
     static void API_EXPORT RebuildHtmlRecord(UnifiedData &unifiedData);
+    static void API_EXPORT CheckHtmlUris(UnifiedData &unifiedData);
+    static void API_EXPORT ClearValidatedHtmlUris(UnifiedData &unifiedData);
+    static bool API_EXPORT MatchImgExtension(const std::string &path);
 private:
     static std::vector<UriInfo> SplitHtmlStr(const std::string &htmlContent);
     static std::vector<std::pair<std::string, uint32_t>> SplitHtmlWithImgLabel(
@@ -36,6 +39,8 @@ private:
     static std::vector<UriInfo> GetValueStr(std::shared_ptr<Object> object);
     static void RemoveInvalidImgSrc(const std::vector<std::string> &validImgSrcList,
         std::vector<UriInfo> &imgSrcMap) noexcept;
+    static std::vector<std::string> ValidateClientUris(const std::vector<UriInfo> &uriInfos);
+    static bool ValidateClientFileUri(const std::string &uri);
 };
 } // namespace UDMF
 } // namespace OHOS

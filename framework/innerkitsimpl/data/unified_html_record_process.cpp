@@ -15,7 +15,11 @@
 #define LOG_TAG "UnifiedHtmlRecordProcess"
 #include "unified_html_record_process.h"
 
+#include <algorithm>
+#include <cerrno>
+#include <cctype>
 #include <regex>
+#include <sys/stat.h>
 #include <unordered_set>
 
 #include "file_uri.h"
@@ -208,6 +212,109 @@ void UnifiedHtmlRecordProcess::RemoveInvalidImgSrc(const std::vector<std::string
             return validImgSrcSet.find(uriInfo.oriUri) == validImgSrcSet.end();
         });
     imgSrcMap.erase(new_end, imgSrcMap.end());
+}
+
+void UnifiedHtmlRecordProcess::CheckHtmlUris(UnifiedData &unifiedData)
+{
+    ClearValidatedHtmlUris(unifiedData);
+    auto utdId = UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML);
+    for (auto &record : unifiedData.GetRecords()) {
+        if (record == nullptr || !record->HasType(utdId)) {
+            continue;
+        }
+        auto htmlData = record->GetEntry(utdId);
+        if (!std::holds_alternative<std::shared_ptr<Object>>(htmlData)) {
+            continue;
+        }
+        auto object = std::get<std::shared_ptr<Object>>(htmlData);
+        if (object == nullptr) {
+            continue;
+        }
+        auto uriInfos = GetValueStr(object);
+        auto validUris = ValidateClientUris(uriInfos);
+        auto validUriSize = validUris.size();
+        record->SetValidatedHtmlUris(std::move(validUris));
+        LOG_INFO(UDMF_CLIENT, "client valid uris size=%{public}zu", validUriSize);
+    }
+}
+
+void UnifiedHtmlRecordProcess::ClearValidatedHtmlUris(UnifiedData &unifiedData)
+{
+    for (auto &record : unifiedData.GetRecords()) {
+        if (record != nullptr) {
+            record->ClearValidatedHtmlUris();
+        }
+    }
+}
+
+std::vector<std::string> UnifiedHtmlRecordProcess::ValidateClientUris(const std::vector<UriInfo> &uriInfos)
+{
+    std::vector<std::string> validUris;
+    std::unordered_set<std::string> checkedUriSet;
+    for (const auto &uriInfo : uriInfos) {
+        if (!IsLocalURI(uriInfo.oriUri) || !checkedUriSet.emplace(uriInfo.oriUri).second) {
+            continue;
+        }
+        if (ValidateClientFileUri(uriInfo.oriUri)) {
+            validUris.push_back(uriInfo.oriUri);
+        }
+    }
+    return validUris;
+}
+
+bool UnifiedHtmlRecordProcess::MatchImgExtension(const std::string &path)
+{
+    static const std::unordered_set<std::string> IMG_EXTENSIONS = {
+        "png", "jpg", "jpeg", "jpe", "tif", "tiff", "xbm", "gif", "djv", "djvu", "jng", "pcx", "pbm", "pgm",
+        "pnm", "ppm", "rgb", "svg", "svgz", "wbmp", "xpm", "xwd", "heif", "heifs", "hif", "heic", "heics",
+        "jp2", "jpg2", "jpx", "jpf", "jpm", "ief", "bmp", "bm", "ico", "cur", "dds", "odi", "oti", "psd", "ai",
+        "dng", "ras", "dwg", "dxf", "tga", "sgi", "exr", "fpx", "cdr", "cdt", "cpt", "pat", "ilbm", "avif",
+        "webp", "xcf", "art", "cr2", "cr3", "crw", "arw", "nef", "nrw", "raf", "rw2", "raw", "pef", "srw",
+        "erf", "orf", "apng",
+    };
+
+    if (path.empty()) {
+        return false;
+    }
+    auto posSlash = path.find_last_of("/\\");
+    std::string fileName = (posSlash == std::string::npos) ? path : path.substr(posSlash + 1);
+    auto posDot = fileName.find_last_of('.');
+    if (posDot == std::string::npos || posDot == 0 || posDot + 1 >= fileName.size()) {
+        return false;
+    }
+    std::string extension = fileName.substr(posDot + 1);
+    std::transform(extension.begin(), extension.end(), extension.begin(),
+        [] (unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+    return IMG_EXTENSIONS.find(extension) != IMG_EXTENSIONS.end();
+}
+
+bool UnifiedHtmlRecordProcess::ValidateClientFileUri(const std::string &uri)
+{
+    if (uri.find_first_of("?#") != std::string::npos) {
+        LOG_DEBUG(UDMF_CLIENT, "uri contains query or fragment");
+        return false;
+    }
+    AppFileService::ModuleFileUri::FileUri fileUri(uri);
+    std::string physicalPath = fileUri.GetRealPath();
+    if (physicalPath.empty()) {
+        LOG_DEBUG(UDMF_CLIENT, "get real path empty");
+        return false;
+    }
+    if (!MatchImgExtension(physicalPath)) {
+        LOG_DEBUG(UDMF_CLIENT, "extension invalid");
+        return false;
+    }
+    errno = 0;
+    struct stat buf = {};
+    if (stat(physicalPath.c_str(), &buf) != 0) {
+        LOG_DEBUG(UDMF_CLIENT, "stat fail, err=%{public}d", errno);
+        return false;
+    }
+    if (!S_ISREG(buf.st_mode)) {
+        LOG_DEBUG(UDMF_CLIENT, "not regular file");
+        return false;
+    }
+    return true;
 }
 } // namespace UDMF
 } // namespace OHOS
