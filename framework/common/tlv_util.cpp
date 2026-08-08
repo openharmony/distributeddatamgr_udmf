@@ -587,6 +587,56 @@ template <> bool Writing(const UnifiedRecord &input, TLVObject &data, TAG tag)
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
 }
 
+static bool ReadUnifiedRecordField(UnifiedRecord &output, TLVObject &data, TLVHead &headItem)
+{
+    UDType dataType;
+    std::string uid;
+    ValueType value;
+    std::string utdId;
+    std::string utdId2;
+    std::shared_ptr<std::map<std::string, ValueType>> entries;
+    std::vector<UriInfo> uriInfos;
+    switch (headItem.tag) {
+        case static_cast<uint16_t>(TAG::TAG_UD_TYPE):
+            if (!TLVUtil::Reading(dataType, data, headItem)) { return false; }
+            output.SetType(dataType);
+            break;
+        case static_cast<uint16_t>(TAG::TAG_UID):
+            if (!data.Read(uid, headItem)) { return false; }
+            output.SetUid(uid);
+            break;
+        case static_cast<uint16_t>(TAG::TAG_RECORD_VALUE):
+            if (!TLVUtil::Reading(value, data, headItem)) { return false; }
+            output.SetValue(value);
+            break;
+        case static_cast<uint16_t>(TAG::TAG_RECORD_UTD_ID):
+            if (!data.Read(utdId, headItem)) { return false; }
+            output.SetUtdId(std::move(utdId));
+            break;
+        case static_cast<uint16_t>(TAG::TAG_RECORD_UTD_ID2):
+            if (!data.Read(utdId2, headItem)) { return false; }
+            output.SetUtdId2(std::move(utdId2));
+            break;
+        case static_cast<uint16_t>(TAG::TAG_RECORD_ENTRIES):
+            if (!TLVUtil::Reading(entries, data, headItem)) { return false; }
+            output.SetInnerEntries(entries);
+            break;
+        case static_cast<uint16_t>(TAG::TAG_RECORD_URIS):
+            if (!TLVUtil::Reading(uriInfos, data, headItem)) { return false; }
+            output.SetUris(std::move(uriInfos));
+            break;
+        case static_cast<uint16_t>(TAG::TAG_RECORD_VALIDATED_HTML_URIS): {
+            std::vector<std::string> uris;
+            if (!TLVUtil::Reading(uris, data, headItem)) { return false; }
+            output.SetValidatedHtmlUris(std::move(uris));
+            break;
+        }
+        default:
+            return data.Skip(headItem);
+    }
+    return true;
+}
+
 template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &head)
 {
     CHECK_RECURSIVE_GUARD();
@@ -595,71 +645,10 @@ template <> bool Reading(UnifiedRecord &output, TLVObject &data, const TLVHead &
         return false;
     }
     auto endCursor = data.GetCursor() + head.len;
-    UDType dataType;
-    std::string uid;
-    ValueType value;
     while (data.GetCursor() < endCursor) {
         TLVHead headItem{};
-        if (!data.ReadHead(headItem)) {
+        if (!data.ReadHead(headItem) || !ReadUnifiedRecordField(output, data, headItem)) {
             return false;
-        }
-        std::string utdId;
-        std::string utdId2;
-        std::shared_ptr<std::map<std::string, ValueType>> entries;
-        std::vector<UriInfo> uriInfos;
-        switch (headItem.tag) {
-            case static_cast<uint16_t>(TAG::TAG_UD_TYPE):
-                if (!TLVUtil::Reading(dataType, data, headItem)) {
-                    return false;
-                }
-                output.SetType(dataType);
-                break;
-            case static_cast<uint16_t>(TAG::TAG_UID):
-                if (!data.Read(uid, headItem)) {
-                    return false;
-                }
-                output.SetUid(uid);
-                break;
-            case static_cast<uint16_t>(TAG::TAG_RECORD_VALUE):
-                if (!TLVUtil::Reading(value, data, headItem)) {
-                    return false;
-                }
-                output.SetValue(value);
-                break;
-            case static_cast<uint16_t>(TAG::TAG_RECORD_UTD_ID):
-                if (!data.Read(utdId, headItem)) {
-                    return false;
-                }
-                output.SetUtdId(std::move(utdId));
-                break;
-            case static_cast<uint16_t>(TAG::TAG_RECORD_UTD_ID2):
-                if (!data.Read(utdId2, headItem)) {
-                    return false;
-                }
-                output.SetUtdId2(std::move(utdId2));
-                break;
-            case static_cast<uint16_t>(TAG::TAG_RECORD_ENTRIES):
-                if (!TLVUtil::Reading(entries, data, headItem)) {
-                    return false;
-                }
-                output.SetInnerEntries(entries);
-                break;
-            case static_cast<uint16_t>(TAG::TAG_RECORD_URIS):
-                if (!TLVUtil::Reading(uriInfos, data, headItem)) {
-                    return false;
-                }
-                output.SetUris(std::move(uriInfos));
-                break;
-            case static_cast<uint16_t>(TAG::TAG_RECORD_VALIDATED_HTML_URIS): {
-                std::vector<std::string> uris;
-                if (!TLVUtil::Reading(uris, data, headItem)) {
-                    return false;
-                }
-                output.SetValidatedHtmlUris(std::move(uris));
-                break;
-            }
-            default:
-                data.Skip(headItem);
         }
     }
     return true;

@@ -56,7 +56,7 @@ constexpr int SLEEP_TIME = 50;   // 50 ms
 constexpr int BATCH_SIZE_2K = 2000;
 constexpr int BATCH_SIZE_5K = 5000;
 constexpr double BASE_CONVERSION = 1000.0;
-constexpr const char *FILE_SCHEME_PREFIX = "file://";
+
 class UdmfClientTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -2400,7 +2400,7 @@ HWTEST_F(UdmfClientTest, SetData028, TestSize.Level1)
 
 /**
 * @tc.name: SetData029
-* @tc.desc: Set Html record include valid value and get uris data
+* @tc.desc: Set Html record containing nonexistent local image URIs without rewriting HTML
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfClientTest, SetData029, TestSize.Level1)
@@ -2431,26 +2431,22 @@ HWTEST_F(UdmfClientTest, SetData029, TestSize.Level1)
     UnifiedData readData;
     status = UdmfClient::GetInstance().GetData(option2, readData);
     ASSERT_EQ(status, E_OK);
-    std::string tmpUri1 = "file://ohos.test.demo1/data/storage/el2/base/haps/101.png";
-    std::string tmpUri2 = "file://ohos.test.demo1/data/storage/el2/base/haps/102.png";
-    AppFileService::ModuleFileUri::FileUri fileUri1(tmpUri1);
-    AppFileService::ModuleFileUri::FileUri fileUri2(tmpUri2);
-    std::string readHtml = "<img data-ohos='clipboard' src='";
-    readHtml += FILE_SCHEME_PREFIX + fileUri1.GetRealPath() + "'><img data-ohos='clipboard' src=\"";
-    readHtml += FILE_SCHEME_PREFIX + fileUri2.GetRealPath() + "\">";
     std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
     ASSERT_NE(readRecord, nullptr);
     auto readHtmlRecord = std::static_pointer_cast<Html>(readRecord);
-    EXPECT_EQ(readHtmlRecord->GetHtmlContent(), readHtml);
+    EXPECT_EQ(readHtmlRecord->GetHtmlContent(), html);
     auto uris = readRecord->GetUris();
     EXPECT_EQ(uris.size(), 2);
+    for (const auto &uri : uris) {
+        EXPECT_TRUE(uri.authUri.empty());
+    }
 
     LOG_INFO(UDMF_TEST, "SetData029 end.");
 }
 
 /**
 * @tc.name: SetData030
-* @tc.desc: Set Html record include valid value and get uris data
+* @tc.desc: Ignore nonexistent local images while preserving unsupported image URI forms
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfClientTest, SetData030, TestSize.Level1)
@@ -2483,19 +2479,14 @@ HWTEST_F(UdmfClientTest, SetData030, TestSize.Level1)
     UnifiedData readData;
     status = UdmfClient::GetInstance().GetData(option2, readData);
     ASSERT_EQ(status, E_OK);
-    std::string tmpUri1 = "file://ohos.test.demo1/data/storage/el2/base/haps/101.png";
-    AppFileService::ModuleFileUri::FileUri fileUri1(tmpUri1);
-    std::string readHtml = "<img data-ohos='clipboard' src='";
-    readHtml += FILE_SCHEME_PREFIX + fileUri1.GetRealPath() + "'>";
-    readHtml += "<img data-ohos='clipboard' src='https://data/storage/el2/base/haps/102.png'>"
-        "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/103.png'>";
     std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
     ASSERT_NE(readRecord, nullptr);
     auto readHtmlRecord = std::static_pointer_cast<Html>(readRecord);
-    EXPECT_EQ(readHtmlRecord->GetHtmlContent(), readHtml);
+    EXPECT_EQ(readHtmlRecord->GetHtmlContent(), html);
     auto uris = readRecord->GetUris();
-    EXPECT_EQ(uris.size(), 1);
+    ASSERT_EQ(uris.size(), 1);
     EXPECT_EQ(uris[0].oriUri, uriSrc);
+    EXPECT_TRUE(uris[0].authUri.empty());
     EXPECT_TRUE(uris[0].dfsUri.empty());
 
     LOG_INFO(UDMF_TEST, "SetData030 end.");
@@ -2602,7 +2593,7 @@ HWTEST_F(UdmfClientTest, SetData032, TestSize.Level1)
 
 /**
 * @tc.name: SetData033
-* @tc.desc: Set Html entry include valid value and get uris data
+* @tc.desc: Preserve a mixed-entry HTML value when its local image does not exist
 * @tc.type: FUNC
 */
 HWTEST_F(UdmfClientTest, SetData033, TestSize.Level1)
@@ -2632,12 +2623,6 @@ HWTEST_F(UdmfClientTest, SetData033, TestSize.Level1)
     UnifiedData readData;
     status = UdmfClient::GetInstance().GetData(option2, readData);
     ASSERT_EQ(status, E_OK);
-    std::string tmpUri1 = "file://ohos.test.demo1/data/storage/el2/base/haps/103.png";
-    AppFileService::ModuleFileUri::FileUri fileUri1(tmpUri1);
-    std::string readHtml = "<img data-ohos='clipboard' src='file://data/storage/el2/base/haps/101.png'>"
-                            "<img data-ohos='clipboard' src='https://data/storage/el2/base/haps/102.png'>"
-                            "<img data-ohos='clipboard' src='";
-    readHtml += FILE_SCHEME_PREFIX + fileUri1.GetRealPath() + "'>";
     std::shared_ptr<UnifiedRecord> readRecord = readData.GetRecordAt(0);
     ASSERT_NE(readRecord, nullptr);
     auto entryValue = readRecord->GetEntry(UtdUtils::GetUtdIdFromUtdEnum(UDType::HTML));
@@ -2647,10 +2632,11 @@ HWTEST_F(UdmfClientTest, SetData033, TestSize.Level1)
     ASSERT_TRUE(iter != object->value_.end());
     EXPECT_TRUE(std::holds_alternative<std::string>(iter->second));
     auto content = std::get<std::string>(iter->second);
-    EXPECT_EQ(content, readHtml);
+    EXPECT_EQ(content, html);
     auto uris = readRecord->GetUris();
-    EXPECT_EQ(uris.size(), 1);
+    ASSERT_EQ(uris.size(), 1);
     EXPECT_EQ(uris[0].oriUri, uriSrc);
+    EXPECT_TRUE(uris[0].authUri.empty());
     EXPECT_TRUE(uris[0].dfsUri.empty());
 
     LOG_INFO(UDMF_TEST, "SetData033 end.");

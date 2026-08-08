@@ -1545,8 +1545,10 @@ HWTEST_F(TlvUtilTest, WritingAndReading_014, TestSize.Level1)
     auto tlvObject = TLVObject(dataBytes);
     EXPECT_TRUE(TLVUtil::Writing(input, tlvObject, TAG::TAG_APP_ID));
 
+    tlvObject.ResetCursor();
     std::vector<std::shared_ptr<UnifiedRecord>> output;
     TLVHead head;
+    ASSERT_TRUE(tlvObject.ReadHead(head));
     EXPECT_TRUE(TLVUtil::Reading(output, tlvObject, head));
     ASSERT_EQ(output.size(), 2U);
     ASSERT_NE(output[1], nullptr);

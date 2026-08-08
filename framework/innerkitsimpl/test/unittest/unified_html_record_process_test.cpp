@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <string>
 
+#include "file_uri.h"
 #include "logger.h"
 #include "udmf_capi_common.h"
 #include "unified_html_record_process.h"
@@ -172,5 +173,38 @@ HWTEST_F(UnifiedHtmlRecordProcessTest, MatchImgExtension_TrailingCharacters_Retu
     EXPECT_FALSE(UnifiedHtmlRecordProcess::MatchImgExtension("/data/files/image.png:any"));
     EXPECT_FALSE(UnifiedHtmlRecordProcess::MatchImgExtension("/data/files/image.png?query"));
     EXPECT_FALSE(UnifiedHtmlRecordProcess::MatchImgExtension("/data/files/.png"));
+}
+
+/**
+* @tc.name: ValidateClientFileUri_ImageDirectory_ReturnsFalse
+* @tc.desc: Reject a real directory whose name has a valid image extension
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedHtmlRecordProcessTest, ValidateClientFileUri_ImageDirectory_ReturnsFalse, TestSize.Level1)
+{
+    char tempRootTemplate[] = "udmf_html_record_XXXXXX";
+    char *tempRoot = mkdtemp(tempRootTemplate);
+    ASSERT_NE(tempRoot, nullptr);
+
+    char currentPath[PATH_MAX] = {};
+    if (getcwd(currentPath, sizeof(currentPath)) == nullptr) {
+        rmdir(tempRoot);
+        FAIL() << "Failed to get current working directory";
+    }
+    std::string imageDirectory = std::string(currentPath) + "/" + tempRoot + "/image.png";
+    if (mkdir(imageDirectory.c_str(), S_IRWXU) != 0) {
+        rmdir(tempRoot);
+        FAIL() << "Failed to create image directory";
+    }
+
+    std::string imageDirectoryUri = "file://" + imageDirectory;
+    AppFileService::ModuleFileUri::FileUri fileUri(imageDirectoryUri);
+    auto physicalPath = fileUri.GetRealPath();
+    EXPECT_FALSE(physicalPath.empty());
+    EXPECT_TRUE(UnifiedHtmlRecordProcess::MatchImgExtension(physicalPath));
+    EXPECT_FALSE(UnifiedHtmlRecordProcess::ValidateClientFileUri(imageDirectoryUri));
+
+    EXPECT_EQ(rmdir(imageDirectory.c_str()), 0);
+    EXPECT_EQ(rmdir(tempRoot), 0);
 }
 } // OHOS::Test
