@@ -34,10 +34,12 @@ public:
 
 private:
     static size_t GetUtf8PrefixLength(const std::string &value, size_t maxBytes);
+    static size_t EstimateStringSize(const std::string &str);
     static size_t EstimateJsonSize(const nlohmann::json &json);
     static void TruncateJsonValue(nlohmann::json &json);
     static void TruncateWantJson(nlohmann::json &wantJson);
     static nlohmann::json ConvertValueToJson(const ValueType &value);
+    static nlohmann::json ConvertValueToJson(const ValueType &value, size_t maxValueSize);
     static nlohmann::json ConvertWantToJson(std::shared_ptr<OHOS::AAFwk::Want> want);
     static nlohmann::json ConvertPixelMapToJson(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
     static nlohmann::json ConvertObjectToJson(std::shared_ptr<Object> object);

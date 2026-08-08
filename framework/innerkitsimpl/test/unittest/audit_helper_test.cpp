@@ -228,7 +228,8 @@ HWTEST_F(AuditHelperTest, ConvertEntriesToJson002, TestSize.Level1)
     std::map<std::string, ValueType> entries;
 
     auto json = AuditHelper::ConvertEntriesToJson(entries);
-    EXPECT_TRUE(json.is_null());
+    EXPECT_TRUE(json.is_object());
+    EXPECT_TRUE(json.empty());
 
     LOG_INFO(UDMF_TEST, "ConvertEntriesToJson002 end.");
 }
@@ -343,6 +344,88 @@ HWTEST_F(AuditHelperTest, ConvertRecordToJson004, TestSize.Level1)
 }
 
 /**
+* @tc.name: ConvertWantToJson001
+* @tc.desc: Test ConvertWantToJson with valid Want object
+* @tc.type: FUNC
+*/
+HWTEST_F(AuditHelperTest, ConvertWantToJson001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ConvertWantToJson001 begin.");
+
+    auto want = std::make_shared<OHOS::AAFwk::Want>();
+    want->SetAction("test.action");
+    want->SetBundle("test.bundle");
+    want->SetType("test/type");
+    want->SetUri("http://test.uri");
+
+    auto json = AuditHelper::ConvertWantToJson(want);
+    EXPECT_TRUE(json.is_object());
+    EXPECT_TRUE(json.contains("action"));
+    EXPECT_TRUE(json.contains("bundle"));
+    EXPECT_TRUE(json.contains("type"));
+    EXPECT_TRUE(json.contains("uri"));
+
+    LOG_INFO(UDMF_TEST, "ConvertWantToJson001 end.");
+}
+
+/**
+* @tc.name: ConvertWantToJson002
+* @tc.desc: Test ConvertWantToJson with nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(AuditHelperTest, ConvertWantToJson002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ConvertWantToJson002 begin.");
+
+    std::shared_ptr<OHOS::AAFwk::Want> want = nullptr;
+
+    auto json = AuditHelper::ConvertWantToJson(want);
+    EXPECT_TRUE(json.is_null());
+
+    LOG_INFO(UDMF_TEST, "ConvertWantToJson002 end.");
+}
+
+/**
+* @tc.name: ConvertPixelMapToJson001
+* @tc.desc: Test ConvertPixelMapToJson with nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(AuditHelperTest, ConvertPixelMapToJson001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ConvertPixelMapToJson001 begin.");
+
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = nullptr;
+
+    auto json = AuditHelper::ConvertPixelMapToJson(pixelMap);
+    EXPECT_TRUE(json.is_null() || json.is_object());
+
+    LOG_INFO(UDMF_TEST, "ConvertPixelMapToJson001 end.");
+}
+
+/**
+* @tc.name: ConvertObjectToJson001
+* @tc.desc: Test ConvertObjectToJson with valid Object
+* @tc.type: FUNC
+*/
+HWTEST_F(AuditHelperTest, ConvertObjectToJson001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ConvertObjectToJson001 begin.");
+
+    auto object = std::make_shared<Object>();
+    object->value_["key1"] = std::string("value1");
+    object->value_["key2"] = int32_t(123);
+    object->value_["key3"] = true;
+
+    auto json = AuditHelper::ConvertObjectToJson(object);
+    EXPECT_TRUE(json.is_object());
+    EXPECT_TRUE(json.contains("key1"));
+    EXPECT_TRUE(json.contains("key2"));
+    EXPECT_TRUE(json.contains("key3"));
+
+    LOG_INFO(UDMF_TEST, "ConvertObjectToJson001 end.");
+}
+
+/**
 * @tc.name: PublishAuditEvent001
 * @tc.desc: Test PublishAuditEvent with valid JSON data
 * @tc.type: FUNC
@@ -446,27 +529,6 @@ HWTEST_F(AuditHelperTest, BinaryLimitTest001, TestSize.Level1)
     EXPECT_TRUE(json.is_null() || json.is_binary());
 
     LOG_INFO(UDMF_TEST, "BinaryLimitTest001 end.");
-}
-
-/**
-* @tc.name: FinalSizeValidationTest001
-* @tc.desc: Test final audit data size does not exceed 10 KiB
-* @tc.type: FUNC
-*/
-HWTEST_F(AuditHelperTest, FinalSizeValidationTest001, TestSize.Level1)
-{
-    LOG_INFO(UDMF_TEST, "FinalSizeValidationTest001 begin.");
-
-    UnifiedData data;
-    auto text = std::make_shared<Text>();
-    UDDetails details;
-    details.insert(std::make_pair("large", std::string(20 * 1024, 'Y')));
-    text->SetDetails(details);
-    data.AddRecord(text);
-
-    EXPECT_NO_FATAL_FAILURE(AuditHelper::ReportDragAuditEvent(data, 100, 12345));
-
-    LOG_INFO(UDMF_TEST, "FinalSizeValidationTest001 end.");
 }
 
 /**

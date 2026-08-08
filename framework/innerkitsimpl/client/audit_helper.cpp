@@ -31,26 +31,26 @@ namespace OHOS {
 namespace UDMF {
 
 constexpr const char *DRAG_AUDIT_EVENT = "usual.event.DRAG_AUDIT";
+static constexpr size_t MAX_DATA_SIZE = 10 * 1024;
 static constexpr size_t MAX_THREADS = 10;
 static constexpr size_t MIN_THREADS = 0;
-static constexpr size_t MAX_DATA_SIZE = 10 * 1024;
 static constexpr size_t ENTRIES_BUDGET_RATIO = 60;
 static constexpr size_t JSON_NULL_SIZE = 4;
 static constexpr size_t JSON_BOOL_SIZE = 5;
 static constexpr size_t JSON_NUMBER_SIZE = 16;
 static constexpr size_t JSON_STRING_DELIMITER_SIZE = 2;
 static constexpr size_t JSON_ESCAPED_CHAR_SIZE = 2;
+static constexpr size_t JSON_UNICODE_ESCAPE_SIZE = 6;
 static constexpr size_t JSON_ARRAY_OVERHEAD = 2;
 static constexpr size_t JSON_OBJECT_OVERHEAD = 2;
-static constexpr size_t JSON_KEY_OVERHEAD = 4;
 static constexpr size_t JSON_KEY_VALUE_SEPARATOR = 4;
 static constexpr size_t JSON_CHAR_SIZE = 1;
 static constexpr size_t JSON_ARRAY_SEPARATOR_SIZE = 1;
-static constexpr size_t BASE64_ENCODING_RATIO_NUMERATOR = 4;
-static constexpr size_t BASE64_ENCODING_RATIO_DENOMINATOR = 3;
+static constexpr size_t JSON_BINARY_BYTE_SIZE = 4;
+static constexpr size_t JSON_BINARY_OVERHEAD = 25;
+static constexpr size_t JSON_PRINTABLE_CHAR_MIN = 0x20;
 static constexpr size_t PERCENTAGE_DENOMINATOR = 100;
 static constexpr size_t MAX_WANT_TRUNCATE_ITERATIONS = 20;
-static constexpr size_t MAX_ROOT_TRUNCATE_ITERATIONS = 100;
 
 static UdmfExecutor &GetAuditExecutor()
 {
@@ -67,6 +67,21 @@ size_t AuditHelper::GetUtf8PrefixLength(const std::string &value, size_t maxByte
     return end;
 }
 
+size_t AuditHelper::EstimateStringSize(const std::string &str)
+{
+    size_t size = JSON_STRING_DELIMITER_SIZE;
+    for (char c : str) {
+        if (c == '"' || c == '\\' || c == '\b' || c == '\f' || c == '\n' || c == '\r' || c == '\t') {
+            size += JSON_ESCAPED_CHAR_SIZE;
+        } else if (c < JSON_PRINTABLE_CHAR_MIN) {
+            size += JSON_UNICODE_ESCAPE_SIZE;
+        } else {
+            size += JSON_CHAR_SIZE;
+        }
+    }
+    return size;
+}
+
 size_t AuditHelper::EstimateJsonSize(const nlohmann::json &json)
 {
     if (json.is_null()) {
@@ -79,20 +94,11 @@ size_t AuditHelper::EstimateJsonSize(const nlohmann::json &json)
         return JSON_NUMBER_SIZE;
     }
     if (json.is_string()) {
-        size_t size = JSON_STRING_DELIMITER_SIZE;
-        for (char c : json.get_ref<const std::string&>()) {
-            if (c == '"' || c == '\\' || c == '\n' || c == '\r' || c == '\t' || c < 0x20) {
-                size += JSON_ESCAPED_CHAR_SIZE;
-            } else {
-                size += JSON_CHAR_SIZE;
-            }
-        }
-        return size;
+        return EstimateStringSize(json.get_ref<const std::string&>());
     }
     if (json.is_binary()) {
         size_t binarySize = json.get_binary().size();
-        return binarySize * BASE64_ENCODING_RATIO_NUMERATOR / BASE64_ENCODING_RATIO_DENOMINATOR +
-               JSON_STRING_DELIMITER_SIZE;
+        return binarySize * JSON_BINARY_BYTE_SIZE + JSON_BINARY_OVERHEAD;
     }
     if (json.is_array()) {
         size_t size = JSON_ARRAY_OVERHEAD;
@@ -104,7 +110,8 @@ size_t AuditHelper::EstimateJsonSize(const nlohmann::json &json)
     if (json.is_object()) {
         size_t size = JSON_OBJECT_OVERHEAD;
         for (auto it = json.begin(); it != json.end(); ++it) {
-            size += it.key().size() + EstimateJsonSize(it.value()) + JSON_KEY_VALUE_SEPARATOR;
+            size_t keySize = EstimateStringSize(it.key());
+            size += keySize + EstimateJsonSize(it.value()) + JSON_KEY_VALUE_SEPARATOR;
         }
         return size;
     }
@@ -195,6 +202,11 @@ nlohmann::json AuditHelper::ConvertObjectToJson(std::shared_ptr<Object> object)
 
 nlohmann::json AuditHelper::ConvertValueToJson(const ValueType &value)
 {
+    return ConvertValueToJson(value, MAX_DATA_SIZE);
+}
+
+nlohmann::json AuditHelper::ConvertValueToJson(const ValueType &value, size_t maxValueSize)
+{
     if (std::holds_alternative<std::monostate>(value)) {
         return nullptr;
     } else if (std::holds_alternative<int32_t>(value)) {
@@ -206,21 +218,19 @@ nlohmann::json AuditHelper::ConvertValueToJson(const ValueType &value)
     } else if (std::holds_alternative<bool>(value)) {
         return std::get<bool>(value);
     } else if (std::holds_alternative<std::string>(value)) {
-        auto str = std::get<std::string>(value);
-        if (str.size() > MAX_DATA_SIZE) {
-            LOG_WARN(UDMF_CLIENT, "String data size %{public}zu exceeds limit %{public}zu, truncated",
-                     str.size(), MAX_DATA_SIZE);
-            str.resize(MAX_DATA_SIZE);
+        const auto &str = std::get<std::string>(value);
+        if (str.size() <= maxValueSize) {
+            return str;
         }
-        return str;
+        size_t end = GetUtf8PrefixLength(str, maxValueSize);
+        return str.substr(0, end);
     } else if (std::holds_alternative<std::vector<uint8_t>>(value)) {
-        auto bytes = std::get<std::vector<uint8_t>>(value);
-        if (bytes.size() > MAX_DATA_SIZE) {
-            LOG_WARN(UDMF_CLIENT, "Bytes data size %{public}zu exceeds limit %{public}zu, truncated",
-                     bytes.size(), MAX_DATA_SIZE);
-            bytes.resize(MAX_DATA_SIZE);
+        const auto &bytes = std::get<std::vector<uint8_t>>(value);
+        if (bytes.size() <= maxValueSize) {
+            return nlohmann::json::binary(bytes);
         }
-        return nlohmann::json::binary(bytes);
+        std::vector<uint8_t> truncated(bytes.begin(), bytes.begin() + maxValueSize);
+        return nlohmann::json::binary(truncated);
     } else if (std::holds_alternative<std::shared_ptr<OHOS::AAFwk::Want>>(value)) {
         auto want = std::get<std::shared_ptr<OHOS::AAFwk::Want>>(value);
         return ConvertWantToJson(want);
@@ -243,12 +253,26 @@ nlohmann::json AuditHelper::ConvertEntriesToJson(const std::map<std::string, Val
     size_t currentSize = JSON_OBJECT_OVERHEAD;
     
     for (const auto &[key, val] : entries) {
+        size_t keyCost = EstimateJsonSize(nlohmann::json(key));
         nlohmann::json valueJson = ConvertValueToJson(val);
         size_t valueSize = EstimateJsonSize(valueJson);
         
-        size_t entryCost = key.size() + valueSize + JSON_KEY_OVERHEAD;
+        size_t entryCost = keyCost + valueSize + JSON_KEY_VALUE_SEPARATOR;
         if (currentSize + entryCost > budget) {
-            break;
+            if (currentSize + keyCost + JSON_KEY_VALUE_SEPARATOR >= budget) {
+                continue;
+            }
+            size_t availableForValue = budget - currentSize - keyCost - JSON_KEY_VALUE_SEPARATOR;
+            if (availableForValue > JSON_STRING_DELIMITER_SIZE) {
+                size_t maxLen = (availableForValue - JSON_STRING_DELIMITER_SIZE) / 2;
+                valueJson = ConvertValueToJson(val, maxLen);
+                valueSize = EstimateJsonSize(valueJson);
+                entryCost = keyCost + valueSize + JSON_KEY_VALUE_SEPARATOR;
+            }
+            
+            if (currentSize + entryCost > budget) {
+                continue;
+            }
         }
         
         entriesJson[key] = valueJson;
@@ -286,54 +310,53 @@ void AuditHelper::PublishAuditEvent(const std::string &auditData)
 
 void AuditHelper::ReportDragAuditEvent(const UnifiedData &unifiedData, int32_t userId, uint32_t tokenId)
 {
-    nlohmann::json root;
-    root["sourceTokenId"] = 0;
-    root["targetTokenId"] = tokenId;
-    root["userId"] = userId;
-    root["content"] = nlohmann::json::object();
-    root["happenTime"] = 0;
-
-    size_t overhead = root.dump().size();
-    if (overhead >= MAX_DATA_SIZE) {
-        LOG_ERROR(UDMF_CLIENT, "Fixed overhead %{public}zu exceeds limit", overhead);
-        return;
-    }
-    size_t budget = MAX_DATA_SIZE - overhead;
-
-    nlohmann::json recordsJson = nlohmann::json::array();
     auto records = unifiedData.GetRecords();
-
+    uint32_t sourceTokenId = 0;
     auto runtime = unifiedData.GetRuntime();
     if (runtime != nullptr) {
-        root["sourceTokenId"] = runtime->tokenId;
-    }
-
-    for (size_t i = 0; i < records.size(); ++i) {
-        nlohmann::json recordJson = ConvertRecordToJson(records[i], i);
-        std::string recordStr = recordJson.dump();
-        if (recordStr.size() > budget) {
-            break;
-        }
-        recordsJson.push_back(std::move(recordJson));
-        budget -= recordStr.size();
-    }
-
-    nlohmann::json unifiedDataJson;
-    unifiedDataJson["entries"] = std::move(recordsJson);
-    root["content"] = std::move(unifiedDataJson);
-    auto now = std::chrono::system_clock::now();
-    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-    root["happenTime"] = milliseconds.count();
-    for (size_t i = 0; i < MAX_ROOT_TRUNCATE_ITERATIONS && EstimateJsonSize(root) > MAX_DATA_SIZE; ++i) {
-        auto &entries = root["content"]["entries"];
-        if (entries.empty()) {
-            break;
-        }
-        entries.erase(entries.size() - 1);
+        sourceTokenId = runtime->tokenId;
     }
     
-    std::string auditData = root.dump();
-    auto task = [auditData = std::move(auditData)]() {
+    auto task = [records = std::move(records), userId, tokenId, sourceTokenId]() {
+        nlohmann::json root;
+        root["sourceTokenId"] = sourceTokenId;
+        root["targetTokenId"] = tokenId;
+        root["userId"] = userId;
+        root["content"] = nlohmann::json::object();
+        root["happenTime"] = 0;
+
+        size_t overhead = root.dump().size();
+        if (overhead >= MAX_DATA_SIZE) {
+            LOG_ERROR(UDMF_CLIENT, "Fixed overhead %{public}zu exceeds limit", overhead);
+            return;
+        }
+        size_t budget = MAX_DATA_SIZE - overhead;
+
+        nlohmann::json recordsJson = nlohmann::json::array();
+        for (size_t i = 0; i < records.size(); ++i) {
+            nlohmann::json recordJson = ConvertRecordToJson(records[i], i);
+            std::string recordStr = recordJson.dump();
+            size_t cost = recordStr.size() + JSON_ARRAY_SEPARATOR_SIZE;
+            if (cost > budget) {
+                break;
+            }
+            recordsJson.push_back(std::move(recordJson));
+            budget -= cost;
+        }
+
+        nlohmann::json unifiedDataJson;
+        unifiedDataJson["entries"] = std::move(recordsJson);
+        root["content"] = std::move(unifiedDataJson);
+        auto now = std::chrono::system_clock::now();
+        auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+        root["happenTime"] = milliseconds.count();
+        
+        std::string auditData = root.dump();
+        while (auditData.size() > MAX_DATA_SIZE && root["content"]["entries"].size() > 0) {
+            root["content"]["entries"].erase(root["content"]["entries"].size() - 1);
+            auditData = root.dump();
+        }
+        
         PublishAuditEvent(auditData);
     };
     
