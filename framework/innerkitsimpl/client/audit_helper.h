@@ -33,15 +33,19 @@ public:
     static void ReportDragAuditEvent(const UnifiedData &unifiedData, int32_t userId, uint32_t tokenId);
 
 private:
-    static std::string UDTypeToString(UDType type);
+    static size_t GetUtf8PrefixLength(const std::string &value, size_t maxBytes);
+    static size_t EstimateStringSize(const std::string &str);
+    static size_t EstimateJsonSize(const nlohmann::json &json);
+    static void TruncateJsonValue(nlohmann::json &json);
+    static void TruncateWantJson(nlohmann::json &wantJson);
     static nlohmann::json ConvertValueToJson(const ValueType &value);
+    static nlohmann::json ConvertValueToJson(const ValueType &value, size_t maxValueSize);
     static nlohmann::json ConvertWantToJson(std::shared_ptr<OHOS::AAFwk::Want> want);
-    static nlohmann::json ConvertWantParamsToJson(const OHOS::AAFwk::WantParams &wantParams);
     static nlohmann::json ConvertPixelMapToJson(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
     static nlohmann::json ConvertObjectToJson(std::shared_ptr<Object> object);
     static nlohmann::json ConvertEntriesToJson(const std::map<std::string, ValueType> &entries);
     static nlohmann::json ConvertRecordToJson(std::shared_ptr<UnifiedRecord> record, size_t index);
-    static void PublishAuditEvent(const nlohmann::json &auditData);
+    static void PublishAuditEvent(const std::string &auditData);
 };
 
 } // namespace UDMF
