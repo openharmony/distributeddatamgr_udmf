@@ -14,6 +14,7 @@
  */
 #define LOG_TAG "UnifiedDataHelper"
 #include "unified_data_helper.h"
+#include <algorithm>
 #include <cinttypes>
 #include "common_func.h"
 #include "directory_ex.h"
@@ -375,10 +376,10 @@ void FillSummaryFormat(const std::string &type, const std::string &utdId, Summar
     if (find != UDS_UTD_TYPE_MAP.end()) {
         udsType = find->second;
     }
-    if (summary.summaryFormat.find(type) != summary.summaryFormat.end()) {
-        summary.summaryFormat[type].emplace_back(udsType);
-    } else {
-        summary.summaryFormat[type] = { udsType };
+    // summaryFormat describes available formats; repeated records of the same format share one entry.
+    auto &formats = summary.summaryFormat[type];
+    if (std::find(formats.begin(), formats.end(), udsType) == formats.end()) {
+        formats.emplace_back(udsType);
     }
 }
 
