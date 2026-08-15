@@ -321,7 +321,7 @@ HWTEST_F(UnifiedDataHelperTest, GetSummary003, TestSize.Level1)
         object->value_[UNIFORM_DATA_TYPE] = GENERAL_FILE_URI;
         object->value_[ORI_URI] = "file://test/image.png";
         object->value_[FILE_TYPE] = "general.png";
-        data.AddRecord(std::make_shared<UnifiedRecord>(UDType::FILE, object));
+        data.AddRecord(std::make_shared<UnifiedRecord>(UDType::FILE_URI, object));
     }
 
     Summary summary;
@@ -346,7 +346,7 @@ HWTEST_F(UnifiedDataHelperTest, GetSummary004, TestSize.Level1)
     object->value_[UNIFORM_DATA_TYPE] = GENERAL_FILE_URI;
     object->value_[ORI_URI] = "file://test/index.html";
     object->value_[FILE_TYPE] = "general.html";
-    data.AddRecord(std::make_shared<UnifiedRecord>(UDType::FILE, object));
+    data.AddRecord(std::make_shared<UnifiedRecord>(UDType::FILE_URI, object));
 
     Summary summary;
     UnifiedDataHelper::GetSummary(data, summary);
