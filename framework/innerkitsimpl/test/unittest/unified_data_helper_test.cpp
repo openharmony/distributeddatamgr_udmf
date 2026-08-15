@@ -14,6 +14,7 @@
  */
 #define LOG_TAG "UnifiedDataHelperTest"
 
+#include <algorithm>
 #include <unistd.h>
 #include <gtest/gtest.h>
 #include <string>
@@ -305,6 +306,56 @@ HWTEST_F(UnifiedDataHelperTest, GetSummary002, TestSize.Level1)
     UnifiedDataHelper::GetSummary(data, summary);
     EXPECT_EQ(summary.totalSize, 0);
     LOG_INFO(UDMF_TEST, "GetSummary002 end.");
+}
+
+/**
+* @tc.name: GetSummary003
+* @tc.desc: Verify duplicate formats are removed from summaryFormat
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, GetSummary003, TestSize.Level1)
+{
+    UnifiedData data;
+    for (int32_t i = 0; i < 2; ++i) {
+        auto object = std::make_shared<Object>();
+        object->value_[UNIFORM_DATA_TYPE] = GENERAL_FILE_URI;
+        object->value_[ORI_URI] = "file://test/image.png";
+        object->value_[FILE_TYPE] = "general.png";
+        data.AddRecord(std::make_shared<UnifiedRecord>(UDType::FILE, object));
+    }
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+
+    ASSERT_EQ(summary.summaryFormat.count("general.png"), 1);
+    const auto &formats = summary.summaryFormat.at("general.png");
+    ASSERT_EQ(formats.size(), 1);
+    EXPECT_EQ(formats.front(), Uds_Type::UDS_FILE_URI);
+}
+
+/**
+* @tc.name: GetSummary004
+* @tc.desc: Verify distinct formats for the same type are retained in summaryFormat
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, GetSummary004, TestSize.Level1)
+{
+    UnifiedData data;
+    data.AddRecord(std::make_shared<UnifiedRecord>(UDType::HTML, std::string("<p>test</p>")));
+    auto object = std::make_shared<Object>();
+    object->value_[UNIFORM_DATA_TYPE] = GENERAL_FILE_URI;
+    object->value_[ORI_URI] = "file://test/index.html";
+    object->value_[FILE_TYPE] = "general.html";
+    data.AddRecord(std::make_shared<UnifiedRecord>(UDType::FILE, object));
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+
+    ASSERT_EQ(summary.summaryFormat.count("general.html"), 1);
+    const auto &formats = summary.summaryFormat.at("general.html");
+    ASSERT_EQ(formats.size(), 2);
+    EXPECT_NE(std::find(formats.begin(), formats.end(), Uds_Type::UDS_HTML), formats.end());
+    EXPECT_NE(std::find(formats.begin(), formats.end(), Uds_Type::UDS_FILE_URI), formats.end());
 }
 
 /**
