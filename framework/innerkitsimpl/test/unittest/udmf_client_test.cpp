@@ -43,6 +43,7 @@
 #include "unified_data_helper.h"
 #include "unified_html_record_process.h"
 #include "progress_callback.h"
+#include "udmf_service_client.h"
 #include "video.h"
 #include "want.h"
 #include "pixel_map.h"
@@ -1136,6 +1137,66 @@ HWTEST_F(UdmfClientTest, SetData019, TestSize.Level1)
     UnifiedDataHelper::SetRootPath("");
 
     LOG_INFO(UDMF_TEST, "SetData019 end.");
+}
+
+/**
+* @tc.name: PostProcessGetData001
+* @tc.desc: Audit large data after unpacking the temporary file record
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, PostProcessGetData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "PostProcessGetData001 begin.");
+    UnifiedData data;
+    data.AddRecord(std::make_shared<PlainText>("content", "abstract"));
+    UnifiedDataHelper::SetRootPath("/data/udmf_test/");
+    bool packed = UnifiedDataHelper::Pack(data);
+
+    bool reported = false;
+    std::vector<UDType> auditedTypes;
+    int32_t status = E_FS_ERROR;
+    if (packed) {
+        status = UdmfServiceClient::PostProcessGetData(data, [&reported, &auditedTypes](const UnifiedData &auditData) {
+            reported = true;
+            for (const auto &record : auditData.GetRecords()) {
+                auditedTypes.emplace_back(record->GetType());
+            }
+        });
+    }
+    UnifiedDataHelper::SetRootPath("");
+
+    ASSERT_TRUE(packed);
+    EXPECT_EQ(status, E_OK);
+    EXPECT_TRUE(reported);
+    ASSERT_EQ(auditedTypes.size(), 1);
+    EXPECT_EQ(auditedTypes[0], UDType::PLAIN_TEXT);
+    auto records = data.GetRecords();
+    ASSERT_EQ(records.size(), 1);
+    EXPECT_EQ(records[0]->GetType(), UDType::PLAIN_TEXT);
+    LOG_INFO(UDMF_TEST, "PostProcessGetData001 end.");
+}
+
+/**
+* @tc.name: PostProcessGetData002
+* @tc.desc: Do not report an audit event when temporary data cannot be unpacked
+* @tc.type: FUNC
+*/
+HWTEST_F(UdmfClientTest, PostProcessGetData002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "PostProcessGetData002 begin.");
+    auto file = std::make_shared<File>("file:///data/udmf_test/missing.ud");
+    UDDetails details = { { "temp_udmf_file_flag", true } };
+    file->SetDetails(details);
+    UnifiedData data;
+    data.AddRecord(file);
+    bool reported = false;
+
+    int32_t status = UdmfServiceClient::PostProcessGetData(data,
+        [&reported](const UnifiedData &) { reported = true; });
+
+    EXPECT_EQ(status, E_FS_ERROR);
+    EXPECT_FALSE(reported);
+    LOG_INFO(UDMF_TEST, "PostProcessGetData002 end.");
 }
 
 /**
