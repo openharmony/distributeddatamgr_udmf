@@ -102,7 +102,9 @@ void Html::SetPlainContent(const std::string &plainContent)
     this->plainContent_ = plainContent;
     if (std::holds_alternative<std::shared_ptr<Object>>(value_)) {
         auto object = std::get<std::shared_ptr<Object>>(value_);
-        object->value_[PLAIN_CONTENT] = plainContent_;
+        if (object != nullptr) {
+            object->value_[PLAIN_CONTENT] = plainContent_;
+        }
     }
 }
 

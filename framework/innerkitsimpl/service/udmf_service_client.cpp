@@ -159,23 +159,34 @@ int32_t UdmfServiceClient::GetData(const QueryOption &query, UnifiedData &unifie
     }
 
     auto err = udmfProxy_->GetData(query, unifiedData);
-    if (err == E_OK) {
-        char isEnterpriseDeviceValue[PARAM_VALUE_LEN_MAX] = {0};
-        GetParameter(IS_ENTERPRISE_DEVICE, ENTERPRISE_DEVICE_FALSE, isEnterpriseDeviceValue, PARAM_VALUE_LEN_MAX);
-        std::string isEnterpriseDevice(isEnterpriseDeviceValue);
-        if (isEnterpriseDevice == ENTERPRISE_DEVICE_TRUE) {
-            int32_t userId = IPCSkeleton::GetCallingUid() / UID_TRANSFORM_DIVISOR;
-            uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
-            AuditHelper::ReportDragAuditEvent(unifiedData, userId, tokenId);
-        }
-        if (UnifiedDataHelper::IsTempUData(unifiedData)) {
-            if (!UnifiedDataHelper::Unpack(unifiedData)) {
-                LOG_ERROR(UDMF_SERVICE, "failed to unpack unified data");
-                return E_FS_ERROR;
-            }
-        }
+    if (err != E_OK) {
+        return err;
     }
-    return err;
+
+    AuditReporter auditReporter;
+    char isEnterpriseDeviceValue[PARAM_VALUE_LEN_MAX] = {0};
+    GetParameter(IS_ENTERPRISE_DEVICE, ENTERPRISE_DEVICE_FALSE, isEnterpriseDeviceValue, PARAM_VALUE_LEN_MAX);
+    std::string isEnterpriseDevice(isEnterpriseDeviceValue);
+    if (isEnterpriseDevice == ENTERPRISE_DEVICE_TRUE) {
+        int32_t userId = IPCSkeleton::GetCallingUid() / UID_TRANSFORM_DIVISOR;
+        uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
+        auditReporter = [userId, tokenId](const UnifiedData &data) {
+            AuditHelper::ReportDragAuditEvent(data, userId, tokenId);
+        };
+    }
+    return PostProcessGetData(unifiedData, auditReporter);
+}
+
+int32_t UdmfServiceClient::PostProcessGetData(UnifiedData &unifiedData, const AuditReporter &auditReporter)
+{
+    if (UnifiedDataHelper::IsTempUData(unifiedData) && !UnifiedDataHelper::Unpack(unifiedData)) {
+        LOG_ERROR(UDMF_SERVICE, "failed to unpack unified data");
+        return E_FS_ERROR;
+    }
+    if (auditReporter) {
+        auditReporter(unifiedData);
+    }
+    return E_OK;
 }
 
 int32_t UdmfServiceClient::GetBatchData(const QueryOption &query, std::vector<UnifiedData> &unifiedDataSet)

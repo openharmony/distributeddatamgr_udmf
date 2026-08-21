@@ -168,6 +168,25 @@ HWTEST_F(HtmlTest, SetPlainContent002, TestSize.Level1)
 }
 
 /**
+* @tc.name: SetPlainContent003
+* @tc.desc: Test SetPlainContent with nullptr Object
+* @tc.type: FUNC
+*/
+HWTEST_F(HtmlTest, SetPlainContent003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SetPlainContent003 begin.");
+    std::shared_ptr<Object> nullObj = nullptr;
+    ValueType value = nullObj;
+    Html html(HTML, value);
+    const std::string plainContent = "plain content";
+
+    html.SetPlainContent(plainContent);
+
+    EXPECT_EQ(html.GetPlainContent(), plainContent);
+    LOG_INFO(UDMF_TEST, "SetPlainContent003 end.");
+}
+
+/**
 * @tc.name: ExtractImgSrc001
 * @tc.desc: Normal testcase of ExtractImgSrc
 * @tc.type: FUNC
