@@ -97,6 +97,11 @@ int64_t SummaryTaihe::GetInner()
     return reinterpret_cast<int64_t>(this);
 }
 
+::taihe::array<::taihe::string> SummaryTaihe::GetFilenameExtensions()
+{
+    return ConvertStringVectorToTaiheArray(this->value_->GetAllFileExtensions());
+}
+
 ::taiheChannel::Summary CreateSummary()
 {
     return taihe::make_holder<SummaryTaihe, ::taiheChannel::Summary>();

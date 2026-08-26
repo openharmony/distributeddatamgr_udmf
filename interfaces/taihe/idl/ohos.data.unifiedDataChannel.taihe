@@ -166,6 +166,8 @@ interface Summary {
   SetSummary(summary: @record Map<String, i64>): void;
   @get("overview")
  	GetOverview(): @record Map<String, i64>;
+  @get("filenameExtensions")
+  GetFilenameExtensions(): Array<String>;
   GetInner(): i64;
 }
 

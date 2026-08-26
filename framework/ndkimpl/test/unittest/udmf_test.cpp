@@ -4609,4 +4609,123 @@ HWTEST_F(UDMFTest, OH_UdmfDataLoadInfo_SetType_OversizeString001, TestSize.Level
 
     OH_UdmfDataLoadInfo_Destroy(info);
 }
+
+/**
+ * @tc.name: OH_UdmfSummary_Create_001
+ * @tc.desc: Test OH_UdmfSummary_Create and Destroy
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfSummary_Create_001, TestSize.Level1)
+{
+    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
+    EXPECT_NE(summary, nullptr);
+    if (summary != nullptr) {
+        EXPECT_NE(summary->summary_, nullptr);
+        OH_UdmfSummary_Destroy(summary);
+    }
+}
+
+/**
+ * @tc.name: OH_UdmfSummary_GetFilenameExtensions_001
+ * @tc.desc: Test OH_UdmfSummary_GetFilenameExtensions with file extensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfSummary_GetFilenameExtensions_001, TestSize.Level1)
+{
+    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
+    ASSERT_NE(summary, nullptr);
+    summary->summary_->typeToFileExtensions["general.file"] = {".jpg"};
+
+    const char* const* extensions = nullptr;
+    unsigned int count = 0;
+    int ret = OH_UdmfSummary_GetFilenameExtensions(summary, &extensions, &count);
+    EXPECT_EQ(ret, UDMF_E_OK);
+    EXPECT_NE(extensions, nullptr);
+    EXPECT_EQ(count, 1u);
+    if (extensions != nullptr && count == 1u) {
+        EXPECT_STREQ(extensions[0], ".jpg");
+    }
+
+    OH_UdmfSummary_Destroy(summary);
+}
+
+/**
+ * @tc.name: OH_UdmfSummary_GetFilenameExtensions_002
+ * @tc.desc: Test OH_UdmfSummary_GetFilenameExtensions with dedup and order
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfSummary_GetFilenameExtensions_002, TestSize.Level1)
+{
+    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
+    ASSERT_NE(summary, nullptr);
+    summary->summary_->typeToFileExtensions["general.file"] = {".jpg", ".png"};
+    summary->summary_->typeToFileExtensions["general.image"] = {".png", ".gif"};
+
+    const char* const* extensions = nullptr;
+    unsigned int count = 0;
+    int ret = OH_UdmfSummary_GetFilenameExtensions(summary, &extensions, &count);
+    EXPECT_EQ(ret, UDMF_E_OK);
+    EXPECT_NE(extensions, nullptr);
+    EXPECT_EQ(count, 3u);
+    if (extensions != nullptr && count == 3u) {
+        EXPECT_STREQ(extensions[0], ".jpg");
+        EXPECT_STREQ(extensions[1], ".png");
+        EXPECT_STREQ(extensions[2], ".gif");
+    }
+
+    OH_UdmfSummary_Destroy(summary);
+}
+
+/**
+ * @tc.name: OH_UdmfSummary_GetFilenameExtensions_003
+ * @tc.desc: Test OH_UdmfSummary_GetFilenameExtensions with empty summary and invalid params
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfSummary_GetFilenameExtensions_003, TestSize.Level1)
+{
+    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
+    ASSERT_NE(summary, nullptr);
+
+    const char* const* extensions = nullptr;
+    unsigned int count = 0;
+    int ret = OH_UdmfSummary_GetFilenameExtensions(summary, &extensions, &count);
+    EXPECT_EQ(ret, UDMF_E_OK);
+    EXPECT_EQ(extensions, nullptr);
+    EXPECT_EQ(count, 0u);
+
+    ret = OH_UdmfSummary_GetFilenameExtensions(nullptr, &extensions, &count);
+    EXPECT_EQ(ret, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfSummary_Destroy(summary);
+}
+
+/**
+ * @tc.name: OH_UdmfSummary_GetOverviewTypes_001
+ * @tc.desc: Test OH_UdmfSummary_GetOverviewTypes and GetOverviewDataSize
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfSummary_GetOverviewTypes_001, TestSize.Level1)
+{
+    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
+    ASSERT_NE(summary, nullptr);
+    summary->summary_->summary["general.file"] = 100;
+    summary->summary_->summary["general.image"] = 200;
+
+    const char* const* types = nullptr;
+    unsigned int count = 0;
+    int ret = OH_UdmfSummary_GetOverviewTypes(summary, &types, &count);
+    EXPECT_EQ(ret, UDMF_E_OK);
+    EXPECT_NE(types, nullptr);
+    EXPECT_EQ(count, 2u);
+
+    int64_t dataSize = 0;
+    ret = OH_UdmfSummary_GetOverviewDataSize(summary, "general.file", &dataSize);
+    EXPECT_EQ(ret, UDMF_E_OK);
+    EXPECT_EQ(dataSize, 100);
+
+    ret = OH_UdmfSummary_GetOverviewDataSize(summary, "general.audio", &dataSize);
+    EXPECT_EQ(ret, UDMF_E_NOT_FOUND);
+
+    OH_UdmfSummary_Destroy(summary);
+}
 }

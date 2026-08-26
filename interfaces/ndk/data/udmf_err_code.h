@@ -64,6 +64,10 @@ typedef enum Udmf_ErrCode {
      * @brief The error code for common invalid args.
      */
     UDMF_E_INVALID_PARAM = (UDMF_ERR + 1),
+    /**
+     * @brief The error code for the specified data not found.
+     */
+    UDMF_E_NOT_FOUND = (UDMF_ERR + 2),
 } Udmf_ErrCode;
 
 /**

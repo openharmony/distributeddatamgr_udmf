@@ -34,6 +34,7 @@ public:
     void SetSummary(::taihe::map_view<::taihe::string, int64_t> summary);
     ::taihe::map<::taihe::string, int64_t> GetOverview();
     int64_t GetInner();
+    ::taihe::array<::taihe::string> GetFilenameExtensions();
 
     std::shared_ptr<Summary> value_;
 };

@@ -36,6 +36,7 @@
 #include "udmf_err_code.h"
 #include "udmf_meta.h"
 #include "unified_meta.h"
+#include "unified_data_helper.h"
 #include "utd.h"
 #include "utd_client.h"
 #include "video.h"
@@ -1385,4 +1386,115 @@ OH_UdmfData* OH_UDMF_GetDataElementAt(OH_UdmfData** dataArray, unsigned int inde
         return nullptr;
     }
     return &((*dataArray)[index]);
+}
+
+OH_UdmfSummary* OH_UdmfSummary_Create()
+{
+    OH_UdmfSummary* summary = new (std::nothrow) OH_UdmfSummary();
+    if (summary == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Memory allocation failed.");
+        return nullptr;
+    }
+
+    summary->summary_ = std::make_shared<Summary>();
+    if (summary->summary_ == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Memory allocation failed.");
+        delete summary;
+        return nullptr;
+    }
+    return summary;
+}
+
+void OH_UdmfSummary_Destroy(OH_UdmfSummary* summary)
+{
+    if (summary == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return;
+    }
+    delete summary;
+}
+
+int OH_UdmfSummary_GetOverviewTypes(const OH_UdmfSummary* summary, const char* const** types, unsigned int* count)
+{
+    if (summary == nullptr || summary->summary_ == nullptr || types == nullptr || count == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    auto* self = const_cast<OH_UdmfSummary*>(summary);
+    std::lock_guard<std::mutex> lock(self->mutex);
+    self->overviewTypes_.clear();
+    for (const auto &item : summary->summary_->summary) {
+        if (!item.first.empty()) {
+            self->overviewTypes_.push_back(item.first);
+        }
+    }
+    self->overviewTypePtrs_.clear();
+    for (const auto &type : self->overviewTypes_) {
+        self->overviewTypePtrs_.push_back(type.c_str());
+    }
+    if (self->overviewTypePtrs_.empty()) {
+        *types = nullptr;
+        *count = 0;
+        return UDMF_E_OK;
+    }
+    *types = self->overviewTypePtrs_.data();
+    *count = static_cast<unsigned int>(self->overviewTypePtrs_.size());
+    return UDMF_E_OK;
+}
+
+int OH_UdmfSummary_GetOverviewDataSize(const OH_UdmfSummary* summary, const char* type, int64_t* dataSize)
+{
+    if (summary == nullptr || summary->summary_ == nullptr || type == nullptr || dataSize == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    auto it = summary->summary_->summary.find(std::string(type));
+    if (it == summary->summary_->summary.end()) {
+        return UDMF_E_NOT_FOUND;
+    }
+    *dataSize = it->second;
+    return UDMF_E_OK;
+}
+
+int OH_UdmfSummary_GetFilenameExtensions(const OH_UdmfSummary* summary, const char* const** filenameExtensions,
+    unsigned int* count)
+{
+    if (summary == nullptr || summary->summary_ == nullptr || filenameExtensions == nullptr || count == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    auto* self = const_cast<OH_UdmfSummary*>(summary);
+    std::lock_guard<std::mutex> lock(self->mutex);
+    self->filenameExtensions_ = summary->summary_->GetAllFileExtensions();
+    self->filenameExtensionPtrs_.clear();
+    for (const auto &ext : self->filenameExtensions_) {
+        self->filenameExtensionPtrs_.push_back(ext.c_str());
+    }
+    if (self->filenameExtensionPtrs_.empty()) {
+        *filenameExtensions = nullptr;
+        *count = 0;
+        return UDMF_E_OK;
+    }
+    *filenameExtensions = self->filenameExtensionPtrs_.data();
+    *count = static_cast<unsigned int>(self->filenameExtensionPtrs_.size());
+    return UDMF_E_OK;
+}
+
+int OH_Udmf_GetSummary(OH_UdmfOptions* options, OH_UdmfSummary* summary)
+{
+    if (options == nullptr || summary == nullptr || summary->summary_ == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    if (options->key.empty() || options->intention != UDMF_INTENTION_DRAG) {
+        LOG_ERROR(UDMF_CAPI, "Invalid key or intention.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    QueryOption query = {.key = options->key, .intention = Intention::UD_INTENTION_DRAG};
+    Status ret = UdmfClient::GetInstance().GetSummary(query, *summary->summary_);
+    if (ret != E_OK) {
+        LOG_ERROR(UDMF_CAPI, "Get summary error, ret = %{public}d", ret);
+        return UDMF_ERR;
+    }
+    return UDMF_E_OK;
 }

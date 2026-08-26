@@ -1112,6 +1112,7 @@ template <> size_t CountBufferSize(const Summary &input, TLVObject &data)
         && CheckAndAdd(size, CountBufferSize(input.totalSize, data))
         && CheckAndAdd(size, CountBufferSize(input.specificSummary, data))
         && CheckAndAdd(size, CountBufferSize(input.summaryFormat, data))
+        && CheckAndAdd(size, CountBufferSize(input.typeToFileExtensions, data))
         && CheckAndAdd(size, data.CountBasic(input.version)) && CheckAndAdd(size, data.Count(input.tag));
     return isWithinMax ? size : 0;
 }
@@ -1132,6 +1133,9 @@ template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
         return false;
     }
     if (!TLVUtil::Writing(input.summaryFormat, data, TAG::TAG_SUMMARY_SUMMARY_FORMAT)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(input.typeToFileExtensions, data, TAG::TAG_SUMMARY_TYPE_TO_FILE_EXTENSIONS)) {
         return false;
     }
     if (!data.WriteBasic(TAG::TAG_SUMMARY_VERSION, input.version)) {
@@ -1174,6 +1178,11 @@ template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
                 break;
             case static_cast<uint16_t>(TAG::TAG_SUMMARY_SUMMARY_FORMAT):
                 if (!TLVUtil::Reading(output.summaryFormat, data, headItem)) {
+                    return false;
+                }
+                break;
+            case static_cast<uint16_t>(TAG::TAG_SUMMARY_TYPE_TO_FILE_EXTENSIONS):
+                if (!TLVUtil::Reading(output.typeToFileExtensions, data, headItem)) {
                     return false;
                 }
                 break;

@@ -16,14 +16,17 @@
 #ifndef UDMF_UNIFIED_TYPES_H
 #define UDMF_UNIFIED_TYPES_H
 
+#include <algorithm>
 #include <map>
 #include <set>
 #include <string>
+#include <vector>
 
 #include "error_code.h"
 #include "iremote_object.h"
 #include "unified_key.h"
 #include "unified_meta.h"
+#include "visibility.h"
 
 namespace OHOS {
 namespace UDMF {
@@ -44,11 +47,15 @@ struct Summary {
     std::map<std::string, int64_t> summary {};
     std::map<std::string, int64_t> specificSummary {};
     std::map<std::string, std::vector<int32_t>> summaryFormat {};
+    std::map<std::string, std::vector<std::string>> typeToFileExtensions {};
     // If version value is 1, it means it contains the format variable;
     // otherwise(not set or 0), it means it does not contain.
     int32_t version {1};
     int64_t totalSize {0};
     std::string tag;
+
+    std::vector<std::string> API_EXPORT GetFileExtensionsByType(const std::string &typeId) const;
+    std::vector<std::string> API_EXPORT GetAllFileExtensions() const;
 };
 
 struct Privilege {

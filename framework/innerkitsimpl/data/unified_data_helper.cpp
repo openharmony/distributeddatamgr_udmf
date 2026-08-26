@@ -114,6 +114,8 @@ void CalRecordSummary(std::map<std::string, ValueType> &entry, Summary &summary)
 void FillSummaryFormat(const std::string &type, const std::string &utdId, Summary &summary);
 void ProcessTypeId(const ValueType &value, std::string &typeId);
 void UpgradeToParentType(std::string &typeId);
+std::string ExtractFileExtension(const std::string &uri);
+void FillFileExtensions(std::shared_ptr<UnifiedRecord> record, const std::string &typeId, Summary &summary);
 }
 
 void UnifiedDataHelper::SetRootPath(const std::string &rootPath)
@@ -180,6 +182,22 @@ void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
             continue;
         }
         CalRecordSummary(*record->GetEntries(), summary);
+
+        if (record->GetType() == UDType::FILE) {
+            auto entries = record->GetEntries();
+            if (entries == nullptr || entries->empty()) {
+                continue;
+            }
+
+            for (const auto &[utdId, value] : *entries) {
+                std::string typeId = utdId;
+                ProcessTypeId(value, typeId);
+                if (utdId == GENERAL_FILE_URI) {
+                    UpgradeToParentType(typeId);
+                }
+                FillFileExtensions(record, typeId, summary);
+            }
+        }
     }
     summary.version = WITH_SUMMARY_FORMAT_VER;
     auto properties = data.GetProperties();
@@ -391,6 +409,72 @@ void UpgradeToParentType(std::string &typeId)
         return;
     }
     typeId = "general.file"; // When utdId is general.file-uri, the default parent type is general.file.
+}
+
+std::string ExtractFileExtension(const std::string &uri)
+{
+    if (uri.empty()) {
+        return "";
+    }
+    size_t lastSlash = uri.find_last_of("/\\");
+    size_t lastDot = uri.find_last_of('.');
+
+    if (lastDot == std::string::npos || (lastSlash != std::string::npos && lastDot < lastSlash)) {
+        return "";
+    }
+
+    std::string extension = uri.substr(lastDot);
+    if (extension.length() <= 1) {
+        return "";
+    }
+
+    size_t queryPos = extension.find('?');
+    if (queryPos != std::string::npos) {
+        extension = extension.substr(0, queryPos);
+    }
+
+    size_t fragmentPos = extension.find('#');
+    if (fragmentPos != std::string::npos) {
+        extension = extension.substr(0, fragmentPos);
+    }
+
+    if (extension.length() <= 1) {
+        return "";
+    }
+
+    for (char &c : extension) {
+        if (c >= 'A' && c <= 'Z') {
+            c = c - 'A' + 'a';
+        }
+    }
+
+    return extension;
+}
+
+void FillFileExtensions(std::shared_ptr<UnifiedRecord> record, const std::string &typeId, Summary &summary)
+{
+    if (record == nullptr || record->GetType() != UDType::FILE) {
+        return;
+    }
+
+    std::string uri = GetFileUriFromRecord(record);
+    if (uri.empty()) {
+        return;
+    }
+
+    if (uri.find("file://") != 0) {
+        return;
+    }
+
+    std::string extension = ExtractFileExtension(uri);
+    if (extension.empty()) {
+        return;
+    }
+
+    auto &extensions = summary.typeToFileExtensions[typeId];
+    if (std::find(extensions.begin(), extensions.end(), extension) == extensions.end()) {
+        extensions.emplace_back(extension);
+    }
 }
 }
 

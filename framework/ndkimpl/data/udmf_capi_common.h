@@ -21,6 +21,7 @@
 #include "udmf.h"
 #include "uri_permission_util.h"
 #include <mutex>
+#include <vector>
 #include <cstdint>
 
 # define MAX_GENERAL_ENTRY_SIZE (100 * 1024 * 1024)
@@ -117,6 +118,15 @@ struct OH_UdmfProperty {
     std::shared_ptr<OHOS::UDMF::UnifiedDataProperties> properties_;
     std::mutex mutex;
     std::string extraStr;
+};
+
+struct OH_UdmfSummary {
+    std::shared_ptr<OHOS::UDMF::Summary> summary_;
+    std::vector<std::string> overviewTypes_;
+    std::vector<const char*> overviewTypePtrs_;
+    std::vector<std::string> filenameExtensions_;
+    std::vector<const char*> filenameExtensionPtrs_;
+    std::mutex mutex;
 };
 
 struct OH_Udmf_ProgressInfo {
