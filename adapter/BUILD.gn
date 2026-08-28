@@ -254,6 +254,7 @@ ohos_source_set("arkui_x_unifieddatachannel") {
     "${udmf_framework_path}/jskitsimpl/data/unified_data_properties_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/unified_record_napi.cpp",
     "${udmf_framework_path}/jskitsimpl/data/video_napi.cpp",
+    "${udmf_interfaces_path}/jskits/module/unified_data_channel_napi_entry.cpp",
     "${udmf_interfaces_path}/jskits/module/unified_data_channel_napi_module.cpp",
     "${udmf_root_path}/adapter/framework/innerkitsimpl/client/udmf_client.cpp",
   ]
