@@ -43,6 +43,8 @@ constexpr int32_t ERR_UDMF_FAILED = -1;
 constexpr int32_t ERR_NO_MEMORY = -2;
 
 const int32_t NONE_VALUE = 1;
+
+constexpr const int MAX_COLLECTION_SIZE = 10 * 1024;
 using WantParams = OHOS::AAFwk::WantParams;
 
 void ClearParametersPtr(CParameters **ptr, int count, bool isKey)
@@ -156,6 +158,9 @@ int32_t InnerWrapWantParamsArray(WantParams &wantParams, sptr<AAFwk::IArray> &ao
 
 void SetDataParameters(CArrParameters parameters, WantParams &wantP)
 {
+    if (parameters.head == nullptr || parameters.size <= 0 || parameters.size > MAX_COLLECTION_SIZE) {
+        return;
+    }
     for (int i = 0; i < parameters.size; i++) {
         auto head = parameters.head + i;
         auto key = std::string(head->key);
