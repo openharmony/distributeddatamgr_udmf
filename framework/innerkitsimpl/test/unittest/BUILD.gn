@@ -106,6 +106,7 @@ udmf_test_impl_sources = [
   "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/unified_data_extension.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/unified_data_helper.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/unified_html_record_process.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
@@ -826,6 +827,8 @@ ohos_unittest("UnifiedDataHelperTest") {
 
   sources = [ "unified_data_helper_test.cpp" ]
 
+  configs = [ ":module_private_config" ]
+
   deps = common_deps
 
   external_deps = common_external_deps
@@ -971,6 +974,7 @@ ohos_unittest("UdmfClientAbnormalTest") {
     "${udmf_framework_path}/innerkitsimpl/data/system_defined_record.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/text.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
+    "${udmf_framework_path}/innerkitsimpl/data/unified_data_extension.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_data_helper.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_html_record_process.cpp",
     "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",

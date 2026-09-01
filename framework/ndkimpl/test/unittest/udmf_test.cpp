@@ -4612,120 +4612,123 @@ HWTEST_F(UDMFTest, OH_UdmfDataLoadInfo_SetType_OversizeString001, TestSize.Level
 
 /**
  * @tc.name: OH_UdmfSummary_Create_001
- * @tc.desc: Test OH_UdmfSummary_Create and Destroy
+ * @tc.desc: Test OH_UdmfSummary_Create initializes the struct id and summary
  * @tc.type: FUNC
  */
 HWTEST_F(UDMFTest, OH_UdmfSummary_Create_001, TestSize.Level1)
 {
     OH_UdmfSummary* summary = OH_UdmfSummary_Create();
-    EXPECT_NE(summary, nullptr);
+    ASSERT_NE(summary, nullptr);
     if (summary != nullptr) {
+        EXPECT_EQ(summary->cid, static_cast<int64_t>(NdkStructId::UDMF_SUMMARY_STRUCT_ID));
         EXPECT_NE(summary->summary_, nullptr);
         OH_UdmfSummary_Destroy(summary);
     }
 }
 
 /**
- * @tc.name: OH_UdmfSummary_GetFilenameExtensions_001
- * @tc.desc: Test OH_UdmfSummary_GetFilenameExtensions with file extensions
- * @tc.type: FUNC
- */
-HWTEST_F(UDMFTest, OH_UdmfSummary_GetFilenameExtensions_001, TestSize.Level1)
-{
-    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
-    ASSERT_NE(summary, nullptr);
-    summary->summary_->typeToFileExtensions["general.file"] = {".jpg"};
-
-    const char* const* extensions = nullptr;
-    unsigned int count = 0;
-    int ret = OH_UdmfSummary_GetFilenameExtensions(summary, &extensions, &count);
-    EXPECT_EQ(ret, UDMF_E_OK);
-    EXPECT_NE(extensions, nullptr);
-    EXPECT_EQ(count, 1u);
-    if (extensions != nullptr && count == 1u) {
-        EXPECT_STREQ(extensions[0], ".jpg");
-    }
-
-    OH_UdmfSummary_Destroy(summary);
-}
-
-/**
- * @tc.name: OH_UdmfSummary_GetFilenameExtensions_002
- * @tc.desc: Test OH_UdmfSummary_GetFilenameExtensions with dedup and order
- * @tc.type: FUNC
- */
-HWTEST_F(UDMFTest, OH_UdmfSummary_GetFilenameExtensions_002, TestSize.Level1)
-{
-    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
-    ASSERT_NE(summary, nullptr);
-    summary->summary_->typeToFileExtensions["general.file"] = {".jpg", ".png"};
-    summary->summary_->typeToFileExtensions["general.image"] = {".png", ".gif"};
-
-    const char* const* extensions = nullptr;
-    unsigned int count = 0;
-    int ret = OH_UdmfSummary_GetFilenameExtensions(summary, &extensions, &count);
-    EXPECT_EQ(ret, UDMF_E_OK);
-    EXPECT_NE(extensions, nullptr);
-    EXPECT_EQ(count, 3u);
-    if (extensions != nullptr && count == 3u) {
-        EXPECT_STREQ(extensions[0], ".jpg");
-        EXPECT_STREQ(extensions[1], ".png");
-        EXPECT_STREQ(extensions[2], ".gif");
-    }
-
-    OH_UdmfSummary_Destroy(summary);
-}
-
-/**
- * @tc.name: OH_UdmfSummary_GetFilenameExtensions_003
- * @tc.desc: Test OH_UdmfSummary_GetFilenameExtensions with empty summary and invalid params
- * @tc.type: FUNC
- */
-HWTEST_F(UDMFTest, OH_UdmfSummary_GetFilenameExtensions_003, TestSize.Level1)
-{
-    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
-    ASSERT_NE(summary, nullptr);
-
-    const char* const* extensions = nullptr;
-    unsigned int count = 0;
-    int ret = OH_UdmfSummary_GetFilenameExtensions(summary, &extensions, &count);
-    EXPECT_EQ(ret, UDMF_E_OK);
-    EXPECT_EQ(extensions, nullptr);
-    EXPECT_EQ(count, 0u);
-
-    ret = OH_UdmfSummary_GetFilenameExtensions(nullptr, &extensions, &count);
-    EXPECT_EQ(ret, UDMF_E_INVALID_PARAM);
-
-    OH_UdmfSummary_Destroy(summary);
-}
-
-/**
  * @tc.name: OH_UdmfSummary_GetOverviewTypes_001
- * @tc.desc: Test OH_UdmfSummary_GetOverviewTypes and GetOverviewDataSize
+ * @tc.desc: Test OH_UdmfSummary_GetOverviewTypes with invalid params and valid summary
  * @tc.type: FUNC
  */
 HWTEST_F(UDMFTest, OH_UdmfSummary_GetOverviewTypes_001, TestSize.Level1)
 {
-    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
-    ASSERT_NE(summary, nullptr);
-    summary->summary_->summary["general.file"] = 100;
-    summary->summary_->summary["general.image"] = 200;
-
     const char* const* types = nullptr;
     unsigned int count = 0;
+
+    EXPECT_EQ(OH_UdmfSummary_GetOverviewTypes(nullptr, &types, &count), UDMF_E_INVALID_PARAM);
+
+    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
+    ASSERT_NE(summary, nullptr);
+    EXPECT_EQ(OH_UdmfSummary_GetOverviewTypes(summary, nullptr, &count), UDMF_E_INVALID_PARAM);
+    EXPECT_EQ(OH_UdmfSummary_GetOverviewTypes(summary, &types, nullptr), UDMF_E_INVALID_PARAM);
+
+    summary->summary_->summary["general.file"] = 100;
+    summary->summary_->summary["general.image"] = 200;
+    summary->overviewTypePtrs_.clear();
+    for (const auto &item : summary->summary_->summary) {
+        summary->overviewTypePtrs_.push_back(item.first.c_str());
+    }
     int ret = OH_UdmfSummary_GetOverviewTypes(summary, &types, &count);
     EXPECT_EQ(ret, UDMF_E_OK);
     EXPECT_NE(types, nullptr);
     EXPECT_EQ(count, 2u);
 
-    int64_t dataSize = 0;
-    ret = OH_UdmfSummary_GetOverviewDataSize(summary, "general.file", &dataSize);
-    EXPECT_EQ(ret, UDMF_E_OK);
-    EXPECT_EQ(dataSize, 100);
+    OH_UdmfSummary_Destroy(summary);
+}
 
-    ret = OH_UdmfSummary_GetOverviewDataSize(summary, "general.audio", &dataSize);
-    EXPECT_EQ(ret, UDMF_E_NOT_FOUND);
+/**
+ * @tc.name: OH_UdmfSummary_GetOverviewDataSize_001
+ * @tc.desc: Test OH_UdmfSummary_GetOverviewDataSize with invalid params and missing type
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfSummary_GetOverviewDataSize_001, TestSize.Level1)
+{
+    int64_t dataSize = 0;
+    EXPECT_EQ(OH_UdmfSummary_GetOverviewDataSize(nullptr, "general.file", &dataSize), UDMF_E_INVALID_PARAM);
+
+    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
+    ASSERT_NE(summary, nullptr);
+    EXPECT_EQ(OH_UdmfSummary_GetOverviewDataSize(summary, nullptr, &dataSize), UDMF_E_INVALID_PARAM);
+    EXPECT_EQ(OH_UdmfSummary_GetOverviewDataSize(summary, "general.file", nullptr), UDMF_E_INVALID_PARAM);
+
+    summary->summary_->summary["general.file"] = 100;
+    EXPECT_EQ(OH_UdmfSummary_GetOverviewDataSize(summary, "general.file", &dataSize), UDMF_E_OK);
+    EXPECT_EQ(dataSize, 100);
+    EXPECT_EQ(OH_UdmfSummary_GetOverviewDataSize(summary, "general.audio", &dataSize), UDMF_ERR);
 
     OH_UdmfSummary_Destroy(summary);
+}
+
+/**
+ * @tc.name: OH_UdmfSummary_GetFilenameExtensions_001
+ * @tc.desc: Test OH_UdmfSummary_GetFilenameExtensions with valid and invalid params
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfSummary_GetFilenameExtensions_001, TestSize.Level1)
+{
+    const char* const* extensions = nullptr;
+    unsigned int count = 0;
+
+    EXPECT_EQ(OH_UdmfSummary_GetFilenameExtensions(nullptr, &extensions, &count), UDMF_E_INVALID_PARAM);
+
+    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
+    ASSERT_NE(summary, nullptr);
+    EXPECT_EQ(OH_UdmfSummary_GetFilenameExtensions(summary, nullptr, &count), UDMF_E_INVALID_PARAM);
+    EXPECT_EQ(OH_UdmfSummary_GetFilenameExtensions(summary, &extensions, nullptr), UDMF_E_INVALID_PARAM);
+
+    summary->summary_->filenameExtensions = {".jpg", ".png"};
+    summary->filenameExtensionPtrs_.clear();
+    for (const auto &ext : summary->summary_->filenameExtensions) {
+        summary->filenameExtensionPtrs_.push_back(ext.c_str());
+    }
+    int ret = OH_UdmfSummary_GetFilenameExtensions(summary, &extensions, &count);
+    EXPECT_EQ(ret, UDMF_E_OK);
+    ASSERT_EQ(count, 2u);
+    if (count == 2u) {
+        EXPECT_STREQ(extensions[0], ".jpg");
+        EXPECT_STREQ(extensions[1], ".png");
+    }
+
+    OH_UdmfSummary_Destroy(summary);
+}
+
+/**
+ * @tc.name: OH_UdmfSummary_CidGuard_001
+ * @tc.desc: Test OH_UdmfSummary rejects an object whose struct id does not match
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfSummary_CidGuard_001, TestSize.Level1)
+{
+    OH_UdmfData* data = OH_UdmfData_Create();
+    ASSERT_NE(data, nullptr);
+    auto* fakeSummary = reinterpret_cast<const OH_UdmfSummary*>(data);
+    const char* const* types = nullptr;
+    unsigned int count = 0;
+    EXPECT_EQ(OH_UdmfSummary_GetOverviewTypes(fakeSummary, &types, &count), UDMF_E_INVALID_PARAM);
+
+    const char* const* extensions = nullptr;
+    EXPECT_EQ(OH_UdmfSummary_GetFilenameExtensions(fakeSummary, &extensions, &count), UDMF_E_INVALID_PARAM);
+    OH_UdmfData_Destroy(data);
 }
 }

@@ -99,7 +99,7 @@ int64_t SummaryTaihe::GetInner()
 
 ::taihe::array<::taihe::string> SummaryTaihe::GetFilenameExtensions()
 {
-    return ConvertStringVectorToTaiheArray(this->value_->GetAllFileExtensions());
+    return ConvertStringVectorToTaiheArray(this->value_->filenameExtensions);
 }
 
 ::taiheChannel::Summary CreateSummary()

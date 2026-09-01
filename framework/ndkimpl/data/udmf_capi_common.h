@@ -46,6 +46,7 @@ enum NdkStructId : std::int64_t {
     UDMF_UNIFIED_DATA_STRUCT_ID,
     UDMF_UNIFIED_RECORD_STRUCT_ID,
     UDMF_UNIFIED_DATA_PROPERTIES_ID,
+    UDMF_SUMMARY_STRUCT_ID,
     UDS_FILE_URI_STRUCT_ID,
     UDS_PIXEL_MAP_STRUCT_ID,
     UDS_ARRAY_BUFFER_STRUCT_ID,
@@ -121,12 +122,10 @@ struct OH_UdmfProperty {
 };
 
 struct OH_UdmfSummary {
+    const int64_t cid = UDMF_SUMMARY_STRUCT_ID;
     std::shared_ptr<OHOS::UDMF::Summary> summary_;
-    std::vector<std::string> overviewTypes_;
     std::vector<const char*> overviewTypePtrs_;
-    std::vector<std::string> filenameExtensions_;
     std::vector<const char*> filenameExtensionPtrs_;
-    std::mutex mutex;
 };
 
 struct OH_Udmf_ProgressInfo {

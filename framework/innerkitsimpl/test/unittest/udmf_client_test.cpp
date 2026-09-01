@@ -4399,11 +4399,6 @@ HWTEST_F(UdmfClientTest, ProcessDragIfInApp001, TestSize.Level1)
     EXPECT_NO_FATAL_FAILURE(UdmfClient::GetInstance().ProcessDragIfInApp(unifiedData, intentionDrag, key));
 }
 
-/**
- * @tc.name: SetData0024
- * @tc.desc: test SetData with invalid intention
- * @tc.type: FUNC
- */
 HWTEST_F(UdmfClientTest, SetData0024, TestSize.Level1)
 {
     CustomOption option;
@@ -4628,7 +4623,7 @@ HWTEST_F(UdmfClientTest, GetSummary006, TestSize.Level1)
     EXPECT_EQ(summary.specificSummary["general.png"], size5);
     EXPECT_EQ(summary.totalSize, record->GetSize() + record1->GetSize() + record2->GetSize());
 
-    EXPECT_EQ(summary.version, 1);
+    EXPECT_EQ(summary.version, CURRENT_SUMMARY_VERSION);
     auto htmlFormat = summary.summaryFormat["general.html"];
     EXPECT_TRUE(std::find(htmlFormat.begin(), htmlFormat.end(), Uds_Type::UDS_FILE_URI) != htmlFormat.end());
     EXPECT_TRUE(std::find(htmlFormat.begin(), htmlFormat.end(), Uds_Type::UDS_HTML) != htmlFormat.end());

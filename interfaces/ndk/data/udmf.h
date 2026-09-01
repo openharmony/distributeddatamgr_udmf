@@ -368,7 +368,6 @@ int OH_UdmfSummary_GetOverviewTypes(const OH_UdmfSummary* summary, const char* c
  * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
  *         {@link UDMF_E_OK} success.
  *         {@link UDMF_E_INVALID_PARAM} The input parameter is invalid.
- *         {@link UDMF_E_NOT_FOUND} The specified data type does not exist in the overview.
  * @see OH_UdmfSummary OH_UdmfSummary_GetOverviewTypes Udmf_ErrCode.
  * @since 24
  */

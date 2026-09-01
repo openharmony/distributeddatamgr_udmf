@@ -126,6 +126,12 @@ static bool IsUnifiedPropertiesValid(OH_UdmfProperty* properties)
            properties->cid == NdkStructId::UDMF_UNIFIED_DATA_PROPERTIES_ID;
 }
 
+static bool IsSummaryValid(const OH_UdmfSummary* summary)
+{
+    return summary != nullptr && summary->cid == NdkStructId::UDMF_SUMMARY_STRUCT_ID &&
+           summary->summary_ != nullptr;
+}
+
 static void AddFileUriTypeIfContains(std::vector<std::string>& types)
 {
     if (std::find(types.begin(), types.end(), UDMF_META_GENERAL_FILE_URI) != types.end()) {
@@ -1416,41 +1422,29 @@ void OH_UdmfSummary_Destroy(OH_UdmfSummary* summary)
 
 int OH_UdmfSummary_GetOverviewTypes(const OH_UdmfSummary* summary, const char* const** types, unsigned int* count)
 {
-    if (summary == nullptr || summary->summary_ == nullptr || types == nullptr || count == nullptr) {
+    if (!IsSummaryValid(summary) || types == nullptr || count == nullptr) {
         LOG_ERROR(UDMF_CAPI, "Parameter error.");
         return UDMF_E_INVALID_PARAM;
     }
-    auto* self = const_cast<OH_UdmfSummary*>(summary);
-    std::lock_guard<std::mutex> lock(self->mutex);
-    self->overviewTypes_.clear();
-    for (const auto &item : summary->summary_->summary) {
-        if (!item.first.empty()) {
-            self->overviewTypes_.push_back(item.first);
-        }
-    }
-    self->overviewTypePtrs_.clear();
-    for (const auto &type : self->overviewTypes_) {
-        self->overviewTypePtrs_.push_back(type.c_str());
-    }
-    if (self->overviewTypePtrs_.empty()) {
+    if (summary->overviewTypePtrs_.empty()) {
         *types = nullptr;
         *count = 0;
         return UDMF_E_OK;
     }
-    *types = self->overviewTypePtrs_.data();
-    *count = static_cast<unsigned int>(self->overviewTypePtrs_.size());
+    *types = summary->overviewTypePtrs_.data();
+    *count = static_cast<unsigned int>(summary->overviewTypePtrs_.size());
     return UDMF_E_OK;
 }
 
 int OH_UdmfSummary_GetOverviewDataSize(const OH_UdmfSummary* summary, const char* type, int64_t* dataSize)
 {
-    if (summary == nullptr || summary->summary_ == nullptr || type == nullptr || dataSize == nullptr) {
+    if (!IsSummaryValid(summary) || type == nullptr || dataSize == nullptr) {
         LOG_ERROR(UDMF_CAPI, "Parameter error.");
         return UDMF_E_INVALID_PARAM;
     }
     auto it = summary->summary_->summary.find(std::string(type));
     if (it == summary->summary_->summary.end()) {
-        return UDMF_E_NOT_FOUND;
+        return UDMF_ERR;
     }
     *dataSize = it->second;
     return UDMF_E_OK;
@@ -1459,30 +1453,37 @@ int OH_UdmfSummary_GetOverviewDataSize(const OH_UdmfSummary* summary, const char
 int OH_UdmfSummary_GetFilenameExtensions(const OH_UdmfSummary* summary, const char* const** filenameExtensions,
     unsigned int* count)
 {
-    if (summary == nullptr || summary->summary_ == nullptr || filenameExtensions == nullptr || count == nullptr) {
+    if (!IsSummaryValid(summary) || filenameExtensions == nullptr || count == nullptr) {
         LOG_ERROR(UDMF_CAPI, "Parameter error.");
         return UDMF_E_INVALID_PARAM;
     }
-    auto* self = const_cast<OH_UdmfSummary*>(summary);
-    std::lock_guard<std::mutex> lock(self->mutex);
-    self->filenameExtensions_ = summary->summary_->GetAllFileExtensions();
-    self->filenameExtensionPtrs_.clear();
-    for (const auto &ext : self->filenameExtensions_) {
-        self->filenameExtensionPtrs_.push_back(ext.c_str());
-    }
-    if (self->filenameExtensionPtrs_.empty()) {
+    if (summary->filenameExtensionPtrs_.empty()) {
         *filenameExtensions = nullptr;
         *count = 0;
         return UDMF_E_OK;
     }
-    *filenameExtensions = self->filenameExtensionPtrs_.data();
-    *count = static_cast<unsigned int>(self->filenameExtensionPtrs_.size());
+    *filenameExtensions = summary->filenameExtensionPtrs_.data();
+    *count = static_cast<unsigned int>(summary->filenameExtensionPtrs_.size());
     return UDMF_E_OK;
+}
+
+static void RefreshSummaryCaches(OH_UdmfSummary* summary)
+{
+    summary->overviewTypePtrs_.clear();
+    for (const auto &item : summary->summary_->summary) {
+        if (!item.first.empty()) {
+            summary->overviewTypePtrs_.push_back(item.first.c_str());
+        }
+    }
+    summary->filenameExtensionPtrs_.clear();
+    for (const auto &ext : summary->summary_->filenameExtensions) {
+        summary->filenameExtensionPtrs_.push_back(ext.c_str());
+    }
 }
 
 int OH_Udmf_GetSummary(OH_UdmfOptions* options, OH_UdmfSummary* summary)
 {
-    if (options == nullptr || summary == nullptr || summary->summary_ == nullptr) {
+    if (options == nullptr || !IsSummaryValid(summary)) {
         LOG_ERROR(UDMF_CAPI, "Parameter error.");
         return UDMF_E_INVALID_PARAM;
     }
@@ -1496,5 +1497,6 @@ int OH_Udmf_GetSummary(OH_UdmfOptions* options, OH_UdmfSummary* summary)
         LOG_ERROR(UDMF_CAPI, "Get summary error, ret = %{public}d", ret);
         return UDMF_ERR;
     }
+    RefreshSummaryCaches(summary);
     return UDMF_E_OK;
 }

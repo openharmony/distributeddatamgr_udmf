@@ -109,7 +109,7 @@ template<>
 bool Marshalling(const Summary &input, MessageParcel &parcel)
 {
     return ITypesUtil::Marshal(parcel, input.summary, input.totalSize, input.specificSummary,
-        input.summaryFormat, input.typeToFileExtensions, input.version, input.tag);
+        input.summaryFormat, input.version, input.tag, input.filenameExtensions);
 }
 
 template<>
@@ -121,7 +121,7 @@ bool Unmarshalling(Summary &output, MessageParcel &parcel)
         return false;
     }
     return ITypesUtil::Unmarshal(parcel, output.summary, output.totalSize, output.specificSummary,
-        output.summaryFormat, output.typeToFileExtensions, output.version, output.tag);
+        output.summaryFormat, output.version, output.tag, output.filenameExtensions);
 }
 
 template<>

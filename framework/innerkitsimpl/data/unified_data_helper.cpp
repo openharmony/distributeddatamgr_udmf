@@ -33,11 +33,8 @@ namespace UDMF {
 constexpr mode_t MODE = 0700;
 static constexpr int64_t MAX_IPC_RAW_DATA_SIZE = 127 * 1024 * 1024;
 static constexpr int64_t MAX_SA_DRAG_RECORD_SIZE  = 15 * 1024 * 1024 + 512 * 1024;
-
 constexpr const char *TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/udata";
 constexpr const char *TEMP_UNIFIED_DATA_SUFFIX = ".ud";
-constexpr const char *TEMP_UNIFIED_DATA_FLAG = "temp_udmf_file_flag";
-static constexpr int WITH_SUMMARY_FORMAT_VER = 1;
 static constexpr int64_t FILE_SIZE_OVERHEAD = 10 * 1024 * 1024;
 std::string UnifiedDataHelper::rootPath_ = "";
 
@@ -96,6 +93,16 @@ std::shared_ptr<UnifiedRecord> CreateTempFileRecord(const std::string &uri, cons
     for (auto &item : summary.summary) {
         details.insert(std::make_pair(item.first, item.second));
     }
+    if (!summary.filenameExtensions.empty()) {
+        std::string extensions;
+        for (const auto &ext : summary.filenameExtensions) {
+            if (!extensions.empty()) {
+                extensions += " ";
+            }
+            extensions += ext;
+        }
+        details.insert(std::make_pair(FILENAME_EXTENSIONS, extensions));
+    }
 
     auto object = std::make_shared<Object>();
     object->value_[UNIFORM_DATA_TYPE] = GENERAL_FILE_URI;
@@ -114,8 +121,6 @@ void CalRecordSummary(std::map<std::string, ValueType> &entry, Summary &summary)
 void FillSummaryFormat(const std::string &type, const std::string &utdId, Summary &summary);
 void ProcessTypeId(const ValueType &value, std::string &typeId);
 void UpgradeToParentType(std::string &typeId);
-std::string ExtractFileExtension(const std::string &uri);
-void FillFileExtensions(std::shared_ptr<UnifiedRecord> record, const std::string &typeId, Summary &summary);
 }
 
 void UnifiedDataHelper::SetRootPath(const std::string &rootPath)
@@ -182,24 +187,9 @@ void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
             continue;
         }
         CalRecordSummary(*record->GetEntries(), summary);
-
-        if (record->GetType() == UDType::FILE) {
-            auto entries = record->GetEntries();
-            if (entries == nullptr || entries->empty()) {
-                continue;
-            }
-
-            for (const auto &[utdId, value] : *entries) {
-                std::string typeId = utdId;
-                ProcessTypeId(value, typeId);
-                if (utdId == GENERAL_FILE_URI) {
-                    UpgradeToParentType(typeId);
-                }
-                FillFileExtensions(record, typeId, summary);
-            }
-        }
     }
-    summary.version = WITH_SUMMARY_FORMAT_VER;
+    summary.filenameExtensions = CollectFilenameExtensions(data);
+    summary.version = CURRENT_SUMMARY_VERSION;
     auto properties = data.GetProperties();
     if (properties != nullptr) {
         summary.tag = properties->tag;
@@ -409,72 +399,6 @@ void UpgradeToParentType(std::string &typeId)
         return;
     }
     typeId = "general.file"; // When utdId is general.file-uri, the default parent type is general.file.
-}
-
-std::string ExtractFileExtension(const std::string &uri)
-{
-    if (uri.empty()) {
-        return "";
-    }
-    size_t lastSlash = uri.find_last_of("/\\");
-    size_t lastDot = uri.find_last_of('.');
-
-    if (lastDot == std::string::npos || (lastSlash != std::string::npos && lastDot < lastSlash)) {
-        return "";
-    }
-
-    std::string extension = uri.substr(lastDot);
-    if (extension.length() <= 1) {
-        return "";
-    }
-
-    size_t queryPos = extension.find('?');
-    if (queryPos != std::string::npos) {
-        extension = extension.substr(0, queryPos);
-    }
-
-    size_t fragmentPos = extension.find('#');
-    if (fragmentPos != std::string::npos) {
-        extension = extension.substr(0, fragmentPos);
-    }
-
-    if (extension.length() <= 1) {
-        return "";
-    }
-
-    for (char &c : extension) {
-        if (c >= 'A' && c <= 'Z') {
-            c = c - 'A' + 'a';
-        }
-    }
-
-    return extension;
-}
-
-void FillFileExtensions(std::shared_ptr<UnifiedRecord> record, const std::string &typeId, Summary &summary)
-{
-    if (record == nullptr || record->GetType() != UDType::FILE) {
-        return;
-    }
-
-    std::string uri = GetFileUriFromRecord(record);
-    if (uri.empty()) {
-        return;
-    }
-
-    if (uri.find("file://") != 0) {
-        return;
-    }
-
-    std::string extension = ExtractFileExtension(uri);
-    if (extension.empty()) {
-        return;
-    }
-
-    auto &extensions = summary.typeToFileExtensions[typeId];
-    if (std::find(extensions.begin(), extensions.end(), extension) == extensions.end()) {
-        extensions.emplace_back(extension);
-    }
 }
 }
 

@@ -43,19 +43,18 @@ enum DataStatus : int32_t {
     FADE
 };
 
+constexpr int32_t SUMMARY_VERSION_FORMAT = 1;
+constexpr int32_t SUMMARY_VERSION_FILENAME_EXTENSIONS = 2;
+constexpr int32_t CURRENT_SUMMARY_VERSION = SUMMARY_VERSION_FILENAME_EXTENSIONS;
+
 struct Summary {
     std::map<std::string, int64_t> summary {};
     std::map<std::string, int64_t> specificSummary {};
     std::map<std::string, std::vector<int32_t>> summaryFormat {};
-    std::map<std::string, std::vector<std::string>> typeToFileExtensions {};
-    // If version value is 1, it means it contains the format variable;
-    // otherwise(not set or 0), it means it does not contain.
-    int32_t version {1};
+    int32_t version {SUMMARY_VERSION_FORMAT};
     int64_t totalSize {0};
     std::string tag;
-
-    std::vector<std::string> API_EXPORT GetFileExtensionsByType(const std::string &typeId) const;
-    std::vector<std::string> API_EXPORT GetAllFileExtensions() const;
+    std::vector<std::string> filenameExtensions {};
 };
 
 struct Privilege {

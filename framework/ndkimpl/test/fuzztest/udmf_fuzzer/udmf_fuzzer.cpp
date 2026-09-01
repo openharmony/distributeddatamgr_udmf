@@ -525,7 +525,6 @@ void CreateAndSetDataLoadInfoRecordFuzz(FuzzedDataProvider &provider)
     OH_UdmfDataLoadInfo_GetRecordCount(dataLoadInfo);
     OH_UdmfDataLoadInfo_Destroy(dataLoadInfo);
 }
-
 }
 
 /* Fuzzer entry point */

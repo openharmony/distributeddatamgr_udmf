@@ -16,7 +16,10 @@
 #ifndef UDMF_UNIFIED_DATA_HELPER_H
 #define UDMF_UNIFIED_DATA_HELPER_H
 
+#include <string>
 #include <sys/stat.h>
+#include <vector>
+
 #include "unified_data.h"
 #include "visibility.h"
 namespace OHOS {
@@ -40,6 +43,13 @@ private:
 private:
     static std::string rootPath_;
 };
+
+/*
+ * Collects the deduplicated, lowercase, leading-dot file name extensions from the
+ * file records (and their subtypes) of the given UnifiedData, preserving first
+ * occurrence order. Non-file records and non file:// URIs are ignored.
+ */
+std::vector<std::string> API_EXPORT CollectFilenameExtensions(const UnifiedData &data);
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_UNIFIED_DATA_HELPER_H

@@ -457,12 +457,13 @@ void ReadingSummaryFuzz(FuzzedDataProvider &provider)
     input.summary.emplace(provider.ConsumeRandomLengthString(), provider.ConsumeIntegral<int64_t>());
     input.summaryFormat.emplace(provider.ConsumeRandomLengthString(), std::vector<int32_t>());
     input.version = provider.ConsumeIntegral<int32_t>();
+    input.filenameExtensions.emplace_back(provider.ConsumeRandomLengthString());
     Summary output;
 
     TLVObject data(buffer);
     TLVHead head;
     TAG tag = static_cast<TAG>(provider.ConsumeIntegralInRange<uint16_t>(
-        static_cast<uint16_t>(TAG::TAG_BUTT) + 1, static_cast<uint16_t>(TAG::TAG_SUMMARY_VERSION) - 1));
+        static_cast<uint16_t>(TAG::TAG_BUTT) + 1, static_cast<uint16_t>(TAG::TAG_SUMMARY_FILENAME_EXTENSIONS)));
     TLVUtil::Writing(input, data, tag);
     TLVUtil::CountBufferSize(input, data);
     TLVUtil::ReadTlv(output, data, tag);

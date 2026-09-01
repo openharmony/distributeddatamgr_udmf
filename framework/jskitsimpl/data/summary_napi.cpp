@@ -114,7 +114,7 @@ napi_value SummaryNapi::GetFilenameExtensions(napi_env env, napi_callback_info i
     auto ctxt = std::make_shared<ContextBase>();
     auto summary = GetDataSummary(env, info, ctxt);
     ASSERT_ERR(ctxt->env, (summary != nullptr && summary->value_ != nullptr), Status::E_ERROR, "invalid object!");
-    ctxt->status = NapiDataUtils::SetValue(env, summary->value_->GetAllFileExtensions(), ctxt->output);
+    ctxt->status = NapiDataUtils::SetValue(env, summary->value_->filenameExtensions, ctxt->output);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set filename extensions failed!");
     return ctxt->output;
 }

@@ -36,6 +36,7 @@
 #include "system_defined_pixelmap.h"
 #include "udmf_async_client.h"
 #include "udmf_executor.h"
+#include "unified_data_helper.h"
 #include "unified_types.h"
 
 using namespace OHOS;
@@ -809,6 +810,7 @@ void IsAppropriateTypeFuzz(FuzzedDataProvider &provider)
     summary.version = provider.ConsumeIntegral<uint32_t>();
     UdmfClient::GetInstance().IsAppropriateType(summary, allowTypes);
 }
+
 }
 
 /* Fuzzer entry point */
