@@ -386,6 +386,25 @@ describe('UdmfJSTest', function () {
   });
 
   /**
+   * @tc.name UnifiedRecordConstruct005
+   * @tc.desc Test UnifiedRecord constructor with empty type
+   * @tc.type: FUNC
+   * @tc.require:
+   */
+  it('UnifiedRecordConstruct005', 0, function () {
+    const TAG = 'UnifiedRecordConstruct005';
+    console.info(TAG, 'start');
+    try {
+      new UDC.UnifiedRecord('', null);
+      expect(null).assertFail();
+    } catch (e) {
+      console.info(TAG, `get e. code is ${e.code},message is ${e.message} `);
+      expect(e.code).assertEqual(ERROR_PARAMETER);
+    }
+    console.info(TAG, 'end');
+  });
+
+  /**
    * @tc.name UDSTest001
    * @tc.desc
    * @tc.type: FUNC
@@ -1269,6 +1288,7 @@ describe('UdmfJSTest', function () {
         let systemDefinedValue = 'systemDefinedValue';
         let record = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
         record.addEntry(undefined, systemDefinedValue);
+        expect(null).assertFail();
       } catch (e) {
         console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
         expect(e.code === ERROR_PARAMETER).assertTrue();
@@ -1278,10 +1298,23 @@ describe('UdmfJSTest', function () {
         let systemDefinedValue = 'systemDefinedValue';
         let record = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
         record.addEntry(null, systemDefinedValue);
+        expect(null).assertFail();
       } catch (e) {
         console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
         expect(e.code === ERROR_PARAMETER).assertTrue();
       }
+      let plaintextValue = 'plaintextValue';
+      let record = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+      try {
+        record.addEntry('', null);
+        expect(null).assertFail();
+      } catch (e) {
+        console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+        expect(e.code).assertEqual(ERROR_PARAMETER);
+      }
+      let types = record.getTypes();
+      expect(types.length).assertEqual(1);
+      expect(types.includes(UTD.UniformDataType.PLAIN_TEXT)).assertTrue();
       console.info(TAG, 'end');
     });
   
@@ -1300,6 +1333,7 @@ describe('UdmfJSTest', function () {
         let record = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
         record.addEntry('openharmony.app-item', systemDefinedValue);
         record.getEntry(undefined);
+        expect(null).assertFail();
       } catch (e) {
         console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
         expect(e.code === ERROR_PARAMETER).assertTrue();
@@ -1310,10 +1344,23 @@ describe('UdmfJSTest', function () {
         let record = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
         record.addEntry('openharmony.app-item', systemDefinedValue);
         record.getEntry(null);
+        expect(null).assertFail();
       } catch (e) {
         console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
         expect(e.code === ERROR_PARAMETER).assertTrue();
       }
+      let plaintextValue = 'plaintextValue';
+      let systemDefinedValue = 'systemDefinedValue';
+      let record = new UDC.UnifiedRecord(UTD.UniformDataType.PLAIN_TEXT, plaintextValue);
+      record.addEntry('openharmony.app-item', systemDefinedValue);
+      try {
+        record.getEntry('');
+        expect(null).assertFail();
+      } catch (e) {
+        console.error(TAG, `get e. code is ${e.code},message is ${e.message} `);
+        expect(e.code).assertEqual(ERROR_PARAMETER);
+      }
+      expect(record.getEntry('openharmony.app-item')).assertEqual(systemDefinedValue);
       console.info(TAG, 'end');
     });
 
