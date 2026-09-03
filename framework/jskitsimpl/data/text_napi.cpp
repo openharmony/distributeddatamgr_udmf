@@ -56,10 +56,10 @@ void TextNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "TextNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *text = new (std::nothrow) TextNapi();
-    ASSERT_ERR_VOID(env, text != nullptr, Status::E_ERROR, "no memory for text!");
+    TextNapi *text = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&text)));
+    ASSERT_ERR_VOID(env, text != nullptr, Status::E_ERROR, "unwrap text failed!");
     text->value_ = std::static_pointer_cast<Text>(in);
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, text, Destructor, nullptr, nullptr), text);
 }
 
 void TextNapi::Destructor(napi_env env, void *data, void *hint)

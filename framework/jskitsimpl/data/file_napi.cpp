@@ -60,10 +60,10 @@ void FileNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "FileNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *file = new (std::nothrow) FileNapi();
-    ASSERT_ERR_VOID(env, file != nullptr, Status::E_ERROR, "no memory for file!");
+    FileNapi *file = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&file)));
+    ASSERT_ERR_VOID(env, file != nullptr, Status::E_ERROR, "unwrap file failed!");
     file->value_ = std::static_pointer_cast<File>(in);
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, file, Destructor, nullptr, nullptr), file);
 }
 
 void FileNapi::Destructor(napi_env env, void *data, void *hint)

@@ -64,10 +64,10 @@ void SystemDefinedAppItemNapi::NewInstance(napi_env env, std::shared_ptr<Unified
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedAppItemNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *sdAppItem = new (std::nothrow) SystemDefinedAppItemNapi();
-    ASSERT_ERR_VOID(env, sdAppItem != nullptr, Status::E_ERROR, "no memory for system defined appitem!");
+    SystemDefinedAppItemNapi *sdAppItem = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&sdAppItem)));
+    ASSERT_ERR_VOID(env, sdAppItem != nullptr, Status::E_ERROR, "unwrap system defined appitem failed!");
     sdAppItem->value_ = std::static_pointer_cast<SystemDefinedAppItem>(in);
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, sdAppItem, Destructor, nullptr, nullptr), sdAppItem);
 }
 
 void SystemDefinedAppItemNapi::Destructor(napi_env env, void *data, void *hint)

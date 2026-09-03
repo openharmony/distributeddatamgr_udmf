@@ -63,10 +63,10 @@ void HtmlNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "HtmlNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *html = new (std::nothrow) HtmlNapi();
-    ASSERT_ERR_VOID(env, html != nullptr, Status::E_ERROR, "no memory for html!");
+    HtmlNapi *html = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&html)));
+    ASSERT_ERR_VOID(env, html != nullptr, Status::E_ERROR, "unwrap html failed!");
     html->value_ = std::static_pointer_cast<Html>(in);
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, html, Destructor, nullptr, nullptr), html);
 }
 
 void HtmlNapi::Destructor(napi_env env, void *data, void *hint)

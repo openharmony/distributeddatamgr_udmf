@@ -61,10 +61,10 @@ void FolderNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, na
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "FolderNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *folder = new (std::nothrow) FolderNapi();
-    ASSERT_ERR_VOID(env, folder != nullptr, Status::E_ERROR, "no memory for folder!");
+    FolderNapi *folder = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&folder)));
+    ASSERT_ERR_VOID(env, folder != nullptr, Status::E_ERROR, "unwrap folder failed!");
     folder->value_ = std::static_pointer_cast<Folder>(in);
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, folder, Destructor, nullptr, nullptr), folder);
 }
 
 void FolderNapi::Destructor(napi_env env, void *data, void *hint)
