@@ -88,13 +88,15 @@ int32_t FileCopyManager::CopyDirFunc(const std::string &src, const std::string &
 }
 
 int32_t FileCopyManager::CopySubDir(const std::string &srcPath,
-    const std::string &destPath, std::shared_ptr<FileInfos> infos)
+    const std::string &destPath, std::shared_ptr<FileInfos> infos,
+    std::unordered_set<ino_t> &visitedInodes, int32_t depth)
 {
     return 0;
 }
 
 int32_t FileCopyManager::RecurCopyDir(const std::string &srcPath,
-    const std::string &destPath, std::shared_ptr<FileInfos> infos)
+    const std::string &destPath, std::shared_ptr<FileInfos> infos,
+    std::unordered_set<ino_t> &visitedInodes, int32_t depth)
 {
     return 0;
 }
