@@ -58,10 +58,10 @@ void SummaryNapi::NewInstance(napi_env env, std::shared_ptr<Summary> in, napi_va
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *summary = new (std::nothrow) SummaryNapi();
-    ASSERT_ERR_VOID(env, summary != nullptr, Status::E_ERROR, "no memory for summary!");
+    SummaryNapi *summary = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&summary)));
+    ASSERT_ERR_VOID(env, summary != nullptr, Status::E_ERROR, "unwrap summary failed!");
     summary->value_ = in;
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, summary, Destructor, nullptr, nullptr), summary);
 }
 
 SummaryNapi *SummaryNapi::GetDataSummary(napi_env env, napi_callback_info info, std::shared_ptr<ContextBase> ctxt)

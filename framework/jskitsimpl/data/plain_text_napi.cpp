@@ -60,10 +60,10 @@ void PlainTextNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in,
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "PlainTextNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *plainText = new (std::nothrow) PlainTextNapi();
-    ASSERT_ERR_VOID(env, plainText != nullptr, Status::E_ERROR, "no memory for plain text!");
+    PlainTextNapi *plainText = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&plainText)));
+    ASSERT_ERR_VOID(env, plainText != nullptr, Status::E_ERROR, "unwrap plain text failed!");
     plainText->value_ = std::static_pointer_cast<PlainText>(in);
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, plainText, Destructor, nullptr, nullptr), plainText);
 }
 
 void PlainTextNapi::Destructor(napi_env env, void *data, void *hint)

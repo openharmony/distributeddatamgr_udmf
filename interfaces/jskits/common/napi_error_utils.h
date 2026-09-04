@@ -68,6 +68,7 @@ napi_value GenerateErrorMsg(napi_env env, NapiErrorCode jsInfo);
     do {                                                         \
         if (!(assertion)) {                                      \
             (ctxt)->isThrowError = true;                         \
+            (ctxt)->status = napi_pending_exception;             \
             ThrowNapiError((ctxt)->env, errorcode, message);     \
             return;                                              \
         }                                                        \
@@ -77,6 +78,7 @@ napi_value GenerateErrorMsg(napi_env env, NapiErrorCode jsInfo);
     do {                                                               \
         if (!(assertion)) {                                            \
             (ctxt)->isThrowError = true;                               \
+            (ctxt)->status = napi_pending_exception;                   \
             ThrowNapiError((ctxt)->env, errorCode, message, false);    \
             return nullptr;                                            \
         }                                                              \

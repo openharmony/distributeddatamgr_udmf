@@ -63,10 +63,10 @@ void SystemDefinedFormNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRec
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedFormNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *sdForm = new (std::nothrow) SystemDefinedFormNapi();
-    ASSERT_ERR_VOID(env, sdForm != nullptr, Status::E_ERROR, "no memory for system defined form!");
+    SystemDefinedFormNapi *sdForm = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&sdForm)));
+    ASSERT_ERR_VOID(env, sdForm != nullptr, Status::E_ERROR, "unwrap system defined form failed!");
     sdForm->value_ = std::static_pointer_cast<SystemDefinedForm>(in);
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, sdForm, Destructor, nullptr, nullptr), sdForm);
 }
 
 void SystemDefinedFormNapi::Destructor(napi_env env, void *data, void *hint)

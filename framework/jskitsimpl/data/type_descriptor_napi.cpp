@@ -65,10 +65,10 @@ void TypeDescriptorNapi::NewInstance(napi_env env, std::shared_ptr<TypeDescripto
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "TypeDescriptorNapi create NewInstance");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    TypeDescriptorNapi *descriptorNapi = new (std::nothrow) TypeDescriptorNapi();
-    ASSERT_ERR_VOID(env, descriptorNapi != nullptr, Status::E_ERROR, "no memory for typeDescriptorNapi!");
+    TypeDescriptorNapi *descriptorNapi = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&descriptorNapi)));
+    ASSERT_ERR_VOID(env, descriptorNapi != nullptr, Status::E_ERROR, "unwrap typeDescriptorNapi failed!");
     descriptorNapi->value_ = in;
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, descriptorNapi, Destructor, nullptr, nullptr), descriptorNapi);
 }
 
 TypeDescriptorNapi *TypeDescriptorNapi::GetDescriptorNapi(napi_env env, napi_callback_info info,

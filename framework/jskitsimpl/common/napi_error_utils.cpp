@@ -70,6 +70,11 @@ void ThrowNapiError(napi_env env, int32_t status, const std::string &errMessage,
     if (status == Status::E_OK) {
         return;
     }
+    bool isPending = false;
+    napi_status napiStatus = napi_is_exception_pending(env, &isPending);
+    if (napiStatus == napi_ok && isPending) {
+        return;
+    }
     auto errorMsg = GetErrorCode(status);
     NapiErrorCode napiError;
     if (errorMsg.has_value()) {

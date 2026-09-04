@@ -61,10 +61,10 @@ void AudioNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, nap
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "AudioNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *audio = new (std::nothrow) AudioNapi();
-    ASSERT_ERR_VOID(env, audio != nullptr, Status::E_ERROR, "no memory for audio!");
+    AudioNapi *audio = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&audio)));
+    ASSERT_ERR_VOID(env, audio != nullptr, Status::E_ERROR, "unwrap audio failed!");
     audio->value_ = std::static_pointer_cast<Audio>(in);
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, audio, Destructor, nullptr, nullptr), audio);
 }
 
 void AudioNapi::Destructor(napi_env env, void *data, void *hint)

@@ -59,10 +59,10 @@ void SystemDefinedPixelMapNapi::NewInstance(napi_env env, std::shared_ptr<Unifie
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "SystemDefinedPixelMapNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *sdPixelMap = new (std::nothrow) SystemDefinedPixelMapNapi();
-    ASSERT_ERR_VOID(env, sdPixelMap != nullptr, Status::E_ERROR, "no memory for system defined pixel map!");
+    SystemDefinedPixelMapNapi *sdPixelMap = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&sdPixelMap)));
+    ASSERT_ERR_VOID(env, sdPixelMap != nullptr, Status::E_ERROR, "unwrap system defined pixel map failed!");
     sdPixelMap->value_ = std::static_pointer_cast<SystemDefinedPixelMap>(in);
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, sdPixelMap, Destructor, nullptr, nullptr), sdPixelMap);
 }
 
 void SystemDefinedPixelMapNapi::Destructor(napi_env env, void *data, void *hint)

@@ -189,10 +189,10 @@ void UnifiedRecordNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord>
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "UnifiedRecordNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *record = new (std::nothrow) UnifiedRecordNapi();
-    ASSERT_ERR_VOID(env, record != nullptr, Status::E_ERROR, "no memory for unified record");
+    UnifiedRecordNapi *record = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&record)));
+    ASSERT_ERR_VOID(env, record != nullptr, Status::E_ERROR, "unwrap unified record failed!");
     record->value_ = in;
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, record, Destructor, nullptr, nullptr), record);
 }
 
 void UnifiedRecordNapi::Destructor(napi_env env, void *data, void *hint)

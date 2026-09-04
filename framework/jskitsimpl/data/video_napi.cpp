@@ -61,10 +61,10 @@ void VideoNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, nap
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "VideoNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *video = new (std::nothrow) VideoNapi();
-    ASSERT_ERR_VOID(env, video != nullptr, Status::E_ERROR, "no memory for video!");
+    VideoNapi *video = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&video)));
+    ASSERT_ERR_VOID(env, video != nullptr, Status::E_ERROR, "unwrap video failed!");
     video->value_ = std::static_pointer_cast<Video>(in);
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, video, Destructor, nullptr, nullptr), video);
 }
 
 void VideoNapi::Destructor(napi_env env, void *data, void *hint)

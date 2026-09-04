@@ -61,10 +61,10 @@ void LinkNapi::NewInstance(napi_env env, std::shared_ptr<UnifiedRecord> in, napi
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "LinkNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *link = new (std::nothrow) LinkNapi();
-    ASSERT_ERR_VOID(env, link != nullptr, Status::E_ERROR, "no memory for link!");
+    LinkNapi *link = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&link)));
+    ASSERT_ERR_VOID(env, link != nullptr, Status::E_ERROR, "unwrap link failed!");
     link->value_ = std::static_pointer_cast<Link>(in);
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, link, Destructor, nullptr, nullptr), link);
 }
 
 void LinkNapi::Destructor(napi_env env, void *data, void *hint)

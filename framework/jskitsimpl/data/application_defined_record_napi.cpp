@@ -58,10 +58,10 @@ void ApplicationDefinedRecordNapi::NewInstance(napi_env env, std::shared_ptr<Uni
 {
     LOG_DEBUG(UDMF_KITS_NAPI, "ApplicationDefinedRecordNapi");
     ASSERT_CALL_VOID(env, napi_new_instance(env, Constructor(env), 0, nullptr, &out));
-    auto *record = new (std::nothrow) ApplicationDefinedRecordNapi();
-    ASSERT_ERR_VOID(env, record != nullptr, Status::E_ERROR, "no memory for application defined record!");
+    ApplicationDefinedRecordNapi *record = nullptr;
+    ASSERT_CALL_VOID(env, napi_unwrap(env, out, reinterpret_cast<void **>(&record)));
+    ASSERT_ERR_VOID(env, record != nullptr, Status::E_ERROR, "unwrap application defined record failed!");
     record->value_ = std::static_pointer_cast<ApplicationDefinedRecord>(in);
-    ASSERT_CALL_DELETE(env, napi_wrap(env, out, record, Destructor, nullptr, nullptr), record);
 }
 
 void ApplicationDefinedRecordNapi::Destructor(napi_env env, void *data, void *hint)
