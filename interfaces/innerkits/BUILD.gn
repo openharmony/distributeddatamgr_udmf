@@ -309,6 +309,7 @@ ohos_shared_library("xml_wrapper") {
   deps = []
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "hilog:libhilog",
     "libxml2:libxml2",
