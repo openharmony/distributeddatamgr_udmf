@@ -863,7 +863,7 @@ HWTEST_F(TlvUtilTest, ReadingSummaryMissingExtensionsTag001, TestSize.Level1)
 
     tlvObject.ResetCursor();
     Summary output;
-    EXPECT_FALSE(TLVUtil::ReadTlv(output, tlvObject, TAG::TAG_SUMMARY));
+    EXPECT_TRUE(TLVUtil::ReadTlv(output, tlvObject, TAG::TAG_SUMMARY));
     LOG_INFO(UDMF_TEST, "ReadingSummaryMissingExtensionsTag001 end.");
 }
 

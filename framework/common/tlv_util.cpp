@@ -1147,16 +1147,6 @@ template <> bool Writing(const Summary &input, TLVObject &data, TAG tag)
     return data.WriteBackHead(static_cast<uint16_t>(tag), tagCursor, data.GetCursor() - tagCursor - sizeof(TLVHead));
 }
 
-static bool CheckSummaryExtensionConsistency(int32_t version, bool hasExtensionsTag)
-{
-    // version >= 2 implies filenameExtensions must be present; missing tag means inconsistent data.
-    if (version >= SUMMARY_VERSION_FILENAME_EXTENSIONS && !hasExtensionsTag) {
-        LOG_ERROR(UDMF_FRAMEWORK, "Summary version is %{public}d but filenameExtensions tag is missing", version);
-        return false;
-    }
-    return true;
-}
-
 template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
 {
     CHECK_RECURSIVE_GUARD();
@@ -1165,7 +1155,6 @@ template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
         return false;
     }
     auto endCursor = data.GetCursor() + head.len;
-    bool hasExtensionsTag = false;
     while (data.GetCursor() < endCursor) {
         TLVHead headItem{};
         if (!data.ReadHead(headItem)) {
@@ -1193,16 +1182,12 @@ template <> bool Reading(Summary &output, TLVObject &data, const TLVHead &head)
                 }
                 break;
             case static_cast<uint16_t>(TAG::TAG_SUMMARY_FILENAME_EXTENSIONS):
-                hasExtensionsTag = true;
                 if (!TLVUtil::Reading(output.filenameExtensions, data, headItem)) {
                     return false;
                 }
                 break;
             case static_cast<uint16_t>(TAG::TAG_SUMMARY_VERSION):
                 if (!data.ReadBasic(output.version, headItem)) {
-                    return false;
-                }
-                if (!CheckSummaryExtensionConsistency(output.version, hasExtensionsTag)) {
                     return false;
                 }
                 break;

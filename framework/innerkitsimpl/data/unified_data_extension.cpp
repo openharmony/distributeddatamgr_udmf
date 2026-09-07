@@ -13,17 +13,23 @@
  * limitations under the License.
  */
 
-#include "unified_data_helper.h"
+#define LOG_TAG "UnifiedDataExtension"
+#include "unified_data_extension.h"
 
 #include <algorithm>
+#include <cctype>
 #include <iterator>
 
+#include "logger.h"
 #include "unified_meta.h"
 #include "unified_record.h"
 
 namespace OHOS {
 namespace UDMF {
 namespace {
+constexpr UDType FILE_SUMMARY_TYPES[] = { FILE, AUDIO, FOLDER, IMAGE, VIDEO };
+constexpr size_t MAX_FILENAME_EXTENSION_SIZE = 127;
+
 std::shared_ptr<Object> GetObjectFromRecord(const std::shared_ptr<UnifiedRecord> &record)
 {
     if (record == nullptr) {
@@ -68,10 +74,9 @@ bool HasTempUnifiedDataFlag(const std::shared_ptr<UnifiedRecord> &record)
         return false;
     }
     auto details = ObjectUtils::ConvertToUDDetails(detailsObj);
-    return details.find(TEMP_UNIFIED_DATA_FLAG) != details.end();
+    bool hasFlag = details.find(TEMP_UNIFIED_DATA_FLAG) != details.end();
+    return hasFlag;
 }
-
-constexpr UDType FILE_SUMMARY_TYPES[] = { FILE, AUDIO, FOLDER, IMAGE, VIDEO };
 
 std::string ExtractFileExtension(const std::string &uri)
 {
@@ -80,48 +85,47 @@ std::string ExtractFileExtension(const std::string &uri)
     }
 
     std::string path = uri;
-    size_t queryPos = path.find('?');
-    if (queryPos != std::string::npos) {
-        path = path.substr(0, queryPos);
-    }
-    size_t fragmentPos = path.find('#');
-    if (fragmentPos != std::string::npos) {
-        path = path.substr(0, fragmentPos);
-    }
 
-    size_t lastSlash = path.find_last_of("/\\");
-    std::string filename = (lastSlash == std::string::npos) ? path : path.substr(lastSlash + 1);
-    if (filename.empty()) {
+    auto posQuery = path.find_first_of("?#");
+    if (posQuery != std::string::npos) {
+        path = path.substr(0, posQuery);
+    }
+    auto posSlash = path.find_last_of("/\\");
+    std::string fileName = (posSlash == std::string::npos) ? path : path.substr(posSlash + 1);
+    if (fileName.empty()) {
         return "";
     }
-
-    size_t lastDot = filename.find_last_of('.');
-    if (lastDot == std::string::npos || lastDot == 0 || lastDot == filename.length() - 1) {
+    auto posDot = fileName.find_last_of('.');
+    if (posDot == std::string::npos || posDot == 0 || posDot + 1 >= fileName.size() ||
+        fileName.size() - posDot > MAX_FILENAME_EXTENSION_SIZE) {
         return "";
     }
-
-    std::string extension = filename.substr(lastDot);
-    for (char &c : extension) {
-        if (c >= 'A' && c <= 'Z') {
-            c = c - 'A' + 'a';
-        }
-    }
+    std::string extension = fileName.substr(posDot);
+    std::transform(extension.begin(), extension.end(), extension.begin(),
+        [] (unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
     return extension;
 }
 } // namespace
 
-std::vector<std::string> API_EXPORT CollectFilenameExtensions(const UnifiedData &data)
+std::vector<std::string> CollectFilenameExtensions(const UnifiedData &data)
 {
     std::vector<std::string> result;
     for (const auto &record : data.GetRecords()) {
-        if (record == nullptr
-            || std::find(std::begin(FILE_SUMMARY_TYPES), std::end(FILE_SUMMARY_TYPES), record->GetType())
-                == std::end(FILE_SUMMARY_TYPES)
-            || HasTempUnifiedDataFlag(record)) {
+        if (record == nullptr) {
+            continue;
+        }
+        if (std::find(std::begin(FILE_SUMMARY_TYPES), std::end(FILE_SUMMARY_TYPES), record->GetType())
+            == std::end(FILE_SUMMARY_TYPES)) {
+            continue;
+        }
+        if (HasTempUnifiedDataFlag(record)) {
             continue;
         }
         std::string uri = GetFileUriFromRecord(record);
-        if (uri.empty() || uri.find("file://") != 0) {
+        if (uri.empty()) {
+            continue;
+        }
+        if (uri.find("file://") != 0) {
             continue;
         }
         std::string extension = ExtractFileExtension(uri);

@@ -558,6 +558,26 @@ HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_EdgeCases001, Test
 }
 
 /**
+ * @tc.name: GetSummary_FilenameExtensions_TooLong001
+ * @tc.desc: Test extension exceeding max length returns empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_TooLong001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_TooLong001 begin.");
+    UnifiedData data;
+    std::string longExt(200, 'x');
+    auto file = std::make_shared<File>("file:///data/test." + longExt);
+    data.AddRecord(file);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_TRUE(extensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_TooLong001 end.");
+}
+
+/**
  * @tc.name: GetSummary_FilenameExtensions_QueryFragment001
  * @tc.desc: Test query and fragment do not affect the extension
  * @tc.type: FUNC

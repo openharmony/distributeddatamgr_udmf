@@ -4637,7 +4637,388 @@ HWTEST_F(UdmfClientTest, GetSummary006, TestSize.Level1)
 }
 
 /**
-* @tc.name: HtmlData001
+ * @tc.name: GetSummary_FilenameExtensions_NormalFile001
+ * @tc.desc: Set normal file records with filename extensions and get summary to verify filenameExtensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetSummary_FilenameExtensions_NormalFile001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_NormalFile001 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    auto file1 = std::make_shared<File>("file:///data/test.jpg");
+    auto file2 = std::make_shared<File>("file:///data/test2.png");
+    data.AddRecord(file1);
+    data.AddRecord(file2);
+
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption query = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(query, summary);
+    ASSERT_EQ(status, E_OK);
+
+    auto extensions = summary.filenameExtensions;
+    EXPECT_EQ(extensions.size(), 2);
+    if (extensions.size() == 2) {
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".jpg"), extensions.end());
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".png"), extensions.end());
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_NormalFile001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_LargeFile001
+ * @tc.desc: Set a large file record that is packed to a temp file and get summary to verify filenameExtensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetSummary_FilenameExtensions_LargeFile001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_LargeFile001 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    auto file = std::make_shared<File>("file:///data/large.jpg");
+    UDDetails details;
+    std::string largeValue(17 * 1024 * 1024, 'x');
+    details.insert({ "udmf_key", largeValue });
+    file->SetDetails(details);
+    data.AddRecord(file);
+
+    std::string key;
+    UnifiedDataHelper::SetRootPath("/data/udmf_test/");
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption query = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(query, summary);
+    UnifiedDataHelper::SetRootPath("");
+
+    ASSERT_EQ(status, E_OK);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_EQ(extensions.size(), 1);
+    if (!extensions.empty()) {
+        EXPECT_EQ(extensions[0], ".jpg");
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_LargeFile001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_MultiTypes001
+ * @tc.desc: Set every file subtype with distinct extensions and verify all are collected
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetSummary_FilenameExtensions_MultiTypes001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_MultiTypes001 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    data.AddRecord(std::make_shared<File>("file:///data/a.jpg"));
+    data.AddRecord(std::make_shared<Image>("file:///data/b.png"));
+    data.AddRecord(std::make_shared<Audio>("file:///data/c.mp3"));
+    data.AddRecord(std::make_shared<Video>("file:///data/d.mp4"));
+    data.AddRecord(std::make_shared<Folder>("file:///data/e.zip"));
+
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption query = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(query, summary);
+    ASSERT_EQ(status, E_OK);
+
+    auto extensions = summary.filenameExtensions;
+    EXPECT_EQ(extensions.size(), 5);
+    if (extensions.size() == 5) {
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".jpg"), extensions.end());
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".png"), extensions.end());
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".mp3"), extensions.end());
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".mp4"), extensions.end());
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".zip"), extensions.end());
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_MultiTypes001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_CaseAndDedup001
+ * @tc.desc: Different cases of the same extension are lowercased and deduplicated
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetSummary_FilenameExtensions_CaseAndDedup001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_CaseAndDedup001 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    data.AddRecord(std::make_shared<File>("file:///data/test.JPG"));
+    data.AddRecord(std::make_shared<File>("file:///data/test2.jpg"));
+    data.AddRecord(std::make_shared<File>("file:///data/photo.PNG"));
+
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption query = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(query, summary);
+    ASSERT_EQ(status, E_OK);
+
+    auto extensions = summary.filenameExtensions;
+    EXPECT_EQ(extensions.size(), 2);
+    if (extensions.size() == 2) {
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".jpg"), extensions.end());
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".png"), extensions.end());
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_CaseAndDedup001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_MultiDot001
+ * @tc.desc: File with multiple dots returns the last extension
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetSummary_FilenameExtensions_MultiDot001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_MultiDot001 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    data.AddRecord(std::make_shared<File>("file:///data/archive.tar.gz"));
+
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption query = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(query, summary);
+    ASSERT_EQ(status, E_OK);
+
+    auto extensions = summary.filenameExtensions;
+    EXPECT_EQ(extensions.size(), 1);
+    if (!extensions.empty()) {
+        EXPECT_EQ(extensions[0], ".gz");
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_MultiDot001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_EdgeCases001
+ * @tc.desc: Hidden file, file without dot and trailing dot yield no extension
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetSummary_FilenameExtensions_EdgeCases001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_EdgeCases001 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    data.AddRecord(std::make_shared<File>("file:///data/.profile"));
+    data.AddRecord(std::make_shared<File>("file:///data/README"));
+    data.AddRecord(std::make_shared<File>("file:///data/name."));
+
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption query = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(query, summary);
+    ASSERT_EQ(status, E_OK);
+
+    EXPECT_TRUE(summary.filenameExtensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_EdgeCases001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_NonFile001
+ * @tc.desc: Non-file records do not yield any extension
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetSummary_FilenameExtensions_NonFile001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_NonFile001 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    data.AddRecord(std::make_shared<PlainText>("content", "abstract"));
+    data.AddRecord(std::make_shared<Html>("<p>html</p>", "plain"));
+
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption query = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(query, summary);
+    ASSERT_EQ(status, E_OK);
+
+    EXPECT_TRUE(summary.filenameExtensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_NonFile001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_NonLocalUri001
+ * @tc.desc: Non file:// urn is ignored and yields no extension
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetSummary_FilenameExtensions_NonLocalUri001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_NonLocalUri001 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    data.AddRecord(std::make_shared<File>("http://example.com/test.jpg"));
+
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption query = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(query, summary);
+    ASSERT_EQ(status, E_OK);
+
+    EXPECT_TRUE(summary.filenameExtensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_NonLocalUri001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_TooLong001
+ * @tc.desc: Extension exceeding max length yields no extension
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetSummary_FilenameExtensions_TooLong001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_TooLong001 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    std::string longExt(200, 'x');
+    data.AddRecord(std::make_shared<File>("file:///data/test." + longExt));
+
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption query = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(query, summary);
+    ASSERT_EQ(status, E_OK);
+
+    EXPECT_TRUE(summary.filenameExtensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_TooLong001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_QueryFragment001
+ * @tc.desc: Query and fragment in the uri do not affect the extension
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetSummary_FilenameExtensions_QueryFragment001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_QueryFragment001 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    data.AddRecord(std::make_shared<File>("file:///data/photo.png?x=.jpg#y"));
+
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption query = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(query, summary);
+    ASSERT_EQ(status, E_OK);
+
+    auto extensions = summary.filenameExtensions;
+    EXPECT_EQ(extensions.size(), 1);
+    if (!extensions.empty()) {
+        EXPECT_EQ(extensions[0], ".png");
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_QueryFragment001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_QueryFragment_Multi001
+ * @tc.desc: Multiple uris with query and fragment strip them and dedup extensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetSummary_FilenameExtensions_QueryFragment_Multi001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_QueryFragment_Multi001 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    data.AddRecord(std::make_shared<File>("file:///data/photo.png?x=.jpg#y"));
+    data.AddRecord(std::make_shared<File>("file:///data/report.pdf?page=2#sec"));
+    data.AddRecord(std::make_shared<File>("file:///data/avatar.JPG?size=100"));
+    data.AddRecord(std::make_shared<File>("file:///data/pic.jpg?raw=1"));
+
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption query = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(query, summary);
+    ASSERT_EQ(status, E_OK);
+
+    auto extensions = summary.filenameExtensions;
+    EXPECT_EQ(extensions.size(), 3);
+    if (extensions.size() == 3) {
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".png"), extensions.end());
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".pdf"), extensions.end());
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".jpg"), extensions.end());
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_QueryFragment_Multi001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_FileSubclass_QueryFragment001
+ * @tc.desc: File subclass records with query and fragment yield their real extensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfClientTest, GetSummary_FilenameExtensions_FileSubclass_QueryFragment001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_FileSubclass_QueryFragment001 begin.");
+
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData data;
+    data.AddRecord(std::make_shared<Image>("file:///data/a.png?x=.jpg#y"));
+    data.AddRecord(std::make_shared<Audio>("file:///data/b.mp3?rate=128"));
+    data.AddRecord(std::make_shared<Video>("file:///data/c.mp4#t=10"));
+    data.AddRecord(std::make_shared<Folder>("file:///data/d.zip?x=1"));
+
+    std::string key;
+    auto status = UdmfClient::GetInstance().SetData(option, data, key);
+    ASSERT_EQ(status, E_OK);
+
+    QueryOption query = { .key = key };
+    Summary summary;
+    status = UdmfClient::GetInstance().GetSummary(query, summary);
+    ASSERT_EQ(status, E_OK);
+
+    auto extensions = summary.filenameExtensions;
+    EXPECT_EQ(extensions.size(), 4);
+    if (extensions.size() == 4) {
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".png"), extensions.end());
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".mp3"), extensions.end());
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".mp4"), extensions.end());
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".zip"), extensions.end());
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_FileSubclass_QueryFragment001 end.");
+}
+
+/**
+ * @tc.name: HtmlData001
 * @tc.desc: test html record process
 * @tc.type: FUNC
 */

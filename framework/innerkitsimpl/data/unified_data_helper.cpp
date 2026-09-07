@@ -26,6 +26,7 @@
 #include "udmf_conversion.h"
 #include "udmf_meta.h"
 #include "udmf_utils.h"
+#include "unified_data_extension.h"
 #include "utd_client.h"
 
 namespace OHOS {

@@ -1403,11 +1403,6 @@ OH_UdmfSummary* OH_UdmfSummary_Create()
     }
 
     summary->summary_ = std::make_shared<Summary>();
-    if (summary->summary_ == nullptr) {
-        LOG_ERROR(UDMF_CAPI, "Memory allocation failed.");
-        delete summary;
-        return nullptr;
-    }
     return summary;
 }
 
@@ -1494,6 +1489,8 @@ int OH_Udmf_GetSummary(OH_UdmfOptions* options, OH_UdmfSummary* summary)
     QueryOption query = {.key = options->key, .intention = Intention::UD_INTENTION_DRAG};
     Status ret = UdmfClient::GetInstance().GetSummary(query, *summary->summary_);
     if (ret != E_OK) {
+        summary->overviewTypePtrs_.clear();
+        summary->filenameExtensionPtrs_.clear();
         LOG_ERROR(UDMF_CAPI, "Get summary error, ret = %{public}d", ret);
         return UDMF_ERR;
     }
