@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace UDMF {
-namespace {
 constexpr UDType FILE_SUMMARY_TYPES[] = { FILE, AUDIO, FOLDER, IMAGE, VIDEO };
 constexpr size_t MAX_FILENAME_EXTENSION_SIZE = 127;
 
@@ -74,8 +73,7 @@ bool HasTempUnifiedDataFlag(const std::shared_ptr<UnifiedRecord> &record)
         return false;
     }
     auto details = ObjectUtils::ConvertToUDDetails(detailsObj);
-    bool hasFlag = details.find(TEMP_UNIFIED_DATA_FLAG) != details.end();
-    return hasFlag;
+    return details.find(TEMP_UNIFIED_DATA_FLAG) != details.end();
 }
 
 std::string ExtractFileExtension(const std::string &uri)
@@ -105,7 +103,6 @@ std::string ExtractFileExtension(const std::string &uri)
         [] (unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
     return extension;
 }
-} // namespace
 
 std::vector<std::string> CollectFilenameExtensions(const UnifiedData &data)
 {

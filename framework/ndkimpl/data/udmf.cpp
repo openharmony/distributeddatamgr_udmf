@@ -1439,6 +1439,7 @@ int OH_UdmfSummary_GetOverviewDataSize(const OH_UdmfSummary* summary, const char
     }
     auto it = summary->summary_->summary.find(std::string(type));
     if (it == summary->summary_->summary.end()) {
+        *dataSize = -1;
         return UDMF_ERR;
     }
     *dataSize = it->second;
@@ -1487,13 +1488,13 @@ int OH_Udmf_GetSummary(OH_UdmfOptions* options, OH_UdmfSummary* summary)
         return UDMF_E_INVALID_PARAM;
     }
     QueryOption query = {.key = options->key, .intention = Intention::UD_INTENTION_DRAG};
-    Status ret = UdmfClient::GetInstance().GetSummary(query, *summary->summary_);
+    Summary tempSummary;
+    Status ret = UdmfClient::GetInstance().GetSummary(query, tempSummary);
     if (ret != E_OK) {
-        summary->overviewTypePtrs_.clear();
-        summary->filenameExtensionPtrs_.clear();
         LOG_ERROR(UDMF_CAPI, "Get summary error, ret = %{public}d", ret);
         return UDMF_ERR;
     }
+    *summary->summary_ = std::move(tempSummary);
     RefreshSummaryCaches(summary);
     return UDMF_E_OK;
 }

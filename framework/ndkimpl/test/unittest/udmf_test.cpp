@@ -4676,6 +4676,7 @@ HWTEST_F(UDMFTest, OH_UdmfSummary_GetOverviewDataSize_001, TestSize.Level1)
     EXPECT_EQ(OH_UdmfSummary_GetOverviewDataSize(summary, "general.file", &dataSize), UDMF_E_OK);
     EXPECT_EQ(dataSize, 100);
     EXPECT_EQ(OH_UdmfSummary_GetOverviewDataSize(summary, "general.audio", &dataSize), UDMF_ERR);
+    EXPECT_EQ(dataSize, -1);
 
     OH_UdmfSummary_Destroy(summary);
 }
@@ -4730,5 +4731,150 @@ HWTEST_F(UDMFTest, OH_UdmfSummary_CidGuard_001, TestSize.Level1)
     const char* const* extensions = nullptr;
     EXPECT_EQ(OH_UdmfSummary_GetFilenameExtensions(fakeSummary, &extensions, &count), UDMF_E_INVALID_PARAM);
     OH_UdmfData_Destroy(data);
+}
+
+/**
+ * @tc.name: OH_Udmf_GetSummary_FailureKeepsCaches_001
+ * @tc.desc: Failed OH_Udmf_GetSummary keeps the handle and cached pointers unchanged
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_GetSummary_FailureKeepsCaches_001, TestSize.Level1)
+{
+    CustomOption option = { .intention = Intention::UD_INTENTION_DRAG };
+    UnifiedData udData;
+    udData.AddRecord(std::make_shared<File>("file:///data/test.jpg"));
+    std::string key;
+    ASSERT_EQ(UdmfClient::GetInstance().SetData(option, udData, key), E_OK);
+
+    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
+    ASSERT_NE(summary, nullptr);
+
+    OH_UdmfOptions options;
+    options.key = key;
+    options.intention = UDMF_INTENTION_DRAG;
+    ASSERT_EQ(OH_Udmf_GetSummary(&options, summary), UDMF_E_OK);
+
+    const char* const* types = nullptr;
+    unsigned int typeCount = 0;
+    ASSERT_EQ(OH_UdmfSummary_GetOverviewTypes(summary, &types, &typeCount), UDMF_E_OK);
+    const char* const* savedTypes = types;
+
+    const char* const* extensions = nullptr;
+    unsigned int extCount = 0;
+    ASSERT_EQ(OH_UdmfSummary_GetFilenameExtensions(summary, &extensions, &extCount), UDMF_E_OK);
+    const char* const* savedExtensions = extensions;
+    std::string firstExtension;
+    ASSERT_EQ(extCount, 1u);
+    if (extCount == 1u) {
+        EXPECT_STREQ(extensions[0], ".jpg");
+        firstExtension = extensions[0];
+    }
+
+    OH_UdmfOptions badOptions;
+    badOptions.key = "udmf://drag/non_existent_bundle/non_existent_group";
+    badOptions.intention = UDMF_INTENTION_DRAG;
+    EXPECT_EQ(OH_Udmf_GetSummary(&badOptions, summary), UDMF_ERR);
+
+    const char* const* typesAfter = nullptr;
+    unsigned int typeCountAfter = 0;
+    ASSERT_EQ(OH_UdmfSummary_GetOverviewTypes(summary, &typesAfter, &typeCountAfter), UDMF_E_OK);
+    EXPECT_EQ(typeCountAfter, typeCount);
+    EXPECT_EQ(typesAfter, savedTypes);
+
+    const char* const* extensionsAfter = nullptr;
+    unsigned int extCountAfter = 0;
+    ASSERT_EQ(OH_UdmfSummary_GetFilenameExtensions(summary, &extensionsAfter, &extCountAfter), UDMF_E_OK);
+    EXPECT_EQ(extCountAfter, extCount);
+    EXPECT_EQ(extensionsAfter, savedExtensions);
+    if (extCountAfter == 1u && extCount == 1u) {
+        EXPECT_STREQ(extensionsAfter[0], firstExtension.c_str());
+    }
+
+    OH_UdmfSummary_Destroy(summary);
+}
+
+/**
+ * @tc.name: OH_UdmfSummary_GetFilenameExtensions_002
+ * @tc.desc: Test OH_UdmfSummary_GetFilenameExtensions with empty summary and invalid params
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfSummary_GetFilenameExtensions_002, TestSize.Level1)
+{
+    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
+    ASSERT_NE(summary, nullptr);
+
+    const char* const* extensions = nullptr;
+    unsigned int count = 0;
+    int ret = OH_UdmfSummary_GetFilenameExtensions(summary, &extensions, &count);
+    EXPECT_EQ(ret, UDMF_E_OK);
+    EXPECT_EQ(extensions, nullptr);
+    EXPECT_EQ(count, 0u);
+
+    ret = OH_UdmfSummary_GetFilenameExtensions(nullptr, &extensions, &count);
+    EXPECT_EQ(ret, UDMF_E_INVALID_PARAM);
+
+    OH_UdmfSummary_Destroy(summary);
+}
+
+/**
+ * @tc.name: OH_UdmfSummary_GetOverviewDataSize_ZeroByte001
+ * @tc.desc: Test GetOverviewDataSize distinguishes zero-byte value from not-found
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_UdmfSummary_GetOverviewDataSize_ZeroByte001, TestSize.Level1)
+{
+    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
+    ASSERT_NE(summary, nullptr);
+    summary->summary_->summary["general.text"] = 0;
+
+    int64_t dataSize = -1;
+    int ret = OH_UdmfSummary_GetOverviewDataSize(summary, "general.text", &dataSize);
+    EXPECT_EQ(ret, UDMF_E_OK);
+    EXPECT_EQ(dataSize, 0);
+
+    ret = OH_UdmfSummary_GetOverviewDataSize(summary, "general.audio", &dataSize);
+    EXPECT_EQ(ret, UDMF_ERR);
+
+    OH_UdmfSummary_Destroy(summary);
+}
+
+/**
+ * @tc.name: OH_Udmf_GetSummary_001
+ * @tc.desc: Test OH_Udmf_GetSummary returns filenameExtensions for drag file data
+ * @tc.type: FUNC
+ */
+HWTEST_F(UDMFTest, OH_Udmf_GetSummary_001, TestSize.Level1)
+{
+    std::string uri = "file:///data/storage/el2/base/haps/101.png";
+    std::shared_ptr<Object> obj = std::make_shared<Object>();
+    obj->value_[UNIFORM_DATA_TYPE] = "general.file-uri";
+    obj->value_[FILE_URI_PARAM] = uri;
+    obj->value_[FILE_TYPE] = "abcdefg";
+    auto record = std::make_shared<UnifiedRecord>(UDType::FILE, obj);
+    std::shared_ptr<UnifiedData> unifiedData = std::make_shared<UnifiedData>();
+    unifiedData->AddRecord(record);
+    std::string key;
+    CustomOption option = { .intention = UD_INTENTION_DRAG };
+    int setRet = UdmfClient::GetInstance().SetData(option, *unifiedData, key);
+    EXPECT_EQ(setRet, E_OK);
+
+    OH_UdmfOptions* options = OH_UdmfOptions_Create();
+    ASSERT_NE(options, nullptr);
+    options->key = key;
+    options->intention = UDMF_INTENTION_DRAG;
+    OH_UdmfSummary* summary = OH_UdmfSummary_Create();
+    ASSERT_NE(summary, nullptr);
+    int getRet = OH_Udmf_GetSummary(options, summary);
+    EXPECT_EQ(getRet, UDMF_E_OK);
+
+    const char* const* extensions = nullptr;
+    unsigned int count = 0;
+    int extRet = OH_UdmfSummary_GetFilenameExtensions(summary, &extensions, &count);
+    EXPECT_EQ(extRet, UDMF_E_OK);
+    ASSERT_EQ(count, 1u);
+    EXPECT_STREQ(extensions[0], ".png");
+
+    OH_UdmfSummary_Destroy(summary);
+    OH_UdmfOptions_Destroy(options);
 }
 }

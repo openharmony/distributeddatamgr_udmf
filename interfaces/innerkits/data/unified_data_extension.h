@@ -16,6 +16,7 @@
 #ifndef UDMF_UNIFIED_DATA_EXTENSION_H
 #define UDMF_UNIFIED_DATA_EXTENSION_H
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -24,7 +25,11 @@
 
 namespace OHOS {
 namespace UDMF {
-std::vector<std::string> CollectFilenameExtensions(const UnifiedData &data);
+API_EXPORT std::shared_ptr<Object> GetObjectFromRecord(const std::shared_ptr<UnifiedRecord> &record);
+API_EXPORT std::string GetFileUriFromRecord(const std::shared_ptr<UnifiedRecord> &record);
+API_EXPORT bool HasTempUnifiedDataFlag(const std::shared_ptr<UnifiedRecord> &record);
+API_EXPORT std::string ExtractFileExtension(const std::string &uri);
+API_EXPORT std::vector<std::string> CollectFilenameExtensions(const UnifiedData &data);
 } // namespace UDMF
 } // namespace OHOS
 #endif // UDMF_UNIFIED_DATA_EXTENSION_H

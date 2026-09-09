@@ -841,6 +841,25 @@ ohos_unittest("UnifiedDataHelperTest") {
   cflags = [ "-Werror=vla" ]
 }
 
+ohos_unittest("UnifiedDataExtensionTest") {
+  module_out_path = module_output_path
+
+  sources = [ "unified_data_extension_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = common_deps
+
+  external_deps = common_external_deps
+
+  defines = [
+    "private=public",
+    "protected=public",
+  ]
+
+  cflags = [ "-Werror=vla" ]
+}
+
 ohos_unittest("UdmfNotifierStubTest") {
   module_out_path = module_output_path
 
@@ -1182,6 +1201,7 @@ group("unittest") {
     ":UdmfDelayDataTest",
     ":UdmfNotifierStubTest",
     ":UnifiedDataHelperTest",
+    ":UnifiedDataExtensionTest",
     ":UnifiedDataTest",
     ":UnifiedMetaTest",
     ":UnifiedRecordTest",
