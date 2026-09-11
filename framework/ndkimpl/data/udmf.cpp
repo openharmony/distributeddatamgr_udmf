@@ -1462,39 +1462,3 @@ int OH_UdmfSummary_GetFilenameExtensions(const OH_UdmfSummary* summary, const ch
     *count = static_cast<unsigned int>(summary->filenameExtensionPtrs_.size());
     return UDMF_E_OK;
 }
-
-static void RefreshSummaryCaches(OH_UdmfSummary* summary)
-{
-    summary->overviewTypePtrs_.clear();
-    for (const auto &item : summary->summary_->summary) {
-        if (!item.first.empty()) {
-            summary->overviewTypePtrs_.push_back(item.first.c_str());
-        }
-    }
-    summary->filenameExtensionPtrs_.clear();
-    for (const auto &ext : summary->summary_->filenameExtensions) {
-        summary->filenameExtensionPtrs_.push_back(ext.c_str());
-    }
-}
-
-int OH_Udmf_GetSummary(OH_UdmfOptions* options, OH_UdmfSummary* summary)
-{
-    if (options == nullptr || !IsSummaryValid(summary)) {
-        LOG_ERROR(UDMF_CAPI, "Parameter error.");
-        return UDMF_E_INVALID_PARAM;
-    }
-    if (options->key.empty() || options->intention != UDMF_INTENTION_DRAG) {
-        LOG_ERROR(UDMF_CAPI, "Invalid key or intention.");
-        return UDMF_E_INVALID_PARAM;
-    }
-    QueryOption query = {.key = options->key, .intention = Intention::UD_INTENTION_DRAG};
-    Summary tempSummary;
-    Status ret = UdmfClient::GetInstance().GetSummary(query, tempSummary);
-    if (ret != E_OK) {
-        LOG_ERROR(UDMF_CAPI, "Get summary error, ret = %{public}d", ret);
-        return UDMF_ERR;
-    }
-    *summary->summary_ = std::move(tempSummary);
-    RefreshSummaryCaches(summary);
-    return UDMF_E_OK;
-}

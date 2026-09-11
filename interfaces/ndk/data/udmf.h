@@ -342,7 +342,7 @@ void OH_UdmfSummary_Destroy(OH_UdmfSummary* summary);
  * @brief Gets all data types in the overview of an {@link OH_UdmfSummary} instance.
  *
  * The returned array and strings are owned by {@code summary}. The caller must not modify or free them. They remain
- * valid until {@code summary} is destroyed or populated again successfully by {@link OH_Udmf_GetSummary}. The order
+ * valid until {@code summary} is destroyed or repopulated. The order
  * of the returned data types is unspecified. If the overview is empty, {@code *types} is nullptr and
  * {@code *count} is 0.
  *
@@ -378,7 +378,7 @@ int OH_UdmfSummary_GetOverviewDataSize(const OH_UdmfSummary* summary, const char
  *
  * Each returned extension includes the leading period and uses lowercase ASCII letters. The returned array and
  * strings are owned by {@code summary}. The caller must not modify or free them. They remain valid until
- * {@code summary} is destroyed or populated again successfully by {@link OH_Udmf_GetSummary}. If no valid file name
+ * {@code summary} is destroyed or repopulated. If no valid file name
  * extension is available, {@code *filenameExtensions} is nullptr and {@code *count} is 0.
  *
  * @param summary Represents a pointer to an {@link OH_UdmfSummary} instance.
@@ -392,24 +392,6 @@ int OH_UdmfSummary_GetOverviewDataSize(const OH_UdmfSummary* summary, const char
  */
 int OH_UdmfSummary_GetFilenameExtensions(const OH_UdmfSummary* summary,
     const char* const** filenameExtensions, unsigned int* count);
-
-/**
- * @brief Gets summary information of unified data from the UDMF database.
- *
- * This API currently supports only the drag intention. Existing summary contents in {@code summary} are replaced when
- * the operation is successful.
- *
- * @param options Represents a pointer to an {@link OH_UdmfOptions} instance. The key must identify drag data and the
- *     intention must be {@link UDMF_INTENTION_DRAG}.
- * @param summary Represents a pointer to an {@link OH_UdmfSummary} instance used to receive the result.
- * @return Returns the status code of the execution. See {@link Udmf_ErrCode}.
- *         {@link UDMF_E_OK} success.
- *         {@link UDMF_E_INVALID_PARAM} The input parameter, key, or intention is invalid.
- *         {@link UDMF_ERR} An internal data error occurs.
- * @see OH_UdmfOptions OH_UdmfSummary Udmf_ErrCode.
- * @since 26.2.0
- */
-int OH_Udmf_GetSummary(OH_UdmfOptions* options, OH_UdmfSummary* summary);
 
 /**
  * @brief Defines the callback function used free the context.

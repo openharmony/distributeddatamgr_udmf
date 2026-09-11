@@ -240,6 +240,58 @@ HWTEST_F(NdkDataConversionTest, GetNdkUnifiedData_002, TestSize.Level1)
 }
 
 /* *
+ * @tc.name: GetNdkSummary_001
+ * @tc.desc: Test GetNdkSummary populates overview and filename extensions from an inner Summary
+ * @tc.type: FUNC
+ */
+HWTEST_F(NdkDataConversionTest, GetNdkSummary_001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetNdkSummary_001 begin.");
+    OH_UdmfSummary *summary = OH_UdmfSummary_Create();
+    ASSERT_NE(summary, nullptr);
+
+    Summary inner;
+    inner.summary["general.file"] = 100;
+    inner.summary["general.image"] = 200;
+    inner.filenameExtensions = { ".jpg", ".png" };
+    Status status = NdkDataConversion::GetNdkSummary(inner, summary);
+    ASSERT_EQ(E_OK, status);
+
+    ASSERT_EQ(inner.summary, summary->summary_->summary);
+    ASSERT_EQ(inner.filenameExtensions, summary->summary_->filenameExtensions);
+    ASSERT_EQ(2u, summary->overviewTypePtrs_.size());
+    ASSERT_EQ(2u, summary->filenameExtensionPtrs_.size());
+    if (summary->filenameExtensionPtrs_.size() == 2u) {
+        EXPECT_STREQ(".jpg", summary->filenameExtensionPtrs_[0]);
+        EXPECT_STREQ(".png", summary->filenameExtensionPtrs_[1]);
+    }
+
+    OH_UdmfSummary_Destroy(summary);
+    LOG_INFO(UDMF_TEST, "GetNdkSummary_001 end.");
+}
+
+/* *
+ * @tc.name: GetNdkSummary_002
+ * @tc.desc: Error testcase of GetNdkSummary
+ * @tc.type: FUNC
+ */
+HWTEST_F(NdkDataConversionTest, GetNdkSummary_002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetNdkSummary_002 begin.");
+    Summary inner;
+    Status status = NdkDataConversion::GetNdkSummary(inner, nullptr);
+    ASSERT_EQ(E_INVALID_PARAMETERS, status);
+
+    OH_UdmfData *data = OH_UdmfData_Create();
+    ASSERT_NE(data, nullptr);
+    auto *fakeSummary = reinterpret_cast<OH_UdmfSummary *>(data);
+    status = NdkDataConversion::GetNdkSummary(inner, fakeSummary);
+    OH_UdmfData_Destroy(data);
+    ASSERT_EQ(E_INVALID_PARAMETERS, status);
+    LOG_INFO(UDMF_TEST, "GetNdkSummary_002 end.");
+}
+
+/* *
  * @tc.name: ConvertPixelMap_001
  * @tc.desc: test pixel-map conversion between JS and C-API
  * @tc.type: FUNC

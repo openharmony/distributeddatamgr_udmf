@@ -39,6 +39,26 @@ Status NdkDataConversion::GetNdkUnifiedData(std::shared_ptr<UnifiedData> data, O
     return Status::E_OK;
 }
 
+Status NdkDataConversion::GetNdkSummary(const Summary &source, OH_UdmfSummary* ndkSummary)
+{
+    if (ndkSummary == nullptr || ndkSummary->cid != NdkStructId::UDMF_SUMMARY_STRUCT_ID ||
+        ndkSummary->summary_ == nullptr) {
+        return Status::E_INVALID_PARAMETERS;
+    }
+    *ndkSummary->summary_ = source;
+    ndkSummary->overviewTypePtrs_.clear();
+    for (const auto &item : ndkSummary->summary_->summary) {
+        if (!item.first.empty()) {
+            ndkSummary->overviewTypePtrs_.push_back(item.first.c_str());
+        }
+    }
+    ndkSummary->filenameExtensionPtrs_.clear();
+    for (const auto &ext : ndkSummary->summary_->filenameExtensions) {
+        ndkSummary->filenameExtensionPtrs_.push_back(ext.c_str());
+    }
+    return Status::E_OK;
+}
+
 char** NdkDataConversion::StrVectorToTypesArray(const std::vector<std::string>& strVector)
 {
     unsigned int vectorSize = strVector.size();
