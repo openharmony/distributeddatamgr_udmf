@@ -39,7 +39,7 @@ Status NdkDataConversion::GetNdkUnifiedData(std::shared_ptr<UnifiedData> data, O
     return Status::E_OK;
 }
 
-Status NdkDataConversion::GetNdkSummary(const Summary &source, OH_UdmfSummary* ndkSummary)
+Status NdkDataConversion::GetNdkSummary(const Summary &source, OH_UDMF_Summary* ndkSummary)
 {
     if (ndkSummary == nullptr || ndkSummary->cid != NdkStructId::UDMF_SUMMARY_STRUCT_ID ||
         ndkSummary->summary_ == nullptr) {

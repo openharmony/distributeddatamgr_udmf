@@ -247,7 +247,7 @@ HWTEST_F(NdkDataConversionTest, GetNdkUnifiedData_002, TestSize.Level1)
 HWTEST_F(NdkDataConversionTest, GetNdkSummary_001, TestSize.Level1)
 {
     LOG_INFO(UDMF_TEST, "GetNdkSummary_001 begin.");
-    OH_UdmfSummary *summary = OH_UdmfSummary_Create();
+    OH_UDMF_Summary *summary = OH_UDMF_CreateSummary();
     ASSERT_NE(summary, nullptr);
 
     Summary inner;
@@ -266,7 +266,7 @@ HWTEST_F(NdkDataConversionTest, GetNdkSummary_001, TestSize.Level1)
         EXPECT_STREQ(".png", summary->filenameExtensionPtrs_[1]);
     }
 
-    OH_UdmfSummary_Destroy(summary);
+    OH_UDMF_DestroySummary(summary);
     LOG_INFO(UDMF_TEST, "GetNdkSummary_001 end.");
 }
 
@@ -284,7 +284,7 @@ HWTEST_F(NdkDataConversionTest, GetNdkSummary_002, TestSize.Level1)
 
     OH_UdmfData *data = OH_UdmfData_Create();
     ASSERT_NE(data, nullptr);
-    auto *fakeSummary = reinterpret_cast<OH_UdmfSummary *>(data);
+    auto *fakeSummary = reinterpret_cast<OH_UDMF_Summary *>(data);
     status = NdkDataConversion::GetNdkSummary(inner, fakeSummary);
     OH_UdmfData_Destroy(data);
     ASSERT_EQ(E_INVALID_PARAMETERS, status);

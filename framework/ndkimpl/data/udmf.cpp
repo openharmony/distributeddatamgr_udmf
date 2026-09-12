@@ -126,7 +126,7 @@ static bool IsUnifiedPropertiesValid(OH_UdmfProperty* properties)
            properties->cid == NdkStructId::UDMF_UNIFIED_DATA_PROPERTIES_ID;
 }
 
-static bool IsSummaryValid(const OH_UdmfSummary* summary)
+static bool IsSummaryValid(const OH_UDMF_Summary* summary)
 {
     return summary != nullptr && summary->cid == NdkStructId::UDMF_SUMMARY_STRUCT_ID &&
            summary->summary_ != nullptr;
@@ -1394,9 +1394,9 @@ OH_UdmfData* OH_UDMF_GetDataElementAt(OH_UdmfData** dataArray, unsigned int inde
     return &((*dataArray)[index]);
 }
 
-OH_UdmfSummary* OH_UdmfSummary_Create()
+OH_UDMF_Summary* OH_UDMF_CreateSummary()
 {
-    OH_UdmfSummary* summary = new (std::nothrow) OH_UdmfSummary();
+    OH_UDMF_Summary* summary = new (std::nothrow) OH_UDMF_Summary();
     if (summary == nullptr) {
         LOG_ERROR(UDMF_CAPI, "Memory allocation failed.");
         return nullptr;
@@ -1406,7 +1406,7 @@ OH_UdmfSummary* OH_UdmfSummary_Create()
     return summary;
 }
 
-void OH_UdmfSummary_Destroy(OH_UdmfSummary* summary)
+void OH_UDMF_DestroySummary(OH_UDMF_Summary* summary)
 {
     if (summary == nullptr) {
         LOG_ERROR(UDMF_CAPI, "Parameter error.");
@@ -1415,7 +1415,7 @@ void OH_UdmfSummary_Destroy(OH_UdmfSummary* summary)
     delete summary;
 }
 
-int OH_UdmfSummary_GetOverviewTypes(const OH_UdmfSummary* summary, const char* const** types, unsigned int* count)
+int OH_UDMF_GetSummaryOverviewTypes(const OH_UDMF_Summary* summary, const char* const** types, int64_t* count)
 {
     if (!IsSummaryValid(summary) || types == nullptr || count == nullptr) {
         LOG_ERROR(UDMF_CAPI, "Parameter error.");
@@ -1427,11 +1427,11 @@ int OH_UdmfSummary_GetOverviewTypes(const OH_UdmfSummary* summary, const char* c
         return UDMF_E_OK;
     }
     *types = summary->overviewTypePtrs_.data();
-    *count = static_cast<unsigned int>(summary->overviewTypePtrs_.size());
+    *count = static_cast<int64_t>(summary->overviewTypePtrs_.size());
     return UDMF_E_OK;
 }
 
-int OH_UdmfSummary_GetOverviewDataSize(const OH_UdmfSummary* summary, const char* type, int64_t* dataSize)
+int OH_UDMF_GetSummaryOverviewSize(const OH_UDMF_Summary* summary, const char* type, int64_t* dataSize)
 {
     if (!IsSummaryValid(summary) || type == nullptr || dataSize == nullptr) {
         LOG_ERROR(UDMF_CAPI, "Parameter error.");
@@ -1446,8 +1446,8 @@ int OH_UdmfSummary_GetOverviewDataSize(const OH_UdmfSummary* summary, const char
     return UDMF_E_OK;
 }
 
-int OH_UdmfSummary_GetFilenameExtensions(const OH_UdmfSummary* summary, const char* const** filenameExtensions,
-    unsigned int* count)
+int OH_UDMF_GetSummaryFilenameExtensions(const OH_UDMF_Summary* summary, const char* const** filenameExtensions,
+    int64_t* count)
 {
     if (!IsSummaryValid(summary) || filenameExtensions == nullptr || count == nullptr) {
         LOG_ERROR(UDMF_CAPI, "Parameter error.");
@@ -1459,6 +1459,6 @@ int OH_UdmfSummary_GetFilenameExtensions(const OH_UdmfSummary* summary, const ch
         return UDMF_E_OK;
     }
     *filenameExtensions = summary->filenameExtensionPtrs_.data();
-    *count = static_cast<unsigned int>(summary->filenameExtensionPtrs_.size());
+    *count = static_cast<int64_t>(summary->filenameExtensionPtrs_.size());
     return UDMF_E_OK;
 }

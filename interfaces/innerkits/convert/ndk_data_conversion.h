@@ -26,7 +26,7 @@ class NdkDataConversion {
 public:
     static Status API_EXPORT GetNativeUnifiedData(OH_UdmfData* ndkData, std::shared_ptr<UnifiedData>& data);
     static Status API_EXPORT GetNdkUnifiedData(std::shared_ptr<UnifiedData> data, OH_UdmfData* ndkData);
-    static Status API_EXPORT GetNdkSummary(const Summary &source, OH_UdmfSummary* ndkSummary);
+    static Status API_EXPORT GetNdkSummary(const Summary &source, OH_UDMF_Summary* ndkSummary);
     static char** StrVectorToTypesArray(const std::vector<std::string>& strVector);
     static void DestroyStringArray(char**& bufArray, unsigned int& count);
 };

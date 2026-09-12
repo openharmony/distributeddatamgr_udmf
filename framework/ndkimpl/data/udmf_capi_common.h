@@ -121,7 +121,7 @@ struct OH_UdmfProperty {
     std::string extraStr;
 };
 
-struct OH_UdmfSummary {
+struct OH_UDMF_Summary {
     const int64_t cid = UDMF_SUMMARY_STRUCT_ID;
     std::shared_ptr<OHOS::UDMF::Summary> summary_;
     std::vector<const char*> overviewTypePtrs_;
