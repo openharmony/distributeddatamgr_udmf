@@ -1840,13 +1840,25 @@ HWTEST_F(UtdClientTest, GetUniformDataTypesByMIMETypeByPrefix001, TestSize.Level
     std::vector<std::string> currTypes;
     auto status = UtdClient::GetInstance().GetUniformDataTypesByMIMEType(mimeType, currTypes);
     ASSERT_EQ(status, E_OK);
-    ASSERT_EQ(currTypes.size(), 3);
-    auto find1 = std::find(currTypes.begin(), currTypes.end(), "general.iges") != currTypes.end();
-    auto find2 = std::find(currTypes.begin(), currTypes.end(), "general.mesh-model") != currTypes.end();
-    auto find3 = std::find(currTypes.begin(), currTypes.end(), "com.autodesk.dwf") != currTypes.end();
-    ASSERT_EQ(find1, true);
-    ASSERT_EQ(find2, true);
-    ASSERT_EQ(find3, true);
+    const std::vector<std::string> expectedTypes = {
+        "general.iges",
+        "general.mesh-model",
+        "com.3dsystems.stereolithography",
+        "com.autodesk.dwf",
+        "general.gltf",
+        "general.glb",
+        "general.obj-model",
+        "general.mtl",
+        "general.3mf",
+        "general.step",
+        "general.usdz",
+        "general.usda",
+        "general.collada"
+    };
+    ASSERT_EQ(currTypes.size(), expectedTypes.size());
+    for (const auto &type : expectedTypes) {
+        EXPECT_NE(std::find(currTypes.begin(), currTypes.end(), type), currTypes.end());
+    }
     LOG_INFO(UDMF_TEST, "GetUniformDataTypesByMIMETypeByPrefix001 end.");
 }
 

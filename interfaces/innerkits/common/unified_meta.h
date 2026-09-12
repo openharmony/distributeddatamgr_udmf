@@ -555,6 +555,17 @@ enum UDType : int32_t {
     IWORK_PAGES,
     MUSICCREATE_GOFILE,
     COREAUDIO_FORMAT,
+    THREE_D_CONTENT,
+    GLTF,
+    GLB,
+    OBJ_MODEL,
+    MTL,
+    THREE_MF,
+    STEP,
+    USDZ,
+    USDA,
+    COLLADA,
+    MATLAB_CODE,
     UD_BUTT
 };
 
