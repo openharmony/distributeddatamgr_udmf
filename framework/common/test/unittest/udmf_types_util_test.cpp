@@ -120,7 +120,52 @@ HWTEST_F(UdmfTypesUtilTest, Marshalling001, TestSize.Level1)
 }
 
 /**
-* @tc.name: Unmarshalling003
+ * @tc.name: SummaryUnmarshallingEmpty001
+ * @tc.desc: Abnormal testcase of Summary Unmarshalling with empty parcel
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfTypesUtilTest, SummaryUnmarshallingEmpty001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SummaryUnmarshallingEmpty001 begin.");
+    Summary summary;
+    MessageParcel parcel;
+    bool ret = ITypesUtil::Unmarshalling(summary, parcel);
+    EXPECT_FALSE(ret);
+    LOG_INFO(UDMF_TEST, "SummaryUnmarshallingEmpty001 end.");
+}
+
+/**
+ * @tc.name: SummaryMarshallingFilenameExtensions001
+ * @tc.desc: Normal testcase of Summary Marshalling and Unmarshalling with filenameExtensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UdmfTypesUtilTest, SummaryMarshallingFilenameExtensions001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "SummaryMarshallingFilenameExtensions001 begin.");
+    Summary input;
+    input.summary.insert({"summary", 10});
+    input.totalSize = 20;
+    input.version = SUMMARY_VERSION_FILENAME_EXTENSIONS;
+    input.filenameExtensions = {".jpg", ".png"};
+
+    MessageParcel parcel;
+    bool ret = ITypesUtil::Marshalling(input, parcel);
+    EXPECT_TRUE(ret);
+
+    Summary output;
+    ret = ITypesUtil::Unmarshalling(output, parcel);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(output.summary, input.summary);
+    EXPECT_EQ(output.totalSize, input.totalSize);
+    EXPECT_EQ(output.version, input.version);
+    ASSERT_EQ(output.filenameExtensions.size(), 2u);
+    EXPECT_EQ(output.filenameExtensions[0], ".jpg");
+    EXPECT_EQ(output.filenameExtensions[1], ".png");
+    LOG_INFO(UDMF_TEST, "SummaryMarshallingFilenameExtensions001 end.");
+}
+
+/**
+ * @tc.name: Unmarshalling003
 * @tc.desc: Normal testcase of Marshalling and Unmarshalling Privilege
 * @tc.type: FUNC
 */

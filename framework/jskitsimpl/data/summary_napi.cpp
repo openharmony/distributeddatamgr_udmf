@@ -27,6 +27,7 @@ napi_value SummaryNapi::Constructor(napi_env env)
         DECLARE_NAPI_GETTER_SETTER("summary", GetSummary, nullptr),
         DECLARE_NAPI_GETTER_SETTER("totalSize", GetTotal, nullptr),
         DECLARE_NAPI_GETTER_SETTER("overview", GetOverview, nullptr),
+        DECLARE_NAPI_GETTER_SETTER("filenameExtensions", GetFilenameExtensions, nullptr),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
     return NapiDataUtils::DefineClass(env, "Summary", properties, count, SummaryNapi::New);
@@ -104,6 +105,17 @@ napi_value SummaryNapi::GetOverview(napi_env env, napi_callback_info info)
     ASSERT_ERR(ctxt->env, (summary != nullptr && summary->value_ != nullptr), Status::E_ERROR, "invalid object!");
     ctxt->status = NapiDataUtils::SetValue(env, summary->value_->summary, ctxt->output);
     ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set record failed!");
+    return ctxt->output;
+}
+
+napi_value SummaryNapi::GetFilenameExtensions(napi_env env, napi_callback_info info)
+{
+    LOG_DEBUG(UDMF_KITS_NAPI, "SummaryNapi");
+    auto ctxt = std::make_shared<ContextBase>();
+    auto summary = GetDataSummary(env, info, ctxt);
+    ASSERT_ERR(ctxt->env, (summary != nullptr && summary->value_ != nullptr), Status::E_ERROR, "invalid object!");
+    ctxt->status = NapiDataUtils::SetValue(env, summary->value_->filenameExtensions, ctxt->output);
+    ASSERT_ERR(ctxt->env, ctxt->status == napi_ok, Status::E_ERROR, "set filename extensions failed!");
     return ctxt->output;
 }
 

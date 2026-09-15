@@ -62,6 +62,7 @@ udmf_core_sources = [
   "${udmf_framework_path}/innerkitsimpl/common/unified_meta.cpp",
   "${udmf_framework_path}/innerkitsimpl/common/uri_permission_util.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/unified_data.cpp",
+  "${udmf_framework_path}/innerkitsimpl/data/unified_data_extension.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/unified_html_record_process.cpp",
   "${udmf_framework_path}/innerkitsimpl/data/unified_record.cpp",
   "${udmf_framework_path}/innerkitsimpl/dynamic/pixelmap_loader.cpp",

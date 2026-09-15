@@ -24,6 +24,8 @@
 #include "unified_data_helper.h"
 #include "file_uri.h"
 #include "unified_meta.h"
+#include "file.h"
+#include "folder.h"
 
 using namespace testing::ext;
 using namespace OHOS::UDMF;
@@ -414,5 +416,456 @@ HWTEST_F(UnifiedDataHelperTest, IsTempUData_NonFileRecord001, TestSize.Level1)
     bool ret = UnifiedDataHelper::IsTempUData(data);
     EXPECT_FALSE(ret);
     LOG_INFO(UDMF_TEST, "IsTempUData_NonFileRecord001 end.");
+}
+
+/**
+* @tc.name: GetSummary_FileExtensions001
+* @tc.desc: Test GetSummary with file URI extension extraction
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FileExtensions001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FileExtensions001 begin.");
+    UnifiedData data;
+    auto file = std::make_shared<File>("file:///data/test.jpg");
+    data.AddRecord(file);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+
+    auto extensions = summary.filenameExtensions;
+    EXPECT_FALSE(extensions.empty());
+    if (!extensions.empty()) {
+        EXPECT_EQ(extensions[0], ".jpg");
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FileExtensions001 end.");
+}
+
+/**
+* @tc.name: GetSummary_FileExtensions002
+* @tc.desc: Test GetSummary with multiple file URIs
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FileExtensions002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FileExtensions002 begin.");
+    UnifiedData data;
+    auto file1 = std::make_shared<File>("file:///data/test.jpg");
+    auto file2 = std::make_shared<File>("file:///data/test2.png");
+    data.AddRecord(file1);
+    data.AddRecord(file2);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+
+    auto extensions = summary.filenameExtensions;
+    EXPECT_EQ(extensions.size(), 2);
+    if (extensions.size() == 2) {
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".jpg"), extensions.end());
+        EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".png"), extensions.end());
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FileExtensions002 end.");
+}
+
+/**
+* @tc.name: GetSummary_FileExtensions003
+* @tc.desc: Test GetSummary with non-file URI
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FileExtensions003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FileExtensions003 begin.");
+    UnifiedData data;
+    auto file = std::make_shared<File>("http://example.com/test.jpg");
+    data.AddRecord(file);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+
+    auto extensions = summary.filenameExtensions;
+    EXPECT_TRUE(extensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FileExtensions003 end.");
+}
+
+/**
+* @tc.name: GetSummary_FileExtensions004
+ * @tc.desc: Test filenameExtensions with leading period, lowercase and dedup
+* @tc.type: FUNC
+*/
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FileExtensions004, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FileExtensions004 begin.");
+    UnifiedData data;
+    auto file1 = std::make_shared<File>("file:///data/test.JPG");
+    auto file2 = std::make_shared<File>("file:///data/test2.jpg");
+    data.AddRecord(file1);
+    data.AddRecord(file2);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+
+    auto extensions = summary.filenameExtensions;
+    EXPECT_EQ(extensions.size(), 1);
+    if (!extensions.empty()) {
+        EXPECT_EQ(extensions[0], ".jpg");
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FileExtensions004 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_MultiDot001
+ * @tc.desc: Test archive.tar.gz returns the last extension .gz
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_MultiDot001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_MultiDot001 begin.");
+    UnifiedData data;
+    auto file = std::make_shared<File>("file:///data/archive.tar.gz");
+    data.AddRecord(file);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_EQ(extensions.size(), 1);
+    if (!extensions.empty()) {
+        EXPECT_EQ(extensions[0], ".gz");
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_MultiDot001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_EdgeCases001
+ * @tc.desc: Test hidden file, no dot and trailing dot return empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_EdgeCases001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_EdgeCases001 begin.");
+    UnifiedData data;
+    auto hidden = std::make_shared<File>("file:///data/.profile");
+    auto noDot = std::make_shared<File>("file:///data/README");
+    auto trailingDot = std::make_shared<File>("file:///data/name.");
+    data.AddRecord(hidden);
+    data.AddRecord(noDot);
+    data.AddRecord(trailingDot);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_TRUE(extensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_EdgeCases001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_TooLong001
+ * @tc.desc: Test extension exceeding max length returns empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_TooLong001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_TooLong001 begin.");
+    UnifiedData data;
+    std::string longExt(200, 'x');
+    auto file = std::make_shared<File>("file:///data/test." + longExt);
+    data.AddRecord(file);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_TRUE(extensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_TooLong001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_QueryFragment001
+ * @tc.desc: Test query and fragment do not affect the extension
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_QueryFragment001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_QueryFragment001 begin.");
+    UnifiedData data;
+    auto file = std::make_shared<File>("file:///data/photo.png?x=.jpg#y");
+    data.AddRecord(file);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_EQ(extensions.size(), 1);
+    if (!extensions.empty()) {
+        EXPECT_EQ(extensions[0], ".png");
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_QueryFragment001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_TempData001
+ * @tc.desc: Test packed temp data does not yield the temporary file extension
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_TempData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_TempData001 begin.");
+    UnifiedData data;
+    auto file = std::make_shared<File>("file:///data/test.jpg");
+    data.AddRecord(file);
+    EXPECT_TRUE(UnifiedDataHelper::Pack(data));
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_TRUE(extensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_TempData001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_NonFile001
+ * @tc.desc: Test non-file records (text/html) do not yield extensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_NonFile001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_NonFile001 begin.");
+    UnifiedData data;
+    auto text = std::make_shared<UnifiedRecord>(UDType::TEXT);
+    auto html = std::make_shared<UnifiedRecord>(UDType::HTML);
+    data.AddRecord(text);
+    data.AddRecord(html);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_TRUE(extensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_NonFile001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_Order001
+ * @tc.desc: Test extensions preserve first occurrence order
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_Order001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_Order001 begin.");
+    UnifiedData data;
+    auto file1 = std::make_shared<File>("file:///data/a.gif");
+    auto file2 = std::make_shared<File>("file:///data/b.jpg");
+    auto file3 = std::make_shared<File>("file:///data/c.png");
+    data.AddRecord(file1);
+    data.AddRecord(file2);
+    data.AddRecord(file3);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    ASSERT_EQ(extensions.size(), 3);
+    EXPECT_EQ(extensions[0], ".gif");
+    EXPECT_EQ(extensions[1], ".jpg");
+    EXPECT_EQ(extensions[2], ".png");
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_Order001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_EmptyData001
+ * @tc.desc: Test empty UnifiedData yields empty extensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_EmptyData001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_EmptyData001 begin.");
+    UnifiedData data;
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_TRUE(extensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_EmptyData001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_Folder001
+ * @tc.desc: Test folder record does not yield extensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_Folder001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_Folder001 begin.");
+    UnifiedData data;
+    auto folder = std::make_shared<Folder>("file:///data/folder.name/");
+    data.AddRecord(folder);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_TRUE(extensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_Folder001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_InvalidUri001
+ * @tc.desc: Test empty URI yields empty extensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_InvalidUri001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_InvalidUri001 begin.");
+    UnifiedData data;
+    auto file = std::make_shared<File>("");
+    data.AddRecord(file);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_TRUE(extensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_InvalidUri001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_LargeFile001
+ * @tc.desc: Test a large file (big size) still yields the correct extension without reading content
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_LargeFile001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_LargeFile001 begin.");
+    UnifiedData data;
+    auto largeFile = std::make_shared<File>("file:///data/storage/el2/base/haps/large_video.mp4");
+    UDDetails details;
+    details.insert({ "large_content", std::string(10 * 1024 * 1024, 'x') });
+    largeFile->SetDetails(details);
+    data.AddRecord(largeFile);
+
+    EXPECT_GT(largeFile->GetSize(), 10 * 1024 * 1024);
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    ASSERT_EQ(extensions.size(), 1);
+    EXPECT_EQ(extensions[0], ".mp4");
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_LargeFile001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_NonFileScheme001
+ * @tc.desc: Test non file:// scheme and relative path yield empty extensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_NonFileScheme001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_NonFileScheme001 begin.");
+    UnifiedData data;
+    auto https = std::make_shared<File>("https://data/storage/el2/base/haps/101.png");
+    auto content = std::make_shared<File>("content://media/external/images/101.jpg");
+    auto relative = std::make_shared<File>("data/storage/el2/base/haps/101.txt");
+    data.AddRecord(https);
+    data.AddRecord(content);
+    data.AddRecord(relative);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_TRUE(extensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_NonFileScheme001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_CaseInsensitive001
+ * @tc.desc: Test case-insensitive dedup and first-occurrence order
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_CaseInsensitive001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_CaseInsensitive001 begin.");
+    UnifiedData data;
+    auto jpg = std::make_shared<File>("file:///data/a.jpg");
+    auto png = std::make_shared<File>("file:///data/b.png");
+    auto jpgUpper = std::make_shared<File>("file:///data/c.JPG");
+    data.AddRecord(jpg);
+    data.AddRecord(png);
+    data.AddRecord(jpgUpper);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    ASSERT_EQ(extensions.size(), 2);
+    EXPECT_EQ(extensions[0], ".jpg");
+    EXPECT_EQ(extensions[1], ".png");
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_CaseInsensitive001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_Backslash001
+ * @tc.desc: Test backslash path separator still yields the correct extension
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_Backslash001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_Backslash001 begin.");
+    UnifiedData data;
+    auto file = std::make_shared<File>("file:///data\\storage\\el2\\base\\haps\\101.png");
+    data.AddRecord(file);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    ASSERT_EQ(extensions.size(), 1);
+    EXPECT_EQ(extensions[0], ".png");
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_Backslash001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_TrailingSlash001
+ * @tc.desc: Test directory URI with trailing slash yields empty extensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_TrailingSlash001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_TrailingSlash001 begin.");
+    UnifiedData data;
+    auto dir = std::make_shared<File>("file:///data/dir/");
+    data.AddRecord(dir);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_TRUE(extensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_TrailingSlash001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_NullRecord001
+ * @tc.desc: Test null record is skipped without yielding extensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_NullRecord001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_NullRecord001 begin.");
+    UnifiedData data;
+    data.AddRecord(nullptr);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    EXPECT_TRUE(extensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_NullRecord001 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FilenameExtensions_FragmentOnly001
+ * @tc.desc: Test fragment without query does not affect the extension
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FilenameExtensions_FragmentOnly001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_FragmentOnly001 begin.");
+    UnifiedData data;
+    auto file = std::make_shared<File>("file:///data/photo.png#frag");
+    data.AddRecord(file);
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+    auto extensions = summary.filenameExtensions;
+    ASSERT_EQ(extensions.size(), 1);
+    EXPECT_EQ(extensions[0], ".png");
+    LOG_INFO(UDMF_TEST, "GetSummary_FilenameExtensions_FragmentOnly001 end.");
 }
 } // OHOS::Test

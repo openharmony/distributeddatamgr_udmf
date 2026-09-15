@@ -35,7 +35,6 @@ constexpr const char *BUNDLE_IN_APP = "udmf.inapp.data";
 static constexpr int KEY_LEN = 32;
 static constexpr int FILE_TYPES_MAX_SIZE = 1024;
 static constexpr std::initializer_list<std::string_view> FILE_TOP_TYPES = { "general.file-uri", "general.file" };
-static constexpr int WITH_SUMMARY_FORMAT_VER = 1;
 using namespace OHOS::DistributedDataDfx;
 using namespace RadarReporter;
 UdmfClient &UdmfClient::GetInstance()
@@ -425,7 +424,7 @@ bool UdmfClient::IsAppropriateType(const Summary &summary, const std::vector<std
             return true;
         }
     }
-    if (summary.version < WITH_SUMMARY_FORMAT_VER) {
+    if (summary.version < SUMMARY_VERSION_FORMAT) {
         return false;
     }
     // when the summary format version is greater than 0, we need to check the file type

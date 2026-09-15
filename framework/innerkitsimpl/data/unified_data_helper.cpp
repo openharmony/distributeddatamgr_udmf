@@ -26,6 +26,7 @@
 #include "udmf_conversion.h"
 #include "udmf_meta.h"
 #include "udmf_utils.h"
+#include "unified_data_extension.h"
 #include "utd_client.h"
 
 namespace OHOS {
@@ -33,68 +34,28 @@ namespace UDMF {
 constexpr mode_t MODE = 0700;
 static constexpr int64_t MAX_IPC_RAW_DATA_SIZE = 127 * 1024 * 1024;
 static constexpr int64_t MAX_SA_DRAG_RECORD_SIZE  = 15 * 1024 * 1024 + 512 * 1024;
-
 constexpr const char *TEMP_UNIFIED_DATA_ROOT_PATH = "data/storage/el2/base/temp/udata";
 constexpr const char *TEMP_UNIFIED_DATA_SUFFIX = ".ud";
-constexpr const char *TEMP_UNIFIED_DATA_FLAG = "temp_udmf_file_flag";
-static constexpr int WITH_SUMMARY_FORMAT_VER = 1;
 static constexpr int64_t FILE_SIZE_OVERHEAD = 10 * 1024 * 1024;
 std::string UnifiedDataHelper::rootPath_ = "";
 
 namespace {
-std::shared_ptr<Object> GetObjectFromRecord(std::shared_ptr<UnifiedRecord> record)
-{
-    if (record == nullptr) {
-        return nullptr;
-    }
-    auto value = record->GetOriginValue();
-    if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
-        record->InitObject();
-        value = record->GetOriginValue();
-    }
-    if (!std::holds_alternative<std::shared_ptr<Object>>(value)) {
-        return nullptr;
-    }
-    return std::get<std::shared_ptr<Object>>(value);
-}
-
-std::string GetFileUriFromRecord(std::shared_ptr<UnifiedRecord> record)
-{
-    std::string uri;
-    auto object = GetObjectFromRecord(record);
-    if (object != nullptr) {
-        object->GetValue(ORI_URI, uri);
-        if (!uri.empty()) {
-            return uri;
-        }
-    }
-    auto value = record == nullptr ? ValueType() : record->GetOriginValue();
-    if (std::holds_alternative<std::string>(value)) {
-        uri = std::get<std::string>(value);
-    }
-    return uri;
-}
-
-bool HasTempUnifiedDataFlag(std::shared_ptr<UnifiedRecord> record)
-{
-    auto object = GetObjectFromRecord(record);
-    if (object == nullptr) {
-        return false;
-    }
-    std::shared_ptr<Object> detailsObj = nullptr;
-    if (!object->GetValue(DETAILS, detailsObj)) {
-        return false;
-    }
-    auto details = ObjectUtils::ConvertToUDDetails(detailsObj);
-    return details.find(TEMP_UNIFIED_DATA_FLAG) != details.end();
-}
-
 std::shared_ptr<UnifiedRecord> CreateTempFileRecord(const std::string &uri, const Summary &summary)
 {
     UDDetails details;
     details.insert(std::make_pair(TEMP_UNIFIED_DATA_FLAG, true));
     for (auto &item : summary.summary) {
         details.insert(std::make_pair(item.first, item.second));
+    }
+    if (!summary.filenameExtensions.empty()) {
+        std::string extensions;
+        for (const auto &ext : summary.filenameExtensions) {
+            if (!extensions.empty()) {
+                extensions += " ";
+            }
+            extensions += ext;
+        }
+        details.insert(std::make_pair(FILENAME_EXTENSIONS, extensions));
     }
 
     auto object = std::make_shared<Object>();
@@ -181,7 +142,8 @@ void UnifiedDataHelper::GetSummary(const UnifiedData &data, Summary &summary)
         }
         CalRecordSummary(*record->GetEntries(), summary);
     }
-    summary.version = WITH_SUMMARY_FORMAT_VER;
+    summary.filenameExtensions = CollectFilenameExtensions(data);
+    summary.version = CURRENT_SUMMARY_VERSION;
     auto properties = data.GetProperties();
     if (properties != nullptr) {
         summary.tag = properties->tag;

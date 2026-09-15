@@ -801,6 +801,175 @@ HWTEST_F(TlvUtilTest, WritingAndReadingSummary_001, TestSize.Level1)
     LOG_INFO(UDMF_TEST, "WritingAndReadingSummary_001 end.");
 }
 
+static bool WriteSummaryManually(TLVObject &tlvObject, const Summary &summary, bool writeExtensions, bool writeVersion)
+{
+    tlvObject.CountHead();
+    TLVUtil::CountBufferSize(summary.summary, tlvObject);
+    TLVUtil::CountBufferSize(summary.totalSize, tlvObject);
+    TLVUtil::CountBufferSize(summary.specificSummary, tlvObject);
+    TLVUtil::CountBufferSize(summary.summaryFormat, tlvObject);
+    if (writeExtensions) {
+        TLVUtil::CountBufferSize(summary.filenameExtensions, tlvObject);
+    }
+    if (writeVersion) {
+        TLVUtil::CountBufferSize(summary.version, tlvObject);
+    }
+    TLVUtil::CountBufferSize(summary.tag, tlvObject);
+    tlvObject.UpdateSize();
+    auto tagCursor = tlvObject.GetCursor();
+    tlvObject.OffsetHead();
+    if (!TLVUtil::Writing(summary.summary, tlvObject, TAG::TAG_SUMMARY_MAP)) {
+        return false;
+    }
+    if (!tlvObject.WriteBasic(TAG::TAG_SUMMARY_SIZE, summary.totalSize)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(summary.specificSummary, tlvObject, TAG::TAG_SUMMARY_SPECIFIC_SUMMARY)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(summary.summaryFormat, tlvObject, TAG::TAG_SUMMARY_SUMMARY_FORMAT)) {
+        return false;
+    }
+    if (writeExtensions && !TLVUtil::Writing(summary.filenameExtensions, tlvObject,
+        TAG::TAG_SUMMARY_FILENAME_EXTENSIONS)) {
+        return false;
+    }
+    if (writeVersion && !tlvObject.WriteBasic(TAG::TAG_SUMMARY_VERSION, summary.version)) {
+        return false;
+    }
+    if (!TLVUtil::Writing(summary.tag, tlvObject, TAG::TAG_SUMMARY_TAG)) {
+        return false;
+    }
+    return tlvObject.WriteBackHead(static_cast<uint16_t>(TAG::TAG_SUMMARY), tagCursor,
+        tlvObject.GetCursor() - tagCursor - sizeof(TLVHead));
+}
+
+/**
+ * @tc.name: ReadingSummaryMissingExtensionsTag001
+ * @tc.desc: test Reading Summary with version==2 but missing filenameExtensions tag
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, ReadingSummaryMissingExtensionsTag001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ReadingSummaryMissingExtensionsTag001 begin.");
+    Summary summary;
+    summary.version = SUMMARY_VERSION_FILENAME_EXTENSIONS;
+    summary.totalSize = 100;
+    summary.summary["general.file"] = 100;
+
+    std::vector<uint8_t> buffer;
+    TLVObject tlvObject(buffer);
+    ASSERT_TRUE(WriteSummaryManually(tlvObject, summary, false, true));
+
+    tlvObject.ResetCursor();
+    Summary output;
+    EXPECT_TRUE(TLVUtil::ReadTlv(output, tlvObject, TAG::TAG_SUMMARY));
+    LOG_INFO(UDMF_TEST, "ReadingSummaryMissingExtensionsTag001 end.");
+}
+
+/**
+ * @tc.name: ReadingSummaryMissingExtensionsTag002
+ * @tc.desc: test Reading Summary with version<2 and missing filenameExtensions tag
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, ReadingSummaryMissingExtensionsTag002, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ReadingSummaryMissingExtensionsTag002 begin.");
+    Summary summary;
+    summary.version = SUMMARY_VERSION_FORMAT;
+    summary.totalSize = 100;
+    summary.summary["general.file"] = 100;
+
+    std::vector<uint8_t> buffer;
+    TLVObject tlvObject(buffer);
+    ASSERT_TRUE(WriteSummaryManually(tlvObject, summary, false, true));
+
+    tlvObject.ResetCursor();
+    Summary output;
+    EXPECT_TRUE(TLVUtil::ReadTlv(output, tlvObject, TAG::TAG_SUMMARY));
+    EXPECT_TRUE(output.filenameExtensions.empty());
+    EXPECT_EQ(output.version, SUMMARY_VERSION_FORMAT);
+    LOG_INFO(UDMF_TEST, "ReadingSummaryMissingExtensionsTag002 end.");
+}
+
+/**
+ * @tc.name: ReadingSummaryMissingVersionTag003
+ * @tc.desc: test Reading Summary without version tag (legacy data)
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, ReadingSummaryMissingVersionTag003, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "ReadingSummaryMissingVersionTag003 begin.");
+    Summary summary;
+    summary.totalSize = 100;
+    summary.summary["general.file"] = 100;
+
+    std::vector<uint8_t> buffer;
+    TLVObject tlvObject(buffer);
+    ASSERT_TRUE(WriteSummaryManually(tlvObject, summary, false, false));
+
+    tlvObject.ResetCursor();
+    Summary output;
+    EXPECT_TRUE(TLVUtil::ReadTlv(output, tlvObject, TAG::TAG_SUMMARY));
+    EXPECT_EQ(output.version, SUMMARY_VERSION_FORMAT);
+    EXPECT_TRUE(output.filenameExtensions.empty());
+    LOG_INFO(UDMF_TEST, "ReadingSummaryMissingVersionTag003 end.");
+}
+
+/**
+ * @tc.name: WritingAndReadingSummaryFilenameExtensions001
+ * @tc.desc: test Summary with non-empty filenameExtensions and version round-trip
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReadingSummaryFilenameExtensions001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReadingSummaryFilenameExtensions001 begin.");
+    Summary summary;
+    summary.summary = { { "general.file", 100 } };
+    summary.totalSize = 100;
+    summary.version = SUMMARY_VERSION_FILENAME_EXTENSIONS;
+    summary.filenameExtensions = { ".jpg", ".png" };
+
+    std::vector<uint8_t> buffer;
+    TLVObject tlvObject(buffer);
+    ASSERT_TRUE(TLVUtil::Writing(summary, tlvObject, TAG::TAG_SUMMARY));
+
+    tlvObject.ResetCursor();
+    Summary output;
+    EXPECT_TRUE(TLVUtil::ReadTlv(output, tlvObject, TAG::TAG_SUMMARY));
+    EXPECT_EQ(output.version, SUMMARY_VERSION_FILENAME_EXTENSIONS);
+    ASSERT_EQ(output.filenameExtensions.size(), 2);
+    EXPECT_EQ(output.filenameExtensions[0], ".jpg");
+    EXPECT_EQ(output.filenameExtensions[1], ".png");
+    EXPECT_EQ(output.summary["general.file"], 100);
+    LOG_INFO(UDMF_TEST, "WritingAndReadingSummaryFilenameExtensions001 end.");
+}
+
+/**
+ * @tc.name: WritingAndReadingSummaryVersion2EmptyExtensions001
+ * @tc.desc: test version 2 Summary with empty filenameExtensions round-trip (present but empty)
+ * @tc.type: FUNC
+ */
+HWTEST_F(TlvUtilTest, WritingAndReadingSummaryVersion2EmptyExtensions001, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "WritingAndReadingSummaryVersion2EmptyExtensions001 begin.");
+    Summary summary;
+    summary.summary = { { "general.file", 100 } };
+    summary.totalSize = 100;
+    summary.version = SUMMARY_VERSION_FILENAME_EXTENSIONS;
+
+    std::vector<uint8_t> buffer;
+    TLVObject tlvObject(buffer);
+    ASSERT_TRUE(TLVUtil::Writing(summary, tlvObject, TAG::TAG_SUMMARY));
+
+    tlvObject.ResetCursor();
+    Summary output;
+    EXPECT_TRUE(TLVUtil::ReadTlv(output, tlvObject, TAG::TAG_SUMMARY));
+    EXPECT_EQ(output.version, SUMMARY_VERSION_FILENAME_EXTENSIONS);
+    EXPECT_TRUE(output.filenameExtensions.empty());
+    LOG_INFO(UDMF_TEST, "WritingAndReadingSummaryVersion2EmptyExtensions001 end.");
+}
+
 /* *
  * @tc.name: WritingAndReadingVersion_001
  * @tc.desc: test Version for Writing And Reading

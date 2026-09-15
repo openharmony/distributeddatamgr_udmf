@@ -21,6 +21,7 @@
 #include "udmf.h"
 #include "uri_permission_util.h"
 #include <mutex>
+#include <vector>
 #include <cstdint>
 
 # define MAX_GENERAL_ENTRY_SIZE (100 * 1024 * 1024)
@@ -45,6 +46,7 @@ enum NdkStructId : std::int64_t {
     UDMF_UNIFIED_DATA_STRUCT_ID,
     UDMF_UNIFIED_RECORD_STRUCT_ID,
     UDMF_UNIFIED_DATA_PROPERTIES_ID,
+    UDMF_SUMMARY_STRUCT_ID,
     UDS_FILE_URI_STRUCT_ID,
     UDS_PIXEL_MAP_STRUCT_ID,
     UDS_ARRAY_BUFFER_STRUCT_ID,
@@ -117,6 +119,13 @@ struct OH_UdmfProperty {
     std::shared_ptr<OHOS::UDMF::UnifiedDataProperties> properties_;
     std::mutex mutex;
     std::string extraStr;
+};
+
+struct OH_UDMF_Summary {
+    const int64_t cid = UDMF_SUMMARY_STRUCT_ID;
+    std::shared_ptr<OHOS::UDMF::Summary> summary_;
+    std::vector<const char*> overviewTypePtrs_;
+    std::vector<const char*> filenameExtensionPtrs_;
 };
 
 struct OH_Udmf_ProgressInfo {

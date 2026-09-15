@@ -40,6 +40,7 @@ private:
     static napi_value GetSummary(napi_env env, napi_callback_info info);
     static napi_value GetTotal(napi_env env, napi_callback_info info);
     static napi_value GetOverview(napi_env env, napi_callback_info info);
+    static napi_value GetFilenameExtensions(napi_env env, napi_callback_info info);
 };
 
 extern "C" {

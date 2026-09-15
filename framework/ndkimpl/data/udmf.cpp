@@ -36,6 +36,7 @@
 #include "udmf_err_code.h"
 #include "udmf_meta.h"
 #include "unified_meta.h"
+#include "unified_data_helper.h"
 #include "utd.h"
 #include "utd_client.h"
 #include "video.h"
@@ -123,6 +124,12 @@ static bool IsUnifiedPropertiesValid(OH_UdmfProperty* properties)
 {
     return properties != nullptr && properties->properties_ != nullptr &&
            properties->cid == NdkStructId::UDMF_UNIFIED_DATA_PROPERTIES_ID;
+}
+
+static bool IsSummaryValid(const OH_UDMF_Summary* summary)
+{
+    return summary != nullptr && summary->cid == NdkStructId::UDMF_SUMMARY_STRUCT_ID &&
+           summary->summary_ != nullptr;
 }
 
 static void AddFileUriTypeIfContains(std::vector<std::string>& types)
@@ -1385,4 +1392,73 @@ OH_UdmfData* OH_UDMF_GetDataElementAt(OH_UdmfData** dataArray, unsigned int inde
         return nullptr;
     }
     return &((*dataArray)[index]);
+}
+
+OH_UDMF_Summary* OH_UDMF_CreateSummary()
+{
+    OH_UDMF_Summary* summary = new (std::nothrow) OH_UDMF_Summary();
+    if (summary == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Memory allocation failed.");
+        return nullptr;
+    }
+
+    summary->summary_ = std::make_shared<Summary>();
+    return summary;
+}
+
+void OH_UDMF_DestroySummary(OH_UDMF_Summary* summary)
+{
+    if (summary == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return;
+    }
+    delete summary;
+}
+
+int OH_UDMF_GetSummaryOverviewTypes(const OH_UDMF_Summary* summary, const char* const** types, int64_t* count)
+{
+    if (!IsSummaryValid(summary) || types == nullptr || count == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    if (summary->overviewTypePtrs_.empty()) {
+        *types = nullptr;
+        *count = 0;
+        return UDMF_E_OK;
+    }
+    *types = summary->overviewTypePtrs_.data();
+    *count = static_cast<int64_t>(summary->overviewTypePtrs_.size());
+    return UDMF_E_OK;
+}
+
+int OH_UDMF_GetSummaryOverviewSize(const OH_UDMF_Summary* summary, const char* type, int64_t* dataSize)
+{
+    if (!IsSummaryValid(summary) || type == nullptr || dataSize == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    auto it = summary->summary_->summary.find(std::string(type));
+    if (it == summary->summary_->summary.end()) {
+        *dataSize = -1;
+        return UDMF_ERR;
+    }
+    *dataSize = it->second;
+    return UDMF_E_OK;
+}
+
+int OH_UDMF_GetSummaryFilenameExtensions(const OH_UDMF_Summary* summary, const char* const** filenameExtensions,
+    int64_t* count)
+{
+    if (!IsSummaryValid(summary) || filenameExtensions == nullptr || count == nullptr) {
+        LOG_ERROR(UDMF_CAPI, "Parameter error.");
+        return UDMF_E_INVALID_PARAM;
+    }
+    if (summary->filenameExtensionPtrs_.empty()) {
+        *filenameExtensions = nullptr;
+        *count = 0;
+        return UDMF_E_OK;
+    }
+    *filenameExtensions = summary->filenameExtensionPtrs_.data();
+    *count = static_cast<int64_t>(summary->filenameExtensionPtrs_.size());
+    return UDMF_E_OK;
 }
