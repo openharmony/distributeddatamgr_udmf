@@ -167,12 +167,12 @@ static int SetUdsAuthPolicy(UdsObject* pThis, uint32_t authPolicy, NdkStructId n
         LOG_ERROR(UDMF_CAPI, "invalid para.");
         return UDMF_E_INVALID_PARAM;
     }
+    std::lock_guard<std::mutex> lock(pThis->mutex);
     if (!IsAuthPolicyValid(authPolicy)) {
         LOG_ERROR(UDMF_CAPI, "invalid auth policy.");
         pThis->obj->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(UriPermission::NONE);
         return UDMF_E_INVALID_PARAM;
     }
-    std::lock_guard<std::mutex> lock(pThis->mutex);
     pThis->obj->value_[URI_AUTHORIZATION_POLICIES] = static_cast<int32_t>(NormalizeAuthPolicy(authPolicy));
     return UDMF_E_OK;
 }
@@ -212,6 +212,7 @@ template <typename T> bool UdsObject::HasObjectKey(const char* paramName)
 template<typename T>
 T* UdsObject::GetUdsValue(const char* paramName)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     if (!HasObjectKey<T>(paramName)) {
         return nullptr;
     }
@@ -221,10 +222,10 @@ T* UdsObject::GetUdsValue(const char* paramName)
 template<typename T>
 int UdsObject::SetUdsValue(const char* paramName, const T &pramValue)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     if (!HasObjectKey<T>(paramName)) {
         return Udmf_ErrCode::UDMF_E_INVALID_PARAM;
     }
-    std::lock_guard<std::mutex> lock(mutex);
     obj->value_[paramName] = pramValue;
     return Udmf_ErrCode::UDMF_E_OK;
 }

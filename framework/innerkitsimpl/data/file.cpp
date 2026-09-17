@@ -20,20 +20,20 @@ namespace UDMF {
 File::File() : UnifiedRecord(FILE)
 {
     SetType(FILE);
-    utdId2_ = GENERAL_FILE_URI;
+    SetUtdId2(GENERAL_FILE_URI);
 }
 
 File::File(const std::string &uri) : UnifiedRecord(FILE)
 {
     SetType(FILE);
     this->oriUri_ = uri;
-    utdId2_ = GENERAL_FILE_URI;
+    SetUtdId2(GENERAL_FILE_URI);
 }
 
 File::File(UDType type, ValueType value) : UnifiedRecord(type, value)
 {
     SetType(FILE);
-    utdId2_ = GENERAL_FILE_URI;
+    SetUtdId2(GENERAL_FILE_URI);
     if (std::holds_alternative<std::string>(value)) {
         oriUri_ = std::get<std::string>(value);
     } else if (std::holds_alternative<std::shared_ptr<Object>>(value)) {
