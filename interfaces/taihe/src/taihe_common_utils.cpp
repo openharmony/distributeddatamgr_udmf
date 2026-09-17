@@ -240,6 +240,7 @@ ValueType ConvertRecordData(ani_env *env, ::taiheChannel::RecordData const& valu
         auto want = std::get<std::shared_ptr<OHOS::AAFwk::Want>>(value);
         if (want == nullptr) {
             LOG_WARN(UDMF_ANI, "<Want> is null");
+            taihe::set_business_error(PARAMETERSERROR, "Want is null");
             return ::taiheChannel::ValueType::make_nullType();
         }
         ani_object wantObj = OHOS::AppExecFwk::WrapWant(taihe::get_env(), *want);
@@ -250,6 +251,7 @@ ValueType ConvertRecordData(ani_env *env, ::taiheChannel::RecordData const& valu
         auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value);
         if (pixelMap == nullptr) {
             LOG_WARN(UDMF_ANI, "<PixelMap> is null");
+            taihe::set_business_error(PARAMETERSERROR, "PixelMap is null");
             return ::taiheChannel::ValueType::make_nullType();
         }
         ani_object pixelMapObj = OHOS::Media::PixelMapTaiheAni::CreateEtsPixelMap(taihe::get_env(), pixelMap);
@@ -351,6 +353,7 @@ ValueType ConvertRecordData(ani_env *env, ::taiheChannel::RecordData const& valu
             auto want = std::get<std::shared_ptr<OHOS::AAFwk::Want>>(value);
             if (want == nullptr) {
                 LOG_WARN(UDMF_ANI, "<Want> is null");
+                taihe::set_business_error(PARAMETERSERROR, "Want is null");
                 recordMap.emplace(key, ::taiheChannel::RecordData::make_nullType());
                 continue;
             }
@@ -362,6 +365,7 @@ ValueType ConvertRecordData(ani_env *env, ::taiheChannel::RecordData const& valu
             auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value);
             if (pixelMap == nullptr) {
                 LOG_WARN(UDMF_ANI, "<PixelMap> is null");
+                taihe::set_business_error(PARAMETERSERROR, "PixelMap is null");
                 recordMap.emplace(key, ::taiheChannel::RecordData::make_nullType());
                 continue;
             }
