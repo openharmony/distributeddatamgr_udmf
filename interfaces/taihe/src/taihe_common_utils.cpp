@@ -238,12 +238,20 @@ ValueType ConvertRecordData(ani_env *env, ::taiheChannel::RecordData const& valu
     }
     if (std::holds_alternative<std::shared_ptr<OHOS::AAFwk::Want>>(value)) {
         auto want = std::get<std::shared_ptr<OHOS::AAFwk::Want>>(value);
+        if (want == nullptr) {
+            LOG_WARN(UDMF_ANI, "<Want> is null");
+            return ::taiheChannel::ValueType::make_nullType();
+        }
         ani_object wantObj = OHOS::AppExecFwk::WrapWant(taihe::get_env(), *want);
         uintptr_t wantPtr = reinterpret_cast<uintptr_t>(wantObj);
         return ::taiheChannel::ValueType::make_object(wantPtr);
     }
     if (std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(value)) {
         auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value);
+        if (pixelMap == nullptr) {
+            LOG_WARN(UDMF_ANI, "<PixelMap> is null");
+            return ::taiheChannel::ValueType::make_nullType();
+        }
         ani_object pixelMapObj = OHOS::Media::PixelMapTaiheAni::CreateEtsPixelMap(taihe::get_env(), pixelMap);
         uintptr_t pixelMapPtr = reinterpret_cast<uintptr_t>(pixelMapObj);
         if (pixelMapPtr != 0) {
@@ -341,12 +349,22 @@ ValueType ConvertRecordData(ani_env *env, ::taiheChannel::RecordData const& valu
             continue;
         } else if (std::holds_alternative<std::shared_ptr<OHOS::AAFwk::Want>>(value)) {
             auto want = std::get<std::shared_ptr<OHOS::AAFwk::Want>>(value);
+            if (want == nullptr) {
+                LOG_WARN(UDMF_ANI, "<Want> is null");
+                recordMap.emplace(key, ::taiheChannel::RecordData::make_nullType());
+                continue;
+            }
             ani_object wantObj = OHOS::AppExecFwk::WrapWant(taihe::get_env(), *want);
             uintptr_t wantPtr = reinterpret_cast<uintptr_t>(wantObj);
             recordMap.emplace(key, ::taiheChannel::RecordData::make_object(wantPtr));
             continue;
         } else if (std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(value)) {
             auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value);
+            if (pixelMap == nullptr) {
+                LOG_WARN(UDMF_ANI, "<PixelMap> is null");
+                recordMap.emplace(key, ::taiheChannel::RecordData::make_nullType());
+                continue;
+            }
             ani_object pixelMapObj = OHOS::Media::PixelMapTaiheAni::CreateEtsPixelMap(taihe::get_env(), pixelMap);
             uintptr_t pixelMapPtr = reinterpret_cast<uintptr_t>(pixelMapObj);
             if (pixelMapPtr != 0) {
