@@ -20,19 +20,19 @@ namespace UDMF {
 Audio::Audio() : Audio("")
 {
     SetType(AUDIO);
-    utdId2_ = GENERAL_FILE_URI;
+    SetUtdId2(GENERAL_FILE_URI);
 }
 
 Audio::Audio(const std::string &uri) : File(uri)
 {
     SetType(AUDIO);
-    utdId2_ = GENERAL_FILE_URI;
+    SetUtdId2(GENERAL_FILE_URI);
 }
 
 Audio::Audio(UDType type, ValueType value) : File(type, value)
 {
     SetType(AUDIO);
-    utdId2_ = GENERAL_FILE_URI;
+    SetUtdId2(GENERAL_FILE_URI);
 }
 
 void Audio::InitObject()
