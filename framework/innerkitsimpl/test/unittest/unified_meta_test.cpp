@@ -743,6 +743,32 @@ HWTEST_F(UnifiedMetaTest, GetValueSize003, TestSize.Level1)
     EXPECT_EQ(ret, std::visit([] (const auto &val) { return sizeof(val); }, value));
 }
 
+/**
+ * @tc.name: GetValueSize004
+ * @tc.desc: Abnormal testcase of GetValueSize, pixelMap is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedMetaTest, GetValueSize004, TestSize.Level1)
+{
+    ValueType value = std::shared_ptr<OHOS::Media::PixelMap>(nullptr);
+    bool isCalValueType = true;
+    int64_t ret = ObjectUtils::GetValueSize(value, isCalValueType);
+    EXPECT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: GetValueSize005
+ * @tc.desc: Abnormal testcase of GetValueSize, want is nullptr
+ * @tc.type:
+ */
+HWTEST_F(UnifiedMetaTest, GetValueSize005, TestSize.Level1)
+{
+    ValueType value = std::shared_ptr<OHOS::AAFwk::Want>(nullptr);
+    bool isCalValueType = true;
+    int64_t ret = ObjectUtils::GetValueSize(value, isCalValueType);
+    EXPECT_EQ(ret, 0);
+}
+
 /* *
 * @tc.name: GetObjectValueSize_001
 * @tc.desc: Abnormal test of GetObjectValueSize, key is DETAILS

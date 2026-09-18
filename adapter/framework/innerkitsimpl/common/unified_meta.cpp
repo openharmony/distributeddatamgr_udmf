@@ -799,6 +799,10 @@ int64_t ObjectUtils::GetValueSize(const ValueType &value, bool isCalValueType)
     }
     if (std::holds_alternative<std::shared_ptr<OHOS::Media::PixelMap>>(value)) {
         auto pixelMap = std::get<std::shared_ptr<OHOS::Media::PixelMap>>(value);
+        if (pixelMap == nullptr) {
+            LOG_WARN(UDMF_FRAMEWORK, "PixelMap is null when GetValueSize!");
+            return 0;
+        }
         return pixelMap->GetByteCount();
     }
     if (std::holds_alternative<std::shared_ptr<OHOS::AAFwk::Want>>(value)) {
