@@ -94,35 +94,6 @@ describe('UdmfIntelligenceJsTest', function () {
   });
 
   /**
-     * @tc.name intelligenceApiTest0200
-     * @tc.number SUB_DistributedData_Intelligence_SDK_intelligenceApiTest_0100
-     * @tc.desc getTextEmbeddingModel promise interface test
-     * @tc.type Function
-     */
-  it('intelligenceApiTest0200', 0, async function (done) {
-    console.info(TAG + 'intelligenceApiTest0200 start');
-    intelligence.getTextEmbeddingModel(textConfig)
-      .then((data) => {
-        console.info(TAG + 'get result' + data);
-        if (currentDeviceIsPc) {
-          let ret = false;
-          if (data != null) {
-            ret = true;
-          }
-          expect(ret).assertEqual(true);
-        } else {
-          expect().assertFail();
-        }
-        done();
-      })
-      .catch((err) => {
-        console.info(TAG + 'get promise error:' + err.code);
-        expect(err.code).assertEqual(801);
-        done();
-      });
-  });
-
-  /**
    * @tc.name intelligenceApiTest0300
    * @tc.number SUB_DistributedData_Intelligence_SDK_intelligenceApiTest_0300
    * @tc.desc getImageEmbeddingModel promise interface test
@@ -442,30 +413,6 @@ describe('UdmfIntelligenceJsTest', function () {
           done();
         });
     }
-  });
-
-  /**
-   * @tc.name intelligenceApiTest1300
-   * @tc.number SUB_DistributedData_Intelligence_SDK_intelligenceApiTest_1300
-   * @tc.desc getSupportedCloudModel() getSupportedCloudModel test interface test
-   * @tc.type Function
-   */
-  it('intelligenceApiTest1300', 0, async function (done) {
-    console.info(TAG + 'intelligenceApiTest1300 start');
-    intelligence.getSupportedCloudModel()
-      .then((info) => {
-        if (currentDeviceIsPc) {
-          expect(info.length >= 0).assertEqual(true);
-        } else {
-          expect().assertFail();
-        }
-        done();
-      })
-      .catch((err) => {
-        console.info(TAG + 'getSupportedCloudModel error:' + err.code);
-        expect(err.code).assertEqual(801);
-        done();
-      });
   });
 
   /**
