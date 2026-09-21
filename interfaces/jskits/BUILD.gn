@@ -196,6 +196,7 @@ ohos_static_library("udmf_js_common") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "ability_runtime:napi_common",
+    "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image",
     "ipc:ipc_single",
