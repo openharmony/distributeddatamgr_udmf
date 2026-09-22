@@ -196,6 +196,44 @@ HWTEST_F(UnifiedDataExtensionTest, CollectFilenameExtensions_EmptyData008, TestS
 }
 
 /**
+ * @tc.name: CollectFilenameExtensions_FileUri009
+ * @tc.desc: general.file-uri (FILE_URI) records yield their extensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataExtensionTest, CollectFilenameExtensions_FileUri009, TestSize.Level1)
+{
+    UnifiedData data;
+    std::shared_ptr<Object> fileUriObj = std::make_shared<Object>();
+    fileUriObj->value_[ORI_URI] = "file:///data/a.jpg";
+    data.AddRecord(std::make_shared<UnifiedRecord>(UDType::FILE_URI, fileUriObj));
+
+    auto extensions = CollectFilenameExtensions(data);
+    ASSERT_EQ(extensions.size(), 1);
+    EXPECT_EQ(extensions[0], ".jpg");
+}
+
+/**
+ * @tc.name: CollectFilenameExtensions_FileUriCaseDedup010
+ * @tc.desc: general.file-uri extensions are lowercased and deduplicated
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataExtensionTest, CollectFilenameExtensions_FileUriCaseDedup010, TestSize.Level1)
+{
+    UnifiedData data;
+    std::shared_ptr<Object> jpgObj = std::make_shared<Object>();
+    jpgObj->value_[ORI_URI] = "file:///data/a.JPG";
+    std::shared_ptr<Object> pngObj = std::make_shared<Object>();
+    pngObj->value_[ORI_URI] = "file:///data/b.png";
+    data.AddRecord(std::make_shared<UnifiedRecord>(UDType::FILE_URI, jpgObj));
+    data.AddRecord(std::make_shared<UnifiedRecord>(UDType::FILE_URI, pngObj));
+
+    auto extensions = CollectFilenameExtensions(data);
+    ASSERT_EQ(extensions.size(), 2);
+    EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".jpg"), extensions.end());
+    EXPECT_NE(std::find(extensions.begin(), extensions.end(), ".png"), extensions.end());
+}
+
+/**
  * @tc.name: CollectFilenameExtensions003
  * @tc.desc: Test CollectFilenameExtensions yields extensions for every file subtype
  * @tc.type: FUNC
