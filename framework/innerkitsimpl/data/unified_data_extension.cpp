@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace UDMF {
-constexpr UDType FILE_SUMMARY_TYPES[] = { FILE, AUDIO, FOLDER, IMAGE, VIDEO };
+constexpr UDType FILE_SUMMARY_TYPES[] = { FILE, FILE_URI, AUDIO, FOLDER, IMAGE, VIDEO };
 constexpr size_t MAX_FILENAME_EXTENSION_SIZE = 127;
 
 std::shared_ptr<Object> GetObjectFromRecord(const std::shared_ptr<UnifiedRecord> &record)

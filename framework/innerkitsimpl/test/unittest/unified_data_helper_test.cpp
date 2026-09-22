@@ -513,6 +513,50 @@ HWTEST_F(UnifiedDataHelperTest, GetSummary_FileExtensions004, TestSize.Level1)
 }
 
 /**
+ * @tc.name: GetSummary_FileExtensions005
+ * @tc.desc: Test GetSummary extracts extension from a general.file-uri (FILE_URI) record
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FileExtensions005, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FileExtensions005 begin.");
+    UnifiedData data;
+    std::shared_ptr<Object> fileUriObj = std::make_shared<Object>();
+    fileUriObj->value_[ORI_URI] = "file:///data/test.jpg";
+    data.AddRecord(std::make_shared<UnifiedRecord>(UDType::FILE_URI, fileUriObj));
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+
+    auto extensions = summary.filenameExtensions;
+    EXPECT_EQ(extensions.size(), 1);
+    if (!extensions.empty()) {
+        EXPECT_EQ(extensions[0], ".jpg");
+    }
+    LOG_INFO(UDMF_TEST, "GetSummary_FileExtensions005 end.");
+}
+
+/**
+ * @tc.name: GetSummary_FileExtensions006
+ * @tc.desc: Test GetSummary skips non-file URI of a general.file-uri record
+ * @tc.type: FUNC
+ */
+HWTEST_F(UnifiedDataHelperTest, GetSummary_FileExtensions006, TestSize.Level1)
+{
+    LOG_INFO(UDMF_TEST, "GetSummary_FileExtensions006 begin.");
+    UnifiedData data;
+    std::shared_ptr<Object> fileUriObj = std::make_shared<Object>();
+    fileUriObj->value_[ORI_URI] = "http://example.com/test.jpg";
+    data.AddRecord(std::make_shared<UnifiedRecord>(UDType::FILE_URI, fileUriObj));
+
+    Summary summary;
+    UnifiedDataHelper::GetSummary(data, summary);
+
+    EXPECT_TRUE(summary.filenameExtensions.empty());
+    LOG_INFO(UDMF_TEST, "GetSummary_FileExtensions006 end.");
+}
+
+/**
  * @tc.name: GetSummary_FilenameExtensions_MultiDot001
  * @tc.desc: Test archive.tar.gz returns the last extension .gz
  * @tc.type: FUNC
