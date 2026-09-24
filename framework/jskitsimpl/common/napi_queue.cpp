@@ -179,7 +179,9 @@ void NapiQueue::onComplete(napi_env env, napi_status status, void *data)
     }
     GenerateOutput(actxt->ctxt.get());
     LOG_DEBUG(UDMF_KITS_NAPI, "NapiQueue::AsyncWork finish output");
-    napi_delete_reference(env, actxt->ctxt->callbackRef);
+    if (actxt->ctxt->callbackRef != nullptr) {
+        napi_delete_reference(env, actxt->ctxt->callbackRef);
+    }
     napi_delete_async_work(env, actxt->work);
     delete actxt;
 }
